@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>OldBit.ZXSpectrum.Emulator</AssemblyName>
+        <RootNamespace>OldBit.ZXSpectrum.Emulator</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Remove="Rom\48.rom" />
+      <EmbeddedResource Include="Rom\48.rom" />
+      <None Remove="Rom\128-0.rom" />
+      <EmbeddedResource Include="Rom\128-0.rom" />
+      <None Remove="Rom\128-1.rom" />
+      <EmbeddedResource Include="Rom\128-1.rom" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="OldBit.Z80.Net">
+        <HintPath>..\..\..\Z80.Net\src\Z80.Net\bin\Debug\net8.0\OldBit.Z80.Net.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>
