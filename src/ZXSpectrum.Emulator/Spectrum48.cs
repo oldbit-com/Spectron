@@ -38,7 +38,7 @@ public class Spectrum48
         return reader.ReadBytes((int)stream.Length);
     }
 
-    private void TimerTick(object? data)
+    private void InterruptHandler(object? data)
     {
         lock (_timerLock)
         {
@@ -54,20 +54,7 @@ public class Spectrum48
     {
         const double frequency = 3.5 * 1000000 / 69888;
         var period = TimeSpan.FromMicroseconds(1 / frequency * 1000000);
-
-        //Trace.Listeners.Add(new TextWriterTraceListener("/Users/voytas/Projects/ZX/ZXSpectrum/src/ZXSpectrum.Emulator/trace.log"));
-
-        // Task.Factory.StartNew(() =>
-        // {
-        //     while (true)
-        //     {
-        //         TimerTick(null);
-        //         Thread.Sleep(period);
-        //     }
-        // });
-
-       //_stopwatch.Start();
-       _timer = new Timer(TimerTick, null, TimeSpan.FromSeconds(2), period);
+       _timer = new Timer(InterruptHandler, null, TimeSpan.FromSeconds(2), period);
     }
 
     public void Stop()

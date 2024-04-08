@@ -1,4 +1,5 @@
 using OldBit.Z80.Net;
+using OldBit.Z80.Net.Extensions;
 using OldBit.ZXSpectrum.Emulator.Screen;
 
 namespace OldBit.ZXSpectrum.Emulator.Hardware;
@@ -12,7 +13,6 @@ public class Bus(
 {
     private const byte KeyboardPort = 0xFE;
 
-    private readonly Keyboard _keyboard = keyboard;
     private readonly Beeper _beeper = beeper;
     private readonly Memory48 _memory = memory;
     private readonly Border _border = border;
@@ -20,9 +20,11 @@ public class Bus(
 
     public byte Read(Word address)
     {
-        if (IsKeyboardPort(address))
-        {
+        var (hiAddress, loAddress) = address;
 
+        if (IsKeyboardPort(loAddress))
+        {
+            return keyboard.GetKey(hiAddress);
         }
 
         return 0xFF;
@@ -36,7 +38,7 @@ public class Bus(
         }
     }
 
-    private static bool IsKeyboardPort(Word address) => (address & 0xFF) == KeyboardPort;
+    private static bool IsKeyboardPort(byte address) => address == KeyboardPort;
 
     private static bool IsUlaPort(Word address) => (address & 0x01) == 0x00;
 }

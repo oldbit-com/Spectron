@@ -20,6 +20,8 @@ public class ScreenRenderer
     private readonly byte[] _pixelData = new byte[TotalHeight * TotalWidth * BytesPerPixel];
     private readonly int[] _clockCycleAtPixel = new int[TotalHeight * TotalWidth];
     private readonly byte[] _bits = [0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01];
+    private readonly Color[] _paperColors = new Color[256];
+    private readonly Color[] _inkColors = new Color[256];
     private readonly Border _border = new();
 
     private int _currentFrame = 1;
@@ -28,10 +30,18 @@ public class ScreenRenderer
     {
         for (var line = 0; line < TotalHeight; line++)
         {
+            // Pre-calculate the clock cycle for each pixel
             for (var pixel = 0; pixel < TotalWidth; pixel++)
             {
                 // 14366 is the first pixel of the first line of the screen
                 _clockCycleAtPixel[line * TotalWidth + pixel] = (64 + line) * CyclesPerLine + (48 + pixel) / 2;
+            }
+
+            // Pre-calculate the paper and ink colors for each attribute
+            for (var i = 0; i < 256; i++)
+            {
+                _paperColors[i] = Colors.PaperColors[i & 0b01111000];
+                _inkColors[i] = Colors.InkColors[i & 0b01000111];
             }
         }
     }
@@ -63,8 +73,8 @@ public class ScreenRenderer
                 var value = screen[address + column];
 
                 var flashBitSet = (attribute & 0x80) != 0 && _currentFrame >= 32;
-                var paperColor = Colors.PaperColors[attribute & 0b01111000];
-                var inkColor = Colors.InkColors[attribute & 0b01000111];
+                var paperColor = _paperColors[attribute];
+                var inkColor = _inkColors[attribute];
 
                 foreach (var pixelBit in _bits)
                 {

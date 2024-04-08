@@ -1,4 +1,4 @@
-using System.Linq;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
@@ -8,12 +8,13 @@ using Avalonia.Platform;
 using Avalonia.Threading;
 using OldBit.ZXSpectrum.Emulator;
 using OldBit.ZXSpectrum.Emulator.Screen;
+using OldBit.ZXSpectrum.Helpers;
 
 namespace OldBit.ZXSpectrum.Views;
 
 public partial class MainWindow : Window
 {
-    private Spectrum48? _spectrum;
+    private Spectrum48 _spectrum = default!;
 
     public MainWindow()
     {
@@ -42,11 +43,19 @@ public partial class MainWindow : Window
 
     private void OnKeyDown(object? sender, KeyEventArgs e)
     {
-
+        var spectrumKey = KeyMappings.ToSpectrumKey(e);
+        if (spectrumKey.Count > 0)
+        {
+            _spectrum.Keyboard.KeyDown(spectrumKey);
+        }
     }
 
     private void OnKeyUp(object? sender, KeyEventArgs e)
     {
-
+        var spectrumKey = KeyMappings.ToSpectrumKey(e);
+        if (spectrumKey.Count > 0)
+        {
+            _spectrum.Keyboard.KeyUp(spectrumKey);
+        }
     }
 }
