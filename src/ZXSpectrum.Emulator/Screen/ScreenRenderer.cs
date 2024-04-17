@@ -2,6 +2,7 @@ namespace OldBit.ZXSpectrum.Emulator.Screen;
 
 public class ScreenRenderer
 {
+    private readonly Border _border;
     internal const int BorderTop = 64;              // top border height
     internal const int BorderBottom = 56;           // bottom border height
     internal const int BorderLeft = 48;             // left border width
@@ -22,12 +23,13 @@ public class ScreenRenderer
     private readonly byte[] _bits = [0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01];
     private readonly Color[] _paperColors = new Color[256];
     private readonly Color[] _inkColors = new Color[256];
-    private readonly Border _border = new();
 
     private int _currentFrame = 1;
 
-    public ScreenRenderer()
+    public ScreenRenderer(Border border)
     {
+        _border = border;
+
         for (var line = 0; line < TotalHeight; line++)
         {
             // Pre-calculate the clock cycle for each pixel

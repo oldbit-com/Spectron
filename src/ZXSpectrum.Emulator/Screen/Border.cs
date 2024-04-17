@@ -10,6 +10,7 @@ public class Border
     // Hash 1234 - 4593
     // Hash 4593 - 8374
 
+
     public void ChangeBorderColor(byte color, int clockCycle)
     {
         var borderColor = Colors.BorderColors[(byte)(color & 0x07)];
