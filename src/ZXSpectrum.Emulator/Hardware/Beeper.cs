@@ -8,13 +8,7 @@ public class Beeper
 {
     private int _lastEarValue;
     private int _lastCycles;
-    private AudioQueuePlayer _audioQueuePlayer;
-
-    public Beeper()
-    {
-        _audioQueuePlayer = new AudioQueuePlayer();
-        _audioQueuePlayer.Create(44100, 1);
-    }
+    private readonly AudioQueuePlayer _audioQueuePlayer = new(44100, 1);
 
     public void UpdateBeeper(byte value, int cycles)
     {
@@ -43,7 +37,7 @@ public class Beeper
     public void Play()
     {
         var data = Demo.GenerateSinWave(48000, 2);
-        _audioQueuePlayer.Play(data);
+       // _audioQueuePlayer.Play(data);
         Console.WriteLine("Done playing!");
 
         //BufferedWaveProvider bufferedWaveProvider = new(new WaveFormat(44100, 16, 1));
