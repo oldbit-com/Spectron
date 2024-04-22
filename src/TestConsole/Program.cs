@@ -1,21 +1,25 @@
-﻿using ZXSpectrum.Audio;
+﻿using TestConsole;
 using ZXSpectrum.Audio.MacOS;
 
-var data = Demo.GenerateSinWave(48000, 2);
+var data = new float[3072];
+
+// float, float, float, float
+// 4      4      4      4  bytes
+
+var generator = new SinWaveGenerator(44100, 2);
+generator.Generate(data, data.Length);
 
 var task = Task.Run(async () =>
 {
     Console.WriteLine("Start playing!");
 
-    using var audioQueue = new AudioQueuePlayer(44100, 1);
+    using var audioQueue = new AudioQueuePlayer(44100, 2);
     audioQueue.Start();
 
-    for (var i = 1; i <= 10; i++)
+    for (var i = 1; i <= 20; i++)
     {
         Console.WriteLine($"Playing {i}");
         await audioQueue.Enqueue(data);
-
-        Thread.Sleep(500);
     }
 
     audioQueue.Stop();

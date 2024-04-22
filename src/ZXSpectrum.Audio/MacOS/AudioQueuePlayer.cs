@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Channels;
 
@@ -9,13 +8,14 @@ public sealed class AudioQueuePlayer: IDisposable
 {
     private const int FloatSizeInBytes = sizeof(float);
     private const int MaxBuffers = 4;
+    private const int DefaultBufferSize = 12288;
 
     private readonly IntPtr _audioQueue;
     private readonly List<IntPtr> _allocatedAudioBuffers;
     private readonly Channel<IntPtr> _availableAudioBuffers;
     private GCHandle _gch;
 
-    public AudioQueuePlayer(int sampleRate, int channelCount, int bufferSize = 12288)
+    public AudioQueuePlayer(int sampleRate, int channelCount, int bufferSize = DefaultBufferSize)
     {
         _gch = GCHandle.Alloc(this);
 
@@ -61,22 +61,21 @@ public sealed class AudioQueuePlayer: IDisposable
         }
     }
 
-    public async Task Enqueue(byte[] data, CancellationToken cancellationToken = default)
+    public void Stop()
+    {
+        AudioToolbox.AudioQueueStop(_audioQueue, true);
+    }
+
+    public async Task Enqueue(float[] data, CancellationToken cancellationToken = default)
     {
         var buffer = await _availableAudioBuffers.Reader.ReadAsync(cancellationToken);
-
-        var bufferFloat = new float[3072];
-        for (var i = 0; i < bufferFloat.Length; i++)
-        {
-            bufferFloat[i] = data[i] / 255f;
-        }
 
         unsafe
         {
             var audioQueueBuffer = (AudioQueueBuffer*)buffer;
-            audioQueueBuffer->AudioDataByteSize = audioQueueBuffer->AudioDataBytesCapacity;
+            audioQueueBuffer->AudioDataByteSize = (uint)(data.Length * FloatSizeInBytes);
 
-            Marshal.Copy(bufferFloat, 0, audioQueueBuffer->AudioData, bufferFloat.Length);
+            Marshal.Copy(data, 0, audioQueueBuffer->AudioData, data.Length);
 
             var status = AudioToolbox.AudioQueueEnqueueBuffer(_audioQueue, audioQueueBuffer, 0, null);
             if (status != 0)
@@ -84,11 +83,6 @@ public sealed class AudioQueuePlayer: IDisposable
                 throw new AudioPlayerException($"Failed to enqueue buffer: {status}");
             }
         }
-    }
-
-    public void Stop()
-    {
-        AudioToolbox.AudioQueueStop(_audioQueue, true);
     }
 
     private IntPtr AudioQueueNewOutput(AudioStreamBasicDescription description)
@@ -134,8 +128,6 @@ public sealed class AudioQueuePlayer: IDisposable
         {
             player._availableAudioBuffers.Writer.TryWrite(buffer);
         }
-
-        Console.WriteLine("AudioQueueOutputCallback");
     }
 
     private void ReleaseUnmanagedResources()
@@ -151,7 +143,7 @@ public sealed class AudioQueuePlayer: IDisposable
             status = AudioToolbox.AudioQueueFreeBuffer(_audioQueue, buffer);
             if (status != 0)
             {
-                Debug.WriteLine($"Failed to free audio queue buffer: {status}");
+                Trace.WriteLine($"Failed to free audio queue buffer: {status}");
             }
         }
 
@@ -160,7 +152,7 @@ public sealed class AudioQueuePlayer: IDisposable
         status = AudioToolbox.AudioQueueDispose(_audioQueue, true);
         if (status != 0)
         {
-            Debug.WriteLine($"Failed to free audio queue: {status}");
+            Trace.WriteLine($"Failed to free audio queue: {status}");
         }
     }
 

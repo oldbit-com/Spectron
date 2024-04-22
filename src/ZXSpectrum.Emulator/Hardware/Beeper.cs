@@ -36,7 +36,7 @@ public class Beeper
 
     public void Play()
     {
-        var data = Demo.GenerateSinWave(48000, 2);
+       // var data = Demo.GenerateSinWave(48000, 2);
        // _audioQueuePlayer.Play(data);
         Console.WriteLine("Done playing!");
 

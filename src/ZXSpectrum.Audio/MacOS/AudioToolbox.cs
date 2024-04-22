@@ -4,6 +4,9 @@ namespace ZXSpectrum.Audio.MacOS;
 
 using OSStatus = int;
 
+/// <summary>
+/// Native methods imported from AudioToolbox MacOS library.
+/// </summary>
 internal static partial class AudioToolbox
 {
     private const string AudioToolboxLibrary = "/System/Library/Frameworks/AudioToolbox.framework/AudioToolbox";
@@ -32,4 +35,3 @@ internal static partial class AudioToolbox
     internal static unsafe partial OSStatus AudioQueueEnqueueBuffer(IntPtr audioQueue, AudioQueueBuffer* audioQueueBuffer, int packets,
         AudioStreamPacketDescription* packetDescriptions);
 }
-

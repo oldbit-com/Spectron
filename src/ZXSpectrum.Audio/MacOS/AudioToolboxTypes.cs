@@ -24,12 +24,8 @@ internal enum AudioFormatType : uint
 [Flags]
 internal enum AudioFormatFlags : uint
 {
-    None = 0,
     AudioFormatFlagIsFloat = 1,
 }
-
-[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-internal unsafe delegate void AudioQueueOutputCallback(IntPtr userData, IntPtr audioQueue, AudioQueueBuffer* buffer);
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct AudioTimeStamp
