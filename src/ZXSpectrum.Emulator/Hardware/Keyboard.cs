@@ -74,7 +74,6 @@ public class Keyboard
                 _keyStates[mapping.Port] &= (byte)~mapping.Bit;
             }
         }
-
     }
 
     public void KeyUp(IEnumerable<SpectrumKey> keys)

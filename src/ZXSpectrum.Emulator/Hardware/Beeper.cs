@@ -1,19 +1,26 @@
-using NAudio.Wave;
-using ZXSpectrum.Audio;
-using ZXSpectrum.Audio.MacOS;
+using OldBit.Beep;
 
 namespace OldBit.ZXSpectrum.Emulator.Hardware;
 
 public class Beeper
 {
+    private const int CyclesPerSample = 8;
+
     private int _lastEarValue;
-    private int _lastCycles;
-    private readonly AudioQueuePlayer _audioQueuePlayer = new(44100, 1);
+    private long _lastCycles;
+    private byte _lastAmplitude;
+    private readonly AudioPlayer _audioPlayer;
 
-    public void UpdateBeeper(byte value, int cycles)
+    public Beeper(float clockMHz)
     {
-        var earValue= value & 0x10;
+        var sampleRate = clockMHz * 1000000 / CyclesPerSample;
+        _audioPlayer = new AudioPlayer(AudioFormat.Unsigned8Bit, (int)sampleRate, 1);
+        _audioPlayer.Start();
+    }
 
+    public void UpdateBeeper(byte value, long cycles)
+    {
+        var earValue = value & 0x10;
         if (earValue == _lastEarValue)
         {
             return;
@@ -23,14 +30,24 @@ public class Beeper
         var duration = cycles - _lastCycles;
         _lastCycles = cycles;
 
-        if (duration > 0)
+        if (duration == 0)
         {
+            return;
         }
+
+        _lastAmplitude = _lastAmplitude == 0 ? (byte)0xFF : (byte)0;
+        var length = (int)(duration / CyclesPerSample);
+
+        Task.Run(async() =>
+        {
+            await _audioPlayer.PlayAsync(Enumerable.Repeat(_lastAmplitude, length));
+        });
+
     }
 
     public void Start()
     {
-        _audioQueuePlayer.Start();
+
     }
 
 
@@ -38,7 +55,7 @@ public class Beeper
     {
        // var data = Demo.GenerateSinWave(48000, 2);
        // _audioQueuePlayer.Play(data);
-        Console.WriteLine("Done playing!");
+      //  Console.WriteLine("Done playing!");
 
         //BufferedWaveProvider bufferedWaveProvider = new(new WaveFormat(44100, 16, 1));
 

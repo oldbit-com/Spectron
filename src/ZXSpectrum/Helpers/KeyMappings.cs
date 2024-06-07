@@ -47,8 +47,10 @@ public static class KeyMappings
             Key.D8 => [SpectrumKey.D8],
             Key.D9 => [SpectrumKey.D9],
             Key.LeftShift => [SpectrumKey.CapsShift],
+            Key.RightShift => [SpectrumKey.CapsShift],
             Key.Enter => [SpectrumKey.Enter],
-            Key.RightShift => [SpectrumKey.SymbolShift],
+            Key.RightAlt => [SpectrumKey.SymbolShift],
+            Key.LeftAlt => [SpectrumKey.SymbolShift],
             Key.Space => [SpectrumKey.Space],
             Key.Back => [SpectrumKey.CapsShift, SpectrumKey.D0],
             _ => []

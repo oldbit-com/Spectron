@@ -6,11 +6,12 @@ namespace OldBit.ZXSpectrum.Emulator;
 
 public class Spectrum48
 {
+    private const float ClockMHz = 3.5f;
     private readonly Keyboard _keyboard = new();
     private readonly Border _border = new();
     private readonly ScreenRenderer _screenRenderer;
     private readonly Memory48 _memory;
-    private readonly Beeper _beeper = new();
+    private readonly Beeper _beeper;
     private readonly Z80.Net.Z80 _z80;
     private Timer? _timer;
     private readonly object _timerLock = new();
@@ -22,6 +23,7 @@ public class Spectrum48
         _memory = new Memory48(rom);
 
         _z80 = new Z80.Net.Z80(_memory);
+        _beeper = new Beeper(ClockMHz);
         var bus = new Bus(_keyboard, _beeper, _border, _z80.Cycles);
         _z80.AddBus(bus);
     }
