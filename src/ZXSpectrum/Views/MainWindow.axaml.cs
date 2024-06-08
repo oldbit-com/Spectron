@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
@@ -52,6 +54,7 @@ public partial class MainWindow : Window
         var spectrumKey = KeyMappings.ToSpectrumKey(e);
         if (spectrumKey.Count > 0)
         {
+            Console.WriteLine($"Key down: {string.Join(',', spectrumKey.Select(k => k.ToString()))}");
             _spectrum.Keyboard.KeyDown(spectrumKey);
         }
     }

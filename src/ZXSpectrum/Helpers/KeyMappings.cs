@@ -52,7 +52,16 @@ public static class KeyMappings
             PhysicalKey.AltLeft => [SpectrumKey.SymbolShift],
             PhysicalKey.AltRight => [SpectrumKey.SymbolShift],
             PhysicalKey.Space => [SpectrumKey.Space],
+
+            // Extra keys on standard keyboard mapped to ZX Spectrum keys
             PhysicalKey.Backspace => [SpectrumKey.CapsShift, SpectrumKey.D0],
+            PhysicalKey.Comma => [SpectrumKey.SymbolShift, SpectrumKey.N],
+            PhysicalKey.Period => [SpectrumKey.SymbolShift, SpectrumKey.M],
+            PhysicalKey.Semicolon => [SpectrumKey.SymbolShift, SpectrumKey.O],
+            PhysicalKey.ArrowLeft => [SpectrumKey.CapsShift, SpectrumKey.D5],
+            PhysicalKey.ArrowDown => [SpectrumKey.CapsShift, SpectrumKey.D6],
+            PhysicalKey.ArrowUp => [SpectrumKey.CapsShift, SpectrumKey.D7],
+            PhysicalKey.ArrowRight => [SpectrumKey.CapsShift, SpectrumKey.D8],
             _ => []
         };
     }

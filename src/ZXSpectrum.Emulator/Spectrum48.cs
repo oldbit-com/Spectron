@@ -46,8 +46,6 @@ public class Spectrum48
 
             var pixels = _screenRenderer.Render(_memory.Screen);
             OnScreenUpdate(pixels);
-
-            _beeper.Play();
         }
     }
 
@@ -56,12 +54,11 @@ public class Spectrum48
         const double frequency = 3.5 * 1000000 / 69888;
         var period = TimeSpan.FromMicroseconds(1 / frequency * 1000000);
        _timer = new Timer(InterruptHandler, null, TimeSpan.FromSeconds(2), period);
-
-      // _beeper.Play();
     }
 
     public void Stop()
     {
+        _beeper.Stop();
         _timer?.Dispose();
     }
 
