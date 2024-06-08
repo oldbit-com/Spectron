@@ -15,8 +15,23 @@
         <viewModels:MainWindowViewModel/>
     </Design.DataContext>
 
-    <Border Height="624" Width="704" Background="Beige">
-        <Image x:Name="ScreenImage" />
-    </Border>
+    <NativeMenu.Menu>
+        <NativeMenu>
+            <NativeMenuItem Header="File">
+                <NativeMenu>
+                    <NativeMenuItem Header="Open..." Gesture="Cmd+O" Command="{Binding OpenFileCommand}" />
+                    <!-- <NativeMenuItem Header="Open Recent"> -->
+                    <!--     <NativeMenu NeedsUpdate="OpenRecent_OnNeedsUpdate" /> -->
+                    <!-- </NativeMenuItem> -->
+                </NativeMenu>
+            </NativeMenuItem>
+        </NativeMenu>
+    </NativeMenu.Menu>
+
+    <Grid>
+        <Border Height="624" Width="704" Background="Beige">
+            <Image x:Name="ScreenImage" />
+        </Border>
+    </Grid>
 
 </Window>

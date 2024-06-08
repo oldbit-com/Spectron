@@ -5,10 +5,9 @@ using OldBit.ZXSpectrum.Emulator.Screen;
 
 namespace OldBit.ZXSpectrum.Emulator;
 
-public class Spectrum48
+public class Spectrum48 : ISpectrum
 {
     private const float ClockMHz = 3.5f;
-    private readonly Keyboard _keyboard = new();
     private readonly Border _border = new();
     private readonly ScreenRenderer _screenRenderer;
     private readonly Memory48 _memory;
@@ -25,8 +24,17 @@ public class Spectrum48
 
         _z80 = new Z80.Net.Z80(_memory);
         _beeper = new Beeper(ClockMHz);
-        var bus = new Bus(_keyboard, _beeper, _border, _z80.Cycles);
+        var bus = new Bus(Keyboard, _beeper, _border, _z80.Cycles);
         _z80.AddBus(bus);
+        _z80.Trap = Trap;
+    }
+
+    private void Trap()
+    {
+        if (_z80.Registers.PC == RomRoutines.LoadBytes)
+        {
+
+        }
     }
 
     private static byte[] ReadRom()
@@ -63,7 +71,12 @@ public class Spectrum48
         _timer?.Dispose();
     }
 
-    public Action<byte[]> OnScreenUpdate { get; set; } = _ => { };
+    public void LoadFile(string fileName)
+    {
+        throw new NotImplementedException();
+    }
 
-    public Keyboard Keyboard => _keyboard;
+    public Action<byte[]> OnScreenUpdate { get; init; } = _ => { };
+
+    public Keyboard Keyboard { get; } = new();
 }

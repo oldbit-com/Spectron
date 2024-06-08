@@ -11,12 +11,13 @@ using Avalonia.Threading;
 using OldBit.ZXSpectrum.Emulator;
 using OldBit.ZXSpectrum.Emulator.Screen;
 using OldBit.ZXSpectrum.Helpers;
+using OldBit.ZXSpectrum.ViewModels;
 
 namespace OldBit.ZXSpectrum.Views;
 
 public partial class MainWindow : Window
 {
-    private Spectrum48 _spectrum = default!;
+    private ISpectrum _spectrum = default!;
 
     public MainWindow()
     {
@@ -26,6 +27,12 @@ public partial class MainWindow : Window
     protected override void OnLoaded(RoutedEventArgs e)
     {
         InitializeEmulator();
+
+        if (DataContext is MainWindowViewModel viewModel)
+        {
+            viewModel.MainWindow = this;
+            viewModel.Spectrum = _spectrum;
+        }
     }
 
     private void InitializeEmulator()

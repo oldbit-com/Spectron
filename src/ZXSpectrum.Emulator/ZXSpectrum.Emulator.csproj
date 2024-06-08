@@ -24,6 +24,9 @@
       <Reference Include="OldBit.Z80.Net">
         <HintPath>..\..\..\Z80.Net\src\Z80.Net\bin\Debug\net8.0\OldBit.Z80.Net.dll</HintPath>
       </Reference>
+      <Reference Include="OldBit.ZXTape">
+        <HintPath>..\..\..\ZXTape\src\ZXTape\bin\Debug\net8.0\OldBit.ZXTape.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>
