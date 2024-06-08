@@ -3,13 +3,8 @@ namespace OldBit.ZXSpectrum.Emulator.Screen;
 public class Border
 {
     private readonly List<BorderState> _borderStates = [];
-    private BorderState _lastBorderState = new();
-
-    // 0, 1234, 4593, 8374, 12345, 123456
-    // Hash 0 - 1234
-    // Hash 1234 - 4593
-    // Hash 4593 - 8374
-
+    private BorderState _lastBorderState = new(Colors.White);
+    private BorderState? _nextBorderState;
 
     public void ChangeBorderColor(byte color, int clockCycle)
     {
@@ -19,15 +14,14 @@ public class Border
             return;
         }
 
-        _lastBorderState.Color = borderColor;
-        _lastBorderState.ClockCycle = clockCycle;
-
-        _borderStates.Add(new BorderState
+        _lastBorderState = new BorderState
         {
             Color = borderColor,
             ClockCycle = clockCycle,
             Index = _borderStates.Count
-        });
+        };
+
+        _borderStates.Add(_lastBorderState);
     }
 
     public Color GetBorderColor(int clockCycle)
@@ -37,7 +31,27 @@ public class Border
             return _lastBorderState.Color;
         }
 
-        // TODO: Binary search or something more efficient
+        var start = 0;
+        if (_nextBorderState != null)
+        {
+            if (clockCycle < _nextBorderState.Value.ClockCycle)
+            {
+                return _lastBorderState.Color;
+            }
+
+            start = _nextBorderState.Value.Index;
+        }
+
+        for (var i = start; i < _borderStates.Count; i++)
+        {
+            if (_borderStates[i].ClockCycle > clockCycle)
+            {
+                _nextBorderState = _borderStates[i];
+                break;
+            }
+
+            _lastBorderState = _borderStates[i];
+        }
 
         return _lastBorderState.Color;
     }
@@ -50,5 +64,6 @@ public class Border
         }
 
         _borderStates.Clear();
+        _nextBorderState = null;
     }
 }

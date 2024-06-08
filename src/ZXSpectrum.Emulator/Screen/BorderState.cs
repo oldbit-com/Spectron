@@ -1,8 +1,3 @@
 namespace OldBit.ZXSpectrum.Emulator.Screen;
 
-internal record BorderState
-{
-    public Color Color { get; set; } = Colors.White;
-    public int ClockCycle { get; set; }
-    public int Index { get; set; }
-}
+internal record struct BorderState(Color Color, int ClockCycle = 0, int Index = 0);
