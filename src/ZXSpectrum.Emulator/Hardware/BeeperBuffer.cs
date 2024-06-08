@@ -1,52 +1,19 @@
+using System.Collections;
+
 namespace OldBit.ZXSpectrum.Emulator.Hardware;
 
-public class BeeperBuffer(int capacity)
+/// <summary>
+/// Represents an infinite circular buffer that provides beeper data.
+/// </summary>
+/// <param name="capacity">The capacity of the buffer.</param>
+/// <param name="defaultValue">The default value to return when buffer is empty.</param>
+internal class BeeperBuffer(int capacity, Func<byte> defaultValue) : IEnumerable<byte>
 {
-    private int _bytesLeft;
-    private int _position;
-    private readonly byte[] _buffer = new byte[capacity];
-    private readonly object _bufferLock = new();
+    private readonly BeeperDataEnumerator _enumerator = new(capacity, defaultValue);
 
-    public void Write(byte[] data)
-    {
-      //  lock (_bufferLock)
-        {
-            var start = (_position + _bytesLeft) % _buffer.Length;
-            var length = Math.Min(data.Length, _buffer.Length - start - 1);
-            Array.Copy(data, 0, _buffer, start, length);
-            if (length < data.Length)
-            {
-                Array.Copy(data, length, _buffer, 0, data.Length - length);
-            }
+    public void Write(byte[] data) => _enumerator.Write(data);
 
-            _bytesLeft += data.Length;
-        }
-    }
+    public IEnumerator<byte> GetEnumerator() => _enumerator;
 
-    public Func<byte> DefaultAmplitude { get; init; } = () => 0;
-
-    public IEnumerable<byte> GetBuffer(CancellationToken cancellationToken)
-    {
-        while (!cancellationToken.IsCancellationRequested)
-        {
-       //     lock (_bufferLock)
-            {
-                if (_bytesLeft == 0)
-                {
-                    yield return DefaultAmplitude();
-                }
-                else
-                {
-                    yield return _buffer[_position];
-
-                    _bytesLeft -= 1;
-                    _position += 1;
-                    if (_position == _buffer.Length)
-                    {
-                        _position = 0;
-                    }
-                }
-            }
-        }
-    }
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

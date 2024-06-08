@@ -19,10 +19,7 @@ public class Beeper
         var sampleRate = clockMHz * 1000000 / CyclesPerSample;
         _audioPlayer = new AudioPlayer(AudioFormat.Unsigned8Bit, (int)sampleRate, 1);
 
-        _beeperBuffer = new BeeperBuffer(16384)
-        {
-            DefaultAmplitude = () => _amplitude
-        };
+        _beeperBuffer = new BeeperBuffer(16384 * 8, () => _amplitude);
 
         Start();
     }
@@ -56,15 +53,13 @@ public class Beeper
 
         Task.Run(async () =>
         {
-            await _audioPlayer.PlayAsync(_beeperBuffer.GetBuffer(_cancellationTokenSource.Token));
+            await _audioPlayer.PlayAsync(_beeperBuffer);
         }, _cancellationTokenSource.Token);
     }
 
     private void WriteBuffer(byte amplitude, int length)
     {
-        Console.WriteLine($"Beep: {amplitude} {length}");
         _beeperBuffer.Write(Enumerable.Repeat(amplitude, length).ToArray());
-        //Task.Run(async () => { await _audioPlayer.PlayAsync(Enumerable.Repeat(amplitude, length)); });
     }
 
     public void Stop()
