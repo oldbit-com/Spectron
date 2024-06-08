@@ -1,5 +1,6 @@
 using System.Reflection;
 using OldBit.ZXSpectrum.Emulator.Hardware;
+using OldBit.ZXSpectrum.Emulator.Hardware.Audio;
 using OldBit.ZXSpectrum.Emulator.Screen;
 
 namespace OldBit.ZXSpectrum.Emulator;

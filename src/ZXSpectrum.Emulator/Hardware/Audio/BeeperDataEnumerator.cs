@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace OldBit.ZXSpectrum.Emulator.Hardware;
+namespace OldBit.ZXSpectrum.Emulator.Hardware.Audio;
 
 /// <summary>
 /// Represents an infinite circular enumerator that provides beeper data, so the player is always saturated

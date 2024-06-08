@@ -1,6 +1,6 @@
 using OldBit.Beep;
 
-namespace OldBit.ZXSpectrum.Emulator.Hardware;
+namespace OldBit.ZXSpectrum.Emulator.Hardware.Audio;
 
 public class Beeper
 {

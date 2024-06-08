@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace OldBit.ZXSpectrum.Emulator.Hardware;
+namespace OldBit.ZXSpectrum.Emulator.Hardware.Audio;
 
 /// <summary>
 /// Represents an infinite circular buffer that provides beeper data.
