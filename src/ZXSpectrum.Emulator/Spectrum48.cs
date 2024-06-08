@@ -1,4 +1,5 @@
 using System.Reflection;
+using OldBit.Z80Cpu;
 using OldBit.ZXSpectrum.Emulator.Hardware;
 using OldBit.ZXSpectrum.Emulator.Hardware.Audio;
 using OldBit.ZXSpectrum.Emulator.Screen;
@@ -15,7 +16,7 @@ public class Spectrum48 : ISpectrum
     private readonly ScreenRenderer _screenRenderer;
     private readonly Memory48 _memory;
     private readonly Beeper _beeper;
-    private readonly Z80.Net.Z80 _z80;
+    private readonly Z80 _z80;
 
     private Timer? _timer;
     private readonly object _timerLock = new();
@@ -26,7 +27,7 @@ public class Spectrum48 : ISpectrum
         var rom = ReadRom();
         _memory = new Memory48(rom);
 
-        _z80 = new Z80.Net.Z80(_memory);
+        _z80 = new Z80(_memory);
         _beeper = new Beeper(ClockMHz);
         var bus = new Bus(Keyboard, _beeper, _border, _z80.Cycles);
         _z80.AddBus(bus);

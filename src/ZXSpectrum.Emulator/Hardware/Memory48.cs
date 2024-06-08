@@ -1,4 +1,4 @@
-using OldBit.Z80.Net;
+using OldBit.Z80Cpu;
 
 namespace OldBit.ZXSpectrum.Emulator.Hardware;
 

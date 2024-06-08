@@ -1,5 +1,5 @@
-using OldBit.Z80.Net;
-using OldBit.Z80.Net.Extensions;
+using OldBit.Z80Cpu;
+using OldBit.Z80Cpu.Extensions;
 using OldBit.ZXSpectrum.Emulator.Hardware.Audio;
 using OldBit.ZXSpectrum.Emulator.Screen;
 
