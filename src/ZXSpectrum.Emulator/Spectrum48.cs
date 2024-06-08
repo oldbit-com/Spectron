@@ -8,11 +8,15 @@ namespace OldBit.ZXSpectrum.Emulator;
 public class Spectrum48 : ISpectrum
 {
     private const float ClockMHz = 3.5f;
+    private const int CyclesPerFrame = (64 + 192 + 56) * 224; // 69888
+    private const float InterruptFrequencyHz = ClockMHz * 1000000 / CyclesPerFrame;
+
     private readonly Border _border = new();
     private readonly ScreenRenderer _screenRenderer;
     private readonly Memory48 _memory;
     private readonly Beeper _beeper;
     private readonly Z80.Net.Z80 _z80;
+
     private Timer? _timer;
     private readonly object _timerLock = new();
 
@@ -50,7 +54,7 @@ public class Spectrum48 : ISpectrum
     {
         lock (_timerLock)
         {
-            _z80.Run(69888);
+            _z80.Run(CyclesPerFrame);
             _z80.Int(0xFF);
 
             var pixels = _screenRenderer.Render(_memory.Screen);
@@ -60,9 +64,8 @@ public class Spectrum48 : ISpectrum
 
     public void Start()
     {
-        const double frequency = 3.5 * 1000000 / 69888;
-        var period = TimeSpan.FromMicroseconds(1 / frequency * 1000000);
-       _timer = new Timer(InterruptHandler, null, TimeSpan.FromSeconds(2), period);
+        var timerPeriod = TimeSpan.FromMicroseconds(1 / InterruptFrequencyHz * 1000000);
+       _timer = new Timer(InterruptHandler, null, TimeSpan.FromSeconds(2), timerPeriod);
     }
 
     public void Stop()
