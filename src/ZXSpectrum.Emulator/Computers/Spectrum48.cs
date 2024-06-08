@@ -1,10 +1,10 @@
-using System.Reflection;
 using OldBit.Z80Cpu;
 using OldBit.ZXSpectrum.Emulator.Hardware;
 using OldBit.ZXSpectrum.Emulator.Hardware.Audio;
 using OldBit.ZXSpectrum.Emulator.Screen;
+using OldBit.ZXSpectrum.Emulator.Tape;
 
-namespace OldBit.ZXSpectrum.Emulator;
+namespace OldBit.ZXSpectrum.Emulator.Computers;
 
 public class Spectrum48 : ISpectrum
 {
@@ -17,21 +17,28 @@ public class Spectrum48 : ISpectrum
     private readonly Memory48 _memory;
     private readonly Beeper _beeper;
     private readonly Z80 _z80;
+    private readonly TapeLoader _tapeLoader;
 
     private Timer? _timer;
     private readonly object _timerLock = new();
+    private bool _isPaused;
+    private bool _isPausedRequested;
 
     public Spectrum48()
     {
         _screenRenderer = new ScreenRenderer(_border);
-        var rom = ReadRom();
-        _memory = new Memory48(rom);
-
-        _z80 = new Z80(_memory);
+        _memory = new Memory48();
         _beeper = new Beeper(ClockMHz);
+
+        _z80 = new Z80(_memory)
+        {
+            Trap = Trap
+        };
+
         var bus = new Bus(Keyboard, _beeper, _border, _z80.Cycles);
         _z80.AddBus(bus);
-        _z80.Trap = Trap;
+
+        _tapeLoader = new TapeLoader(_z80, _memory);
     }
 
     private void Trap()
@@ -42,21 +49,21 @@ public class Spectrum48 : ISpectrum
         }
     }
 
-    private static byte[] ReadRom()
-    {
-        var assembly = Assembly.GetExecutingAssembly();
-        using var stream = assembly.GetManifestResourceStream("OldBit.ZXSpectrum.Emulator.Rom.48.rom")!;
-        using var reader = new BinaryReader(stream);
-
-        return reader.ReadBytes((int)stream.Length);
-    }
-
     private void InterruptHandler(object? data)
     {
         lock (_timerLock)
         {
-            _z80.Run(CyclesPerFrame);
-            _z80.Int(0xFF);
+            if (_isPausedRequested)
+            {
+                _isPaused = true;
+                _isPausedRequested = false;
+            }
+
+            if (!_isPaused)
+            {
+                _z80.Run(CyclesPerFrame);
+                _z80.Int(0xFF);
+            }
 
             var pixels = _screenRenderer.Render(_memory.Screen);
             OnScreenUpdate(pixels);
@@ -75,9 +82,21 @@ public class Spectrum48 : ISpectrum
         _timer?.Dispose();
     }
 
+    public void Pause()
+    {
+        _isPausedRequested = true;
+        while (!_isPaused) { }
+    }
+
+    public void Resume()
+    {
+        _isPaused = false;
+    }
+
     public void LoadFile(string fileName)
     {
-        throw new NotImplementedException();
+
+        _tapeLoader.LoadFile(fileName);
     }
 
     public Action<byte[]> OnScreenUpdate { get; init; } = _ => { };

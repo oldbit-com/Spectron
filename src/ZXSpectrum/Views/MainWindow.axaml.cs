@@ -9,6 +9,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
 using OldBit.ZXSpectrum.Emulator;
+using OldBit.ZXSpectrum.Emulator.Computers;
 using OldBit.ZXSpectrum.Emulator.Screen;
 using OldBit.ZXSpectrum.Helpers;
 using OldBit.ZXSpectrum.ViewModels;

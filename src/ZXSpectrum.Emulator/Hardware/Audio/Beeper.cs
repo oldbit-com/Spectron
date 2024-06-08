@@ -4,7 +4,7 @@ namespace OldBit.ZXSpectrum.Emulator.Hardware.Audio;
 
 public class Beeper
 {
-    private const int CyclesPerSample = 16;
+    private const int CyclesPerSample = 8;
     private const int MaxBeepCycles = 214042;     // BEEP x,-60
 
     private int _lastEarValue;
@@ -53,7 +53,7 @@ public class Beeper
 
         Task.Run(async () =>
         {
-            await _audioPlayer.PlayAsync(_beeperBuffer);
+            await _audioPlayer.PlayAsync(_beeperBuffer, _cancellationTokenSource.Token);
         }, _cancellationTokenSource.Token);
     }
 

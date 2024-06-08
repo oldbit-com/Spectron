@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using MsBox.Avalonia;
-using OldBit.ZXSpectrum.Emulator;
+using OldBit.ZXSpectrum.Emulator.Computers;
 using OldBit.ZXSpectrum.Helpers;
 using ReactiveUI;
 
@@ -42,12 +42,18 @@ public class MainWindowViewModel : ViewModelBase
             {
                 try
                 {
-                    Spectrum.LoadFile(files[0].Name);
+                    Spectrum.Pause();
+                    Spectrum.LoadFile(files[0].Path.LocalPath);
                 }
                 catch (Exception ex)
                 {
-                    var messageBox = MessageBoxManager.GetMessageBoxStandard("Error", ex.Message, windowStartupLocation: WindowStartupLocation.CenterOwner);
+                    var messageBox = MessageBoxManager.GetMessageBoxStandard("Error", ex.Message,
+                        windowStartupLocation: WindowStartupLocation.CenterOwner);
                     await messageBox.ShowWindowDialogAsync(MainWindow);
+                }
+                finally
+                {
+                    Spectrum.Resume();
                 }
             }
         }
