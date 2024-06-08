@@ -1,8 +1,10 @@
-using System.Diagnostics;
+using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
@@ -19,6 +21,10 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+    }
+
+    protected override void OnLoaded(RoutedEventArgs e)
+    {
         InitializeEmulator();
     }
 
@@ -39,6 +45,8 @@ public partial class MainWindow : Window
                 Dispatcher.UIThread.Post(() => ScreenImage.Source = image);
             }
         };
+
+        _spectrum.Start();
     }
 
     private void OnKeyDown(object? sender, KeyEventArgs e)
@@ -46,6 +54,7 @@ public partial class MainWindow : Window
         var spectrumKey = KeyMappings.ToSpectrumKey(e);
         if (spectrumKey.Count > 0)
         {
+            Console.WriteLine($"Key down: {string.Join(',', spectrumKey.Select(k => k.ToString()))}");
             _spectrum.Keyboard.KeyDown(spectrumKey);
         }
     }

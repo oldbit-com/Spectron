@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Reflection;
 using OldBit.ZXSpectrum.Emulator.Hardware;
 using OldBit.ZXSpectrum.Emulator.Screen;
@@ -7,26 +6,26 @@ namespace OldBit.ZXSpectrum.Emulator;
 
 public class Spectrum48
 {
+    private const float ClockMHz = 3.5f;
     private readonly Keyboard _keyboard = new();
-    private readonly ScreenRenderer _screenRenderer = new();
     private readonly Border _border = new();
+    private readonly ScreenRenderer _screenRenderer;
     private readonly Memory48 _memory;
+    private readonly Beeper _beeper;
     private readonly Z80.Net.Z80 _z80;
     private Timer? _timer;
     private readonly object _timerLock = new();
-    private readonly Stopwatch _stopwatch = new();
 
     public Spectrum48()
     {
-        var beeper = new Beeper();
+        _screenRenderer = new ScreenRenderer(_border);
         var rom = ReadRom();
         _memory = new Memory48(rom);
 
         _z80 = new Z80.Net.Z80(_memory);
-        var bus = new Bus(_keyboard, beeper, _memory, _border, _z80.Cycles);
+        _beeper = new Beeper(ClockMHz);
+        var bus = new Bus(_keyboard, _beeper, _border, _z80.Cycles);
         _z80.AddBus(bus);
-
-        Start();
     }
 
     private static byte[] ReadRom()
@@ -59,6 +58,7 @@ public class Spectrum48
 
     public void Stop()
     {
+        _beeper.Stop();
         _timer?.Dispose();
     }
 

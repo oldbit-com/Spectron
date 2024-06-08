@@ -18,6 +18,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Reference Include="OldBit.Beep">
+        <HintPath>..\..\..\..\Beep\src\Beep\bin\Debug\net8.0\OldBit.Beep.dll</HintPath>
+      </Reference>
       <Reference Include="OldBit.Z80.Net">
         <HintPath>..\..\..\Z80.Net\src\Z80.Net\bin\Debug\net8.0\OldBit.Z80.Net.dll</HintPath>
       </Reference>
