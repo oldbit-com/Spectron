@@ -4,11 +4,11 @@ namespace OldBit.ZXSpectrum.Emulator.Hardware.Audio;
 
 public class Beeper
 {
-    private const int CyclesPerSample = 8;
-    private const int MaxBeepCycles = 214042;     // BEEP x,-60
+    private const int StatesPerSample = 8;
+    private const int MaxBeepStates = 214042;     // BEEP x,-60
 
     private int _lastEarValue;
-    private long _lastTotalCycles;
+    private long _lastTotalStates;
     private byte _amplitude;
     private readonly AudioPlayer _audioPlayer;
     private readonly BeeperBuffer _beeperBuffer;
@@ -16,7 +16,7 @@ public class Beeper
 
     public Beeper(float clockMHz)
     {
-        var sampleRate = clockMHz * 1000000 / CyclesPerSample;
+        var sampleRate = clockMHz * 1000000 / StatesPerSample;
         _audioPlayer = new AudioPlayer(AudioFormat.Unsigned8Bit, (int)sampleRate, 1);
 
         _beeperBuffer = new BeeperBuffer(16384 * 8, () => _amplitude);
@@ -24,7 +24,7 @@ public class Beeper
         Start();
     }
 
-    public void UpdateBeeper(byte value, long totalCycles)
+    public void UpdateBeeper(byte value, long totalStates)
     {
         var earValue = value & 0x10;
         if (earValue == _lastEarValue)
@@ -33,16 +33,16 @@ public class Beeper
         }
 
         _lastEarValue = earValue;
-        var cycles = totalCycles - _lastTotalCycles;
-        _lastTotalCycles = totalCycles;
+        var states = totalStates - _lastTotalStates;
+        _lastTotalStates = totalStates;
 
-        if (cycles is 0 or > MaxBeepCycles)
+        if (states is 0 or > MaxBeepStates)
         {
             return;
         }
 
         _amplitude = _amplitude == 0 ? (byte)0xFF : (byte)0;
-        var length = (int)(cycles / CyclesPerSample);
+        var length = (int)(states / StatesPerSample);
 
         WriteBuffer(_amplitude, length);
     }

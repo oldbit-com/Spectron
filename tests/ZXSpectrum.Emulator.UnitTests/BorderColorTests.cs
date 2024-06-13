@@ -10,12 +10,12 @@ public class BorderColorTests
     [InlineData(3847)]
     [InlineData(5678)]
     [InlineData(63626)]
-    public void BorderColor_ShouldBeCyan(int clockCycle)
+    public void BorderColor_ShouldBeCyan(int states)
     {
         var borderState = new Border();
         borderState.ChangeBorderColor(5, 0);
 
-        var color = borderState.GetBorderColor(clockCycle);
+        var color = borderState.GetBorderColor(states);
 
         color.Should().Be(Colors.Cyan);
     }
@@ -29,7 +29,7 @@ public class BorderColorTests
     [InlineData(7363, "Blue")]
     [InlineData(7364, "Blue")]
     [InlineData(18222, "Magenta")]
-    public void BorderColor_ShouldBeExpectedColor(int clockCycle, string expectedColor)
+    public void BorderColor_ShouldBeExpectedColor(int states, string expectedColor)
     {
         var borderState = new Border();
         borderState.ChangeBorderColor(5, 0);
@@ -37,7 +37,7 @@ public class BorderColorTests
         borderState.ChangeBorderColor(1, 7363);
         borderState.ChangeBorderColor(3, 18222);
 
-        var color = borderState.GetBorderColor(clockCycle);
+        var color = borderState.GetBorderColor(states);
 
         color.Should().Be(ColorNames[expectedColor]);
     }

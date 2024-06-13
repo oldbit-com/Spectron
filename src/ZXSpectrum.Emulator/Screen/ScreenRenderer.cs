@@ -11,7 +11,7 @@ public class ScreenRenderer
     internal const int ScreenWidth = 256;           // screen width, excluding borders
     internal const int ScreenHeight = 192;          // screen height, excluding borders
 
-    internal const int CyclesPerLine = 224;         // T-states per line
+    internal const int StatesPerLine = 224;         // T-states per line
 
     private const int BytesPerPixel = 4;
 
@@ -19,7 +19,7 @@ public class ScreenRenderer
     public const int TotalHeight = BorderTop + ScreenHeight + BorderBottom;         // total screen height with borders
 
     private readonly byte[] _pixelData = new byte[TotalHeight * TotalWidth * BytesPerPixel];
-    private readonly int[] _clockCycleAtPixel = new int[TotalHeight * TotalWidth];
+    private readonly int[] _stateAtPixel = new int[TotalHeight * TotalWidth];
     private readonly byte[] _bits = [0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01];
     private readonly Color[] _paperColors = new Color[256];
     private readonly Color[] _inkColors = new Color[256];
@@ -32,11 +32,11 @@ public class ScreenRenderer
 
         for (var line = 0; line < TotalHeight; line++)
         {
-            // Pre-calculate the clock cycle for each pixel
+            // Pre-calculate the T-state for each pixel
             for (var pixel = 0; pixel < TotalWidth; pixel++)
             {
                 // 14366 is the first pixel of the first line of the screen
-                _clockCycleAtPixel[line * TotalWidth + pixel] = (64 + line) * CyclesPerLine + (48 + pixel) / 2;
+                _stateAtPixel[line * TotalWidth + pixel] = (64 + line) * StatesPerLine + (48 + pixel) / 2;
             }
 
             // Pre-calculate the paper and ink colors for each attribute
@@ -112,8 +112,8 @@ public class ScreenRenderer
 
     private void SetBorderPixelColor(int pixel)
     {
-        var pixelCycle = _clockCycleAtPixel[pixel / BytesPerPixel];
-        var borderColor = _border.GetBorderColor(pixelCycle);
+        var pixelState = _stateAtPixel[pixel / BytesPerPixel];
+        var borderColor = _border.GetBorderColor(pixelState);
 
         SetPixelColor(pixel, borderColor);
     }

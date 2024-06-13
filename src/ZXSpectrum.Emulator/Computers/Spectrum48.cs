@@ -9,8 +9,8 @@ namespace OldBit.ZXSpectrum.Emulator.Computers;
 public class Spectrum48 : ISpectrum
 {
     private const float ClockMHz = 3.5f;
-    private const int CyclesPerFrame = (64 + 192 + 56) * 224; // 69888
-    private const float InterruptFrequencyHz = ClockMHz * 1000000 / CyclesPerFrame;
+    private const int StatesPerFrame = (64 + 192 + 56) * 224; // 69888
+    private const float InterruptFrequencyHz = ClockMHz * 1000000 / StatesPerFrame;
 
     private readonly Border _border = new();
     private readonly ScreenRenderer _screenRenderer;
@@ -32,10 +32,10 @@ public class Spectrum48 : ISpectrum
 
         _z80 = new Z80(_memory)
         {
-            Trap = Trap
+            //Trap = Trap
         };
 
-        var bus = new Bus(Keyboard, _beeper, _border, _z80.Cycles);
+        var bus = new Bus(Keyboard, _beeper, _border, _z80.States);
         _z80.AddBus(bus);
 
         _tapeLoader = new TapeLoader(_z80, _memory);
@@ -61,7 +61,7 @@ public class Spectrum48 : ISpectrum
 
             if (!_isPaused)
             {
-                _z80.Run(CyclesPerFrame);
+                _z80.Run(StatesPerFrame);
                 _z80.Int(0xFF);
             }
 

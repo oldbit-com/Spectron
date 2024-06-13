@@ -77,7 +77,7 @@ public class TapeLoader
 
         _z80.Registers.I = file.Data.Header.I;
         _z80.Registers.R = file.Data.Header.R;
-        _z80.InterruptMode = (InterruptMode)file.Data.Header.InterruptMode;
+        _z80.IM = (InterruptMode)file.Data.Header.InterruptMode;
         _z80.IFF2 = (file.Data.Header.Interrupt & 0x04) != 0;
 
         _z80.Registers.PC = (Word)(_memory.Read((Word)(_z80.Registers.SP + 1)) << 8 |

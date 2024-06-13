@@ -6,7 +6,7 @@ public class Border
     private BorderState _lastBorderState = new(Colors.White);
     private BorderState? _nextBorderState;
 
-    public void ChangeBorderColor(byte color, int clockCycle)
+    public void ChangeBorderColor(byte color, int currentStates)
     {
         var borderColor = Colors.BorderColors[(byte)(color & 0x07)];
         if (_lastBorderState.Color == borderColor)
@@ -17,14 +17,14 @@ public class Border
         _lastBorderState = new BorderState
         {
             Color = borderColor,
-            ClockCycle = clockCycle,
+            CurrentStates = currentStates,
             Index = _borderStates.Count
         };
 
         _borderStates.Add(_lastBorderState);
     }
 
-    public Color GetBorderColor(int clockCycle)
+    public Color GetBorderColor(int states)
     {
         if (_borderStates.Count == 0)
         {
@@ -34,7 +34,7 @@ public class Border
         var start = 0;
         if (_nextBorderState != null)
         {
-            if (clockCycle < _nextBorderState.Value.ClockCycle)
+            if (states < _nextBorderState.Value.CurrentStates)
             {
                 return _lastBorderState.Color;
             }
@@ -44,7 +44,7 @@ public class Border
 
         for (var i = start; i < _borderStates.Count; i++)
         {
-            if (_borderStates[i].ClockCycle > clockCycle)
+            if (_borderStates[i].CurrentStates > states)
             {
                 _nextBorderState = _borderStates[i];
                 break;

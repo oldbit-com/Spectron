@@ -5,7 +5,7 @@ using OldBit.ZXSpectrum.Emulator.Screen;
 
 namespace OldBit.ZXSpectrum.Emulator.Hardware;
 
-public class Bus(Keyboard keyboard, Beeper beeper, Border border, CyclesCounter cyclesCounter) : IBus
+public class Bus(Keyboard keyboard, Beeper beeper, Border border, StatesCounter statesCounter) : IBus
 {
     public byte Read(Word address)
     {
@@ -23,8 +23,8 @@ public class Bus(Keyboard keyboard, Beeper beeper, Border border, CyclesCounter 
     {
         if (IsUlaPort(address))
         {
-            border.ChangeBorderColor(data, cyclesCounter.CurrentCycles);
-            beeper.UpdateBeeper(data, cyclesCounter.TotalCycles);
+            border.ChangeBorderColor(data, statesCounter.CurrentStates);
+            beeper.UpdateBeeper(data, statesCounter.TotalStates);
         }
     }
 
