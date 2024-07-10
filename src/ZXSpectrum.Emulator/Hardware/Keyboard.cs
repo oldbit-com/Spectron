@@ -87,5 +87,23 @@ public class Keyboard
         }
     }
 
-    public byte GetKey(byte port) => _keyStates.GetValueOrDefault(port, (byte)0xFF);
+    public byte GetKeyState(byte port)
+    {
+        if (_keyStates.TryGetValue(port, out var state))
+        {
+            return state;
+        }
+
+        state = 0xFF;
+        // Special case, for example if port is 0x02, it means check any key except row A-G (0xFD) etc.
+        foreach (var (keyPort, keyState) in _keyStates)
+        {
+            if ((keyPort & port) == port)
+            {
+                state &= keyState;
+            }
+        }
+
+        return state;
+    }
 }

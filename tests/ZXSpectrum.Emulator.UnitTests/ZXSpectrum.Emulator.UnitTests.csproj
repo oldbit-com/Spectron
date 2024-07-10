@@ -7,6 +7,8 @@
 
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
+        <AssemblyName>OldBit.ZXSpectrum.Emulator.UnitTests</AssemblyName>
+        <RootNamespace>OldBit.ZXSpectrum.Emulator.UnitTests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

@@ -44,7 +44,7 @@ public class Beeper
         _amplitude = _amplitude == 0 ? (byte)0xFF : (byte)0;
         var length = (int)(states / StatesPerSample);
 
-        WriteBuffer(_amplitude, length);
+        //WriteBuffer(_amplitude, length);
     }
 
     private void Start()
@@ -53,7 +53,7 @@ public class Beeper
 
         Task.Run(async () =>
         {
-            await _audioPlayer.PlayAsync(_beeperBuffer, _cancellationTokenSource.Token);
+            //await _audioPlayer.PlayAsync(_beeperBuffer, _cancellationTokenSource.Token);
         }, _cancellationTokenSource.Token);
     }
 

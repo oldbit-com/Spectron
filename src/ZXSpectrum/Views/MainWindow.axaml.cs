@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
@@ -8,7 +6,6 @@ using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
-using OldBit.ZXSpectrum.Emulator;
 using OldBit.ZXSpectrum.Emulator.Computers;
 using OldBit.ZXSpectrum.Emulator.Screen;
 using OldBit.ZXSpectrum.Helpers;
@@ -19,6 +16,7 @@ namespace OldBit.ZXSpectrum.Views;
 public partial class MainWindow : Window
 {
     private ISpectrum _spectrum = default!;
+    private bool _isPaused;
 
     public MainWindow()
     {
@@ -38,9 +36,9 @@ public partial class MainWindow : Window
 
     private void InitializeEmulator()
     {
-        _spectrum = new Spectrum48
+        _spectrum = new Spectrum48K
         {
-            OnScreenUpdate = (pixels) =>
+            OnScreenRender = buffer =>
             {
                 var image = new WriteableBitmap(
                     new PixelSize(ScreenRenderer.TotalWidth, ScreenRenderer.TotalHeight),
@@ -48,7 +46,8 @@ public partial class MainWindow : Window
                     PixelFormat.Rgba8888);
                 using var frameBuffer = image.Lock();
 
-                Marshal.Copy(pixels, 0, frameBuffer.Address, pixels.Length);
+                var data = buffer.ToBytes();
+                Marshal.Copy(data, 0, frameBuffer.Address, data.Length);
 
                 Dispatcher.UIThread.Post(() => ScreenImage.Source = image);
             }
@@ -63,6 +62,20 @@ public partial class MainWindow : Window
         if (spectrumKey.Count > 0)
         {
             _spectrum.Keyboard.KeyDown(spectrumKey);
+        }
+
+        if (e.Key == Key.F11)
+        {
+            if (_isPaused)
+            {
+                _spectrum.Resume();
+            }
+            else
+            {
+                _spectrum.Pause();
+            }
+
+            _isPaused = !_isPaused;
         }
     }
 

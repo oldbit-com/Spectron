@@ -29,4 +29,10 @@
       </Reference>
     </ItemGroup>
 
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>OldBit.ZXSpectrum.Emulator.UnitTests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
 </Project>
