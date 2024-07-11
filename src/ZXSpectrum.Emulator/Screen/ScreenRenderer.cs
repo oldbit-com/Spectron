@@ -11,6 +11,7 @@ public class ScreenRenderer
     private readonly ContentRenderer _contentRenderer;
 
     private Color _lastBorderColor;
+    private bool _borderColorChanged = true;
 
     public ScreenBuffer ScreenBuffer { get; } = new(Colors.White);
 
@@ -28,8 +29,19 @@ public class ScreenRenderer
 
     public void UpdateBorder(Color borderColor, int currentTicks)
     {
-        _lastBorderColor = borderColor;
+        if (_lastBorderColor != borderColor)
+        {
+            _lastBorderColor = borderColor;
+            _borderColorChanged = true;
+        }
+
+        if (!_borderColorChanged)
+        {
+            return;
+        }
+
         _borderRenderer.Update(borderColor, currentTicks);
+        _borderColorChanged = false;
     }
 
     public void UpdateBorder(int currentTicks) => _borderRenderer.Update(_lastBorderColor, currentTicks);
