@@ -2,62 +2,70 @@ using OldBit.ZXSpectrum.Emulator.Hardware;
 
 namespace OldBit.ZXSpectrum.Emulator.Screen;
 
-public class ContentRenderer(ScreenBuffer screenBuffer, Memory48K memory)
+public class ContentRenderer(FrameBuffer frameBuffer, Memory48K memory)
 {
-    private readonly bool[] _needsRefresh = new bool[32*24*8];
+    private readonly bool[] _bitmapDirty = new bool[32*24*8];
 
-    private int _lastTicks = Constants.FirstDataPixelTick;
     private int _frameCount = 1;
     private bool _isFlashOnFrame;
+    private int _fetchCycleIndex;
 
-    public void Update(int ticks)
+    public void Update(int frameTicks)
     {
-        if (ticks >= FastLookup.PixelTicks.Length)
+        if (frameTicks < 14335 || _fetchCycleIndex >= FastLookup.ScreenRenderEvents.Length)
         {
             return;
         }
 
-        for (var screenTick = _lastTicks; screenTick <= ticks; screenTick++)
+        while (true)
         {
-            var pixelData = FastLookup.PixelTicks[screenTick];
-            if (pixelData is null)
+            var fetchCycleData = FastLookup.ScreenRenderEvents[_fetchCycleIndex];
+            if (frameTicks < fetchCycleData.Ticks)
             {
-                continue;
+                break;
             }
 
-            if (!_needsRefresh[pixelData.Address])
+            // First screen byte and attribute
+            UpdateFrameBuffer(fetchCycleData.FrameBufferIndex, fetchCycleData.BitmapAddress, fetchCycleData.AttributeAddress);
+
+            // Second screen byte and attribute
+            UpdateFrameBuffer(fetchCycleData.FrameBufferIndex + 8, fetchCycleData.BitmapAddress + 1, fetchCycleData.AttributeAddress + 1);
+
+            _fetchCycleIndex += 1;
+            if (_fetchCycleIndex >= FastLookup.ScreenRenderEvents.Length)
             {
-                continue;
+                break;
             }
-
-            var screenData = memory.Screen[pixelData.Address];
-            var attrValue = memory.Screen[pixelData.AttrAddress];
-            var colors = FastLookup.AttributeColors[attrValue];
-
-            var isFlashOn = colors.IsFlashOn && _isFlashOnFrame;
-
-            for (var i = 0; i < FastLookup.BitMasks.Length; i++)
-            {
-                var color = (screenData & FastLookup.BitMasks[i]) != 0 ^ isFlashOn ? colors.Ink : colors.Paper;
-                screenBuffer.Data[pixelData.BufferAddress + i] = color;
-            }
-
-            _needsRefresh[pixelData.Address] = false;
         }
+    }
 
-        _lastTicks = ticks + 1;
+    private void UpdateFrameBuffer(int frameBufferIndex, int bitmapAddress, int attributeAddress)
+    {
+        var bitmap = memory.Screen[bitmapAddress];
+        var attribute = memory.Screen[attributeAddress];
+
+        var attributeData = FastLookup.AttributeData[attribute];
+        var isFlashOn = attributeData.IsFlashOn && _isFlashOnFrame;
+
+        for (var i = 0; i < FastLookup.BitMasks.Length; i++)
+        {
+            var color = (bitmap & FastLookup.BitMasks[i]) != 0 ^ isFlashOn ? attributeData.Ink : attributeData.Paper;
+            frameBuffer.Data[frameBufferIndex + i] = color;
+        }
     }
 
     public void NewFrame()
     {
-        _lastTicks = Constants.FirstDataPixelTick;
         _frameCount += 1;
+        _fetchCycleIndex = 0;
 
-        if (_frameCount >= 32)
+        if (_frameCount < 32)
         {
-            ToggleFlash();
-            _frameCount = 1;
+            return;
         }
+
+        ToggleFlash();
+        _frameCount = 1;
     }
 
     public void UpdateScreen(Word address) => UpdateScreenPrivate(address - 0x4000);
@@ -67,20 +75,20 @@ public class ContentRenderer(ScreenBuffer screenBuffer, Memory48K memory)
         if (address < 0x1800)
         {
             // Screen byte
-            _needsRefresh[address] = true;
+            _bitmapDirty[address] = true;
         }
         else
         {
             // Attribute byte affecting 8 screen bytes
             var screenAddress = FastLookup.LineAddressForAttrAddress[address - 0x1800];
-            _needsRefresh[screenAddress] = true;
-            _needsRefresh[screenAddress + 256] = true;
-            _needsRefresh[screenAddress + 512] = true;
-            _needsRefresh[screenAddress + 768] = true;
-            _needsRefresh[screenAddress + 1024] = true;
-            _needsRefresh[screenAddress + 1280] = true;
-            _needsRefresh[screenAddress + 1536] = true;
-            _needsRefresh[screenAddress + 1792] = true;
+            _bitmapDirty[screenAddress] = true;
+            _bitmapDirty[screenAddress + 256] = true;
+            _bitmapDirty[screenAddress + 512] = true;
+            _bitmapDirty[screenAddress + 768] = true;
+            _bitmapDirty[screenAddress + 1024] = true;
+            _bitmapDirty[screenAddress + 1280] = true;
+            _bitmapDirty[screenAddress + 1536] = true;
+            _bitmapDirty[screenAddress + 1792] = true;
         }
     }
 

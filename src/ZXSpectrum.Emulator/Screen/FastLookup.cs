@@ -1,18 +1,11 @@
-using System.Collections.ObjectModel;
-
 namespace OldBit.ZXSpectrum.Emulator.Screen;
 
-internal record PixelTickData(int Tick, Word Address, Word AttrAddress, int BufferAddress);
+internal record AttributeColor(Color Paper, Color Ink, bool IsFlashOn);
 
-internal  record AttributeColor(Color Paper, Color Ink, bool IsFlashOn);
+internal record ScreenRenderEvent(Word BitmapAddress, Word AttributeAddress, int Ticks, int FrameBufferIndex);
 
 internal static class FastLookup
 {
-    /// <summary>
-    /// Pixel address data indexed by t-state.
-    /// </summary>
-    internal static readonly PixelTickData?[] PixelTicks = BuildPixelLookupTable();
-
     /// <summary>
     /// Bit masks for each bit in a byte.
     /// </summary>
@@ -21,7 +14,7 @@ internal static class FastLookup
     /// <summary>
     /// Attribute colors indexed by attribute value (0-255).
     /// </summary>
-    internal static readonly AttributeColor[] AttributeColors = BuildAttributeColorLookupTable();
+    internal static readonly AttributeColor[] AttributeData = BuildAttributeColorLookupTable();
 
     /// <summary>
     /// Address of the first screen byte for each attribute address.
@@ -29,40 +22,9 @@ internal static class FastLookup
     internal static readonly Word[] LineAddressForAttrAddress = BuildScreenAddressLookupTable();
 
     /// <summary>
-    /// Incremental tick for rendering each screen byte.
+    /// List of events used to render the screen. Each event occurs at 8 ticks intervals and updates 2 bytes of the screen.
     /// </summary>
-    internal static int[] ContentTicks { get; } = BuildContentTicksTable();
-
-    private static PixelTickData?[] BuildPixelLookupTable()
-    {
-        var pixels = new List<PixelTickData>();
-
-        for (var line = 0; line < Constants.ContentHeight; line++)
-        {
-            for (var tick = 0; tick < Constants.ContentTicks; tick++)
-            {
-                var column = tick / 4;
-                var pixelTick = Constants.FirstDataPixelTick + line * Constants.LineTicks + tick;
-
-                var tickData = new PixelTickData(
-                    Tick: pixelTick,
-                    Address: (Word)(ScreenAddress.Calculate(column, line) - 0x4000), // addresses are 0-based
-                    AttrAddress: (Word)(0x1800 + 32 * (line / 8) + column),
-                    BufferAddress: ScreenBuffer.GetContentAddress(line) + column * 8
-                );
-
-                pixels.Add(tickData);
-            }
-        }
-
-        var pixelTickLookup = new PixelTickData?[pixels.Last().Tick + 1];
-        foreach (var pixelTick in pixels)
-        {
-            pixelTickLookup[pixelTick.Tick] = pixelTick;
-        }
-
-        return pixelTickLookup;
-    }
+    internal static ScreenRenderEvent[] ScreenRenderEvents { get; } = BuildScreenEventsTable();
 
     private static AttributeColor[] BuildAttributeColorLookupTable()
     {
@@ -99,18 +61,28 @@ internal static class FastLookup
         return screenAddressLookup;
     }
 
-    private static int[] BuildContentTicksTable()
+    public static ScreenRenderEvent[] BuildScreenEventsTable()
     {
-        var ticks = new List<int>();
+        var screenEvents = new List<ScreenRenderEvent>();
 
-        for (var line = 0; line < Constants.ContentHeight; line++)
+        for (var y = 0; y < Constants.ContentHeight; y++)
         {
-            for (var tick = 0; tick < Constants.ContentTicks / 4; tick++)
+            var rowTime = Constants.FirstDataPixelTick - 1 + Constants.RowTicks * y;
+            var bufferLineIndex = FrameBuffer.GetLineIndex(y);
+
+            for (var x = 0; x < 16; x++)
             {
-                ticks.Add(2 + Constants.FirstDataPixelTick + line * Constants.LineTicks + tick * 4);
+                var bitmapAddress = ScreenAddress.Calculate(x * 2, y) - 0x4000;
+                var attributeAddress = 0x1800 + 32 * (y / 8) + x * 2;
+
+                screenEvents.Add(new ScreenRenderEvent(
+                    BitmapAddress: (Word)bitmapAddress,
+                    AttributeAddress: (Word)attributeAddress,
+                    Ticks: rowTime + 8 * x,
+                    FrameBufferIndex: bufferLineIndex + 8 * x * 2));
             }
         }
 
-        return ticks.ToArray();
+        return screenEvents.ToArray();
     }
 }

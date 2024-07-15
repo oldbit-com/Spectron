@@ -3,18 +3,13 @@ using OldBit.ZXSpectrum.Emulator.Rom;
 
 namespace OldBit.ZXSpectrum.Emulator.Hardware;
 
-internal class ScreenMemoryUpdatedEventArgs(Word address)
-{
-    public Word Address { get; } = address;
-}
-
 public class Memory48K : IMemory
 {
     private byte[] Memory { get; } = new byte[65536];
 
     internal ReadOnlySpan<byte> Screen => new(Memory, 0x4000, 0x1C00);
 
-    internal delegate void ScreenMemoryUpdatedEventHandler(ScreenMemoryUpdatedEventArgs e);
+    internal delegate void ScreenMemoryUpdatedEventHandler(Word address);
 
     internal event ScreenMemoryUpdatedEventHandler? ScreenMemoryUpdated;
 
@@ -34,11 +29,16 @@ public class Memory48K : IMemory
             return;
         }
 
+        if (Memory[address] == data)
+        {
+            return;
+        }
+
         Memory[address] = data;
 
         if (address < 0x5B00)
         {
-            ScreenMemoryUpdated?.Invoke(new ScreenMemoryUpdatedEventArgs(address));
+            ScreenMemoryUpdated?.Invoke(address);
         }
     }
 }

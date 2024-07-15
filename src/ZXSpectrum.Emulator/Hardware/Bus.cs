@@ -26,8 +26,6 @@ public class Bus(Keyboard keyboard, Beeper beeper, ScreenRenderer renderer, Cloc
             var borderColor = Colors.BorderColors[(byte)(data & 0x07)];
             renderer.UpdateBorder(borderColor, clock.FrameTicks);
 
-            //border.ChangeBorderColor(data, clock.FrameTicks);
-
             beeper.UpdateBeeper(data, clock.TotalTicks);
         }
     }

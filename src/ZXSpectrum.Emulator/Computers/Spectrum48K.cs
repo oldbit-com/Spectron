@@ -22,7 +22,7 @@ public class Spectrum48K : ISpectrum
     private bool _isPaused;
     private bool _isPausedRequested;
 
-    public Action<ScreenBuffer> OnScreenRender { get; init; } = _ => { };
+    public Action<FrameBuffer> OnScreenRender { get; init; } = _ => { };
     public Keyboard Keyboard { get; } = new();
 
     public Spectrum48K()
@@ -39,11 +39,15 @@ public class Spectrum48K : ISpectrum
             //Trap = Trap
         };
 
+        _z80.Clock.TicksAdded += ClockTicksAdded;
+
         var bus = new Bus(Keyboard, _beeper, _screenRenderer, _z80.Clock);
         _z80.AddBus(bus);
 
         _tapeLoader = new TapeLoader(_z80, _memory);
     }
+
+    private void ClockTicksAdded(int previousFrameTicks, int currentFrameTicks) => _screenRenderer.UpdateContent(currentFrameTicks);
 
     private void ProcessInterrupt(object? data)
     {
@@ -60,7 +64,7 @@ public class Spectrum48K : ISpectrum
                 RunFrame();
             }
 
-            OnScreenRender(_screenRenderer.ScreenBuffer);
+            OnScreenRender(_screenRenderer.FrameBuffer);
         }
     }
 
@@ -68,13 +72,7 @@ public class Spectrum48K : ISpectrum
     {
         StartFrame();
 
-        foreach (var ticks in FastLookup.ContentTicks)
-        {
-            _z80.Run(ticks, RunMode.Incremental);
-            _screenRenderer.UpdateContent(_z80.Clock.FrameTicks);
-        }
-
-        _z80.Run(Constants.FrameTicks, RunMode.Incremental);
+        _z80.Run(Constants.FrameTicks);
 
         EndFrame();
     }
@@ -119,5 +117,5 @@ public class Spectrum48K : ISpectrum
         _tapeLoader.LoadFile(fileName);
     }
 
-    private void ScreenMemoryUpdated(ScreenMemoryUpdatedEventArgs e) => _screenRenderer.ScreenMemoryUpdated(e.Address);
+    private void ScreenMemoryUpdated(Word address) => _screenRenderer.ScreenMemoryUpdated(address);
 }

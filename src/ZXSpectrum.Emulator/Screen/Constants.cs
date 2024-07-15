@@ -16,7 +16,7 @@ internal static class Constants
     internal const int ContentTicks = 128;
     internal const int LeftBorderTicks = 24;
     internal const int RightBorderTicks = 24;
-    internal const int LineTicks = LeftBorderTicks + ContentTicks + RightBorderTicks + RetraceTicks;
-    internal const int FrameTicks = TotalLines * LineTicks;
+    internal const int RowTicks = LeftBorderTicks + ContentTicks + RightBorderTicks + RetraceTicks;
+    internal const int FrameTicks = TotalLines * RowTicks;
     internal const int FirstDataPixelTick = 14336;
 }

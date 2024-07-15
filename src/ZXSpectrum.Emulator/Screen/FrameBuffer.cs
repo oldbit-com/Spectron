@@ -1,10 +1,10 @@
 namespace OldBit.ZXSpectrum.Emulator.Screen;
 
-public class ScreenBuffer
+public class FrameBuffer
 {
     private readonly byte[] _dataBytes;
 
-    public ScreenBuffer(Color color)
+    public FrameBuffer(Color color)
     {
         Data = Enumerable.Repeat(color,
             (Constants.BorderLeft + Constants.ContentWidth + Constants.BorderRight) *
@@ -31,7 +31,7 @@ public class ScreenBuffer
         return _dataBytes;
     }
 
-    public static int GetContentAddress(int line) =>
+    public static int GetLineIndex(int line) =>
         (Constants.BorderLeft + Constants.ContentWidth + Constants.BorderRight) * Constants.BorderTop +
         Constants.BorderLeft +
         (Constants.BorderLeft + Constants.ContentWidth + Constants.BorderRight) * line;

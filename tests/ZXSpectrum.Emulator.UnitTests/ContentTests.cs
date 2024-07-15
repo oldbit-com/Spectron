@@ -5,22 +5,19 @@ namespace OldBit.ZXSpectrum.Emulator.UnitTests;
 
 public class ContentTests
 {
-    [Fact]
-    public void ContentRenderer_TicksTableShouldHave6144Elements()
-    {
-        FastLookup.ContentTicks.Length.Should().Be(6144);
-    }
-
     [Theory]
-    [InlineData(0, 14338)]
-    [InlineData(1, 14342)]
-    [InlineData(31, 14462)]
-    [InlineData(32, 14562)]
-    [InlineData(6112, 57122)]
-    [InlineData(6113, 57126)]
-    [InlineData(6143, 57246)]
-    public void ContentRenderer_ShouldBuildTicksTable(int index, int expectedTick)
+    [InlineData(0, 14335, 0x4000, 0x5800)]
+    [InlineData(1, 14343, 0x4002, 0x5802)]
+    [InlineData(15, 14455, 0x401E, 0x581E)]
+    [InlineData(16, 14559, 0x4100, 0x5800)]
+    [InlineData(3056, 57119, 0x57E0, 0x5AE0)]
+    [InlineData(3071, 57239, 0x57FE, 0x5AFE)]
+    public void ContentRenderer_ShouldBuildScreenEventsTable(int index, int expectedTicks, Word expectedBitmapAddress, Word expectedAttributeAddress)
     {
-        FastLookup.ContentTicks[index].Should().Be(expectedTick);
+        var eventsTable = FastLookup.BuildScreenEventsTable();
+
+        eventsTable[index].Ticks.Should().Be(expectedTicks);
+        eventsTable[index].BitmapAddress.Should().Be(expectedBitmapAddress);
+        eventsTable[index].AttributeAddress.Should().Be(expectedAttributeAddress);
     }
 }

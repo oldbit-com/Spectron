@@ -2,7 +2,7 @@ namespace OldBit.ZXSpectrum.Emulator.Screen;
 
 public record struct BorderTick(int StartTick, int EndTick, int StartPixel);
 
-public class BorderRenderer(ScreenBuffer screenBuffer)
+public class BorderRenderer(FrameBuffer frameBuffer)
 {
     private readonly List<BorderTick> _borderTickRanges = BuildBorderTickRanges();
 
@@ -10,7 +10,7 @@ public class BorderRenderer(ScreenBuffer screenBuffer)
     private int _offset;
     private Color _lastColor = Colors.White;
 
-    public void Update(Color color) => _lastColor = color;
+    internal void Update(Color color) => _lastColor = color;
 
     /// <summary>
     /// Fill the border with the specified color uo to the current tick.
@@ -22,6 +22,7 @@ public class BorderRenderer(ScreenBuffer screenBuffer)
         for (var rangeIndex = _lastRangeIndex; rangeIndex < _borderTickRanges.Count; rangeIndex++)
         {
             var tickRange = _borderTickRanges[rangeIndex];
+
             if (currentTicks >= tickRange.StartTick)
             {
                 if (currentTicks < tickRange.EndTick)
@@ -29,7 +30,7 @@ public class BorderRenderer(ScreenBuffer screenBuffer)
                     var startPixel = tickRange.StartPixel + 2 * _offset;
                     var count = 2 * (currentTicks - (tickRange.StartTick + _offset) + 1);
 
-                    screenBuffer.Fill(startPixel, count, _lastColor);
+                    frameBuffer.Fill(startPixel, count, _lastColor);
 
                     _offset = currentTicks - tickRange.StartTick + 1;
                     _lastRangeIndex = rangeIndex;
@@ -41,7 +42,7 @@ public class BorderRenderer(ScreenBuffer screenBuffer)
                     var startPixel = tickRange.StartPixel + 2 * _offset;
                     var count = 2 * (tickRange.EndTick - (tickRange.StartTick + _offset) + 1);
 
-                    screenBuffer.Fill(startPixel, count, _lastColor);
+                    frameBuffer.Fill(startPixel, count, _lastColor);
 
                     _offset = 0;
                 }
@@ -49,7 +50,6 @@ public class BorderRenderer(ScreenBuffer screenBuffer)
             else
             {
                 _lastRangeIndex = rangeIndex;
-
                 break;
             }
         }

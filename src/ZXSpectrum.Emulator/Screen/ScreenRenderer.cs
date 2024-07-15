@@ -13,12 +13,12 @@ public class ScreenRenderer
     private Color _lastBorderColor;
     private bool _borderColorChanged = true;
 
-    public ScreenBuffer ScreenBuffer { get; } = new(Colors.White);
+    public FrameBuffer FrameBuffer { get; } = new(Colors.White);
 
     public ScreenRenderer(Memory48K memory)
     {
-        _borderRenderer = new BorderRenderer(ScreenBuffer);
-        _contentRenderer = new ContentRenderer(ScreenBuffer, memory);
+        _borderRenderer = new BorderRenderer(FrameBuffer);
+        _contentRenderer = new ContentRenderer(FrameBuffer, memory);
     }
 
     public void NewFrame()
@@ -46,7 +46,7 @@ public class ScreenRenderer
 
     public void UpdateBorder(int currentTicks) => _borderRenderer.Update(_lastBorderColor, currentTicks);
 
-    public void UpdateContent(int currentTicks) => _contentRenderer.Update(currentTicks);
+    public void UpdateContent(int currentFrameTicks) => _contentRenderer.Update(currentFrameTicks);
 
     public void ScreenMemoryUpdated(Word address) => _contentRenderer.UpdateScreen(address);
 }
