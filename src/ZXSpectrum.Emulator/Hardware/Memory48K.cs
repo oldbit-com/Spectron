@@ -9,9 +9,9 @@ public class Memory48K : IMemory
 
     internal ReadOnlySpan<byte> Screen => new(Memory, 0x4000, 0x1C00);
 
-    internal delegate void ScreenMemoryUpdatedEventHandler(Word address);
+    internal delegate void ScreenMemoryUpdatedEvent(Word address);
 
-    internal event ScreenMemoryUpdatedEventHandler? ScreenMemoryUpdated;
+    internal event ScreenMemoryUpdatedEvent? ScreenMemoryUpdated;
 
     public Memory48K()
     {

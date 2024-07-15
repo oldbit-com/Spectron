@@ -73,48 +73,48 @@ public class BorderRenderer(FrameBuffer frameBuffer)
         var ticksTable = new List<BorderTick>();
 
         var startTick = 0;
-        var endTick = Constants.ContentTicks + Constants.LeftBorderTicks;
-        var startPixel = Constants.BorderLeft;
+        var endTick = DefaultTimings.ContentLineTicks + DefaultTimings.LeftBorderTicks;
+        var startPixel = DefaultSizes.BorderLeft;
 
-        for (var line = 0; line < Constants.TotalLines; line++)
+        for (var line = 0; line < DefaultSizes.TotalLines; line++)
         {
             switch (line)
             {
-                case < Constants.BorderTop:
+                case < DefaultSizes.BorderTop:
                     ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
 
-                    startTick = endTick + Constants.RetraceTicks;
-                    endTick = startTick + Constants.LeftBorderTicks + Constants.ContentTicks + Constants.RightBorderTicks;
+                    startTick = endTick + DefaultTimings.RetraceTicks;
+                    endTick = startTick + DefaultTimings.LeftBorderTicks + DefaultTimings.ContentLineTicks + DefaultTimings.RightBorderTicks;
                     startPixel += line == 0 ?
-                        Constants.ContentWidth + Constants.BorderRight :
-                        Constants.BorderLeft + Constants.ContentWidth + Constants.BorderRight;
+                        DefaultSizes.ContentWidth + DefaultSizes.BorderRight :
+                        DefaultSizes.BorderLeft + DefaultSizes.ContentWidth + DefaultSizes.BorderRight;
 
                     break;
 
-                case >= Constants.BorderTop + Constants.ContentHeight:
-                    endTick = startTick + Constants.LeftBorderTicks + Constants.ContentTicks + Constants.RightBorderTicks;
+                case >= DefaultSizes.BorderTop + DefaultSizes.ContentHeight:
+                    endTick = startTick + DefaultTimings.LeftBorderTicks + DefaultTimings.ContentLineTicks + DefaultTimings.RightBorderTicks;
 
                     ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
 
-                    startTick = endTick + Constants.RetraceTicks;
-                    startPixel += Constants.BorderLeft + Constants.ContentWidth + Constants.BorderRight;
+                    startTick = endTick + DefaultTimings.RetraceTicks;
+                    startPixel += DefaultSizes.BorderLeft + DefaultSizes.ContentWidth + DefaultSizes.BorderRight;
 
                     break;
 
                 default:
                     // Left border
-                    endTick = startTick + Constants.LeftBorderTicks;
+                    endTick = startTick + DefaultTimings.LeftBorderTicks;
                     ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
 
                     // Skip content area
-                    startTick = endTick + Constants.ContentTicks;
-                    endTick = startTick + Constants.RightBorderTicks;
-                    startPixel += Constants.BorderLeft + Constants.ContentWidth;
+                    startTick = endTick + DefaultTimings.ContentLineTicks;
+                    endTick = startTick + DefaultTimings.RightBorderTicks;
+                    startPixel += DefaultSizes.BorderLeft + DefaultSizes.ContentWidth;
 
                     // Right border
                     ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
-                    startTick = endTick + Constants.RetraceTicks;
-                    startPixel += Constants.BorderRight;
+                    startTick = endTick + DefaultTimings.RetraceTicks;
+                    startPixel += DefaultSizes.BorderRight;
 
                     break;
             }

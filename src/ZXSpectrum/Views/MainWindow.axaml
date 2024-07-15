@@ -3,6 +3,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:OldBit.ZXSpectrum.ViewModels"
+        xmlns:models="clr-namespace:OldBit.ZXSpectrum.Models"
+        xmlns:converters="clr-namespace:OldBit.ZXSpectrum.Converters"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.ZXSpectrum.Views.MainWindow"
         x:DataType="viewModels:MainWindowViewModel"
@@ -15,6 +17,10 @@
         <viewModels:MainWindowViewModel/>
     </Design.DataContext>
 
+    <Window.Resources>
+        <converters:SelectedBorderSizeToBooleanConverter x:Key="SelectedBorderSizeToBooleanConverter"/>
+    </Window.Resources>
+
     <NativeMenu.Menu>
         <NativeMenu>
             <NativeMenuItem Header="File">
@@ -23,6 +29,19 @@
                     <!-- <NativeMenuItem Header="Open Recent"> -->
                     <!--     <NativeMenu NeedsUpdate="OpenRecent_OnNeedsUpdate" /> -->
                     <!-- </NativeMenuItem> -->
+                </NativeMenu>
+            </NativeMenuItem>
+            <NativeMenuItem Header="View">
+                <NativeMenu>
+                    <NativeMenuItem Header="Border">
+                        <NativeMenu>
+                            <NativeMenuItem Header="None" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.None}" IsChecked="{Binding BorderSize, Converter={StaticResource SelectedBorderSizeToBooleanConverter}, ConverterParameter={x:Static models:BorderSize.None}}"/>
+                            <NativeMenuItem Header="Small" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Small}" IsChecked="{Binding BorderSize, Converter={StaticResource SelectedBorderSizeToBooleanConverter}, ConverterParameter={x:Static models:BorderSize.Small}}"/>
+                            <NativeMenuItem Header="Medium" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Medium}" IsChecked="{Binding BorderSize, Converter={StaticResource SelectedBorderSizeToBooleanConverter}, ConverterParameter={x:Static models:BorderSize.Medium}}"/>
+                            <NativeMenuItem Header="Large" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Large}" IsChecked="{Binding BorderSize, Converter={StaticResource SelectedBorderSizeToBooleanConverter}, ConverterParameter={x:Static models:BorderSize.Large}}"/>
+                            <NativeMenuItem Header="Full" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Full}" IsChecked="{Binding BorderSize, Converter={StaticResource SelectedBorderSizeToBooleanConverter}, ConverterParameter={x:Static models:BorderSize.Full}}"/>
+                        </NativeMenu>
+                    </NativeMenuItem>
                 </NativeMenu>
             </NativeMenuItem>
         </NativeMenu>

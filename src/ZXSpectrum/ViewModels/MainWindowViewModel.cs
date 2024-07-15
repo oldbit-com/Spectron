@@ -6,24 +6,30 @@ using Avalonia.Platform.Storage;
 using MsBox.Avalonia;
 using OldBit.ZXSpectrum.Emulator.Computers;
 using OldBit.ZXSpectrum.Helpers;
+using OldBit.ZXSpectrum.Models;
 using ReactiveUI;
 
 namespace OldBit.ZXSpectrum.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
+    private BorderSize _borderSize = BorderSize.Full;
+
     public Window MainWindow { get; set; } = null!;
 
     public ISpectrum Spectrum { get; set; } = null!;
 
     public ReactiveCommand<Unit, Task> OpenFileCommand { get; private set; }
 
+    public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
+
     public MainWindowViewModel()
     {
-        OpenFileCommand = ReactiveCommand.Create(OpenFileAsync);
+        OpenFileCommand = ReactiveCommand.Create(HandleOpenFileAsync);
+        ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
     }
 
-    private async Task OpenFileAsync()
+    private async Task HandleOpenFileAsync()
     {
         var topLevel = TopLevel.GetTopLevel(MainWindow);
         if (topLevel != null)
@@ -57,5 +63,17 @@ public class MainWindowViewModel : ViewModelBase
                 }
             }
         }
+    }
+
+    private void HandleChangeBorderSize(BorderSize borderSize)
+    {
+        BorderSize = borderSize;
+        // Handle border size change here
+    }
+
+    public BorderSize BorderSize
+    {
+        get => _borderSize;
+        set => this.RaiseAndSetIfChanged(ref _borderSize, value);
     }
 }

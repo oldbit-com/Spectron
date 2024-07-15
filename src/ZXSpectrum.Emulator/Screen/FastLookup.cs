@@ -65,9 +65,9 @@ internal static class FastLookup
     {
         var screenEvents = new List<ScreenRenderEvent>();
 
-        for (var y = 0; y < Constants.ContentHeight; y++)
+        for (var y = 0; y < DefaultSizes.ContentHeight; y++)
         {
-            var rowTime = Constants.FirstDataPixelTick - 1 + Constants.RowTicks * y;
+            var rowTime = DefaultTimings.FirstDataPixelTick - 1 + DefaultTimings.LineTicks * y;
             var bufferLineIndex = FrameBuffer.GetLineIndex(y);
 
             for (var x = 0; x < 16; x++)

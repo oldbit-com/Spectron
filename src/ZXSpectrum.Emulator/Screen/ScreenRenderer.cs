@@ -4,9 +4,6 @@ namespace OldBit.ZXSpectrum.Emulator.Screen;
 
 public class ScreenRenderer
 {
-    public const int TotalWidth = Constants.BorderLeft + Constants.ContentWidth + Constants.BorderRight;
-    public const int TotalHeight = Constants.BorderTop + Constants.ContentHeight + Constants.BorderBottom;
-
     private readonly BorderRenderer _borderRenderer;
     private readonly ContentRenderer _contentRenderer;
 

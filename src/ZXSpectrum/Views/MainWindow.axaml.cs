@@ -36,22 +36,25 @@ public partial class MainWindow : Window
 
     private void InitializeEmulator()
     {
-        _spectrum = new Spectrum48K
-        {
-            OnScreenRender = buffer =>
-            {
-                var image = new WriteableBitmap(
-                    new PixelSize(ScreenRenderer.TotalWidth, ScreenRenderer.TotalHeight),
-                    new Vector(96, 96),
-                    PixelFormat.Rgba8888);
-                using var frameBuffer = image.Lock();
+        var spectrum = new Spectrum48K();
 
+        spectrum.RenderScreen += buffer =>
+        {
+            var bitmap = new WriteableBitmap(
+                new PixelSize(FrameBuffer.Width, FrameBuffer.Height),
+                new Vector(96, 96),
+                PixelFormat.Rgba8888);
+
+            using (var frameBuffer = bitmap.Lock())
+            {
                 var data = buffer.ToBytes();
                 Marshal.Copy(data, 0, frameBuffer.Address, data.Length);
-
-                Dispatcher.UIThread.Post(() => ScreenImage.Source = image);
             }
+
+            Dispatcher.UIThread.Post(() => ScreenImage.Source = bitmap);
         };
+
+        _spectrum = spectrum;
 
         _spectrum.Start();
     }

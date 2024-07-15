@@ -9,7 +9,7 @@ namespace OldBit.ZXSpectrum.Emulator.Computers;
 public class Spectrum48K : ISpectrum
 {
     private const float ClockMHz = 3.5f;
-    private const float InterruptFrequencyHz = ClockMHz * 1000000 / Constants.FrameTicks;
+    private const float InterruptFrequencyHz = ClockMHz * 1000000 / DefaultTimings.FrameTicks;
 
     private readonly ScreenRenderer _screenRenderer;
     private readonly Memory48K _memory;
@@ -22,8 +22,11 @@ public class Spectrum48K : ISpectrum
     private bool _isPaused;
     private bool _isPausedRequested;
 
-    public Action<FrameBuffer> OnScreenRender { get; init; } = _ => { };
     public Keyboard Keyboard { get; } = new();
+
+    public delegate void RenderScreenEvent(FrameBuffer frameBuffer);
+
+    public event RenderScreenEvent? RenderScreen;
 
     public Spectrum48K()
     {
@@ -64,7 +67,7 @@ public class Spectrum48K : ISpectrum
                 RunFrame();
             }
 
-            OnScreenRender(_screenRenderer.FrameBuffer);
+            RenderScreen?.Invoke(_screenRenderer.FrameBuffer);
         }
     }
 
@@ -72,7 +75,7 @@ public class Spectrum48K : ISpectrum
     {
         StartFrame();
 
-        _z80.Run(Constants.FrameTicks);
+        _z80.Run(DefaultTimings.FrameTicks);
 
         EndFrame();
     }
