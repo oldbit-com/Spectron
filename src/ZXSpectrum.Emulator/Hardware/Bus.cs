@@ -5,17 +5,24 @@ using OldBit.ZXSpectrum.Emulator.Screen;
 
 namespace OldBit.ZXSpectrum.Emulator.Hardware;
 
-public class Bus(Keyboard keyboard, Beeper beeper, ScreenRenderer renderer, Clock clock) : IBus
+public class Bus(Beeper beeper, ScreenRenderer renderer, Clock clock) : IBus
 {
+    private readonly List<IInputDevice> _inputDevices = [];
+
+    internal void AddDevice(IInputDevice device) => _inputDevices.Add(device);
+
     public byte Read(Word address)
     {
-        var (hiAddress, loAddress) = address;
-
-        if (IsKeyboardPort(loAddress))
+        foreach (var inputDevice in _inputDevices)
         {
-            return keyboard.GetKeyState(hiAddress);
+            var result = inputDevice.Read(address);
+            if (result != null)
+            {
+                return result.Value;
+            }
         }
 
+        // TODO: Floating bus
         return 0xFF;
     }
 
@@ -29,8 +36,6 @@ public class Bus(Keyboard keyboard, Beeper beeper, ScreenRenderer renderer, Cloc
             beeper.UpdateBeeper(data, clock.TotalTicks);
         }
     }
-
-    private static bool IsKeyboardPort(byte address) => address == 0xFE;
 
     private static bool IsUlaPort(Word address) => (address & 0x01) == 0x00;
 }

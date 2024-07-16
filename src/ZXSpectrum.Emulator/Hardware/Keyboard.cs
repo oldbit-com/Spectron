@@ -1,6 +1,6 @@
 namespace OldBit.ZXSpectrum.Emulator.Hardware;
 
-public class Keyboard
+public class Keyboard : IInputDevice
 {
     private readonly Dictionary<byte, byte> _keyStates = new()
     {
@@ -65,7 +65,17 @@ public class Keyboard
         { SpectrumKey.B, (0b10000, 0x7F) }
     };
 
-    public void KeyDown(IEnumerable<SpectrumKey> keys)
+    public byte? Read(Word address)
+    {
+        if (!IsKeyPort(address))
+        {
+            return null;
+        }
+
+        return GetKeyState((byte)(address >> 8));
+    }
+
+    public void HandleKeyDown(IEnumerable<SpectrumKey> keys)
     {
         foreach (var key in keys)
         {
@@ -76,7 +86,7 @@ public class Keyboard
         }
     }
 
-    public void KeyUp(IEnumerable<SpectrumKey> keys)
+    public void HandleKeyUp(IEnumerable<SpectrumKey> keys)
     {
         foreach (var key in keys)
         {
@@ -87,7 +97,7 @@ public class Keyboard
         }
     }
 
-    public byte GetKeyState(byte port)
+    private byte GetKeyState(byte port)
     {
         if (_keyStates.TryGetValue(port, out var state))
         {
@@ -95,6 +105,7 @@ public class Keyboard
         }
 
         state = 0xFF;
+
         // Special case, for example if port is 0x02, it means check any key except row A-G (0xFD) etc.
         foreach (var (keyPort, keyState) in _keyStates)
         {
@@ -106,4 +117,6 @@ public class Keyboard
 
         return state;
     }
+
+    private static bool IsKeyPort(Word address) => (address & 0x01) == 0;
 }

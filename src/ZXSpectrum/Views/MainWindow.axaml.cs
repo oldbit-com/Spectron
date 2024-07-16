@@ -36,7 +36,7 @@ public partial class MainWindow : Window
         var spectrumKey = KeyMappings.ToSpectrumKey(e);
         if (spectrumKey.Count > 0)
         {
-            _emulator.Keyboard.KeyDown(spectrumKey);
+            _emulator.Keyboard.HandleKeyDown(spectrumKey);
         }
 
         if (e.Key == Key.F11)
@@ -59,7 +59,7 @@ public partial class MainWindow : Window
         var spectrumKey = KeyMappings.ToSpectrumKey(e);
         if (spectrumKey.Count > 0)
         {
-            _emulator.Keyboard.KeyUp(spectrumKey);
+            _emulator.Keyboard.HandleKeyUp(spectrumKey);
         }
     }
 }
