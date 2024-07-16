@@ -1,6 +1,9 @@
 namespace OldBit.ZXSpectrum.Emulator.Screen;
 
-public readonly record struct Color(byte Red, byte Green, byte Blue);
+public readonly record struct Color(byte Red, byte Green, byte Blue)
+{
+    public int Abgr { get; } = 0xFF << 24 | Blue << 16 | Green << 8 | Red;
+}
 
 internal static class Colors
 {

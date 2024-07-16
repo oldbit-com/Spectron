@@ -48,9 +48,11 @@
     </NativeMenu.Menu>
 
     <Grid>
-        <Border Height="624" Width="704" Background="Beige">
-            <Image x:Name="ScreenImage" />
-        </Border>
+        <Panel>
+            <Border Background="Beige">
+                <Image x:Name="ScreenImage" Source="{Binding SpectrumScreen}"/>
+            </Border>
+        </Panel>
     </Grid>
 
 </Window>

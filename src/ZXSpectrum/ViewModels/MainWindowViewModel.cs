@@ -2,9 +2,12 @@
 using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using MsBox.Avalonia;
 using OldBit.ZXSpectrum.Emulator.Computers;
+using OldBit.ZXSpectrum.Emulator.Screen;
 using OldBit.ZXSpectrum.Helpers;
 using OldBit.ZXSpectrum.Models;
 using ReactiveUI;
@@ -13,15 +16,13 @@ namespace OldBit.ZXSpectrum.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
-    private BorderSize _borderSize = BorderSize.Full;
+    private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
+
+    public Spectrum48K? Emulator { get; set; }
 
     public Window MainWindow { get; set; } = null!;
 
-    public ISpectrum Spectrum { get; set; } = null!;
-
-    public ReactiveCommand<Unit, Task> OpenFileCommand { get; private set; }
-
-    public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
+    public Control ScreenControl { get; set; } = null!;
 
     public MainWindowViewModel()
     {
@@ -29,6 +30,24 @@ public class MainWindowViewModel : ViewModelBase
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
     }
 
+    public void Initialize()
+    {
+        Emulator = new Spectrum48K();
+        Emulator.RenderScreen += EmulatorOnRenderScreen;
+
+        Emulator.Start();
+    }
+
+    private void EmulatorOnRenderScreen(FrameBuffer framebuffer)
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            SpectrumScreen = _frameBufferConverter.Convert(framebuffer);
+            ScreenControl.InvalidateVisual();
+        });
+    }
+
+    public ReactiveCommand<Unit, Task> OpenFileCommand { get; private set; }
     private async Task HandleOpenFileAsync()
     {
         var topLevel = TopLevel.GetTopLevel(MainWindow);
@@ -44,12 +63,12 @@ public class MainWindowViewModel : ViewModelBase
                 }
             });
 
-            if (files?.Count > 0)
+            if (files.Count > 0)
             {
                 try
                 {
-                    Spectrum.Pause();
-                    Spectrum.LoadFile(files[0].Path.LocalPath);
+                    Emulator?.Pause();
+                    Emulator?.LoadFile(files[0].Path.LocalPath);
                 }
                 catch (Exception ex)
                 {
@@ -59,21 +78,30 @@ public class MainWindowViewModel : ViewModelBase
                 }
                 finally
                 {
-                    Spectrum.Resume();
+                    Emulator?.Resume();
                 }
             }
         }
     }
 
+    public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     private void HandleChangeBorderSize(BorderSize borderSize)
     {
         BorderSize = borderSize;
         // Handle border size change here
     }
 
+    private BorderSize _borderSize = BorderSize.Full;
     public BorderSize BorderSize
     {
         get => _borderSize;
         set => this.RaiseAndSetIfChanged(ref _borderSize, value);
+    }
+
+    private Bitmap? _spectrumScreen;
+    public Bitmap? SpectrumScreen
+    {
+        get => _spectrumScreen;
+        set => this.RaiseAndSetIfChanged(ref _spectrumScreen, value);
     }
 }

@@ -38,7 +38,7 @@ public class BorderTests
 
         borderRenderer.Update(Colors.Blue, 69888);
 
-        BorderShouldHaveColor(Colors.Blue, screenBuffer.Data);
+        BorderShouldHaveColor(Colors.Blue, screenBuffer.Pixels);
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class BorderTests
             borderRenderer.Update(Colors.Red, ticks);
         }
 
-        BorderShouldHaveColor(Colors.Red, screenBuffer.Data);
+        BorderShouldHaveColor(Colors.Red, screenBuffer.Pixels);
     }
 
     [Fact]
@@ -71,8 +71,8 @@ public class BorderTests
         borderRenderer.Update(Colors.Blue, 25013);
         borderRenderer.Update(Colors.Blue, 69888);
 
-        screenBuffer.Data[..52].Should().AllSatisfy(c => c.Should().Be(Colors.White));
-        screenBuffer.Data[52..351].Should().AllSatisfy(c => c.Should().Be(Colors.Cyan));
+        screenBuffer.Pixels[..52].Should().AllSatisfy(c => c.Should().Be(Colors.White));
+        screenBuffer.Pixels[52..351].Should().AllSatisfy(c => c.Should().Be(Colors.Cyan));
         //screenBuffer[48..351].Should().AllSatisfy(c => c.Should().Be(Colors.Cyan));
     }
 

@@ -9,6 +9,7 @@
         <AssemblyName>OldBit.ZXSpectrum</AssemblyName>
         <RootNamespace>OldBit.ZXSpectrum</RootNamespace>
         <LangVersion>12</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
@@ -31,5 +32,9 @@
 
     <ItemGroup>
       <ProjectReference Include="..\ZXSpectrum.Emulator\ZXSpectrum.Emulator.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Extensions\" />
     </ItemGroup>
 </Project>
