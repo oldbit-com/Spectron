@@ -44,8 +44,11 @@ public class Spectrum48K : ISpectrum
 
         _z80.Clock.TicksAdded += ClockTicksAdded;
 
-        var bus = new Bus(_beeper, _screenRenderer, _z80.Clock);
-        bus.AddDevice(Keyboard);
+        var ula = new Ula(Keyboard, _beeper, _screenRenderer, _z80.Clock);
+        var bus = new Bus();
+
+        bus.AddInputDevice(ula);
+        bus.AddOutputDevice(ula);
 
         _z80.AddBus(bus);
 

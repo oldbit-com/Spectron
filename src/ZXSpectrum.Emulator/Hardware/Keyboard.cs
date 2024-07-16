@@ -67,7 +67,7 @@ public class Keyboard : IInputDevice
 
     public byte? Read(Word address)
     {
-        if (!IsKeyPort(address))
+        if (!Bus.IsUlaPort(address))
         {
             return null;
         }
@@ -117,6 +117,4 @@ public class Keyboard : IInputDevice
 
         return state;
     }
-
-    private static bool IsKeyPort(Word address) => (address & 0x01) == 0;
 }

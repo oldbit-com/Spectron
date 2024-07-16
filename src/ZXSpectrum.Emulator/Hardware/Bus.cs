@@ -1,15 +1,14 @@
 using OldBit.Z80Cpu;
-using OldBit.Z80Cpu.Extensions;
-using OldBit.ZXSpectrum.Emulator.Hardware.Audio;
-using OldBit.ZXSpectrum.Emulator.Screen;
 
 namespace OldBit.ZXSpectrum.Emulator.Hardware;
 
-public class Bus(Beeper beeper, ScreenRenderer renderer, Clock clock) : IBus
+public class Bus() : IBus
 {
     private readonly List<IInputDevice> _inputDevices = [];
+    private readonly List<IOutputDevice> _outputDevices = [];
 
-    internal void AddDevice(IInputDevice device) => _inputDevices.Add(device);
+    internal void AddInputDevice(IInputDevice device) => _inputDevices.Add(device);
+    internal void AddOutputDevice(IOutputDevice device) => _outputDevices.Add(device);
 
     public byte Read(Word address)
     {
@@ -22,20 +21,16 @@ public class Bus(Beeper beeper, ScreenRenderer renderer, Clock clock) : IBus
             }
         }
 
-        // TODO: Floating bus
         return 0xFF;
     }
 
     public void Write(Word address, byte data)
     {
-        if (IsUlaPort(address))
+        foreach(var outputDevice in _outputDevices)
         {
-            var borderColor = Colors.BorderColors[(byte)(data & 0x07)];
-            renderer.UpdateBorder(borderColor, clock.FrameTicks);
-
-            beeper.UpdateBeeper(data, clock.TotalTicks);
+            outputDevice.Write(address, data);
         }
     }
 
-    private static bool IsUlaPort(Word address) => (address & 0x01) == 0x00;
+    internal static bool IsUlaPort(Word address) => (address & 0x01) == 0x00;
 }
