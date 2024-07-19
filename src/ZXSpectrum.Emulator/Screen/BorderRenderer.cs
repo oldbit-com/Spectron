@@ -16,23 +16,23 @@ public class BorderRenderer(FrameBuffer frameBuffer)
     /// Fill the border with the specified color uo to the current tick.
     /// </summary>
     /// <param name="color">The new color.</param>
-    /// <param name="currentTicks">The current tick when border color is changing.</param>
-    public void Update(Color color, int currentTicks)
+    /// <param name="frameTicks">The current tick when border color is changing.</param>
+    public void Update(Color color, int frameTicks)
     {
         for (var rangeIndex = _lastRangeIndex; rangeIndex < _borderTickRanges.Count; rangeIndex++)
         {
             var tickRange = _borderTickRanges[rangeIndex];
 
-            if (currentTicks >= tickRange.StartTick)
+            if (frameTicks >= tickRange.StartTick)
             {
-                if (currentTicks < tickRange.EndTick)
+                if (frameTicks < tickRange.EndTick)
                 {
                     var startPixel = tickRange.StartPixel + 2 * _offset;
-                    var count = 2 * (currentTicks - (tickRange.StartTick + _offset) + 1);
+                    var count = 2 * (frameTicks - (tickRange.StartTick + _offset) + 1);
 
                     frameBuffer.Fill(startPixel, count, _lastColor);
 
-                    _offset = currentTicks - tickRange.StartTick + 1;
+                    _offset = frameTicks - tickRange.StartTick + 1;
                     _lastRangeIndex = rangeIndex;
 
                     break;

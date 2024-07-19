@@ -4,7 +4,7 @@ namespace OldBit.ZXSpectrum.Emulator.Hardware.Audio;
 
 /// <summary>
 /// Represents an infinite circular enumerator that provides beeper data, so the player is always saturated
-/// and playin indefinitely, even when beeper is silent.
+/// and playing indefinitely, even when beeper is silent.
 /// </summary>
 /// <param name="capacity">The capacity of the buffer.</param>
 /// <param name="defaultValue">The default value to return when buffer is empty.</param>

@@ -32,5 +32,8 @@ internal static class DefaultTimings
     /// </summary>
     internal const int FrameTicks = DefaultSizes.TotalLines * LineTicks;
 
-    internal const int FirstDataPixelTick = 14336;
+    /// <summary>
+    /// Number of T-states passed since the interrupt generation to the first display byte is being sent to screen.
+    /// </summary>
+    internal const int FirstPixelTick = 14336;
 }

@@ -67,7 +67,7 @@ internal static class FastLookup
 
         for (var y = 0; y < DefaultSizes.ContentHeight; y++)
         {
-            var rowTime = DefaultTimings.FirstDataPixelTick - 1 + DefaultTimings.LineTicks * y;
+            var rowTime = DefaultTimings.FirstPixelTick + DefaultTimings.LineTicks * y;
             var bufferLineIndex = FrameBuffer.GetLineIndex(y);
 
             for (var x = 0; x < 16; x++)

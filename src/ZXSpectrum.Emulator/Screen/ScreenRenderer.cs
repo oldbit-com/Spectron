@@ -24,7 +24,7 @@ public class ScreenRenderer
         _contentRenderer.NewFrame();
     }
 
-    public void UpdateBorder(Color borderColor, int currentTicks)
+    public void UpdateBorder(Color borderColor, int frameTicks)
     {
         if (_lastBorderColor != borderColor)
         {
@@ -37,13 +37,14 @@ public class ScreenRenderer
             return;
         }
 
-        _borderRenderer.Update(borderColor, currentTicks);
+        _borderRenderer.Update(borderColor, frameTicks);
+
         _borderColorChanged = false;
     }
 
-    public void UpdateBorder(int currentTicks) => _borderRenderer.Update(_lastBorderColor, currentTicks);
+    public void UpdateBorder(int frameTicks) => _borderRenderer.Update(_lastBorderColor, frameTicks);
 
-    public void UpdateContent(int currentFrameTicks) => _contentRenderer.Update(currentFrameTicks);
+    public void UpdateContent(int frameTicks) => _contentRenderer.Update(frameTicks);
 
     public void ScreenMemoryUpdated(Word address) => _contentRenderer.UpdateScreen(address);
 }

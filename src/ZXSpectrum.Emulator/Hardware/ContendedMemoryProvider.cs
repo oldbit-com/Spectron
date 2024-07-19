@@ -1,22 +1,21 @@
 using OldBit.Z80Cpu.Contention;
+using OldBit.ZXSpectrum.Emulator.Screen;
 
 namespace OldBit.ZXSpectrum.Emulator.Hardware;
 
 public class ContendedMemoryProvider : IContentionProvider
 {
-    private const int FirstState = 14335;           // T-state for the 1st visible pixel
-    private const int StatesPerLine = 224;          // T-states per line pixels
-    private const int LineCount = 24 * 8;           // 192 lines
     private static readonly int[] ContentionPattern = [6, 5, 4, 3, 2, 1, 0, 0];
     private readonly int[] _contentionTable = BuildContentionTable();
 
     private static int[] BuildContentionTable()
     {
-        var contentionTable = new int[FirstState + LineCount * StatesPerLine];
+        var contentionTable = new int[
+            DefaultTimings.FirstPixelTick + DefaultSizes.ContentHeight * DefaultTimings.LineTicks];
 
-        for (var line = 0; line < LineCount; line++)
+        for (var line = 0; line < DefaultSizes.ContentHeight; line++)
         {
-            var startLineState = FirstState + line * StatesPerLine;
+            var startLineState = DefaultTimings.FirstPixelTick + line * DefaultTimings.LineTicks;
 
             for (var i = 0; i < 128; i += ContentionPattern.Length)
             {
@@ -37,7 +36,7 @@ public class ContendedMemoryProvider : IContentionProvider
             return 0;
         }
 
-        if (currentStates < _contentionTable.Length && currentStates >= FirstState)
+        if (currentStates < _contentionTable.Length && currentStates >= DefaultTimings.FirstPixelTick)
         {
             return _contentionTable[currentStates];
         }

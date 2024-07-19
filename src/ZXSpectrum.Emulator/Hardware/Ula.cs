@@ -6,6 +6,8 @@ namespace OldBit.ZXSpectrum.Emulator.Hardware;
 
 public class Ula(Keyboard keyboard, Beeper beeper, ScreenRenderer renderer, Clock clock) : IInputDevice, IOutputDevice
 {
+    private const byte EarBit = 0x10;
+
     public byte? Read(Word address)
     {
         if (IsUlaPort(address))
@@ -24,10 +26,13 @@ public class Ula(Keyboard keyboard, Beeper beeper, ScreenRenderer renderer, Cloc
             return;
         }
 
-        var borderColor = Colors.BorderColors[(byte)(data & 0x07)];
-        renderer.UpdateBorder(borderColor, clock.FrameTicks);
+        var color = Colors.BorderColors[(byte)(data & 0x07)];
+        renderer.UpdateBorder(color, clock.FrameTicks);
 
         beeper.UpdateBeeper(data, clock.TotalTicks);
+
+        // var beeperState = data & EarBit >> 4;
+        // beeper.UpdateBeeper1(beeperState, clock.FrameTicks);
     }
 
     private static bool IsUlaPort(Word address) => (address & 0x01) == 0x00;

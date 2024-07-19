@@ -33,8 +33,4 @@
     <ItemGroup>
       <ProjectReference Include="..\ZXSpectrum.Emulator\ZXSpectrum.Emulator.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Extensions\" />
-    </ItemGroup>
 </Project>

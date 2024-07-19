@@ -8,6 +8,7 @@ using Avalonia.Threading;
 using MsBox.Avalonia;
 using OldBit.ZXSpectrum.Emulator.Computers;
 using OldBit.ZXSpectrum.Emulator.Screen;
+using OldBit.ZXSpectrum.Extensions;
 using OldBit.ZXSpectrum.Helpers;
 using OldBit.ZXSpectrum.Models;
 using ReactiveUI;
@@ -88,7 +89,7 @@ public class MainWindowViewModel : ViewModelBase
     private void HandleChangeBorderSize(BorderSize borderSize)
     {
         BorderSize = borderSize;
-        // Handle border size change here
+        _frameBufferConverter.SetBorderSize(borderSize);
     }
 
     private BorderSize _borderSize = BorderSize.Full;

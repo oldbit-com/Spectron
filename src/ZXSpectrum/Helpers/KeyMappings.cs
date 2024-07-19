@@ -62,6 +62,7 @@ public static class KeyMappings
             PhysicalKey.ArrowDown => [SpectrumKey.CapsShift, SpectrumKey.D6],
             PhysicalKey.ArrowUp => [SpectrumKey.CapsShift, SpectrumKey.D7],
             PhysicalKey.ArrowRight => [SpectrumKey.CapsShift, SpectrumKey.D8],
+            PhysicalKey.Minus => [SpectrumKey.SymbolShift, SpectrumKey.J],
             _ => []
         };
     }
