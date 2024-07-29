@@ -23,16 +23,18 @@ public class Beeper
 
     public Beeper(float clockMHz)
     {
-        _statesPerSample = clockMHz * 1_000_000 / PlayerSampleRate;
+        _statesPerSample = (int)(clockMHz * 1_000_000 / PlayerSampleRate);
 
         _audioPlayer = new AudioPlayer(AudioFormat.Unsigned8Bit, PlayerSampleRate, 1);
-        _beeperBuffer = new BeeperBuffer(16384*4, () => _amplitude);
+        _beeperBuffer = new BeeperBuffer(16384 * 4, () => _amplitude);
 
         Start();
     }
 
     public void UpdateBeeper(byte value, long ticks)
     {
+        // TODO: Sound is more or less ok, but not perfect, need some more work, sampling most likely.
+
         var ear = value & 0x10;
         if (ear == _lastEar)
         {
@@ -48,15 +50,11 @@ public class Beeper
 
         _remainingTicks += ticksElapsed;
 
-        var samples = (int)(_remainingTicks / _statesPerSample);
-        if (samples > 0)
+        var sampleCount = (int)(_remainingTicks / _statesPerSample);
+        if (sampleCount > 0)
         {
-            WriteBuffer(_amplitude, samples);
-            _remainingTicks -= samples * _statesPerSample;
-        }
-        else
-        {
-            Debug.WriteLine($"Clipping");
+            WriteBuffer(_amplitude, sampleCount);
+            _remainingTicks -= sampleCount * _statesPerSample;
         }
 
         _amplitude = _amplitude == LowAmplitude ? HighAmplitude : LowAmplitude;
@@ -66,8 +64,6 @@ public class Beeper
 
     private void Start()
     {
-        _audioPlayer.Start();
-
         Task.Run(async () =>
         {
             await _audioPlayer.PlayAsync(_beeperBuffer, _cancellationTokenSource.Token);
