@@ -16,6 +16,7 @@ public class Spectrum48K : ISpectrum
     private readonly Beeper _beeper;
     private readonly Z80 _z80;
     private readonly TapeLoader _tapeLoader;
+    private readonly TapePlayer _tapePlayer;
 
     private Timer? _timer;
     private readonly object _timerLock = new();
@@ -23,6 +24,8 @@ public class Spectrum48K : ISpectrum
     private bool _isPausedRequested;
 
     public Keyboard Keyboard { get; } = new();
+
+    public bool IsPaused => _isPaused;
 
     public delegate void RenderScreenEvent(FrameBuffer frameBuffer);
 
@@ -37,14 +40,14 @@ public class Spectrum48K : ISpectrum
         _beeper = new Beeper(ClockMHz);
 
         var contendedMemoryProvider = new ContendedMemoryProvider();
-        _z80 = new Z80(_memory, contendedMemoryProvider)
-        {
-            //Trap = Trap
-        };
+        _z80 = new Z80(_memory, contendedMemoryProvider);
 
+        _z80.BeforeFetch += BeforeInstructionFetch;
         _z80.Clock.TicksAdded += ClockTicksAdded;
 
-        var ula = new Ula(Keyboard, _beeper, _screenRenderer, _z80.Clock);
+        _tapePlayer = new TapePlayer(_z80.Clock);
+
+        var ula = new Ula(Keyboard, _beeper, _screenRenderer, _z80.Clock, _tapePlayer);
         var bus = new Bus();
 
         bus.AddInputDevice(ula);
@@ -52,10 +55,21 @@ public class Spectrum48K : ISpectrum
 
         _z80.AddBus(bus);
 
-        _tapeLoader = new TapeLoader(_z80, _memory);
+        _tapeLoader = new TapeLoader(_z80, _memory, _screenRenderer, _tapePlayer);
     }
 
-    private void ClockTicksAdded(int previousFrameTicks, int currentFrameTicks) => _screenRenderer.UpdateContent(currentFrameTicks);
+    private void BeforeInstructionFetch(Word pc)
+    {
+        if (pc == RomRoutines.LoadBytes)
+        {
+            if (!_tapePlayer.IsPlaying)
+            {
+                _tapePlayer.Start();
+            }
+        }
+    }
+
+    private void ClockTicksAdded(int addedTicks, int previousFrameTicks, int currentFrameTicks) => _screenRenderer.UpdateContent(currentFrameTicks);
 
     private void ProcessInterrupt(object? data)
     {
@@ -118,6 +132,11 @@ public class Spectrum48K : ISpectrum
     public void Resume()
     {
         _isPaused = false;
+    }
+
+    public void Reset()
+    {
+        _z80.Reset();
     }
 
     public void LoadFile(string fileName)

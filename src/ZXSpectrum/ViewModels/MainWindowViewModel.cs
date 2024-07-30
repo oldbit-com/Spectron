@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
@@ -8,7 +9,6 @@ using Avalonia.Threading;
 using MsBox.Avalonia;
 using OldBit.ZXSpectrum.Emulator.Computers;
 using OldBit.ZXSpectrum.Emulator.Screen;
-using OldBit.ZXSpectrum.Extensions;
 using OldBit.ZXSpectrum.Helpers;
 using OldBit.ZXSpectrum.Models;
 using ReactiveUI;
@@ -29,12 +29,17 @@ public class MainWindowViewModel : ViewModelBase
     {
         OpenFileCommand = ReactiveCommand.Create(HandleOpenFileAsync);
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
+        PauseCommand = ReactiveCommand.Create(HandleMachinePause, this.WhenAnyValue(x => x.Emulator).Select(emulator => emulator is null));
+        ResetCommand = ReactiveCommand.Create(HandleMachineReset, this.WhenAnyValue(x => x.Emulator).Select(emulator => emulator is null));
     }
 
     public void Initialize()
     {
         Emulator = new Spectrum48K();
         Emulator.RenderScreen += EmulatorOnRenderScreen;
+
+       // this.WhenAnyValue(x => x.Emulator!.IsPaused).ToProperty(this, x => x.IsPaused, out _isPaused);
+
 
         Emulator.Start();
     }
@@ -60,7 +65,7 @@ public class MainWindowViewModel : ViewModelBase
                 AllowMultiple = false,
                 FileTypeFilter = new[]
                 {
-                    TapeFileTypes.All, TapeFileTypes.Sna, TapeFileTypes.Tap, TapeFileTypes.Tzx, TapeFileTypes.Z80
+                    TapeFileTypes.All, TapeFileTypes.Sna, TapeFileTypes.Szx, TapeFileTypes.Tap, TapeFileTypes.Tzx, TapeFileTypes.Z80
                 }
             });
 
@@ -92,6 +97,29 @@ public class MainWindowViewModel : ViewModelBase
         _frameBufferConverter.SetBorderSize(borderSize);
     }
 
+    public ReactiveCommand<Unit, Unit> ResetCommand { get; private set; }
+    private void HandleMachineReset()
+    {
+        Emulator?.Reset();
+    }
+
+    public ReactiveCommand<Unit, Unit> PauseCommand { get; private set; }
+    private void HandleMachinePause()
+    {
+        switch (Emulator?.IsPaused)
+        {
+            case true:
+                Emulator.Resume();
+                break;
+
+            case false:
+                Emulator.Pause();
+                break;
+        }
+
+        IsPaused = Emulator?.IsPaused ?? false;
+    }
+
     private BorderSize _borderSize = BorderSize.Full;
     public BorderSize BorderSize
     {
@@ -104,5 +132,12 @@ public class MainWindowViewModel : ViewModelBase
     {
         get => _spectrumScreen;
         set => this.RaiseAndSetIfChanged(ref _spectrumScreen, value);
+    }
+
+    private bool _isPaused;
+    public bool IsPaused
+    {
+        get => _isPaused;
+        set => this.RaiseAndSetIfChanged(ref _isPaused, value);
     }
 }

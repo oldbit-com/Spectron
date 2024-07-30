@@ -19,16 +19,16 @@ public partial class MainWindow : Window
 
     protected override void OnLoaded(RoutedEventArgs e)
     {
-        //InitializeEmulator();
-
-        if (DataContext is MainWindowViewModel viewModel)
+        if (DataContext is not MainWindowViewModel viewModel)
         {
-            viewModel.MainWindow = this;
-            viewModel.ScreenControl = ScreenImage;
-
-            viewModel.Initialize();
-            _emulator = viewModel.Emulator!;
+            return;
         }
+
+        viewModel.MainWindow = this;
+        viewModel.ScreenControl = ScreenImage;
+
+        viewModel.Initialize();
+        _emulator = viewModel.Emulator!;
     }
 
     private void OnKeyDown(object? sender, KeyEventArgs e)
@@ -37,20 +37,6 @@ public partial class MainWindow : Window
         if (spectrumKey.Count > 0)
         {
             _emulator.Keyboard.HandleKeyDown(spectrumKey);
-        }
-
-        if (e.Key == Key.F11)
-        {
-            if (_isPaused)
-            {
-                _emulator.Resume();
-            }
-            else
-            {
-                _emulator.Pause();
-            }
-
-            _isPaused = !_isPaused;
         }
     }
 

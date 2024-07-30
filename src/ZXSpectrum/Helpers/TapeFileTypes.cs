@@ -6,7 +6,7 @@ public static class TapeFileTypes
 {
     public static FilePickerFileType All { get; } = new("All Files")
     {
-        Patterns = new[] { "*.tap", "*.tzx", "*.sna", "*.z80" }
+        Patterns = new[] { "*.tap", "*.tzx", "*.sna", "*.szx", "*.z80" }
     };
 
     public static FilePickerFileType Tap { get; } = new("TAP File")
@@ -22,6 +22,11 @@ public static class TapeFileTypes
     public static FilePickerFileType Sna { get; } = new("SNA File")
     {
         Patterns = new[] { "*.sna" }
+    };
+
+    public static FilePickerFileType Szx { get; } = new("SZX File")
+    {
+        Patterns = new[] { "*.szx" }
     };
 
     public static FilePickerFileType Z80 { get; } = new("Z80 File")

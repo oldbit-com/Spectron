@@ -25,10 +25,16 @@
         <NativeMenu>
             <NativeMenuItem Header="File">
                 <NativeMenu>
-                    <NativeMenuItem Header="Open..." Gesture="Cmd+O" Command="{Binding OpenFileCommand}" />
+                    <NativeMenuItem Header="Open..." Gesture="Cmd+O" Command="{Binding OpenFileCommand}"/>
                     <!-- <NativeMenuItem Header="Open Recent"> -->
                     <!--     <NativeMenu NeedsUpdate="OpenRecent_OnNeedsUpdate" /> -->
                     <!-- </NativeMenuItem> -->
+                </NativeMenu>
+            </NativeMenuItem>
+            <NativeMenuItem Header="Machine">
+                <NativeMenu>
+                    <NativeMenuItem Header="Pause" Gesture="F11" Command="{Binding PauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
+                    <NativeMenuItem Header="Reset" Command="{Binding ResetCommand}"/>
                 </NativeMenu>
             </NativeMenuItem>
             <NativeMenuItem Header="View">

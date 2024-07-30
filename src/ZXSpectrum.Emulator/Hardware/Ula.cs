@@ -1,22 +1,25 @@
 using OldBit.Z80Cpu;
 using OldBit.ZXSpectrum.Emulator.Hardware.Audio;
 using OldBit.ZXSpectrum.Emulator.Screen;
+using OldBit.ZXSpectrum.Emulator.Tape;
 
 namespace OldBit.ZXSpectrum.Emulator.Hardware;
 
-public class Ula(Keyboard keyboard, Beeper beeper, ScreenRenderer renderer, Clock clock) : IInputDevice, IOutputDevice
+internal class Ula(Keyboard keyboard, Beeper beeper, ScreenRenderer renderer, Clock clock, TapePlayer tapePlayer) : IInputDevice, IOutputDevice
 {
-    private const byte EarBit = 0x10;
-
     public byte? Read(Word address)
     {
-        if (IsUlaPort(address))
+        if (!IsUlaPort(address))
         {
-            return keyboard.Read(address);
+            // TODO: Floating bus handling
+            return 0xFF;
         }
 
-        // TODO: Floating bus handling
-        return 0xFF;
+        var value = keyboard.Read(address);
+
+        value = UpdateEarBit(value);
+
+        return value;
     }
 
     public void Write(Word address, byte data)
@@ -31,9 +34,24 @@ public class Ula(Keyboard keyboard, Beeper beeper, ScreenRenderer renderer, Cloc
 
         beeper.UpdateBeeper(data, clock.TotalTicks);
 
+       // Console.WriteLine($"ULA: {data:X2} CLOCK: {clock.TotalTicks}");
+
         // var beeperState = data & EarBit >> 4;
         // beeper.UpdateBeeper1(beeperState, clock.FrameTicks);
     }
 
     private static bool IsUlaPort(Word address) => (address & 0x01) == 0x00;
+
+    private byte? UpdateEarBit(byte? value)
+    {
+        if (!tapePlayer.IsPlaying)
+        {
+            return value;
+        }
+
+        value &= 0b10111111;
+        value |= tapePlayer.EarBit;
+
+        return value;
+    }
 }

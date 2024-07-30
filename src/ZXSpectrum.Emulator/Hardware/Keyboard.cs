@@ -65,15 +65,7 @@ public class Keyboard : IInputDevice
         { SpectrumKey.B, (0b10000, 0x7F) }
     };
 
-    public byte? Read(Word address)
-    {
-        if (!Bus.IsUlaPort(address))
-        {
-            return null;
-        }
-
-        return GetKeyState((byte)(address >> 8));
-    }
+    public byte? Read(Word address) => GetKeyState((byte)(address >> 8));
 
     public void HandleKeyDown(IEnumerable<SpectrumKey> keys)
     {
