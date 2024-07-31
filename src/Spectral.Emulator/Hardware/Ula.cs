@@ -16,39 +16,44 @@ internal class Ula(Keyboard keyboard, Beeper beeper, ScreenRenderer renderer, Cl
         }
 
         var value = keyboard.Read(address);
-
-        value = UpdateEarBit(value);
+        UpdateEarBit(ref value);
 
         return value;
     }
 
-    public void Write(Word address, byte data)
+    public void Write(Word address, byte value)
     {
         if (!IsUlaPort(address))
         {
             return;
         }
 
-        var color = Colors.BorderColors[(byte)(data & 0x07)];
+        var color = Colors.BorderColors[(byte)(value & 0x07)];
         renderer.UpdateBorder(color, clock.FrameTicks);
 
-        beeper.UpdateBeeper(data, clock.TotalTicks);
-
-       // Console.WriteLine($"ULA: {data:X2} CLOCK: {clock.TotalTicks}");
-
-        // var beeperState = data & EarBit >> 4;
-        // beeper.UpdateBeeper1(beeperState, clock.FrameTicks);
+        UpdateTapeLoadingBeeper(ref value);
+        beeper.UpdateBeeper(value, clock.TotalTicks);
     }
 
     private static bool IsUlaPort(Word address) => (address & 0x01) == 0x00;
 
-    private byte UpdateEarBit(byte value)
+    private void UpdateEarBit(ref byte value)
     {
         if (!tapePlayer.IsPlaying)
         {
-            return value;
+            return;
         }
 
-        return tapePlayer.EarBit ? (byte)(value | 0x40) : (byte)(value & 0xBF);
+        value = tapePlayer.EarBit ? (byte)(value | 0x40) : (byte)(value & 0xBF);
+    }
+
+    private void UpdateTapeLoadingBeeper(ref byte value)
+    {
+        if (!tapePlayer.IsPlaying)
+        {
+            return;
+        }
+
+        value = tapePlayer.EarBit ? (byte)(value | 0x10) : (byte)(value & 0xEF);
     }
 }
