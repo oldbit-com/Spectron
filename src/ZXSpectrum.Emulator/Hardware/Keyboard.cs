@@ -1,6 +1,6 @@
 namespace OldBit.ZXSpectrum.Emulator.Hardware;
 
-public class Keyboard : IInputDevice
+public class Keyboard
 {
     private readonly Dictionary<byte, byte> _keyStates = new()
     {
@@ -65,7 +65,7 @@ public class Keyboard : IInputDevice
         { SpectrumKey.B, (0b10000, 0x7F) }
     };
 
-    public byte? Read(Word address) => GetKeyState((byte)(address >> 8));
+    public byte Read(Word address) => GetKeyState((byte)(address >> 8));
 
     public void HandleKeyDown(IEnumerable<SpectrumKey> keys)
     {

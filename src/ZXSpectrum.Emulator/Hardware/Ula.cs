@@ -42,16 +42,13 @@ internal class Ula(Keyboard keyboard, Beeper beeper, ScreenRenderer renderer, Cl
 
     private static bool IsUlaPort(Word address) => (address & 0x01) == 0x00;
 
-    private byte? UpdateEarBit(byte? value)
+    private byte UpdateEarBit(byte value)
     {
         if (!tapePlayer.IsPlaying)
         {
             return value;
         }
 
-        value &= 0b10111111;
-        value |= tapePlayer.EarBit;
-
-        return value;
+        return tapePlayer.EarBit ? (byte)(value | 0x40) : (byte)(value & 0xBF);
     }
 }

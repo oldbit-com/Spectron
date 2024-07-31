@@ -5,15 +5,12 @@ namespace OldBit.ZXSpectrum.Emulator.Tape;
 
 internal class TapePlayer(Clock clock)
 {
-    private const byte EarHighState = 0x40;
-    private const byte EarLowState = 0x00;
-
     private readonly TapePulseCollection _tape = new();
     private int _currentPulseIndex;
     private int _runningPulseLength;
     private int _runningPulseCount;
 
-    internal byte EarBit { get; set; }
+    internal bool EarBit { get; set; }
 
     internal bool IsPlaying { get; set; }
 
@@ -91,8 +88,6 @@ internal class TapePlayer(Clock clock)
            _runningPulseCount = 0;
        }
 
-       ToggleEarBit();
+       EarBit = !EarBit;
     }
-
-    private void ToggleEarBit() => EarBit = EarBit == EarLowState ? EarHighState : EarLowState;
 }
