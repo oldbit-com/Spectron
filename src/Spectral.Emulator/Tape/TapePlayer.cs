@@ -3,19 +3,18 @@ using OldBit.ZXTape.Tap;
 
 namespace OldBit.Spectral.Emulator.Tape;
 
-internal class TapePlayer(Clock clock)
+internal class TapePlayer(Clock clock) : IDisposable
 {
-    private readonly TapePulseCollection _tape = new();
-    private int _currentPulseIndex;
+    private IEnumerator<TapePulse>? _pulses;
     private int _runningPulseLength;
     private int _runningPulseCount;
 
-    internal bool EarBit { get; set; }
-
-    internal bool IsPlaying { get; set; }
+    internal bool EarBit { get; private set; }
+    internal bool IsPlaying { get; private set; }
 
     internal void Start()
     {
+        clock.TicksAdded -= ReadTape;
         clock.TicksAdded += ReadTape;
         IsPlaying = true;
     }
@@ -28,7 +27,6 @@ internal class TapePlayer(Clock clock)
 
     internal void Rewind()
     {
-        _currentPulseIndex = 0;
         _runningPulseLength = 0;
         _runningPulseCount = 0;
         IsPlaying = false;
@@ -36,34 +34,20 @@ internal class TapePlayer(Clock clock)
 
     internal void LoadTape(TapFile tapFile)
     {
-        _tape.Clear();
+        var tapePulseProvider = new TapePulseProvider(tapFile);
 
-        foreach (var block in tapFile.Blocks)
-        {
-            if (block.IsHeader)
-            {
-                _tape.AddPilotHeaderPulses();
-            }
-            else
-            {
-                _tape.AddPilotDataPulses();
-            }
-            _tape.AddSyncPulses();
-
-            _tape.AddDataPulses(block.Flag);
-            _tape.AddDataPulses(block.Data);
-            _tape.AddDataPulses(block.Checksum);
-        }
+        _pulses = tapePulseProvider.GetPulses().GetEnumerator();
+        _pulses.MoveNext();
     }
 
     private void ReadTape(int addedTicks, int previousFrameTicks, int currentFrameTicks)
     {
-        if (!IsPlaying)
+        if (!IsPlaying || _pulses == null)
         {
             return;
         }
 
-        var pulse = _tape.Pulses[_currentPulseIndex];
+        var pulse = _pulses.Current;
        _runningPulseLength += addedTicks;
 
        // If the pulse length is less than the current pulse length, then we need to wait for the next pulse
@@ -78,8 +62,7 @@ internal class TapePlayer(Clock clock)
        // If we have reached the pulse count, then move to the next pulse
        if (_runningPulseCount >= pulse.PulseCount)
        {
-           _currentPulseIndex += 1;
-           if (_currentPulseIndex >= _tape.Pulses.Count)
+           if (!_pulses.MoveNext())
            {
                Stop();
                return;
@@ -89,5 +72,10 @@ internal class TapePlayer(Clock clock)
        }
 
        EarBit = !EarBit;
+    }
+
+    public void Dispose()
+    {
+        _pulses?.Dispose();
     }
 }
