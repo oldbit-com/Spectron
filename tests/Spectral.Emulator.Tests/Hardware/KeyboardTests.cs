@@ -1,7 +1,7 @@
 using FluentAssertions;
 using OldBit.Spectral.Emulator.Hardware;
 
-namespace OldBit.ZXSpectrum.Emulator.UnitTests;
+namespace OldBit.ZXSpectrum.Emulator.Tests.Hardware;
 
 public class KeyboardTests
 {

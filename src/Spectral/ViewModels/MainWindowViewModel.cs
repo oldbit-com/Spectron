@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
@@ -12,25 +15,44 @@ using OldBit.Spectral.Emulator.Screen;
 using OldBit.Spectral.Helpers;
 using OldBit.Spectral.Models;
 using ReactiveUI;
+using Timer = System.Timers.Timer;
 
 namespace OldBit.Spectral.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
     private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
+    private readonly Timer _statusBarTimer;
+    private readonly Stopwatch _stopwatch = new();
 
-    public Spectrum48K? Emulator { get; set; }
+    private int _frameCount;
 
+    public Spectrum48K? Emulator { get; private set; }
     public Window MainWindow { get; set; } = null!;
-
     public Control ScreenControl { get; set; } = null!;
 
     public MainWindowViewModel()
     {
+        _statusBarTimer = new Timer(TimeSpan.FromSeconds(1));
+        _statusBarTimer.AutoReset = true;
+        _statusBarTimer.Elapsed += StatusBarTimerOnElapsed;
+
         OpenFileCommand = ReactiveCommand.Create(HandleOpenFileAsync);
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
         PauseCommand = ReactiveCommand.Create(HandleMachinePause, this.WhenAnyValue(x => x.Emulator).Select(emulator => emulator is null));
         ResetCommand = ReactiveCommand.Create(HandleMachineReset, this.WhenAnyValue(x => x.Emulator).Select(emulator => emulator is null));
+    }
+
+    private void StatusBarTimerOnElapsed(object? sender, ElapsedEventArgs e)
+    {
+        var fps = $"FPS: {_frameCount.ToString()}";
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            StatusBar.FramesPerSecond = fps;
+        });
+
+        Interlocked.Exchange(ref _frameCount, 0);
     }
 
     public void Initialize()
@@ -38,7 +60,9 @@ public class MainWindowViewModel : ViewModelBase
         Emulator = new Spectrum48K();
         Emulator.RenderScreen += EmulatorOnRenderScreen;
         SpectrumScreen = _frameBufferConverter.Bitmap;
+
         Emulator.Start();
+        _statusBarTimer.Start();
     }
 
     private void EmulatorOnRenderScreen(FrameBuffer framebuffer)
@@ -48,6 +72,8 @@ public class MainWindowViewModel : ViewModelBase
             _frameBufferConverter.UpdateBitmap(framebuffer);
             ScreenControl.InvalidateVisual();
         });
+
+        Interlocked.Increment(ref _frameCount);
     }
 
     public ReactiveCommand<Unit, Task> OpenFileCommand { get; private set; }
@@ -117,6 +143,8 @@ public class MainWindowViewModel : ViewModelBase
 
         IsPaused = Emulator?.IsPaused ?? false;
     }
+
+    public StatusBarViewModel StatusBar { get; } = new();
 
     private BorderSize _borderSize = BorderSize.Full;
     public BorderSize BorderSize

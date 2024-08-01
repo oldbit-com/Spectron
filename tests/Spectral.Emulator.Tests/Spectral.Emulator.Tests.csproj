@@ -7,8 +7,8 @@
 
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
-        <AssemblyName>OldBit.ZXSpectrum.Emulator.UnitTests</AssemblyName>
-        <RootNamespace>OldBit.ZXSpectrum.Emulator.UnitTests</RootNamespace>
+        <AssemblyName>OldBit.ZXSpectrum.Emulator.Tests</AssemblyName>
+        <RootNamespace>OldBit.ZXSpectrum.Emulator.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -27,6 +27,10 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\Spectral.Emulator\Spectral.Emulator.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Tape\" />
     </ItemGroup>
 
 </Project>

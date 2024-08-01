@@ -5,10 +5,11 @@
         xmlns:viewModels="clr-namespace:OldBit.Spectral.ViewModels"
         xmlns:converters="clr-namespace:OldBit.Spectral.Converters"
         xmlns:models="clr-namespace:OldBit.Spectral.Models"
+        xmlns:controls="clr-namespace:OldBit.Spectral.Controls"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectral.Views.MainWindow"
         x:DataType="viewModels:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/spectral.ico"
         Title="ZX Spectrum Emulator"
         KeyDown="OnKeyDown"
         KeyUp="OnKeyUp">
@@ -50,15 +51,29 @@
                     </NativeMenuItem>
                 </NativeMenu>
             </NativeMenuItem>
+            <NativeMenuItem Header="Tape">
+                <NativeMenu>
+                    <NativeMenuItem Header="Open..."/>
+                    <NativeMenuItem Header="Play"/>
+                    <NativeMenuItem Header="Stop"/>
+                    <NativeMenuItem Header="Rewind"/>
+                    <NativeMenuItem Header="Close"/>
+                </NativeMenu>
+            </NativeMenuItem>
         </NativeMenu>
     </NativeMenu.Menu>
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
         <Panel>
             <Border Background="Brown" Padding="4">
                 <Image x:Name="ScreenImage" Source="{Binding SpectrumScreen}"/>
             </Border>
         </Panel>
+        <controls:StatusBar DataContext="{Binding StatusBar}" Grid.Row="1" />
     </Grid>
 
 </Window>

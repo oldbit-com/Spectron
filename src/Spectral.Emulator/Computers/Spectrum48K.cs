@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using OldBit.Spectral.Emulator.Hardware;
 using OldBit.Spectral.Emulator.Hardware.Audio;
 using OldBit.Spectral.Emulator.Screen;
@@ -17,18 +18,16 @@ public class Spectrum48K : ISpectrum
     private readonly Z80 _z80;
     private readonly TapeLoader _tapeLoader;
     private readonly TapePlayer _tapePlayer;
+    private readonly Stopwatch _stopwatch = new();
 
     private Timer? _timer;
     private readonly object _timerLock = new();
-    private bool _isPaused;
     private bool _isPausedRequested;
 
     public Keyboard Keyboard { get; } = new();
-
-    public bool IsPaused => _isPaused;
+    public bool IsPaused { get; private set; }
 
     public delegate void RenderScreenEvent(FrameBuffer frameBuffer);
-
     public event RenderScreenEvent? RenderScreen;
 
     public Spectrum48K()
@@ -77,11 +76,11 @@ public class Spectrum48K : ISpectrum
         {
             if (_isPausedRequested)
             {
-                _isPaused = true;
+                IsPaused = true;
                 _isPausedRequested = false;
             }
 
-            if (!_isPaused)
+            if (!IsPaused)
             {
                 RunFrame();
             }
@@ -115,6 +114,8 @@ public class Spectrum48K : ISpectrum
     {
         var timerPeriod = TimeSpan.FromMicroseconds(1 / InterruptFrequencyHz * 1000000);
        _timer = new Timer(ProcessInterrupt, null, TimeSpan.FromSeconds(2), timerPeriod);
+
+       _stopwatch.Start();
     }
 
     public void Stop()
@@ -126,12 +127,12 @@ public class Spectrum48K : ISpectrum
     public void Pause()
     {
         _isPausedRequested = true;
-        while (!_isPaused) { }
+        while (!IsPaused) { }
     }
 
     public void Resume()
     {
-        _isPaused = false;
+        IsPaused = false;
     }
 
     public void Reset()

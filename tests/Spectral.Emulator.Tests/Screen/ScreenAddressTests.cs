@@ -1,7 +1,7 @@
 using FluentAssertions;
 using OldBit.Spectral.Emulator.Screen;
 
-namespace OldBit.ZXSpectrum.Emulator.UnitTests;
+namespace OldBit.ZXSpectrum.Emulator.Tests.Screen;
 
 public class ScreenAddressTests
 {
