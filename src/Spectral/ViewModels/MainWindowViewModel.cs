@@ -37,10 +37,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         Emulator = new Spectrum48K();
         Emulator.RenderScreen += EmulatorOnRenderScreen;
-
-       // this.WhenAnyValue(x => x.Emulator!.IsPaused).ToProperty(this, x => x.IsPaused, out _isPaused);
-
-
+        SpectrumScreen = _frameBufferConverter.Bitmap;
         Emulator.Start();
     }
 
@@ -48,7 +45,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         Dispatcher.UIThread.Post(() =>
         {
-            SpectrumScreen = _frameBufferConverter.Convert(framebuffer);
+            _frameBufferConverter.UpdateBitmap(framebuffer);
             ScreenControl.InvalidateVisual();
         });
     }
@@ -95,6 +92,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         BorderSize = borderSize;
         _frameBufferConverter.SetBorderSize(borderSize);
+        SpectrumScreen = _frameBufferConverter.Bitmap;
     }
 
     public ReactiveCommand<Unit, Unit> ResetCommand { get; private set; }
@@ -127,8 +125,8 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _borderSize, value);
     }
 
-    private Bitmap? _spectrumScreen;
-    public Bitmap? SpectrumScreen
+    private WriteableBitmap? _spectrumScreen;
+    public WriteableBitmap? SpectrumScreen
     {
         get => _spectrumScreen;
         set => this.RaiseAndSetIfChanged(ref _spectrumScreen, value);

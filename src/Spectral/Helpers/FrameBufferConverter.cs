@@ -8,6 +8,9 @@ using OldBit.Spectral.Models;
 
 namespace OldBit.Spectral.Helpers;
 
+/// <summary>
+/// Converts and writes the frame buffer to a WriteableBitmap which can be displayed by Avalonia.
+/// </summary>
 internal sealed class FrameBufferConverter : IDisposable
 {
     private static readonly Border BorderNone = new();
@@ -16,64 +19,62 @@ internal sealed class FrameBufferConverter : IDisposable
     private static readonly Border BorderLarge = new(Top: 57, Left: 40, Right: 40, Bottom: 40);
     private static readonly Border BorderFull = new(Top: 64, Left: 48, Right: 48, Bottom: 56);
 
-    private WriteableBitmap _bitmap;
     private Border _border = BorderFull;
 
     private readonly int _zoomX;
     private readonly int _zoomY;
+
+    internal WriteableBitmap Bitmap { get; private set; }
 
     internal FrameBufferConverter(int zoomX, int zoomY)
     {
         _zoomX = zoomX;
         _zoomY = zoomY;
 
-        _bitmap = CreateBitmap();
+        Bitmap = CreateBitmap();
     }
 
-    internal Bitmap Convert(FrameBuffer frameBuffer)
+    internal void UpdateBitmap(FrameBuffer frameBuffer)
     {
         var start = (BorderFull.Top - _border.Top) * FrameBuffer.Width + 1;
         var end = frameBuffer.Pixels.Length - (BorderFull.Bottom - _border.Bottom) * FrameBuffer.Width;
 
-        using (var lockedBitmap = _bitmap.Lock())
+        using var lockedBitmap = Bitmap.Lock();
+
+        var targetAddress = lockedBitmap.Address;
+
+        for (var pixel = start; pixel < end; pixel++)
         {
-            var targetAddress = lockedBitmap.Address;
+            var color = frameBuffer.Pixels[pixel].Abgr;
 
-            for (var pixel = start; pixel < end; pixel++)
+            // Duplicate pixels horizontally
+            for (var x = 0; x < _zoomX; x++)
             {
-                var color = frameBuffer.Pixels[pixel].Abgr;
-
-                // Duplicate pixels horizontally
-                for (var x = 0; x < _zoomX; x++)
+                unsafe
                 {
-                    unsafe
-                    {
-                        *(int*)targetAddress = color;
-                    }
-
-                    targetAddress += 4;
+                    *(int*)targetAddress = color;
                 }
 
-                if (_zoomY == 1 || pixel % FrameBuffer.Width != 0)
+                targetAddress += 4;
+            }
+
+            if (_zoomY == 1 || pixel % FrameBuffer.Width != 0)
+            {
+                continue;
+            }
+
+            // Duplicate previous line vertically if zoom factor is greater than 1
+            var source = targetAddress - lockedBitmap.RowBytes;
+            for (var y = 0; y < _zoomY - 1; y++)
+            {
+                unsafe
                 {
-                    continue;
+                    Buffer.MemoryCopy(source.ToPointer(), targetAddress.ToPointer(), lockedBitmap.RowBytes, lockedBitmap.RowBytes);
                 }
 
-                // Duplicate previous line vertically if zoom factor is greater than 1
-                var source = targetAddress - lockedBitmap.RowBytes;
-                for (var y = 0; y < _zoomY - 1; y++)
-                {
-                    unsafe
-                    {
-                        Buffer.MemoryCopy(source.ToPointer(), targetAddress.ToPointer(), lockedBitmap.RowBytes, lockedBitmap.RowBytes);
-                    }
-
-                    targetAddress += lockedBitmap.RowBytes;
-                }
+                targetAddress += lockedBitmap.RowBytes;
             }
         }
-
-        return _bitmap;
     }
 
     internal void SetBorderSize(BorderSize borderSize)
@@ -87,7 +88,7 @@ internal sealed class FrameBufferConverter : IDisposable
             _ => BorderFull,
         };
 
-        _bitmap = CreateBitmap();
+        Bitmap = CreateBitmap();
     }
 
     private WriteableBitmap CreateBitmap()
@@ -104,6 +105,6 @@ internal sealed class FrameBufferConverter : IDisposable
 
     public void Dispose()
     {
-        _bitmap.Dispose();
+        Bitmap.Dispose();
     }
 }
