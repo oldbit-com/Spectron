@@ -3,20 +3,21 @@ using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using OldBit.Spectral.Emulator.Screen;
-using OldBit.Spectral.Extensions;
 using OldBit.Spectral.Models;
 
 namespace OldBit.Spectral.Helpers;
+
+public record struct Border(int Top, int Left, int Right, int Bottom);
 
 /// <summary>
 /// Converts and writes the frame buffer to a WriteableBitmap which can be displayed by Avalonia.
 /// </summary>
 internal sealed class FrameBufferConverter : IDisposable
 {
-    private static readonly Border BorderNone = new();
-    private static readonly Border BorderSmall = new(Top: 31, Left: 15, Right: 15, Bottom: 15);
-    private static readonly Border BorderMedium = new(Top: 41, Left: 25, Right: 25, Bottom: 25);
-    private static readonly Border BorderLarge = new(Top: 57, Left: 40, Right: 40, Bottom: 40);
+    private static readonly Border BorderNone = new(Top: 0, Left: 0, Right: 0, Bottom: 0);
+    private static readonly Border BorderSmall = new(Top: 15, Left: 15, Right: 15, Bottom: 15);
+    private static readonly Border BorderMedium = new(Top: 25, Left: 25, Right: 25, Bottom: 25);
+    private static readonly Border BorderLarge = new(Top: 40, Left: 40, Right: 40, Bottom: 40);
     private static readonly Border BorderFull = new(Top: 64, Left: 48, Right: 48, Bottom: 56);
 
     private Border _border = BorderFull;
@@ -33,43 +34,44 @@ internal sealed class FrameBufferConverter : IDisposable
 
         Bitmap = CreateBitmap();
     }
-
     internal void UpdateBitmap(FrameBuffer frameBuffer)
     {
-        var start = (BorderFull.Top - _border.Top) * FrameBuffer.Width + 1;
-        var end = frameBuffer.Pixels.Length - (BorderFull.Bottom - _border.Bottom) * FrameBuffer.Width;
+        var startFrameBufferRow = BorderFull.Top - _border.Top;
+        var endFrameBufferRow = FrameBuffer.Height - (BorderFull.Bottom - _border.Bottom) - 1;
+        var startFrameBufferCol = BorderFull.Left - _border.Left;
+        var endFrameBufferCol = FrameBuffer.Width - (BorderFull.Right - _border.Right) - 1;
 
         using var lockedBitmap = Bitmap.Lock();
-
         var targetAddress = lockedBitmap.Address;
 
-        for (var pixel = start; pixel < end; pixel++)
+        for (var frameBufferRow = startFrameBufferRow; frameBufferRow <= endFrameBufferRow; frameBufferRow++)
         {
-            var color = frameBuffer.Pixels[pixel].Abgr;
+            var rowOffset = frameBufferRow * FrameBuffer.Width;
 
-            // Duplicate pixels horizontally
-            for (var x = 0; x < _zoomX; x++)
+            for (var frameBufferCol = startFrameBufferCol; frameBufferCol <= endFrameBufferCol; frameBufferCol++)
             {
-                unsafe
+                var pixelIndex = rowOffset + frameBufferCol;
+                var color = frameBuffer.Pixels[pixelIndex].Abgr;
+
+                // Duplicate pixels horizontally
+                for (var x = 0; x < _zoomX; x++)
                 {
-                    *(int*)targetAddress = color;
+                    unsafe
+                    {
+                        *(int*)targetAddress = color;
+                    }
+
+                    targetAddress += 4;
                 }
-
-                targetAddress += 4;
             }
 
-            if (_zoomY == 1 || pixel % FrameBuffer.Width != 0)
-            {
-                continue;
-            }
-
-            // Duplicate previous line vertically if zoom factor is greater than 1
-            var source = targetAddress - lockedBitmap.RowBytes;
+            // Duplicate previous line vertically based on zoom factor
+            var previousLine = targetAddress - lockedBitmap.RowBytes;
             for (var y = 0; y < _zoomY - 1; y++)
             {
                 unsafe
                 {
-                    Buffer.MemoryCopy(source.ToPointer(), targetAddress.ToPointer(), lockedBitmap.RowBytes, lockedBitmap.RowBytes);
+                    Buffer.MemoryCopy(previousLine.ToPointer(), targetAddress.ToPointer(), lockedBitmap.RowBytes, lockedBitmap.RowBytes);
                 }
 
                 targetAddress += lockedBitmap.RowBytes;
@@ -94,10 +96,11 @@ internal sealed class FrameBufferConverter : IDisposable
     private WriteableBitmap CreateBitmap()
     {
         var height = FrameBuffer.Height - (BorderFull.Top - _border.Top) - (BorderFull.Bottom - _border.Bottom);
+        var width = FrameBuffer.Width - (BorderFull.Left - _border.Left) - (BorderFull.Right - _border.Right);
 
         return new WriteableBitmap(
             new PixelSize(
-                FrameBuffer.Width * _zoomX,
+                width * _zoomX,
                 height * _zoomY),
             new Vector(96, 96),
             PixelFormats.Rgba8888);
