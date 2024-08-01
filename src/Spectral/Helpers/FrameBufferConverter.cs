@@ -7,7 +7,7 @@ using OldBit.Spectral.Models;
 
 namespace OldBit.Spectral.Helpers;
 
-public record struct Border(int Top, int Left, int Right, int Bottom);
+internal record struct Border(int Top, int Left, int Right, int Bottom);
 
 /// <summary>
 /// Converts and writes the frame buffer to a WriteableBitmap which can be displayed by Avalonia.
