@@ -4,9 +4,9 @@ using OldBit.ZXTape.Tap;
 namespace OldBit.Spectral.Emulator.Tape;
 
 /// <summary>
-/// Memory efficient tape pulse provider. Only supports TAP files.
+/// Memory efficient tape pulse provider. Only supports TAP files at the moment.
 /// </summary>
-internal class TapePulseProvider(TapFile tapFile)
+internal class PulseProvider(TapFile tapFile)
 {
     private const int PilotHeaderPulseCount = 8063;         // Before each header block is a sequence of 8063 pulses
     private const int PilotDataPulseCount = 3223;           // Before each data block is a sequence of 3223 pulses
@@ -16,16 +16,16 @@ internal class TapePulseProvider(TapFile tapFile)
     private const int ZeroBitPulseLength = 855;             // '0' bit is encoded as 2 pulses of 855 T-states each
     private const int OneBitPulseLength = 1710;             // '1' bit is encoded as 2 pulses of 1710 T-states each
 
-    private static readonly TapePulse PilotHeaderPulse = new(PilotHeaderPulseCount, PilotPulseLength);
-    private static readonly TapePulse PilotDataPulse = new(PilotDataPulseCount, PilotPulseLength);
-    private static readonly TapePulse FirstSyncPulse = new(PulseCount: 1, FirstSyncPulseLength);
-    private static readonly TapePulse SecondSyncPulse = new(PulseCount: 1, SecondSyncPulseLength);
-    private static readonly TapePulse ZeroBitPulse = new(PulseCount: 2, ZeroBitPulseLength);
-    private static readonly TapePulse OneBitPulse = new(PulseCount: 2, OneBitPulseLength);
+    private static readonly Pulse PilotHeaderPulse = new(PilotHeaderPulseCount, PilotPulseLength);
+    private static readonly Pulse PilotDataPulse = new(PilotDataPulseCount, PilotPulseLength);
+    private static readonly Pulse FirstSyncPulse = new(RepeatCount: 1, FirstSyncPulseLength);
+    private static readonly Pulse SecondSyncPulse = new(RepeatCount: 1, SecondSyncPulseLength);
+    private static readonly Pulse ZeroBitPulse = new(RepeatCount: 2, ZeroBitPulseLength);
+    private static readonly Pulse OneBitPulse = new(RepeatCount: 2, OneBitPulseLength);
 
-    internal IEnumerable<TapePulse> GetPulses() => PrivateGetPulses().SelectMany(pulse => pulse);
+    internal IEnumerable<Pulse> GetPulses() => PrivateGetPulses().SelectMany(pulse => pulse);
 
-    private IEnumerable<IEnumerable<TapePulse>> PrivateGetPulses()
+    private IEnumerable<IEnumerable<Pulse>> PrivateGetPulses()
     {
         foreach (var block in tapFile.Blocks)
         {
@@ -47,11 +47,10 @@ internal class TapePulseProvider(TapFile tapFile)
         }
     }
 
-    private static IEnumerable<TapePulse> ToEnumerable(byte value) => ToEnumerable([value]);
+    private static IEnumerable<Pulse> ToEnumerable(byte value) => ToEnumerable([value]);
 
-    private static IEnumerable<TapePulse> ToEnumerable(IEnumerable<byte> values) =>
+    private static IEnumerable<Pulse> ToEnumerable(IEnumerable<byte> values) =>
         values.SelectMany(value => GetBitValue(value).Select(bit => bit == 0 ? ZeroBitPulse : OneBitPulse));
 
-    private static IEnumerable<int> GetBitValue(byte value) =>
-        FastLookup.BitMasks.Select(mask => value & mask);
+    private static IEnumerable<int> GetBitValue(byte value) => FastLookup.BitMasks.Select(mask => value & mask);
 }

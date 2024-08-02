@@ -10,7 +10,7 @@
         x:Class="OldBit.Spectral.Views.MainWindow"
         x:DataType="viewModels:MainWindowViewModel"
         Icon="/Assets/spectral.ico"
-        Title="ZX Spectrum Emulator"
+        Title="Spectral - ZX Spectrum Emulator"
         KeyDown="OnKeyDown"
         KeyUp="OnKeyUp">
 
@@ -53,11 +53,11 @@
             </NativeMenuItem>
             <NativeMenuItem Header="Tape">
                 <NativeMenu>
-                    <NativeMenuItem Header="Open..."/>
-                    <NativeMenuItem Header="Play"/>
-                    <NativeMenuItem Header="Stop"/>
-                    <NativeMenuItem Header="Rewind"/>
-                    <NativeMenuItem Header="Close"/>
+                    <NativeMenuItem Header="Insert..." Gesture="Cmd+T" Command="{Binding TapeMenu.InsertCommand}"/>
+                    <NativeMenuItem Header="Play" Command="{Binding TapeMenu.PlayCommand}"/>
+                    <NativeMenuItem Header="Stop" Command="{Binding TapeMenu.StopCommand}"/>
+                    <NativeMenuItem Header="Rewind" Command="{Binding TapeMenu.RewindCommand}"/>
+                    <NativeMenuItem Header="Eject" Command="{Binding TapeMenu.EjectCommand}"/>
                 </NativeMenu>
             </NativeMenuItem>
         </NativeMenu>

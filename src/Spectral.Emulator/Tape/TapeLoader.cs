@@ -8,7 +8,7 @@ namespace OldBit.Spectral.Emulator.Tape;
 
 internal class TapeLoader(Z80 z80, IMemory memory, ScreenRenderer screenRenderer, TapePlayer tapePlayer)
 {
-    public void LoadFile(string fileName)
+    internal void LoadFile(string fileName)
     {
         var ext = Path.GetExtension(fileName).ToLowerInvariant();
         switch (ext)

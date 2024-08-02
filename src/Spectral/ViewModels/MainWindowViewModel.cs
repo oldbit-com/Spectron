@@ -31,16 +31,25 @@ public class MainWindowViewModel : ViewModelBase
     public Window MainWindow { get; set; } = null!;
     public Control ScreenControl { get; set; } = null!;
 
+    public TapeMenuViewModel TapeMenu { get; } = new();
+
+    public ReactiveCommand<Unit, Task> OpenFileCommand { get; private set; }
+    public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ResetCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> PauseCommand { get; private set; }
+
     public MainWindowViewModel()
     {
         _statusBarTimer = new Timer(TimeSpan.FromSeconds(1));
         _statusBarTimer.AutoReset = true;
         _statusBarTimer.Elapsed += StatusBarTimerOnElapsed;
 
+        var emulatorNotNull = this.WhenAnyValue(x => x.Emulator).Select(emulator => emulator is null);
+
         OpenFileCommand = ReactiveCommand.Create(HandleOpenFileAsync);
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
-        PauseCommand = ReactiveCommand.Create(HandleMachinePause, this.WhenAnyValue(x => x.Emulator).Select(emulator => emulator is null));
-        ResetCommand = ReactiveCommand.Create(HandleMachineReset, this.WhenAnyValue(x => x.Emulator).Select(emulator => emulator is null));
+        PauseCommand = ReactiveCommand.Create(HandleMachinePause, emulatorNotNull);
+        ResetCommand = ReactiveCommand.Create(HandleMachineReset, emulatorNotNull);
     }
 
     private void StatusBarTimerOnElapsed(object? sender, ElapsedEventArgs e)
@@ -76,7 +85,7 @@ public class MainWindowViewModel : ViewModelBase
         Interlocked.Increment(ref _frameCount);
     }
 
-    public ReactiveCommand<Unit, Task> OpenFileCommand { get; private set; }
+
     private async Task HandleOpenFileAsync()
     {
         var topLevel = TopLevel.GetTopLevel(MainWindow);
@@ -113,7 +122,6 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     private void HandleChangeBorderSize(BorderSize borderSize)
     {
         BorderSize = borderSize;
@@ -121,13 +129,11 @@ public class MainWindowViewModel : ViewModelBase
         SpectrumScreen = _frameBufferConverter.Bitmap;
     }
 
-    public ReactiveCommand<Unit, Unit> ResetCommand { get; private set; }
     private void HandleMachineReset()
     {
         Emulator?.Reset();
     }
 
-    public ReactiveCommand<Unit, Unit> PauseCommand { get; private set; }
     private void HandleMachinePause()
     {
         switch (Emulator?.IsPaused)

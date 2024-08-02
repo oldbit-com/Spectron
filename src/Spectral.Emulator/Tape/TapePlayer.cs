@@ -5,8 +5,8 @@ namespace OldBit.Spectral.Emulator.Tape;
 
 internal class TapePlayer(Clock clock) : IDisposable
 {
-    private IEnumerator<TapePulse>? _pulses;
-    private int _runningPulseLength;
+    private IEnumerator<Pulse>? _pulses;
+    private int _runningPulseDuration;
     private int _runningPulseCount;
 
     internal bool EarBit { get; private set; }
@@ -27,14 +27,14 @@ internal class TapePlayer(Clock clock) : IDisposable
 
     internal void Rewind()
     {
-        _runningPulseLength = 0;
+        _runningPulseDuration = 0;
         _runningPulseCount = 0;
         IsPlaying = false;
     }
 
     internal void LoadTape(TapFile tapFile)
     {
-        var tapePulseProvider = new TapePulseProvider(tapFile);
+        var tapePulseProvider = new PulseProvider(tapFile);
 
         _pulses = tapePulseProvider.GetPulses().GetEnumerator();
         _pulses.MoveNext();
@@ -48,19 +48,19 @@ internal class TapePlayer(Clock clock) : IDisposable
         }
 
         var pulse = _pulses.Current;
-       _runningPulseLength += addedTicks;
+       _runningPulseDuration += addedTicks;
 
        // If the pulse length is less than the current pulse length, then we need to wait for the next pulse
-       if (_runningPulseLength < pulse.PulseLength)
+       if (_runningPulseDuration < pulse.Duration)
        {
            return;
        }
 
-       _runningPulseLength = 0;
+       _runningPulseDuration = 0;
        _runningPulseCount += 1;
 
        // If we have reached the pulse count, then move to the next pulse
-       if (_runningPulseCount >= pulse.PulseCount)
+       if (_runningPulseCount >= pulse.RepeatCount)
        {
            if (!_pulses.MoveNext())
            {
