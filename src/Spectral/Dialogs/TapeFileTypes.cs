@@ -1,12 +1,17 @@
 using Avalonia.Platform.Storage;
 
-namespace OldBit.Spectral.Helpers;
+namespace OldBit.Spectral.Dialogs;
 
 public static class TapeFileTypes
 {
     public static FilePickerFileType All { get; } = new("All Files")
     {
         Patterns = new[] { "*.tap", "*.tzx", "*.sna", "*.szx", "*.z80" }
+    };
+
+    public static FilePickerFileType TapTzx { get; } = new("Tape Files")
+    {
+        Patterns = new[] { "*.tap", "*.tzx" }
     };
 
     public static FilePickerFileType Tap { get; } = new("TAP File")

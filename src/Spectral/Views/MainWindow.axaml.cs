@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using OldBit.Spectral.Dialogs;
 using OldBit.Spectral.Emulator.Computers;
 using OldBit.Spectral.Helpers;
 using OldBit.Spectral.ViewModels;
@@ -9,8 +10,7 @@ namespace OldBit.Spectral.Views;
 
 public partial class MainWindow : Window
 {
-    private ISpectrum _emulator = default!;
-    private bool _isPaused;
+    private MainWindowViewModel? _viewModel;
 
     public MainWindow()
     {
@@ -24,28 +24,25 @@ public partial class MainWindow : Window
             return;
         }
 
-        viewModel.MainWindow = this;
-        viewModel.ScreenControl = ScreenImage;
+        _viewModel = viewModel;
 
-        viewModel.Initialize();
-        _emulator = viewModel.Emulator!;
+        FileDialogs.MainWindow = this;
+        MessageDialogs.MainWindow = this;
+
+        _viewModel.ScreenControl = ScreenImage;
+
+        _viewModel.Initialize();
     }
 
     private void OnKeyDown(object? sender, KeyEventArgs e)
     {
-        var spectrumKey = KeyMappings.ToSpectrumKey(e);
-        if (spectrumKey.Count > 0)
-        {
-            _emulator.Keyboard.HandleKeyDown(spectrumKey);
-        }
+        var keys = KeyMappings.ToSpectrumKey(e);
+        _viewModel?.KeyDown(keys);
     }
 
     private void OnKeyUp(object? sender, KeyEventArgs e)
     {
-        var spectrumKey = KeyMappings.ToSpectrumKey(e);
-        if (spectrumKey.Count > 0)
-        {
-            _emulator.Keyboard.HandleKeyUp(spectrumKey);
-        }
+        var keys = KeyMappings.ToSpectrumKey(e);
+        _viewModel?.KeyUp(keys);
     }
 }

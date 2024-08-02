@@ -9,12 +9,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Remove="Rom\48.rom" />
-      <EmbeddedResource Include="Rom\48.rom" />
-      <None Remove="Rom\128-0.rom" />
-      <EmbeddedResource Include="Rom\128-0.rom" />
-      <None Remove="Rom\128-1.rom" />
-      <EmbeddedResource Include="Rom\128-1.rom" />
+      <EmbeddedResource Include="Rom\Files\128-0.rom" />
+      <EmbeddedResource Include="Rom\Files\128-1.rom" />
+      <EmbeddedResource Include="Rom\Files\48.rom" />
+      <EmbeddedResource Include="Rom\Files\bsrom140.rom" />
+      <EmbeddedResource Include="Rom\Files\DiagROMv.171" />
+      <EmbeddedResource Include="Rom\Files\gw03.rom" />
+      <EmbeddedResource Include="Rom\Files\JGH077.ROM" />
     </ItemGroup>
 
     <ItemGroup>

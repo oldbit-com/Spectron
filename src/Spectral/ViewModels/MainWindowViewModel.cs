@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 using System.Timers;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
-using Avalonia.Platform.Storage;
 using Avalonia.Threading;
-using MsBox.Avalonia;
+using OldBit.Spectral.Dialogs;
 using OldBit.Spectral.Emulator.Computers;
+using OldBit.Spectral.Emulator.Hardware;
+using OldBit.Spectral.Emulator.Rom;
 using OldBit.Spectral.Emulator.Screen;
 using OldBit.Spectral.Helpers;
 using OldBit.Spectral.Models;
@@ -23,18 +24,17 @@ public class MainWindowViewModel : ViewModelBase
 {
     private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
     private readonly Timer _statusBarTimer;
-    private readonly Stopwatch _stopwatch = new();
 
     private int _frameCount;
 
     public Spectrum48K? Emulator { get; private set; }
-    public Window MainWindow { get; set; } = null!;
     public Control ScreenControl { get; set; } = null!;
 
     public TapeMenuViewModel TapeMenu { get; } = new();
 
     public ReactiveCommand<Unit, Task> OpenFileCommand { get; private set; }
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
+    public ReactiveCommand<RomType, Unit> ChangeRomCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ResetCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> PauseCommand { get; private set; }
 
@@ -48,8 +48,11 @@ public class MainWindowViewModel : ViewModelBase
 
         OpenFileCommand = ReactiveCommand.Create(HandleOpenFileAsync);
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
+        ChangeRomCommand = ReactiveCommand.Create<RomType>(HandleChangeRom);
         PauseCommand = ReactiveCommand.Create(HandleMachinePause, emulatorNotNull);
         ResetCommand = ReactiveCommand.Create(HandleMachineReset, emulatorNotNull);
+
+        SpectrumScreen = _frameBufferConverter.Bitmap;
     }
 
     private void StatusBarTimerOnElapsed(object? sender, ElapsedEventArgs e)
@@ -66,13 +69,16 @@ public class MainWindowViewModel : ViewModelBase
 
     public void Initialize()
     {
-        Emulator = new Spectrum48K();
+        Emulator = new Spectrum48K(RomType);
         Emulator.RenderScreen += EmulatorOnRenderScreen;
-        SpectrumScreen = _frameBufferConverter.Bitmap;
 
         Emulator.Start();
         _statusBarTimer.Start();
     }
+
+    public void KeyDown(List<SpectrumKey> keys) => Emulator?.Keyboard.HandleKeyDown(keys);
+
+    public void KeyUp(List<SpectrumKey> keys) => Emulator?.Keyboard.HandleKeyUp(keys);
 
     private void EmulatorOnRenderScreen(FrameBuffer framebuffer)
     {
@@ -85,39 +91,24 @@ public class MainWindowViewModel : ViewModelBase
         Interlocked.Increment(ref _frameCount);
     }
 
-
     private async Task HandleOpenFileAsync()
     {
-        var topLevel = TopLevel.GetTopLevel(MainWindow);
-        if (topLevel != null)
-        {
-            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
-            {
-                Title = "Open File",
-                AllowMultiple = false,
-                FileTypeFilter = new[]
-                {
-                    TapeFileTypes.All, TapeFileTypes.Sna, TapeFileTypes.Szx, TapeFileTypes.Tap, TapeFileTypes.Tzx, TapeFileTypes.Z80
-                }
-            });
+        var files = await FileDialogs.OpenAnyFileAsync();
 
-            if (files.Count > 0)
+        if (files.Count > 0)
+        {
+            try
             {
-                try
-                {
-                    Emulator?.Pause();
-                    Emulator?.LoadFile(files[0].Path.LocalPath);
-                }
-                catch (Exception ex)
-                {
-                    var messageBox = MessageBoxManager.GetMessageBoxStandard("Error", ex.Message,
-                        windowStartupLocation: WindowStartupLocation.CenterOwner);
-                    await messageBox.ShowWindowDialogAsync(MainWindow);
-                }
-                finally
-                {
-                    Emulator?.Resume();
-                }
+                Emulator?.Pause();
+                Emulator?.LoadFile(files[0].Path.LocalPath);
+            }
+            catch (Exception ex)
+            {
+                await MessageDialogs.Error(ex.Message);
+            }
+            finally
+            {
+                Emulator?.Resume();
             }
         }
     }
@@ -127,6 +118,19 @@ public class MainWindowViewModel : ViewModelBase
         BorderSize = borderSize;
         _frameBufferConverter.SetBorderSize(borderSize);
         SpectrumScreen = _frameBufferConverter.Bitmap;
+    }
+
+    private void HandleChangeRom(RomType romType)
+    {
+        RomType = romType;
+
+        if (Emulator != null)
+        {
+            Emulator.Stop();
+            Emulator.RenderScreen -= EmulatorOnRenderScreen;
+        }
+
+        Initialize();
     }
 
     private void HandleMachineReset()
@@ -157,6 +161,13 @@ public class MainWindowViewModel : ViewModelBase
     {
         get => _borderSize;
         set => this.RaiseAndSetIfChanged(ref _borderSize, value);
+    }
+
+    private RomType _romType = RomType.Original48;
+    public RomType RomType
+    {
+        get => _romType;
+        set => this.RaiseAndSetIfChanged(ref _romType, value);
     }
 
     private WriteableBitmap? _spectrumScreen;

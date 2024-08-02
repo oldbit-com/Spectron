@@ -13,12 +13,7 @@ public class Memory48K : IMemory
 
     internal event ScreenMemoryUpdatedEvent? ScreenMemoryUpdated;
 
-    public Memory48K()
-    {
-        var rom = RomReader.Read48Rom();
-
-        Array.Copy(rom, 0, Memory, 0, rom.Length);
-    }
+    public Memory48K(byte[] rom) => Array.Copy(rom, 0, Memory, 0, rom.Length);
 
     public byte Read(Word address) => Memory[address];
 

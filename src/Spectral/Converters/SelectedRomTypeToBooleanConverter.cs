@@ -2,11 +2,11 @@ using System;
 using System.Globalization;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
-using OldBit.Spectral.Models;
+using OldBit.Spectral.Emulator.Rom;
 
 namespace OldBit.Spectral.Converters;
 
-public class SelectedBorderSizeToBooleanConverter : IValueConverter
+public class SelectedRomTypeToBooleanConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
@@ -15,9 +15,9 @@ public class SelectedBorderSizeToBooleanConverter : IValueConverter
             return false;
         }
 
-        if (value is BorderSize borderSize && parameter is BorderSize matchingBorderSize)
+        if (value is RomType romType && parameter is RomType matchingRomType)
         {
-            return borderSize == matchingBorderSize;
+            return romType == matchingRomType;
         }
 
         return new BindingNotification(new InvalidCastException(), BindingErrorType.Error);

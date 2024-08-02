@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using OldBit.Spectral.Emulator.Hardware;
 using OldBit.Spectral.Emulator.Hardware.Audio;
+using OldBit.Spectral.Emulator.Rom;
 using OldBit.Spectral.Emulator.Screen;
 using OldBit.Spectral.Emulator.Tape;
 using OldBit.Z80Cpu;
@@ -30,9 +31,10 @@ public class Spectrum48K : ISpectrum
     public delegate void RenderScreenEvent(FrameBuffer frameBuffer);
     public event RenderScreenEvent? RenderScreen;
 
-    public Spectrum48K()
+    public Spectrum48K(RomType romType)
     {
-        _memory = new Memory48K();
+        var rom = RomReader.ReadRom(romType);
+        _memory = new Memory48K(rom);
         _memory.ScreenMemoryUpdated += ScreenMemoryUpdated;
 
         _screenRenderer = new ScreenRenderer(_memory);
@@ -107,7 +109,8 @@ public class Spectrum48K : ISpectrum
     private void EndFrame()
     {
         _screenRenderer.UpdateBorder(_z80.Clock.FrameTicks);
-        _z80.Int(0xFF);
+
+        _z80.INT(0xFF);
     }
 
     public void Start()

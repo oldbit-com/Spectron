@@ -1,6 +1,7 @@
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using OldBit.Spectral.Dialogs;
 using ReactiveUI;
 
 namespace OldBit.Spectral.ViewModels;
@@ -28,6 +29,8 @@ public class TapeMenuViewModel : ViewModelBase
 
     private async Task Insert()
     {
+        var files = await FileDialogs.OpenTapeFileAsync();
+
         IsTapeInserted = true;
         await Task.CompletedTask;
     }

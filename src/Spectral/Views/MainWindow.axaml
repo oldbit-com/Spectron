@@ -5,6 +5,7 @@
         xmlns:viewModels="clr-namespace:OldBit.Spectral.ViewModels"
         xmlns:converters="clr-namespace:OldBit.Spectral.Converters"
         xmlns:models="clr-namespace:OldBit.Spectral.Models"
+        xmlns:rom="clr-namespace:OldBit.Spectral.Emulator.Rom;assembly=OldBit.Spectral.Emulator"
         xmlns:controls="clr-namespace:OldBit.Spectral.Controls"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectral.Views.MainWindow"
@@ -20,6 +21,7 @@
 
     <Window.Resources>
         <converters:SelectedBorderSizeToBooleanConverter x:Key="SelectedBorderSizeToBooleanConverter"/>
+        <converters:SelectedRomTypeToBooleanConverter x:Key="SelectedRomTypeToBooleanConverter"/>
     </Window.Resources>
 
     <NativeMenu.Menu>
@@ -34,6 +36,15 @@
             </NativeMenuItem>
             <NativeMenuItem Header="Machine">
                 <NativeMenu>
+                    <NativeMenuItem Header="ROM">
+                        <NativeMenu>
+                            <NativeMenuItem Header="Original 16/48k" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Original48}" IsChecked="{Binding RomType, Converter={StaticResource SelectedRomTypeToBooleanConverter}, ConverterParameter={x:Static rom:RomType.Original48}}"/>
+                            <NativeMenuItem Header="Gosh Wonderful" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.GoshWonderful}" IsChecked="{Binding RomType, Converter={StaticResource SelectedRomTypeToBooleanConverter}, ConverterParameter={x:Static rom:RomType.GoshWonderful}}"/>
+                            <NativeMenuItem Header="Busy Soft v1.40" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.BusySoft}" IsChecked="{Binding RomType, Converter={StaticResource SelectedRomTypeToBooleanConverter}, ConverterParameter={x:Static rom:RomType.BusySoft}}"/>
+                            <NativeMenuItem Header="J.G. Harston v0.77" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Harston}" IsChecked="{Binding RomType, Converter={StaticResource SelectedRomTypeToBooleanConverter}, ConverterParameter={x:Static rom:RomType.Harston}}"/>
+                            <NativeMenuItem Header="Retroleum v1.71" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Retroleum}" IsChecked="{Binding RomType, Converter={StaticResource SelectedRomTypeToBooleanConverter}, ConverterParameter={x:Static rom:RomType.Retroleum}}"/>
+                        </NativeMenu>
+                    </NativeMenuItem>
                     <NativeMenuItem Header="Pause" Gesture="F11" Command="{Binding PauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
                     <NativeMenuItem Header="Reset" Command="{Binding ResetCommand}"/>
                 </NativeMenu>
@@ -63,11 +74,7 @@
         </NativeMenu>
     </NativeMenu.Menu>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="30" />
-        </Grid.RowDefinitions>
+    <Grid RowDefinitions="*,30">
         <Panel>
             <Border Background="Brown" Padding="4">
                 <Image x:Name="ScreenImage" Source="{Binding SpectrumScreen}"/>
