@@ -40,8 +40,8 @@ public class Spectrum48K : IEmulator
         _screenRenderer = new ScreenRenderer(_memory);
         _beeper = new Beeper(ClockMHz);
 
-        var contendedMemoryProvider = new ContendedMemoryProvider();
-        _z80 = new Z80(_memory, contendedMemoryProvider);
+        var contendedMemory = new ContendedMemory();
+        _z80 = new Z80(_memory, contendedMemory);
 
         _z80.BeforeFetch += BeforeInstructionFetch;
         _z80.Clock.TicksAdded += ClockTicksAdded;
@@ -141,6 +141,7 @@ public class Spectrum48K : IEmulator
     public void Reset()
     {
         _z80.Reset();
+        _screenRenderer.Reset();
     }
 
     public void LoadFile(string fileName)

@@ -2,7 +2,7 @@ namespace OldBit.Spectral.Emulator.Screen;
 
 public record struct BorderTick(int StartTick, int EndTick, int StartPixel);
 
-public class BorderRenderer(FrameBuffer frameBuffer)
+internal class BorderRenderer(FrameBuffer frameBuffer)
 {
     private readonly List<BorderTick> _borderTickRanges = BuildBorderTickRanges();
 
@@ -17,7 +17,7 @@ public class BorderRenderer(FrameBuffer frameBuffer)
     /// </summary>
     /// <param name="color">The new color.</param>
     /// <param name="frameTicks">The current tick when border color is changing.</param>
-    public void Update(Color color, int frameTicks)
+    internal void Update(Color color, int frameTicks)
     {
         for (var rangeIndex = _lastRangeIndex; rangeIndex < _borderTickRanges.Count; rangeIndex++)
         {
@@ -57,10 +57,16 @@ public class BorderRenderer(FrameBuffer frameBuffer)
         _lastColor = color;
     }
 
-    public void NewFrame()
+    internal void NewFrame()
     {
         _lastRangeIndex = 0;
         _offset = 0;
+    }
+
+    internal void Reset()
+    {
+        _lastColor = Colors.White;
+        NewFrame();
     }
 
     /// <summary>

@@ -10,7 +10,7 @@ internal class ContentRenderer(FrameBuffer frameBuffer, Memory48K memory)
     private bool _isFlashOnFrame;
     private int _fetchCycleIndex;
 
-    public void Update(int frameTicks)
+    internal void Update(int frameTicks)
     {
         if (frameTicks < DefaultTimings.FirstPixelTick || _fetchCycleIndex >= FastLookup.ScreenRenderEvents.Length)
         {
@@ -61,7 +61,7 @@ internal class ContentRenderer(FrameBuffer frameBuffer, Memory48K memory)
         _bitmapDirty[bitmapAddress] = false;
     }
 
-    public void NewFrame()
+    internal void NewFrame()
     {
         _frameCount += 1;
         _fetchCycleIndex = 0;
@@ -75,7 +75,13 @@ internal class ContentRenderer(FrameBuffer frameBuffer, Memory48K memory)
         _frameCount = 1;
     }
 
-    public void UpdateScreen(Word address) => UpdateScreenPrivate(address - 0x4000);
+    internal void Reset()
+    {
+        NewFrame();
+        _bitmapDirty.AsSpan().Fill(true);
+    }
+
+    internal void UpdateScreen(Word address) => UpdateScreenPrivate(address - 0x4000);
 
     private void UpdateScreenPrivate(int address)
     {

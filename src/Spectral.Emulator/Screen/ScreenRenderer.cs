@@ -42,6 +42,12 @@ internal class ScreenRenderer
         _borderColorChanged = false;
     }
 
+    public void Reset()
+    {
+        _borderRenderer.Reset();
+        _contentRenderer.Reset();
+    }
+
     public void UpdateBorder(int frameTicks) => _borderRenderer.Update(_lastBorderColor, frameTicks);
 
     public void UpdateContent(int frameTicks) => _contentRenderer.Update(frameTicks);

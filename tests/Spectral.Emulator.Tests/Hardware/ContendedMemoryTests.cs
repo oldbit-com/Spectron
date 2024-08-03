@@ -3,9 +3,9 @@ using OldBit.Spectral.Emulator.Hardware;
 
 namespace OldBit.ZXSpectrum.Emulator.Tests.Hardware;
 
-public class ContendedMemoryProviderTests
+public class ContendedMemoryTests
 {
-    private readonly ContendedMemoryProvider _contentionProvider = new();
+    private readonly ContendedMemory _contention = new();
 
     [Theory]
     [InlineData(16384, 14335, 6)]
@@ -32,7 +32,7 @@ public class ContendedMemoryProviderTests
     [InlineData(16384, 57124, 1)]
     public void WhenContentedAddress_ShouldReturnExpectedContention(Word address, int state, int expectedContention)
     {
-        var contention = _contentionProvider.GetMemoryContention(state, address);
+        var contention = _contention.GetMemoryContention(state, address);
 
         contention.Should().Be(expectedContention);
     }
@@ -42,7 +42,7 @@ public class ContendedMemoryProviderTests
     [InlineData(32768, 14348)]
     public void WhenNotContendedAddress_ShouldReturnZeroContention(Word address, int state)
     {
-        var contention = _contentionProvider.GetMemoryContention(state, address);
+        var contention = _contention.GetMemoryContention(state, address);
 
         contention.Should().Be(0);
     }

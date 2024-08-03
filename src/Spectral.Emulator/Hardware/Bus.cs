@@ -2,7 +2,7 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectral.Emulator.Hardware;
 
-public class Bus() : IBus
+public class Bus : IBus
 {
     private readonly List<IInputDevice> _inputDevices = [];
     private readonly List<IOutputDevice> _outputDevices = [];
