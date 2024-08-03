@@ -41,6 +41,11 @@ internal class ContentRenderer(FrameBuffer frameBuffer, Memory48K memory)
 
     private void UpdateFrameBuffer(int frameBufferIndex, int bitmapAddress, int attributeAddress)
     {
+        if (!_bitmapDirty[bitmapAddress])
+        {
+            return;
+        }
+
         var bitmap = memory.Screen[bitmapAddress];
         var attribute = memory.Screen[attributeAddress];
 
@@ -52,6 +57,8 @@ internal class ContentRenderer(FrameBuffer frameBuffer, Memory48K memory)
             var color = (bitmap & FastLookup.BitMasks[i]) != 0 ^ isFlashOn ? attributeData.Ink : attributeData.Paper;
             frameBuffer.Pixels[frameBufferIndex + i] = color;
         }
+
+        _bitmapDirty[bitmapAddress] = false;
     }
 
     public void NewFrame()
