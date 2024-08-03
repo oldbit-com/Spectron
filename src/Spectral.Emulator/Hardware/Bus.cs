@@ -31,6 +31,4 @@ public class Bus() : IBus
             outputDevice.Write(address, data);
         }
     }
-
-    internal static bool IsUlaPort(Word address) => (address & 0x01) == 0x00;
 }

@@ -8,7 +8,7 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectral.Emulator.Computers;
 
-public class Spectrum48K : ISpectrum
+public class Spectrum48K : IEmulator
 {
     private const float ClockMHz = 3.5f;
     private const float InterruptFrequencyHz = ClockMHz * 1000000 / DefaultTimings.FrameTicks;
@@ -48,7 +48,7 @@ public class Spectrum48K : ISpectrum
 
         _tapePlayer = new TapePlayer(_z80.Clock);
 
-        var ula = new Ula(Keyboard, _beeper, _screenRenderer, _z80.Clock, _tapePlayer);
+        var ula = new Ula(_memory, Keyboard, _beeper, _screenRenderer, _z80.Clock, _tapePlayer);
         var bus = new Bus();
 
         bus.AddInputDevice(ula);

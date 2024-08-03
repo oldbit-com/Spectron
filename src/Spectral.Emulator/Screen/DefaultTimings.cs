@@ -28,7 +28,7 @@ internal static class DefaultTimings
     internal const int LineTicks = LeftBorderTicks + ContentLineTicks + RightBorderTicks + RetraceTicks;
 
     /// <summary>
-    /// Number of ticks per frame (69888T.
+    /// Number of ticks per frame (69888T).
     /// </summary>
     internal const int FrameTicks = DefaultSizes.TotalLines * LineTicks;
 
@@ -36,4 +36,9 @@ internal static class DefaultTimings
     /// Number of T-states passed since the interrupt generation to the first display byte is being sent to screen.
     /// </summary>
     internal const int FirstPixelTick = 14336;
+
+    /// <summary>
+    /// Number of T-states passed since the interrupt generation to the last display byte is being sent to screen.
+    /// </summary>
+    internal const int LastPixelTick = FirstPixelTick + (DefaultSizes.ContentHeight - 1) * LineTicks + ContentLineTicks;
 }

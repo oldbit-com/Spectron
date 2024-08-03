@@ -1,21 +1,19 @@
-using OldBit.Z80Cpu;
-
 namespace OldBit.Spectral.Emulator.Hardware;
 
 /// <summary>
-/// Memory for 48K Spectrum.
+/// Memory for 16K Spectrum.
 /// </summary>
-internal class Memory48K : Memory
+internal class Memory16K : Memory
 {
-    private byte[] Memory { get; } = new byte[65536];
+    private byte[] Memory { get; } = new byte[32768];
 
-    public Memory48K(byte[] rom) => Array.Copy(rom, 0, Memory, 0, rom.Length);
+    public Memory16K(byte[] rom) => Array.Copy(rom, 0, Memory, 0, rom.Length);
 
-    public override byte Read(Word address) => Memory[address];
+    public override byte Read(Word address) => address > 32767 ? (byte)0xFF : Memory[address];
 
     public override void Write(Word address, byte data)
     {
-        if (address < 0x4000)
+        if (address is < 0x4000 or > 32767)
         {
             return;
         }

@@ -1,9 +1,8 @@
 using OldBit.Spectral.Emulator.Hardware;
-using OldBit.Spectral.Emulator.Rom;
 
 namespace OldBit.Spectral.Emulator.Computers;
 
-public interface ISpectrum
+public interface IEmulator
 {
     void Start();
 

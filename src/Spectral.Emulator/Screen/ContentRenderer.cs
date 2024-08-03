@@ -2,7 +2,7 @@ using OldBit.Spectral.Emulator.Hardware;
 
 namespace OldBit.Spectral.Emulator.Screen;
 
-public class ContentRenderer(FrameBuffer frameBuffer, Memory48K memory)
+internal class ContentRenderer(FrameBuffer frameBuffer, Memory48K memory)
 {
     private readonly bool[] _bitmapDirty = new bool[32*24*8];
 
@@ -12,7 +12,7 @@ public class ContentRenderer(FrameBuffer frameBuffer, Memory48K memory)
 
     public void Update(int frameTicks)
     {
-        if (frameTicks < 14335 || _fetchCycleIndex >= FastLookup.ScreenRenderEvents.Length)
+        if (frameTicks < DefaultTimings.FirstPixelTick || _fetchCycleIndex >= FastLookup.ScreenRenderEvents.Length)
         {
             return;
         }

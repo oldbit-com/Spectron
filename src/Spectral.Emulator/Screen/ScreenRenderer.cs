@@ -2,7 +2,7 @@ using OldBit.Spectral.Emulator.Hardware;
 
 namespace OldBit.Spectral.Emulator.Screen;
 
-public class ScreenRenderer
+internal class ScreenRenderer
 {
     private readonly BorderRenderer _borderRenderer;
     private readonly ContentRenderer _contentRenderer;

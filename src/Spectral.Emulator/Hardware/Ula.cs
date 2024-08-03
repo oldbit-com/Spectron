@@ -5,13 +5,22 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectral.Emulator.Hardware;
 
-internal class Ula(Keyboard keyboard, Beeper beeper, ScreenRenderer renderer, Clock clock, TapePlayer tapePlayer) : IInputDevice, IOutputDevice
+internal class Ula(
+    Memory memory,
+    Keyboard keyboard,
+    Beeper beeper,
+    ScreenRenderer renderer,
+    Clock clock,
+    TapePlayer tapePlayer) : IInputDevice, IOutputDevice
 {
+    private readonly FloatingBus _floatingBus = new(memory);
+
     public byte? Read(Word address)
     {
         if (!IsUlaPort(address))
         {
             // TODO: Floating bus handling
+            _floatingBus.GetFloatingValue(clock.FrameTicks);
             return 0xFF;
         }
 

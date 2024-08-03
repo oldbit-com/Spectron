@@ -61,7 +61,7 @@ internal static class FastLookup
         return screenAddressLookup;
     }
 
-    public static ScreenRenderEvent[] BuildScreenEventsTable()
+    private static ScreenRenderEvent[] BuildScreenEventsTable()
     {
         var screenEvents = new List<ScreenRenderEvent>();
 
