@@ -11,4 +11,6 @@ public enum RomType
     BusySoft,
 
     Harston,
+
+    BrendanAlford,
 }

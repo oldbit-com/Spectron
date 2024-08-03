@@ -9,6 +9,7 @@ internal static class RomReader
     private const string GoshWonderfulRomResourceName = "OldBit.Spectral.Emulator.Rom.Files.gw03.rom";
     private const string BusySoftRomResourceName = "OldBit.Spectral.Emulator.Rom.Files.bsrom140.rom";
     private const string HarstonRomResourceName = "OldBit.Spectral.Emulator.Rom.Files.JGH077.ROM";
+    private const string BrendanAlfordRomResourceName = "OldBit.Spectral.Emulator.Rom.Files.testrom1.37.bin";
 
     internal static byte[] ReadRom(RomType romType)
     {
@@ -19,6 +20,7 @@ internal static class RomReader
             RomType.GoshWonderful => GoshWonderfulRomResourceName,
             RomType.BusySoft => BusySoftRomResourceName,
             RomType.Harston => HarstonRomResourceName,
+            RomType.BrendanAlford => BrendanAlfordRomResourceName,
             _ => throw new ArgumentOutOfRangeException(nameof(romType), romType, null)
         };
 

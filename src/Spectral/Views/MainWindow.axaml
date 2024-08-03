@@ -42,7 +42,12 @@
                             <NativeMenuItem Header="Gosh Wonderful" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.GoshWonderful}" IsChecked="{Binding RomType, Converter={StaticResource SelectedRomTypeToBooleanConverter}, ConverterParameter={x:Static rom:RomType.GoshWonderful}}"/>
                             <NativeMenuItem Header="Busy Soft v1.40" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.BusySoft}" IsChecked="{Binding RomType, Converter={StaticResource SelectedRomTypeToBooleanConverter}, ConverterParameter={x:Static rom:RomType.BusySoft}}"/>
                             <NativeMenuItem Header="J.G. Harston v0.77" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Harston}" IsChecked="{Binding RomType, Converter={StaticResource SelectedRomTypeToBooleanConverter}, ConverterParameter={x:Static rom:RomType.Harston}}"/>
-                            <NativeMenuItem Header="Retroleum v1.71" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Retroleum}" IsChecked="{Binding RomType, Converter={StaticResource SelectedRomTypeToBooleanConverter}, ConverterParameter={x:Static rom:RomType.Retroleum}}"/>
+                            <NativeMenuItem Header="Diagnostics">
+                                <NativeMenu>
+                                    <NativeMenuItem Header="Retroleum v1.71" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Retroleum}" IsChecked="{Binding RomType, Converter={StaticResource SelectedRomTypeToBooleanConverter}, ConverterParameter={x:Static rom:RomType.Retroleum}}"/>
+                                    <NativeMenuItem Header="B. Alford v1.37" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.BrendanAlford}" IsChecked="{Binding RomType, Converter={StaticResource SelectedRomTypeToBooleanConverter}, ConverterParameter={x:Static rom:RomType.BrendanAlford}}"/>
+                                </NativeMenu>
+                            </NativeMenuItem>
                         </NativeMenu>
                     </NativeMenuItem>
                     <NativeMenuItem Header="Pause" Gesture="F11" Command="{Binding PauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
