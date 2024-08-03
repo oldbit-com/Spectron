@@ -19,9 +19,7 @@ internal class Ula(
     {
         if (!IsUlaPort(address))
         {
-            // TODO: Floating bus handling
-            _floatingBus.GetFloatingValue(clock.FrameTicks);
-            return 0xFF;
+            return _floatingBus.GetFloatingValue(clock.FrameTicks);
         }
 
         var value = keyboard.Read(address);
