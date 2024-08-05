@@ -1,13 +1,21 @@
-namespace OldBit.Spectral.Emulator.Hardware;
+namespace OldBit.Spectral.Emulation.Devices;
 
 /// <summary>
-/// Memory for 16K Spectrum.
+/// Memory for the Spectrum 16k.
 /// </summary>
-internal class Memory16K : Memory
+internal sealed class Memory16K : Memory
 {
     private byte[] Memory { get; } = new byte[32768];
 
-    public Memory16K(byte[] rom) => Array.Copy(rom, 0, Memory, 0, rom.Length);
+    public Memory16K(byte[] rom)
+    {
+        if (rom.Length != 16384)
+        {
+            throw new ArgumentException("ROM must be exactly 16KB in size.", nameof(rom));
+        }
+
+        Array.Copy(rom, 0, Memory, 0, rom.Length);
+    }
 
     public override byte Read(Word address) => address > 32767 ? (byte)0xFF : Memory[address];
 
@@ -30,6 +38,4 @@ internal class Memory16K : Memory
             OnScreenMemoryUpdated(address);
         }
     }
-
-    internal override ReadOnlySpan<byte> Screen => new(Memory, 0x4000, 0x1C00);
 }

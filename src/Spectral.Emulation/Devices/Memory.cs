@@ -1,17 +1,17 @@
 using OldBit.Z80Cpu;
 
-namespace OldBit.Spectral.Emulator.Hardware;
+namespace OldBit.Spectral.Emulation.Devices;
 
-internal abstract class Memory : IMemory
+public abstract class Memory : IMemory
 {
     public abstract byte Read(Word address);
 
     public abstract void Write(Word address, byte data);
 
-    internal abstract ReadOnlySpan<byte> Screen { get; }
-
     internal delegate void ScreenMemoryUpdatedEvent(Word address);
     internal event ScreenMemoryUpdatedEvent? ScreenMemoryUpdated;
 
     protected void OnScreenMemoryUpdated(Word address) => ScreenMemoryUpdated?.Invoke(address);
+
+    internal virtual byte ReadScreen(Word address) => Read((Word)(address + 0x4000));
 }
