@@ -1,4 +1,4 @@
-namespace OldBit.Spectral.Emulator.Rom;
+namespace OldBit.Spectral.Emulation.Rom;
 
 public enum RomType
 {

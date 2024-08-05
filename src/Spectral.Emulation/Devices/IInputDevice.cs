@@ -1,4 +1,4 @@
-namespace OldBit.Spectral.Emulator.Hardware;
+namespace OldBit.Spectral.Emulation.Devices;
 
 public interface IInputDevice
 {
