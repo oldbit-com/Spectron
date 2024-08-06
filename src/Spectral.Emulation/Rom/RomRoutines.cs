@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace OldBit.Spectral.Emulation;
+namespace OldBit.Spectral.Emulation.Rom;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 internal static class RomRoutines
