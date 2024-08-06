@@ -2,7 +2,7 @@ using System;
 using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using OldBit.Spectral.Emulator.Screen;
+using OldBit.Spectral.Emulation.Screen;
 using OldBit.Spectral.Models;
 
 namespace OldBit.Spectral.Helpers;

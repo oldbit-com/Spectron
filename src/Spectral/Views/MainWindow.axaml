@@ -5,7 +5,7 @@
         xmlns:viewModels="clr-namespace:OldBit.Spectral.ViewModels"
         xmlns:converters="clr-namespace:OldBit.Spectral.Converters"
         xmlns:models="clr-namespace:OldBit.Spectral.Models"
-        xmlns:rom="clr-namespace:OldBit.Spectral.Emulator.Rom;assembly=OldBit.Spectral.Emulator"
+        xmlns:rom="clr-namespace:OldBit.Spectral.Emulation.Rom;assembly=OldBit.Spectral.Emulation"
         xmlns:controls="clr-namespace:OldBit.Spectral.Controls"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectral.Views.MainWindow"

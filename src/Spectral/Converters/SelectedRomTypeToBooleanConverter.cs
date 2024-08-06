@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
-using OldBit.Spectral.Emulator.Rom;
+using OldBit.Spectral.Emulation.Rom;
 
 namespace OldBit.Spectral.Converters;
 

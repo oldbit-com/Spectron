@@ -26,7 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\Spectral.Emulator\Spectral.Emulator.csproj" />
+      <ProjectReference Include="..\..\src\Spectral.Emulation\Spectral.Emulation.csproj" />
     </ItemGroup>
 
     <ItemGroup>

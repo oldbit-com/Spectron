@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using OldBit.Spectral.Dialogs;
-using OldBit.Spectral.Emulator.Computers;
 using OldBit.Spectral.Helpers;
 using OldBit.Spectral.ViewModels;
 

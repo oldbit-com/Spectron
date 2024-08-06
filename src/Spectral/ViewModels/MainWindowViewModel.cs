@@ -9,10 +9,10 @@ using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using OldBit.Spectral.Dialogs;
-using OldBit.Spectral.Emulator.Computers;
-using OldBit.Spectral.Emulator.Hardware;
-using OldBit.Spectral.Emulator.Rom;
-using OldBit.Spectral.Emulator.Screen;
+using OldBit.Spectral.Emulation.Computers;
+using OldBit.Spectral.Emulation.Devices.Keyboard;
+using OldBit.Spectral.Emulation.Rom;
+using OldBit.Spectral.Emulation.Screen;
 using OldBit.Spectral.Helpers;
 using OldBit.Spectral.Models;
 using ReactiveUI;
@@ -27,7 +27,7 @@ public class MainWindowViewModel : ViewModelBase
 
     private int _frameCount;
 
-    public Spectrum48K? Emulator { get; private set; }
+    public Emulator? Emulator { get; private set; }
     public Control ScreenControl { get; set; } = null!;
 
     public TapeMenuViewModel TapeMenu { get; } = new();
@@ -69,16 +69,16 @@ public class MainWindowViewModel : ViewModelBase
 
     public void Initialize()
     {
-        Emulator = new Spectrum48K(RomType);
-        Emulator.RenderScreen += EmulatorOnRenderScreen;
+        Emulator = EmulatorFactory.Create(EmulationMode.Spectrum48K, RomType);
+        Emulator!.RenderScreen += EmulatorOnRenderScreen;
 
         Emulator.Start();
         _statusBarTimer.Start();
     }
 
-    public void KeyDown(List<SpectrumKey> keys) => Emulator?.Keyboard.HandleKeyDown(keys);
+    public void KeyDown(List<SpectrumKey> keys) => Emulator?.KeyHandler.HandleKeyDown(keys);
 
-    public void KeyUp(List<SpectrumKey> keys) => Emulator?.Keyboard.HandleKeyUp(keys);
+    public void KeyUp(List<SpectrumKey> keys) => Emulator?.KeyHandler.HandleKeyUp(keys);
 
     private void EmulatorOnRenderScreen(FrameBuffer framebuffer)
     {
@@ -100,7 +100,7 @@ public class MainWindowViewModel : ViewModelBase
             try
             {
                 Emulator?.Pause();
-                Emulator?.LoadFile(files[0].Path.LocalPath);
+                Emulator?.TapeLoader.LoadFile(files[0].Path.LocalPath);
             }
             catch (Exception ex)
             {

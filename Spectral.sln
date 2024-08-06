@@ -6,7 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{ED4EA606
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spectral", "src\Spectral\Spectral.csproj", "{C60D08C5-964F-48E6-BA67-BB14AA63AA6D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spectral.Emulator", "src\Spectral.Emulator\Spectral.Emulator.csproj", "{B8978359-FFBB-4979-A990-DA54963E4724}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spectral.Emulation", "src\Spectral.Emulation\Spectral.Emulation.csproj", "{B8978359-FFBB-4979-A990-DA54963E4724}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spectral.Emulator.Tests", "tests\Spectral.Emulator.Tests\Spectral.Emulator.Tests.csproj", "{10F6D919-AF27-4920-A67E-872C03C45405}"
 EndProject

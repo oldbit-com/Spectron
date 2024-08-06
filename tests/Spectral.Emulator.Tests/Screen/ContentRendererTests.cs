@@ -1,6 +1,6 @@
-using OldBit.Spectral.Emulator.Hardware;
-using OldBit.Spectral.Emulator.Rom;
-using OldBit.Spectral.Emulator.Screen;
+using OldBit.Spectral.Emulation.Devices;
+using OldBit.Spectral.Emulation.Rom;
+using OldBit.Spectral.Emulation.Screen;
 
 namespace OldBit.ZXSpectrum.Emulator.Tests.Screen;
 

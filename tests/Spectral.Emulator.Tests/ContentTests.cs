@@ -1,5 +1,5 @@
 using FluentAssertions;
-using OldBit.Spectral.Emulator.Screen;
+using OldBit.Spectral.Emulation.Screen;
 
 namespace OldBit.ZXSpectrum.Emulator.Tests;
 
