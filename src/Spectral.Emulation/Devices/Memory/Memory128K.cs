@@ -19,6 +19,9 @@ internal sealed class Memory128K : EmulatorMemory
     private byte[] _activeRam;
     private bool _isPagingDisabledUntilReset;
 
+    internal delegate void BankPagedEvent(int bankId);
+    internal event BankPagedEvent? BankPaged;
+
     internal Memory128K(byte[] rom128, byte[] rom48)
     {
         _rom48 = rom48;
@@ -78,6 +81,14 @@ internal sealed class Memory128K : EmulatorMemory
         }
     }
 
+    public override void Reset()
+    {
+        _isPagingDisabledUntilReset = false;
+        _activeRom = _rom128;
+        _activeScreen = _banks[5];
+        _activeRam = _banks[0];
+    }
+
     internal override byte ReadScreen(Word address) => _activeScreen[address];
 
     internal void SetPagingMode(byte pagingMode)
@@ -120,7 +131,8 @@ internal sealed class Memory128K : EmulatorMemory
 
     private void SelectActiveRamBank(byte pagingMode)
     {
-        var bank = _banks[pagingMode & RamBankMask];
+        var bankId = pagingMode & RamBankMask;
+        var bank = _banks[bankId];
 
         if (ReferenceEquals(_activeRam, bank))
         {
@@ -128,6 +140,8 @@ internal sealed class Memory128K : EmulatorMemory
         }
 
         _activeRam = bank;
+
+        BankPaged?.Invoke(bankId);
     }
 
     private void Select48KRom()

@@ -8,8 +8,7 @@ internal sealed class ContentionProvider(int firstPixelTick, int ticksPerLine) :
     private static readonly int[] ContentionPattern = [6, 5, 4, 3, 2, 1, 0, 0];
     private readonly int[] _contentionTable = BuildContentionTable(firstPixelTick, ticksPerLine);
 
-    // TODO: Set memory page from 128K
-    internal int MemoryPage { get; set; }
+    internal int MemoryBankId { get; set; }
 
     public int GetMemoryContention(int ticks, Word address)
     {
@@ -43,7 +42,7 @@ internal sealed class ContentionProvider(int firstPixelTick, int ticksPerLine) :
             return false;
         }
 
-        switch (MemoryPage)
+        switch (MemoryBankId)
         {
             case 0 when address > 0x7fff:
             case 1 or 3 or 5 or 7 when address > 0xBFFF:

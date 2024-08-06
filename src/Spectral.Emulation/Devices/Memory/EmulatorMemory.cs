@@ -10,6 +10,8 @@ internal abstract class EmulatorMemory : IMemory, IDevice
 
     public virtual void WritePort(Word address, byte data) { }
 
+    public virtual void Reset() { }
+
     internal delegate void ScreenMemoryUpdatedEvent(Word address);
     internal event ScreenMemoryUpdatedEvent? ScreenMemoryUpdated;
 

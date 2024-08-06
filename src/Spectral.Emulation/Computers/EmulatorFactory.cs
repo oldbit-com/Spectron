@@ -31,16 +31,20 @@ public static class EmulatorFactory
 
     private static Emulator CreateSpectrum128K()
     {
+        var contentionProvider = new ContentionProvider(
+            Hardware.Spectrum128K.FirstPixelTick,
+            Hardware.Spectrum128K.TicksPerLine);
+
         var memory = new Memory128K(
             RomReader.ReadRom(RomType.Original128Bank0),
             RomReader.ReadRom(RomType.Original128Bank1));
 
+        memory.BankPaged += bankId => contentionProvider.MemoryBankId = bankId;
+
         var emulatorSettings = new EmulatorSettings(
             ComputerType.Spectrum128K,
             memory,
-            new ContentionProvider(
-                Hardware.Spectrum128K.FirstPixelTick,
-                Hardware.Spectrum128K.TicksPerLine),
+            contentionProvider,
             new Beeper(Hardware.Spectrum128K.ClockMhz),
             UseAYSound: true);
 
@@ -60,6 +64,4 @@ public static class EmulatorFactory
 
         return new Emulator(emulatorSettings);
     }
-
-
 }

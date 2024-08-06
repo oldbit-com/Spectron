@@ -6,7 +6,6 @@ using OldBit.Spectral.Emulation.Devices.Memory;
 using OldBit.Spectral.Emulation.Screen;
 using OldBit.Spectral.Emulation.Tape;
 using OldBit.Z80Cpu;
-using OldBit.Z80Cpu.Contention;
 
 namespace OldBit.Spectral.Emulation.Computers;
 
@@ -15,6 +14,7 @@ namespace OldBit.Spectral.Emulation.Computers;
 /// </summary>
 public sealed class Emulator
 {
+    private readonly EmulatorMemory _memory;
     private readonly Beeper _beeper;
     private readonly Z80 _z80;
     private readonly ScreenBuffer _screenBuffer;
@@ -30,6 +30,7 @@ public sealed class Emulator
 
     internal Emulator(EmulatorSettings settings)
     {
+        _memory = settings.Memory;
         _beeper = settings.Beeper;
         _screenBuffer = new ScreenBuffer(settings.Memory);
         settings.Memory.ScreenMemoryUpdated += address => _screenBuffer.UpdateScreen(address);
@@ -80,6 +81,7 @@ public sealed class Emulator
 
     public void Reset()
     {
+        _memory.Reset();
         _z80.Reset();
         _screenBuffer.Reset();
     }
