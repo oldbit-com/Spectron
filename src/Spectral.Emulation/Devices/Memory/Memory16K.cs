@@ -7,7 +7,7 @@ internal sealed class Memory16K : EmulatorMemory
 {
     private byte[] Memory { get; } = new byte[32768];
 
-    public Memory16K(byte[] rom)
+    internal Memory16K(byte[] rom)
     {
         if (rom.Length != 16384)
         {

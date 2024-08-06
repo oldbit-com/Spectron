@@ -7,7 +7,7 @@ internal sealed class Memory48K : EmulatorMemory
 {
     private readonly byte[] _memory = new byte[65536];
 
-    public Memory48K(byte[] rom)
+    internal Memory48K(byte[] rom)
     {
         if (rom.Length != 16384)
         {

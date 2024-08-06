@@ -2,9 +2,9 @@ using OldBit.Spectral.Emulation.Devices.Memory;
 
 namespace OldBit.ZXSpectrum.Emulator.Tests.Fixtures;
 
-public static class MemoryExtensions
+internal static class MemoryExtensions
 {
-    public static byte[] ReadAll(this EmulatorMemory memory)
+    internal static byte[] ReadAll(this EmulatorMemory memory)
     {
         var result = new byte[65536];
 
@@ -16,7 +16,7 @@ public static class MemoryExtensions
         return result;
     }
 
-    public static byte[] ReadRom(this EmulatorMemory memory)
+    internal static byte[] ReadRom(this EmulatorMemory memory)
     {
         var result = new byte[16384];
 
@@ -28,7 +28,7 @@ public static class MemoryExtensions
         return result;
     }
 
-    public static byte[] ReadRange(this EmulatorMemory memory, int startAddress, int count)
+    internal static byte[] ReadRange(this EmulatorMemory memory, int startAddress, int count)
     {
         var result = new byte[count];
 
@@ -52,7 +52,7 @@ public static class MemoryExtensions
         return result;
     }
 
-    public static void Fill(this EmulatorMemory memory, int startAddress, int count, byte value)
+    internal static void Fill(this EmulatorMemory memory, int startAddress, int count, byte value)
     {
         for (var i = 0; i < count; i++)
         {

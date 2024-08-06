@@ -1,7 +1,7 @@
 namespace OldBit.Spectral.Emulation.Devices.Memory;
 
 /// <summary>
-/// Memory for the Spectrum 128k.
+/// Memory for the Spectrum 128k. It supports paging and screen switching.
 /// </summary>
 internal sealed class Memory128K : EmulatorMemory
 {
@@ -19,7 +19,7 @@ internal sealed class Memory128K : EmulatorMemory
     private byte[] _activeRam;
     private bool _isPagingDisabledUntilReset;
 
-    public Memory128K(byte[] rom128, byte[] rom48)
+    internal Memory128K(byte[] rom128, byte[] rom48)
     {
         if (rom128.Length != 16384)
         {
