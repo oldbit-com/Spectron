@@ -2,19 +2,17 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectral.Emulation.Devices;
 
-public class Bus : IBus
+internal class Bus : IBus
 {
-    private readonly List<IInputDevice> _inputDevices = [];
-    private readonly List<IOutputDevice> _outputDevices = [];
+    private readonly List<IDevice> _devices = [];
 
-    internal void AddInputDevice(IInputDevice device) => _inputDevices.Add(device);
-    internal void AddOutputDevice(IOutputDevice device) => _outputDevices.Add(device);
+    internal void AddDevice(IDevice device) => _devices.Add(device);
 
     public byte Read(Word address)
     {
-        foreach (var inputDevice in _inputDevices)
+        foreach (var device in _devices)
         {
-            var result = inputDevice.Read(address);
+            var result = device.ReadPort(address);
             if (result != null)
             {
                 return result.Value;
@@ -26,9 +24,9 @@ public class Bus : IBus
 
     public void Write(Word address, byte data)
     {
-        foreach(var outputDevice in _outputDevices)
+        foreach(var device in _devices)
         {
-            outputDevice.Write(address, data);
+            device.WritePort(address, data);
         }
     }
 }

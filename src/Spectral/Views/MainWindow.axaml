@@ -36,11 +36,11 @@
             </NativeMenuItem>
             <NativeMenuItem Header="Machine">
                 <NativeMenu>
-                    <NativeMenuItem Header="Emulated Computer">
+                    <NativeMenuItem Header="Computer">
                         <NativeMenu>
-                            <NativeMenuItem Header="ZX Spectrum 16 kB" ToggleType="CheckBox" Command="{Binding ChangeEmulatedComputer}" CommandParameter="{x:Static computer:EmulatedComputer.Spectrum16K}" IsChecked="{Binding EmulatedComputer, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:EmulatedComputer.Spectrum16K}}"/>
-                            <NativeMenuItem Header="ZX Spectrum 48 kB" ToggleType="CheckBox" Command="{Binding ChangeEmulatedComputer}" CommandParameter="{x:Static computer:EmulatedComputer.Spectrum48K}" IsChecked="{Binding EmulatedComputer, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:EmulatedComputer.Spectrum48K}}"/>
-                            <NativeMenuItem Header="ZX Spectrum 128 kB" ToggleType="CheckBox" Command="{Binding ChangeEmulatedComputer}" CommandParameter="{x:Static computer:EmulatedComputer.Spectrum128K}" IsChecked="{Binding EmulatedComputer, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:EmulatedComputer.Spectrum128K}}"/>
+                            <NativeMenuItem Header="ZX Spectrum 16" ToggleType="CheckBox" Command="{Binding ChangeComputer}" CommandParameter="{x:Static computer:Computer.Spectrum16K}" IsChecked="{Binding Computer, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:Computer.Spectrum16K}}"/>
+                            <NativeMenuItem Header="ZX Spectrum 48" ToggleType="CheckBox" Command="{Binding ChangeComputer}" CommandParameter="{x:Static computer:Computer.Spectrum48K}" IsChecked="{Binding Computer, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:Computer.Spectrum48K}}"/>
+                            <NativeMenuItem Header="ZX Spectrum 128" ToggleType="CheckBox" Command="{Binding ChangeComputer}" CommandParameter="{x:Static computer:Computer.Spectrum128K}" IsChecked="{Binding Computer, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:Computer.Spectrum128K}}"/>
                         </NativeMenu>
                     </NativeMenuItem>
                     <NativeMenuItem Header="ROM">

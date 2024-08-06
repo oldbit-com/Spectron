@@ -20,7 +20,7 @@ public class Memory128KTests
     [Fact]
     public void Rom_ShouldBePopulatedAndDefaultTo128K()
     {
-        var memory = new Memory128K(_rom48, _rom128);
+        var memory = new Memory128K(_rom128, _rom48);
 
         memory.ReadRom().Should().BeEquivalentTo(_rom128);
     }
@@ -28,7 +28,7 @@ public class Memory128KTests
     [Fact]
     public void Rom_ShouldBeAbleToSwitchBetweenRoms()
     {
-        var memory = new Memory128K(_rom48, _rom128);
+        var memory = new Memory128K(_rom128, _rom48);
 
         memory.SetPagingMode(0b00010000);
         memory.ReadRom().Should().BeEquivalentTo(_rom48);
@@ -40,7 +40,7 @@ public class Memory128KTests
     [Fact]
     public void Rom_ShouldBeAbleToSwitchScreen()
     {
-        var memory = new Memory128K(_rom48, _rom128);
+        var memory = new Memory128K(_rom128, _rom48);
         // Fill standard screen with 0x20
         memory.Fill(0x4000, 0x4000, 0x20);
 
@@ -63,7 +63,7 @@ public class Memory128KTests
     [Fact]
     public void Rom_ShouldBeAbleToWriteToBank2()
     {
-        var memory = new Memory128K(_rom48, _rom128);
+        var memory = new Memory128K(_rom128, _rom48);
         memory.SetPagingMode(2);
 
         memory.Fill(0xC000, 0x4000, 0x56);
@@ -76,7 +76,7 @@ public class Memory128KTests
     [Fact]
     public void Rom_ShouldBeAbleToWriteToBank5()
     {
-        var memory = new Memory128K(_rom48, _rom128);
+        var memory = new Memory128K(_rom128, _rom48);
         memory.SetPagingMode(5);
 
         memory.Fill(0xC000, 0x4000, 0xAF);

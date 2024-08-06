@@ -35,7 +35,7 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Task> OpenFileCommand { get; private set; }
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     public ReactiveCommand<RomType, Unit> ChangeRomCommand { get; private set; }
-    public ReactiveCommand<EmulatedComputer, Unit> ChangeEmulatedComputer { get; private set; }
+    public ReactiveCommand<Computer, Unit> ChangeComputer { get; private set; }
     public ReactiveCommand<Unit, Unit> ResetCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> PauseCommand { get; private set; }
 
@@ -50,7 +50,7 @@ public class MainWindowViewModel : ViewModelBase
         OpenFileCommand = ReactiveCommand.Create(HandleOpenFileAsync);
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
         ChangeRomCommand = ReactiveCommand.Create<RomType>(HandleChangeRom);
-        ChangeEmulatedComputer = ReactiveCommand.Create<EmulatedComputer>(HandleChangeEmulatedComputer);
+        ChangeComputer = ReactiveCommand.Create<Computer>(HandleChangeComputer);
         PauseCommand = ReactiveCommand.Create(HandleMachinePause, emulatorNotNull);
         ResetCommand = ReactiveCommand.Create(HandleMachineReset, emulatorNotNull);
 
@@ -69,7 +69,7 @@ public class MainWindowViewModel : ViewModelBase
         Interlocked.Exchange(ref _frameCount, 0);
     }
 
-    public void Initialize(EmulatedComputer computer)
+    public void Initialize(Computer computer)
     {
         Emulator = EmulatorFactory.Create(computer, RomType);
         Emulator!.RenderScreen += EmulatorOnRenderScreen;
@@ -117,13 +117,24 @@ public class MainWindowViewModel : ViewModelBase
 
     private void HandleChangeBorderSize(BorderSize borderSize)
     {
+        if (BorderSize == borderSize)
+        {
+            return;
+        }
+
         BorderSize = borderSize;
+
         _frameBufferConverter.SetBorderSize(borderSize);
         SpectrumScreen = _frameBufferConverter.Bitmap;
     }
 
     private void HandleChangeRom(RomType romType)
     {
+        if (RomType == romType)
+        {
+            return;
+        }
+
         RomType = romType;
 
         if (Emulator != null)
@@ -132,15 +143,20 @@ public class MainWindowViewModel : ViewModelBase
             Emulator.RenderScreen -= EmulatorOnRenderScreen;
         }
 
-        Initialize(EmulatedComputer);
+        Initialize(Computer);
     }
 
-    private void HandleChangeEmulatedComputer(EmulatedComputer emulatedComputer)
+    private void HandleChangeComputer(Computer computer)
     {
-        Emulator?.Stop();
-        Initialize(emulatedComputer);
+        if (Computer == computer)
+        {
+            return;
+        }
 
-        EmulatedComputer = emulatedComputer;
+        Computer = computer;
+
+        Emulator?.Stop();
+        Initialize(computer);
     }
 
     private void HandleMachineReset()
@@ -180,11 +196,11 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _romType, value);
     }
 
-    private EmulatedComputer _emulatedComputer = EmulatedComputer.Spectrum48K;
-    public EmulatedComputer EmulatedComputer
+    private Computer _computer = Computer.Spectrum48K;
+    public Computer Computer
     {
-        get => _emulatedComputer;
-        set => this.RaiseAndSetIfChanged(ref _emulatedComputer, value);
+        get => _computer;
+        set => this.RaiseAndSetIfChanged(ref _computer, value);
     }
 
     private WriteableBitmap? _spectrumScreen;

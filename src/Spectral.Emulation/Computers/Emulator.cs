@@ -28,28 +28,31 @@ public sealed class Emulator
     public KeyHandler KeyHandler { get; } = new();
     public TapeLoader TapeLoader { get; }
 
-    public Emulator(
-        EmulatorMemory memory,
-        Beeper beeper,
-        IContentionProvider contentionProvider)
+    internal Emulator(EmulatorSettings settings)
     {
-        _beeper = beeper;
-        _screenRenderer = new ScreenRenderer(memory);
-        memory.ScreenMemoryUpdated += address => _screenRenderer.ScreenMemoryUpdated(address);
+        _beeper = settings.Beeper;
+        _screenRenderer = new ScreenRenderer(settings.Memory);
+        settings.Memory.ScreenMemoryUpdated += address => _screenRenderer.ScreenMemoryUpdated(address);
 
-        _z80 = new Z80(memory, contentionProvider);
+        _z80 = new Z80(settings.Memory, settings.ContentionProvider);
         _z80.Clock.TicksAdded += (_, _, currentFrameTicks) => _screenRenderer.UpdateContent(currentFrameTicks);
 
         var tapePlayer = new TapePlayer(_z80.Clock);
 
-        var ula = new Ula(memory, KeyHandler, beeper, _screenRenderer, _z80.Clock, tapePlayer);
+        var ula = new Ula(settings.Memory, KeyHandler, settings.Beeper, _screenRenderer, _z80.Clock, tapePlayer);
         var bus = new Bus();
 
-        bus.AddInputDevice(ula);
-        bus.AddOutputDevice(ula);
+        bus.AddDevice(ula);
+        bus.AddDevice(settings.Memory);
+
         _z80.AddBus(bus);
 
-        TapeLoader = new TapeLoader(_z80, memory, _screenRenderer, tapePlayer);
+        if (settings.UseAYSound)
+        {
+            bus.AddDevice(new AY8910());
+        }
+
+        TapeLoader = new TapeLoader(_z80, settings.Memory, _screenRenderer, tapePlayer);
 
         _workerThread = new Thread(WorkerThread)
         {

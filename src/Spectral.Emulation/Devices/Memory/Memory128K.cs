@@ -19,16 +19,16 @@ internal sealed class Memory128K : EmulatorMemory
     private byte[] _activeRam;
     private bool _isPagingDisabledUntilReset;
 
-    public Memory128K(byte[] rom48, byte[] rom128)
+    public Memory128K(byte[] rom128, byte[] rom48)
     {
-        if (rom48.Length != 16384)
-        {
-            throw new ArgumentException("ROM must be exactly 16KB in size.", nameof(rom48));
-        }
-
         if (rom128.Length != 16384)
         {
             throw new ArgumentException("ROM must be exactly 16KB in size.", nameof(rom128));
+        }
+
+        if (rom48.Length != 16384)
+        {
+            throw new ArgumentException("ROM must be exactly 16KB in size.", nameof(rom48));
         }
 
         _rom48 = rom48;
@@ -76,6 +76,15 @@ internal sealed class Memory128K : EmulatorMemory
         if (address < 0x5B00)
         {
             OnScreenMemoryUpdated(address);
+        }
+    }
+
+    public override void WritePort(Word address, byte data)
+    {
+        // Port 0x7FFD is decoded as: A15=0 & A1=0
+        if ((address & 0x8002) == 0)
+        {
+            SetPagingMode(data);
         }
     }
 

@@ -13,11 +13,11 @@ internal class Ula(
     Beeper beeper,
     ScreenRenderer renderer,
     Clock clock,
-    TapePlayer tapePlayer) : IInputDevice, IOutputDevice
+    TapePlayer tapePlayer) : IDevice
 {
     private readonly FloatingBus _floatingBus = new(memory);
 
-    public byte? Read(Word address)
+    public byte? ReadPort(Word address)
     {
         if (!IsUlaPort(address))
         {
@@ -30,7 +30,7 @@ internal class Ula(
         return value;
     }
 
-    public void Write(Word address, byte value)
+    public void WritePort(Word address, byte value)
     {
         if (!IsUlaPort(address))
         {

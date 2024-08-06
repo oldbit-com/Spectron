@@ -6,32 +6,53 @@ namespace OldBit.Spectral.Emulation.Computers;
 
 public static class EmulatorFactory
 {
-    public static Emulator Create(EmulatedComputer computer, RomType romType) => computer switch
+    public static Emulator Create(Computer computer, RomType romType) => computer switch
     {
-        EmulatedComputer.Spectrum16K => CreateSpectrum16K(romType),
-        EmulatedComputer.Spectrum48K => CreateSpectrum48K(romType),
-        EmulatedComputer.Spectrum128K => CreateSpectrum128K(romType),
+        Computer.Spectrum16K => CreateSpectrum16K(romType),
+        Computer.Spectrum48K => CreateSpectrum48K(romType),
+        Computer.Spectrum128K => CreateSpectrum128K(),
+        Computer.Timex2048 => throw new NotImplementedException(),
         _ => throw new ArgumentOutOfRangeException(nameof(computer))
     };
 
     private static Emulator CreateSpectrum16K(RomType romType) =>
-        CreateSpectrum16Or48K(romType, new Memory16K(RomReader.ReadRom(romType)));
+        CreateSpectrum16Or48K(new Memory16K(RomReader.ReadRom(romType)));
 
     private static Emulator CreateSpectrum48K(RomType romType) =>
-        CreateSpectrum16Or48K(romType, new Memory48K(RomReader.ReadRom(romType)));
+        CreateSpectrum16Or48K(new Memory48K(RomReader.ReadRom(romType)));
 
-    private static Emulator CreateSpectrum16Or48K(RomType romType, EmulatorMemory memory)
+    private static Emulator CreateSpectrum128K()
+    {
+        // TODO: Proper timing and contention
+        const float clockMHz = 3.5f;
+
+        var memory = new Memory128K(
+            RomReader.ReadRom(RomType.Original128Bank0),
+            RomReader.ReadRom(RomType.Original128Bank1));
+
+        var emulatorSettings = new EmulatorSettings(
+            Computer.Spectrum128K,
+            memory,
+            new ContendedMemory(),
+            new Beeper(clockMHz),
+            UseAYSound: true);
+
+        return new Emulator(emulatorSettings);
+    }
+
+    private static Emulator CreateSpectrum16Or48K(EmulatorMemory memory)
     {
         const float clockMHz = 3.5f;
 
-        var contentionProvider = new ContendedMemory();
-        var beeper = new Beeper(clockMHz);
+        var emulatorSettings = new EmulatorSettings(
+            Computer.Spectrum48K,
+            memory,
+            new ContendedMemory(),
+            new Beeper(clockMHz),
+            UseAYSound: false);
 
-        return new Emulator(memory, beeper, contentionProvider);
+        return new Emulator(emulatorSettings);
     }
 
-    private static Emulator CreateSpectrum128K(RomType romType)
-    {
-        throw new NotImplementedException();
-    }
+
 }

@@ -2,11 +2,13 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectral.Emulation.Devices.Memory;
 
-public abstract class EmulatorMemory : IMemory
+public abstract class EmulatorMemory : IMemory, IDevice
 {
     public abstract byte Read(Word address);
 
     public abstract void Write(Word address, byte data);
+
+    public virtual void WritePort(Word address, byte data) { }
 
     internal delegate void ScreenMemoryUpdatedEvent(Word address);
     internal event ScreenMemoryUpdatedEvent? ScreenMemoryUpdated;
