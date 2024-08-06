@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using OldBit.Spectral.Dialogs;
+using OldBit.Spectral.Emulation.Computers;
 using OldBit.Spectral.Helpers;
 using OldBit.Spectral.ViewModels;
 
@@ -30,7 +31,7 @@ public partial class MainWindow : Window
 
         _viewModel.ScreenControl = ScreenImage;
 
-        _viewModel.Initialize();
+        _viewModel.Initialize(EmulatedComputer.Spectrum48K);
     }
 
     private void OnKeyDown(object? sender, KeyEventArgs e)

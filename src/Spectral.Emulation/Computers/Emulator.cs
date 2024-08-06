@@ -9,6 +9,9 @@ using OldBit.Z80Cpu.Contention;
 
 namespace OldBit.Spectral.Emulation.Computers;
 
+/// <summary>
+/// This is the main emulator class that ties everything together.
+/// </summary>
 public sealed class Emulator
 {
     private readonly Beeper _beeper;

@@ -1,12 +1,10 @@
 using System;
 using System.Globalization;
-using Avalonia.Data;
 using Avalonia.Data.Converters;
-using OldBit.Spectral.Models;
 
 namespace OldBit.Spectral.Converters;
 
-public class SelectedBorderSizeToBooleanConverter : IValueConverter
+public class SelectedEnumToBooleanConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
@@ -15,12 +13,7 @@ public class SelectedBorderSizeToBooleanConverter : IValueConverter
             return false;
         }
 
-        if (value is BorderSize borderSize && parameter is BorderSize matchingBorderSize)
-        {
-            return borderSize == matchingBorderSize;
-        }
-
-        return new BindingNotification(new InvalidCastException(), BindingErrorType.Error);
+        return value?.Equals(parameter) == true;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => null;

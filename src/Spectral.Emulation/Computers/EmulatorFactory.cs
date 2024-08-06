@@ -6,12 +6,12 @@ namespace OldBit.Spectral.Emulation.Computers;
 
 public static class EmulatorFactory
 {
-    public static Emulator Create(EmulationMode mode, RomType romType) => mode switch
+    public static Emulator Create(EmulatedComputer computer, RomType romType) => computer switch
     {
-        EmulationMode.Spectrum16K => CreateSpectrum16K(romType),
-        EmulationMode.Spectrum48K => CreateSpectrum48K(romType),
-        EmulationMode.Spectrum128K => CreateSpectrum128K(romType),
-        _ => throw new ArgumentOutOfRangeException(nameof(mode))
+        EmulatedComputer.Spectrum16K => CreateSpectrum16K(romType),
+        EmulatedComputer.Spectrum48K => CreateSpectrum48K(romType),
+        EmulatedComputer.Spectrum128K => CreateSpectrum128K(romType),
+        _ => throw new ArgumentOutOfRangeException(nameof(computer))
     };
 
     private static Emulator CreateSpectrum16K(RomType romType) =>

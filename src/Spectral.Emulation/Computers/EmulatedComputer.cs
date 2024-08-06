@@ -1,10 +1,12 @@
 namespace OldBit.Spectral.Emulation.Computers;
 
-public enum EmulationMode
+public enum EmulatedComputer
 {
     Spectrum16K,
 
     Spectrum48K,
 
     Spectrum128K,
+
+    Timex2048,
 }

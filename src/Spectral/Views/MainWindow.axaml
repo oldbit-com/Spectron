@@ -6,6 +6,7 @@
         xmlns:converters="clr-namespace:OldBit.Spectral.Converters"
         xmlns:models="clr-namespace:OldBit.Spectral.Models"
         xmlns:rom="clr-namespace:OldBit.Spectral.Emulation.Rom;assembly=OldBit.Spectral.Emulation"
+        xmlns:computer="clr-namespace:OldBit.Spectral.Emulation.Computers;assembly=OldBit.Spectral.Emulation"
         xmlns:controls="clr-namespace:OldBit.Spectral.Controls"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectral.Views.MainWindow"
@@ -20,8 +21,7 @@
     </Design.DataContext>
 
     <Window.Resources>
-        <converters:SelectedBorderSizeToBooleanConverter x:Key="SelectedBorderSizeToBooleanConverter"/>
-        <converters:SelectedRomTypeToBooleanConverter x:Key="SelectedRomTypeToBooleanConverter"/>
+        <converters:SelectedEnumToBooleanConverter x:Key="SelectedEnumToBooleanConverter"/>
     </Window.Resources>
 
     <NativeMenu.Menu>
@@ -36,16 +36,23 @@
             </NativeMenuItem>
             <NativeMenuItem Header="Machine">
                 <NativeMenu>
+                    <NativeMenuItem Header="Emulated Computer">
+                        <NativeMenu>
+                            <NativeMenuItem Header="ZX Spectrum 16 kB" ToggleType="CheckBox" Command="{Binding ChangeEmulatedComputer}" CommandParameter="{x:Static computer:EmulatedComputer.Spectrum16K}" IsChecked="{Binding EmulatedComputer, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:EmulatedComputer.Spectrum16K}}"/>
+                            <NativeMenuItem Header="ZX Spectrum 48 kB" ToggleType="CheckBox" Command="{Binding ChangeEmulatedComputer}" CommandParameter="{x:Static computer:EmulatedComputer.Spectrum48K}" IsChecked="{Binding EmulatedComputer, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:EmulatedComputer.Spectrum48K}}"/>
+                            <NativeMenuItem Header="ZX Spectrum 128 kB" ToggleType="CheckBox" Command="{Binding ChangeEmulatedComputer}" CommandParameter="{x:Static computer:EmulatedComputer.Spectrum128K}" IsChecked="{Binding EmulatedComputer, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:EmulatedComputer.Spectrum128K}}"/>
+                        </NativeMenu>
+                    </NativeMenuItem>
                     <NativeMenuItem Header="ROM">
                         <NativeMenu>
-                            <NativeMenuItem Header="Original 16/48k" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Original48}" IsChecked="{Binding RomType, Converter={StaticResource SelectedRomTypeToBooleanConverter}, ConverterParameter={x:Static rom:RomType.Original48}}"/>
-                            <NativeMenuItem Header="Gosh Wonderful" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.GoshWonderful}" IsChecked="{Binding RomType, Converter={StaticResource SelectedRomTypeToBooleanConverter}, ConverterParameter={x:Static rom:RomType.GoshWonderful}}"/>
-                            <NativeMenuItem Header="Busy Soft v1.40" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.BusySoft}" IsChecked="{Binding RomType, Converter={StaticResource SelectedRomTypeToBooleanConverter}, ConverterParameter={x:Static rom:RomType.BusySoft}}"/>
-                            <NativeMenuItem Header="J.G. Harston v0.77" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Harston}" IsChecked="{Binding RomType, Converter={StaticResource SelectedRomTypeToBooleanConverter}, ConverterParameter={x:Static rom:RomType.Harston}}"/>
+                            <NativeMenuItem Header="Original 16/48k" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Original48}" IsChecked="{Binding RomType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static rom:RomType.Original48}}"/>
+                            <NativeMenuItem Header="Gosh Wonderful" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.GoshWonderful}" IsChecked="{Binding RomType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static rom:RomType.GoshWonderful}}"/>
+                            <NativeMenuItem Header="Busy Soft v1.40" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.BusySoft}" IsChecked="{Binding RomType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static rom:RomType.BusySoft}}"/>
+                            <NativeMenuItem Header="J.G. Harston v0.77" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Harston}" IsChecked="{Binding RomType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static rom:RomType.Harston}}"/>
                             <NativeMenuItem Header="Diagnostics">
                                 <NativeMenu>
-                                    <NativeMenuItem Header="Retroleum v1.71" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Retroleum}" IsChecked="{Binding RomType, Converter={StaticResource SelectedRomTypeToBooleanConverter}, ConverterParameter={x:Static rom:RomType.Retroleum}}"/>
-                                    <NativeMenuItem Header="B. Alford v1.37" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.BrendanAlford}" IsChecked="{Binding RomType, Converter={StaticResource SelectedRomTypeToBooleanConverter}, ConverterParameter={x:Static rom:RomType.BrendanAlford}}"/>
+                                    <NativeMenuItem Header="Retroleum v1.71" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Retroleum}" IsChecked="{Binding RomType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static rom:RomType.Retroleum}}"/>
+                                    <NativeMenuItem Header="B. Alford v1.37" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.BrendanAlford}" IsChecked="{Binding RomType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static rom:RomType.BrendanAlford}}"/>
                                 </NativeMenu>
                             </NativeMenuItem>
                         </NativeMenu>
@@ -58,11 +65,11 @@
                 <NativeMenu>
                     <NativeMenuItem Header="Border">
                         <NativeMenu>
-                            <NativeMenuItem Header="None" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.None}" IsChecked="{Binding BorderSize, Converter={StaticResource SelectedBorderSizeToBooleanConverter}, ConverterParameter={x:Static models:BorderSize.None}}"/>
-                            <NativeMenuItem Header="Small" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Small}" IsChecked="{Binding BorderSize, Converter={StaticResource SelectedBorderSizeToBooleanConverter}, ConverterParameter={x:Static models:BorderSize.Small}}"/>
-                            <NativeMenuItem Header="Medium" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Medium}" IsChecked="{Binding BorderSize, Converter={StaticResource SelectedBorderSizeToBooleanConverter}, ConverterParameter={x:Static models:BorderSize.Medium}}"/>
-                            <NativeMenuItem Header="Large" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Large}" IsChecked="{Binding BorderSize, Converter={StaticResource SelectedBorderSizeToBooleanConverter}, ConverterParameter={x:Static models:BorderSize.Large}}"/>
-                            <NativeMenuItem Header="Full" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Full}" IsChecked="{Binding BorderSize, Converter={StaticResource SelectedBorderSizeToBooleanConverter}, ConverterParameter={x:Static models:BorderSize.Full}}"/>
+                            <NativeMenuItem Header="None" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.None}" IsChecked="{Binding BorderSize, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static models:BorderSize.None}}"/>
+                            <NativeMenuItem Header="Small" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Small}" IsChecked="{Binding BorderSize, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static models:BorderSize.Small}}"/>
+                            <NativeMenuItem Header="Medium" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Medium}" IsChecked="{Binding BorderSize, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static models:BorderSize.Medium}}"/>
+                            <NativeMenuItem Header="Large" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Large}" IsChecked="{Binding BorderSize, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static models:BorderSize.Large}}"/>
+                            <NativeMenuItem Header="Full" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Full}" IsChecked="{Binding BorderSize, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static models:BorderSize.Full}}"/>
                         </NativeMenu>
                     </NativeMenuItem>
                 </NativeMenu>
