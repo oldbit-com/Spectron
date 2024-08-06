@@ -21,16 +21,6 @@ internal sealed class Memory128K : EmulatorMemory
 
     internal Memory128K(byte[] rom128, byte[] rom48)
     {
-        if (rom128.Length != 16384)
-        {
-            throw new ArgumentException("ROM must be exactly 16KB in size.", nameof(rom128));
-        }
-
-        if (rom48.Length != 16384)
-        {
-            throw new ArgumentException("ROM must be exactly 16KB in size.", nameof(rom48));
-        }
-
         _rom48 = rom48;
         _rom128 = rom128;
 

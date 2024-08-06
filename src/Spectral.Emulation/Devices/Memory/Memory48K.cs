@@ -7,15 +7,7 @@ internal sealed class Memory48K : EmulatorMemory
 {
     private readonly byte[] _memory = new byte[65536];
 
-    internal Memory48K(byte[] rom)
-    {
-        if (rom.Length != 16384)
-        {
-            throw new ArgumentException("ROM must be exactly 16KB in size.", nameof(rom));
-        }
-
-        Array.Copy(rom, 0, _memory, 0, rom.Length);
-    }
+    internal Memory48K(byte[] rom) => Array.Copy(rom, 0, _memory, 0, rom.Length);
 
     public override byte Read(Word address) => _memory[address];
 
