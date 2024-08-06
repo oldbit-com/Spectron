@@ -3,14 +3,17 @@ using OldBit.Z80Cpu.Contention;
 
 namespace OldBit.Spectral.Emulation.Devices.Memory;
 
-internal sealed class ContentionProvider : IContentionProvider
+internal sealed class ContentionProvider(int firstPixelTick, int ticksPerLine) : IContentionProvider
 {
     private static readonly int[] ContentionPattern = [6, 5, 4, 3, 2, 1, 0, 0];
-    private readonly int[] _contentionTable = BuildContentionTable();
+    private readonly int[] _contentionTable = BuildContentionTable(firstPixelTick, ticksPerLine);
+
+    // TODO: Set memory page from 128K
+    internal int MemoryPage { get; set; }
 
     public int GetMemoryContention(int ticks, Word address)
     {
-        if (address is < 0x4000 or > 0x7fff)
+        if (!IsAddressContended(address))
         {
             return 0;
         }
@@ -25,7 +28,7 @@ internal sealed class ContentionProvider : IContentionProvider
 
     public int GetPortContention(int ticks, Word port)
     {
-        if (port is < 0x4000 or > 0x7fff)
+        if (!IsAddressContended(port))
         {
             return 0;
         }
@@ -33,13 +36,30 @@ internal sealed class ContentionProvider : IContentionProvider
         return ticks < _contentionTable.Length ? _contentionTable[ticks] : 0;
     }
 
-    private static int[] BuildContentionTable()
+    private bool IsAddressContended(Word address)
     {
-        var contentionTable = new int[DefaultTimings.FirstPixelTick + ScreenSize.ContentHeight * DefaultTimings.LineTicks];
+        if (address < 0x4000)
+        {
+            return false;
+        }
+
+        switch (MemoryPage)
+        {
+            case 0 when address > 0x7fff:
+            case 1 or 3 or 5 or 7 when address > 0xBFFF:
+                return false;
+        }
+
+        return true;
+    }
+
+    private static int[] BuildContentionTable(int firstPixelTick, int ticksPerLine)
+    {
+        var contentionTable = new int[firstPixelTick + ScreenSize.ContentHeight * ticksPerLine];
 
         for (var line = 0; line < ScreenSize.ContentHeight; line++)
         {
-            var startLineState = DefaultTimings.FirstPixelTick + line * DefaultTimings.LineTicks;
+            var startLineState = firstPixelTick + line * ticksPerLine;
 
             for (var i = 0; i < 128; i += ContentionPattern.Length)
             {

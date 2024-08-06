@@ -5,7 +5,7 @@ namespace OldBit.ZXSpectrum.Emulator.Tests.Devices.Memory;
 
 public class ContentionProviderTests
 {
-    private readonly ContentionProvider _contention = new();
+    private readonly ContentionProvider _contention = new(14335, 224);
 
     [Theory]
     [InlineData(16384, 14335, 6)]

@@ -23,9 +23,6 @@ public static class EmulatorFactory
 
     private static Emulator CreateSpectrum128K()
     {
-        // TODO: Proper timing and contention
-        const float clockMHz = 3.5f;
-
         var memory = new Memory128K(
             RomReader.ReadRom(RomType.Original128Bank0),
             RomReader.ReadRom(RomType.Original128Bank1));
@@ -33,8 +30,10 @@ public static class EmulatorFactory
         var emulatorSettings = new EmulatorSettings(
             Computer.Spectrum128K,
             memory,
-            new ContentionProvider(),
-            new Beeper(clockMHz),
+            new ContentionProvider(
+                Hardware.Spectrum128K.FirstPixelTick,
+                Hardware.Spectrum128K.TicksPerLine),
+            new Beeper(Hardware.Spectrum128K.ClockMhz),
             UseAYSound: true);
 
         return new Emulator(emulatorSettings);
@@ -42,13 +41,13 @@ public static class EmulatorFactory
 
     private static Emulator CreateSpectrum16Or48K(EmulatorMemory memory)
     {
-        const float clockMHz = 3.5f;
-
         var emulatorSettings = new EmulatorSettings(
             Computer.Spectrum48K,
             memory,
-            new ContentionProvider(),
-            new Beeper(clockMHz),
+            new ContentionProvider(
+                Hardware.Spectrum48K.FirstPixelTick,
+                Hardware.Spectrum48K.TicksPerLine),
+            new Beeper(Hardware.Spectrum48K.ClockMhz),
             UseAYSound: false);
 
         return new Emulator(emulatorSettings);
