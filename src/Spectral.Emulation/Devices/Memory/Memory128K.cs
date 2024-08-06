@@ -3,7 +3,7 @@ namespace OldBit.Spectral.Emulation.Devices.Memory;
 /// <summary>
 /// Memory for the Spectrum 128k. It supports paging and screen switching.
 /// </summary>
-internal sealed class Memory128K : EmulatorMemory
+internal sealed class Memory128K : IEmulatorMemory
 {
     private const byte RomSelectBit = 0b00010000;
     private const byte PagingDisableBit = 0b00100000;
@@ -37,7 +37,7 @@ internal sealed class Memory128K : EmulatorMemory
         _activeRam = _banks[0];
     }
 
-    public override byte Read(Word address) => address switch
+    public byte Read(Word address) => address switch
     {
         < 0x4000 => _activeRom[address],
         < 0x8000 => _banks[5][address - 0x4000],
@@ -45,7 +45,7 @@ internal sealed class Memory128K : EmulatorMemory
         _ => _activeRam[address - 0xC000]
     };
 
-    public override void Write(Word address, byte data)
+    public void Write(Word address, byte data)
     {
         if (address < 0x4000)
         {
@@ -68,11 +68,13 @@ internal sealed class Memory128K : EmulatorMemory
 
         if (address < 0x5B00)
         {
-            OnScreenMemoryUpdated(address);
+            ScreenMemoryUpdated?.Invoke(address);
         }
     }
 
-    public override void WritePort(Word address, byte data)
+    public event ScreenMemoryUpdatedEvent? ScreenMemoryUpdated;
+
+    public void WritePort(Word address, byte data)
     {
         // Port 0x7FFD is decoded as: A15=0 & A1=0
         if ((address & 0x8002) == 0)
@@ -81,7 +83,7 @@ internal sealed class Memory128K : EmulatorMemory
         }
     }
 
-    public override void Reset()
+    public void Reset()
     {
         _isPagingDisabledUntilReset = false;
 
@@ -90,7 +92,7 @@ internal sealed class Memory128K : EmulatorMemory
         _activeRam = _banks[0];
     }
 
-    internal override byte ReadScreen(Word address) => _activeScreen[address];
+    public byte ReadScreen(Word address) => _activeScreen[address];
 
     internal void SetPagingMode(byte pagingMode)
     {

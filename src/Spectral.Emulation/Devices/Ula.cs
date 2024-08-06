@@ -8,7 +8,7 @@ using OldBit.Z80Cpu;
 namespace OldBit.Spectral.Emulation.Devices;
 
 internal class Ula(
-    EmulatorMemory memory,
+    IEmulatorMemory memory,
     KeyHandler keyHandler,
     Beeper beeper,
     ScreenBuffer screenBuffer,

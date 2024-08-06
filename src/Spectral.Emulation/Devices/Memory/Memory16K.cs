@@ -3,15 +3,15 @@ namespace OldBit.Spectral.Emulation.Devices.Memory;
 /// <summary>
 /// Memory for the Spectrum 16k.
 /// </summary>
-internal sealed class Memory16K : EmulatorMemory
+internal sealed class Memory16K : IEmulatorMemory
 {
     private byte[] Memory { get; } = new byte[32768];
 
     internal Memory16K(byte[] rom) => Array.Copy(rom, 0, Memory, 0, rom.Length);
 
-    public override byte Read(Word address) => address > 32767 ? (byte)0xFF : Memory[address];
+    public byte Read(Word address) => address > 32767 ? (byte)0xFF : Memory[address];
 
-    public override void Write(Word address, byte data)
+    public void Write(Word address, byte data)
     {
         if (address is < 0x4000 or > 32767)
         {
@@ -27,7 +27,9 @@ internal sealed class Memory16K : EmulatorMemory
 
         if (address < 0x5B00)
         {
-            OnScreenMemoryUpdated(address);
+            ScreenMemoryUpdated?.Invoke(address);
         }
     }
+
+    public event ScreenMemoryUpdatedEvent? ScreenMemoryUpdated;
 }

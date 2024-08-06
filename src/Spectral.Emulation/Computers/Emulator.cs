@@ -14,7 +14,7 @@ namespace OldBit.Spectral.Emulation.Computers;
 /// </summary>
 public sealed class Emulator
 {
-    private readonly EmulatorMemory _memory;
+    private readonly IEmulatorMemory _memory;
     private readonly Beeper _beeper;
     private readonly Z80 _z80;
     private readonly ScreenBuffer _screenBuffer;

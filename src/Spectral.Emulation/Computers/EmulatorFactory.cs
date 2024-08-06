@@ -7,7 +7,7 @@ namespace OldBit.Spectral.Emulation.Computers;
 
 internal record EmulatorSettings(
     ComputerType ComputerType,
-    EmulatorMemory Memory,
+    IEmulatorMemory Memory,
     IContentionProvider ContentionProvider,
     Beeper Beeper,
     bool UseAYSound);
@@ -51,7 +51,7 @@ public static class EmulatorFactory
         return new Emulator(emulatorSettings);
     }
 
-    private static Emulator CreateSpectrum16Or48K(EmulatorMemory memory)
+    private static Emulator CreateSpectrum16Or48K(IEmulatorMemory memory)
     {
         var emulatorSettings = new EmulatorSettings(
             ComputerType.Spectrum48K,

@@ -12,7 +12,7 @@ internal class ScreenBuffer
 
     public FrameBuffer FrameBuffer { get; } = new(Colors.White);
 
-    public ScreenBuffer(EmulatorMemory memory)
+    public ScreenBuffer(IEmulatorMemory memory)
     {
         _border = new Border(FrameBuffer);
         _content = new Content(FrameBuffer, memory);

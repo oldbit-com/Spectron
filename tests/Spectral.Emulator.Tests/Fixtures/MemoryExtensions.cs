@@ -4,7 +4,7 @@ namespace OldBit.ZXSpectrum.Emulator.Tests.Fixtures;
 
 internal static class MemoryExtensions
 {
-    internal static byte[] ReadAll(this EmulatorMemory memory)
+    internal static byte[] ReadAll(this IEmulatorMemory memory)
     {
         var result = new byte[65536];
 
@@ -16,7 +16,7 @@ internal static class MemoryExtensions
         return result;
     }
 
-    internal static byte[] ReadRom(this EmulatorMemory memory)
+    internal static byte[] ReadRom(this IEmulatorMemory memory)
     {
         var result = new byte[16384];
 
@@ -28,7 +28,7 @@ internal static class MemoryExtensions
         return result;
     }
 
-    internal static byte[] ReadRange(this EmulatorMemory memory, int startAddress, int count)
+    internal static byte[] ReadRange(this IEmulatorMemory memory, int startAddress, int count)
     {
         var result = new byte[count];
 
@@ -40,7 +40,7 @@ internal static class MemoryExtensions
         return result;
     }
 
-    internal static byte[] ReadScreen(this EmulatorMemory memory)
+    internal static byte[] ReadScreen(this IEmulatorMemory memory)
     {
         var result = new byte[16384];
 
@@ -52,7 +52,7 @@ internal static class MemoryExtensions
         return result;
     }
 
-    internal static void Fill(this EmulatorMemory memory, int startAddress, int count, byte value)
+    internal static void Fill(this IEmulatorMemory memory, int startAddress, int count, byte value)
     {
         for (var i = 0; i < count; i++)
         {
