@@ -2,7 +2,7 @@ namespace OldBit.Spectral.Emulation.Screen;
 
 public record struct BorderTick(int StartTick, int EndTick, int StartPixel);
 
-internal class BorderRenderer(FrameBuffer frameBuffer)
+internal class Border(FrameBuffer frameBuffer)
 {
     private readonly List<BorderTick> _borderTickRanges = BuildBorderTickRanges();
 
@@ -80,30 +80,30 @@ internal class BorderRenderer(FrameBuffer frameBuffer)
 
         var startTick = 0;
         var endTick = DefaultTimings.ContentLineTicks + DefaultTimings.LeftBorderTicks;
-        var startPixel = DefaultSizes.BorderLeft;
+        var startPixel = ScreenSize.BorderLeft;
 
-        for (var line = 0; line < DefaultSizes.TotalLines; line++)
+        for (var line = 0; line < ScreenSize.TotalLines; line++)
         {
             switch (line)
             {
-                case < DefaultSizes.BorderTop:
+                case < ScreenSize.BorderTop:
                     ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
 
                     startTick = endTick + DefaultTimings.RetraceTicks;
                     endTick = startTick + DefaultTimings.LeftBorderTicks + DefaultTimings.ContentLineTicks + DefaultTimings.RightBorderTicks;
                     startPixel += line == 0 ?
-                        DefaultSizes.ContentWidth + DefaultSizes.BorderRight :
-                        DefaultSizes.BorderLeft + DefaultSizes.ContentWidth + DefaultSizes.BorderRight;
+                        ScreenSize.ContentWidth + ScreenSize.BorderRight :
+                        ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight;
 
                     break;
 
-                case >= DefaultSizes.BorderTop + DefaultSizes.ContentHeight:
+                case >= ScreenSize.BorderTop + ScreenSize.ContentHeight:
                     endTick = startTick + DefaultTimings.LeftBorderTicks + DefaultTimings.ContentLineTicks + DefaultTimings.RightBorderTicks;
 
                     ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
 
                     startTick = endTick + DefaultTimings.RetraceTicks;
-                    startPixel += DefaultSizes.BorderLeft + DefaultSizes.ContentWidth + DefaultSizes.BorderRight;
+                    startPixel += ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight;
 
                     break;
 
@@ -115,12 +115,12 @@ internal class BorderRenderer(FrameBuffer frameBuffer)
                     // Skip content area
                     startTick = endTick + DefaultTimings.ContentLineTicks;
                     endTick = startTick + DefaultTimings.RightBorderTicks;
-                    startPixel += DefaultSizes.BorderLeft + DefaultSizes.ContentWidth;
+                    startPixel += ScreenSize.BorderLeft + ScreenSize.ContentWidth;
 
                     // Right border
                     ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
                     startTick = endTick + DefaultTimings.RetraceTicks;
-                    startPixel += DefaultSizes.BorderRight;
+                    startPixel += ScreenSize.BorderRight;
 
                     break;
             }

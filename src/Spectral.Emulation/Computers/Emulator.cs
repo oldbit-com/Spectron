@@ -17,7 +17,7 @@ public sealed class Emulator
 {
     private readonly Beeper _beeper;
     private readonly Z80 _z80;
-    private readonly ScreenRenderer _screenRenderer;
+    private readonly ScreenBuffer _screenBuffer;
     private readonly Thread _workerThread;
     private bool _isRunning;
 
@@ -31,15 +31,15 @@ public sealed class Emulator
     internal Emulator(EmulatorSettings settings)
     {
         _beeper = settings.Beeper;
-        _screenRenderer = new ScreenRenderer(settings.Memory);
-        settings.Memory.ScreenMemoryUpdated += address => _screenRenderer.ScreenMemoryUpdated(address);
+        _screenBuffer = new ScreenBuffer(settings.Memory);
+        settings.Memory.ScreenMemoryUpdated += address => _screenBuffer.UpdateScreen(address);
 
         _z80 = new Z80(settings.Memory, settings.ContentionProvider);
-        _z80.Clock.TicksAdded += (_, _, currentFrameTicks) => _screenRenderer.UpdateContent(currentFrameTicks);
+        _z80.Clock.TicksAdded += (_, _, currentFrameTicks) => _screenBuffer.UpdateContent(currentFrameTicks);
 
         var tapePlayer = new TapePlayer(_z80.Clock);
 
-        var ula = new Ula(settings.Memory, KeyHandler, settings.Beeper, _screenRenderer, _z80.Clock, tapePlayer);
+        var ula = new Ula(settings.Memory, KeyHandler, settings.Beeper, _screenBuffer, _z80.Clock, tapePlayer);
         var bus = new Bus();
 
         bus.AddDevice(ula);
@@ -52,7 +52,7 @@ public sealed class Emulator
             bus.AddDevice(new AY8910());
         }
 
-        TapeLoader = new TapeLoader(_z80, settings.Memory, _screenRenderer, tapePlayer);
+        TapeLoader = new TapeLoader(_z80, settings.Memory, _screenBuffer, tapePlayer);
 
         _workerThread = new Thread(WorkerThread)
         {
@@ -81,7 +81,7 @@ public sealed class Emulator
     public void Reset()
     {
         _z80.Reset();
-        _screenRenderer.Reset();
+        _screenBuffer.Reset();
     }
 
     private void RunFrame()
@@ -96,16 +96,16 @@ public sealed class Emulator
     private void StartFrame()
     {
         _z80.Clock.NewFrame();
-        _screenRenderer.NewFrame();
+        _screenBuffer.NewFrame();
     }
 
     private void EndFrame()
     {
-        _screenRenderer.UpdateBorder(_z80.Clock.FrameTicks);
+        _screenBuffer.UpdateBorder(_z80.Clock.FrameTicks);
 
         _z80.INT(0xFF);
 
-        RenderScreen?.Invoke(_screenRenderer.FrameBuffer);
+        RenderScreen?.Invoke(_screenBuffer.FrameBuffer);
     }
 
     private void WorkerThread()

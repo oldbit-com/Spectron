@@ -8,36 +8,36 @@ internal sealed class ContentionProvider : IContentionProvider
     private static readonly int[] ContentionPattern = [6, 5, 4, 3, 2, 1, 0, 0];
     private readonly int[] _contentionTable = BuildContentionTable();
 
-    public int GetMemoryContention(int currentStates, Word address)
+    public int GetMemoryContention(int ticks, Word address)
     {
         if (address is < 0x4000 or > 0x7fff)
         {
             return 0;
         }
 
-        if (currentStates < _contentionTable.Length && currentStates >= DefaultTimings.FirstPixelTick)
+        if (ticks < _contentionTable.Length && ticks >= DefaultTimings.FirstPixelTick)
         {
-            return _contentionTable[currentStates];
+            return _contentionTable[ticks];
         }
 
         return 0;
     }
 
-    public int GetPortContention(int currentStates, Word port)
+    public int GetPortContention(int ticks, Word port)
     {
         if (port is < 0x4000 or > 0x7fff)
         {
             return 0;
         }
 
-        return currentStates < _contentionTable.Length ? _contentionTable[currentStates] : 0;
+        return ticks < _contentionTable.Length ? _contentionTable[ticks] : 0;
     }
 
     private static int[] BuildContentionTable()
     {
-        var contentionTable = new int[DefaultTimings.FirstPixelTick + DefaultSizes.ContentHeight * DefaultTimings.LineTicks];
+        var contentionTable = new int[DefaultTimings.FirstPixelTick + ScreenSize.ContentHeight * DefaultTimings.LineTicks];
 
-        for (var line = 0; line < DefaultSizes.ContentHeight; line++)
+        for (var line = 0; line < ScreenSize.ContentHeight; line++)
         {
             var startLineState = DefaultTimings.FirstPixelTick + line * DefaultTimings.LineTicks;
 

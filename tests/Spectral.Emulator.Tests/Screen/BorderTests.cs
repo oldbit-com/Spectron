@@ -5,7 +5,7 @@ namespace OldBit.ZXSpectrum.Emulator.Tests.Screen;
 
 public class BorderTests
 {
-    private readonly List<BorderTick> _borderTicks = BorderRenderer.BuildBorderTickRanges();
+    private readonly List<BorderTick> _borderTicks = Border.BuildBorderTickRanges();
 
     [Theory]
     [InlineData(0, 0, 151, 48)]                 // first top border line
@@ -33,7 +33,7 @@ public class BorderTests
     public void BorderRenderer_ShouldSetBorderBlue()
     {
         var screenBuffer = new FrameBuffer(Colors.White);
-        var borderRenderer = new BorderRenderer(screenBuffer);
+        var borderRenderer = new Border(screenBuffer);
         borderRenderer.Update(Colors.Blue);
 
         borderRenderer.Update(Colors.Blue, 69888);
@@ -47,7 +47,7 @@ public class BorderTests
         var random = new Random(69888);
 
         var screenBuffer = new FrameBuffer(Colors.White);
-        var borderRenderer = new BorderRenderer(screenBuffer);
+        var borderRenderer = new Border(screenBuffer);
         borderRenderer.Update(Colors.Red);
 
         var ticks = 0;
@@ -64,7 +64,7 @@ public class BorderTests
     public void BorderRenderer_ShouldMatchAquaplane()
     {
         var screenBuffer = new FrameBuffer(Colors.White);
-        var borderRenderer = new BorderRenderer(screenBuffer);
+        var borderRenderer = new Border(screenBuffer);
 
         borderRenderer.Update(Colors.Cyan, 1);
         borderRenderer.Update(Colors.Cyan, 145);

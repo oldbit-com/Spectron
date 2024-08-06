@@ -10,14 +10,14 @@ public sealed class TapeLoader
 {
     private readonly Z80 _z80;
     private readonly IMemory _memory;
-    private readonly ScreenRenderer _screenRenderer;
+    private readonly ScreenBuffer _screenBuffer;
     private readonly TapePlayer _tapePlayer;
 
-    internal TapeLoader(Z80 z80, IMemory memory, ScreenRenderer screenRenderer, TapePlayer tapePlayer)
+    internal TapeLoader(Z80 z80, IMemory memory, ScreenBuffer screenBuffer, TapePlayer tapePlayer)
     {
         _z80 = z80;
         _memory = memory;
-        _screenRenderer = screenRenderer;
+        _screenBuffer = screenBuffer;
         _tapePlayer = tapePlayer;
     }
 
@@ -103,9 +103,9 @@ public sealed class TapeLoader
                                    _memory.Read(_z80.Registers.SP));
         _z80.Registers.SP += 2;
 
-        _screenRenderer.Reset();
+        _screenBuffer.Reset();
         var borderColor = Colors.BorderColors[(byte)(file.Data.Header.Border & 0x07)];
-        _screenRenderer.UpdateBorder(borderColor);
+        _screenBuffer.UpdateBorder(borderColor);
     }
 
     private void LoadSzx(string fileName)

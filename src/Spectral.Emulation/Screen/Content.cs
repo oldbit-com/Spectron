@@ -2,7 +2,7 @@ using OldBit.Spectral.Emulation.Devices.Memory;
 
 namespace OldBit.Spectral.Emulation.Screen;
 
-internal class ContentRenderer(FrameBuffer frameBuffer, EmulatorMemory memory)
+internal class Content(FrameBuffer frameBuffer, EmulatorMemory memory)
 {
     private readonly bool[] _bitmapDirty = new bool[32*24*8];
 
@@ -87,12 +87,12 @@ internal class ContentRenderer(FrameBuffer frameBuffer, EmulatorMemory memory)
     {
         if (address < 0x1800)
         {
-            // Screen byte
+            // Single screen byte
             _bitmapDirty[address] = true;
         }
         else
         {
-            // Attribute byte affecting 8 screen bytes, unrolled for performance (~7x faster than a loop in this case)
+            // Attribute byte affecting 8 screen bytes, unrolled for performance (~7x faster than a for loop)
             var screenAddress = FastLookup.LineAddressForAttrAddress[address - 0x1800];
 
             _bitmapDirty[screenAddress] = true;

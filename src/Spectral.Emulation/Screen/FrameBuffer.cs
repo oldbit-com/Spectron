@@ -5,9 +5,9 @@ namespace OldBit.Spectral.Emulation.Screen;
 /// </summary>
 public class FrameBuffer(Color color)
 {
-    public static int Width => DefaultSizes.BorderLeft + DefaultSizes.ContentWidth + DefaultSizes.BorderRight;
+    public static int Width => ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight;
 
-    public static int Height => DefaultSizes.BorderTop + DefaultSizes.ContentHeight + DefaultSizes.BorderBottom;
+    public static int Height => ScreenSize.BorderTop + ScreenSize.ContentHeight + ScreenSize.BorderBottom;
 
     public Color[] Pixels { get; } = Enumerable.Repeat(color, Width * Height).ToArray();
 
@@ -16,5 +16,5 @@ public class FrameBuffer(Color color)
         Array.Fill(Pixels, color, start, count);
     }
 
-    internal static int GetLineIndex(int line) => Width * DefaultSizes.BorderTop + DefaultSizes.BorderLeft + Width * line;
+    internal static int GetLineIndex(int line) => Width * ScreenSize.BorderTop + ScreenSize.BorderLeft + Width * line;
 }

@@ -1,6 +1,6 @@
 namespace OldBit.Spectral.Emulation.Screen;
 
-internal static class DefaultSizes
+internal static class ScreenSize
 {
     /// <summary>
     /// Standard top border size is 64 lines.
@@ -32,5 +32,8 @@ internal static class DefaultSizes
     /// </summary>
     internal const int ContentHeight = 192;
 
+    /// <summary>
+    /// The total number of screen lines, including top and bottom borders.
+    /// </summary>
     internal const int TotalLines = BorderTop + ContentHeight + BorderBottom;
 }

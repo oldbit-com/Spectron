@@ -11,7 +11,7 @@ internal class Ula(
     EmulatorMemory memory,
     KeyHandler keyHandler,
     Beeper beeper,
-    ScreenRenderer renderer,
+    ScreenBuffer screenBuffer,
     Clock clock,
     TapePlayer tapePlayer) : IDevice
 {
@@ -38,7 +38,7 @@ internal class Ula(
         }
 
         var color = Colors.BorderColors[(byte)(value & 0x07)];
-        renderer.UpdateBorder(color, clock.FrameTicks);
+        screenBuffer.UpdateBorder(color, clock.FrameTicks);
 
         UpdateTapeLoadingBeeper(ref value);
         beeper.UpdateBeeper(value, clock.TotalTicks);
