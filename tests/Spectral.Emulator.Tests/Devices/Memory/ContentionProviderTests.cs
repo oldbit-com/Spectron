@@ -3,9 +3,9 @@ using OldBit.Spectral.Emulation.Devices.Memory;
 
 namespace OldBit.ZXSpectrum.Emulator.Tests.Devices.Memory;
 
-public class ContendedMemoryTests
+public class ContentionProviderTests
 {
-    private readonly ContendedMemory _contention = new();
+    private readonly ContentionProvider _contention = new();
 
     [Theory]
     [InlineData(16384, 14335, 6)]

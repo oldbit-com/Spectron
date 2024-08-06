@@ -3,7 +3,7 @@ using OldBit.Z80Cpu.Contention;
 
 namespace OldBit.Spectral.Emulation.Devices.Memory;
 
-public class ContendedMemory : IContentionProvider
+public class ContentionProvider : IContentionProvider
 {
     private static readonly int[] ContentionPattern = [6, 5, 4, 3, 2, 1, 0, 0];
     private readonly int[] _contentionTable = BuildContentionTable();

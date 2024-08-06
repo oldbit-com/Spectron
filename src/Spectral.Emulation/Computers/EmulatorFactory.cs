@@ -33,7 +33,7 @@ public static class EmulatorFactory
         var emulatorSettings = new EmulatorSettings(
             Computer.Spectrum128K,
             memory,
-            new ContendedMemory(),
+            new ContentionProvider(),
             new Beeper(clockMHz),
             UseAYSound: true);
 
@@ -47,7 +47,7 @@ public static class EmulatorFactory
         var emulatorSettings = new EmulatorSettings(
             Computer.Spectrum48K,
             memory,
-            new ContendedMemory(),
+            new ContentionProvider(),
             new Beeper(clockMHz),
             UseAYSound: false);
 
