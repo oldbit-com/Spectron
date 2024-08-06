@@ -35,7 +35,7 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Task> OpenFileCommand { get; private set; }
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     public ReactiveCommand<RomType, Unit> ChangeRomCommand { get; private set; }
-    public ReactiveCommand<Computer, Unit> ChangeComputer { get; private set; }
+    public ReactiveCommand<ComputerType, Unit> ChangeComputerType { get; private set; }
     public ReactiveCommand<Unit, Unit> ResetCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> PauseCommand { get; private set; }
 
@@ -50,7 +50,7 @@ public class MainWindowViewModel : ViewModelBase
         OpenFileCommand = ReactiveCommand.Create(HandleOpenFileAsync);
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
         ChangeRomCommand = ReactiveCommand.Create<RomType>(HandleChangeRom);
-        ChangeComputer = ReactiveCommand.Create<Computer>(HandleChangeComputer);
+        ChangeComputerType = ReactiveCommand.Create<ComputerType>(HandleChangeComputerType);
         PauseCommand = ReactiveCommand.Create(HandleMachinePause, emulatorNotNull);
         ResetCommand = ReactiveCommand.Create(HandleMachineReset, emulatorNotNull);
 
@@ -69,9 +69,9 @@ public class MainWindowViewModel : ViewModelBase
         Interlocked.Exchange(ref _frameCount, 0);
     }
 
-    public void Initialize(Computer computer)
+    public void Initialize(ComputerType computerType)
     {
-        Emulator = EmulatorFactory.Create(computer, RomType);
+        Emulator = EmulatorFactory.Create(computerType, RomType);
         Emulator!.RenderScreen += EmulatorOnRenderScreen;
 
         Emulator.Start();
@@ -143,20 +143,20 @@ public class MainWindowViewModel : ViewModelBase
             Emulator.RenderScreen -= EmulatorOnRenderScreen;
         }
 
-        Initialize(Computer);
+        Initialize(ComputerType);
     }
 
-    private void HandleChangeComputer(Computer computer)
+    private void HandleChangeComputerType(ComputerType computerType)
     {
-        if (Computer == computer)
+        if (ComputerType == computerType)
         {
             return;
         }
 
-        Computer = computer;
+        ComputerType = computerType;
 
         Emulator?.Stop();
-        Initialize(computer);
+        Initialize(computerType);
     }
 
     private void HandleMachineReset()
@@ -196,11 +196,11 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _romType, value);
     }
 
-    private Computer _computer = Computer.Spectrum48K;
-    public Computer Computer
+    private ComputerType _computerType = ComputerType.Spectrum48K;
+    public ComputerType ComputerType
     {
-        get => _computer;
-        set => this.RaiseAndSetIfChanged(ref _computer, value);
+        get => _computerType;
+        set => this.RaiseAndSetIfChanged(ref _computerType, value);
     }
 
     private WriteableBitmap? _spectrumScreen;

@@ -1,6 +1,6 @@
 namespace OldBit.Spectral.Emulation.Computers;
 
-public enum Computer
+public enum ComputerType
 {
     Spectrum16K,
 

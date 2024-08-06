@@ -31,7 +31,7 @@ public partial class MainWindow : Window
 
         _viewModel.ScreenControl = ScreenImage;
 
-        _viewModel.Initialize(Computer.Spectrum48K);
+        _viewModel.Initialize(ComputerType.Spectrum48K);
     }
 
     private void OnKeyDown(object? sender, KeyEventArgs e)

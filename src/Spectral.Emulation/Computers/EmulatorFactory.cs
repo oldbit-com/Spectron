@@ -6,13 +6,13 @@ namespace OldBit.Spectral.Emulation.Computers;
 
 public static class EmulatorFactory
 {
-    public static Emulator Create(Computer computer, RomType romType) => computer switch
+    public static Emulator Create(ComputerType computerType, RomType romType) => computerType switch
     {
-        Computer.Spectrum16K => CreateSpectrum16K(romType),
-        Computer.Spectrum48K => CreateSpectrum48K(romType),
-        Computer.Spectrum128K => CreateSpectrum128K(),
-        Computer.Timex2048 => throw new NotImplementedException(),
-        _ => throw new ArgumentOutOfRangeException(nameof(computer))
+        ComputerType.Spectrum16K => CreateSpectrum16K(romType),
+        ComputerType.Spectrum48K => CreateSpectrum48K(romType),
+        ComputerType.Spectrum128K => CreateSpectrum128K(),
+        ComputerType.Timex2048 => throw new NotImplementedException(),
+        _ => throw new ArgumentOutOfRangeException(nameof(computerType))
     };
 
     private static Emulator CreateSpectrum16K(RomType romType) =>
@@ -28,7 +28,7 @@ public static class EmulatorFactory
             RomReader.ReadRom(RomType.Original128Bank1));
 
         var emulatorSettings = new EmulatorSettings(
-            Computer.Spectrum128K,
+            ComputerType.Spectrum128K,
             memory,
             new ContentionProvider(
                 Hardware.Spectrum128K.FirstPixelTick,
@@ -42,7 +42,7 @@ public static class EmulatorFactory
     private static Emulator CreateSpectrum16Or48K(EmulatorMemory memory)
     {
         var emulatorSettings = new EmulatorSettings(
-            Computer.Spectrum48K,
+            ComputerType.Spectrum48K,
             memory,
             new ContentionProvider(
                 Hardware.Spectrum48K.FirstPixelTick,

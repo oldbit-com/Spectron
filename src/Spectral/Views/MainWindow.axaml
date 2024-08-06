@@ -38,9 +38,9 @@
                 <NativeMenu>
                     <NativeMenuItem Header="Computer">
                         <NativeMenu>
-                            <NativeMenuItem Header="ZX Spectrum 16" ToggleType="CheckBox" Command="{Binding ChangeComputer}" CommandParameter="{x:Static computer:Computer.Spectrum16K}" IsChecked="{Binding Computer, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:Computer.Spectrum16K}}"/>
-                            <NativeMenuItem Header="ZX Spectrum 48" ToggleType="CheckBox" Command="{Binding ChangeComputer}" CommandParameter="{x:Static computer:Computer.Spectrum48K}" IsChecked="{Binding Computer, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:Computer.Spectrum48K}}"/>
-                            <NativeMenuItem Header="ZX Spectrum 128" ToggleType="CheckBox" Command="{Binding ChangeComputer}" CommandParameter="{x:Static computer:Computer.Spectrum128K}" IsChecked="{Binding Computer, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:Computer.Spectrum128K}}"/>
+                            <NativeMenuItem Header="ZX Spectrum 16" ToggleType="CheckBox" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static computer:ComputerType.Spectrum16K}" IsChecked="{Binding ComputerType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:ComputerType.Spectrum16K}}"/>
+                            <NativeMenuItem Header="ZX Spectrum 48" ToggleType="CheckBox" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static computer:ComputerType.Spectrum48K}" IsChecked="{Binding ComputerType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:ComputerType.Spectrum48K}}"/>
+                            <NativeMenuItem Header="ZX Spectrum 128" ToggleType="CheckBox" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static computer:ComputerType.Spectrum128K}" IsChecked="{Binding ComputerType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:ComputerType.Spectrum128K}}"/>
                         </NativeMenu>
                     </NativeMenuItem>
                     <NativeMenuItem Header="ROM">
