@@ -5,11 +5,11 @@ namespace OldBit.Spectral.Emulation.Devices.Memory;
 /// </summary>
 internal sealed class Memory16K : IEmulatorMemory
 {
-    private byte[] Memory { get; } = new byte[32768];
+    private readonly byte[] _memory = new byte[32768];
 
-    internal Memory16K(byte[] rom) => Array.Copy(rom, 0, Memory, 0, rom.Length);
+    internal Memory16K(byte[] rom) => Array.Copy(rom, 0, _memory, 0, rom.Length);
 
-    public byte Read(Word address) => address > 32767 ? (byte)0xFF : Memory[address];
+    public byte Read(Word address) => address > 32767 ? (byte)0xFF : _memory[address];
 
     public void Write(Word address, byte data)
     {
@@ -18,12 +18,12 @@ internal sealed class Memory16K : IEmulatorMemory
             return;
         }
 
-        if (Memory[address] == data)
+        if (_memory[address] == data)
         {
             return;
         }
 
-        Memory[address] = data;
+        _memory[address] = data;
 
         if (address < 0x5B00)
         {
