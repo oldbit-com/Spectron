@@ -1,4 +1,4 @@
-using OldBit.Spectral.Emulation.Devices;
+using OldBit.Spectral.Emulation.Devices.Memory;
 using OldBit.Spectral.Emulation.Rom;
 using OldBit.Spectral.Emulation.Screen;
 

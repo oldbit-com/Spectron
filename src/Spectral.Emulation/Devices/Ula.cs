@@ -1,5 +1,6 @@
 using OldBit.Spectral.Emulation.Devices.Audio;
 using OldBit.Spectral.Emulation.Devices.Keyboard;
+using OldBit.Spectral.Emulation.Devices.Memory;
 using OldBit.Spectral.Emulation.Screen;
 using OldBit.Spectral.Emulation.Tape;
 using OldBit.Z80Cpu;
@@ -7,7 +8,7 @@ using OldBit.Z80Cpu;
 namespace OldBit.Spectral.Emulation.Devices;
 
 internal class Ula(
-    Memory memory,
+    EmulatorMemory memory,
     KeyHandler keyHandler,
     Beeper beeper,
     ScreenRenderer renderer,

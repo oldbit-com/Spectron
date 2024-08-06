@@ -1,9 +1,9 @@
-namespace OldBit.Spectral.Emulation.Devices;
+namespace OldBit.Spectral.Emulation.Devices.Memory;
 
 /// <summary>
 /// Memory for the Spectrum 48k.
 /// </summary>
-internal sealed class Memory48K : Memory
+internal sealed class Memory48K : EmulatorMemory
 {
     private readonly byte[] _memory = new byte[65536];
 

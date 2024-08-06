@@ -1,9 +1,9 @@
-namespace OldBit.Spectral.Emulation.Devices;
+namespace OldBit.Spectral.Emulation.Devices.Memory;
 
 /// <summary>
 /// Memory for the Spectrum 16k.
 /// </summary>
-internal sealed class Memory16K : Memory
+internal sealed class Memory16K : EmulatorMemory
 {
     private byte[] Memory { get; } = new byte[32768];
 

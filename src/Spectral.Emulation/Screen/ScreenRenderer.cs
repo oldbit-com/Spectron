@@ -1,4 +1,4 @@
-using OldBit.Spectral.Emulation.Devices;
+using OldBit.Spectral.Emulation.Devices.Memory;
 
 namespace OldBit.Spectral.Emulation.Screen;
 
@@ -12,7 +12,7 @@ internal class ScreenRenderer
 
     public FrameBuffer FrameBuffer { get; } = new(Colors.White);
 
-    public ScreenRenderer(Memory memory)
+    public ScreenRenderer(EmulatorMemory memory)
     {
         _borderRenderer = new BorderRenderer(FrameBuffer);
         _contentRenderer = new ContentRenderer(FrameBuffer, memory);

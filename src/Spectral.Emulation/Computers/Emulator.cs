@@ -2,6 +2,7 @@ using System.Diagnostics;
 using OldBit.Spectral.Emulation.Devices;
 using OldBit.Spectral.Emulation.Devices.Audio;
 using OldBit.Spectral.Emulation.Devices.Keyboard;
+using OldBit.Spectral.Emulation.Devices.Memory;
 using OldBit.Spectral.Emulation.Screen;
 using OldBit.Spectral.Emulation.Tape;
 using OldBit.Z80Cpu;
@@ -28,7 +29,7 @@ public sealed class Emulator
     public TapeLoader TapeLoader { get; }
 
     public Emulator(
-        Memory memory,
+        EmulatorMemory memory,
         Beeper beeper,
         IContentionProvider contentionProvider)
     {

@@ -1,7 +1,7 @@
 using OldBit.Spectral.Emulation.Screen;
 using OldBit.Z80Cpu.Contention;
 
-namespace OldBit.Spectral.Emulation.Devices;
+namespace OldBit.Spectral.Emulation.Devices.Memory;
 
 public class ContendedMemory : IContentionProvider
 {

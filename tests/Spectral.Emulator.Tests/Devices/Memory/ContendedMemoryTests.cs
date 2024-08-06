@@ -1,7 +1,7 @@
 using FluentAssertions;
-using OldBit.Spectral.Emulation.Devices;
+using OldBit.Spectral.Emulation.Devices.Memory;
 
-namespace OldBit.ZXSpectrum.Emulator.Tests.Devices;
+namespace OldBit.ZXSpectrum.Emulator.Tests.Devices.Memory;
 
 public class ContendedMemoryTests
 {

@@ -1,8 +1,8 @@
-using OldBit.Spectral.Emulation.Devices;
+using OldBit.Spectral.Emulation.Devices.Memory;
 
 namespace OldBit.Spectral.Emulation.Screen;
 
-internal class ContentRenderer(FrameBuffer frameBuffer, Memory memory)
+internal class ContentRenderer(FrameBuffer frameBuffer, EmulatorMemory memory)
 {
     private readonly bool[] _bitmapDirty = new bool[32*24*8];
 

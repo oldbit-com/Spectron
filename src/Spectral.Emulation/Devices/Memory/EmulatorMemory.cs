@@ -1,8 +1,8 @@
 using OldBit.Z80Cpu;
 
-namespace OldBit.Spectral.Emulation.Devices;
+namespace OldBit.Spectral.Emulation.Devices.Memory;
 
-public abstract class Memory : IMemory
+public abstract class EmulatorMemory : IMemory
 {
     public abstract byte Read(Word address);
 

@@ -1,9 +1,9 @@
-namespace OldBit.Spectral.Emulation.Devices;
+namespace OldBit.Spectral.Emulation.Devices.Memory;
 
 /// <summary>
 /// Memory for the Spectrum 128k.
 /// </summary>
-internal sealed class Memory128K : Memory
+internal sealed class Memory128K : EmulatorMemory
 {
     private const byte RomSelectBit = 0b00010000;
     private const byte PagingDisableBit = 0b00100000;

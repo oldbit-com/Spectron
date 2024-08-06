@@ -1,5 +1,5 @@
-using OldBit.Spectral.Emulation.Devices;
 using OldBit.Spectral.Emulation.Devices.Audio;
+using OldBit.Spectral.Emulation.Devices.Memory;
 using OldBit.Spectral.Emulation.Rom;
 
 namespace OldBit.Spectral.Emulation.Computers;
@@ -20,7 +20,7 @@ public static class EmulatorFactory
     private static Emulator CreateSpectrum48K(RomType romType) =>
         CreateSpectrum16Or48K(romType, new Memory48K(RomReader.ReadRom(romType)));
 
-    private static Emulator CreateSpectrum16Or48K(RomType romType, Memory memory)
+    private static Emulator CreateSpectrum16Or48K(RomType romType, EmulatorMemory memory)
     {
         const float clockMHz = 3.5f;
 
