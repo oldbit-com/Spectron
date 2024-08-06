@@ -84,6 +84,7 @@ internal sealed class Memory128K : EmulatorMemory
     public override void Reset()
     {
         _isPagingDisabledUntilReset = false;
+
         _activeRom = _rom128;
         _activeScreen = _banks[5];
         _activeRam = _banks[0];
