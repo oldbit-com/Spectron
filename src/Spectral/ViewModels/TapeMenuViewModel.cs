@@ -1,7 +1,9 @@
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using OldBit.Spectral.Dialogs;
+using OldBit.Spectral.Emulation.Tape;
 using ReactiveUI;
 
 namespace OldBit.Spectral.ViewModels;
@@ -13,6 +15,8 @@ public class TapeMenuViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> StopCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> RewindCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> EjectCommand { get; private set; }
+
+    internal TapeManager? TapeManager { get; set; }
 
     public TapeMenuViewModel()
     {
@@ -30,13 +34,21 @@ public class TapeMenuViewModel : ViewModelBase
     private async Task Insert()
     {
         var files = await FileDialogs.OpenTapeFileAsync();
+        if (files.Count == 0)
+        {
+            return;
+        }
 
-        IsTapeInserted = true;
-        await Task.CompletedTask;
+        if (TapeManager?.TryInsertTape(files[0].Path.LocalPath) == true)
+        {
+            IsTapeInserted = true;
+        }
     }
 
     private void Play()
     {
+        TapeManager?.PlayTape();
+
         IsTapePlaying = true;
     }
 
@@ -52,6 +64,8 @@ public class TapeMenuViewModel : ViewModelBase
 
     private void Eject()
     {
+        TapeManager?.EjectTape();
+
         IsTapeInserted = false;
         IsTapePlaying = false;
     }

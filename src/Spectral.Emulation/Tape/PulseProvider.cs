@@ -1,12 +1,14 @@
 using OldBit.Spectral.Emulation.Screen;
 using OldBit.ZXTape.Tap;
+using OldBit.ZXTape.Tzx;
+using OldBit.ZXTape.Tzx.Blocks;
 
 namespace OldBit.Spectral.Emulation.Tape;
 
 /// <summary>
 /// Memory efficient tape pulse provider. Only supports TAP files at the moment.
 /// </summary>
-internal class PulseProvider(TapFile tapFile)
+internal class PulseProvider(TzxFile tzxFile)
 {
     private const int PilotHeaderPulseCount = 8063;         // Before each header block is a sequence of 8063 pulses
     private const int PilotDataPulseCount = 3223;           // Before each data block is a sequence of 3223 pulses
@@ -27,9 +29,14 @@ internal class PulseProvider(TapFile tapFile)
 
     private IEnumerable<IEnumerable<Pulse>> PrivateGetPulses()
     {
-        foreach (var block in tapFile.Blocks)
+        foreach (var block in tzxFile.Blocks.Where(b => b is StandardSpeedDataBlock).Cast<StandardSpeedDataBlock>())
         {
-            if (block.IsHeader)
+            if (!TapData.TryParse(block.Data, out var tapData))
+            {
+                continue;
+            }
+
+            if (tapData.IsHeader)
             {
                 yield return PilotHeaderPulse.AsEnumerable();
             }
@@ -41,9 +48,9 @@ internal class PulseProvider(TapFile tapFile)
             yield return FirstSyncPulse.AsEnumerable();
             yield return SecondSyncPulse.AsEnumerable();
 
-            yield return ToEnumerable(block.Flag);
-            yield return ToEnumerable(block.Data);
-            yield return ToEnumerable(block.Checksum);
+            yield return ToEnumerable(tapData.Flag);
+            yield return ToEnumerable(tapData.Data);
+            yield return ToEnumerable(tapData.Checksum);
         }
     }
 

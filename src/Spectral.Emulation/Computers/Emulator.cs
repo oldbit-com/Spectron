@@ -25,8 +25,9 @@ public sealed class Emulator
     public event RenderScreenEvent? RenderScreen;
 
     public bool IsPaused { get; private set; }
+    public bool IsUlaPlusEnabled { get; set; }
     public KeyHandler KeyHandler { get; } = new();
-    public TapeLoader TapeLoader { get; }
+    public TapeManager TapeManager { get; }
 
     internal Emulator(EmulatorSettings settings)
     {
@@ -38,9 +39,9 @@ public sealed class Emulator
         _z80 = new Z80(settings.Memory, settings.ContentionProvider);
         _z80.Clock.TicksAdded += (_, _, currentFrameTicks) => _screenBuffer.UpdateContent(currentFrameTicks);
 
-        var tapePlayer = new TapePlayer(_z80.Clock);
+        TapeManager = new TapeManager(_z80, settings.Memory, _screenBuffer);
 
-        var ula = new Ula(settings.Memory, KeyHandler, settings.Beeper, _screenBuffer, _z80.Clock, tapePlayer);
+        var ula = new Ula(settings.Memory, KeyHandler, settings.Beeper, _screenBuffer, _z80.Clock, TapeManager.TapePlayer);
         var bus = new Bus();
 
         bus.AddDevice(ula);
@@ -52,8 +53,6 @@ public sealed class Emulator
         {
             bus.AddDevice(new AY8910());
         }
-
-        TapeLoader = new TapeLoader(_z80, settings.Memory, _screenBuffer, tapePlayer);
 
         _workerThread = new Thread(WorkerThread)
         {

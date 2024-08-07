@@ -30,7 +30,7 @@ public class MainWindowViewModel : ViewModelBase
 
     public Control ScreenControl { get; set; } = null!;
 
-    public TapeMenuViewModel TapeMenu { get; } = new();
+    public TapeMenuViewModel TapeMenuViewModel { get; } = new();
 
     public ReactiveCommand<Unit, Task> OpenFileCommand { get; private set; }
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
@@ -74,7 +74,8 @@ public class MainWindowViewModel : ViewModelBase
     public void Initialize(ComputerType computerType)
     {
         Emulator = EmulatorFactory.Create(computerType, RomType);
-        Emulator!.RenderScreen += EmulatorOnRenderScreen;
+        Emulator.RenderScreen += EmulatorOnRenderScreen;
+        TapeMenuViewModel.TapeManager = Emulator.TapeManager;
 
         Emulator.Start();
         _statusBarTimer.Start();
@@ -104,7 +105,7 @@ public class MainWindowViewModel : ViewModelBase
             try
             {
                 Emulator?.Pause();
-                Emulator?.TapeLoader.LoadFile(files[0].Path.LocalPath);
+                Emulator?.TapeManager.LoadAndRun(files[0].Path.LocalPath);
             }
             catch (Exception ex)
             {
@@ -164,6 +165,10 @@ public class MainWindowViewModel : ViewModelBase
     private void HandleToggleUlaPlus()
     {
         IsUlaPlusEnabled = !IsUlaPlusEnabled;
+        if (Emulator != null)
+        {
+            Emulator.IsUlaPlusEnabled = IsUlaPlusEnabled;
+        }
     }
 
     private void HandleMachineReset()

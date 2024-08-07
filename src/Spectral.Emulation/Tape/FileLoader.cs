@@ -1,19 +1,21 @@
+using System.Diagnostics.CodeAnalysis;
 using OldBit.Spectral.Emulation.Screen;
 using OldBit.Z80Cpu;
+using OldBit.ZXTape.Extensions;
 using OldBit.ZXTape.Sna;
 using OldBit.ZXTape.Tap;
 using OldBit.ZXTape.Tzx;
 
 namespace OldBit.Spectral.Emulation.Tape;
 
-public sealed class TapeLoader
+public sealed class FileLoader
 {
     private readonly Z80 _z80;
     private readonly IMemory _memory;
     private readonly ScreenBuffer _screenBuffer;
     private readonly TapePlayer _tapePlayer;
 
-    internal TapeLoader(Z80 z80, IMemory memory, ScreenBuffer screenBuffer, TapePlayer tapePlayer)
+    internal FileLoader(Z80 z80, IMemory memory, ScreenBuffer screenBuffer, TapePlayer tapePlayer)
     {
         _z80 = z80;
         _memory = memory;
@@ -24,6 +26,7 @@ public sealed class TapeLoader
     public void LoadFile(string fileName)
     {
         var ext = Path.GetExtension(fileName).ToLowerInvariant();
+
         switch (ext)
         {
             case ".sna":
@@ -51,19 +54,35 @@ public sealed class TapeLoader
         }
     }
 
+    public static bool TryLoadTape(string fileName, [NotNullWhen(true)] out TzxFile? tzxFile)
+    {
+        tzxFile = null;
+
+        if (IsTapFile(fileName))
+        {
+            var tapFile = TapFile.Load(fileName);
+            tzxFile = tapFile.ToTzx();
+        }
+        else if (IsTzxFile(fileName))
+        {
+            tzxFile = TzxFile.Load(fileName);
+        }
+
+        return tzxFile != null;
+    }
+
     private void LoadTzx(string fileName)
     {
         var tzxFile = TzxFile.Load(fileName);
-        var tapFile = tzxFile.ToTap();
 
-        _tapePlayer.LoadTape(tapFile);
+        _tapePlayer.LoadTape(tzxFile);
     }
 
     private void LoadTap(string fileName)
     {
         var tapFile = TapFile.Load(fileName);
 
-        _tapePlayer.LoadTape(tapFile);
+        _tapePlayer.LoadTape(tapFile.ToTzx());
     }
 
     private void LoadZ80(string fileName)
@@ -104,7 +123,7 @@ public sealed class TapeLoader
         _z80.Registers.SP += 2;
 
         _screenBuffer.Reset();
-        var borderColor = Colors.BorderColors[(byte)(file.Data.Header.Border & 0x07)];
+        var borderColor = Palette.BorderColors[(byte)(file.Data.Header.Border & 0x07)];
         _screenBuffer.UpdateBorder(borderColor);
     }
 
@@ -112,4 +131,7 @@ public sealed class TapeLoader
     {
         throw new NotImplementedException();
     }
+
+    private static bool IsTapFile(string fileName) => Path.GetExtension(fileName).ToLowerInvariant() == ".tap";
+    private static bool IsTzxFile(string fileName) => Path.GetExtension(fileName).ToLowerInvariant() == ".tzx";
 }
