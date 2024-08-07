@@ -36,7 +36,7 @@
             </NativeMenuItem>
             <NativeMenuItem Header="Machine">
                 <NativeMenu>
-                    <NativeMenuItem Header="Computer">
+                    <NativeMenuItem Header="Machine">
                         <NativeMenu>
                             <NativeMenuItem Header="ZX Spectrum 16" ToggleType="CheckBox" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static computer:ComputerType.Spectrum16K}" IsChecked="{Binding ComputerType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:ComputerType.Spectrum16K}}"/>
                             <NativeMenuItem Header="ZX Spectrum 48" ToggleType="CheckBox" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static computer:ComputerType.Spectrum48K}" IsChecked="{Binding ComputerType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:ComputerType.Spectrum48K}}"/>
@@ -57,6 +57,8 @@
                             </NativeMenuItem>
                         </NativeMenu>
                     </NativeMenuItem>
+                    <NativeMenuItem Header="Enable ULA+" ToggleType="CheckBox" Command="{Binding ToggleUlaPlus}" IsChecked="{Binding IsUlaPlusEnabled}"/>
+                    <NativeMenuItemSeparator/>
                     <NativeMenuItem Header="Pause" Gesture="F11" Command="{Binding PauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
                     <NativeMenuItem Header="Reset" Command="{Binding ResetCommand}"/>
                 </NativeMenu>

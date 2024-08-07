@@ -36,6 +36,7 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     public ReactiveCommand<RomType, Unit> ChangeRomCommand { get; private set; }
     public ReactiveCommand<ComputerType, Unit> ChangeComputerType { get; private set; }
+    public ReactiveCommand<Unit, Unit> ToggleUlaPlus { get; private set; }
     public ReactiveCommand<Unit, Unit> ResetCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> PauseCommand { get; private set; }
 
@@ -51,6 +52,7 @@ public class MainWindowViewModel : ViewModelBase
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
         ChangeRomCommand = ReactiveCommand.Create<RomType>(HandleChangeRom);
         ChangeComputerType = ReactiveCommand.Create<ComputerType>(HandleChangeComputerType);
+        ToggleUlaPlus = ReactiveCommand.Create(HandleToggleUlaPlus);
         PauseCommand = ReactiveCommand.Create(HandleMachinePause, emulatorNotNull);
         ResetCommand = ReactiveCommand.Create(HandleMachineReset, emulatorNotNull);
 
@@ -159,6 +161,11 @@ public class MainWindowViewModel : ViewModelBase
         Initialize(computerType);
     }
 
+    private void HandleToggleUlaPlus()
+    {
+        IsUlaPlusEnabled = !IsUlaPlusEnabled;
+    }
+
     private void HandleMachineReset()
     {
         Emulator?.Reset();
@@ -201,6 +208,13 @@ public class MainWindowViewModel : ViewModelBase
     {
         get => _computerType;
         set => this.RaiseAndSetIfChanged(ref _computerType, value);
+    }
+
+    private bool _isUlaPlusEnabled;
+    public bool IsUlaPlusEnabled
+    {
+        get => _isUlaPlusEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isUlaPlusEnabled, value);
     }
 
     private WriteableBitmap? _spectrumScreen;
