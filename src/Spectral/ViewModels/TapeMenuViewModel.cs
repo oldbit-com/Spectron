@@ -16,7 +16,7 @@ public class TapeMenuViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> RewindCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> EjectCommand { get; private set; }
 
-    internal TapeManager? TapeManager { get; set; }
+    private TapeManager? _tapeManager;
 
     public TapeMenuViewModel()
     {
@@ -34,41 +34,22 @@ public class TapeMenuViewModel : ViewModelBase
     private async Task Insert()
     {
         var files = await FileDialogs.OpenTapeFileAsync();
+
         if (files.Count == 0)
         {
             return;
         }
 
-        if (TapeManager?.TryInsertTape(files[0].Path.LocalPath) == true)
-        {
-            IsTapeInserted = true;
-        }
+        TapeManager?.TryInsertTape(files[0].Path.LocalPath);
     }
 
-    private void Play()
-    {
-        TapeManager?.PlayTape();
+    private void Play() => TapeManager?.PlayTape();
 
-        IsTapePlaying = true;
-    }
+    private void Stop() => TapeManager?.StopTape();
 
-    private void Stop()
-    {
-        IsTapePlaying = false;
-    }
+    private void Rewind() { }
 
-    private void Rewind()
-    {
-
-    }
-
-    private void Eject()
-    {
-        TapeManager?.EjectTape();
-
-        IsTapeInserted = false;
-        IsTapePlaying = false;
-    }
+    private void Eject() => TapeManager?.EjectTape();
 
     private bool _isTapeInserted;
     private bool IsTapeInserted
@@ -82,5 +63,23 @@ public class TapeMenuViewModel : ViewModelBase
     {
         get => _isTapePlaying;
         set => this.RaiseAndSetIfChanged(ref _isTapePlaying, value);
+    }
+
+    internal TapeManager? TapeManager
+    {
+        get  => _tapeManager;
+        set
+        {
+            _tapeManager = value;
+            if (_tapeManager == null)
+            {
+                return;
+            }
+
+            _tapeManager.TapeInserted += _ => IsTapeInserted = true;
+            _tapeManager.TapePlaying += _ => IsTapePlaying = true;
+            _tapeManager.TapeStopped += _ => IsTapePlaying = false;
+            _tapeManager.TapeEjected += _ => IsTapeInserted = false;
+        }
     }
 }

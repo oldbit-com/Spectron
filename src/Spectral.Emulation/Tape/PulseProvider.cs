@@ -1,4 +1,5 @@
 using OldBit.Spectral.Emulation.Computers;
+using OldBit.Spectral.Emulation.Extensions;
 using OldBit.ZXTape.Tap;
 using OldBit.ZXTape.Tzx;
 using OldBit.ZXTape.Tzx.Blocks;
@@ -11,13 +12,13 @@ namespace OldBit.Spectral.Emulation.Tape;
 /// <param name="RepeatCount">How many times pulse change should be repeated.</param>
 /// <param name="Duration">The pulse duration in T-states.</param>
 /// <param name="IsSilence">Used to add a delay between blocks.</param>
-internal record Pulse(int RepeatCount, int Duration, bool IsSilence = false);
+internal sealed record Pulse(int RepeatCount, int Duration, bool IsSilence = false);
 
 /// <summary>
 /// Memory efficient tape pulse provider. Only supports Standard Speed Data Blocks.
 /// Normally there are many thousands of pulses in a file, so we don't want to store them all in memory.
 /// </summary>
-internal class PulseProvider(TzxFile tzxFile, HardwareSettings hardware)
+internal sealed class PulseProvider(TzxFile tzxFile, HardwareSettings hardware)
 {
     private const int PilotHeaderPulseCount = 8063;         // Before each header block is a sequence of 8063 pulses
     private const int PilotDataPulseCount = 3223;           // Before each data block is a sequence of 3223 pulses
@@ -38,7 +39,7 @@ internal class PulseProvider(TzxFile tzxFile, HardwareSettings hardware)
 
     internal IEnumerable<Pulse> GetAll()
     {
-        foreach (var block in tzxFile.Blocks.Where(b => b is StandardSpeedDataBlock).Cast<StandardSpeedDataBlock>())
+        foreach (var block in tzxFile.Blocks.GetStandardSpeedDataBlocks())
         {
             if (!TapData.TryParse(block.Data, out var tapData))
             {

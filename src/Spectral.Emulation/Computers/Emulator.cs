@@ -3,6 +3,7 @@ using OldBit.Spectral.Emulation.Devices;
 using OldBit.Spectral.Emulation.Devices.Audio;
 using OldBit.Spectral.Emulation.Devices.Keyboard;
 using OldBit.Spectral.Emulation.Devices.Memory;
+using OldBit.Spectral.Emulation.Rom;
 using OldBit.Spectral.Emulation.Screen;
 using OldBit.Spectral.Emulation.Tape;
 using OldBit.Z80Cpu;
@@ -37,6 +38,7 @@ public sealed class Emulator
         emulator.Memory.ScreenMemoryUpdated += address => _screenBuffer.UpdateScreen(address);
 
         _z80 = new Z80(emulator.Memory, emulator.ContentionProvider);
+        _z80.BeforeFetch += BeforeInstructionFetch;
         _z80.Clock.TicksAdded += (_, _, currentFrameTicks) => _screenBuffer.UpdateContent(currentFrameTicks);
 
         TapeManager = new TapeManager(_z80, emulator.Memory, _screenBuffer, hardware);
@@ -161,5 +163,19 @@ public sealed class Emulator
         }
 
         stopwatch.Stop();
+    }
+
+    private void BeforeInstructionFetch(Word pc)
+    {
+        switch (pc)
+        {
+            case 0x056A:
+                TapeManager.FastFileLoader.LoadBytes();
+                break;
+
+            case RomRoutines.SAVE_ETC:
+                //
+                break;
+        }
     }
 }
