@@ -7,7 +7,7 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectral.Emulation.Devices;
 
-internal class Ula(
+internal sealed class Ula(
     IEmulatorMemory memory,
     KeyHandler keyHandler,
     Beeper beeper,
@@ -37,7 +37,7 @@ internal class Ula(
             return;
         }
 
-        var color = Colors.BorderColors[(byte)(value & 0x07)];
+        var color = Palette.BorderColors[(byte)(value & 0x07)];
         screenBuffer.UpdateBorder(color, clock.FrameTicks);
 
         UpdateTapeLoadingBeeper(ref value);

@@ -34,8 +34,8 @@ internal static class FastLookup
         {
             var isFlashOn = (i & 0x80) != 0;
 
-            var ink = Colors.InkColors[i & 0x47];
-            var paper = Colors.PaperColors[i & 0x78];
+            var ink = Palette.InkColors[i & 0x47];
+            var paper = Palette.PaperColors[i & 0x78];
 
             colors.Add(new AttributeColor(paper, ink, isFlashOn));
         }
@@ -61,6 +61,7 @@ internal static class FastLookup
         return screenAddressLookup;
     }
 
+    // TODO: 128 mode
     private static ScreenRenderEvent[] BuildScreenEventsTable()
     {
         var screenEvents = new List<ScreenRenderEvent>();

@@ -39,28 +39,6 @@ internal class Content(FrameBuffer frameBuffer, IEmulatorMemory memory)
         }
     }
 
-    private void UpdateFrameBuffer(int frameBufferIndex, Word bitmapAddress, Word attributeAddress)
-    {
-        if (!_bitmapDirty[bitmapAddress])
-        {
-            return;
-        }
-
-        var bitmap = memory.ReadScreen(bitmapAddress);
-        var attribute = memory.ReadScreen(attributeAddress);
-
-        var attributeData = FastLookup.AttributeData[attribute];
-        var isFlashOn = attributeData.IsFlashOn && _isFlashOnFrame;
-
-        for (var i = 0; i < FastLookup.BitMasks.Length; i++)
-        {
-            var color = (bitmap & FastLookup.BitMasks[i]) != 0 ^ isFlashOn ? attributeData.Ink : attributeData.Paper;
-            frameBuffer.Pixels[frameBufferIndex + i] = color;
-        }
-
-        _bitmapDirty[bitmapAddress] = false;
-    }
-
     internal void NewFrame()
     {
         _frameCount += 1;
@@ -82,6 +60,28 @@ internal class Content(FrameBuffer frameBuffer, IEmulatorMemory memory)
     }
 
     internal void UpdateScreen(Word address) => UpdateScreenPrivate(address - 0x4000);
+
+    private void UpdateFrameBuffer(int frameBufferIndex, Word bitmapAddress, Word attributeAddress)
+    {
+        if (!_bitmapDirty[bitmapAddress])
+        {
+            return;
+        }
+
+        var bitmap = memory.ReadScreen(bitmapAddress);
+        var attribute = memory.ReadScreen(attributeAddress);
+
+        var attributeData = FastLookup.AttributeData[attribute];
+        var isFlashOn = attributeData.IsFlashOn && _isFlashOnFrame;
+
+        for (var i = 0; i < FastLookup.BitMasks.Length; i++)
+        {
+            var color = (bitmap & FastLookup.BitMasks[i]) != 0 ^ isFlashOn ? attributeData.Ink : attributeData.Paper;
+            frameBuffer.Pixels[frameBufferIndex + i] = color;
+        }
+
+        _bitmapDirty[bitmapAddress] = false;
+    }
 
     private void UpdateScreenPrivate(int address)
     {

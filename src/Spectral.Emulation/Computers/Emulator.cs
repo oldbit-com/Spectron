@@ -18,6 +18,7 @@ public sealed class Emulator
     private readonly IEmulatorMemory _memory;
     private readonly Beeper _beeper;
     private readonly Z80 _z80;
+    private readonly UlaPlus _ulaPlus;
     private readonly ScreenBuffer _screenBuffer;
     private readonly Thread _workerThread;
     private bool _isRunning;
@@ -26,7 +27,9 @@ public sealed class Emulator
     public event RenderScreenEvent? RenderScreen;
 
     public bool IsPaused { get; private set; }
-    public bool IsUlaPlusEnabled { get; set; }
+
+    public bool IsUlaPlusEnabled { set => ToggleUlaPlus(value); }
+
     public KeyHandler KeyHandler { get; } = new();
     public TapeManager TapeManager { get; }
 
@@ -44,9 +47,12 @@ public sealed class Emulator
         TapeManager = new TapeManager(_z80, emulator.Memory, _screenBuffer, hardware);
 
         var ula = new Ula(emulator.Memory, KeyHandler, emulator.Beeper, _screenBuffer, _z80.Clock, TapeManager.TapePlayer);
+        _ulaPlus = new UlaPlus();
+
         var bus = new Bus();
 
         bus.AddDevice(ula);
+        bus.AddDevice(_ulaPlus);
         bus.AddDevice(emulator.Memory);
 
         _z80.AddBus(bus);
@@ -109,6 +115,10 @@ public sealed class Emulator
         _z80.INT(0xFF);
 
         RenderScreen?.Invoke(_screenBuffer.FrameBuffer);
+    }
+
+    private void ToggleUlaPlus(bool value)
+    {
     }
 
     private void WorkerThread()

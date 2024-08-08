@@ -1,11 +1,6 @@
 namespace OldBit.Spectral.Emulation.Screen;
 
-public readonly record struct Color(byte Red, byte Green, byte Blue)
-{
-    public int Abgr { get; } = 0xFF << 24 | Blue << 16 | Green << 8 | Red;
-}
-
-internal static class Colors
+internal static class Palette
 {
     internal static readonly Color Black = new (0x00, 0x00, 0x00);
     internal static readonly Color Blue = new (0x00, 0x00, 0xD7);

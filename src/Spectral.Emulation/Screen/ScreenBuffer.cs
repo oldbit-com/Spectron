@@ -10,7 +10,7 @@ internal class ScreenBuffer
     private Color _lastBorderColor;
     private bool _borderColorChanged = true;
 
-    public FrameBuffer FrameBuffer { get; } = new(Colors.White);
+    public FrameBuffer FrameBuffer { get; } = new(Palette.White);
 
     public ScreenBuffer(IEmulatorMemory memory)
     {

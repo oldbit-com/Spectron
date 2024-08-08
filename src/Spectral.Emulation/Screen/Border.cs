@@ -8,7 +8,7 @@ internal class Border(FrameBuffer frameBuffer)
 
     private int _lastRangeIndex;
     private int _offset;
-    private Color _lastColor = Colors.White;
+    private Color _lastColor = Palette.White;
 
     internal void Update(Color color) => _lastColor = color;
 
@@ -65,7 +65,7 @@ internal class Border(FrameBuffer frameBuffer)
 
     internal void Reset()
     {
-        _lastColor = Colors.White;
+        _lastColor = Palette.White;
         NewFrame();
     }
 
