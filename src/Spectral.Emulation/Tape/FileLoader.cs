@@ -75,14 +75,14 @@ public sealed class FileLoader
     {
         var tzxFile = TzxFile.Load(fileName);
 
-        _tapePlayer.LoadTape(tzxFile);
+        //_tapePlayer.LoadTape(tzxFile);
     }
 
     private void LoadTap(string fileName)
     {
         var tapFile = TapFile.Load(fileName);
 
-        _tapePlayer.LoadTape(tapFile.ToTzx());
+        //_tapePlayer.LoadTape(tapFile.ToTzx());
     }
 
     private void LoadZ80(string fileName)

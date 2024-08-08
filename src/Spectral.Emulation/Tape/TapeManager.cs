@@ -1,8 +1,6 @@
+using OldBit.Spectral.Emulation.Computers;
 using OldBit.Spectral.Emulation.Screen;
 using OldBit.Z80Cpu;
-using OldBit.ZXTape.Extensions;
-using OldBit.ZXTape.Tap;
-using OldBit.ZXTape.Tzx;
 
 namespace OldBit.Spectral.Emulation.Tape;
 
@@ -11,9 +9,9 @@ public sealed class TapeManager
     internal TapePlayer TapePlayer { get; }
     internal FileLoader FileLoader { get; }
 
-    internal TapeManager(Z80 z80, IMemory memory, ScreenBuffer screenBuffer)
+    internal TapeManager(Z80 z80, IMemory memory, ScreenBuffer screenBuffer, HardwareSettings hardware)
     {
-        TapePlayer = new TapePlayer(z80.Clock);
+        TapePlayer = new TapePlayer(z80.Clock, hardware);
         FileLoader = new FileLoader(z80, memory, screenBuffer, TapePlayer);
     }
 

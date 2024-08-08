@@ -1,4 +1,4 @@
-using OldBit.Spectral.Emulation.Screen;
+using OldBit.Spectral.Emulation.Computers;
 using OldBit.ZXTape.Tap;
 using OldBit.ZXTape.Tzx;
 using OldBit.ZXTape.Tzx.Blocks;
@@ -6,9 +6,18 @@ using OldBit.ZXTape.Tzx.Blocks;
 namespace OldBit.Spectral.Emulation.Tape;
 
 /// <summary>
-/// Memory efficient tape pulse provider. Only supports TAP files at the moment.
+/// A pulse represents a change in the signal level (lo->hi or hi->lo, e.g. toggle).
 /// </summary>
-internal class PulseProvider(TzxFile tzxFile)
+/// <param name="RepeatCount">How many times pulse change should be repeated.</param>
+/// <param name="Duration">The pulse duration in T-states.</param>
+/// <param name="IsSilence">Used to add a delay between blocks.</param>
+internal record Pulse(int RepeatCount, int Duration, bool IsSilence = false);
+
+/// <summary>
+/// Memory efficient tape pulse provider. Only supports Standard Speed Data Blocks.
+/// Normally there are many thousands of pulses in a file, so we don't want to store them all in memory.
+/// </summary>
+internal class PulseProvider(TzxFile tzxFile, HardwareSettings hardware)
 {
     private const int PilotHeaderPulseCount = 8063;         // Before each header block is a sequence of 8063 pulses
     private const int PilotDataPulseCount = 3223;           // Before each data block is a sequence of 3223 pulses
@@ -18,6 +27,8 @@ internal class PulseProvider(TzxFile tzxFile)
     private const int ZeroBitPulseLength = 855;             // '0' bit is encoded as 2 pulses of 855 T-states each
     private const int OneBitPulseLength = 1710;             // '1' bit is encoded as 2 pulses of 1710 T-states each
 
+    private static readonly byte[] BitMasks = [0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01];
+
     private static readonly Pulse PilotHeaderPulse = new(PilotHeaderPulseCount, PilotPulseLength);
     private static readonly Pulse PilotDataPulse = new(PilotDataPulseCount, PilotPulseLength);
     private static readonly Pulse FirstSyncPulse = new(RepeatCount: 1, FirstSyncPulseLength);
@@ -25,9 +36,7 @@ internal class PulseProvider(TzxFile tzxFile)
     private static readonly Pulse ZeroBitPulse = new(RepeatCount: 2, ZeroBitPulseLength);
     private static readonly Pulse OneBitPulse = new(RepeatCount: 2, OneBitPulseLength);
 
-    internal IEnumerable<Pulse> GetPulses() => PrivateGetPulses().SelectMany(pulse => pulse);
-
-    private IEnumerable<IEnumerable<Pulse>> PrivateGetPulses()
+    internal IEnumerable<Pulse> GetAll()
     {
         foreach (var block in tzxFile.Blocks.Where(b => b is StandardSpeedDataBlock).Cast<StandardSpeedDataBlock>())
         {
@@ -38,26 +47,28 @@ internal class PulseProvider(TzxFile tzxFile)
 
             if (tapData.IsHeader)
             {
-                yield return PilotHeaderPulse.AsEnumerable();
+                yield return PilotHeaderPulse;
             }
             else
             {
-                yield return PilotDataPulse.AsEnumerable();
+                yield return PilotDataPulse;
             }
 
-            yield return FirstSyncPulse.AsEnumerable();
-            yield return SecondSyncPulse.AsEnumerable();
+            yield return FirstSyncPulse;
+            yield return SecondSyncPulse;
 
-            yield return ToEnumerable(tapData.Flag);
-            yield return ToEnumerable(tapData.Data);
-            yield return ToEnumerable(tapData.Checksum);
+            var pulses = block.Data
+                .SelectMany(item => BitMasks.Select(mask => (item & mask) == 0 ? ZeroBitPulse : OneBitPulse));
+
+            foreach (var pulse in pulses)
+            {
+                yield return pulse;
+            }
+
+            var pauseMilliseconds = block.PauseDuration == 0 ? 500 : block.PauseDuration;
+            var duration = (int)(pauseMilliseconds / 1000f * hardware.TicksPerFrame * hardware.InterruptFrequency);
+
+            yield return new Pulse(RepeatCount: 1, Duration: duration, IsSilence: true);
         }
     }
-
-    private static IEnumerable<Pulse> ToEnumerable(byte value) => ToEnumerable([value]);
-
-    private static IEnumerable<Pulse> ToEnumerable(IEnumerable<byte> values) =>
-        values.SelectMany(value => GetBitValue(value).Select(bit => bit == 0 ? ZeroBitPulse : OneBitPulse));
-
-    private static IEnumerable<int> GetBitValue(byte value) => FastLookup.BitMasks.Select(mask => value & mask);
 }

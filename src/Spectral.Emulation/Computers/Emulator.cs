@@ -29,27 +29,27 @@ public sealed class Emulator
     public KeyHandler KeyHandler { get; } = new();
     public TapeManager TapeManager { get; }
 
-    internal Emulator(EmulatorSettings settings)
+    internal Emulator(EmulatorSettings emulator, HardwareSettings hardware)
     {
-        _memory = settings.Memory;
-        _beeper = settings.Beeper;
-        _screenBuffer = new ScreenBuffer(settings.Memory);
-        settings.Memory.ScreenMemoryUpdated += address => _screenBuffer.UpdateScreen(address);
+        _memory = emulator.Memory;
+        _beeper = emulator.Beeper;
+        _screenBuffer = new ScreenBuffer(emulator.Memory);
+        emulator.Memory.ScreenMemoryUpdated += address => _screenBuffer.UpdateScreen(address);
 
-        _z80 = new Z80(settings.Memory, settings.ContentionProvider);
+        _z80 = new Z80(emulator.Memory, emulator.ContentionProvider);
         _z80.Clock.TicksAdded += (_, _, currentFrameTicks) => _screenBuffer.UpdateContent(currentFrameTicks);
 
-        TapeManager = new TapeManager(_z80, settings.Memory, _screenBuffer);
+        TapeManager = new TapeManager(_z80, emulator.Memory, _screenBuffer, hardware);
 
-        var ula = new Ula(settings.Memory, KeyHandler, settings.Beeper, _screenBuffer, _z80.Clock, TapeManager.TapePlayer);
+        var ula = new Ula(emulator.Memory, KeyHandler, emulator.Beeper, _screenBuffer, _z80.Clock, TapeManager.TapePlayer);
         var bus = new Bus();
 
         bus.AddDevice(ula);
-        bus.AddDevice(settings.Memory);
+        bus.AddDevice(emulator.Memory);
 
         _z80.AddBus(bus);
 
-        if (settings.UseAYSound)
+        if (emulator.UseAYSound)
         {
             bus.AddDevice(new AY8910());
         }

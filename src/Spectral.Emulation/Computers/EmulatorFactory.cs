@@ -48,7 +48,7 @@ public static class EmulatorFactory
             new Beeper(Hardware.Spectrum128K.ClockMhz),
             UseAYSound: true);
 
-        return new Emulator(emulatorSettings);
+        return new Emulator(emulatorSettings, Hardware.Spectrum128K);
     }
 
     private static Emulator CreateSpectrum16Or48K(IEmulatorMemory memory)
@@ -62,6 +62,6 @@ public static class EmulatorFactory
             new Beeper(Hardware.Spectrum48K.ClockMhz),
             UseAYSound: false);
 
-        return new Emulator(emulatorSettings);
+        return new Emulator(emulatorSettings, Hardware.Spectrum48K);
     }
 }

@@ -1,5 +1,5 @@
+using OldBit.Spectral.Emulation.Computers;
 using OldBit.Z80Cpu;
-using OldBit.ZXTape.Tap;
 using OldBit.ZXTape.Tzx;
 
 namespace OldBit.Spectral.Emulation.Tape;
@@ -7,7 +7,7 @@ namespace OldBit.Spectral.Emulation.Tape;
 /// <summary>
 /// Simulates a tape player that converts tape data into pulses that can be read by the Spectrum.
 /// </summary>
-internal class TapePlayer(Clock clock) : IDisposable
+internal class TapePlayer(Clock clock, HardwareSettings hardware) : IDisposable
 {
     private IEnumerator<Pulse>? _pulses;
     private int _runningPulseDuration;
@@ -38,9 +38,9 @@ internal class TapePlayer(Clock clock) : IDisposable
 
     internal void LoadTape(TzxFile tzxFile)
     {
-        var tapePulseProvider = new PulseProvider(tzxFile);
+        var tapePulseProvider = new PulseProvider(tzxFile, hardware);
 
-        _pulses = tapePulseProvider.GetPulses().GetEnumerator();
+        _pulses = tapePulseProvider.GetAll().GetEnumerator();
         _pulses.MoveNext();
     }
 
@@ -73,6 +73,12 @@ internal class TapePlayer(Clock clock) : IDisposable
            }
 
            _runningPulseCount = 0;
+       }
+
+       if (pulse.IsSilence)
+       {
+           EarBit = false;
+           return;
        }
 
        EarBit = !EarBit;
