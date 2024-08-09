@@ -7,11 +7,11 @@ namespace OldBit.Spectral.Emulation.Devices.Audio;
 /// </summary>
 /// <param name="capacity">The capacity of the buffer.</param>
 /// <param name="defaultValue">The default value to return when buffer is empty.</param>
-internal class BeeperBuffer(int capacity, Func<byte> defaultValue) : IEnumerable<byte>
+internal sealed class BeeperBuffer(int capacity, Func<byte> defaultValue) : IEnumerable<byte>
 {
     private readonly BeeperDataEnumerator _enumerator = new(capacity, defaultValue);
 
-    public void Write(byte[] data) => _enumerator.Write(data);
+    internal void Write(byte[] data) => _enumerator.Write(data);
 
     public IEnumerator<byte> GetEnumerator() => _enumerator;
 

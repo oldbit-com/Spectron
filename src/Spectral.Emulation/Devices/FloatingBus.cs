@@ -9,7 +9,7 @@ namespace OldBit.Spectral.Emulation.Devices;
 /// such as periods spent building the border.
 /// https://sinclair.wiki.zxnet.co.uk/wiki/Floating_bus
 /// </summary>
-internal class FloatingBus
+internal sealed class FloatingBus
 {
     private readonly IMemory _memory;
     private readonly Dictionary<int, Word> _floatingBusAddreesIndex = new();

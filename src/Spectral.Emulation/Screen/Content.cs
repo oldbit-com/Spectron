@@ -3,7 +3,7 @@ using OldBit.Spectral.Emulation.Devices.Memory;
 
 namespace OldBit.Spectral.Emulation.Screen;
 
-internal class Content(FrameBuffer frameBuffer, IEmulatorMemory memory, UlaPlus ulaPlus)
+internal sealed class Content(FrameBuffer frameBuffer, IEmulatorMemory memory, UlaPlus ulaPlus)
 {
     private readonly bool[] _bitmapDirty = new bool[32*24*8];
 

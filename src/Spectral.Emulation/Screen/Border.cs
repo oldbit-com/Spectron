@@ -2,7 +2,7 @@ namespace OldBit.Spectral.Emulation.Screen;
 
 public record struct BorderTick(int StartTick, int EndTick, int StartPixel);
 
-internal class Border(FrameBuffer frameBuffer)
+internal sealed class Border(FrameBuffer frameBuffer)
 {
     private readonly List<BorderTick> _borderTickRanges = BuildBorderTickRanges();
 

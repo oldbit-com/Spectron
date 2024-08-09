@@ -1,6 +1,6 @@
 namespace OldBit.Spectral.Emulation.Devices.Keyboard;
 
-public class KeyHandler
+public sealed class KeyHandler
 {
     private readonly Dictionary<byte, byte> _keyStates = new()
     {

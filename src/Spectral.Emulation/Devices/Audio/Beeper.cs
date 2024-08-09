@@ -2,7 +2,7 @@ using OldBit.Beep;
 
 namespace OldBit.Spectral.Emulation.Devices.Audio;
 
-public class Beeper
+internal sealed class Beeper
 {
     private const int PlayerSampleRate = 44100;
     private const int MaxBeepTicks = 214042;     // BEEP x,-60 - assume the longest lasting note
@@ -20,7 +20,7 @@ public class Beeper
 
     private readonly float _statesPerSample;
 
-    public Beeper(float clockMHz)
+    internal Beeper(float clockMHz)
     {
         _statesPerSample = (int)(clockMHz * 1_000_000 / PlayerSampleRate);
 
@@ -30,7 +30,7 @@ public class Beeper
         Start();
     }
 
-    public void UpdateBeeper(byte value, long ticks)
+    internal void UpdateBeeper(byte value, long ticks)
     {
         // TODO: Sound is more or less ok, but not perfect, need some more work, sampling most likely.
 

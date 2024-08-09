@@ -5,7 +5,7 @@ using OldBit.Z80Cpu.Contention;
 
 namespace OldBit.Spectral.Emulation.Computers;
 
-internal record EmulatorSettings(
+internal sealed record EmulatorSettings(
     ComputerType ComputerType,
     IEmulatorMemory Memory,
     IContentionProvider ContentionProvider,

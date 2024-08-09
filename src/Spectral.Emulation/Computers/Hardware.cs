@@ -1,6 +1,6 @@
 namespace OldBit.Spectral.Emulation.Computers;
 
-internal record HardwareSettings(
+internal sealed record HardwareSettings(
     float ClockMhz,
     int TicksPerLine,
     int TicksPerFrame,

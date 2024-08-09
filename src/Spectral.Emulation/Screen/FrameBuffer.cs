@@ -3,7 +3,7 @@ namespace OldBit.Spectral.Emulation.Screen;
 /// <summary>
 /// Represents a frame buffer for the ZX Spectrum screen.
 /// </summary>
-public class FrameBuffer(Color color)
+public sealed class FrameBuffer(Color color)
 {
     public static int Width => ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight;
 

@@ -3,7 +3,7 @@ using OldBit.Spectral.Emulation.Devices.Memory;
 
 namespace OldBit.Spectral.Emulation.Screen;
 
-internal class ScreenBuffer
+internal sealed class ScreenBuffer
 {
     private readonly Border _border;
     private readonly Content _content;
