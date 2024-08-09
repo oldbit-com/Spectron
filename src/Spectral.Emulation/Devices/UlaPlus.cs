@@ -92,17 +92,17 @@ internal sealed class UlaPlus : IDevice
     private static Color TranslateColor(int value)
     {
         var green = (value & 0b11100000) >> 5;
-        green = ScaleColor(green);
+        green = Scale3BitsColor(green);
 
         var red = (value & 0b00011100) >> 2;
-        red = ScaleColor(red);
+        red = Scale3BitsColor(red);
 
         var blue = (value & 0b00000011) << 1;
         blue = blue == 0 ? blue : blue | 0x01;
-        blue = ScaleColor(blue);
+        blue = Scale3BitsColor(blue);
 
         return new Color(red, green, blue);
     }
 
-    private static byte ScaleColor(int color) => (byte)(color << 5 | color << 2 | color & 0x03);
+    private static byte Scale3BitsColor(int color) => (byte)(color << 5 | color << 2 | color & 0x03);
 }
