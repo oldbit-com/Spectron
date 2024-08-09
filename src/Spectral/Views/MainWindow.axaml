@@ -14,9 +14,7 @@
         x:DataType="viewModels:MainWindowViewModel"
         Icon="/Assets/spectral.ico"
         Title="Spectral - ZX Spectrum Emulator"
-        Name="Window"
-        KeyDown="OnKeyDown"
-        KeyUp="OnKeyUp">
+        Name="Window">
 
     <Design.DataContext>
         <viewModels:MainWindowViewModel/>
@@ -27,7 +25,13 @@
             <InvokeCommandAction Command="{Binding WindowOpenedCommand}" />
         </EventTriggerBehavior>
         <EventTriggerBehavior EventName="Closing" SourceObject="Window">
-            <InvokeCommandAction Command="{Binding WindowClosingCommand}" />
+            <InvokeCommandAction Command="{Binding WindowClosingCommand}"/>
+        </EventTriggerBehavior>
+        <EventTriggerBehavior EventName="KeyDown" SourceObject="Window">
+            <InvokeCommandAction Command="{Binding KeyDownCommand}" PassEventArgsToCommand="True"/>
+        </EventTriggerBehavior>
+        <EventTriggerBehavior EventName="KeyUp" SourceObject="Window">
+            <InvokeCommandAction Command="{Binding KeyUpCommand}" PassEventArgsToCommand="True"/>
         </EventTriggerBehavior>
     </i:Interaction.Behaviors>
 

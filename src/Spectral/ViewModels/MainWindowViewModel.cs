@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using OldBit.Spectral.Dialogs;
 using OldBit.Spectral.Emulation.Computers;
-using OldBit.Spectral.Emulation.Devices.Keyboard;
 using OldBit.Spectral.Emulation.Rom;
 using OldBit.Spectral.Emulation.Screen;
 using OldBit.Spectral.Helpers;
@@ -32,10 +31,13 @@ public class MainWindowViewModel : ViewModelBase
 
     public Control ScreenControl { get; set; } = null!;
 
+    public StatusBarViewModel StatusBar { get; } = new();
     public TapeMenuViewModel TapeMenuViewModel { get; } = new();
 
-    public ReactiveCommand<Unit, Unit> WindowOpenedCommand { get; set; }
-    public ReactiveCommand<Unit, Unit> WindowClosingCommand { get; set; }
+    public ReactiveCommand<Unit, Unit> WindowOpenedCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> WindowClosingCommand { get; private set; }
+    public ReactiveCommand<KeyEventArgs, Unit> KeyDownCommand { get; private set; }
+    public ReactiveCommand<KeyEventArgs, Unit> KeyUpCommand { get; private set; }
     public ReactiveCommand<Unit, Task> OpenFileCommand { get; private set; }
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     public ReactiveCommand<RomType, Unit> ChangeRomCommand { get; private set; }
@@ -54,6 +56,8 @@ public class MainWindowViewModel : ViewModelBase
 
         WindowOpenedCommand = ReactiveCommand.CreateFromTask(WindowOpenedAsync);
         WindowClosingCommand = ReactiveCommand.CreateFromTask(WindowClosingAsync);
+        KeyDownCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyDown);
+        KeyUpCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyUp);
         OpenFileCommand = ReactiveCommand.Create(HandleOpenFileAsync);
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
         ChangeRomCommand = ReactiveCommand.Create<RomType>(HandleChangeRom);
@@ -76,10 +80,6 @@ public class MainWindowViewModel : ViewModelBase
 
         Interlocked.Exchange(ref _frameCount, 0);
     }
-
-    public void KeyDown(List<SpectrumKey> keys) => Emulator?.KeyHandler.HandleKeyDown(keys);
-
-    public void KeyUp(List<SpectrumKey> keys) => Emulator?.KeyHandler.HandleKeyUp(keys);
 
     private void EmulatorOnRenderScreen(FrameBuffer framebuffer)
     {
@@ -206,7 +206,17 @@ public class MainWindowViewModel : ViewModelBase
         IsPaused = Emulator?.IsPaused ?? false;
     }
 
-    public StatusBarViewModel StatusBar { get; } = new();
+    private void HandleKeyUp(KeyEventArgs e)
+    {
+        var keys = KeyMappings.ToSpectrumKey(e);
+        Emulator?.KeyHandler.HandleKeyUp(keys);
+    }
+
+    private void HandleKeyDown(KeyEventArgs e)
+    {
+        var keys = KeyMappings.ToSpectrumKey(e);
+        Emulator?.KeyHandler.HandleKeyDown(keys);
+    }
 
     private BorderSize _borderSize = BorderSize.Medium;
     public BorderSize BorderSize
