@@ -1,10 +1,10 @@
+using System;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using OldBit.Spectral.Dialogs;
-using OldBit.Spectral.Emulation.Computers;
 using OldBit.Spectral.Helpers;
 using OldBit.Spectral.ViewModels;
+using ReactiveUI;
 
 namespace OldBit.Spectral.Views;
 
@@ -17,7 +17,7 @@ public partial class MainWindow : Window
         InitializeComponent();
     }
 
-    protected override void OnLoaded(RoutedEventArgs e)
+    protected override void OnDataContextChanged(EventArgs e)
     {
         if (DataContext is not MainWindowViewModel viewModel)
         {
@@ -25,13 +25,10 @@ public partial class MainWindow : Window
         }
 
         _viewModel = viewModel;
+        _viewModel.ScreenControl = ScreenImage;
 
         FileDialogs.MainWindow = this;
         MessageDialogs.MainWindow = this;
-
-        _viewModel.ScreenControl = ScreenImage;
-
-        _viewModel.Initialize(ComputerType.Spectrum48K);
     }
 
     private void OnKeyDown(object? sender, KeyEventArgs e)

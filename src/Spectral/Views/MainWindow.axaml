@@ -8,17 +8,28 @@
         xmlns:rom="clr-namespace:OldBit.Spectral.Emulation.Rom;assembly=OldBit.Spectral.Emulation"
         xmlns:computer="clr-namespace:OldBit.Spectral.Emulation.Computers;assembly=OldBit.Spectral.Emulation"
         xmlns:controls="clr-namespace:OldBit.Spectral.Controls"
+        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectral.Views.MainWindow"
         x:DataType="viewModels:MainWindowViewModel"
         Icon="/Assets/spectral.ico"
         Title="Spectral - ZX Spectrum Emulator"
+        Name="Window"
         KeyDown="OnKeyDown"
         KeyUp="OnKeyUp">
 
     <Design.DataContext>
         <viewModels:MainWindowViewModel/>
     </Design.DataContext>
+
+    <i:Interaction.Behaviors>
+        <EventTriggerBehavior EventName="Opened" SourceObject="Window">
+            <InvokeCommandAction Command="{Binding WindowOpenedCommand}" />
+        </EventTriggerBehavior>
+        <EventTriggerBehavior EventName="Closing" SourceObject="Window">
+            <InvokeCommandAction Command="{Binding WindowClosingCommand}" />
+        </EventTriggerBehavior>
+    </i:Interaction.Behaviors>
 
     <Window.Resources>
         <converters:SelectedEnumToBooleanConverter x:Key="SelectedEnumToBooleanConverter"/>

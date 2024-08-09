@@ -15,6 +15,7 @@ using OldBit.Spectral.Emulation.Rom;
 using OldBit.Spectral.Emulation.Screen;
 using OldBit.Spectral.Helpers;
 using OldBit.Spectral.Models;
+using OldBit.Spectral.Preferences;
 using ReactiveUI;
 using Timer = System.Timers.Timer;
 
@@ -26,12 +27,15 @@ public class MainWindowViewModel : ViewModelBase
     private readonly Timer _statusBarTimer;
 
     private Emulator? Emulator { get; set; }
+    private DefaultSettings _defaultSettings = new();
     private int _frameCount;
 
     public Control ScreenControl { get; set; } = null!;
 
     public TapeMenuViewModel TapeMenuViewModel { get; } = new();
 
+    public ReactiveCommand<Unit, Unit> WindowOpenedCommand { get; set; }
+    public ReactiveCommand<Unit, Unit> WindowClosingCommand { get; set; }
     public ReactiveCommand<Unit, Task> OpenFileCommand { get; private set; }
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     public ReactiveCommand<RomType, Unit> ChangeRomCommand { get; private set; }
@@ -48,6 +52,8 @@ public class MainWindowViewModel : ViewModelBase
 
         var emulatorNotNull = this.WhenAnyValue(x => x.Emulator).Select(emulator => emulator is null);
 
+        WindowOpenedCommand = ReactiveCommand.CreateFromTask(WindowOpenedAsync);
+        WindowClosingCommand = ReactiveCommand.CreateFromTask(WindowClosingAsync);
         OpenFileCommand = ReactiveCommand.Create(HandleOpenFileAsync);
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
         ChangeRomCommand = ReactiveCommand.Create<RomType>(HandleChangeRom);
@@ -71,16 +77,6 @@ public class MainWindowViewModel : ViewModelBase
         Interlocked.Exchange(ref _frameCount, 0);
     }
 
-    public void Initialize(ComputerType computerType)
-    {
-        Emulator = EmulatorFactory.Create(computerType, RomType);
-        Emulator.RenderScreen += EmulatorOnRenderScreen;
-        TapeMenuViewModel.TapeManager = Emulator.TapeManager;
-
-        Emulator.Start();
-        _statusBarTimer.Start();
-    }
-
     public void KeyDown(List<SpectrumKey> keys) => Emulator?.KeyHandler.HandleKeyDown(keys);
 
     public void KeyUp(List<SpectrumKey> keys) => Emulator?.KeyHandler.HandleKeyUp(keys);
@@ -94,6 +90,38 @@ public class MainWindowViewModel : ViewModelBase
         });
 
         Interlocked.Increment(ref _frameCount);
+    }
+
+    private async Task WindowOpenedAsync()
+    {
+        _defaultSettings = await SettingsManager.LoadAsync<DefaultSettings>();
+
+        HandleChangeBorderSize(_defaultSettings.BorderSize);
+        ComputerType = _defaultSettings.ComputerType;
+        IsUlaPlusEnabled = _defaultSettings.IsUlaPlusEnabled;
+
+        InitializeEmulator();
+    }
+
+    private async Task WindowClosingAsync()
+    {
+        _defaultSettings.BorderSize = BorderSize;
+        _defaultSettings.ComputerType = ComputerType;
+        _defaultSettings.IsUlaPlusEnabled = IsUlaPlusEnabled;
+
+        await SettingsManager.SaveAsync(_defaultSettings);
+    }
+
+    private void InitializeEmulator()
+    {
+        Emulator = EmulatorFactory.Create(ComputerType, RomType);
+        Emulator.IsUlaPlusEnabled = IsUlaPlusEnabled;
+        Emulator.RenderScreen += EmulatorOnRenderScreen;
+
+        TapeMenuViewModel.TapeManager = Emulator.TapeManager;
+
+        Emulator.Start();
+        _statusBarTimer.Start();
     }
 
     private async Task HandleOpenFileAsync()
@@ -120,11 +148,6 @@ public class MainWindowViewModel : ViewModelBase
 
     private void HandleChangeBorderSize(BorderSize borderSize)
     {
-        if (BorderSize == borderSize)
-        {
-            return;
-        }
-
         BorderSize = borderSize;
 
         _frameBufferConverter.SetBorderSize(borderSize);
@@ -133,11 +156,6 @@ public class MainWindowViewModel : ViewModelBase
 
     private void HandleChangeRom(RomType romType)
     {
-        if (RomType == romType)
-        {
-            return;
-        }
-
         RomType = romType;
 
         if (Emulator != null)
@@ -146,25 +164,21 @@ public class MainWindowViewModel : ViewModelBase
             Emulator.RenderScreen -= EmulatorOnRenderScreen;
         }
 
-        Initialize(ComputerType);
+        InitializeEmulator();
     }
 
     private void HandleChangeComputerType(ComputerType computerType)
     {
-        if (ComputerType == computerType)
-        {
-            return;
-        }
-
         ComputerType = computerType;
 
         Emulator?.Stop();
-        Initialize(computerType);
+        InitializeEmulator();
     }
 
     private void HandleToggleUlaPlus()
     {
         IsUlaPlusEnabled = !IsUlaPlusEnabled;
+
         if (Emulator != null)
         {
             Emulator.IsUlaPlusEnabled = IsUlaPlusEnabled;
@@ -194,7 +208,7 @@ public class MainWindowViewModel : ViewModelBase
 
     public StatusBarViewModel StatusBar { get; } = new();
 
-    private BorderSize _borderSize = BorderSize.Full;
+    private BorderSize _borderSize = BorderSize.Medium;
     public BorderSize BorderSize
     {
         get => _borderSize;
