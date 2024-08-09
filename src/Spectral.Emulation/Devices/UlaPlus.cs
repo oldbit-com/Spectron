@@ -97,7 +97,6 @@ internal sealed class UlaPlus : IDevice
         var red = (value & 0b00011100) >> 2;
         red = ScaleColor(red);
 
-        // Two bits of blue color are converted to 3 bits
         var blue = (value & 0b00000011) << 1;
         blue = blue == 0 ? blue : blue | 0x01;
         blue = ScaleColor(blue);
@@ -105,7 +104,5 @@ internal sealed class UlaPlus : IDevice
         return new Color(red, green, blue);
     }
 
-    // When scaling 3-bits of color data to more bits for emulators that operate in high color mode,
-    // simply concatenate the bits repeatedly and then truncate to as many bits as needed.
     private static byte ScaleColor(int color) => (byte)(color << 5 | color << 2 | color & 0x03);
 }
