@@ -22,6 +22,7 @@ public sealed class Emulator
     private readonly ScreenBuffer _screenBuffer;
     private readonly Thread _workerThread;
     private bool _isRunning;
+    private bool _invalidateScreen;
 
     public delegate void RenderScreenEvent(FrameBuffer frameBuffer);
     public event RenderScreenEvent? RenderScreen;
@@ -37,36 +38,15 @@ public sealed class Emulator
     {
         _memory = emulator.Memory;
         _beeper = emulator.Beeper;
-        _screenBuffer = new ScreenBuffer(emulator.Memory);
-        emulator.Memory.ScreenMemoryUpdated += address => _screenBuffer.UpdateScreen(address);
-
+        _ulaPlus = new UlaPlus();
+        _screenBuffer = new ScreenBuffer(emulator.Memory, _ulaPlus);
         _z80 = new Z80(emulator.Memory, emulator.ContentionProvider);
-        _z80.BeforeFetch += BeforeInstructionFetch;
-        _z80.Clock.TicksAdded += (_, _, currentFrameTicks) => _screenBuffer.UpdateContent(currentFrameTicks);
 
         TapeManager = new TapeManager(_z80, emulator.Memory, _screenBuffer, hardware);
 
-        var ula = new Ula(emulator.Memory, KeyHandler, emulator.Beeper, _screenBuffer, _z80.Clock, TapeManager.TapePlayer);
-        _ulaPlus = new UlaPlus();
-
-        var bus = new Bus();
-
-        bus.AddDevice(ula);
-        bus.AddDevice(_ulaPlus);
-        bus.AddDevice(emulator.Memory);
-
-        _z80.AddBus(bus);
-
-        if (emulator.UseAYSound)
-        {
-            bus.AddDevice(new AY8910());
-        }
-
-        _workerThread = new Thread(WorkerThread)
-        {
-            IsBackground = true,
-            Priority = ThreadPriority.AboveNormal,
-        };
+        SetupUlaAndDevices(emulator.UseAYSound);
+        SetupEventHandlers();
+        _workerThread = SetupWorkerThread();
     }
 
     public void Start()
@@ -93,6 +73,40 @@ public sealed class Emulator
         _screenBuffer.Reset();
     }
 
+    private void SetupEventHandlers()
+    {
+        _memory.ScreenMemoryUpdated += address => _screenBuffer.UpdateScreen(address);
+
+        _z80.Clock.TicksAdded += (_, _, currentFrameTicks) => _screenBuffer.UpdateContent(currentFrameTicks);
+
+        _z80.BeforeFetch += BeforeInstructionFetch;
+
+        _ulaPlus.ActiveChanged += (_) => _invalidateScreen = true;
+    }
+
+    private void SetupUlaAndDevices(bool useAYSound)
+    {
+        var ula = new Ula(_memory, KeyHandler, _beeper, _screenBuffer, _z80.Clock, TapeManager.TapePlayer);
+        var bus = new Bus();
+
+        bus.AddDevice(ula);
+        bus.AddDevice(_ulaPlus);
+        bus.AddDevice(_memory);
+
+        if (useAYSound)
+        {
+            bus.AddDevice(new AY8910());
+        }
+
+        _z80.AddBus(bus);
+    }
+
+    private Thread SetupWorkerThread() => new(WorkerThread)
+    {
+        IsBackground = true,
+        Priority = ThreadPriority.AboveNormal,
+    };
+
     private void RunFrame()
     {
         StartFrame();
@@ -100,6 +114,12 @@ public sealed class Emulator
         _z80.Run(DefaultTimings.FrameTicks);
 
         EndFrame();
+
+        if (_invalidateScreen)
+        {
+            _screenBuffer.Invalidate();
+            _invalidateScreen = false;
+        }
     }
 
     private void StartFrame()
@@ -119,6 +139,8 @@ public sealed class Emulator
 
     private void ToggleUlaPlus(bool value)
     {
+        _ulaPlus.IsEnabled = value;
+        _invalidateScreen = true;
     }
 
     private void WorkerThread()

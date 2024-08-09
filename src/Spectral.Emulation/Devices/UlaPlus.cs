@@ -16,8 +16,13 @@ internal sealed class UlaPlus : IDevice
     private Register _register;
 
     private int _paletteGroup;
-    private bool _isActive;
     private byte _lastWrittenValue;
+
+    internal bool IsActive { get; private set; }
+    internal bool IsEnabled { get; set; }
+
+    internal delegate void ActiveChangedEvent(EventArgs e);
+    internal event ActiveChangedEvent? ActiveChanged;
 
     public void WritePort(Word address, byte value)
     {
@@ -43,10 +48,13 @@ internal sealed class UlaPlus : IDevice
                         var color = TranslateColor(value);
 
                         _paletteColors[paletteIndex][colorIndex] = color;
+
                         break;
 
                     case Register.ModeGroup:
-                        _isActive = (value & 0x01) == 0x01;
+                        IsActive = (value & 0x01) == 0x01;
+                        ActiveChanged?.Invoke(EventArgs.Empty);
+
                         break;
                 }
                 break;
@@ -63,7 +71,7 @@ internal sealed class UlaPlus : IDevice
         return _lastWrittenValue;
     }
 
-    public Color GetInkColor(byte attribute)
+    internal Color GetInkColor(byte attribute)
     {
         var paletteIndex = attribute >> 6;
         var palette = _paletteColors[paletteIndex];
@@ -72,30 +80,32 @@ internal sealed class UlaPlus : IDevice
         return palette[colorIndex];
     }
 
-    public Color GetPaperColor(byte attribute)
+    internal Color GetPaperColor(byte attribute)
     {
         var paletteIndex = attribute >> 6;
         var palette = _paletteColors[paletteIndex];
-        var colorIndex = attribute >> 3 & 0x07 | 8;
+        var colorIndex = ((attribute >> 3) & 0x07) | 8;
 
         return palette[colorIndex];
     }
 
     private static Color TranslateColor(int value)
     {
-        var green = value & 0b11100000 >> 5;
-        green = ScaleToByte(green);
+        var green = (value & 0b11100000) >> 5;
+        green = ScaleColor(green);
 
-        var red = value & 0b00011100 >> 2;
-        red = ScaleToByte(red);
+        var red = (value & 0b00011100) >> 2;
+        red = ScaleColor(red);
 
-        var blue = value & 0b00000011;
-        blue = blue == 0 ? blue : blue | 1; // Missing lowest bit is set to 1 if any other 2 bits are set
+        // Two bits of blue color are converted to 3 bits
+        var blue = (value & 0b00000011) << 1;
+        blue = blue == 0 ? blue : blue | 0x01;
+        blue = ScaleColor(blue);
 
         return new Color(red, green, blue);
     }
 
     // When scaling 3-bits of color data to more bits for emulators that operate in high color mode,
     // simply concatenate the bits repeatedly and then truncate to as many bits as needed.
-    private static byte ScaleToByte(int color) => (byte)(color << 5 | color << 2 | color >> 1);
+    private static byte ScaleColor(int color) => (byte)(color << 5 | color << 2 | color & 0x03);
 }

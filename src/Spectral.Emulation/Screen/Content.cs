@@ -1,8 +1,9 @@
+using OldBit.Spectral.Emulation.Devices;
 using OldBit.Spectral.Emulation.Devices.Memory;
 
 namespace OldBit.Spectral.Emulation.Screen;
 
-internal class Content(FrameBuffer frameBuffer, IEmulatorMemory memory)
+internal class Content(FrameBuffer frameBuffer, IEmulatorMemory memory, UlaPlus ulaPlus)
 {
     private readonly bool[] _bitmapDirty = new bool[32*24*8];
 
@@ -55,9 +56,13 @@ internal class Content(FrameBuffer frameBuffer, IEmulatorMemory memory)
 
     internal void Reset()
     {
-        NewFrame();
-        _bitmapDirty.AsSpan().Fill(true);
+        _frameCount += 1;
+        _fetchCycleIndex = 0;
+
+        Invalidate();
     }
+
+    internal void Invalidate() => _bitmapDirty.AsSpan().Fill(true);
 
     internal void UpdateScreen(Word address) => UpdateScreenPrivate(address - 0x4000);
 
@@ -74,10 +79,24 @@ internal class Content(FrameBuffer frameBuffer, IEmulatorMemory memory)
         var attributeData = FastLookup.AttributeData[attribute];
         var isFlashOn = attributeData.IsFlashOn && _isFlashOnFrame;
 
-        for (var i = 0; i < FastLookup.BitMasks.Length; i++)
+        for (var bit = 0; bit < FastLookup.BitMasks.Length; bit++)
         {
-            var color = (bitmap & FastLookup.BitMasks[i]) != 0 ^ isFlashOn ? attributeData.Ink : attributeData.Paper;
-            frameBuffer.Pixels[frameBufferIndex + i] = color;
+            Color color;
+
+            if (ulaPlus is { IsEnabled: true, IsActive: true })
+            {
+                color = (bitmap & FastLookup.BitMasks[bit]) != 0 ?
+                    ulaPlus.GetInkColor(attribute) :
+                    ulaPlus.GetPaperColor(attribute);
+            }
+            else
+            {
+                color = (bitmap & FastLookup.BitMasks[bit]) != 0 ^ isFlashOn ?
+                    attributeData.Ink :
+                    attributeData.Paper;
+            }
+
+            frameBuffer.Pixels[frameBufferIndex + bit] = color;
         }
 
         _bitmapDirty[bitmapAddress] = false;

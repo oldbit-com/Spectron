@@ -1,3 +1,4 @@
+using OldBit.Spectral.Emulation.Devices;
 using OldBit.Spectral.Emulation.Devices.Memory;
 
 namespace OldBit.Spectral.Emulation.Screen;
@@ -12,19 +13,19 @@ internal class ScreenBuffer
 
     public FrameBuffer FrameBuffer { get; } = new(Palette.White);
 
-    public ScreenBuffer(IEmulatorMemory memory)
+    internal ScreenBuffer(IEmulatorMemory memory, UlaPlus ulaPlus)
     {
         _border = new Border(FrameBuffer);
-        _content = new Content(FrameBuffer, memory);
+        _content = new Content(FrameBuffer, memory, ulaPlus);
     }
 
-    public void NewFrame()
+    internal void NewFrame()
     {
         _border.NewFrame();
         _content.NewFrame();
     }
 
-    public void UpdateBorder(Color borderColor, int frameTicks = 0)
+    internal void UpdateBorder(Color borderColor, int frameTicks = 0)
     {
         if (_lastBorderColor != borderColor)
         {
@@ -42,15 +43,23 @@ internal class ScreenBuffer
         _borderColorChanged = false;
     }
 
-    public void Reset()
+    internal void Reset()
     {
         _border.Reset();
         _content.Reset();
     }
 
-    public void UpdateBorder(int frameTicks) => _border.Update(_lastBorderColor, frameTicks);
+    internal void Invalidate()
+    {
+        _border.Invalidate();
+        _content.Invalidate();
+    }
 
-    public void UpdateContent(int frameTicks) => _content.Update(frameTicks);
+    internal void UpdateBorder(int frameTicks) => _border.Update(_lastBorderColor, frameTicks);
 
-    public void UpdateScreen(Word address) => _content.UpdateScreen(address);
+    internal void UpdateContent(int frameTicks) => _content.Update(frameTicks);
+
+    internal void UpdateScreen(Word address) => _content.UpdateScreen(address);
+
+
 }

@@ -69,6 +69,12 @@ internal class Border(FrameBuffer frameBuffer)
         NewFrame();
     }
 
+    public void Invalidate()
+    {
+        _lastRangeIndex = 0;
+        _offset = 0;
+    }
+
     /// <summary>
     /// Builds a lookup table for border ticks so that we can quickly determine the border range and
     /// pixel position for a given tick.
