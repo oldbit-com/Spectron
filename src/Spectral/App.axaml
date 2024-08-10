@@ -13,5 +13,29 @@
 
     <Application.Styles>
         <FluentTheme />
+        <StyleInclude Source="avares://OldBit.Spectral/Controls/PausedOverlay.axaml" />
     </Application.Styles>
+
+    <Application.Resources>
+        <!-- Spectrum fonts -->
+        <FontFamily x:Key="SpectrumStrictFont">/Assets/Fonts/zxSpectrumStrict.ttf#zxSpectrumStrict</FontFamily>
+        <FontFamily x:Key="SpectrumExpandedFont">/Assets/Fonts/zxSpectrumExpanded.ttf#zxSpectrumExpanded</FontFamily>
+
+        <!-- Spectrum palette -->
+        <SolidColorBrush x:Key="SpectrumBlack" Color="#FF000000"/>
+        <SolidColorBrush x:Key="SpectrumBlue" Color="#FF0000D8"/>
+        <SolidColorBrush x:Key="SpectrumBrightBlue" Color="#FF0000FF"/>
+        <SolidColorBrush x:Key="SpectrumRed" Color="#FFD80000"/>
+        <SolidColorBrush x:Key="SpectrumBrightRed" Color="#FFD80000"/>
+        <SolidColorBrush x:Key="SpectrumMagenta" Color="#FFD800D8"/>
+        <SolidColorBrush x:Key="SpectrumBrightMagenta" Color="#FFD800FF"/>
+        <SolidColorBrush x:Key="SpectrumGreen" Color="#FF00D800"/>
+        <SolidColorBrush x:Key="SpectrumBrightGreen" Color="#FF00FF00"/>
+        <SolidColorBrush x:Key="SpectrumCyan" Color="#FF00D8D8"/>
+        <SolidColorBrush x:Key="SpectrumBrightCyan" Color="#FF00FFFF"/>
+        <SolidColorBrush x:Key="SpectrumYellow" Color="#FFD8D800"/>
+        <SolidColorBrush x:Key="SpectrumBrightYellow" Color="#FFFFFF00"/>
+        <SolidColorBrush x:Key="SpectrumWhite" Color="#FFD8D8D8"/>
+        <SolidColorBrush x:Key="SpectrumBrightWhite" Color="#FFFFFFFF"/>
+    </Application.Resources>
 </Application>

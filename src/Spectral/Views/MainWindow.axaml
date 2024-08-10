@@ -106,7 +106,10 @@
     <Grid RowDefinitions="*,30">
         <Panel>
             <Border Background="Brown" Padding="4">
-                <Image x:Name="ScreenImage" Source="{Binding SpectrumScreen}"/>
+                <Grid>
+                    <Image x:Name="ScreenImage" Source="{Binding SpectrumScreen}"/>
+                    <controls:PausedOverlay FontSize="80" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding IsPaused}"/>
+                </Grid>
             </Border>
         </Panel>
         <controls:StatusBar DataContext="{Binding StatusBar}" Grid.Row="1" />

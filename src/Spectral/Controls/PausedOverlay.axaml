@@ -1,0 +1,47 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:OldBit.Spectral.Controls">
+
+    <Design.PreviewWith>
+        <controls:PausedOverlay FontSize="60" />
+    </Design.PreviewWith>
+
+    <Style Selector="controls|PausedOverlay">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" Background="{StaticResource SpectrumWhite}">
+                    <TextBlock Grid.Column="0" Text="P"
+                               FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:PausedOverlay}}}"
+                               FontFamily="{StaticResource SpectrumStrictFont}"
+                               Foreground="{StaticResource SpectrumBlack}"
+                               />
+                    <TextBlock Grid.Column="1" Text="A"
+                               FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:PausedOverlay}}}"
+                               FontFamily="{StaticResource SpectrumStrictFont}"
+                               Foreground="{StaticResource SpectrumBrightRed}"
+                               />
+                    <TextBlock Grid.Column="2" Text="U"
+                               FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:PausedOverlay}}}"
+                               FontFamily="{StaticResource SpectrumStrictFont}"
+                               Foreground="{StaticResource SpectrumBrightGreen}"
+                               />
+                    <TextBlock Grid.Column="3" Text="S"
+                               FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:PausedOverlay}}}"
+                               FontFamily="{StaticResource SpectrumStrictFont}"
+                               Foreground="{StaticResource SpectrumBrightYellow}"
+                               />
+                    <TextBlock Grid.Column="4" Text="E"
+                               FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:PausedOverlay}}}"
+                               FontFamily="{StaticResource SpectrumStrictFont}"
+                               Foreground="{StaticResource SpectrumBrightMagenta}"
+                               />
+                    <TextBlock Grid.Column="5" Text="D"
+                               FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:PausedOverlay}}}"
+                               FontFamily="{StaticResource SpectrumStrictFont}"
+                               Foreground="{StaticResource SpectrumBrightBlue}"
+                               />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>
