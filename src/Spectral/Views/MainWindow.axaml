@@ -89,6 +89,8 @@
                             <NativeMenuItem Header="Full" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Full}" IsChecked="{Binding BorderSize, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static models:BorderSize.Full}}"/>
                         </NativeMenu>
                     </NativeMenuItem>
+                    <NativeMenuItemSeparator/>
+                    <NativeMenuItem Header="Enter Full Screen"/>
                 </NativeMenu>
             </NativeMenuItem>
             <NativeMenuItem Header="Tape">
