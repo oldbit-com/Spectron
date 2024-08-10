@@ -158,6 +158,6 @@ public sealed class FileLoader
         throw new NotImplementedException();
     }
 
-    private static bool IsTapFile(string fileName) => Path.GetExtension(fileName).ToLowerInvariant() == ".tap";
-    private static bool IsTzxFile(string fileName) => Path.GetExtension(fileName).ToLowerInvariant() == ".tzx";
+    private static bool IsTapFile(string fileName) => Path.GetExtension(fileName).Equals(".tap", StringComparison.InvariantCultureIgnoreCase);
+    private static bool IsTzxFile(string fileName) => Path.GetExtension(fileName).Equals(".tzx", StringComparison.InvariantCultureIgnoreCase);
 }

@@ -31,6 +31,12 @@ public sealed class TapeManager
 
     public void LoadAndRun(string fileName)
     {
+        if (IsSnaFile(fileName))
+        {
+            FileLoader.LoadFile(fileName);
+            return;
+        }
+
         if (!TryInsertTape(fileName))
         {
             return;
@@ -74,4 +80,7 @@ public sealed class TapeManager
         StopTape();
         TapeEjected?.Invoke(EventArgs.Empty);
     }
+
+    private static bool IsSnaFile(string fileName) => Path.GetExtension(fileName).Equals(".sna", StringComparison.InvariantCultureIgnoreCase);
+
 }
