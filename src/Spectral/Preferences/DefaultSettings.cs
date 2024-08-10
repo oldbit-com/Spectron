@@ -1,4 +1,5 @@
 using OldBit.Spectral.Emulation.Computers;
+using OldBit.Spectral.Emulation.Rom;
 using OldBit.Spectral.Models;
 
 namespace OldBit.Spectral.Preferences;
@@ -10,6 +11,8 @@ public class DefaultSettings
     public BorderSize BorderSize { get; set; } = BorderSize.Medium;
 
     public ComputerType ComputerType { get; set; } = ComputerType.Spectrum48K;
+
+    public RomType RomType { get; set; } = RomType.Original;
 
     public int MaxRecentFiles { get; set; } = 10;
 }

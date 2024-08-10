@@ -18,25 +18,28 @@ public static class EmulatorFactory
     {
         ComputerType.Spectrum16K => CreateSpectrum16K(romType),
         ComputerType.Spectrum48K => CreateSpectrum48K(romType),
-        ComputerType.Spectrum128K => CreateSpectrum128K(),
+        ComputerType.Spectrum128K => CreateSpectrum128K(romType),
         ComputerType.Timex2048 => throw new NotImplementedException(),
         _ => throw new ArgumentOutOfRangeException(nameof(computerType))
     };
 
     private static Emulator CreateSpectrum16K(RomType romType) =>
-        CreateSpectrum16Or48K(new Memory16K(RomReader.ReadRom(romType)));
+        CreateSpectrum16Or48K(new Memory16K(
+            RomReader.ReadRom(romType == RomType.Original ? RomType.Original48 : romType)));
 
     private static Emulator CreateSpectrum48K(RomType romType) =>
-        CreateSpectrum16Or48K(new Memory48K(RomReader.ReadRom(romType)));
+        CreateSpectrum16Or48K(new Memory48K(RomReader.ReadRom(romType == RomType.Original ? RomType.Original48 : romType)));
 
-    private static Emulator CreateSpectrum128K()
+    private static Emulator CreateSpectrum128K(RomType romType)
     {
         var contentionProvider = new ContentionProvider(
             Hardware.Spectrum128K.FirstPixelTick,
             Hardware.Spectrum128K.TicksPerLine);
 
+        var romBank0 = RomReader.ReadRom(romType == RomType.Original ? RomType.Original128Bank0 : romType);
+
         var memory = new Memory128K(
-            RomReader.ReadRom(RomType.Original128Bank0),
+            romBank0,
             RomReader.ReadRom(RomType.Original128Bank1));
 
         memory.BankPaged += bankId => contentionProvider.MemoryBankId = bankId;

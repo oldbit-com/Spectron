@@ -99,6 +99,7 @@ public class MainWindowViewModel : ViewModelBase
         HandleChangeBorderSize(_defaultSettings.BorderSize);
         ComputerType = _defaultSettings.ComputerType;
         IsUlaPlusEnabled = _defaultSettings.IsUlaPlusEnabled;
+        RomType = _defaultSettings.RomType;
 
         InitializeEmulator();
     }
@@ -108,6 +109,7 @@ public class MainWindowViewModel : ViewModelBase
         _defaultSettings.BorderSize = BorderSize;
         _defaultSettings.ComputerType = ComputerType;
         _defaultSettings.IsUlaPlusEnabled = IsUlaPlusEnabled;
+        _defaultSettings.RomType = RomType;
 
         await SettingsManager.SaveAsync(_defaultSettings);
     }
@@ -225,7 +227,7 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _borderSize, value);
     }
 
-    private RomType _romType = RomType.Original48;
+    private RomType _romType = RomType.Original;
     public RomType RomType
     {
         get => _romType;

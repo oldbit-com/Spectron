@@ -60,7 +60,7 @@
                     </NativeMenuItem>
                     <NativeMenuItem Header="ROM">
                         <NativeMenu>
-                            <NativeMenuItem Header="Original 16/48k" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Original48}" IsChecked="{Binding RomType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static rom:RomType.Original48}}"/>
+                            <NativeMenuItem Header="Original" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Original}" IsChecked="{Binding RomType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static rom:RomType.Original}}"/>
                             <NativeMenuItem Header="Gosh Wonderful" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.GoshWonderful}" IsChecked="{Binding RomType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static rom:RomType.GoshWonderful}}"/>
                             <NativeMenuItem Header="Busy Soft v1.40" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.BusySoft}" IsChecked="{Binding RomType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static rom:RomType.BusySoft}}"/>
                             <NativeMenuItem Header="J.G. Harston v0.77" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Harston}" IsChecked="{Binding RomType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static rom:RomType.Harston}}"/>

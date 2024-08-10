@@ -2,6 +2,8 @@ namespace OldBit.Spectral.Emulation.Rom;
 
 public enum RomType
 {
+    Original,
+
     Original48,
 
     Original128Bank0,
