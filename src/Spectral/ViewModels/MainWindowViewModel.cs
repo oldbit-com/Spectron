@@ -11,6 +11,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using OldBit.Spectral.Dialogs;
 using OldBit.Spectral.Emulation.Computers;
+using OldBit.Spectral.Emulation.Devices.Joystick;
 using OldBit.Spectral.Emulation.Rom;
 using OldBit.Spectral.Emulation.Screen;
 using OldBit.Spectral.Helpers;
@@ -46,6 +47,7 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     public ReactiveCommand<RomType, Unit> ChangeRomCommand { get; private set; }
     public ReactiveCommand<ComputerType, Unit> ChangeComputerType { get; private set; }
+    public ReactiveCommand<JoystickType, Unit> ChangeJoystickType { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleUlaPlus { get; private set; }
     public ReactiveCommand<Unit, Unit> ResetCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> PauseCommand { get; private set; }
@@ -68,6 +70,7 @@ public class MainWindowViewModel : ViewModelBase
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
         ChangeRomCommand = ReactiveCommand.Create<RomType>(HandleChangeRom);
         ChangeComputerType = ReactiveCommand.Create<ComputerType>(HandleChangeComputerType);
+        ChangeJoystickType = ReactiveCommand.Create<JoystickType>(HandleChangeJoystickType);
         ToggleUlaPlus = ReactiveCommand.Create(HandleToggleUlaPlus);
         PauseCommand = ReactiveCommand.Create(HandleMachinePause, emulatorNotNull);
         ResetCommand = ReactiveCommand.Create(HandleMachineReset, emulatorNotNull);
@@ -185,6 +188,16 @@ public class MainWindowViewModel : ViewModelBase
         InitializeEmulator();
     }
 
+    private void HandleChangeJoystickType(JoystickType joystickType)
+    {
+        JoystickType = joystickType;
+
+        // if (Emulator != null)
+        // {
+        //     Emulator.JoystickType = joystickType;
+        // }
+    }
+
     private void HandleToggleUlaPlus()
     {
         IsUlaPlusEnabled = !IsUlaPlusEnabled;
@@ -274,6 +287,13 @@ public class MainWindowViewModel : ViewModelBase
     {
         get => _computerType;
         set => this.RaiseAndSetIfChanged(ref _computerType, value);
+    }
+
+    private JoystickType _joystickType = JoystickType.None;
+    public JoystickType JoystickType
+    {
+        get => _joystickType;
+        set => this.RaiseAndSetIfChanged(ref _joystickType, value);
     }
 
     private bool _isUlaPlusEnabled;

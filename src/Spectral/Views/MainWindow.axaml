@@ -6,6 +6,7 @@
         xmlns:converters="clr-namespace:OldBit.Spectral.Converters"
         xmlns:models="clr-namespace:OldBit.Spectral.Models"
         xmlns:rom="clr-namespace:OldBit.Spectral.Emulation.Rom;assembly=OldBit.Spectral.Emulation"
+        xmlns:joy="clr-namespace:OldBit.Spectral.Emulation.Devices.Joystick;assembly=OldBit.Spectral.Emulation"
         xmlns:computer="clr-namespace:OldBit.Spectral.Emulation.Computers;assembly=OldBit.Spectral.Emulation"
         xmlns:controls="clr-namespace:OldBit.Spectral.Controls"
         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
@@ -53,7 +54,7 @@
                     <!-- </NativeMenuItem> -->
                 </NativeMenu>
             </NativeMenuItem>
-            <NativeMenuItem Header="Machine">
+            <NativeMenuItem Header="Emulator">
                 <NativeMenu>
                     <NativeMenuItem Header="Machine">
                         <NativeMenu>
@@ -74,6 +75,16 @@
                                     <NativeMenuItem Header="B. Alford v1.37" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.BrendanAlford}" IsChecked="{Binding RomType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static rom:RomType.BrendanAlford}}"/>
                                 </NativeMenu>
                             </NativeMenuItem>
+                        </NativeMenu>
+                    </NativeMenuItem>
+                    <NativeMenuItem Header="Joystick">
+                        <NativeMenu>
+                            <NativeMenuItem Header="None" ToggleType="CheckBox" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.None}" IsChecked="{Binding JoystickType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static joy:JoystickType.None}}"/>
+                            <NativeMenuItem Header="Kempston" ToggleType="CheckBox" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Kempston}" IsChecked="{Binding JoystickType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static joy:JoystickType.Kempston}}"/>
+                            <NativeMenuItem Header="Sinclair 1" ToggleType="CheckBox" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Sinclair1}" IsChecked="{Binding JoystickType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static joy:JoystickType.Sinclair1}}"/>
+                            <NativeMenuItem Header="Sinclair 2" ToggleType="CheckBox" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Sinclair2}" IsChecked="{Binding JoystickType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static joy:JoystickType.Sinclair2}}"/>
+                            <NativeMenuItem Header="Cursor" ToggleType="CheckBox" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Cursor}" IsChecked="{Binding JoystickType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static joy:JoystickType.Cursor}}"/>
+                            <NativeMenuItem Header="Fuller" ToggleType="CheckBox" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Fuller}" IsChecked="{Binding JoystickType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static joy:JoystickType.Fuller}}"/>
                         </NativeMenu>
                     </NativeMenuItem>
                     <NativeMenuItem Header="Enable ULA+" ToggleType="CheckBox" Command="{Binding ToggleUlaPlus}" IsChecked="{Binding IsUlaPlusEnabled}"/>
