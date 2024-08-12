@@ -94,7 +94,7 @@
                         </NativeMenu>
                     </NativeMenuItem>
                     <NativeMenuItemSeparator/>
-                    <NativeMenuItem Header="Enter Full Screen" Gesture="Ctrl+Enter" Command="{Binding ToggleFullScreenCommand}"/>
+                    <NativeMenuItem Header="{Binding WindowStateCommandName}" Gesture="Ctrl+Enter" Command="{Binding ToggleFullScreenCommand}"/>
                 </NativeMenu>
             </NativeMenuItem>
             <NativeMenuItem Header="Tape">
@@ -110,7 +110,7 @@
     </NativeMenu.Menu>
 
     <Grid RowDefinitions="*,Auto">
-        <Border Background="Brown" Padding="4">
+        <Border>
             <Grid>
                 <Border CornerRadius="15" HorizontalAlignment="Center" ClipToBounds="True">
                     <Image x:Name="ScreenImage" Source="{Binding SpectrumScreen}" Stretch="Uniform"/>

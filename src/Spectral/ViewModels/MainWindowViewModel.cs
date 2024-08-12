@@ -273,6 +273,17 @@ public class MainWindowViewModel : ViewModelBase
     public WindowState WindowState
     {
         get => _windowState;
-        set => this.RaiseAndSetIfChanged(ref _windowState, value);
+        set
+        {
+            WindowStateCommandName = value == WindowState.FullScreen ? "Exit Full Screen" : "Enter Full Screen";
+            this.RaiseAndSetIfChanged(ref _windowState, value);
+        }
+    }
+
+    private string _windowStateCommandName = "Enter Full Screen";
+    public string WindowStateCommandName
+    {
+        get => _windowStateCommandName;
+        set => this.RaiseAndSetIfChanged(ref _windowStateCommandName, value);
     }
 }
