@@ -26,5 +26,6 @@ public partial class MainWindow : Window
 
         FileDialogs.MainWindow = this;
         MessageDialogs.MainWindow = this;
+        viewModel.MainWindow = this;
     }
 }

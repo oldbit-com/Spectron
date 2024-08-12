@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media.Imaging;
@@ -15,6 +16,7 @@ using OldBit.Spectral.Emulation.Screen;
 using OldBit.Spectral.Helpers;
 using OldBit.Spectral.Models;
 using OldBit.Spectral.Preferences;
+using OldBit.Spectral.Views;
 using ReactiveUI;
 using Timer = System.Timers.Timer;
 
@@ -27,10 +29,12 @@ public class MainWindowViewModel : ViewModelBase
 
     private Emulator? Emulator { get; set; }
     private DefaultSettings _defaultSettings = new();
+    private HelpKeyboardView? _helpKeyboardView;
+
     private int _frameCount;
 
     public Control ScreenControl { get; set; } = null!;
-
+    public Window? MainWindow { get; set; }
     public StatusBarViewModel StatusBar { get; } = new();
     public TapeMenuViewModel TapeMenuViewModel { get; } = new();
 
@@ -46,6 +50,7 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> ResetCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> PauseCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleFullScreenCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> HelpKeyboardCommand { get; private set; }
 
     public MainWindowViewModel()
     {
@@ -67,6 +72,7 @@ public class MainWindowViewModel : ViewModelBase
         PauseCommand = ReactiveCommand.Create(HandleMachinePause, emulatorNotNull);
         ResetCommand = ReactiveCommand.Create(HandleMachineReset, emulatorNotNull);
         ToggleFullScreenCommand = ReactiveCommand.Create(HandleToggleFullScreen);
+        HelpKeyboardCommand = ReactiveCommand.Create(HandleHelpKeyboardCommand);
 
         SpectrumScreen = _frameBufferConverter.Bitmap;
     }
@@ -213,6 +219,28 @@ public class MainWindowViewModel : ViewModelBase
     private void HandleToggleFullScreen()
     {
         WindowState = WindowState == WindowState.FullScreen ? WindowState.Normal : WindowState.FullScreen;
+    }
+
+    private void HandleHelpKeyboardCommand()
+    {
+        if (_helpKeyboardView == null)
+        {
+            _helpKeyboardView = new HelpKeyboardView();
+            _helpKeyboardView.Closed += (_, _) => _helpKeyboardView = null;
+
+            if (MainWindow != null)
+            {
+                _helpKeyboardView.Show(MainWindow);
+            }
+            else
+            {
+                _helpKeyboardView.Show();
+            }
+        }
+        else
+        {
+            _helpKeyboardView.Activate();
+        }
     }
 
     private void HandleKeyUp(KeyEventArgs e)
