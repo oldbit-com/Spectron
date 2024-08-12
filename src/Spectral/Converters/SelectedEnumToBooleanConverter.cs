@@ -13,7 +13,7 @@ public class SelectedEnumToBooleanConverter : IValueConverter
             return false;
         }
 
-        return value?.Equals(parameter) == true;
+        return value.Equals(parameter);
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => null;

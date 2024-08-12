@@ -45,6 +45,7 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> ToggleUlaPlus { get; private set; }
     public ReactiveCommand<Unit, Unit> ResetCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> PauseCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ToggleFullScreenCommand { get; private set; }
 
     public MainWindowViewModel()
     {
@@ -65,6 +66,7 @@ public class MainWindowViewModel : ViewModelBase
         ToggleUlaPlus = ReactiveCommand.Create(HandleToggleUlaPlus);
         PauseCommand = ReactiveCommand.Create(HandleMachinePause, emulatorNotNull);
         ResetCommand = ReactiveCommand.Create(HandleMachineReset, emulatorNotNull);
+        ToggleFullScreenCommand = ReactiveCommand.Create(HandleToggleFullScreen);
 
         SpectrumScreen = _frameBufferConverter.Bitmap;
     }
@@ -208,6 +210,11 @@ public class MainWindowViewModel : ViewModelBase
         IsPaused = Emulator?.IsPaused ?? false;
     }
 
+    private void HandleToggleFullScreen()
+    {
+        WindowState = WindowState == WindowState.FullScreen ? WindowState.Normal : WindowState.FullScreen;
+    }
+
     private void HandleKeyUp(KeyEventArgs e)
     {
         var keys = KeyMappings.ToSpectrumKey(e);
@@ -260,5 +267,12 @@ public class MainWindowViewModel : ViewModelBase
     {
         get => _isPaused;
         set => this.RaiseAndSetIfChanged(ref _isPaused, value);
+    }
+
+    private WindowState _windowState = WindowState.Normal;
+    public WindowState WindowState
+    {
+        get => _windowState;
+        set => this.RaiseAndSetIfChanged(ref _windowState, value);
     }
 }
