@@ -267,7 +267,7 @@ public class MainWindowViewModel : ViewModelBase
         }
 
         var keys = KeyMappings.ToSpectrumKey(e);
-        Emulator?.KeyHandler.HandleKeyUp(keys);
+        Emulator?.KeyboardHandler.HandleKeyUp(keys);
     }
 
     private void HandleKeyDown(KeyEventArgs e)
@@ -283,7 +283,7 @@ public class MainWindowViewModel : ViewModelBase
         }
 
         var keys = KeyMappings.ToSpectrumKey(e);
-        Emulator?.KeyHandler.HandleKeyDown(keys);
+        Emulator?.KeyboardHandler.HandleKeyDown(keys);
     }
 
     private BorderSize _borderSize = BorderSize.Medium;

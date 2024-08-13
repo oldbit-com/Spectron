@@ -9,7 +9,7 @@ namespace OldBit.Spectral.Emulation.Devices;
 
 internal sealed class Ula(
     IEmulatorMemory memory,
-    KeyHandler keyHandler,
+    KeyboardHandler keyboardHandler,
     Beeper beeper,
     ScreenBuffer screenBuffer,
     Clock clock,
@@ -22,7 +22,7 @@ internal sealed class Ula(
             return null;
         }
 
-        var value = keyHandler.Read(address);
+        var value = keyboardHandler.Read(address);
         UpdateEarBit(ref value);
 
         return value;

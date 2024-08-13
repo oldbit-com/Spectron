@@ -33,7 +33,7 @@ public sealed class Emulator
 
     public bool IsUlaPlusEnabled { set => ToggleUlaPlus(value); }
 
-    public KeyHandler KeyHandler { get; } = new();
+    public KeyboardHandler KeyboardHandler { get; } = new();
     public TapeManager TapeManager { get; }
     public JoystickManager JoystickManager { get; }
 
@@ -47,7 +47,7 @@ public sealed class Emulator
         _z80 = new Z80(emulator.Memory, emulator.ContentionProvider);
 
         TapeManager = new TapeManager(_z80, emulator.Memory, _screenBuffer, hardware);
-        JoystickManager = new JoystickManager(_spectrumBus);
+        JoystickManager = new JoystickManager(_spectrumBus, KeyboardHandler);
 
         SetupUlaAndDevices(emulator.UseAYSound);
         SetupEventHandlers();
@@ -91,7 +91,7 @@ public sealed class Emulator
 
     private void SetupUlaAndDevices(bool useAYSound)
     {
-        var ula = new Ula(_memory, KeyHandler, _beeper, _screenBuffer, _z80.Clock, TapeManager.TapePlayer);
+        var ula = new Ula(_memory, KeyboardHandler, _beeper, _screenBuffer, _z80.Clock, TapeManager.TapePlayer);
 
         _spectrumBus.AddDevice(ula);
         _spectrumBus.AddDevice(_ulaPlus);

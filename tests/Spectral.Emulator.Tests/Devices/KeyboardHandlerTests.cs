@@ -3,7 +3,7 @@ using OldBit.Spectral.Emulation.Devices.Keyboard;
 
 namespace OldBit.ZXSpectrum.Emulator.Tests.Devices;
 
-public class KeyHandlerTests
+public class KeyboardHandlerTests
 {
     [Theory]
     [InlineData(SpectrumKey.CapsShift, 0xFE, 0b11111110)]
@@ -48,7 +48,7 @@ public class KeyHandlerTests
     [InlineData(SpectrumKey.B, 0x7FFE, 0b11101111)]
     public void GivenKeyIsPressed_WhenReadPort_ThenReturnsState(SpectrumKey key, Word port, byte expectedState)
     {
-        var keyboard = new KeyHandler();
+        var keyboard = new KeyboardHandler();
         keyboard.HandleKeyDown(new[] { key });
 
         var state = keyboard.Read(port);
@@ -69,7 +69,7 @@ public class KeyHandlerTests
     [InlineData(new[] { SpectrumKey.G }, 0x02FE, 0b11111111)]
     public void GivenKeyIsPressed_WhenReadSeveralPorts_ThenReturnsCompositeState(IEnumerable<SpectrumKey> keys, Word port, byte expectedState)
     {
-        var keyboard = new KeyHandler();
+        var keyboard = new KeyboardHandler();
         keyboard.HandleKeyDown(keys);
 
         var state = keyboard.Read(port);
