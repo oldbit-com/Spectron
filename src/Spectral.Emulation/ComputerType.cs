@@ -1,4 +1,4 @@
-namespace OldBit.Spectral.Emulation.Computers;
+namespace OldBit.Spectral.Emulation;
 
 public enum ComputerType
 {

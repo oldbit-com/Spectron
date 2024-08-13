@@ -9,32 +9,41 @@ namespace OldBit.Spectral.Emulation.Devices;
 /// such as periods spent building the border.
 /// https://sinclair.wiki.zxnet.co.uk/wiki/Floating_bus
 /// </summary>
-internal sealed class FloatingBus
+internal sealed class FloatingBus : IDevice
 {
     private readonly IMemory _memory;
-    private readonly Dictionary<int, Word> _floatingBusAddreesIndex = new();
+    private readonly Clock _clock;
+    private readonly Dictionary<int, Word> _floatingBusAddressIndex = new();
 
-    internal FloatingBus(IMemory memory)
+    internal FloatingBus(IMemory memory, Clock clock)
     {
         _memory = memory;
+        _clock = clock;
+
         foreach (var screenEvent in FastLookup.ScreenRenderEvents)
         {
-            _floatingBusAddreesIndex[screenEvent.Ticks + 0] = screenEvent.BitmapAddress;
-            _floatingBusAddreesIndex[screenEvent.Ticks + 1] = screenEvent.AttributeAddress;
-            _floatingBusAddreesIndex[screenEvent.Ticks + 2] = (Word)(screenEvent.BitmapAddress + 1);
-            _floatingBusAddreesIndex[screenEvent.Ticks + 3] = (Word)(screenEvent.AttributeAddress + 1);
+            _floatingBusAddressIndex[screenEvent.Ticks + 0] = screenEvent.BitmapAddress;
+            _floatingBusAddressIndex[screenEvent.Ticks + 1] = screenEvent.AttributeAddress;
+            _floatingBusAddressIndex[screenEvent.Ticks + 2] = (Word)(screenEvent.BitmapAddress + 1);
+            _floatingBusAddressIndex[screenEvent.Ticks + 3] = (Word)(screenEvent.AttributeAddress + 1);
         }
     }
 
-    internal byte GetFloatingValue(int frameTicks)
+    public byte? ReadPort(Word address)
     {
-        if (frameTicks is < DefaultTimings.FirstPixelTick or > DefaultTimings.LastPixelTick)
+        if (Ula.IsUlaPort(address))
         {
-            return 0xFF;
+            return null;
         }
 
-        return _floatingBusAddreesIndex.TryGetValue(frameTicks, out var address) ?
-            _memory.Read((Word)(0x4000 + address)) :
-            (byte)0xFF;
+        if (_clock.FrameTicks is < DefaultTimings.FirstPixelTick or > DefaultTimings.LastPixelTick)
+        {
+            return null;
+        }
+
+        return _floatingBusAddressIndex.TryGetValue(_clock.FrameTicks, out var screenAddress) ?
+            _memory.Read((Word)(0x4000 + screenAddress)) : null;
     }
+
+    public int Priority => int.MaxValue;
 }

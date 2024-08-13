@@ -4,13 +4,12 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using OldBit.Spectral.Dialogs;
-using OldBit.Spectral.Emulation.Computers;
+using OldBit.Spectral.Emulation;
 using OldBit.Spectral.Emulation.Devices.Joystick;
 using OldBit.Spectral.Emulation.Rom;
 using OldBit.Spectral.Emulation.Screen;
@@ -111,6 +110,7 @@ public class MainWindowViewModel : ViewModelBase
         ComputerType = _defaultSettings.ComputerType;
         IsUlaPlusEnabled = _defaultSettings.IsUlaPlusEnabled;
         RomType = _defaultSettings.RomType;
+        JoystickType = _defaultSettings.JoystickType;
 
         InitializeEmulator();
     }
@@ -121,6 +121,7 @@ public class MainWindowViewModel : ViewModelBase
         _defaultSettings.ComputerType = ComputerType;
         _defaultSettings.IsUlaPlusEnabled = IsUlaPlusEnabled;
         _defaultSettings.RomType = RomType;
+        _defaultSettings.JoystickType = JoystickType;
 
         await SettingsManager.SaveAsync(_defaultSettings);
     }
@@ -129,6 +130,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         Emulator = EmulatorFactory.Create(ComputerType, RomType);
         Emulator.IsUlaPlusEnabled = IsUlaPlusEnabled;
+        Emulator.JoystickManager.SetupJoystick(JoystickType);
         Emulator.RenderScreen += EmulatorOnRenderScreen;
 
         TapeMenuViewModel.TapeManager = Emulator.TapeManager;
@@ -191,11 +193,7 @@ public class MainWindowViewModel : ViewModelBase
     private void HandleChangeJoystickType(JoystickType joystickType)
     {
         JoystickType = joystickType;
-
-        // if (Emulator != null)
-        // {
-        //     Emulator.JoystickType = joystickType;
-        // }
+        Emulator?.JoystickManager.SetupJoystick(joystickType);
     }
 
     private void HandleToggleUlaPlus()
@@ -258,12 +256,32 @@ public class MainWindowViewModel : ViewModelBase
 
     private void HandleKeyUp(KeyEventArgs e)
     {
+        if (JoystickType != JoystickType.None)
+        {
+            var joystickKeys = KeyMappings.ToJoystickAction(e);
+            if (joystickKeys != JoystickInput.None)
+            {
+                Emulator?.JoystickManager.HandleInput(joystickKeys, isOn: false);
+                return;
+            }
+        }
+
         var keys = KeyMappings.ToSpectrumKey(e);
         Emulator?.KeyHandler.HandleKeyUp(keys);
     }
 
     private void HandleKeyDown(KeyEventArgs e)
     {
+        if (JoystickType != JoystickType.None)
+        {
+            var joystickKeys = KeyMappings.ToJoystickAction(e);
+            if (joystickKeys != JoystickInput.None)
+            {
+                Emulator?.JoystickManager.HandleInput(joystickKeys, isOn: true);
+                return;
+            }
+        }
+
         var keys = KeyMappings.ToSpectrumKey(e);
         Emulator?.KeyHandler.HandleKeyDown(keys);
     }

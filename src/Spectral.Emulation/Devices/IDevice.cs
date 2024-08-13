@@ -8,4 +8,6 @@ internal interface IDevice
     void WritePort(Word address, byte value) { }
 
     byte? ReadPort(Word address) => null;
+
+    int Priority => 0;
 }

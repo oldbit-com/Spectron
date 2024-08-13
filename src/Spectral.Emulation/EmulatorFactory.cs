@@ -3,7 +3,7 @@ using OldBit.Spectral.Emulation.Devices.Memory;
 using OldBit.Spectral.Emulation.Rom;
 using OldBit.Z80Cpu.Contention;
 
-namespace OldBit.Spectral.Emulation.Computers;
+namespace OldBit.Spectral.Emulation;
 
 internal sealed record EmulatorSettings(
     ComputerType ComputerType,

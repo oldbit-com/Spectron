@@ -15,13 +15,11 @@ internal sealed class Ula(
     Clock clock,
     TapePlayer tapePlayer) : IDevice
 {
-    private readonly FloatingBus _floatingBus = new(memory);
-
     public byte? ReadPort(Word address)
     {
         if (!IsUlaPort(address))
         {
-            return _floatingBus.GetFloatingValue(clock.FrameTicks);
+            return null;
         }
 
         var value = keyHandler.Read(address);
@@ -44,7 +42,7 @@ internal sealed class Ula(
         beeper.UpdateBeeper(value, clock.TotalTicks);
     }
 
-    private static bool IsUlaPort(Word address) => (address & 0x01) == 0x00;
+    internal static bool IsUlaPort(Word address) => (address & 0x01) == 0x00;
 
     private void UpdateEarBit(ref byte value)
     {

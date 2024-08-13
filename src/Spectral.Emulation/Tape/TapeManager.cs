@@ -1,4 +1,3 @@
-using OldBit.Spectral.Emulation.Computers;
 using OldBit.Spectral.Emulation.Screen;
 using OldBit.Z80Cpu;
 

@@ -1,4 +1,3 @@
-using OldBit.Spectral.Emulation.Computers;
 using OldBit.Spectral.Emulation.Extensions;
 using OldBit.Z80Cpu;
 using OldBit.ZXTape.Tap;

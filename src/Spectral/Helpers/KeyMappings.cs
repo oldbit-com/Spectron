@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Avalonia.Input;
+using OldBit.Spectral.Emulation.Devices.Joystick;
 using OldBit.Spectral.Emulation.Devices.Keyboard;
 
 namespace OldBit.Spectral.Helpers;
@@ -13,6 +14,7 @@ public static class KeyMappings
             ":" => [SpectrumKey.SymbolShift, SpectrumKey.Z],
             "\"" => [SpectrumKey.SymbolShift, SpectrumKey.P],
             "'" => [SpectrumKey.SymbolShift, SpectrumKey.D7],
+            // This needs different handling because it needs Extended mode
             "[" => [SpectrumKey.SymbolShift, SpectrumKey.CapsShift, SpectrumKey.Y],
 
             _ => e.PhysicalKey switch
@@ -71,6 +73,19 @@ public static class KeyMappings
                 PhysicalKey.Minus => [SpectrumKey.SymbolShift, SpectrumKey.J],
                 _ => []
             }
+        };
+    }
+
+    public static JoystickInput ToJoystickAction(KeyEventArgs e)
+    {
+        return e.PhysicalKey switch
+        {
+            PhysicalKey.ArrowLeft => JoystickInput.Left,
+            PhysicalKey.ArrowRight => JoystickInput.Right,
+            PhysicalKey.ArrowDown => JoystickInput.Down,
+            PhysicalKey.ArrowUp => JoystickInput.Up,
+            PhysicalKey.Tab => JoystickInput.Fire,
+            _ => JoystickInput.None
         };
     }
 }

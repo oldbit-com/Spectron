@@ -2,11 +2,25 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectral.Emulation.Devices;
 
-internal sealed class Bus : IBus
+internal sealed class SpectrumBus : IBus
 {
     private readonly List<IDevice> _devices = [];
 
-    internal void AddDevice(IDevice device) => _devices.Add(device);
+    internal void AddDevice(IDevice device)
+    {
+        var lastIndex = _devices.FindLastIndex(x => x.Priority <= device.Priority);
+
+        if (lastIndex == -1)
+        {
+            _devices.Add(device);
+        }
+        else
+        {
+            _devices.Insert(lastIndex + 1, device);
+        }
+    }
+
+    internal void RemoveDevice(IDevice device) => _devices.Remove(device);
 
     public byte Read(Word address)
     {

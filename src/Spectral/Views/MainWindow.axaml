@@ -7,9 +7,9 @@
         xmlns:models="clr-namespace:OldBit.Spectral.Models"
         xmlns:rom="clr-namespace:OldBit.Spectral.Emulation.Rom;assembly=OldBit.Spectral.Emulation"
         xmlns:joy="clr-namespace:OldBit.Spectral.Emulation.Devices.Joystick;assembly=OldBit.Spectral.Emulation"
-        xmlns:computer="clr-namespace:OldBit.Spectral.Emulation.Computers;assembly=OldBit.Spectral.Emulation"
         xmlns:controls="clr-namespace:OldBit.Spectral.Controls"
         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+        xmlns:emu="clr-namespace:OldBit.Spectral.Emulation;assembly=OldBit.Spectral.Emulation"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectral.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -58,9 +58,9 @@
                 <NativeMenu>
                     <NativeMenuItem Header="Machine">
                         <NativeMenu>
-                            <NativeMenuItem Header="ZX Spectrum 16" ToggleType="CheckBox" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static computer:ComputerType.Spectrum16K}" IsChecked="{Binding ComputerType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:ComputerType.Spectrum16K}}"/>
-                            <NativeMenuItem Header="ZX Spectrum 48" ToggleType="CheckBox" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static computer:ComputerType.Spectrum48K}" IsChecked="{Binding ComputerType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:ComputerType.Spectrum48K}}"/>
-                            <NativeMenuItem Header="ZX Spectrum 128" ToggleType="CheckBox" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static computer:ComputerType.Spectrum128K}" IsChecked="{Binding ComputerType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static computer:ComputerType.Spectrum128K}}"/>
+                            <NativeMenuItem Header="ZX Spectrum 16" ToggleType="CheckBox" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum16K}" IsChecked="{Binding ComputerType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum16K}}"/>
+                            <NativeMenuItem Header="ZX Spectrum 48" ToggleType="CheckBox" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum48K}" IsChecked="{Binding ComputerType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum48K}}"/>
+                            <NativeMenuItem Header="ZX Spectrum 128" ToggleType="CheckBox" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum128K}" IsChecked="{Binding ComputerType, Converter={StaticResource SelectedEnumToBooleanConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum128K}}"/>
                         </NativeMenu>
                     </NativeMenuItem>
                     <NativeMenuItem Header="ROM">

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using OldBit.Spectral.Emulation.Devices;
 using OldBit.Spectral.Emulation.Devices.Audio;
+using OldBit.Spectral.Emulation.Devices.Joystick;
 using OldBit.Spectral.Emulation.Devices.Keyboard;
 using OldBit.Spectral.Emulation.Devices.Memory;
 using OldBit.Spectral.Emulation.Rom;
@@ -8,7 +9,7 @@ using OldBit.Spectral.Emulation.Screen;
 using OldBit.Spectral.Emulation.Tape;
 using OldBit.Z80Cpu;
 
-namespace OldBit.Spectral.Emulation.Computers;
+namespace OldBit.Spectral.Emulation;
 
 /// <summary>
 /// This is the main emulator class that ties everything together.
@@ -19,6 +20,7 @@ public sealed class Emulator
     private readonly Beeper _beeper;
     private readonly Z80 _z80;
     private readonly UlaPlus _ulaPlus;
+    private readonly SpectrumBus _spectrumBus;
     private readonly ScreenBuffer _screenBuffer;
     private readonly Thread _workerThread;
     private bool _isRunning;
@@ -33,16 +35,19 @@ public sealed class Emulator
 
     public KeyHandler KeyHandler { get; } = new();
     public TapeManager TapeManager { get; }
+    public JoystickManager JoystickManager { get; }
 
     internal Emulator(EmulatorSettings emulator, HardwareSettings hardware)
     {
         _memory = emulator.Memory;
         _beeper = emulator.Beeper;
         _ulaPlus = new UlaPlus();
+        _spectrumBus = new SpectrumBus();
         _screenBuffer = new ScreenBuffer(emulator.Memory, _ulaPlus);
         _z80 = new Z80(emulator.Memory, emulator.ContentionProvider);
 
         TapeManager = new TapeManager(_z80, emulator.Memory, _screenBuffer, hardware);
+        JoystickManager = new JoystickManager(_spectrumBus);
 
         SetupUlaAndDevices(emulator.UseAYSound);
         SetupEventHandlers();
@@ -87,18 +92,20 @@ public sealed class Emulator
     private void SetupUlaAndDevices(bool useAYSound)
     {
         var ula = new Ula(_memory, KeyHandler, _beeper, _screenBuffer, _z80.Clock, TapeManager.TapePlayer);
-        var bus = new Bus();
 
-        bus.AddDevice(ula);
-        bus.AddDevice(_ulaPlus);
-        bus.AddDevice(_memory);
+        _spectrumBus.AddDevice(ula);
+        _spectrumBus.AddDevice(_ulaPlus);
+        _spectrumBus.AddDevice(_memory);
 
         if (useAYSound)
         {
-            bus.AddDevice(new AY8910());
+            _spectrumBus.AddDevice(new AY8910());
         }
 
-        _z80.AddBus(bus);
+        var floatingBus = new FloatingBus(_memory, _z80.Clock);
+        _spectrumBus.AddDevice(floatingBus);
+
+        _z80.AddBus(_spectrumBus);
     }
 
     private Thread SetupWorkerThread() => new(WorkerThread)
