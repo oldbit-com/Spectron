@@ -14,7 +14,7 @@
 
     <NativeMenu.Menu>
         <NativeMenu>
-            <NativeMenuItem Header="About Spectral" />
+            <NativeMenuItem Header="About Spectral" Click="AboutMenuItem_OnClick" />
         </NativeMenu>
     </NativeMenu.Menu>
 

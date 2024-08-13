@@ -1,0 +1,22 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="OldBit.Spectral.Views.AboutView"
+        Title="About Spectral"
+        Height="250"
+        Width="350"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+    <Grid RowDefinitions="96,*" Margin="10">
+        <Image Grid.Row="0" Source="../Assets/Logo.png" Height="128" Width="96"/>
+        <StackPanel Grid.Row="1">
+            <TextBlock Text="Spectral" FontFamily="{StaticResource SpectrumStrictFont}" FontSize="64" HorizontalAlignment="Center" Foreground="{StaticResource SpectrumMagenta}"/>
+            <TextBlock Text="Version 0.0.1" FontFamily="{StaticResource SpectrumStrictFont}" FontSize="24" HorizontalAlignment="Center" Padding="8" Foreground="{StaticResource SpectrumBrightGreen}"/>
+            <TextBlock Text="© 2024 OldBit Ltd" FontFamily="{StaticResource SpectrumStrictFont}" FontSize="20" HorizontalAlignment="Center" Padding="0,20,0,3" Foreground="{StaticResource SpectrumBrightCyan}"/>
+            <TextBlock Text="Wojciech Sobieszek" FontFamily="{StaticResource SpectrumStrictFont}" FontSize="20" HorizontalAlignment="Center" Foreground="{StaticResource SpectrumBrightCyan}"/>
+        </StackPanel>
+    </Grid>
+</Window>
