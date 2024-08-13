@@ -1,6 +1,3 @@
-using OldBit.Spectral.Emulation.Screen;
-using OldBit.Z80Cpu;
-
 namespace OldBit.Spectral.Emulation.Tape;
 
 public sealed class TapeManager
@@ -21,11 +18,11 @@ public sealed class TapeManager
     public delegate void TapeEjectedEvent(EventArgs e);
     public event TapeEjectedEvent? TapeEjected;
 
-    internal TapeManager(Z80 z80, IMemory memory, ScreenBuffer screenBuffer, HardwareSettings hardware)
+    internal TapeManager(Emulator emulator, HardwareSettings hardware)
     {
-        TapePlayer = new TapePlayer(z80.Clock, hardware);
-        FileLoader = new FileLoader(z80, memory, screenBuffer, TapePlayer);
-        FastFileLoader = new FastFileLoader(z80, memory, TapePlayer);
+        TapePlayer = new TapePlayer(emulator.Z80.Clock, hardware);
+        FileLoader = new FileLoader(emulator);
+        FastFileLoader = new FastFileLoader(emulator.Z80, emulator.Memory, TapePlayer);
     }
 
     public void LoadAndRun(string fileName)
@@ -70,7 +67,6 @@ public sealed class TapeManager
     public void PlayTape()
     {
         TapePlayer.Play();
-
         TapePlaying?.Invoke(EventArgs.Empty);
     }
 
@@ -81,5 +77,4 @@ public sealed class TapeManager
     }
 
     private static bool IsSnaFile(string fileName) => Path.GetExtension(fileName).Equals(".sna", StringComparison.InvariantCultureIgnoreCase);
-
 }
