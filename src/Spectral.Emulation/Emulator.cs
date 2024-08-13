@@ -139,7 +139,7 @@ public sealed class Emulator
     {
         _screenBuffer.UpdateBorder(_z80.Clock.FrameTicks);
 
-        _z80.INT(0xFF);
+        _z80.TriggerInt(0xFF);
 
         RenderScreen?.Invoke(_screenBuffer.FrameBuffer);
     }
