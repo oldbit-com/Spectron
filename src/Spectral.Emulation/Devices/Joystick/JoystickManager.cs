@@ -18,9 +18,15 @@ public sealed class JoystickManager
             _joystick = null;
         }
 
-        if (joystickType == JoystickType.Kempston)
+        _joystick = joystickType switch
         {
-            _joystick = new KempstonJoystick();
+            JoystickType.Kempston => new KempstonJoystick(),
+            JoystickType.Fuller => new FullerJoystick(),
+            _ => null
+        };
+
+        if (_joystick != null)
+        {
             _spectrumBus.AddDevice(_joystick);
         }
     }

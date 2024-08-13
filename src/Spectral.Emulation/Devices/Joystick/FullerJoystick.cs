@@ -1,9 +1,40 @@
 namespace OldBit.Spectral.Emulation.Devices.Joystick;
 
-public class FullerJoystick
+internal class FullerJoystick : IJoystick
 {
-    // This joystick port used port 7Fh, which returned F--RLDU, whose active bits were low
-    // (0=triggered, 1=untriggered). It supported standard Atari-style joysticks just as with
-    // the Kempston, Interface 2, and Cursor joystick interfaces. The Fuller interface is quite
-    // a rare item these days as they didn't sell in great numbers.
+    private const Word FullerPort = 0x7F;
+    private const byte None = 0xFF;
+    private const byte Right = 0x08;
+    private const byte Left = 0x04;
+    private const byte Down = 0x02;
+    private const byte Up = 0x01;
+    private const byte Fire = 0x80;
+
+    private byte _joystickState = None;
+
+    public byte? ReadPort(Word address) => address != FullerPort ? null : _joystickState;
+
+    public void HandleInput(JoystickInput input, bool isOn)
+    {
+        var value = GetValue(input);
+
+        if (isOn)
+        {
+            _joystickState &= (byte)~value;
+        }
+        else
+        {
+            _joystickState |= value;
+        }
+    }
+
+    private static byte GetValue(JoystickInput input) => input switch
+    {
+        JoystickInput.Left => Left,
+        JoystickInput.Right => Right,
+        JoystickInput.Up => Up,
+        JoystickInput.Down => Down,
+        JoystickInput.Fire => Fire,
+        _ => None
+    };
 }
