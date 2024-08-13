@@ -20,7 +20,15 @@ internal sealed class SpectrumBus : IBus
         }
     }
 
-    internal void RemoveDevice(IDevice device) => _devices.Remove(device);
+    internal void RemoveDevice(IDevice? device)
+    {
+        if (device == null)
+        {
+            return;
+        }
+
+        _devices.Remove(device);
+    }
 
     public byte Read(Word address)
     {
