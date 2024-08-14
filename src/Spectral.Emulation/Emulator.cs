@@ -75,6 +75,7 @@ public sealed class Emulator
         Memory.Reset();
         Z80.Reset();
         ScreenBuffer.Reset();
+        _ulaPlus.Reset();
     }
 
     private void SetupEventHandlers()

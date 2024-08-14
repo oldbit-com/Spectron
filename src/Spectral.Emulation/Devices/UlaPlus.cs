@@ -14,11 +14,20 @@ internal sealed class UlaPlus : IDevice
 
     private readonly Color[][] _paletteColors = [new Color[16], new Color[16], new Color[16], new Color[16]];
     private Register _register;
+    private bool _isActive;
 
     private int _paletteGroup;
     private byte _lastWrittenValue;
 
-    internal bool IsActive { get; private set; }
+    internal bool IsActive
+    {
+        get => _isActive;
+        private set
+        {
+            _isActive = value;
+            ActiveChanged?.Invoke(EventArgs.Empty);
+        }
+    }
     internal bool IsEnabled { get; set; }
 
     internal delegate void ActiveChangedEvent(EventArgs e);
@@ -48,13 +57,10 @@ internal sealed class UlaPlus : IDevice
                         var color = TranslateColor(value);
 
                         _paletteColors[paletteIndex][colorIndex] = color;
-
                         break;
 
                     case Register.ModeGroup:
                         IsActive = (value & 0x01) == 0x01;
-                        ActiveChanged?.Invoke(EventArgs.Empty);
-
                         break;
                 }
                 break;
@@ -87,6 +93,20 @@ internal sealed class UlaPlus : IDevice
         var colorIndex = ((attribute >> 3) & 0x07) | 8;
 
         return palette[colorIndex];
+    }
+
+    internal void Reset()
+    {
+        IsActive = false;
+
+        _paletteGroup = 0;
+        _register = Register.PaletteGroup;
+        _lastWrittenValue = 0;
+
+        foreach (var palette in _paletteColors)
+        {
+            Array.Fill(palette, Palette.White);
+        }
     }
 
     private static Color TranslateColor(int value)
