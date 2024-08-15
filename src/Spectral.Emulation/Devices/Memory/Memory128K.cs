@@ -12,7 +12,6 @@ internal sealed class Memory128K : IEmulatorMemory
 
     private readonly byte[] _rom48;
     private readonly byte[] _rom128;
-    private readonly byte[][] _banks = new byte[8][];
 
     private byte[] _activeScreen;
     private byte[] _activeRom;
@@ -21,27 +20,28 @@ internal sealed class Memory128K : IEmulatorMemory
 
     internal delegate void BankPagedEvent(int bankId);
     internal event BankPagedEvent? BankPaged;
+    internal byte[][] Banks { get; } = new byte[8][];
 
     internal Memory128K(byte[] rom128, byte[] rom48)
     {
         _rom48 = rom48;
         _rom128 = rom128;
 
-        for (var bank = 0; bank < _banks.Length; bank++)
+        for (var bank = 0; bank < Banks.Length; bank++)
         {
-            _banks[bank] = new byte[0x4000];
+            Banks[bank] = new byte[0x4000];
         }
 
         _activeRom = rom128;
-        _activeScreen = _banks[5];
-        _activeRam = _banks[0];
+        _activeScreen = Banks[5];
+        _activeRam = Banks[0];
     }
 
     public byte Read(Word address) => address switch
     {
         < 0x4000 => _activeRom[address],
-        < 0x8000 => _banks[5][address - 0x4000],
-        < 0xC000 => _banks[2][address - 0x8000],
+        < 0x8000 => Banks[5][address - 0x4000],
+        < 0xC000 => Banks[2][address - 0x8000],
         _ => _activeRam[address - 0xC000]
     };
 
@@ -54,8 +54,8 @@ internal sealed class Memory128K : IEmulatorMemory
 
         var (bank, relativeAddress) = address switch
         {
-            < 0x8000 => (_banks[5], (Word)(address - 0x4000)),
-            < 0xC000 => (_banks[2], (Word)(address - 0x8000)),
+            < 0x8000 => (Banks[5], (Word)(address - 0x4000)),
+            < 0xC000 => (Banks[2], (Word)(address - 0x8000)),
             _ => (_activeRam, (Word)(address - 0xC000))
         };
 
@@ -88,8 +88,8 @@ internal sealed class Memory128K : IEmulatorMemory
         _isPagingDisabledUntilReset = false;
 
         _activeRom = _rom128;
-        _activeScreen = _banks[5];
-        _activeRam = _banks[0];
+        _activeScreen = Banks[5];
+        _activeRam = Banks[0];
     }
 
     public byte ReadScreen(Word address) => _activeScreen[address];
@@ -135,7 +135,7 @@ internal sealed class Memory128K : IEmulatorMemory
     private void SelectActiveRamBank(byte pagingMode)
     {
         var bankId = pagingMode & RamBankMask;
-        var bank = _banks[bankId];
+        var bank = Banks[bankId];
 
         if (ReferenceEquals(_activeRam, bank))
         {
@@ -169,21 +169,21 @@ internal sealed class Memory128K : IEmulatorMemory
 
     private void SelectNormalScreen()
     {
-        if (ReferenceEquals(_activeScreen, _banks[5]))
+        if (ReferenceEquals(_activeScreen, Banks[5]))
         {
             return;
         }
 
-        _activeScreen = _banks[5];
+        _activeScreen = Banks[5];
     }
 
     private void SelectShadowScreen()
     {
-        if (ReferenceEquals(_activeScreen, _banks[7]))
+        if (ReferenceEquals(_activeScreen, Banks[7]))
         {
             return;
         }
 
-        _activeScreen = _banks[7];
+        _activeScreen = Banks[7];
     }
 }

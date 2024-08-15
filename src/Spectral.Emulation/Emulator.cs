@@ -96,7 +96,7 @@ public sealed class Emulator
 
     private void SetupUlaAndDevices(bool useAYSound)
     {
-        var ula = new Ula(Memory, KeyboardHandler, _beeper, ScreenBuffer, Cpu.Clock, TapeManager.TapePlayer);
+        var ula = new Ula(KeyboardHandler, _beeper, ScreenBuffer, Cpu.Clock, TapeManager.TapePlayer);
 
         _spectrumBus.AddDevice(ula);
         _spectrumBus.AddDevice(_ulaPlus);

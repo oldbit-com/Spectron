@@ -21,7 +21,7 @@ public sealed class TapeManager
     internal TapeManager(Emulator emulator, HardwareSettings hardware)
     {
         TapePlayer = new TapePlayer(emulator.Cpu.Clock, hardware);
-        FileLoader = new FileLoader(emulator);
+        FileLoader = new FileLoader();
         FastFileLoader = new FastFileLoader(emulator.Cpu, emulator.Memory, TapePlayer);
     }
 

@@ -8,13 +8,6 @@ namespace OldBit.Spectral.Emulation.Tape;
 
 public sealed class FileLoader
 {
-    private readonly Emulator _emulator;
-
-    internal FileLoader(Emulator emulator)
-    {
-        _emulator = emulator;
-    }
-
     public static Emulator LoadSnapshot(string fileName, FileType fileType)
     {
         switch (fileType)
@@ -23,13 +16,11 @@ public sealed class FileLoader
                 return SnaFileLoader.Load(fileName);
 
             case FileType.Szx:
-                var szxFileLoader = new SzxFileLoader();
+                //var szxFileLoader = new SzxFileLoader();
                 throw new NotImplementedException();
 
             case FileType.Z80:
-                // var z80FileLoader = new Z80FileLoader();
-                // z80FileLoader.Load(fileName);
-                throw new NotImplementedException();
+                return Z80FileLoader.Load(fileName);
 
             default:
                 throw new NotSupportedException($"The file extension '{Path.GetExtension(fileName)}' is not supported.");
