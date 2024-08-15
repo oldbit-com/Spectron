@@ -8,6 +8,8 @@ public sealed class JoystickManager
     private readonly KeyboardHandler _keyboardHandler;
     private IJoystick? _joystick;
 
+    public JoystickType JoystickType { get; private set; } = JoystickType.None;
+
     internal JoystickManager(SpectrumBus spectrumBus, KeyboardHandler keyboardHandler)
     {
         _spectrumBus = spectrumBus;
@@ -16,6 +18,8 @@ public sealed class JoystickManager
 
     public void SetupJoystick(JoystickType joystickType)
     {
+        JoystickType = joystickType;
+
         _spectrumBus.RemoveDevice(_joystick);
 
         _joystick = joystickType switch

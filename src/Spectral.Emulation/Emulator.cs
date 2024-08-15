@@ -31,19 +31,24 @@ public sealed class Emulator
     public KeyboardHandler KeyboardHandler { get; } = new();
     public TapeManager TapeManager { get; }
     public JoystickManager JoystickManager { get; }
+    public ComputerType ComputerType { get; }
+    public RomType RomType { get; }
 
-    internal Z80 Z80 { get; }
+    internal Z80 Cpu { get; }
     internal IEmulatorMemory Memory { get; }
     internal ScreenBuffer ScreenBuffer { get; }
 
     internal Emulator(EmulatorSettings emulator, HardwareSettings hardware)
     {
+        ComputerType = emulator.ComputerType;
+        RomType = emulator.RomType;
         Memory = emulator.Memory;
         _beeper = emulator.Beeper;
+
         _ulaPlus = new UlaPlus();
         _spectrumBus = new SpectrumBus();
         ScreenBuffer = new ScreenBuffer(emulator.Memory, _ulaPlus);
-        Z80 = new Z80(emulator.Memory, emulator.ContentionProvider);
+        Cpu = new Z80(emulator.Memory, emulator.ContentionProvider);
 
         TapeManager = new TapeManager(this, hardware);
         JoystickManager = new JoystickManager(_spectrumBus, KeyboardHandler);
@@ -73,7 +78,7 @@ public sealed class Emulator
     public void Reset()
     {
         Memory.Reset();
-        Z80.Reset();
+        Cpu.Reset();
         ScreenBuffer.Reset();
         _ulaPlus.Reset();
     }
@@ -82,16 +87,16 @@ public sealed class Emulator
     {
         Memory.ScreenMemoryUpdated += address => ScreenBuffer.UpdateScreen(address);
 
-        Z80.Clock.TicksAdded += (_, _, currentFrameTicks) => ScreenBuffer.UpdateContent(currentFrameTicks);
+        Cpu.Clock.TicksAdded += (_, _, currentFrameTicks) => ScreenBuffer.UpdateContent(currentFrameTicks);
 
-        Z80.BeforeFetch += BeforeInstructionFetch;
+        Cpu.BeforeFetch += BeforeInstructionFetch;
 
         _ulaPlus.ActiveChanged += (_) => _invalidateScreen = true;
     }
 
     private void SetupUlaAndDevices(bool useAYSound)
     {
-        var ula = new Ula(Memory, KeyboardHandler, _beeper, ScreenBuffer, Z80.Clock, TapeManager.TapePlayer);
+        var ula = new Ula(Memory, KeyboardHandler, _beeper, ScreenBuffer, Cpu.Clock, TapeManager.TapePlayer);
 
         _spectrumBus.AddDevice(ula);
         _spectrumBus.AddDevice(_ulaPlus);
@@ -102,10 +107,10 @@ public sealed class Emulator
             _spectrumBus.AddDevice(new AY8910());
         }
 
-        var floatingBus = new FloatingBus(Memory, Z80.Clock);
+        var floatingBus = new FloatingBus(Memory, Cpu.Clock);
         _spectrumBus.AddDevice(floatingBus);
 
-        Z80.AddBus(_spectrumBus);
+        Cpu.AddBus(_spectrumBus);
     }
 
     private Thread SetupWorkerThread() => new(WorkerThread)
@@ -118,7 +123,7 @@ public sealed class Emulator
     {
         StartFrame();
 
-        Z80.Run(DefaultTimings.FrameTicks);
+        Cpu.Run(DefaultTimings.FrameTicks);
 
         EndFrame();
 
@@ -131,15 +136,15 @@ public sealed class Emulator
 
     private void StartFrame()
     {
-        Z80.Clock.NewFrame();
+        Cpu.Clock.NewFrame();
         ScreenBuffer.NewFrame();
     }
 
     private void EndFrame()
     {
-        ScreenBuffer.UpdateBorder(Z80.Clock.FrameTicks);
+        ScreenBuffer.UpdateBorder(Cpu.Clock.FrameTicks);
 
-        Z80.TriggerInt(0xFF);
+        Cpu.TriggerInt(0xFF);
 
         RenderScreen?.Invoke(ScreenBuffer.FrameBuffer);
     }

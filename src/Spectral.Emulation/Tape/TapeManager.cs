@@ -20,16 +20,19 @@ public sealed class TapeManager
 
     internal TapeManager(Emulator emulator, HardwareSettings hardware)
     {
-        TapePlayer = new TapePlayer(emulator.Z80.Clock, hardware);
+        TapePlayer = new TapePlayer(emulator.Cpu.Clock, hardware);
         FileLoader = new FileLoader(emulator);
-        FastFileLoader = new FastFileLoader(emulator.Z80, emulator.Memory, TapePlayer);
+        FastFileLoader = new FastFileLoader(emulator.Cpu, emulator.Memory, TapePlayer);
     }
 
     public void LoadAndRun(string fileName)
     {
-        if (IsSnaFile(fileName))
+        var fileType = FileTypeHelper.GetFileType(fileName);
+        if (fileType.IsSnapshot())
         {
-            FileLoader.LoadFile(fileName);
+            var emulator = FileLoader.LoadSnapshot(fileName, fileType);
+
+
             return;
         }
 

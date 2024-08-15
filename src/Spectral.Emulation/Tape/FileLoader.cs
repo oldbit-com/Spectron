@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using OldBit.Spectral.Emulation.Loaders;
+using OldBit.Spectral.Emulation.Snapshot;
 using OldBit.ZXTape.Extensions;
 using OldBit.ZXTape.Tap;
 using OldBit.ZXTape.Tzx;
@@ -15,27 +15,33 @@ public sealed class FileLoader
         _emulator = emulator;
     }
 
+    public static Emulator LoadSnapshot(string fileName, FileType fileType)
+    {
+        switch (fileType)
+        {
+            case FileType.Sna:
+                return SnaFileLoader.Load(fileName);
+
+            case FileType.Szx:
+                var szxFileLoader = new SzxFileLoader();
+                throw new NotImplementedException();
+
+            case FileType.Z80:
+                // var z80FileLoader = new Z80FileLoader();
+                // z80FileLoader.Load(fileName);
+                throw new NotImplementedException();
+
+            default:
+                throw new NotSupportedException($"The file extension '{Path.GetExtension(fileName)}' is not supported.");
+        }
+    }
+
     public void LoadFile(string fileName)
     {
         var fileType = FileTypeHelper.GetFileType(fileName);
 
         switch (fileType)
         {
-            case FileType.Sna:
-                var snaFileLoader = new SnaFileLoader(_emulator);
-                snaFileLoader.Load(fileName);
-                break;
-
-            case FileType.Szx:
-                var szxFileLoader = new SzxFileLoader();
-                szxFileLoader.Load(fileName);
-                break;
-
-            case FileType.Z80:
-                var z80FileLoader = new Z80FileLoader(_emulator);
-                z80FileLoader.Load(fileName);
-                break;
-
             case FileType.Tap:
                 LoadTap(fileName);
                 break;

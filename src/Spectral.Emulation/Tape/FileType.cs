@@ -1,6 +1,6 @@
 namespace OldBit.Spectral.Emulation.Tape;
 
-internal enum FileType
+public enum FileType
 {
     Tap,
 
@@ -15,8 +15,8 @@ internal enum FileType
     Unsupported
 }
 
-internal static class FileTypeExtensions
+public static class FileTypeExtensions
 {
-    internal static bool IsSnapshot(this FileType fileType) =>
+    public static bool IsSnapshot(this FileType fileType) =>
         fileType is FileType.Sna or FileType.Z80 or FileType.Szx;
 }

@@ -7,6 +7,7 @@ namespace OldBit.Spectral.Emulation;
 
 internal sealed record EmulatorSettings(
     ComputerType ComputerType,
+    RomType RomType,
     IEmulatorMemory Memory,
     IContentionProvider ContentionProvider,
     Beeper Beeper,
@@ -24,11 +25,14 @@ public static class EmulatorFactory
     };
 
     private static Emulator CreateSpectrum16K(RomType romType) =>
-        CreateSpectrum16Or48K(new Memory16K(
-            RomReader.ReadRom(romType == RomType.Original ? RomType.Original48 : romType)));
+        CreateSpectrum16Or48K(
+            romType,
+            new Memory16K(RomReader.ReadRom(romType == RomType.Original ? RomType.Original48 : romType)));
 
     private static Emulator CreateSpectrum48K(RomType romType) =>
-        CreateSpectrum16Or48K(new Memory48K(RomReader.ReadRom(romType == RomType.Original ? RomType.Original48 : romType)));
+        CreateSpectrum16Or48K(
+            romType,
+            new Memory48K(RomReader.ReadRom(romType == RomType.Original ? RomType.Original48 : romType)));
 
     private static Emulator CreateSpectrum128K(RomType romType)
     {
@@ -46,6 +50,7 @@ public static class EmulatorFactory
 
         var emulatorSettings = new EmulatorSettings(
             ComputerType.Spectrum128K,
+            romType,
             memory,
             contentionProvider,
             new Beeper(Hardware.Spectrum128K.ClockMhz),
@@ -54,14 +59,17 @@ public static class EmulatorFactory
         return new Emulator(emulatorSettings, Hardware.Spectrum128K);
     }
 
-    private static Emulator CreateSpectrum16Or48K(IEmulatorMemory memory)
+    private static Emulator CreateSpectrum16Or48K(RomType romType, IEmulatorMemory memory)
     {
+        var contentionProvider = new ContentionProvider(
+            Hardware.Spectrum48K.FirstPixelTick,
+            Hardware.Spectrum48K.TicksPerLine);
+
         var emulatorSettings = new EmulatorSettings(
             ComputerType.Spectrum48K,
+            romType,
             memory,
-            new ContentionProvider(
-                Hardware.Spectrum48K.FirstPixelTick,
-                Hardware.Spectrum48K.TicksPerLine),
+            contentionProvider,
             new Beeper(Hardware.Spectrum48K.ClockMhz),
             UseAYSound: false);
 

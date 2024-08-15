@@ -1,4 +1,4 @@
-namespace OldBit.Spectral.Emulation.Loaders;
+namespace OldBit.Spectral.Emulation.Snapshot;
 
 internal class SzxFileLoader
 {

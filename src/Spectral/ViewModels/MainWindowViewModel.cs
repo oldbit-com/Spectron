@@ -13,6 +13,7 @@ using OldBit.Spectral.Emulation;
 using OldBit.Spectral.Emulation.Devices.Joystick;
 using OldBit.Spectral.Emulation.Rom;
 using OldBit.Spectral.Emulation.Screen;
+using OldBit.Spectral.Emulation.Tape;
 using OldBit.Spectral.Helpers;
 using OldBit.Spectral.Models;
 using OldBit.Spectral.Preferences;
@@ -112,7 +113,7 @@ public class MainWindowViewModel : ViewModelBase
         RomType = _defaultSettings.RomType;
         JoystickType = _defaultSettings.JoystickType;
 
-        InitializeEmulator();
+        CreateNewEmulator();
     }
 
     private async Task WindowClosingAsync()
@@ -126,9 +127,15 @@ public class MainWindowViewModel : ViewModelBase
         await SettingsManager.SaveAsync(_defaultSettings);
     }
 
-    private void InitializeEmulator()
+    private void CreateNewEmulator() =>
+        InitializeEmulator(EmulatorFactory.Create(ComputerType, RomType));
+
+    private void InitializeEmulator(Emulator emulator)
     {
-        Emulator = EmulatorFactory.Create(ComputerType, RomType);
+        Emulator?.Stop();
+
+        Emulator = emulator;
+
         Emulator.IsUlaPlusEnabled = IsUlaPlusEnabled;
         Emulator.JoystickManager.SetupJoystick(JoystickType);
         Emulator.RenderScreen += EmulatorOnRenderScreen;
@@ -148,7 +155,22 @@ public class MainWindowViewModel : ViewModelBase
             try
             {
                 Emulator?.Pause();
-                Emulator?.TapeManager.LoadAndRun(files[0].Path.LocalPath);
+
+                var fileType = FileTypeHelper.GetFileType(files[0].Path.LocalPath);
+                if (fileType.IsSnapshot())
+                {
+                    var emulator = FileLoader.LoadSnapshot(files[0].Path.LocalPath, fileType);
+
+                    ComputerType = emulator.ComputerType;
+                    RomType = emulator.RomType;
+                    JoystickType = emulator.JoystickManager.JoystickType;
+
+                    InitializeEmulator(emulator);
+                }
+                else
+                {
+                    Emulator?.TapeManager.LoadAndRun(files[0].Path.LocalPath);
+                }
             }
             catch (Exception ex)
             {
@@ -179,7 +201,7 @@ public class MainWindowViewModel : ViewModelBase
             Emulator.RenderScreen -= EmulatorOnRenderScreen;
         }
 
-        InitializeEmulator();
+        CreateNewEmulator();
     }
 
     private void HandleChangeComputerType(ComputerType computerType)
@@ -187,7 +209,7 @@ public class MainWindowViewModel : ViewModelBase
         ComputerType = computerType;
 
         Emulator?.Stop();
-        InitializeEmulator();
+        CreateNewEmulator();
     }
 
     private void HandleChangeJoystickType(JoystickType joystickType)
