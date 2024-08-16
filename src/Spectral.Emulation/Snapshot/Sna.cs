@@ -114,54 +114,40 @@ internal static class Sna
 
     private static void LoadMemory(SnaFile snapshot, Memory128K memory)
     {
-        var loadedPages = new bool[8];
+        // Load Bank 5
+        LoadBank(memory.Banks[5], snapshot.Ram48);
 
-        // Bank 5
-        var bank = 5;
-        for (var i = 0x4000; i <= 0x7FFF; i++)
-        {
-            memory.Banks[bank][i - 0x4000] = snapshot.Ram48[i - 0x4000];
-        }
-        loadedPages[bank] = true;
-
-        // Bank 2
-        bank = 2;
-        for (var i = 0x8000; i <= 0xBFFF; i++)
-        {
-            memory.Banks[bank][i - 0x8000] = snapshot.Ram48[i - 0x4000];
-        }
-        loadedPages[bank] = true;
+        // Load Bank 2
+        LoadBank(memory.Banks[2], snapshot.Ram48, 0x4000);
 
         // Bank n, skip if already loaded e.g. 5 or 2
-        bank = snapshot.Header128!.PageMode & 0x07;
-        if (!loadedPages[bank])
+        var bankN = snapshot.Header128!.PageMode & 0x07;
+        if (bankN != 5 && bankN != 2)
         {
-            for (var i = 0xC000; i <= 0xFFFF; i++)
-            {
-                memory.Banks[bank][i - 0xC000] = snapshot.Ram48[i - 0x4000];
-            }
-
-            loadedPages[bank] = true;
+            LoadBank(memory.Banks[bankN], snapshot.Ram48, 0x8000);
         }
 
         // Remaining banks
         var currentSnaBank = 0;
-        for (bank = 0; bank < 8; bank++)
+        for (var bank = 0; bank < 8; bank++)
         {
-            if (loadedPages[bank])
+            if (bank == 2 || bank == 5 || bank == bankN)
             {
                 continue;
             }
 
-            for (var j = 0; j < 0x4000; j++)
-            {
-                memory.Banks[bank][j] = snapshot.RamBanks![currentSnaBank][j];
-            }
-            loadedPages[bank] = true;
-
-            currentSnaBank += 1;
+            LoadBank(memory.Banks[bank], snapshot.RamBanks![currentSnaBank]);
+            currentSnaBank++;
         }
 
         memory.SetPagingMode(snapshot.Header128.PageMode);
+    }
+
+    private static void LoadBank(byte[] bank, byte[] data, int offset = 0)
+    {
+        for (var i = 0; i < 0x4000; i++)
+        {
+            bank[i] = data[i + offset];
+        }
     }
 }
