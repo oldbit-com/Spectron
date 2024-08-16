@@ -8,10 +8,10 @@ internal sealed class ScreenBuffer
     private readonly Border _border;
     private readonly Content _content;
 
-    private Color _lastBorderColor;
     private bool _borderColorChanged = true;
 
     public FrameBuffer FrameBuffer { get; } = new(Palette.White);
+    internal Color LastBorderColor { get; private set; }
 
     internal ScreenBuffer(IEmulatorMemory memory, UlaPlus ulaPlus)
     {
@@ -27,9 +27,9 @@ internal sealed class ScreenBuffer
 
     internal void UpdateBorder(Color borderColor, int frameTicks = 0)
     {
-        if (_lastBorderColor != borderColor)
+        if (LastBorderColor != borderColor)
         {
-            _lastBorderColor = borderColor;
+            LastBorderColor = borderColor;
             _borderColorChanged = true;
         }
 
@@ -55,7 +55,7 @@ internal sealed class ScreenBuffer
         _content.Invalidate();
     }
 
-    internal void UpdateBorder(int frameTicks) => _border.Update(_lastBorderColor, frameTicks);
+    internal void UpdateBorder(int frameTicks) => _border.Update(LastBorderColor, frameTicks);
 
     internal void UpdateContent(int frameTicks) => _content.Update(frameTicks);
 

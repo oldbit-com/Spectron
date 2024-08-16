@@ -52,6 +52,7 @@
                     <!-- <NativeMenuItem Header="Open Recent"> -->
                     <!--     <NativeMenu NeedsUpdate="OpenRecent_OnNeedsUpdate" /> -->
                     <!-- </NativeMenuItem> -->
+                    <NativeMenuItem Header="Save Snapshot..." Gesture="Cmd+S" Command="{Binding SaveFileCommand}"/>
                 </NativeMenu>
             </NativeMenuItem>
             <NativeMenuItem Header="Emulator">

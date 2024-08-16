@@ -8,7 +8,7 @@ using OldBit.ZXTape.Z80.Types;
 
 namespace OldBit.Spectral.Emulation.Snapshot;
 
-internal static class Z80FileLoader
+internal static class Z80
 {
     internal static Emulator Load(string fileName)
     {
@@ -57,6 +57,15 @@ internal static class Z80FileLoader
         screenBuffer.UpdateBorder(borderColor);
 
         return emulator;
+    }
+
+    internal static void Save(string fileName, Emulator emulator)
+    {
+        var snapshot = new Z80File();
+
+        // TODO: Populate snapshot with emulator state
+
+        snapshot.Save(fileName);
     }
 
     private static void LoadMemory(ComputerType computerType, Z80File snapshot, IMemory memory)

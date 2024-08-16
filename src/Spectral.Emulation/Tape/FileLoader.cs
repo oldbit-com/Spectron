@@ -13,14 +13,13 @@ public sealed class FileLoader
         switch (fileType)
         {
             case FileType.Sna:
-                return SnaFileLoader.Load(fileName);
+                return Sna.Load(fileName);
 
             case FileType.Szx:
-                //var szxFileLoader = new SzxFileLoader();
-                throw new NotImplementedException();
+                return Szx.Load(fileName);
 
             case FileType.Z80:
-                return Z80FileLoader.Load(fileName);
+                return Z80.Load(fileName);
 
             default:
                 throw new NotSupportedException($"The file extension '{Path.GetExtension(fileName)}' is not supported.");

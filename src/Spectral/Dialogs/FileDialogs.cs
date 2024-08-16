@@ -24,12 +24,12 @@ public static class FileDialogs
             AllowMultiple = false,
             FileTypeFilter = new[]
             {
-                TapeFileTypes.All,
-                TapeFileTypes.Sna,
-                TapeFileTypes.Szx,
-                TapeFileTypes.Tap,
-                TapeFileTypes.Tzx,
-                TapeFileTypes.Z80
+                FileTypes.All,
+                FileTypes.Sna,
+                FileTypes.Szx,
+                FileTypes.Tap,
+                FileTypes.Tzx,
+                FileTypes.Z80
             }
         });
     }
@@ -48,10 +48,36 @@ public static class FileDialogs
             AllowMultiple = false,
             FileTypeFilter = new[]
             {
-                TapeFileTypes.TapTzx,
-                TapeFileTypes.Tap,
-                TapeFileTypes.Tzx
+                FileTypes.TapeFiles,
+                FileTypes.Tap,
+                FileTypes.Tzx
             }
+        });
+    }
+
+    public static async Task<IStorageFile?> SaveSnapshotFileAsync(string? suggestedFileName = null)
+    {
+        var topLevel = TopLevel.GetTopLevel(MainWindow);
+        if (topLevel == null)
+        {
+            return null;
+        }
+
+        var documentsFolder = await topLevel.StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
+
+        return await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Save Snapshot File",
+            DefaultExtension = ".z80",
+            SuggestedFileName = suggestedFileName,
+            SuggestedStartLocation = documentsFolder,
+            ShowOverwritePrompt = true,
+            FileTypeChoices = new[]
+            {
+                FileTypes.Szx,
+                FileTypes.Z80,
+                FileTypes.Sna
+            },
         });
     }
 }

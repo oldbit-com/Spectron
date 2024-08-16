@@ -21,6 +21,7 @@ internal sealed class Memory128K : IEmulatorMemory
     internal delegate void BankPagedEvent(int bankId);
     internal event BankPagedEvent? BankPaged;
     internal byte[][] Banks { get; } = new byte[8][];
+    internal byte LastPortValue { get; private set; }
 
     internal Memory128K(byte[] rom128, byte[] rom48)
     {
@@ -77,10 +78,13 @@ internal sealed class Memory128K : IEmulatorMemory
     public void WritePort(Word address, byte data)
     {
         // Port 0x7FFD is decoded as: A15=0 & A1=0
-        if ((address & 0x8002) == 0)
+        if ((address & 0x8002) != 0)
         {
-            SetPagingMode(data);
+            return;
         }
+
+        SetPagingMode(data);
+        LastPortValue = data;
     }
 
     public void Reset()

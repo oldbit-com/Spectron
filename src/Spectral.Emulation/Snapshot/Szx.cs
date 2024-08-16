@@ -1,8 +1,8 @@
 namespace OldBit.Spectral.Emulation.Snapshot;
 
-internal class SzxFileLoader
+internal static class Szx
 {
-    public void Load(string fileName)
+    internal static Emulator Load(string fileName)
     {
         throw new NotImplementedException();
     }

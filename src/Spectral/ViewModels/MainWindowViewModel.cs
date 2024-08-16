@@ -44,6 +44,7 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<KeyEventArgs, Unit> KeyDownCommand { get; private set; }
     public ReactiveCommand<KeyEventArgs, Unit> KeyUpCommand { get; private set; }
     public ReactiveCommand<Unit, Task> OpenFileCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> SaveFileCommand { get; private set; }
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     public ReactiveCommand<RomType, Unit> ChangeRomCommand { get; private set; }
     public ReactiveCommand<ComputerType, Unit> ChangeComputerType { get; private set; }
@@ -67,6 +68,7 @@ public class MainWindowViewModel : ViewModelBase
         KeyDownCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyDown);
         KeyUpCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyUp);
         OpenFileCommand = ReactiveCommand.Create(HandleOpenFileAsync);
+        SaveFileCommand = ReactiveCommand.Create(HandleSaveFileAsync);
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
         ChangeRomCommand = ReactiveCommand.Create<RomType>(HandleChangeRom);
         ChangeComputerType = ReactiveCommand.Create<ComputerType>(HandleChangeComputerType);
@@ -180,6 +182,24 @@ public class MainWindowViewModel : ViewModelBase
             {
                 Emulator?.Resume();
             }
+        }
+    }
+
+    private async Task HandleSaveFileAsync()
+    {
+        try
+        {
+            Emulator?.Pause();
+
+            var file = await FileDialogs.SaveSnapshotFileAsync();
+            if (file == null)
+            {
+                return;
+            }
+        }
+        finally
+        {
+            Emulator?.Resume();
         }
     }
 
