@@ -89,7 +89,10 @@
                         </NativeMenu>
                     </NativeMenuItem>
                     <NativeMenuItem Header="Enable ULA+" ToggleType="CheckBox" Command="{Binding ToggleUlaPlus}" IsChecked="{Binding IsUlaPlusEnabled}"/>
-                    <NativeMenuItemSeparator/>
+                </NativeMenu>
+            </NativeMenuItem>
+            <NativeMenuItem Header="Control">
+                <NativeMenu>
                     <NativeMenuItem Header="Speed">
                         <NativeMenu>
                             <NativeMenuItem Header="25%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="25" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='25'}"/>
@@ -105,6 +108,7 @@
                             <NativeMenuItem Header="500%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="500" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='500'}"/>
                         </NativeMenu>
                     </NativeMenuItem>
+                    <NativeMenuItemSeparator/>
                     <NativeMenuItem Header="Pause" Gesture="F11" Command="{Binding PauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
                     <NativeMenuItem Header="Reset" Command="{Binding ResetCommand}"/>
                 </NativeMenu>

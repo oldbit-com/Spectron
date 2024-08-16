@@ -78,6 +78,9 @@ public sealed class Emulator
         _ulaPlus.Reset();
     }
 
+    public void SetSpeed(int speed) =>
+        _timer.Interval = TimeSpan.FromMilliseconds(20 * (100f / speed));
+
     private void SetupEventHandlers()
     {
         Memory.ScreenMemoryUpdated += address => ScreenBuffer.UpdateScreen(address);

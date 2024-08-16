@@ -273,6 +273,12 @@ public class MainWindowViewModel : ViewModelBase
 
     private void HandleSetSpeed(string speed)
     {
+        if (!int.TryParse(speed, out var speedValue))
+        {
+            return;
+        }
+
+        Emulator?.SetSpeed(speedValue);
         EmulationSpeed = speed;
     }
 

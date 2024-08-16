@@ -8,11 +8,12 @@ namespace OldBit.Spectral.Emulation;
 /// </summary>
 internal sealed class EmulatorTimer
 {
-    private bool _isRunning;
     private readonly Action _callback;
     private readonly Thread _thread;
+    private bool _isRunning;
 
     internal bool IsPaused { get; private set; }
+    internal TimeSpan Interval { get; set; } = TimeSpan.FromMilliseconds(20);
 
     internal EmulatorTimer(Action callback)
     {
@@ -50,12 +51,11 @@ internal sealed class EmulatorTimer
     private void Worker()
     {
         var stopwatch = Stopwatch.StartNew();
-        var interval = TimeSpan.FromMilliseconds(20);
         var nextTrigger = TimeSpan.Zero;
 
         while (_isRunning)
         {
-            nextTrigger += interval;
+            nextTrigger += Interval;
 
             if (IsPaused)
             {
