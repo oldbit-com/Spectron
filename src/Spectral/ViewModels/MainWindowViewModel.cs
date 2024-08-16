@@ -52,6 +52,7 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> ToggleUlaPlus { get; private set; }
     public ReactiveCommand<Unit, Unit> ResetCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> PauseCommand { get; private set; }
+    public ReactiveCommand<string, Unit> SetEmulationSpeedCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleFullScreenCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> HelpKeyboardCommand { get; private set; }
 
@@ -76,6 +77,7 @@ public class MainWindowViewModel : ViewModelBase
         ToggleUlaPlus = ReactiveCommand.Create(HandleToggleUlaPlus);
         PauseCommand = ReactiveCommand.Create(HandleMachinePause, emulatorNotNull);
         ResetCommand = ReactiveCommand.Create(HandleMachineReset, emulatorNotNull);
+        SetEmulationSpeedCommand = ReactiveCommand.Create<string>(HandleSetSpeed);
         ToggleFullScreenCommand = ReactiveCommand.Create(HandleToggleFullScreen);
         HelpKeyboardCommand = ReactiveCommand.Create(HandleHelpKeyboardCommand);
 
@@ -269,6 +271,11 @@ public class MainWindowViewModel : ViewModelBase
         IsPaused = Emulator?.IsPaused ?? false;
     }
 
+    private void HandleSetSpeed(string speed)
+    {
+        EmulationSpeed = speed;
+    }
+
     private void HandleToggleFullScreen()
     {
         WindowState = WindowState == WindowState.FullScreen ? WindowState.Normal : WindowState.FullScreen;
@@ -375,6 +382,13 @@ public class MainWindowViewModel : ViewModelBase
     {
         get => _isPaused;
         set => this.RaiseAndSetIfChanged(ref _isPaused, value);
+    }
+
+    private string _emulationSpeed = "100";
+    public string EmulationSpeed
+    {
+        get => _emulationSpeed;
+        set => this.RaiseAndSetIfChanged(ref _emulationSpeed, value);
     }
 
     private WindowState _windowState = WindowState.Normal;
