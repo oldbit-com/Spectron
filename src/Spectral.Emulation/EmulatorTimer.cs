@@ -14,7 +14,7 @@ internal sealed class EmulatorTimer
 
     internal bool IsPaused { get; private set; }
 
-    public EmulatorTimer(Action callback)
+    internal EmulatorTimer(Action callback)
     {
         _callback = callback;
 
