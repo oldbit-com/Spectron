@@ -51,8 +51,9 @@ internal static class Sna
             cpu.Registers.SP += 2;
         }
 
-        screenBuffer.Reset();
         var borderColor = Palette.BorderColors[(byte)(snapshot.Header.BorderColor & 0x07)];
+
+        screenBuffer.Reset();
         screenBuffer.UpdateBorder(borderColor);
 
         return emulator;
