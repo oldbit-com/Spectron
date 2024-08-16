@@ -19,14 +19,13 @@ public sealed class Emulator
     private readonly Beeper _beeper;
     private readonly UlaPlus _ulaPlus;
     private readonly SpectrumBus _spectrumBus;
-    private readonly Thread _workerThread;
-    private bool _isRunning;
+    private readonly EmulatorTimer _timer;
     private bool _invalidateScreen;
 
     public delegate void RenderScreenEvent(FrameBuffer frameBuffer);
     public event RenderScreenEvent? RenderScreen;
 
-    public bool IsPaused { get; private set; }
+    public bool IsPaused => _timer.IsPaused;
     public bool IsUlaPlusEnabled { set => ToggleUlaPlus(value); }
     public KeyboardHandler KeyboardHandler { get; } = new();
     public TapeManager TapeManager { get; }
@@ -55,25 +54,21 @@ public sealed class Emulator
 
         SetupUlaAndDevices(emulator.UseAYSound);
         SetupEventHandlers();
-        _workerThread = SetupWorkerThread();
+
+        _timer = new EmulatorTimer(RunFrame);
     }
 
-    public void Start()
-    {
-        _isRunning = true;
-        _workerThread.Start();
-    }
+    public void Start() => _timer.Start();
 
     public void Stop()
     {
-        _isRunning = false;
         _beeper.Stop();
-        _workerThread.Join();
+        _timer.Stop();
     }
 
-    public void Pause() => IsPaused = true;
+    public void Pause() => _timer.Pause();
 
-    public void Resume() => IsPaused = false;
+    public void Resume() => _timer.Resume();
 
     public void Reset()
     {
@@ -86,11 +81,8 @@ public sealed class Emulator
     private void SetupEventHandlers()
     {
         Memory.ScreenMemoryUpdated += address => ScreenBuffer.UpdateScreen(address);
-
         Cpu.Clock.TicksAdded += (_, _, currentFrameTicks) => ScreenBuffer.UpdateContent(currentFrameTicks);
-
         Cpu.BeforeFetch += BeforeInstructionFetch;
-
         _ulaPlus.ActiveChanged += (_) => _invalidateScreen = true;
     }
 
@@ -112,12 +104,6 @@ public sealed class Emulator
 
         Cpu.AddBus(_spectrumBus);
     }
-
-    private Thread SetupWorkerThread() => new(WorkerThread)
-    {
-        IsBackground = true,
-        Priority = ThreadPriority.AboveNormal,
-    };
 
     private void RunFrame()
     {
@@ -143,9 +129,7 @@ public sealed class Emulator
     private void EndFrame()
     {
         ScreenBuffer.UpdateBorder(Cpu.Clock.FrameTicks);
-
         Cpu.TriggerInt(0xFF);
-
         RenderScreen?.Invoke(ScreenBuffer.FrameBuffer);
     }
 
@@ -153,60 +137,6 @@ public sealed class Emulator
     {
         _ulaPlus.IsEnabled = value;
         _invalidateScreen = true;
-    }
-
-    private void WorkerThread()
-    {
-        var stopwatch = Stopwatch.StartNew();
-        var interval = TimeSpan.FromMilliseconds(20);
-        var nextTrigger = TimeSpan.Zero;
-        var lastElapsed = 0L;
-
-        while (_isRunning)
-        {
-            nextTrigger += interval;
-
-            if (IsPaused)
-            {
-                Thread.Sleep(500);
-
-                nextTrigger = TimeSpan.Zero;
-                stopwatch.Restart();
-
-                continue;
-            }
-
-            while (_isRunning)
-            {
-                var timeToWait = (nextTrigger - stopwatch.Elapsed).TotalMilliseconds;
-
-                if (timeToWait <= 0)
-                {
-                    RunFrame();
-                    // Console.WriteLine("Elapsed: " + (stopwatch.ElapsedMilliseconds - lastElapsed));
-                    // lastElapsed = stopwatch.ElapsedMilliseconds;
-
-                    break;
-                }
-
-                switch (timeToWait)
-                {
-                    case < 1:
-                        Thread.SpinWait(5);
-                        break;
-
-                    case < 5:
-                        Thread.SpinWait(10);
-                        break;
-
-                    case < 10:
-                        Thread.Sleep(5);
-                        break;
-                }
-            }
-        }
-
-        stopwatch.Stop();
     }
 
     private void BeforeInstructionFetch(Word pc)
