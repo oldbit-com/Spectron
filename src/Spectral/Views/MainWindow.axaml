@@ -6,6 +6,7 @@
         xmlns:converters="clr-namespace:OldBit.Spectral.Converters"
         xmlns:models="clr-namespace:OldBit.Spectral.Models"
         xmlns:rom="clr-namespace:OldBit.Spectral.Emulation.Rom;assembly=OldBit.Spectral.Emulation"
+        xmlns:tape="clr-namespace:OldBit.Spectral.Emulation.Tape;assembly=OldBit.Spectral.Emulation"
         xmlns:joy="clr-namespace:OldBit.Spectral.Emulation.Devices.Joystick;assembly=OldBit.Spectral.Emulation"
         xmlns:controls="clr-namespace:OldBit.Spectral.Controls"
         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
@@ -136,7 +137,14 @@
                     <NativeMenuItem Header="Rewind" Command="{Binding TapeMenuViewModel.RewindCommand}"/>
                     <NativeMenuItem Header="Eject" Command="{Binding TapeMenuViewModel.EjectCommand}"/>
                     <NativeMenuItemSeparator/>
-                    <NativeMenuItem Header="Instant Tape Load" ToggleType="CheckBox" IsChecked="{Binding IsInstantLoadEnabled}" Command="{Binding ToggleInstantLoadCommand}" />
+                    <NativeMenuItem Header="Loading Speed">
+                        <NativeMenu>
+                            <NativeMenuItem Header="Normal" ToggleType="CheckBox" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeLoadingSpeed.Normal}" IsChecked="{Binding TapeLoadingSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeLoadingSpeed.Normal}}"/>
+                            <NativeMenuItem Header="Instant" ToggleType="CheckBox" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeLoadingSpeed.Instant}" IsChecked="{Binding TapeLoadingSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeLoadingSpeed.Instant}}"/>
+                            <NativeMenuItem Header="Accelerated" ToggleType="CheckBox" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeLoadingSpeed.Accelerated}" IsChecked="{Binding TapeLoadingSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeLoadingSpeed.Accelerated}}"/>
+                        </NativeMenu>
+                    </NativeMenuItem>
+
                 </NativeMenu>
             </NativeMenuItem>
             <NativeMenuItem Header="Help">

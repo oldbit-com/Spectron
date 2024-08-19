@@ -15,6 +15,7 @@ using OldBit.Spectral.Emulation.File;
 using OldBit.Spectral.Emulation.Rom;
 using OldBit.Spectral.Emulation.Screen;
 using OldBit.Spectral.Emulation.Snapshot;
+using OldBit.Spectral.Emulation.Tape;
 using OldBit.Spectral.Helpers;
 using OldBit.Spectral.Models;
 using OldBit.Spectral.Preferences;
@@ -55,7 +56,7 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> PauseCommand { get; private set; }
     public ReactiveCommand<string, Unit> SetEmulationSpeedCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleFullScreenCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> ToggleInstantLoadCommand { get; private set; }
+    public ReactiveCommand<TapeLoadingSpeed, Unit> SetTapeLoadSpeedCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> HelpKeyboardCommand { get; private set; }
 
     public MainWindowViewModel()
@@ -79,9 +80,9 @@ public class MainWindowViewModel : ViewModelBase
         ToggleUlaPlus = ReactiveCommand.Create(HandleToggleUlaPlus);
         PauseCommand = ReactiveCommand.Create(HandleMachinePause, emulatorNotNull);
         ResetCommand = ReactiveCommand.Create(HandleMachineReset, emulatorNotNull);
-        SetEmulationSpeedCommand = ReactiveCommand.Create<string>(HandleSetSpeed);
+        SetEmulationSpeedCommand = ReactiveCommand.Create<string>(HandleSetEmulationSpeed);
         ToggleFullScreenCommand = ReactiveCommand.Create(HandleToggleFullScreen);
-        ToggleInstantLoadCommand = ReactiveCommand.Create(HandleToggleInstantLoad);
+        SetTapeLoadSpeedCommand = ReactiveCommand.Create<TapeLoadingSpeed>(HandleSetTapeLoadingSpeed);
         HelpKeyboardCommand = ReactiveCommand.Create(HandleHelpKeyboardCommand);
 
         SpectrumScreen = _frameBufferConverter.Bitmap;
@@ -119,7 +120,7 @@ public class MainWindowViewModel : ViewModelBase
         IsUlaPlusEnabled = _defaultSettings.IsUlaPlusEnabled;
         RomType = _defaultSettings.RomType;
         JoystickType = _defaultSettings.JoystickType;
-        IsInstantLoadEnabled = _defaultSettings.IsInstantTapeLoadEnabled;
+        TapeLoadingSpeed = _defaultSettings.TapeLoadingSpeed;
 
         CreateNewEmulator();
     }
@@ -131,7 +132,7 @@ public class MainWindowViewModel : ViewModelBase
         _defaultSettings.IsUlaPlusEnabled = IsUlaPlusEnabled;
         _defaultSettings.RomType = RomType;
         _defaultSettings.JoystickType = JoystickType;
-        _defaultSettings.IsInstantTapeLoadEnabled = IsInstantLoadEnabled;
+        _defaultSettings.TapeLoadingSpeed = TapeLoadingSpeed;
 
         await SettingsManager.SaveAsync(_defaultSettings);
     }
@@ -146,7 +147,7 @@ public class MainWindowViewModel : ViewModelBase
         Emulator = emulator;
 
         Emulator.IsUlaPlusEnabled = IsUlaPlusEnabled;
-        Emulator.IsInstantLoadEnabled = IsInstantLoadEnabled;
+        Emulator.TapeLoadingSpeed = TapeLoadingSpeed;
         Emulator.JoystickManager.SetupJoystick(JoystickType);
         Emulator.RenderScreen += EmulatorOnRenderScreen;
 
@@ -278,21 +279,21 @@ public class MainWindowViewModel : ViewModelBase
         IsPaused = Emulator?.IsPaused ?? false;
     }
 
-    private void HandleSetSpeed(string speed)
+    private void HandleSetEmulationSpeed(string emulationSpeed)
     {
-        if (!int.TryParse(speed, out var speedValue))
+        if (!int.TryParse(emulationSpeed, out var emulationSpeedValue))
         {
             return;
         }
 
-        Emulator?.SetSpeed(speedValue);
-        EmulationSpeed = speed;
+        Emulator?.SetSpeed(emulationSpeedValue);
+        EmulationSpeed = emulationSpeed;
     }
 
     private void HandleToggleFullScreen() =>
         WindowState = WindowState == WindowState.FullScreen ? WindowState.Normal : WindowState.FullScreen;
 
-    private void HandleToggleInstantLoad() => IsInstantLoadEnabled = !IsInstantLoadEnabled;
+    private void HandleSetTapeLoadingSpeed(TapeLoadingSpeed tapeLoadingSpeed) => TapeLoadingSpeed = tapeLoadingSpeed;
 
     private void HandleHelpKeyboardCommand()
     {
@@ -422,16 +423,16 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _windowStateCommandName, value);
     }
 
-    private bool _isInstantLoadEnabled = true;
-    public bool IsInstantLoadEnabled
+    private TapeLoadingSpeed _tapeLoadingSpeed = TapeLoadingSpeed.Instant;
+    public TapeLoadingSpeed TapeLoadingSpeed
     {
-        get => _isInstantLoadEnabled;
+        get => _tapeLoadingSpeed;
         set
         {
-            this.RaiseAndSetIfChanged(ref _isInstantLoadEnabled, value);
+            this.RaiseAndSetIfChanged(ref _tapeLoadingSpeed, value);
             if (Emulator != null)
             {
-                Emulator.IsInstantLoadEnabled = IsInstantLoadEnabled;
+                Emulator.TapeLoadingSpeed = TapeLoadingSpeed;
             }
         }
     }

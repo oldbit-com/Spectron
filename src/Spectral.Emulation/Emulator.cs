@@ -31,7 +31,7 @@ public sealed class Emulator
     public JoystickManager JoystickManager { get; }
     public ComputerType ComputerType { get; }
     public RomType RomType { get; }
-    public bool IsInstantLoadEnabled { get; set; }
+    public TapeLoadingSpeed TapeLoadingSpeed { get; set; }
 
     internal Z80 Cpu { get; }
     internal IEmulatorMemory Memory { get; }
@@ -157,7 +157,7 @@ public sealed class Emulator
         switch (pc)
         {
             case 0x056A:
-                if (IsInstantLoadEnabled)
+                if (TapeLoadingSpeed == TapeLoadingSpeed.Instant)
                 {
                     TapeManager.InstantTapeLoader.LoadBytes();
                 }

@@ -1,6 +1,7 @@
 using OldBit.Spectral.Emulation;
 using OldBit.Spectral.Emulation.Devices.Joystick;
 using OldBit.Spectral.Emulation.Rom;
+using OldBit.Spectral.Emulation.Tape;
 using OldBit.Spectral.Models;
 
 namespace OldBit.Spectral.Preferences;
@@ -19,5 +20,5 @@ public class DefaultSettings
 
     public int MaxRecentFiles { get; set; } = 10;
 
-    public bool IsInstantTapeLoadEnabled { get; set; } = true;
+    public TapeLoadingSpeed TapeLoadingSpeed { get; set; } = TapeLoadingSpeed.Instant;
 }
