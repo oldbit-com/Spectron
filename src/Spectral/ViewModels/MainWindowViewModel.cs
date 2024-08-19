@@ -286,7 +286,7 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        Emulator?.SetSpeed(emulationSpeedValue);
+        Emulator?.SetEmulationSpeed(emulationSpeedValue);
         EmulationSpeed = emulationSpeed;
     }
 

@@ -34,7 +34,7 @@ internal sealed class InstantTapeLoader
         }
 
         // Check if running Load (CF=1) or Verify (CF = 0)
-        if ((_z80.Registers.Prime.F & Flags.C) == 0)
+        if ((_z80.Registers.F & Flags.C) == 0)
         {
             return;
         }
@@ -44,7 +44,7 @@ internal sealed class InstantTapeLoader
         var blockLength = _z80.Registers.DE;
 
         // Load data directly to memory
-        if (_z80.Registers.Prime.A == tapeBlock.Flag)
+        if (_z80.Registers.A == tapeBlock.Flag)
         {
             for (var i = 0; i < blockLength; i++)
             {

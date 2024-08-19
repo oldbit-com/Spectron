@@ -8,7 +8,12 @@ internal static class RomRoutines
     /// <summary>
     /// LD_BYTES subroutine.
     /// </summary>
-    internal const Word LD_BYTES = 0x056A;
+    internal const Word LD_BYTES = 0x0556;
+
+    /// <summary>
+    /// LD_BYTES subroutine return
+    /// </summary>
+    internal const Word LD_BYTES_RET = 0x05E2;
 
     /// <summary>
     /// The 'SAVE, LOAD, VERIFY and MERGE' command routine.

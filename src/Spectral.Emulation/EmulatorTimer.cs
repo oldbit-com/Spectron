@@ -53,6 +53,12 @@ internal sealed class EmulatorTimer
         var stopwatch = Stopwatch.StartNew();
         var nextTrigger = TimeSpan.Zero;
 
+        var resetTimer = () =>
+        {
+            nextTrigger = TimeSpan.Zero;
+            stopwatch.Restart();
+        };
+
         while (_isRunning)
         {
             nextTrigger += Interval;
@@ -61,8 +67,7 @@ internal sealed class EmulatorTimer
             {
                 Thread.Sleep(500);
 
-                nextTrigger = TimeSpan.Zero;
-                stopwatch.Restart();
+                resetTimer();
 
                 continue;
             }
@@ -73,7 +78,10 @@ internal sealed class EmulatorTimer
 
                 if (timeToWait <= 0)
                 {
+                    resetTimer();
+
                     _callback();
+
                     break;
                 }
 

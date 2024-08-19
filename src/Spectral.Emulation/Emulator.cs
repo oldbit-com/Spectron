@@ -18,13 +18,14 @@ public sealed class Emulator
     private readonly Beeper _beeper;
     private readonly UlaPlus _ulaPlus;
     private readonly SpectrumBus _spectrumBus;
-    private readonly EmulatorTimer _timer;
+    private readonly EmulatorTimer _emulationTimer;
     private bool _invalidateScreen;
+    private bool _isAcceleratedLoading;
 
     public delegate void RenderScreenEvent(FrameBuffer frameBuffer);
     public event RenderScreenEvent? RenderScreen;
 
-    public bool IsPaused => _timer.IsPaused;
+    public bool IsPaused => _emulationTimer.IsPaused;
     public bool IsUlaPlusEnabled { set => ToggleUlaPlus(value); }
     public KeyboardHandler KeyboardHandler { get; } = new();
     public TapeManager TapeManager { get; }
@@ -55,20 +56,20 @@ public sealed class Emulator
         SetupUlaAndDevices(emulator.UseAYSound);
         SetupEventHandlers();
 
-        _timer = new EmulatorTimer(RunFrame);
+        _emulationTimer = new EmulatorTimer(RunFrame);
     }
 
-    public void Start() => _timer.Start();
+    public void Start() => _emulationTimer.Start();
 
     public void Stop()
     {
         _beeper.Stop();
-        _timer.Stop();
+        _emulationTimer.Stop();
     }
 
-    public void Pause() => _timer.Pause();
+    public void Pause() => _emulationTimer.Pause();
 
-    public void Resume() => _timer.Resume();
+    public void Resume() => _emulationTimer.Resume();
 
     public void Reset()
     {
@@ -78,8 +79,8 @@ public sealed class Emulator
         _ulaPlus.Reset();
     }
 
-    public void SetSpeed(int speed) =>
-        _timer.Interval = TimeSpan.FromMilliseconds(20 * (100f / speed));
+    public void SetEmulationSpeed(int emulationSpeedPercentage) =>
+        _emulationTimer.Interval = TimeSpan.FromMilliseconds(20 * (100f / emulationSpeedPercentage));
 
     public void LoadTape(string fileName)
     {
@@ -156,11 +157,25 @@ public sealed class Emulator
     {
         switch (pc)
         {
-            case 0x056A:
+            case RomRoutines.LD_BYTES:
                 if (TapeLoadingSpeed == TapeLoadingSpeed.Instant)
                 {
                     TapeManager.InstantTapeLoader.LoadBytes();
                 }
+                else if (TapeLoadingSpeed == TapeLoadingSpeed.Accelerated)
+                {
+                    SetEmulationSpeed(1000);
+                    _isAcceleratedLoading = true;
+                }
+                break;
+
+            case RomRoutines.LD_BYTES_RET:
+                if (_isAcceleratedLoading)
+                {
+                    SetEmulationSpeed(100);
+                    _isAcceleratedLoading = false;
+                }
+
                 break;
 
             case RomRoutines.SAVE_ETC:
