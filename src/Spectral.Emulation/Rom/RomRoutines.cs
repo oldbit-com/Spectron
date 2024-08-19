@@ -6,6 +6,11 @@ namespace OldBit.Spectral.Emulation.Rom;
 internal static class RomRoutines
 {
     /// <summary>
+    /// The 'Error' restart routine.
+    /// </summary>
+    internal const Word ERROR_1 = 0x0008;
+
+    /// <summary>
     /// LD_BYTES subroutine.
     /// </summary>
     internal const Word LD_BYTES = 0x0556;

@@ -170,6 +170,7 @@ public sealed class Emulator
                 break;
 
             case RomRoutines.LD_BYTES_RET:
+            case RomRoutines.ERROR_1:
                 if (_isAcceleratedLoading)
                 {
                     SetEmulationSpeed(100);
