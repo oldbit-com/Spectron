@@ -11,9 +11,10 @@ using Avalonia.Threading;
 using OldBit.Spectral.Dialogs;
 using OldBit.Spectral.Emulation;
 using OldBit.Spectral.Emulation.Devices.Joystick;
+using OldBit.Spectral.Emulation.File;
 using OldBit.Spectral.Emulation.Rom;
 using OldBit.Spectral.Emulation.Screen;
-using OldBit.Spectral.Emulation.Tape;
+using OldBit.Spectral.Emulation.Snapshot;
 using OldBit.Spectral.Helpers;
 using OldBit.Spectral.Models;
 using OldBit.Spectral.Preferences;
@@ -43,7 +44,7 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> WindowClosingCommand { get; private set; }
     public ReactiveCommand<KeyEventArgs, Unit> KeyDownCommand { get; private set; }
     public ReactiveCommand<KeyEventArgs, Unit> KeyUpCommand { get; private set; }
-    public ReactiveCommand<Unit, Task> OpenFileCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> LoadFileCommand { get; private set; }
     public ReactiveCommand<Unit, Task> SaveFileCommand { get; private set; }
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     public ReactiveCommand<RomType, Unit> ChangeRomCommand { get; private set; }
@@ -54,6 +55,7 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> PauseCommand { get; private set; }
     public ReactiveCommand<string, Unit> SetEmulationSpeedCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleFullScreenCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ToggleInstantLoadCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> HelpKeyboardCommand { get; private set; }
 
     public MainWindowViewModel()
@@ -68,7 +70,7 @@ public class MainWindowViewModel : ViewModelBase
         WindowClosingCommand = ReactiveCommand.CreateFromTask(WindowClosingAsync);
         KeyDownCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyDown);
         KeyUpCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyUp);
-        OpenFileCommand = ReactiveCommand.Create(HandleOpenFileAsync);
+        LoadFileCommand = ReactiveCommand.Create(HandleLoadFileAsync);
         SaveFileCommand = ReactiveCommand.Create(HandleSaveFileAsync);
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
         ChangeRomCommand = ReactiveCommand.Create<RomType>(HandleChangeRom);
@@ -79,6 +81,7 @@ public class MainWindowViewModel : ViewModelBase
         ResetCommand = ReactiveCommand.Create(HandleMachineReset, emulatorNotNull);
         SetEmulationSpeedCommand = ReactiveCommand.Create<string>(HandleSetSpeed);
         ToggleFullScreenCommand = ReactiveCommand.Create(HandleToggleFullScreen);
+        ToggleInstantLoadCommand = ReactiveCommand.Create(HandleToggleInstantLoad);
         HelpKeyboardCommand = ReactiveCommand.Create(HandleHelpKeyboardCommand);
 
         SpectrumScreen = _frameBufferConverter.Bitmap;
@@ -116,7 +119,7 @@ public class MainWindowViewModel : ViewModelBase
         IsUlaPlusEnabled = _defaultSettings.IsUlaPlusEnabled;
         RomType = _defaultSettings.RomType;
         JoystickType = _defaultSettings.JoystickType;
-        TapeMenuViewModel.IsInstantLoadEnabled = _defaultSettings.IsInstantTapeLoadEnabled;
+        IsInstantLoadEnabled = _defaultSettings.IsInstantTapeLoadEnabled;
 
         CreateNewEmulator();
     }
@@ -128,7 +131,7 @@ public class MainWindowViewModel : ViewModelBase
         _defaultSettings.IsUlaPlusEnabled = IsUlaPlusEnabled;
         _defaultSettings.RomType = RomType;
         _defaultSettings.JoystickType = JoystickType;
-        _defaultSettings.IsInstantTapeLoadEnabled = TapeMenuViewModel.IsInstantLoadEnabled;
+        _defaultSettings.IsInstantTapeLoadEnabled = IsInstantLoadEnabled;
 
         await SettingsManager.SaveAsync(_defaultSettings);
     }
@@ -143,6 +146,7 @@ public class MainWindowViewModel : ViewModelBase
         Emulator = emulator;
 
         Emulator.IsUlaPlusEnabled = IsUlaPlusEnabled;
+        Emulator.IsInstantLoadEnabled = IsInstantLoadEnabled;
         Emulator.JoystickManager.SetupJoystick(JoystickType);
         Emulator.RenderScreen += EmulatorOnRenderScreen;
 
@@ -152,40 +156,41 @@ public class MainWindowViewModel : ViewModelBase
         _statusBarTimer.Start();
     }
 
-    private async Task HandleOpenFileAsync()
+    private async Task HandleLoadFileAsync()
     {
         var files = await FileDialogs.OpenAnyFileAsync();
-
-        if (files.Count > 0)
+        if (files.Count <= 0)
         {
-            try
-            {
-                Emulator?.Pause();
+            return;
+        }
 
-                var fileType = FileTypeHelper.GetFileType(files[0].Path.LocalPath);
-                if (fileType.IsSnapshot())
-                {
-                    var emulator = FileLoader.LoadSnapshot(files[0].Path.LocalPath, fileType);
+        Emulator?.Pause();
 
-                    ComputerType = emulator.ComputerType;
-                    RomType = emulator.RomType;
-                    JoystickType = emulator.JoystickManager.JoystickType;
+        try
+        {
+            var fileType = FileTypeHelper.GetFileType(files[0].Path.LocalPath);
+            if (fileType.IsSnapshot())
+            {
+                var emulator = SnapshotLoader.Load(files[0].Path.LocalPath);
 
-                    InitializeEmulator(emulator);
-                }
-                else
-                {
-                    Emulator?.TapeManager.LoadAndRun(files[0].Path.LocalPath);
-                }
+                ComputerType = emulator.ComputerType;
+                RomType = emulator.RomType;
+                JoystickType = emulator.JoystickManager.JoystickType;
+
+                InitializeEmulator(emulator);
             }
-            catch (Exception ex)
+            else
             {
-                await MessageDialogs.Error(ex.Message);
+                Emulator?.LoadTape(files[0].Path.LocalPath);
             }
-            finally
-            {
-                Emulator?.Resume();
-            }
+        }
+        catch (Exception ex)
+        {
+            await MessageDialogs.Error(ex.Message);
+        }
+        finally
+        {
+            Emulator?.Resume();
         }
     }
 
@@ -284,10 +289,10 @@ public class MainWindowViewModel : ViewModelBase
         EmulationSpeed = speed;
     }
 
-    private void HandleToggleFullScreen()
-    {
+    private void HandleToggleFullScreen() =>
         WindowState = WindowState == WindowState.FullScreen ? WindowState.Normal : WindowState.FullScreen;
-    }
+
+    private void HandleToggleInstantLoad() => IsInstantLoadEnabled = !IsInstantLoadEnabled;
 
     private void HandleHelpKeyboardCommand()
     {
@@ -415,5 +420,19 @@ public class MainWindowViewModel : ViewModelBase
     {
         get => _windowStateCommandName;
         set => this.RaiseAndSetIfChanged(ref _windowStateCommandName, value);
+    }
+
+    private bool _isInstantLoadEnabled = true;
+    public bool IsInstantLoadEnabled
+    {
+        get => _isInstantLoadEnabled;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _isInstantLoadEnabled, value);
+            if (Emulator != null)
+            {
+                Emulator.IsInstantLoadEnabled = IsInstantLoadEnabled;
+            }
+        }
     }
 }

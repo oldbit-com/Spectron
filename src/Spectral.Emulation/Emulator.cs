@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using OldBit.Spectral.Emulation.Devices;
 using OldBit.Spectral.Emulation.Devices.Audio;
 using OldBit.Spectral.Emulation.Devices.Joystick;
@@ -32,6 +31,7 @@ public sealed class Emulator
     public JoystickManager JoystickManager { get; }
     public ComputerType ComputerType { get; }
     public RomType RomType { get; }
+    public bool IsInstantLoadEnabled { get; set; }
 
     internal Z80 Cpu { get; }
     internal IEmulatorMemory Memory { get; }
@@ -80,6 +80,16 @@ public sealed class Emulator
 
     public void SetSpeed(int speed) =>
         _timer.Interval = TimeSpan.FromMilliseconds(20 * (100f / speed));
+
+    public void LoadTape(string fileName)
+    {
+        if (!TapeManager.TryLoadTape(fileName))
+        {
+            return;
+        }
+
+        // TODO: Simulate LOAD "" to start the loader
+    }
 
     private void SetupEventHandlers()
     {
@@ -147,7 +157,10 @@ public sealed class Emulator
         switch (pc)
         {
             case 0x056A:
-                TapeManager.FastFileLoader.LoadBytes();
+                if (IsInstantLoadEnabled)
+                {
+                    TapeManager.InstantTapeLoader.LoadBytes();
+                }
                 break;
 
             case RomRoutines.SAVE_ETC:

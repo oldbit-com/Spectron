@@ -3,13 +3,17 @@ using OldBit.Z80Cpu.Registers;
 
 namespace OldBit.Spectral.Emulation.Tape;
 
-internal sealed class FastFileLoader
+/// <summary>
+/// Allows for instant loading of the tape files by bypassing the tape player
+/// and loading the data directly to memory.
+/// </summary>
+internal sealed class InstantTapeLoader
 {
     private readonly Z80 _z80;
     private readonly IMemory _memory;
     private readonly TapePlayer _tapePlayer;
 
-    internal FastFileLoader(Z80 z80, IMemory memory, TapePlayer tapePlayer)
+    internal InstantTapeLoader(Z80 z80, IMemory memory, TapePlayer tapePlayer)
     {
         _z80 = z80;
         _memory = memory;

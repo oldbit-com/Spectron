@@ -1,10 +1,15 @@
+using System.Diagnostics.CodeAnalysis;
+using OldBit.Spectral.Emulation.File;
+using OldBit.ZXTape.Extensions;
+using OldBit.ZXTape.Tap;
+using OldBit.ZXTape.Tzx;
+
 namespace OldBit.Spectral.Emulation.Tape;
 
 public sealed class TapeManager
 {
     internal TapePlayer TapePlayer { get; }
-    internal FileLoader FileLoader { get; }
-    internal FastFileLoader FastFileLoader { get; }
+    internal InstantTapeLoader InstantTapeLoader { get; }
 
     public delegate void TapeInsertedEvent(EventArgs e);
     public event TapeInsertedEvent? TapeInserted;
@@ -21,36 +26,26 @@ public sealed class TapeManager
     internal TapeManager(Emulator emulator, HardwareSettings hardware)
     {
         TapePlayer = new TapePlayer(emulator.Cpu.Clock, hardware);
-        FileLoader = new FileLoader();
-        FastFileLoader = new FastFileLoader(emulator.Cpu, emulator.Memory, TapePlayer);
+        InstantTapeLoader = new InstantTapeLoader(emulator.Cpu, emulator.Memory, TapePlayer);
     }
 
-    public void LoadAndRun(string fileName)
+    public bool TryLoadTape(string fileName)
     {
-        var fileType = FileTypeHelper.GetFileType(fileName);
-        if (fileType.IsSnapshot())
-        {
-            var emulator = FileLoader.LoadSnapshot(fileName, fileType);
-
-
-            return;
-        }
-
         if (!TryInsertTape(fileName))
         {
-            return;
+            return false;
         }
 
-
         PlayTape();
-        // TODO: Simulate LOAD ""
+
+        return true;
     }
 
     public bool TryInsertTape(string fileName)
     {
         StopTape();
 
-        if (!FileLoader.TryLoadTape(fileName, out var tzxFile))
+        if (!TryLoadTape(fileName, out var tzxFile))
         {
             return false;
         }
@@ -79,5 +74,25 @@ public sealed class TapeManager
         TapeEjected?.Invoke(EventArgs.Empty);
     }
 
-    private static bool IsSnaFile(string fileName) => Path.GetExtension(fileName).Equals(".sna", StringComparison.InvariantCultureIgnoreCase);
+    private static bool TryLoadTape(string fileName, [NotNullWhen(true)] out TzxFile? tzxFile)
+    {
+        var fileType = FileTypeHelper.GetFileType(fileName);
+        tzxFile = null;
+
+        switch (fileType)
+        {
+            case FileType.Tap:
+            {
+                var tapFile = TapFile.Load(fileName);
+                tzxFile = tapFile.ToTzx();
+                break;
+            }
+
+            case FileType.Tzx:
+                tzxFile = TzxFile.Load(fileName);
+                break;
+        }
+
+        return tzxFile != null;
+    }
 }

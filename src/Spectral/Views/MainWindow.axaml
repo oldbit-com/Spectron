@@ -48,7 +48,7 @@
         <NativeMenu>
             <NativeMenuItem Header="File">
                 <NativeMenu>
-                    <NativeMenuItem Header="Open..." Gesture="Cmd+O" Command="{Binding OpenFileCommand}"/>
+                    <NativeMenuItem Header="Load..." Gesture="Cmd+O" Command="{Binding LoadFileCommand}"/>
                     <!-- <NativeMenuItem Header="Open Recent"> -->
                     <!--     <NativeMenu NeedsUpdate="OpenRecent_OnNeedsUpdate" /> -->
                     <!-- </NativeMenuItem> -->
@@ -136,7 +136,7 @@
                     <NativeMenuItem Header="Rewind" Command="{Binding TapeMenuViewModel.RewindCommand}"/>
                     <NativeMenuItem Header="Eject" Command="{Binding TapeMenuViewModel.EjectCommand}"/>
                     <NativeMenuItemSeparator/>
-                    <NativeMenuItem Header="Instant Tape Load" ToggleType="CheckBox" IsChecked="{Binding TapeMenuViewModel.IsInstantLoadEnabled}" Command="{Binding TapeMenuViewModel.ToggleInstantLoadCommand}" />
+                    <NativeMenuItem Header="Instant Tape Load" ToggleType="CheckBox" IsChecked="{Binding IsInstantLoadEnabled}" Command="{Binding ToggleInstantLoadCommand}" />
                 </NativeMenu>
             </NativeMenuItem>
             <NativeMenuItem Header="Help">

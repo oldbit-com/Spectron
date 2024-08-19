@@ -1,4 +1,4 @@
-namespace OldBit.Spectral.Emulation.Tape;
+namespace OldBit.Spectral.Emulation.File;
 
 public static class FileTypeHelper
 {

@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -15,7 +14,6 @@ public class TapeMenuViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> StopCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> RewindCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> EjectCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> ToggleInstantLoadCommand { get; private set; }
 
     private TapeManager? _tapeManager;
 
@@ -26,11 +24,10 @@ public class TapeMenuViewModel : ViewModelBase
         var isTapeInsertedAndNotPlaying = this.WhenAnyValue(x => x.IsTapeInserted, x => x.IsTapePlaying, (inserted, playing) => inserted && !playing);
 
         InsertCommand = ReactiveCommand.Create(Insert);
-        PlayCommand = ReactiveCommand.Create(Play, isTapeInsertedAndNotPlaying);
-        StopCommand = ReactiveCommand.Create(Stop, isTapePlaying);
+        PlayCommand = ReactiveCommand.Create(() => { TapeManager?.PlayTape(); }, isTapeInsertedAndNotPlaying);
+        StopCommand = ReactiveCommand.Create(() => { TapeManager?.StopTape(); }, isTapePlaying);
         RewindCommand = ReactiveCommand.Create(Rewind, isTapeInserted);
-        EjectCommand = ReactiveCommand.Create(Eject, isTapeInserted);
-        ToggleInstantLoadCommand = ReactiveCommand.Create(ToggleInstantLoad);
+        EjectCommand = ReactiveCommand.Create(() => { TapeManager?.EjectTape(); }, isTapeInserted);
     }
 
     private async Task Insert()
@@ -45,15 +42,7 @@ public class TapeMenuViewModel : ViewModelBase
         TapeManager?.TryInsertTape(files[0].Path.LocalPath);
     }
 
-    private void Play() => TapeManager?.PlayTape();
-
-    private void Stop() => TapeManager?.StopTape();
-
     private void Rewind() { }
-
-    private void Eject() => TapeManager?.EjectTape();
-
-    private void ToggleInstantLoad() => IsInstantLoadEnabled = !IsInstantLoadEnabled;
 
     private bool _isTapeInserted;
     private bool IsTapeInserted
@@ -67,13 +56,6 @@ public class TapeMenuViewModel : ViewModelBase
     {
         get => _isTapePlaying;
         set => this.RaiseAndSetIfChanged(ref _isTapePlaying, value);
-    }
-
-    private bool _isInstantLoadEnabled = true;
-    public bool IsInstantLoadEnabled
-    {
-        get => _isInstantLoadEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isInstantLoadEnabled, value);
     }
 
     internal TapeManager? TapeManager
