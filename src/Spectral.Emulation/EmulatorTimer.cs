@@ -78,7 +78,10 @@ internal sealed class EmulatorTimer
 
                 if (timeToWait <= 0)
                 {
-                    resetTimer();
+                    if (timeToWait < -Interval.TotalMilliseconds)
+                    {
+                        resetTimer();
+                    }
 
                     _callback();
 
