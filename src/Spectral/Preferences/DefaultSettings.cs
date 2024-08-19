@@ -18,4 +18,6 @@ public class DefaultSettings
     public JoystickType JoystickType { get; set; } = JoystickType.None;
 
     public int MaxRecentFiles { get; set; } = 10;
+
+    public bool IsInstantTapeLoadEnabled { get; set; } = true;
 }

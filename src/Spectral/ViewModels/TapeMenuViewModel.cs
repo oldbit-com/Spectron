@@ -15,6 +15,7 @@ public class TapeMenuViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> StopCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> RewindCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> EjectCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ToggleInstantLoadCommand { get; private set; }
 
     private TapeManager? _tapeManager;
 
@@ -29,6 +30,7 @@ public class TapeMenuViewModel : ViewModelBase
         StopCommand = ReactiveCommand.Create(Stop, isTapePlaying);
         RewindCommand = ReactiveCommand.Create(Rewind, isTapeInserted);
         EjectCommand = ReactiveCommand.Create(Eject, isTapeInserted);
+        ToggleInstantLoadCommand = ReactiveCommand.Create(ToggleInstantLoad);
     }
 
     private async Task Insert()
@@ -51,6 +53,8 @@ public class TapeMenuViewModel : ViewModelBase
 
     private void Eject() => TapeManager?.EjectTape();
 
+    private void ToggleInstantLoad() => IsInstantLoadEnabled = !IsInstantLoadEnabled;
+
     private bool _isTapeInserted;
     private bool IsTapeInserted
     {
@@ -63,6 +67,13 @@ public class TapeMenuViewModel : ViewModelBase
     {
         get => _isTapePlaying;
         set => this.RaiseAndSetIfChanged(ref _isTapePlaying, value);
+    }
+
+    private bool _isInstantLoadEnabled = true;
+    public bool IsInstantLoadEnabled
+    {
+        get => _isInstantLoadEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isInstantLoadEnabled, value);
     }
 
     internal TapeManager? TapeManager

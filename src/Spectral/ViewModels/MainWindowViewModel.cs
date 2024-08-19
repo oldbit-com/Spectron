@@ -116,6 +116,7 @@ public class MainWindowViewModel : ViewModelBase
         IsUlaPlusEnabled = _defaultSettings.IsUlaPlusEnabled;
         RomType = _defaultSettings.RomType;
         JoystickType = _defaultSettings.JoystickType;
+        TapeMenuViewModel.IsInstantLoadEnabled = _defaultSettings.IsInstantTapeLoadEnabled;
 
         CreateNewEmulator();
     }
@@ -127,6 +128,7 @@ public class MainWindowViewModel : ViewModelBase
         _defaultSettings.IsUlaPlusEnabled = IsUlaPlusEnabled;
         _defaultSettings.RomType = RomType;
         _defaultSettings.JoystickType = JoystickType;
+        _defaultSettings.IsInstantTapeLoadEnabled = TapeMenuViewModel.IsInstantLoadEnabled;
 
         await SettingsManager.SaveAsync(_defaultSettings);
     }

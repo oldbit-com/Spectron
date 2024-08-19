@@ -135,6 +135,8 @@
                     <NativeMenuItem Header="Stop" Command="{Binding TapeMenuViewModel.StopCommand}"/>
                     <NativeMenuItem Header="Rewind" Command="{Binding TapeMenuViewModel.RewindCommand}"/>
                     <NativeMenuItem Header="Eject" Command="{Binding TapeMenuViewModel.EjectCommand}"/>
+                    <NativeMenuItemSeparator/>
+                    <NativeMenuItem Header="Instant Tape Load" ToggleType="CheckBox" IsChecked="{Binding TapeMenuViewModel.IsInstantLoadEnabled}" Command="{Binding TapeMenuViewModel.ToggleInstantLoadCommand}" />
                 </NativeMenu>
             </NativeMenuItem>
             <NativeMenuItem Header="Help">
