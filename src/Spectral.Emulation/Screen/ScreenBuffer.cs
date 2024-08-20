@@ -60,6 +60,4 @@ internal sealed class ScreenBuffer
     internal void UpdateContent(int frameTicks) => _content.Update(frameTicks);
 
     internal void UpdateScreen(Word address) => _content.UpdateScreen(address);
-
-
 }
