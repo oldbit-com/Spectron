@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
@@ -35,6 +36,8 @@ public class MainWindowViewModel : ViewModelBase
     private HelpKeyboardView? _helpKeyboardView;
 
     private int _frameCount;
+    private readonly Stopwatch _renderStopwatch = new();
+    private TimeSpan _lastScreenRender = TimeSpan.Zero;
 
     public Control ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }
@@ -102,6 +105,12 @@ public class MainWindowViewModel : ViewModelBase
 
     private void EmulatorOnRenderScreen(FrameBuffer framebuffer)
     {
+        // If we are running in accelerated mode, we don't need to exceed 100 FPS
+        if (_renderStopwatch.Elapsed - _lastScreenRender < TimeSpan.FromMilliseconds(8))
+        {
+            return;
+        }
+
         Dispatcher.UIThread.Post(() =>
         {
             _frameBufferConverter.UpdateBitmap(framebuffer);
@@ -109,6 +118,8 @@ public class MainWindowViewModel : ViewModelBase
         });
 
         Interlocked.Increment(ref _frameCount);
+
+        _lastScreenRender = _renderStopwatch.Elapsed;
     }
 
     private async Task WindowOpenedAsync()
@@ -154,6 +165,7 @@ public class MainWindowViewModel : ViewModelBase
         TapeMenuViewModel.TapeManager = Emulator.TapeManager;
 
         Emulator.Start();
+        _renderStopwatch.Restart();
         _statusBarTimer.Start();
     }
 
