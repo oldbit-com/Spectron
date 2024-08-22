@@ -1,4 +1,4 @@
-# Spectral
+# Spectron
 Yet another ZX Spectrum emulator written in dotnet. It is a cross platform emulator that runs on Windows, Linux and MacOS.
 
 Why another emulator? Because I wanted to do it and it has been a lot of fun. And a challenge as well, something
