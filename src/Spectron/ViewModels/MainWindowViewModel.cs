@@ -164,8 +164,11 @@ public class MainWindowViewModel : ViewModelBase
 
         TapeMenuViewModel.TapeManager = Emulator.TapeManager;
 
-        Emulator.Start();
         _renderStopwatch.Restart();
+        _lastScreenRender = TimeSpan.Zero;
+
+        Emulator.Start();
+
         _statusBarTimer.Start();
     }
 
