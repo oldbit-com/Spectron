@@ -22,15 +22,7 @@ public static class FileDialogs
         {
             Title = "Open File",
             AllowMultiple = false,
-            FileTypeFilter = new[]
-            {
-                FileTypes.All,
-                FileTypes.Sna,
-                FileTypes.Szx,
-                FileTypes.Tap,
-                FileTypes.Tzx,
-                FileTypes.Z80
-            }
+            FileTypeFilter = [FileTypes.All, FileTypes.Sna, FileTypes.Szx, FileTypes.Tap, FileTypes.Tzx, FileTypes.Z80]
         });
     }
 
@@ -46,12 +38,7 @@ public static class FileDialogs
         {
             Title = "Open Tape File",
             AllowMultiple = false,
-            FileTypeFilter = new[]
-            {
-                FileTypes.TapeFiles,
-                FileTypes.Tap,
-                FileTypes.Tzx
-            }
+            FileTypeFilter = [FileTypes.TapeFiles, FileTypes.Tap, FileTypes.Tzx]
         });
     }
 
@@ -68,16 +55,11 @@ public static class FileDialogs
         return await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
             Title = "Save Snapshot File",
-            DefaultExtension = ".z80",
+            DefaultExtension = ".szx",
             SuggestedFileName = suggestedFileName,
             SuggestedStartLocation = documentsFolder,
             ShowOverwritePrompt = true,
-            FileTypeChoices = new[]
-            {
-                FileTypes.Szx,
-                FileTypes.Z80,
-                FileTypes.Sna
-            },
+            FileTypeChoices = [FileTypes.Szx, FileTypes.Z80, FileTypes.Sna],
         });
     }
 }

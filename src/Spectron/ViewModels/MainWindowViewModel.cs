@@ -75,7 +75,7 @@ public class MainWindowViewModel : ViewModelBase
         KeyDownCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyDown);
         KeyUpCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyUp);
         LoadFileCommand = ReactiveCommand.Create(HandleLoadFileAsync);
-        SaveFileCommand = ReactiveCommand.Create(HandleSaveFileAsync);
+        SaveFileCommand = ReactiveCommand.Create(HandleSaveFileAsync, emulatorNotNull);
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
         ChangeRomCommand = ReactiveCommand.Create<RomType>(HandleChangeRom);
         ChangeComputerType = ReactiveCommand.Create<ComputerType>(HandleChangeComputerType);
@@ -187,7 +187,7 @@ public class MainWindowViewModel : ViewModelBase
             var fileType = FileTypeHelper.GetFileType(files[0].Path.LocalPath);
             if (fileType.IsSnapshot())
             {
-                var emulator = SnapshotLoader.Load(files[0].Path.LocalPath);
+                var emulator = SnapshotFile.Load(files[0].Path.LocalPath);
 
                 ComputerType = emulator.ComputerType;
                 RomType = emulator.RomType;
@@ -212,19 +212,28 @@ public class MainWindowViewModel : ViewModelBase
 
     private async Task HandleSaveFileAsync()
     {
+        if (Emulator == null)
+        {
+            return;
+        }
+
         try
         {
-            Emulator?.Pause();
+            Emulator.Pause();
 
             var file = await FileDialogs.SaveSnapshotFileAsync();
-            if (file == null)
+            if (file != null)
             {
-                return;
+                SnapshotFile.Save(file.Path.LocalPath, Emulator);
             }
+        }
+        catch (Exception ex)
+        {
+            await MessageDialogs.Error(ex.Message);
         }
         finally
         {
-            Emulator?.Resume();
+            Emulator.Resume();
         }
     }
 

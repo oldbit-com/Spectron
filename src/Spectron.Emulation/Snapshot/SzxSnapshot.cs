@@ -30,6 +30,7 @@ internal static class SzxSnapshot
         LoadRegisters(cpu, snapshot.Z80Registers);
         LoadMemory(memory, snapshot.RamPages, snapshot.SpecRegs);
         UpdateBorder(screenBuffer, snapshot.SpecRegs);
+        // TODO: Load the rest of the snapshot
 
         return emulator;
     }
@@ -115,5 +116,10 @@ internal static class SzxSnapshot
 
         screenBuffer.Reset();
         screenBuffer.UpdateBorder(borderColor);
+    }
+
+    public static void Save(string fileName, Emulator emulator)
+    {
+        throw new NotImplementedException();
     }
 }
