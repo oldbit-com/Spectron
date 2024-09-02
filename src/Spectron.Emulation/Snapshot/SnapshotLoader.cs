@@ -11,13 +11,13 @@ public static class SnapshotLoader
         switch (fileType)
         {
             case FileType.Sna:
-                return Sna.Load(fileName);
+                return SnaSnapshot.Load(fileName);
 
             case FileType.Szx:
-                return Szx.Load(fileName);
+                return SzxSnapshot.Load(fileName);
 
             case FileType.Z80:
-                return Z80.Load(fileName);
+                return Z80Snapshot.Load(fileName);
 
             default:
                 throw new NotSupportedException($"The file extension '{Path.GetExtension(fileName)}' is not supported.");

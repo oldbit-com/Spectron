@@ -6,7 +6,7 @@ using OldBit.ZXTape.Sna;
 
 namespace OldBit.Spectron.Emulation.Snapshot;
 
-internal static class Sna
+internal static class SnaSnapshot
 {
     internal static Emulator Load(string fileName)
     {

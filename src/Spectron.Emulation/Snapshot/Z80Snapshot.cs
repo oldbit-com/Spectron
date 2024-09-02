@@ -8,7 +8,7 @@ using OldBit.ZXTape.Z80.Types;
 
 namespace OldBit.Spectron.Emulation.Snapshot;
 
-internal static class Z80
+internal static class Z80Snapshot
 {
     internal static Emulator Load(string fileName)
     {
@@ -81,6 +81,7 @@ internal static class Z80
         {
             switch (computerType)
             {
+                case ComputerType.Spectrum16K:
                 case ComputerType.Spectrum48K:
                     LoadMemory48K(snapshot, memory);
                     break;

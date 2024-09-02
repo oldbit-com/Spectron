@@ -15,36 +15,38 @@ internal sealed record EmulatorSettings(
 
 public static class EmulatorFactory
 {
-    public static Emulator Create(ComputerType computerType, RomType romType) => computerType switch
+    public static Emulator Create(ComputerType computerType, RomType romType, byte[]? customRom = null)
     {
-        ComputerType.Spectrum16K => CreateSpectrum16K(romType),
-        ComputerType.Spectrum48K => CreateSpectrum48K(romType),
-        ComputerType.Spectrum128K => CreateSpectrum128K(romType),
-        ComputerType.Timex2048 => throw new NotImplementedException(),
-        _ => throw new ArgumentOutOfRangeException(nameof(computerType))
-    };
+        byte[] rom;
 
-    private static Emulator CreateSpectrum16K(RomType romType) =>
-        CreateSpectrum16Or48K(
-            romType,
-            new Memory16K(RomReader.ReadRom(romType == RomType.Original ? RomType.Original48 : romType)));
+        switch (computerType)
+        {
+            case ComputerType.Spectrum16K:
+                rom = customRom ?? GetSpectrum48KRom(romType);
+                return CreateSpectrum16Or48K(RomType.Custom, new Memory16K(rom));
 
-    private static Emulator CreateSpectrum48K(RomType romType) =>
-        CreateSpectrum16Or48K(
-            romType,
-            new Memory48K(RomReader.ReadRom(romType == RomType.Original ? RomType.Original48 : romType)));
+            case ComputerType.Spectrum48K:
+                rom = customRom ?? GetSpectrum48KRom(romType);
+                return CreateSpectrum16Or48K(RomType.Custom, new Memory48K(rom));
 
-    private static Emulator CreateSpectrum128K(RomType romType)
+            case ComputerType.Spectrum128K:
+                rom = customRom != null ? customRom[0..0x4000] : GetSpectrum128KRom(romType);
+                var bank1Rom = customRom != null ? customRom[0x4000..] : RomReader.ReadRom(RomType.Original128Bank1);
+                return CreateSpectrum128K(romType, new Memory128K(rom, bank1Rom));
+
+            case ComputerType.Timex2048:
+                throw new NotImplementedException();
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(computerType));
+        }
+    }
+
+    private static Emulator CreateSpectrum128K(RomType romType, Memory128K memory)
     {
         var contentionProvider = new ContentionProvider(
             Hardware.Spectrum128K.FirstPixelTick,
             Hardware.Spectrum128K.TicksPerLine);
-
-        var romBank0 = RomReader.ReadRom(romType == RomType.Original ? RomType.Original128Bank0 : romType);
-
-        var memory = new Memory128K(
-            romBank0,
-            RomReader.ReadRom(RomType.Original128Bank1));
 
         memory.BankPaged += bankId => contentionProvider.MemoryBankId = bankId;
 
@@ -75,4 +77,10 @@ public static class EmulatorFactory
 
         return new Emulator(emulatorSettings, Hardware.Spectrum48K);
     }
+
+    private static byte[] GetSpectrum48KRom(RomType romType) =>
+        RomReader.ReadRom(romType == RomType.Original ? RomType.Original48 : romType);
+
+    private static byte[] GetSpectrum128KRom(RomType romType) =>
+        RomReader.ReadRom(romType == RomType.Original ? RomType.Original128Bank0 : romType);
 }

@@ -12,6 +12,8 @@ public enum RomType
 
     Timex2048,
 
+    Custom,
+
     Retroleum,
 
     GoshWonderful,

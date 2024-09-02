@@ -129,7 +129,7 @@ public class MainWindowViewModel : ViewModelBase
         HandleChangeBorderSize(_defaultSettings.BorderSize);
         ComputerType = _defaultSettings.ComputerType;
         IsUlaPlusEnabled = _defaultSettings.IsUlaPlusEnabled;
-        RomType = _defaultSettings.RomType;
+        RomType = _defaultSettings.RomType == RomType.Custom ? RomType.Original : _defaultSettings.RomType;
         JoystickType = _defaultSettings.JoystickType;
         TapeLoadingSpeed = _defaultSettings.TapeLoadingSpeed;
 
