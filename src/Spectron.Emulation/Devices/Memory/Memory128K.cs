@@ -10,9 +10,6 @@ internal sealed class Memory128K : IEmulatorMemory
     private const byte ScreenSelectBit = 0b00001000;
     private const byte RamBankMask = 0b00000111;
 
-    private readonly byte[] _rom48;
-    private readonly byte[] _rom128;
-
     private byte[] _activeScreen;
     private byte[] _activeRom;
     private byte[] _activeRam;
@@ -21,19 +18,21 @@ internal sealed class Memory128K : IEmulatorMemory
     internal delegate void BankPagedEvent(int bankId);
     internal event BankPagedEvent? BankPaged;
     internal byte[][] Banks { get; } = new byte[8][];
-    internal byte LastPortValue { get; private set; }
+    internal byte LastPagingModeValue { get; private set; }
+    internal byte[] RomBank0 { get; }
+    internal byte[] RomBank1 { get; }
 
-    internal Memory128K(byte[] rom128, byte[] rom48)
+    internal Memory128K(byte[] romBank0, byte[] romBank1)
     {
-        _rom48 = rom48;
-        _rom128 = rom128;
+        RomBank1 = romBank1;
+        RomBank0 = romBank0;
 
         for (var bank = 0; bank < Banks.Length; bank++)
         {
             Banks[bank] = new byte[0x4000];
         }
 
-        _activeRom = rom128;
+        _activeRom = romBank0;
         _activeScreen = Banks[5];
         _activeRam = Banks[0];
     }
@@ -84,14 +83,14 @@ internal sealed class Memory128K : IEmulatorMemory
         }
 
         SetPagingMode(data);
-        LastPortValue = data;
+        LastPagingModeValue = data;
     }
 
     public void Reset()
     {
         _isPagingDisabledUntilReset = false;
 
-        _activeRom = _rom128;
+        _activeRom = RomBank0;
         _activeScreen = Banks[5];
         _activeRam = Banks[0];
     }
@@ -116,11 +115,11 @@ internal sealed class Memory128K : IEmulatorMemory
     {
         if ((pagingMode & RomSelectBit) != 0)
         {
-            Select48KRom();
+            SelectRomBank1();
         }
         else
         {
-            Select128KRom();
+            SelectRomBank0();
         }
     }
 
@@ -151,24 +150,24 @@ internal sealed class Memory128K : IEmulatorMemory
         BankPaged?.Invoke(bankId);
     }
 
-    private void Select48KRom()
+    private void SelectRomBank1()
     {
-        if (ReferenceEquals(_activeRom, _rom48))
+        if (ReferenceEquals(_activeRom, RomBank1))
         {
             return;
         }
 
-        _activeRom = _rom48;
+        _activeRom = RomBank1;
     }
 
-    private void Select128KRom()
+    private void SelectRomBank0()
     {
-        if (ReferenceEquals(_activeRom, _rom128))
+        if (ReferenceEquals(_activeRom, RomBank0))
         {
             return;
         }
 
-        _activeRom = _rom128;
+        _activeRom = RomBank0;
     }
 
     private void SelectNormalScreen()

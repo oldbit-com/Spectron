@@ -84,8 +84,7 @@ internal static class SnaSnapshot
                 InterruptMode = (byte)emulator.Cpu.IM,
                 Interrupt = (byte)((emulator.Cpu.IFF2 ? 0x04 : 0x00) | (emulator.Cpu.IFF1 ? 0x02 : 0x00)),
 
-                BorderColor = Palette.BorderColors.Where(c => c.Value == emulator.ScreenBuffer.LastBorderColor)
-                    .Select(c => c.Key).FirstOrDefault()
+                BorderColor = Palette.ReverseBorderColors[emulator.ScreenBuffer.LastBorderColor]
             }
         };
 
@@ -95,7 +94,7 @@ internal static class SnaSnapshot
 
             snapshot.Header128 = new SnaHeader128
             {
-                PageMode = memory.LastPortValue,
+                PageMode = memory.LastPagingModeValue,
                 PC = emulator.Cpu.Registers.PC,
             };
         }

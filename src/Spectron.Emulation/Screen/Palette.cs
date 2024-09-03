@@ -31,6 +31,9 @@ internal static class Palette
         { 0b0000111, White }
     };
 
+    internal static readonly Dictionary<Color, byte> ReverseBorderColors =
+        BorderColors.ToDictionary(x => x.Value, x => x.Key);
+
     internal static readonly Dictionary<int, Color> PaperColors = new()
     {
         { 0b00000000, Black },

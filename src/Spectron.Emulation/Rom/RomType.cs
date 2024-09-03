@@ -24,3 +24,8 @@ public enum RomType
 
     BrendanAlford,
 }
+
+internal static class RomTypeExtensions
+{
+    internal static bool IsCustomRom(this RomType romType) => romType > RomType.Timex2048;
+}

@@ -29,7 +29,8 @@ internal static class SzxSnapshot
 
         LoadRegisters(cpu, snapshot.Z80Registers);
         LoadMemory(memory, snapshot.RamPages, snapshot.SpecRegs);
-        UpdateBorder(screenBuffer, snapshot.SpecRegs);
+        LoadSpectrumRegisters(screenBuffer, snapshot.SpecRegs);
+
         // TODO: Load the rest of the snapshot
 
         return emulator;
@@ -110,7 +111,7 @@ internal static class SzxSnapshot
         }
     }
 
-    private static void UpdateBorder(ScreenBuffer screenBuffer, SpecRegsBlock specRegs)
+    private static void LoadSpectrumRegisters(ScreenBuffer screenBuffer, SpecRegsBlock specRegs)
     {
         var borderColor = Palette.BorderColors[(byte)(specRegs.Border & 0x07)];
 
@@ -118,8 +119,106 @@ internal static class SzxSnapshot
         screenBuffer.UpdateBorder(borderColor);
     }
 
+    private static void SaveRegisters(Z80 cpu, Z80RegsBlock registers)
+    {
+        registers.AF = cpu.Registers.AF;
+        registers.BC = cpu.Registers.BC;
+        registers.DE = cpu.Registers.DE;
+        registers.HL = cpu.Registers.HL;
+
+        registers.AF1 = cpu.Registers.Prime.AF;
+        registers.BC1 = cpu.Registers.Prime.BC;
+        registers.DE1 = cpu.Registers.Prime.DE;
+        registers.HL1 = cpu.Registers.Prime.HL;
+
+        registers.IX = cpu.Registers.IX;
+        registers.IY = cpu.Registers.IY;
+        registers.SP = cpu.Registers.SP;
+        registers.PC = cpu.Registers.PC;
+
+        registers.I = cpu.Registers.I;
+        registers.R = cpu.Registers.R;
+        registers.IM = (byte)cpu.IM;
+        registers.IFF1 = (byte)(cpu.IFF1 ? 1 : 0);
+        registers.IFF2 = (byte)(cpu.IFF2 ? 1 : 0);
+
+        if (cpu.IsHalted)
+        {
+            registers.Flags = Z80RegsBlock.FlagsHalted;
+        }
+    }
+
+    private static void SaveMemory(IMemory memory, List<RamPageBlock> ramPages, SpecRegsBlock specRegs)
+    {
+        switch (memory)
+        {
+            case Memory16K memory16K:
+                ramPages.Add(new RamPageBlock(memory16K.Memory[0x4000..0x8000], 5));
+                break;
+
+            case Memory48K memory48K:
+                ramPages.Add(new RamPageBlock(memory48K.Memory[0x4000..0x8000], 5));
+                ramPages.Add(new RamPageBlock(memory48K.Memory[0x8000..0xC000], 2));
+                ramPages.Add(new RamPageBlock(memory48K.Memory[0xC000..0x10000], 0));
+                break;
+
+            case Memory128K memory128K:
+            {
+                for (byte i = 0; i < 8; i++)
+                {
+                    ramPages.Add(new RamPageBlock(memory128K.Banks[i], i));
+                }
+
+                specRegs.Port7FFD = memory128K.LastPagingModeValue;
+                break;
+            }
+        }
+    }
+
+    private static void SaveCustomRom(IMemory memory, SzxFile snapshot)
+    {
+        if (memory is Memory16K memory16K)
+        {
+            snapshot.CustomRom = new CustomRomBlock(memory16K.Memory[..0x4000], false);
+        }
+        else if (memory is Memory48K memory48K)
+        {
+            snapshot.CustomRom = new CustomRomBlock(memory48K.Memory[..0x4000], false);
+        }
+        else if (memory is Memory128K memory128K)
+        {
+            snapshot.CustomRom = new CustomRomBlock(ConcatenateArrays(memory128K.RomBank0, memory128K.RomBank1));
+        }
+    }
+
+    private static void SaveSpectrumRegisters(ScreenBuffer screenBuffer, SpecRegsBlock specRegs)
+    {
+        specRegs.Border = Palette.ReverseBorderColors[screenBuffer.LastBorderColor];
+    }
+
     public static void Save(string fileName, Emulator emulator)
     {
-        throw new NotImplementedException();
+        var snapshot = new SzxFile();
+
+        SaveRegisters(emulator.Cpu, snapshot.Z80Registers);
+        SaveMemory(emulator.Memory, snapshot.RamPages, snapshot.SpecRegs);
+        SaveSpectrumRegisters(emulator.ScreenBuffer, snapshot.SpecRegs);
+
+        if (emulator.RomType.IsCustomRom())
+        {
+            SaveCustomRom(emulator.Memory, snapshot);
+        }
+
+        snapshot.Save(fileName);
+    }
+
+    private static T[] ConcatenateArrays<T>(T[] first, T[] second)
+    {
+        var result = new T[first.Length + second.Length];
+
+        Array.Copy(first, 0, result, 0, first.Length);
+        Array.Copy(second, 0, result, first.Length, second.Length);
+
+        return result;
     }
 }
