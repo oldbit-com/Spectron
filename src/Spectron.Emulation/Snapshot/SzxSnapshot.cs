@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
@@ -34,6 +35,29 @@ internal static class SzxSnapshot
         // TODO: Load the rest of the snapshot
 
         return emulator;
+    }
+
+    internal static void Save(string fileName, Emulator emulator)
+    {
+        var snapshot = CreateSnapshot(emulator);
+
+        snapshot.Save(fileName);
+    }
+
+    internal static SzxFile CreateSnapshot(Emulator emulator, CompressionLevel compressionLevel = CompressionLevel.SmallestSize)
+    {
+        var snapshot = new SzxFile();
+
+        SaveRegisters(emulator.Cpu, snapshot.Z80Registers);
+        SaveMemory(emulator.Memory, snapshot.RamPages, snapshot.SpecRegs, compressionLevel);
+        SaveSpectrumRegisters(emulator.ScreenBuffer, snapshot.SpecRegs);
+
+        if (emulator.RomType.IsCustomRom())
+        {
+            SaveCustomRom(emulator.Memory, snapshot, compressionLevel);
+        }
+
+        return snapshot;
     }
 
     private static void LoadRegisters(Z80 cpu, Z80RegsBlock registers)
@@ -148,25 +172,25 @@ internal static class SzxSnapshot
         }
     }
 
-    private static void SaveMemory(IMemory memory, List<RamPageBlock> ramPages, SpecRegsBlock specRegs)
+    private static void SaveMemory(IMemory memory, List<RamPageBlock> ramPages, SpecRegsBlock specRegs, CompressionLevel compressionLevel)
     {
         switch (memory)
         {
             case Memory16K memory16K:
-                ramPages.Add(new RamPageBlock(memory16K.Memory[0x4000..0x8000], 5));
+                ramPages.Add(new RamPageBlock(memory16K.Memory[0x4000..0x8000], pageNumber: 5, compressionLevel));
                 break;
 
             case Memory48K memory48K:
-                ramPages.Add(new RamPageBlock(memory48K.Memory[0x4000..0x8000], 5));
-                ramPages.Add(new RamPageBlock(memory48K.Memory[0x8000..0xC000], 2));
-                ramPages.Add(new RamPageBlock(memory48K.Memory[0xC000..0x10000], 0));
+                ramPages.Add(new RamPageBlock(memory48K.Memory[0x4000..0x8000], pageNumber: 5, compressionLevel));
+                ramPages.Add(new RamPageBlock(memory48K.Memory[0x8000..0xC000], pageNumber: 2, compressionLevel));
+                ramPages.Add(new RamPageBlock(memory48K.Memory[0xC000..0x10000], pageNumber: 0, compressionLevel));
                 break;
 
             case Memory128K memory128K:
             {
                 for (byte i = 0; i < 8; i++)
                 {
-                    ramPages.Add(new RamPageBlock(memory128K.Banks[i], i));
+                    ramPages.Add(new RamPageBlock(memory128K.Banks[i], pageNumber: i, compressionLevel));
                 }
 
                 specRegs.Port7FFD = memory128K.LastPagingModeValue;
@@ -175,41 +199,25 @@ internal static class SzxSnapshot
         }
     }
 
-    private static void SaveCustomRom(IMemory memory, SzxFile snapshot)
+    private static void SaveCustomRom(IMemory memory, SzxFile snapshot, CompressionLevel compressionLevel)
     {
         if (memory is Memory16K memory16K)
         {
-            snapshot.CustomRom = new CustomRomBlock(memory16K.Memory[..0x4000], false);
+            snapshot.CustomRom = new CustomRomBlock(memory16K.Memory[..0x4000], compressionLevel);
         }
         else if (memory is Memory48K memory48K)
         {
-            snapshot.CustomRom = new CustomRomBlock(memory48K.Memory[..0x4000], false);
+            snapshot.CustomRom = new CustomRomBlock(memory48K.Memory[..0x4000], compressionLevel);
         }
         else if (memory is Memory128K memory128K)
         {
-            snapshot.CustomRom = new CustomRomBlock(ConcatenateArrays(memory128K.RomBank0, memory128K.RomBank1));
+            snapshot.CustomRom = new CustomRomBlock(ConcatenateArrays(memory128K.RomBank0, memory128K.RomBank1), compressionLevel);
         }
     }
 
     private static void SaveSpectrumRegisters(ScreenBuffer screenBuffer, SpecRegsBlock specRegs)
     {
         specRegs.Border = Palette.ReverseBorderColors[screenBuffer.LastBorderColor];
-    }
-
-    public static void Save(string fileName, Emulator emulator)
-    {
-        var snapshot = new SzxFile();
-
-        SaveRegisters(emulator.Cpu, snapshot.Z80Registers);
-        SaveMemory(emulator.Memory, snapshot.RamPages, snapshot.SpecRegs);
-        SaveSpectrumRegisters(emulator.ScreenBuffer, snapshot.SpecRegs);
-
-        if (emulator.RomType.IsCustomRom())
-        {
-            SaveCustomRom(emulator.Memory, snapshot);
-        }
-
-        snapshot.Save(fileName);
     }
 
     private static T[] ConcatenateArrays<T>(T[] first, T[] second)
