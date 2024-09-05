@@ -17,28 +17,28 @@ namespace OldBit.Spectron.Emulation;
 public sealed class Emulator
 {
     private readonly Beeper _beeper;
-    private readonly UlaPlus _ulaPlus;
     private readonly SpectrumBus _spectrumBus;
     private readonly EmulatorTimer _emulationTimer;
     private bool _invalidateScreen;
     private bool _isAcceleratedLoading;
-    private readonly TimeMachineManager _timeMachineManager = new TimeMachineManager(TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(1));
 
     public delegate void RenderScreenEvent(FrameBuffer frameBuffer);
     public event RenderScreenEvent? RenderScreen;
 
     public bool IsPaused => _emulationTimer.IsPaused;
-    public bool IsUlaPlusEnabled { set => ToggleUlaPlus(value); }
+    public bool IsUlaPlusEnabled { get => UlaPlus.IsEnabled; set => ToggleUlaPlus(value); }
     public KeyboardHandler KeyboardHandler { get; } = new();
     public TapeManager TapeManager { get; }
     public JoystickManager JoystickManager { get; }
     public ComputerType ComputerType { get; }
     public RomType RomType { get; }
     public TapeLoadingSpeed TapeLoadingSpeed { get; set; }
+    public readonly TimeMachineManager TimeMachineManager = new(TimeSpan.FromSeconds(0.5), TimeSpan.FromMinutes(1));
 
     internal Z80 Cpu { get; }
     internal IEmulatorMemory Memory { get; }
     internal ScreenBuffer ScreenBuffer { get; }
+    internal UlaPlus UlaPlus { get; }
 
     internal Emulator(EmulatorSettings emulator, HardwareSettings hardware)
     {
@@ -47,9 +47,9 @@ public sealed class Emulator
         Memory = emulator.Memory;
         _beeper = emulator.Beeper;
 
-        _ulaPlus = new UlaPlus();
+        UlaPlus = new UlaPlus();
         _spectrumBus = new SpectrumBus();
-        ScreenBuffer = new ScreenBuffer(emulator.Memory, _ulaPlus);
+        ScreenBuffer = new ScreenBuffer(emulator.Memory, UlaPlus);
         Cpu = new Z80(emulator.Memory, emulator.ContentionProvider);
 
         TapeManager = new TapeManager(this, hardware);
@@ -78,7 +78,12 @@ public sealed class Emulator
         Memory.Reset();
         Cpu.Reset();
         ScreenBuffer.Reset();
-        _ulaPlus.Reset();
+        UlaPlus.Reset();
+
+        if (IsPaused)
+        {
+            Resume();
+        }
     }
 
     public void SetEmulationSpeed(int emulationSpeedPercentage) =>
@@ -99,7 +104,7 @@ public sealed class Emulator
         Memory.ScreenMemoryUpdated += address => ScreenBuffer.UpdateScreen(address);
         Cpu.Clock.TicksAdded += (_, _, currentFrameTicks) => ScreenBuffer.UpdateContent(currentFrameTicks);
         Cpu.BeforeFetch += BeforeInstructionFetch;
-        _ulaPlus.ActiveChanged += (_) => _invalidateScreen = true;
+        UlaPlus.ActiveChanged += (_) => _invalidateScreen = true;
     }
 
     private void SetupUlaAndDevices(bool useAYSound)
@@ -107,7 +112,7 @@ public sealed class Emulator
         var ula = new Ula(KeyboardHandler, _beeper, ScreenBuffer, Cpu.Clock, TapeManager.TapePlayer);
 
         _spectrumBus.AddDevice(ula);
-        _spectrumBus.AddDevice(_ulaPlus);
+        _spectrumBus.AddDevice(UlaPlus);
         _spectrumBus.AddDevice(Memory);
 
         if (useAYSound)
@@ -148,12 +153,12 @@ public sealed class Emulator
         Cpu.TriggerInt(0xFF);
         RenderScreen?.Invoke(ScreenBuffer.FrameBuffer);
 
-        _timeMachineManager.Update(this);
+        TimeMachineManager.Update(this);
     }
 
     private void ToggleUlaPlus(bool value)
     {
-        _ulaPlus.IsEnabled = value;
+        UlaPlus.IsEnabled = value;
         _invalidateScreen = true;
     }
 

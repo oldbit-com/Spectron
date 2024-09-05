@@ -15,20 +15,19 @@ internal sealed class UlaPlus : IDevice
     private readonly Color[][] _paletteColors = [new Color[16], new Color[16], new Color[16], new Color[16]];
     private Register _register;
     private bool _isActive;
-
-    private int _paletteGroup;
     private byte _lastWrittenValue;
 
+    internal byte PaletteGroup { get; set; }
+    internal bool IsEnabled { get; set; }
     internal bool IsActive
     {
         get => _isActive;
-        private set
+        set
         {
             _isActive = value;
             ActiveChanged?.Invoke(EventArgs.Empty);
         }
     }
-    internal bool IsEnabled { get; set; }
 
     internal delegate void ActiveChangedEvent(EventArgs e);
     internal event ActiveChangedEvent? ActiveChanged;
@@ -42,7 +41,7 @@ internal sealed class UlaPlus : IDevice
 
                 if (_register == Register.PaletteGroup)
                 {
-                    _paletteGroup = value & 0x3F;
+                    PaletteGroup = (byte)(value & 0x3F);
                 }
                 break;
 
@@ -52,9 +51,9 @@ internal sealed class UlaPlus : IDevice
                 switch (_register)
                 {
                     case Register.PaletteGroup:
-                        var paletteIndex = _paletteGroup >> 4;
-                        var colorIndex = _paletteGroup & 0x0F;
-                        var color = TranslateColor(value);
+                        var paletteIndex = PaletteGroup >> 4;
+                        var colorIndex = PaletteGroup & 0x0F;
+                        var color = ColorFromValue(value);
 
                         _paletteColors[paletteIndex][colorIndex] = color;
                         break;
@@ -99,7 +98,7 @@ internal sealed class UlaPlus : IDevice
     {
         IsActive = false;
 
-        _paletteGroup = 0;
+        PaletteGroup = 0;
         _register = Register.PaletteGroup;
         _lastWrittenValue = 0;
 
@@ -109,7 +108,39 @@ internal sealed class UlaPlus : IDevice
         }
     }
 
-    private static Color TranslateColor(int value)
+    internal byte[] GetPaletteData()
+    {
+        var data = new byte[64];
+
+        for (var i = 0; i < _paletteColors.Length; i++)
+        {
+            for (var j = 0; j < _paletteColors[i].Length; j++)
+            {
+                var color = _paletteColors[i][j];
+                var value = ValueFromColor(color);
+
+                data[i * 16 + j] = value;
+            }
+        }
+
+        return data;
+    }
+
+    internal void SetPaletteData(byte[] data)
+    {
+        for (var i = 0; i < _paletteColors.Length; i++)
+        {
+            for (var j = 0; j < _paletteColors[i].Length; j++)
+            {
+                var value = data[i * 16 + j];
+                var color = ColorFromValue(value);
+
+                _paletteColors[i][j] = color;
+            }
+        }
+    }
+
+    private static Color ColorFromValue(int value)
     {
         var green = (value & 0b11100000) >> 5;
         green = Scale3BitsColor(green);
@@ -122,6 +153,15 @@ internal sealed class UlaPlus : IDevice
         blue = Scale3BitsColor(blue);
 
         return new Color(red, green, blue);
+    }
+
+    private static byte ValueFromColor(Color color)
+    {
+        var red = color.Red >> 5;
+        var green = color.Green >> 5;
+        var blue = color.Blue >> 5;
+
+        return (byte)((green << 5) | (red << 2) | (blue >> 1));
     }
 
     private static byte Scale3BitsColor(int color) => (byte)(color << 5 | color << 2 | color & 0x03);

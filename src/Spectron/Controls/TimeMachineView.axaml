@@ -1,0 +1,18 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:TimeMachineViewModel"
+             x:Class="OldBit.Spectron.Controls.TimeMachineView">
+    <Grid>
+        <StackPanel>
+            <Border Background="Aquamarine" CornerRadius="10" HorizontalAlignment="Center" ClipToBounds="True">
+                <Image Width="160" Height="128" />
+            </Border>
+            <Slider FocusAdorner="{x:Null}" Minimum="0" Maximum="{Binding Maximum}" Value="{Binding SelectedValue}" TickFrequency="1" IsSnapToTickEnabled="True"/>
+            <TextBlock Text="{Binding SelectedValue}" HorizontalAlignment="Center"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -11,7 +11,7 @@ internal static class ScreenAddress
     /// </remarks>
     /// <param name="x">The column number (0-31).</param>
     /// <param name="y">The row number (0-191).</param>
-    /// <returns>The screen address for the specified column and row</returns>
+    /// <returns>The screen address for the specified column and row.</returns>
     internal static Word Calculate(int x, int y)
     {
         var address =
@@ -21,4 +21,12 @@ internal static class ScreenAddress
 
         return (Word)address;
     }
+
+    /// <summary>
+    /// Calculate the attribute address for the specified column and row.
+    /// </summary>
+    /// <param name="x">The column number (0-31).</param>
+    /// <param name="y">The row number (0-191).</param>
+    /// <returns>The attribute address for the specified column and row.</returns>
+    internal static Word CalculateAttribute(int x, int y) => (Word)(0x1800 + 32 * (y / 8) + x);
 }

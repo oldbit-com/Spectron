@@ -43,6 +43,7 @@ public class MainWindowViewModel : ViewModelBase
     public Window? MainWindow { get; set; }
     public StatusBarViewModel StatusBar { get; } = new();
     public TapeMenuViewModel TapeMenuViewModel { get; } = new();
+    public TimeMachineViewModel TimeMachineViewModel { get; } = new();
 
     public ReactiveCommand<Unit, Unit> WindowOpenedCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> WindowClosingCommand { get; private set; }
@@ -133,7 +134,7 @@ public class MainWindowViewModel : ViewModelBase
         JoystickType = _defaultSettings.JoystickType;
         TapeLoadingSpeed = _defaultSettings.TapeLoadingSpeed;
 
-        CreateNewEmulator();
+        CreateEmulator();
     }
 
     private async Task WindowClosingAsync()
@@ -148,7 +149,7 @@ public class MainWindowViewModel : ViewModelBase
         await SettingsManager.SaveAsync(_defaultSettings);
     }
 
-    private void CreateNewEmulator() =>
+    private void CreateEmulator() =>
         InitializeEmulator(EmulatorFactory.Create(ComputerType, RomType));
 
     private void InitializeEmulator(Emulator emulator)
@@ -192,6 +193,7 @@ public class MainWindowViewModel : ViewModelBase
                 ComputerType = emulator.ComputerType;
                 RomType = emulator.RomType;
                 JoystickType = emulator.JoystickManager.JoystickType;
+                IsUlaPlusEnabled = emulator.IsUlaPlusEnabled;
 
                 InitializeEmulator(emulator);
             }
@@ -255,7 +257,7 @@ public class MainWindowViewModel : ViewModelBase
             Emulator.RenderScreen -= EmulatorOnRenderScreen;
         }
 
-        CreateNewEmulator();
+        CreateEmulator();
     }
 
     private void HandleChangeComputerType(ComputerType computerType)
@@ -263,7 +265,7 @@ public class MainWindowViewModel : ViewModelBase
         ComputerType = computerType;
 
         Emulator?.Stop();
-        CreateNewEmulator();
+        CreateEmulator();
     }
 
     private void HandleChangeJoystickType(JoystickType joystickType)
@@ -285,6 +287,7 @@ public class MainWindowViewModel : ViewModelBase
     private void HandleMachineReset()
     {
         Emulator?.Reset();
+        IsPaused = Emulator?.IsPaused ?? false;
     }
 
     private void HandleMachinePause()
@@ -301,6 +304,7 @@ public class MainWindowViewModel : ViewModelBase
         }
 
         IsPaused = Emulator?.IsPaused ?? false;
+        TimeMachineViewModel.Update(Emulator?.TimeMachineManager.Snapshots);
     }
 
     private void HandleSetEmulationSpeed(string emulationSpeed)

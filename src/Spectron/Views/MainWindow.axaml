@@ -10,7 +10,7 @@
         xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
         xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
         xmlns:models="clr-namespace:OldBit.Spectron.Models"
-        xmlns:controls1="clr-namespace:OldBit.Spectron.Controls"
+        xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.MainWindow"
         x:DataType="viewModels:MainWindowViewModel"
@@ -161,11 +161,16 @@
                 <Border CornerRadius="15" HorizontalAlignment="Center" ClipToBounds="True">
                     <Image x:Name="ScreenImage" Source="{Binding SpectrumScreen}" Stretch="Uniform"/>
                 </Border>
-                <controls1:PausedOverlay FontSize="80" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding IsPaused}"/>
+                <Border Padding="20 0 20 0" CornerRadius="10" IsVisible="{Binding IsPaused}" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Silver">
+                    <StackPanel>
+                        <controls:PausedOverlay FontSize="80" IsVisible="{Binding IsPaused}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <controls:TimeMachineView DataContext="{Binding TimeMachineViewModel}" />
+                    </StackPanel>
+                </Border>
             </Grid>
         </Border>
 
-        <controls1:StatusBar Grid.Row="1" Height="30" DataContext="{Binding StatusBar}" IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}"/>
+        <controls:StatusBar Grid.Row="1" Height="30" DataContext="{Binding StatusBar}" IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}"/>
     </Grid>
 
 </Window>

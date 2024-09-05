@@ -1,44 +1,43 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:controls="using:OldBit.Spectron.Controls"
-        xmlns:controls1="clr-namespace:OldBit.Spectron.Controls">
+        xmlns:controls="clr-namespace:OldBit.Spectron.Controls">
 
     <Design.PreviewWith>
-        <controls1:PausedOverlay FontSize="60" />
+        <controls:PausedOverlay FontSize="60" />
     </Design.PreviewWith>
 
-    <Style Selector="controls1|PausedOverlay">
+    <Style Selector="controls|PausedOverlay">
         <Setter Property="Template">
             <ControlTemplate>
-                <Border Background="{StaticResource SpectrumWhite}" CornerRadius="8" Padding="5 -5 5 5" Opacity=".7">
+                <Border CornerRadius="8" Padding="5 -5 5 5" Opacity=".7">
                     <StackPanel  Orientation="Horizontal" >
                         <TextBlock Text="P" x:Name="PART_LetterP" Opacity="1"
-                                   FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls1:PausedOverlay}}}"
+                                   FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:PausedOverlay}}}"
                                    FontFamily="{StaticResource SpectrumStrictFont}"
                                    Foreground="{StaticResource SpectrumBlack}"
                         />
                         <TextBlock Text="A" x:Name="PART_LetterA" Opacity="1"
-                                   FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls1:PausedOverlay}}}"
+                                   FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:PausedOverlay}}}"
                                    FontFamily="{StaticResource SpectrumStrictFont}"
                                    Foreground="{StaticResource SpectrumBrightRed}"
                         />
                         <TextBlock Text="U" x:Name="PART_LetterU" Opacity="1"
-                                   FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls1:PausedOverlay}}}"
+                                   FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:PausedOverlay}}}"
                                    FontFamily="{StaticResource SpectrumStrictFont}"
                                    Foreground="{StaticResource SpectrumBrightGreen}"
                         />
                         <TextBlock Text="S" x:Name="PART_LetterS" Opacity="1"
-                                   FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls1:PausedOverlay}}}"
+                                   FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:PausedOverlay}}}"
                                    FontFamily="{StaticResource SpectrumStrictFont}"
                                    Foreground="{StaticResource SpectrumBrightYellow}"
                         />
                         <TextBlock Text="E" x:Name="PART_LetterE" Opacity="1"
-                                   FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls1:PausedOverlay}}}"
+                                   FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:PausedOverlay}}}"
                                    FontFamily="{StaticResource SpectrumStrictFont}"
                                    Foreground="{StaticResource SpectrumBrightMagenta}"
                         />
                         <TextBlock Text="D" x:Name="PART_LetterD" Opacity="1"
-                                   FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls1:PausedOverlay}}}"
+                                   FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:PausedOverlay}}}"
                                    FontFamily="{StaticResource SpectrumStrictFont}"
                                    Foreground="{StaticResource SpectrumBrightBlue}"
                         />

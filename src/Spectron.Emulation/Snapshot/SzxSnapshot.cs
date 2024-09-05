@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
@@ -26,11 +27,10 @@ internal static class SzxSnapshot
 
         var emulator = EmulatorFactory.Create(computerType, romType, snapshot.CustomRom?.Data);
 
-        var (cpu, memory, screenBuffer) = (emulator.Cpu, emulator.Memory, emulator.ScreenBuffer);
-
-        LoadRegisters(cpu, snapshot.Z80Registers);
-        LoadMemory(memory, snapshot.RamPages, snapshot.SpecRegs);
-        LoadSpectrumRegisters(screenBuffer, snapshot.SpecRegs);
+        LoadRegisters(emulator.Cpu, snapshot.Z80Registers);
+        LoadMemory(emulator.Memory, snapshot.RamPages, snapshot.SpecRegs);
+        LoadSpectrumRegisters(emulator.ScreenBuffer, snapshot.SpecRegs);
+        LoadUlaPlus(emulator.UlaPlus, snapshot.Palette);
 
         // TODO: Load the rest of the snapshot
 
@@ -51,6 +51,7 @@ internal static class SzxSnapshot
         SaveRegisters(emulator.Cpu, snapshot.Z80Registers);
         SaveMemory(emulator.Memory, snapshot.RamPages, snapshot.SpecRegs, compressionLevel);
         SaveSpectrumRegisters(emulator.ScreenBuffer, snapshot.SpecRegs);
+        SaveUlaPlus(snapshot, emulator.UlaPlus);
 
         if (emulator.RomType.IsCustomRom())
         {
@@ -84,7 +85,7 @@ internal static class SzxSnapshot
         cpu.IFF2 = registers.IFF2 == 1;
         cpu.IsHalted = registers.Flags == Z80RegsBlock.FlagsHalted;
 
-        // TODO: Restart cycle counter at the gven value
+        // TODO: Restart cycle counter at the given value
         // registers.CyclesStart;
         // registers.HoldIntReqCycles;
     }
@@ -141,6 +142,20 @@ internal static class SzxSnapshot
 
         screenBuffer.Reset();
         screenBuffer.UpdateBorder(borderColor);
+    }
+
+    private static void LoadUlaPlus(UlaPlus ulaPlus, PaletteBlock? palette)
+    {
+        if (palette == null)
+        {
+            return;
+        }
+
+        ulaPlus.IsActive = palette.Flags == PaletteBlock.FlagsPaletteEnabled;
+        ulaPlus.IsEnabled = true;
+
+        ulaPlus.PaletteGroup = palette.CurrentRegister;
+        ulaPlus.SetPaletteData(palette.Registers);
     }
 
     private static void SaveRegisters(Z80 cpu, Z80RegsBlock registers)
@@ -218,6 +233,22 @@ internal static class SzxSnapshot
     private static void SaveSpectrumRegisters(ScreenBuffer screenBuffer, SpecRegsBlock specRegs)
     {
         specRegs.Border = Palette.ReverseBorderColors[screenBuffer.LastBorderColor];
+    }
+
+    private static void SaveUlaPlus(SzxFile snapshot, UlaPlus ulaPlus)
+    {
+        if (!ulaPlus.IsEnabled)
+        {
+            return;
+        }
+
+        snapshot.Palette = new PaletteBlock
+        {
+            Flags = PaletteBlock.FlagsPaletteEnabled,
+            CurrentRegister = ulaPlus.PaletteGroup,
+        };
+
+        ulaPlus.GetPaletteData().CopyTo(snapshot.Palette.Registers, 0);
     }
 
     private static T[] ConcatenateArrays<T>(T[] first, T[] second)

@@ -23,14 +23,14 @@ public static class EmulatorFactory
         {
             case ComputerType.Spectrum16K:
                 rom = customRom ?? GetSpectrum48KRom(romType);
-                return CreateSpectrum16Or48K(RomType.Custom, new Memory16K(rom));
+                return CreateSpectrum16Or48K(romType, new Memory16K(rom));
 
             case ComputerType.Spectrum48K:
                 rom = customRom ?? GetSpectrum48KRom(romType);
-                return CreateSpectrum16Or48K(RomType.Custom, new Memory48K(rom));
+                return CreateSpectrum16Or48K(romType, new Memory48K(rom));
 
             case ComputerType.Spectrum128K:
-                rom = customRom != null ? customRom[0..0x4000] : GetSpectrum128KRom(romType);
+                rom = customRom != null ? customRom[..0x4000] : GetSpectrum128KRom(romType);
                 var bank1Rom = customRom != null ? customRom[0x4000..] : RomReader.ReadRom(RomType.Original128Bank1);
                 return CreateSpectrum128K(romType, new Memory128K(rom, bank1Rom));
 

@@ -4,14 +4,15 @@ using OldBit.ZXTape.Szx;
 
 namespace OldBit.Spectron.Emulation.TimeMachine;
 
-internal record TimeMachineState(DateTimeOffset Time, SzxFile Snapshot);
+public record TimeMachineState(DateTimeOffset Time, SzxFile Snapshot);
 
-internal sealed class TimeMachineManager(TimeSpan interval, TimeSpan duration)
+public sealed class TimeMachineManager(TimeSpan interval, TimeSpan duration)
 {
+    private readonly List<TimeMachineState> _snapshots = [];
     private readonly int _maxSnapshots = (int)(duration.TotalMilliseconds / interval.TotalMilliseconds);
     private DateTimeOffset _lastSnapshotTime;
 
-    internal List<TimeMachineState> Snapshots { get; } = [];
+    public IReadOnlyList<TimeMachineState> Snapshots => _snapshots;
 
     internal void Update(Emulator emulator)
     {
@@ -22,11 +23,11 @@ internal sealed class TimeMachineManager(TimeSpan interval, TimeSpan duration)
         }
 
         var snapshot = SzxSnapshot.CreateSnapshot(emulator, CompressionLevel.NoCompression);
-        Snapshots.Add(new TimeMachineState(now, snapshot));
+        _snapshots.Add(new TimeMachineState(now, snapshot));
 
-        if (Snapshots.Count >_maxSnapshots)
+        if (_snapshots.Count >_maxSnapshots)
         {
-            Snapshots.RemoveAt(0);
+            _snapshots.RemoveAt(0);
         }
 
         _lastSnapshotTime = now;
