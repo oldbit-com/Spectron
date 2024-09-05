@@ -50,14 +50,11 @@ public static class FileDialogs
             return null;
         }
 
-        var documentsFolder = await topLevel.StorageProvider.TryGetWellKnownFolderAsync(WellKnownFolder.Documents);
-
         return await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
             Title = "Save Snapshot File",
             DefaultExtension = ".szx",
             SuggestedFileName = suggestedFileName,
-            SuggestedStartLocation = documentsFolder,
             ShowOverwritePrompt = true,
             FileTypeChoices = [FileTypes.Szx, FileTypes.Z80, FileTypes.Sna],
         });
