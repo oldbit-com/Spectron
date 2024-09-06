@@ -32,13 +32,13 @@ public class BorderTests
     [Fact]
     public void BorderRenderer_ShouldSetBorderBlue()
     {
-        var screenBuffer = new FrameBuffer(Palette.White);
+        var screenBuffer = new FrameBuffer(SpectrumPalette.White);
         var borderRenderer = new Border(screenBuffer);
-        borderRenderer.Update(Palette.Blue);
+        borderRenderer.Update(SpectrumPalette.Blue);
 
-        borderRenderer.Update(Palette.Blue, 69888);
+        borderRenderer.Update(SpectrumPalette.Blue, 69888);
 
-        BorderShouldHaveColor(Palette.Blue, screenBuffer.Pixels);
+        BorderShouldHaveColor(SpectrumPalette.Blue, screenBuffer.Pixels);
     }
 
     [Fact]
@@ -46,44 +46,44 @@ public class BorderTests
     {
         var random = new Random(69888);
 
-        var screenBuffer = new FrameBuffer(Palette.White);
+        var screenBuffer = new FrameBuffer(SpectrumPalette.White);
         var borderRenderer = new Border(screenBuffer);
-        borderRenderer.Update(Palette.Red);
+        borderRenderer.Update(SpectrumPalette.Red);
 
         var ticks = 0;
         while (ticks < 69888)
         {
             ticks += random.Next(4, 1000);
-            borderRenderer.Update(Palette.Red, ticks);
+            borderRenderer.Update(SpectrumPalette.Red, ticks);
         }
 
-        BorderShouldHaveColor(Palette.Red, screenBuffer.Pixels);
+        BorderShouldHaveColor(SpectrumPalette.Red, screenBuffer.Pixels);
     }
 
     [Fact]
     public void BorderRenderer_ShouldMatchAquaplane()
     {
-        var screenBuffer = new FrameBuffer(Palette.White);
+        var screenBuffer = new FrameBuffer(SpectrumPalette.White);
         var borderRenderer = new Border(screenBuffer);
 
-        borderRenderer.Update(Palette.Cyan, 1);
-        borderRenderer.Update(Palette.Cyan, 145);
-        borderRenderer.Update(Palette.Blue, 25013);
-        borderRenderer.Update(Palette.Blue, 69888);
+        borderRenderer.Update(SpectrumPalette.Cyan, 1);
+        borderRenderer.Update(SpectrumPalette.Cyan, 145);
+        borderRenderer.Update(SpectrumPalette.Blue, 25013);
+        borderRenderer.Update(SpectrumPalette.Blue, 69888);
 
-        screenBuffer.Pixels[..52].Should().AllSatisfy(c => c.Should().Be(Palette.White));
-        screenBuffer.Pixels[52..351].Should().AllSatisfy(c => c.Should().Be(Palette.Cyan));
+        screenBuffer.Pixels[..52].Should().AllSatisfy(c => c.Should().Be(SpectrumPalette.White));
+        screenBuffer.Pixels[52..351].Should().AllSatisfy(c => c.Should().Be(SpectrumPalette.Cyan));
         //screenBuffer[48..351].Should().AllSatisfy(c => c.Should().Be(Colors.Cyan));
     }
 
     private static void BorderShouldHaveColor(Color color, Color[] screenBuffer)
     {
-        screenBuffer[0..47].Should().AllSatisfy(c => c.Should().Be(Palette.White));
+        screenBuffer[0..47].Should().AllSatisfy(c => c.Should().Be(SpectrumPalette.White));
         screenBuffer[48..22576].Should().AllSatisfy(c => c.Should().Be(color));
         for (var i = 0; i < 192; i++)
         {
             screenBuffer.Skip(22528 + (i * 352)).Take(48).Should().AllSatisfy(c => c.Should().Be(color));
-            screenBuffer.Skip(22576 + (i * 352)).Take(256).Should().AllSatisfy(c => c.Should().Be(Palette.White));
+            screenBuffer.Skip(22576 + (i * 352)).Take(256).Should().AllSatisfy(c => c.Should().Be(SpectrumPalette.White));
             screenBuffer.Skip(22832 + (i * 352)).Take(48).Should().AllSatisfy(c => c.Should().Be(color));
         }
         screenBuffer[90112..].Should().AllSatisfy(c => c.Should().Be(color));

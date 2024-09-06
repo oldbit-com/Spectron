@@ -28,5 +28,5 @@ internal static class ScreenAddress
     /// <param name="x">The column number (0-31).</param>
     /// <param name="y">The row number (0-191).</param>
     /// <returns>The attribute address for the specified column and row.</returns>
-    internal static Word CalculateAttribute(int x, int y) => (Word)(0x1800 + 32 * (y / 8) + x);
+    internal static Word CalculateAttribute(int x, int y) => (Word)(0x5800 + 32 * (y / 8) + x);
 }

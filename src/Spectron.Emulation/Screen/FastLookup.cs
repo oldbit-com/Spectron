@@ -34,8 +34,8 @@ internal static class FastLookup
         {
             var isFlashOn = (i & 0x80) != 0;
 
-            var ink = Palette.InkColors[i & 0x47];
-            var paper = Palette.PaperColors[i & 0x78];
+            var ink = SpectrumPalette.GetInkColor(i);
+            var paper = SpectrumPalette.GetPaperColor(i);
 
             colors.Add(new AttributeColor(paper, ink, isFlashOn));
         }

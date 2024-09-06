@@ -33,7 +33,7 @@ internal sealed class Ula(
             return;
         }
 
-        var color = Palette.BorderColors[(byte)(value & 0x07)];
+        var color = SpectrumPalette.GetBorderColor(value);
         screenBuffer.UpdateBorder(color, clock.FrameTicks);
 
         UpdateTapeLoadingBeeper(ref value);

@@ -3,6 +3,7 @@ namespace OldBit.Spectron.Emulation.Screen;
 public readonly record struct Color
 {
     public int Abgr { get; }
+    public int Argb { get; }
     public byte Red { get; init; }
     public byte Green { get; init; }
     public byte Blue { get; init; }
@@ -16,5 +17,6 @@ public readonly record struct Color
         this.Blue = Blue;
 
         Abgr = 0xFF << 24 | Blue << 16 | Green << 8 | Red;
+        Argb = 0xFF << 24 | Red << 16 | Green << 8 | Blue;
     }
 }

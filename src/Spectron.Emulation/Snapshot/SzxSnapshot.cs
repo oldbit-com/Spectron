@@ -138,7 +138,7 @@ internal static class SzxSnapshot
 
     private static void LoadSpectrumRegisters(ScreenBuffer screenBuffer, SpecRegsBlock specRegs)
     {
-        var borderColor = Palette.BorderColors[(byte)(specRegs.Border & 0x07)];
+        var borderColor = SpectrumPalette.GetBorderColor(specRegs.Border);
 
         screenBuffer.Reset();
         screenBuffer.UpdateBorder(borderColor);
@@ -232,7 +232,7 @@ internal static class SzxSnapshot
 
     private static void SaveSpectrumRegisters(ScreenBuffer screenBuffer, SpecRegsBlock specRegs)
     {
-        specRegs.Border = Palette.ReverseBorderColors[screenBuffer.LastBorderColor];
+        specRegs.Border = SpectrumPalette.ReverseBorderColors[screenBuffer.LastBorderColor];
     }
 
     private static void SaveUlaPlus(SzxFile snapshot, UlaPlus ulaPlus)

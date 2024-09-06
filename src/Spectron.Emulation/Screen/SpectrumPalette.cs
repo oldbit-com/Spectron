@@ -1,6 +1,6 @@
 namespace OldBit.Spectron.Emulation.Screen;
 
-internal static class Palette
+public static class SpectrumPalette
 {
     internal static readonly Color Black = new (0x00, 0x00, 0x00);
     internal static readonly Color Blue = new (0x00, 0x00, 0xD7);
@@ -19,7 +19,11 @@ internal static class Palette
     internal static readonly Color BrightYellow = new (0xFF, 0xFF, 0x00);
     internal static readonly Color BrightWhite = new (0xFF, 0xFF, 0xFF);
 
-    internal static readonly Dictionary<byte, Color> BorderColors = new()
+    public static Color GetBorderColor(int attr) => BorderColors[(byte)(attr & 0x07)];
+    public static Color GetPaperColor(int attr) => PaperColors[(byte)(attr & 0x78)];
+    public static Color GetInkColor(int attr) => InkColors[(byte)(attr & 0x47)];
+
+    private static readonly Dictionary<byte, Color> BorderColors = new()
     {
         { 0b0000000, Black },
         { 0b0000001, Blue },
@@ -34,7 +38,7 @@ internal static class Palette
     internal static readonly Dictionary<Color, byte> ReverseBorderColors =
         BorderColors.ToDictionary(x => x.Value, x => x.Key);
 
-    internal static readonly Dictionary<int, Color> PaperColors = new()
+    private static readonly Dictionary<int, Color> PaperColors = new()
     {
         { 0b00000000, Black },
         { 0b00001000, Blue },
@@ -54,7 +58,7 @@ internal static class Palette
         { 0b01111000, BrightWhite }
     };
 
-    internal static readonly Dictionary<int, Color> InkColors = new()
+    private static readonly Dictionary<int, Color> InkColors = new()
     {
         { 0b00000000, Black },
         { 0b00000001, Blue },

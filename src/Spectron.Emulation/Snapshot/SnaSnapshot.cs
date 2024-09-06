@@ -51,7 +51,7 @@ internal static class SnaSnapshot
             cpu.Registers.SP += 2;
         }
 
-        var borderColor = Palette.BorderColors[(byte)(snapshot.Header.BorderColor & 0x07)];
+        var borderColor = SpectrumPalette.GetBorderColor(snapshot.Header.BorderColor);
 
         screenBuffer.Reset();
         screenBuffer.UpdateBorder(borderColor);
@@ -84,7 +84,7 @@ internal static class SnaSnapshot
                 InterruptMode = (byte)emulator.Cpu.IM,
                 Interrupt = (byte)((emulator.Cpu.IFF2 ? 0x04 : 0x00) | (emulator.Cpu.IFF1 ? 0x02 : 0x00)),
 
-                BorderColor = Palette.ReverseBorderColors[emulator.ScreenBuffer.LastBorderColor]
+                BorderColor = SpectrumPalette.ReverseBorderColors[emulator.ScreenBuffer.LastBorderColor]
             }
         };
 

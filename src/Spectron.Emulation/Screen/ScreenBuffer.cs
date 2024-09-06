@@ -10,7 +10,7 @@ internal sealed class ScreenBuffer
 
     private bool _borderColorChanged = true;
 
-    public FrameBuffer FrameBuffer { get; } = new(Palette.White);
+    public FrameBuffer FrameBuffer { get; } = new(SpectrumPalette.White);
     internal Color LastBorderColor { get; private set; }
 
     internal ScreenBuffer(IEmulatorMemory memory, UlaPlus ulaPlus)

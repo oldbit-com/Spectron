@@ -8,7 +8,7 @@ internal sealed class Border(FrameBuffer frameBuffer)
 
     private int _lastRangeIndex;
     private int _offset;
-    private Color _lastColor = Palette.White;
+    private Color _lastColor = SpectrumPalette.White;
 
     internal void Update(Color color) => _lastColor = color;
 
@@ -65,7 +65,7 @@ internal sealed class Border(FrameBuffer frameBuffer)
 
     internal void Reset()
     {
-        _lastColor = Palette.White;
+        _lastColor = SpectrumPalette.White;
         NewFrame();
     }
 

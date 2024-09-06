@@ -104,7 +104,7 @@ internal sealed class UlaPlus : IDevice
 
         foreach (var palette in _paletteColors)
         {
-            Array.Fill(palette, Palette.White);
+            Array.Fill(palette, SpectrumPalette.White);
         }
     }
 

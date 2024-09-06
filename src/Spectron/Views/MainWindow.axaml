@@ -161,9 +161,9 @@
                 <Border CornerRadius="15" HorizontalAlignment="Center" ClipToBounds="True">
                     <Image x:Name="ScreenImage" Source="{Binding SpectrumScreen}" Stretch="Uniform"/>
                 </Border>
-                <Border Padding="20 0 20 0" CornerRadius="10" IsVisible="{Binding IsPaused}" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Silver">
+                <Border Padding="20" CornerRadius="10" BoxShadow="15 15 25 0 DarkGray" IsVisible="{Binding IsPaused}" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Silver" >
                     <StackPanel>
-                        <controls:PausedOverlay FontSize="80" IsVisible="{Binding IsPaused}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <controls:PausedOverlay FontSize="40" IsVisible="{Binding IsPaused}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         <controls:TimeMachineView DataContext="{Binding TimeMachineViewModel}" />
                     </StackPanel>
                 </Border>
