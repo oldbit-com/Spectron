@@ -57,7 +57,7 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<JoystickType, Unit> ChangeJoystickType { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleUlaPlus { get; private set; }
     public ReactiveCommand<Unit, Unit> ResetCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> PauseCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> TogglePauseCommand { get; private set; }
     public ReactiveCommand<string, Unit> SetEmulationSpeedCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleFullScreenCommand { get; private set; }
     public ReactiveCommand<TapeLoadingSpeed, Unit> SetTapeLoadSpeedCommand { get; private set; }
@@ -82,7 +82,7 @@ public class MainWindowViewModel : ViewModelBase
         ChangeComputerType = ReactiveCommand.Create<ComputerType>(HandleChangeComputerType);
         ChangeJoystickType = ReactiveCommand.Create<JoystickType>(HandleChangeJoystickType);
         ToggleUlaPlus = ReactiveCommand.Create(HandleToggleUlaPlus);
-        PauseCommand = ReactiveCommand.Create(HandleMachinePause, emulatorNotNull);
+        TogglePauseCommand = ReactiveCommand.Create(HandleTogglePause, emulatorNotNull);
         ResetCommand = ReactiveCommand.Create(HandleMachineReset, emulatorNotNull);
         SetEmulationSpeedCommand = ReactiveCommand.Create<string>(HandleSetEmulationSpeed);
         ToggleFullScreenCommand = ReactiveCommand.Create(HandleToggleFullScreen);
@@ -290,7 +290,7 @@ public class MainWindowViewModel : ViewModelBase
         IsPaused = Emulator?.IsPaused ?? false;
     }
 
-    private void HandleMachinePause()
+    private void HandleTogglePause()
     {
         switch (Emulator?.IsPaused)
         {
@@ -304,7 +304,11 @@ public class MainWindowViewModel : ViewModelBase
         }
 
         IsPaused = Emulator?.IsPaused ?? false;
-        TimeMachineViewModel.Update(Emulator?.TimeMachineManager.Snapshots);
+
+        if (IsPaused)
+        {
+            TimeMachineViewModel.Update(Emulator?.TimeMachineManager.Snapshots);
+        }
     }
 
     private void HandleSetEmulationSpeed(string emulationSpeed)
@@ -371,6 +375,11 @@ public class MainWindowViewModel : ViewModelBase
                 Emulator?.JoystickManager.HandleInput(joystickKeys, isOn: true);
                 return;
             }
+        }
+
+        if (IsPaused && e.Key == Key.Escape)
+        {
+            HandleTogglePause();
         }
 
         var keys = KeyMappings.ToSpectrumKey(e);

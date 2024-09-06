@@ -110,7 +110,7 @@
                         </NativeMenu>
                     </NativeMenuItem>
                     <NativeMenuItemSeparator/>
-                    <NativeMenuItem Header="Pause" Gesture="F11" Command="{Binding PauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
+                    <NativeMenuItem Header="Pause" Gesture="F10" Command="{Binding TogglePauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
                     <NativeMenuItem Header="Reset" Command="{Binding ResetCommand}"/>
                 </NativeMenu>
             </NativeMenuItem>
@@ -159,7 +159,17 @@
         <Border>
             <Grid>
                 <Border CornerRadius="15" HorizontalAlignment="Center" ClipToBounds="True">
-                    <Image x:Name="ScreenImage" Source="{Binding SpectrumScreen}" Stretch="Uniform"/>
+                    <Grid>
+                        <Image x:Name="ScreenImage" Source="{Binding SpectrumScreen}" Stretch="Uniform" Classes.IsPaused="{Binding IsPaused}">
+                            <Image.Styles>
+                                <Style Selector="Image.IsPaused">
+                                    <Setter Property="Effect">
+                                        <BlurEffect Radius="10"/>
+                                    </Setter>
+                                </Style>
+                            </Image.Styles>
+                        </Image>
+                    </Grid>
                 </Border>
                 <Border Padding="20" CornerRadius="10" BoxShadow="15 15 25 0 DarkGray" IsVisible="{Binding IsPaused}" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Silver" >
                     <StackPanel>
