@@ -38,6 +38,5 @@ public sealed class JoystickManager
         }
     }
 
-    public void HandleInput(JoystickInput input, bool isOn) =>
-        _joystick?.HandleInput(input, isOn);
+    public void HandleInput(JoystickInput input, bool isOn) => _joystick?.HandleInput(input, isOn);
 }

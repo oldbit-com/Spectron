@@ -1,4 +1,5 @@
-using System.Collections.Generic;
+using System;
+using System.Reactive;
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
@@ -7,7 +8,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Snapshot;
-using OldBit.Spectron.Emulation.TimeMachine;
+using OldBit.Spectron.Emulation.TimeTravel;
 using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
@@ -17,57 +18,81 @@ public class TimeMachineViewModel : ViewModelBase
     private const int PreviewHeight = 192;
     private const int PreviewWidth = 256;
 
-    private IReadOnlyList<TimeMachineState>? _snapshotStates;
-
+    public ReactiveCommand<Unit, Unit> TimeTravelCommand { get; private set; }
     public Control PreviewControl { get; set; } = null!;
+    public Action<TimeMachineEntry>? OnTimeTravel { get; set; }
 
-    public void Update(IReadOnlyList<TimeMachineState>? snapshotStates)
+    public TimeMachineViewModel()
     {
-        _snapshotStates = snapshotStates;
-        Maximum = _snapshotStates?.Count - 1 ?? 0;
-        SelectedValue = Maximum;
+        TimeTravelCommand = ReactiveCommand.Create(HandleTimeTravel);
     }
 
-    private void UpdateScreen()
+    public void BeforeShow()
     {
-        var index = (int)_selectedValue;
-        var state = _snapshotStates?[index];
-        var screenshot = state?.Snapshot.GetScreenshot();
+        EntriesCount = TimeMachine.Instance.Entries.Count - 1;
+        CurrentEntryIndex = EntriesCount;
+    }
 
-        if (screenshot == null)
+    private void HandleTimeTravel()
+    {
+        if (_currentEntryIndex >= EntriesCount)
         {
             return;
         }
+
+        var timeMachineEntry = GetSelectedEntry();
+        if (timeMachineEntry != null)
+        {
+            OnTimeTravel?.Invoke(timeMachineEntry);
+        }
+    }
+
+    private void UpdatePreview()
+    {
+        var timeMachineEntry = GetSelectedEntry();
+        if (timeMachineEntry == null)
+        {
+            return;
+        }
+
+        var screenshot = timeMachineEntry.Snapshot.GetScreenshot();
 
         using (var bitmap = ScreenPreview.Lock())
         {
             Marshal.Copy(screenshot, 0, bitmap.Address, screenshot.Length);
         }
 
-        if (state?.Snapshot.SpecRegs.Border != null)
-        {
-            var borderColor = SpectrumPalette.GetBorderColor(state.Snapshot.SpecRegs.Border);
-            ScreenBorderBrush = new SolidColorBrush((uint)borderColor.Argb);
-        }
-
+        var borderColor = SpectrumPalette.GetBorderColor(timeMachineEntry.Snapshot.SpecRegs.Border);
+        ScreenBorderBrush = new SolidColorBrush((uint)borderColor.Argb);
         PreviewControl.InvalidateVisual();
     }
 
-    private int _maximum = 1;
-    public int Maximum
+    private TimeMachineEntry? GetSelectedEntry()
     {
-        get => _maximum;
-        set => this.RaiseAndSetIfChanged(ref _maximum, value);
+        var index = (int)_currentEntryIndex;
+        if (index >= 0 && index < TimeMachine.Instance.Entries.Count)
+        {
+            return TimeMachine.Instance.Entries[index];
+        }
+
+        return null;
     }
 
-    private double _selectedValue;
-    public double SelectedValue
+    private int _entriesCount;
+    public int EntriesCount
     {
-        get => _selectedValue;
+        get => _entriesCount;
+        set => this.RaiseAndSetIfChanged(ref _entriesCount, value);
+    }
+
+    private double _currentEntryIndex;
+    public double CurrentEntryIndex
+    {
+        get => _currentEntryIndex;
         set
         {
-            this.RaiseAndSetIfChanged(ref _selectedValue, value);
-            UpdateScreen();
+            this.RaiseAndSetIfChanged(ref _currentEntryIndex, value);
+            UpdatePreview();
         }
     }
 

@@ -17,6 +17,7 @@ using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.Tape;
+using OldBit.Spectron.Emulation.TimeTravel;
 using OldBit.Spectron.Helpers;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Preferences;
@@ -89,6 +90,8 @@ public class MainWindowViewModel : ViewModelBase
         SetTapeLoadSpeedCommand = ReactiveCommand.Create<TapeLoadingSpeed>(HandleSetTapeLoadingSpeed);
         HelpKeyboardCommand = ReactiveCommand.Create(HandleHelpKeyboardCommand);
 
+        TimeMachineViewModel.OnTimeTravel = HandleTimeTravel;
+
         SpectrumScreen = _frameBufferConverter.Bitmap;
     }
 
@@ -149,14 +152,18 @@ public class MainWindowViewModel : ViewModelBase
         await SettingsManager.SaveAsync(_defaultSettings);
     }
 
-    private void CreateEmulator() =>
-        InitializeEmulator(EmulatorFactory.Create(ComputerType, RomType));
+    private void CreateEmulator() => InitializeEmulator(EmulatorFactory.Create(ComputerType, RomType));
 
     private void InitializeEmulator(Emulator emulator)
     {
         Emulator?.Stop();
-
         Emulator = emulator;
+        IsPaused = false;
+
+        ComputerType = emulator.ComputerType;
+        RomType = emulator.RomType;
+        JoystickType = emulator.JoystickManager.JoystickType;
+        IsUlaPlusEnabled = emulator.IsUlaPlusEnabled;
 
         Emulator.IsUlaPlusEnabled = IsUlaPlusEnabled;
         Emulator.TapeLoadingSpeed = TapeLoadingSpeed;
@@ -189,12 +196,6 @@ public class MainWindowViewModel : ViewModelBase
             if (fileType.IsSnapshot())
             {
                 var emulator = SnapshotFile.Load(files[0].Path.LocalPath);
-
-                ComputerType = emulator.ComputerType;
-                RomType = emulator.RomType;
-                JoystickType = emulator.JoystickManager.JoystickType;
-                IsUlaPlusEnabled = emulator.IsUlaPlusEnabled;
-
                 InitializeEmulator(emulator);
             }
             else
@@ -307,7 +308,7 @@ public class MainWindowViewModel : ViewModelBase
 
         if (IsPaused)
         {
-            TimeMachineViewModel.Update(Emulator?.TimeMachineManager.Snapshots);
+            TimeMachineViewModel.BeforeShow();
         }
     }
 
@@ -351,6 +352,11 @@ public class MainWindowViewModel : ViewModelBase
 
     private void HandleKeyUp(KeyEventArgs e)
     {
+        if (IsPaused)
+        {
+            return;
+        }
+
         if (JoystickType != JoystickType.None)
         {
             var joystickKeys = KeyMappings.ToJoystickAction(e);
@@ -367,6 +373,15 @@ public class MainWindowViewModel : ViewModelBase
 
     private void HandleKeyDown(KeyEventArgs e)
     {
+        if (IsPaused)
+        {
+            if (e.Key == Key.Escape)
+            {
+                HandleTogglePause();
+            }
+            return;
+        }
+
         if (JoystickType != JoystickType.None)
         {
             var joystickKeys = KeyMappings.ToJoystickAction(e);
@@ -377,13 +392,14 @@ public class MainWindowViewModel : ViewModelBase
             }
         }
 
-        if (IsPaused && e.Key == Key.Escape)
-        {
-            HandleTogglePause();
-        }
-
         var keys = KeyMappings.ToSpectrumKey(e);
         Emulator?.KeyboardHandler.HandleKeyDown(keys);
+    }
+
+    private void HandleTimeTravel(TimeMachineEntry entry)
+    {
+        var emulator = EmulatorFactory.Create(entry.Snapshot);
+        InitializeEmulator(emulator);
     }
 
     private BorderSize _borderSize = BorderSize.Medium;

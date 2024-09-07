@@ -1,7 +1,9 @@
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
+using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Z80Cpu.Contention;
+using OldBit.ZXTape.Szx;
 
 namespace OldBit.Spectron.Emulation;
 
@@ -41,6 +43,8 @@ public static class EmulatorFactory
                 throw new ArgumentOutOfRangeException(nameof(computerType));
         }
     }
+
+    public static Emulator Create(SzxFile snapshot) => SzxSnapshot.CreateEmulator(snapshot);
 
     private static Emulator CreateSpectrum128K(RomType romType, Memory128K memory)
     {

@@ -5,16 +5,31 @@
              xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:TimeMachineViewModel"
-             x:Class="OldBit.Spectron.Controls.TimeMachineView">
+             x:Class="OldBit.Spectron.Controls.TimeMachineView"
+             Name="TimeMachine">
+
+    <UserControl.Styles>
+        <Style Selector="TextBlock.ZX">
+            <Setter Property="FontFamily" Value="{StaticResource SpectrumStrictFont}"/>
+        </Style>
+    </UserControl.Styles>
+
     <Grid>
         <StackPanel>
+            <Border Padding="0 0 0 10" CornerRadius="20">
+                <TextBlock Text="Time Machine Travel" HorizontalAlignment="Center" FontSize="25" Classes="ZX" Foreground="{StaticResource SpectrumMagenta}"/>
+            </Border>
             <Border CornerRadius="10" HorizontalAlignment="Center" ClipToBounds="True">
-                <Border Padding="20" Background="{Binding ScreenBorderBrush}">
-                    <Image Name="PreviewImage" Width="256" Height="192" Source="{Binding ScreenPreview}" Stretch="Uniform" />
+                <Border Padding="40 40 40 30" Background="{Binding ScreenBorderBrush}">
+                    <Image Name="PreviewImage" Width="256" Height="192" Source="{Binding ScreenPreview}" Stretch="Uniform"/>
                 </Border>
             </Border>
-            <Slider FocusAdorner="{x:Null}" Minimum="0" Maximum="{Binding Maximum}" Value="{Binding SelectedValue}" TickFrequency="1" IsSnapToTickEnabled="True"/>
-            <TextBlock Text="{Binding SelectedValue}" HorizontalAlignment="Center"/>
+            <Slider TickPlacement="None" FocusAdorner="{x:Null}" Height="35" Minimum="0" Maximum="{Binding EntriesCount}" Value="{Binding CurrentEntryIndex}" TickFrequency="1" IsSnapToTickEnabled="True"/>
+            <Grid ColumnDefinitions="*,*,*">
+                <TextBlock Grid.Column="0" Text="past" Classes="ZX" FontSize="15" Foreground="{StaticResource SpectrumBlue}"/>
+                <Button Margin="0 10 0 0" Grid.Column="1" Content="Time Travel" Command="{Binding TimeTravelCommand}" FontFamily="{StaticResource SpectrumStrictFont}" FontSize="20" CornerRadius="10"/>
+                <TextBlock Grid.Column="2" Text="now" TextAlignment="Right" Classes="ZX" FontSize="15" Foreground="{StaticResource SpectrumBlue}"/>
+            </Grid>
         </StackPanel>
     </Grid>
 </UserControl>

@@ -6,7 +6,7 @@ using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Tape;
-using OldBit.Spectron.Emulation.TimeMachine;
+using OldBit.Spectron.Emulation.TimeTravel;
 using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation;
@@ -33,7 +33,6 @@ public sealed class Emulator
     public ComputerType ComputerType { get; }
     public RomType RomType { get; }
     public TapeLoadingSpeed TapeLoadingSpeed { get; set; }
-    public readonly TimeMachineManager TimeMachineManager = new(TimeSpan.FromSeconds(0.5), TimeSpan.FromMinutes(1));
 
     internal Z80 Cpu { get; }
     internal IEmulatorMemory Memory { get; }
@@ -69,7 +68,11 @@ public sealed class Emulator
         _emulationTimer.Stop();
     }
 
-    public void Pause() => _emulationTimer.Pause();
+    public void Pause()
+    {
+        _emulationTimer.Pause();
+        TimeMachine.Instance.Update(this);
+    }
 
     public void Resume() => _emulationTimer.Resume();
 
@@ -153,7 +156,7 @@ public sealed class Emulator
         Cpu.TriggerInt(0xFF);
         RenderScreen?.Invoke(ScreenBuffer.FrameBuffer);
 
-        TimeMachineManager.Update(this);
+        TimeMachine.Instance.Update(this);
     }
 
     private void ToggleUlaPlus(bool value)

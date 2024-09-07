@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.IO.Compression;
 using OldBit.Spectron.Emulation.Devices;
+using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
@@ -15,6 +17,11 @@ internal static class SzxSnapshot
     {
         var snapshot = SzxFile.Load(fileName);
 
+        return CreateEmulator(snapshot);
+    }
+
+    internal static Emulator CreateEmulator(SzxFile snapshot)
+    {
         var computerType = snapshot.Header.MachineId switch
         {
             SzxHeader.MachineId16K => ComputerType.Spectrum48K,
@@ -31,6 +38,7 @@ internal static class SzxSnapshot
         LoadMemory(emulator.Memory, snapshot.RamPages, snapshot.SpecRegs);
         LoadSpectrumRegisters(emulator.ScreenBuffer, snapshot.SpecRegs);
         LoadUlaPlus(emulator.UlaPlus, snapshot.Palette);
+        LoadJoystick(emulator.JoystickManager, snapshot.Joystick);
 
         // TODO: Load the rest of the snapshot
 
@@ -51,7 +59,8 @@ internal static class SzxSnapshot
         SaveRegisters(emulator.Cpu, snapshot.Z80Registers);
         SaveMemory(emulator.Memory, snapshot.RamPages, snapshot.SpecRegs, compressionLevel);
         SaveSpectrumRegisters(emulator.ScreenBuffer, snapshot.SpecRegs);
-        SaveUlaPlus(snapshot, emulator.UlaPlus);
+        SaveUlaPlus(emulator.UlaPlus, snapshot);
+        SaveJoystick(emulator.JoystickManager, snapshot);
 
         if (emulator.RomType.IsCustomRom())
         {
@@ -158,6 +167,24 @@ internal static class SzxSnapshot
         ulaPlus.SetPaletteData(palette.Registers);
     }
 
+    private static void LoadJoystick(JoystickManager joystickManager, JoystickBlock? joystickBlock)
+    {
+        if (joystickBlock == null)
+        {
+            return;
+        }
+
+        joystickManager.SetupJoystick(joystickBlock.JoystickTypePlayer1 switch
+        {
+            JoystickBlock.JoystickKempston => JoystickType.Kempston,
+            JoystickBlock.JoystickSinclair1 => JoystickType.Sinclair1,
+            JoystickBlock.JoystickSinclair2 => JoystickType.Sinclair2,
+            JoystickBlock.JoystickCursor => JoystickType.Cursor,
+            JoystickBlock.JoystickFuller => JoystickType.Fuller,
+            _ => JoystickType.None,
+        });
+    }
+
     private static void SaveRegisters(Z80 cpu, Z80RegsBlock registers)
     {
         registers.AF = cpu.Registers.AF;
@@ -235,7 +262,7 @@ internal static class SzxSnapshot
         specRegs.Border = SpectrumPalette.ReverseBorderColors[screenBuffer.LastBorderColor];
     }
 
-    private static void SaveUlaPlus(SzxFile snapshot, UlaPlus ulaPlus)
+    private static void SaveUlaPlus(UlaPlus ulaPlus, SzxFile snapshot)
     {
         if (!ulaPlus.IsEnabled)
         {
@@ -249,6 +276,28 @@ internal static class SzxSnapshot
         };
 
         ulaPlus.GetPaletteData().CopyTo(snapshot.Palette.Registers, 0);
+    }
+
+    private static void SaveJoystick(JoystickManager joystickManager, SzxFile snapshot)
+    {
+        if (joystickManager.JoystickType == JoystickType.None)
+        {
+            return;
+        }
+
+        snapshot.Joystick = new JoystickBlock
+        {
+            JoystickTypePlayer1 = joystickManager.JoystickType switch
+            {
+                JoystickType.Kempston => JoystickBlock.JoystickKempston,
+                JoystickType.Sinclair1 => JoystickBlock.JoystickSinclair1,
+                JoystickType.Sinclair2 => JoystickBlock.JoystickSinclair2,
+                JoystickType.Cursor => JoystickBlock.JoystickCursor,
+                JoystickType.Fuller => JoystickBlock.JoystickFuller,
+                _ => JoystickBlock.JoystickDisabled,
+            },
+            JoystickTypePlayer2 = JoystickBlock.JoystickDisabled
+        };
     }
 
     private static T[] ConcatenateArrays<T>(T[] first, T[] second)
