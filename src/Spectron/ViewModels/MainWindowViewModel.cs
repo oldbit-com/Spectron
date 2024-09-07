@@ -182,16 +182,16 @@ public class MainWindowViewModel : ViewModelBase
 
     private async Task HandleLoadFileAsync()
     {
-        var files = await FileDialogs.OpenAnyFileAsync();
-        if (files.Count <= 0)
-        {
-            return;
-        }
-
-        Emulator?.Pause();
-
         try
         {
+            Emulator?.Pause();
+
+            var files = await FileDialogs.OpenAnyFileAsync();
+            if (files.Count <= 0)
+            {
+                return;
+            }
+
             var fileType = FileTypeHelper.GetFileType(files[0].Path.LocalPath);
             if (fileType.IsSnapshot())
             {
@@ -215,17 +215,12 @@ public class MainWindowViewModel : ViewModelBase
 
     private async Task HandleSaveFileAsync()
     {
-        if (Emulator == null)
-        {
-            return;
-        }
-
         try
         {
-            Emulator.Pause();
+            Emulator?.Pause();
 
             var file = await FileDialogs.SaveSnapshotFileAsync();
-            if (file != null)
+            if (file != null && Emulator != null)
             {
                 SnapshotFile.Save(file.Path.LocalPath, Emulator);
             }
@@ -236,7 +231,7 @@ public class MainWindowViewModel : ViewModelBase
         }
         finally
         {
-            Emulator.Resume();
+            Emulator?.Resume();
         }
     }
 
