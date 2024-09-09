@@ -1,4 +1,4 @@
-using OldBit.Spectron.Emulation.File;
+using OldBit.Spectron.Emulation.Storage;
 
 namespace OldBit.Spectron.Emulation.Snapshot;
 

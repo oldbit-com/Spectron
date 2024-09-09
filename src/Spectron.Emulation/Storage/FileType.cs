@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.File;
+namespace OldBit.Spectron.Emulation.Storage;
 
 public enum FileType
 {
