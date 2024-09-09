@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using OldBit.Spectron.Emulation.File;
+using OldBit.Spectron.Emulation.Storage;
 using OldBit.ZXTape.Extensions;
 using OldBit.ZXTape.Tap;
 using OldBit.ZXTape.Tzx;
