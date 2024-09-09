@@ -21,10 +21,6 @@
         WindowState="{Binding WindowState}"
         Name="Window">
 
-    <Design.DataContext>
-        <viewModels:MainWindowViewModel/>
-    </Design.DataContext>
-
     <i:Interaction.Behaviors>
         <EventTriggerBehavior EventName="Opened" SourceObject="Window">
             <InvokeCommandAction Command="{Binding WindowOpenedCommand}" />
@@ -50,9 +46,9 @@
             <NativeMenuItem Header="File">
                 <NativeMenu>
                     <NativeMenuItem Header="Load..." Gesture="Cmd+O" Command="{Binding LoadFileCommand}"/>
-                    <!-- <NativeMenuItem Header="Open Recent"> -->
-                    <!--     <NativeMenu NeedsUpdate="OpenRecent_OnNeedsUpdate" /> -->
-                    <!-- </NativeMenuItem> -->
+                    <NativeMenuItem Header="Recent...">
+                        <NativeMenu Opening="RecentFilesMenu_OnOpening" />
+                    </NativeMenuItem>
                     <NativeMenuItem Header="Save Snapshot..." Gesture="Cmd+S" Command="{Binding SaveFileCommand}"/>
                 </NativeMenu>
             </NativeMenuItem>

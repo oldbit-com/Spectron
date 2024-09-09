@@ -1,5 +1,6 @@
 using System;
 using Avalonia.Controls;
+using DynamicData;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.ViewModels;
 
@@ -27,5 +28,15 @@ public partial class MainWindow : Window
         FileDialogs.MainWindow = this;
         MessageDialogs.MainWindow = this;
         viewModel.MainWindow = this;
+    }
+
+    private void RecentFilesMenu_OnOpening(object? sender, EventArgs e)
+    {
+        if (sender is not NativeMenu recentFilesMenu)
+        {
+            return;
+        }
+
+        _viewModel?.RecentFilesViewModel.Opening(recentFilesMenu.Items);
     }
 }
