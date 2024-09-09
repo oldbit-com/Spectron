@@ -4,9 +4,9 @@ using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Models;
 
-namespace OldBit.Spectron.Preferences;
+namespace OldBit.Spectron.Settings;
 
-public class DefaultSettings
+public class Preferences
 {
     public bool IsUlaPlusEnabled { get; set; }
 
