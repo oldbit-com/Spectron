@@ -6,20 +6,25 @@ namespace OldBit.Spectron.Emulation.TimeTravel;
 
 public record TimeMachineEntry(DateTimeOffset Timestamp, SzxFile Snapshot);
 
-public sealed class TimeMachine(TimeSpan interval, TimeSpan duration)
+public sealed class TimeMachine
 {
     private readonly List<TimeMachineEntry> _entries = [];
-    private readonly int _maxSnapshots = (int)(duration.TotalMilliseconds / interval.TotalMilliseconds);
-    private DateTimeOffset _lastEntryTime;
+    private readonly int _maxSnapshots = (int)(DefaultDuration.TotalMilliseconds / DefaultInterval.TotalMilliseconds);
 
-    public static TimeMachine Instance { get; } = new(TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(5));
-
+    public static TimeSpan DefaultInterval { get; } = TimeSpan.FromSeconds(1);
+    public static TimeSpan DefaultDuration { get; } = TimeSpan.FromMinutes(5);
+    public static TimeMachine Instance { get; } = new();
     public IReadOnlyList<TimeMachineEntry> Entries => _entries;
 
-    internal void Update(Emulator emulator)
+    private TimeMachine()
     {
+    }
+
+    internal void AddEntry(Emulator emulator)
+    {
+        var lastEntryTime = _entries.LastOrDefault()?.Timestamp ?? DateTimeOffset.MinValue;
         var now = DateTimeOffset.UtcNow;
-        if (now - _lastEntryTime < interval)
+        if (now - lastEntryTime < DefaultInterval)
         {
             return;
         }
@@ -31,7 +36,5 @@ public sealed class TimeMachine(TimeSpan interval, TimeSpan duration)
         {
             _entries.RemoveAt(0);
         }
-
-        _lastEntryTime = now;
     }
 }

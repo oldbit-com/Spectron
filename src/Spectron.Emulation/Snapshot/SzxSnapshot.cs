@@ -11,7 +11,7 @@ using OldBit.ZXTape.Szx.Blocks;
 
 namespace OldBit.Spectron.Emulation.Snapshot;
 
-internal static class SzxSnapshot
+public static class SzxSnapshot
 {
     internal static Emulator Load(string fileName)
     {
@@ -52,7 +52,7 @@ internal static class SzxSnapshot
         snapshot.Save(fileName);
     }
 
-    internal static SzxFile CreateSnapshot(Emulator emulator, CompressionLevel compressionLevel = CompressionLevel.SmallestSize)
+    public static SzxFile CreateSnapshot(Emulator emulator, CompressionLevel compressionLevel = CompressionLevel.SmallestSize)
     {
         var snapshot = new SzxFile();
 

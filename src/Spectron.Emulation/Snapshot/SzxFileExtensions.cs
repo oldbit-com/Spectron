@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.ZXTape.Szx;
 using OldBit.ZXTape.Szx.Blocks;
