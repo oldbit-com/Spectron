@@ -20,17 +20,16 @@ public class RecentFilesViewModel : ViewModelBase
     public RecentFilesViewModel(RecentFilesService recentFilesService)
     {
         _recentFilesService = recentFilesService;
-        _openRecentFileCommand = ReactiveCommand.CreateFromTask<string, Unit>(HandleOpenRecentFileAsync);
-    }
 
-    private async Task<Unit> HandleOpenRecentFileAsync(string fileName)
-    {
-        if (OpenRecentFileAsync != null)
+        _openRecentFileCommand = ReactiveCommand.CreateFromTask<string, Unit>(async fileName =>
         {
-            await OpenRecentFileAsync(fileName);
-        }
+            if (OpenRecentFileAsync != null)
+            {
+                await OpenRecentFileAsync(fileName);
+            }
 
-        return Unit.Default;
+            return Unit.Default;
+        });
     }
 
     public async Task LoadAsync() => _recentFilesSettings = await _recentFilesService.LoadAsync();
@@ -72,6 +71,4 @@ public class RecentFilesViewModel : ViewModelBase
             _recentFilesSettings.Files.Remove(filePath);
         }
     }
-
-
 }
