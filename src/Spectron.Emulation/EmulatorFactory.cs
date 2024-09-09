@@ -25,11 +25,11 @@ public static class EmulatorFactory
         {
             case ComputerType.Spectrum16K:
                 rom = customRom ?? GetSpectrum48KRom(romType);
-                return CreateSpectrum16Or48K(romType, new Memory16K(rom));
+                return CreateSpectrum(computerType, romType, new Memory16K(rom));
 
             case ComputerType.Spectrum48K:
                 rom = customRom ?? GetSpectrum48KRom(romType);
-                return CreateSpectrum16Or48K(romType, new Memory48K(rom));
+                return CreateSpectrum(computerType, romType, new Memory48K(rom));
 
             case ComputerType.Spectrum128K:
                 rom = customRom != null ? customRom[..0x4000] : GetSpectrum128KRom(romType);
@@ -65,14 +65,14 @@ public static class EmulatorFactory
         return new Emulator(emulatorSettings, Hardware.Spectrum128K);
     }
 
-    private static Emulator CreateSpectrum16Or48K(RomType romType, IEmulatorMemory memory)
+    private static Emulator CreateSpectrum(ComputerType computerType, RomType romType, IEmulatorMemory memory)
     {
         var contentionProvider = new ContentionProvider(
             Hardware.Spectrum48K.FirstPixelTick,
             Hardware.Spectrum48K.TicksPerLine);
 
         var emulatorSettings = new EmulatorSettings(
-            ComputerType.Spectrum48K,
+            computerType,
             romType,
             memory,
             contentionProvider,
