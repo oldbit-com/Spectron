@@ -9,18 +9,20 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
+using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Joystick;
-using OldBit.Spectron.Emulation.File;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Snapshot;
+using OldBit.Spectron.Emulation.Storage;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Emulation.TimeTravel;
 using OldBit.Spectron.Helpers;
 using OldBit.Spectron.Models;
-using OldBit.Spectron.Preferences;
+using OldBit.Spectron.Services;
+using OldBit.Spectron.Settings;
 using OldBit.Spectron.Views;
 using ReactiveUI;
 using Timer = System.Timers.Timer;
@@ -29,11 +31,13 @@ namespace OldBit.Spectron.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
+    private readonly PreferencesService _preferencesService;
+    private readonly ILogger<MainWindowViewModel> _logger;
     private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
     private readonly Timer _statusBarTimer;
 
     private Emulator? Emulator { get; set; }
-    private DefaultSettings _defaultSettings = new();
+    private Preferences _preferences = new();
     private HelpKeyboardView? _helpKeyboardView;
 
     private int _frameCount;
@@ -45,6 +49,7 @@ public class MainWindowViewModel : ViewModelBase
     public StatusBarViewModel StatusBar { get; } = new();
     public TapeMenuViewModel TapeMenuViewModel { get; } = new();
     public TimeMachineViewModel TimeMachineViewModel { get; } = new();
+    public RecentFilesViewModel RecentFilesViewModel { get; }
 
     public ReactiveCommand<Unit, Unit> WindowOpenedCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> WindowClosingCommand { get; private set; }
@@ -64,8 +69,17 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<TapeLoadingSpeed, Unit> SetTapeLoadSpeedCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> HelpKeyboardCommand { get; private set; }
 
-    public MainWindowViewModel()
+    public MainWindowViewModel(
+        PreferencesService preferencesService,
+        RecentFilesViewModel recentFilesViewModel,
+        ILogger<MainWindowViewModel> logger)
     {
+        _preferencesService = preferencesService;
+        RecentFilesViewModel = recentFilesViewModel;
+        recentFilesViewModel.OpenRecentFileAsync = async fileName => await HandleLoadFileAsync(fileName);
+
+        _logger = logger;
+
         _statusBarTimer = new Timer(TimeSpan.FromSeconds(1));
         _statusBarTimer.AutoReset = true;
         _statusBarTimer.Elapsed += StatusBarTimerOnElapsed;
@@ -128,28 +142,32 @@ public class MainWindowViewModel : ViewModelBase
 
     private async Task WindowOpenedAsync()
     {
-        _defaultSettings = await SettingsManager.LoadAsync<DefaultSettings>();
+        _preferences = await _preferencesService.LoadAsync();
 
-        HandleChangeBorderSize(_defaultSettings.BorderSize);
-        ComputerType = _defaultSettings.ComputerType;
-        IsUlaPlusEnabled = _defaultSettings.IsUlaPlusEnabled;
-        RomType = _defaultSettings.RomType == RomType.Custom ? RomType.Original : _defaultSettings.RomType;
-        JoystickType = _defaultSettings.JoystickType;
-        TapeLoadingSpeed = _defaultSettings.TapeLoadingSpeed;
+        HandleChangeBorderSize(_preferences.BorderSize);
+        ComputerType = _preferences.ComputerType;
+        IsUlaPlusEnabled = _preferences.IsUlaPlusEnabled;
+        RomType = _preferences.RomType == RomType.Custom ? RomType.Original : _preferences.RomType;
+        JoystickType = _preferences.JoystickType;
+        TapeLoadingSpeed = _preferences.TapeLoadingSpeed;
+
+        await RecentFilesViewModel.LoadAsync();
 
         CreateEmulator();
     }
 
     private async Task WindowClosingAsync()
     {
-        _defaultSettings.BorderSize = BorderSize;
-        _defaultSettings.ComputerType = ComputerType;
-        _defaultSettings.IsUlaPlusEnabled = IsUlaPlusEnabled;
-        _defaultSettings.RomType = RomType;
-        _defaultSettings.JoystickType = JoystickType;
-        _defaultSettings.TapeLoadingSpeed = TapeLoadingSpeed;
+        _preferences.BorderSize = BorderSize;
+        _preferences.ComputerType = ComputerType;
+        _preferences.IsUlaPlusEnabled = IsUlaPlusEnabled;
+        _preferences.RomType = RomType;
+        _preferences.JoystickType = JoystickType;
+        _preferences.TapeLoadingSpeed = TapeLoadingSpeed;
 
-        await SettingsManager.SaveAsync(_defaultSettings);
+        await Task.WhenAll(
+            _preferencesService.SaveAsync(_preferences),
+            RecentFilesViewModel.SaveAsync());
     }
 
     private void CreateEmulator() => InitializeEmulator(EmulatorFactory.Create(ComputerType, RomType));
@@ -180,32 +198,42 @@ public class MainWindowViewModel : ViewModelBase
         _statusBarTimer.Start();
     }
 
-    private async Task HandleLoadFileAsync()
+    private async Task HandleLoadFileAsync() => await HandleLoadFileAsync(null);
+
+    private async Task HandleLoadFileAsync(string? filePath)
     {
         try
         {
             Emulator?.Pause();
 
-            var files = await FileDialogs.OpenAnyFileAsync();
-            if (files.Count <= 0)
+            if (filePath == null)
             {
-                return;
+                var files = await FileDialogs.OpenAnyFileAsync();
+                if (files.Count <= 0)
+                {
+                    return;
+                }
+
+                filePath = files[0].Path.LocalPath;
             }
 
-            var fileType = FileTypeHelper.GetFileType(files[0].Path.LocalPath);
+            var fileType = FileTypeHelper.GetFileType(filePath);
             if (fileType.IsSnapshot())
             {
-                var emulator = SnapshotFile.Load(files[0].Path.LocalPath);
+                var emulator = SnapshotFile.Load(filePath);
                 InitializeEmulator(emulator);
             }
             else
             {
-                Emulator?.LoadTape(files[0].Path.LocalPath);
+                Emulator?.LoadTape(filePath);
             }
+
+            RecentFilesViewModel.Add(filePath);
         }
         catch (Exception ex)
         {
             await MessageDialogs.Error(ex.Message);
+            RecentFilesViewModel.Remove(filePath);
         }
         finally
         {

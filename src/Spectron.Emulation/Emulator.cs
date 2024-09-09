@@ -71,7 +71,7 @@ public sealed class Emulator
     public void Pause()
     {
         _emulationTimer.Pause();
-        TimeMachine.Instance.Update(this);
+        TimeMachine.Instance.AddEntry(this);
     }
 
     public void Resume() => _emulationTimer.Resume();
@@ -156,7 +156,7 @@ public sealed class Emulator
         Cpu.TriggerInt(0xFF);
         RenderScreen?.Invoke(ScreenBuffer.FrameBuffer);
 
-        TimeMachine.Instance.Update(this);
+        TimeMachine.Instance.AddEntry(this);
     }
 
     private void ToggleUlaPlus(bool value)
