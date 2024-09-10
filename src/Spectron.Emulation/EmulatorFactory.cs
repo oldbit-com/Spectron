@@ -1,9 +1,7 @@
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
-using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Z80Cpu.Contention;
-using OldBit.ZXTape.Szx;
 
 namespace OldBit.Spectron.Emulation;
 
@@ -15,9 +13,9 @@ internal sealed record EmulatorSettings(
     Beeper Beeper,
     bool UseAYSound);
 
-public static class EmulatorFactory
+public sealed class EmulatorFactory(TimeMachine timeMachine)
 {
-    public static Emulator Create(ComputerType computerType, RomType romType, byte[]? customRom = null)
+    public Emulator Create(ComputerType computerType, RomType romType, byte[]? customRom = null)
     {
         byte[] rom;
 
@@ -44,9 +42,7 @@ public static class EmulatorFactory
         }
     }
 
-    public static Emulator Create(SzxFile snapshot) => SzxSnapshot.CreateEmulator(snapshot);
-
-    private static Emulator CreateSpectrum128K(RomType romType, Memory128K memory)
+    private Emulator CreateSpectrum128K(RomType romType, Memory128K memory)
     {
         var contentionProvider = new ContentionProvider(
             Hardware.Spectrum128K.FirstPixelTick,
@@ -62,10 +58,10 @@ public static class EmulatorFactory
             new Beeper(Hardware.Spectrum128K.ClockMhz),
             UseAYSound: true);
 
-        return new Emulator(emulatorSettings, Hardware.Spectrum128K);
+        return new Emulator(emulatorSettings, Hardware.Spectrum128K, timeMachine);
     }
 
-    private static Emulator CreateSpectrum(ComputerType computerType, RomType romType, IEmulatorMemory memory)
+    private Emulator CreateSpectrum(ComputerType computerType, RomType romType, IEmulatorMemory memory)
     {
         var contentionProvider = new ContentionProvider(
             Hardware.Spectrum48K.FirstPixelTick,
@@ -79,7 +75,7 @@ public static class EmulatorFactory
             new Beeper(Hardware.Spectrum48K.ClockMhz),
             UseAYSound: false);
 
-        return new Emulator(emulatorSettings, Hardware.Spectrum48K);
+        return new Emulator(emulatorSettings, Hardware.Spectrum48K, timeMachine);
     }
 
     private static byte[] GetSpectrum48KRom(RomType romType) =>

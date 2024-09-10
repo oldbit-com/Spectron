@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using OldBit.Spectron.Emulation;
 
 namespace OldBit.Spectron.Services;
 
@@ -10,5 +11,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<PreferencesService>();
         services.AddSingleton<SessionService>();
         services.AddSingleton<RecentFilesService>();
+        services.AddSingleton<TimeMachine>();
     }
 }

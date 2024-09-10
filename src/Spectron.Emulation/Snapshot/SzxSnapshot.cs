@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.IO.Compression;
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Joystick;
@@ -11,16 +10,16 @@ using OldBit.ZXTape.Szx.Blocks;
 
 namespace OldBit.Spectron.Emulation.Snapshot;
 
-public static class SzxSnapshot
+public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
 {
-    internal static Emulator Load(string fileName)
+    internal Emulator Load(string fileName)
     {
         var snapshot = SzxFile.Load(fileName);
 
         return CreateEmulator(snapshot);
     }
 
-    internal static Emulator CreateEmulator(SzxFile snapshot)
+    public Emulator CreateEmulator(SzxFile snapshot)
     {
         var computerType = snapshot.Header.MachineId switch
         {
@@ -32,7 +31,7 @@ public static class SzxSnapshot
 
         var romType = snapshot.CustomRom?.Data != null ? RomType.Custom : RomType.Original;
 
-        var emulator = EmulatorFactory.Create(computerType, romType, snapshot.CustomRom?.Data);
+        var emulator = emulatorFactory.Create(computerType, romType, snapshot.CustomRom?.Data);
 
         LoadRegisters(emulator.Cpu, snapshot.Z80Registers);
         LoadMemory(emulator.Memory, snapshot.RamPages, snapshot.SpecRegs);

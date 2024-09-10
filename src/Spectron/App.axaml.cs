@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
+using OldBit.Spectron.Emulation.DependencyInjection;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.ViewModels;
 using OldBit.Spectron.Views;
@@ -21,6 +22,7 @@ public partial class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         var services = new ServiceCollection();
+        services.AddEmulation();
         services.AddServices();
         services.AddViewModels();
         services.AddLogging();

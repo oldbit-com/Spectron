@@ -8,5 +8,6 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<MainWindowViewModel>();
         services.AddTransient<RecentFilesViewModel>();
+        services.AddTransient<TimeMachineViewModel>();
     }
 }

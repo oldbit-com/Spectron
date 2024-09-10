@@ -8,17 +8,17 @@ using OldBit.ZXTape.Z80.Types;
 
 namespace OldBit.Spectron.Emulation.Snapshot;
 
-internal static class Z80Snapshot
+public sealed class Z80Snapshot(EmulatorFactory emulatorFactory)
 {
-    internal static Emulator Load(string fileName)
+    internal Emulator Load(string fileName)
     {
         var snapshot = Z80File.Load(fileName);
 
         var emulator = (snapshot.Header.HardwareMode, snapshot.Header.Flags3?.ModifyHardware) switch
         {
-            (HardwareMode.Spectrum48, false) => EmulatorFactory.Create(ComputerType.Spectrum48K, RomType.Original),
-            (HardwareMode.Spectrum48, true) => EmulatorFactory.Create(ComputerType.Spectrum16K, RomType.Original),
-            (HardwareMode.Spectrum128, false) => EmulatorFactory.Create(ComputerType.Spectrum128K, RomType.Original),
+            (HardwareMode.Spectrum48, false) => emulatorFactory.Create(ComputerType.Spectrum48K, RomType.Original),
+            (HardwareMode.Spectrum48, true) => emulatorFactory.Create(ComputerType.Spectrum16K, RomType.Original),
+            (HardwareMode.Spectrum128, false) => emulatorFactory.Create(ComputerType.Spectrum128K, RomType.Original),
             _ => throw new NotSupportedException($"Snapshot hardware mode not supported: {snapshot.Header.HardwareMode}")
         };
 

@@ -6,13 +6,13 @@ using OldBit.ZXTape.Sna;
 
 namespace OldBit.Spectron.Emulation.Snapshot;
 
-internal static class SnaSnapshot
+public sealed class SnaSnapshot(EmulatorFactory emulatorFactory)
 {
-    internal static Emulator Load(string fileName)
+    internal Emulator Load(string fileName)
     {
         var snapshot = SnaFile.Load(fileName);
 
-        var emulator = EmulatorFactory.Create(snapshot.Header128 != null ?
+        var emulator = emulatorFactory.Create(snapshot.Header128 != null ?
             ComputerType.Spectrum128K : ComputerType.Spectrum48K, RomType.Original);
         var (cpu, memory, screenBuffer) = (emulator.Cpu, emulator.Memory, emulator.ScreenBuffer);
 

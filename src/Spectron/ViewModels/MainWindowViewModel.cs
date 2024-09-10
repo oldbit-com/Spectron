@@ -18,7 +18,6 @@ using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.Storage;
 using OldBit.Spectron.Emulation.Tape;
-using OldBit.Spectron.Emulation.TimeTravel;
 using OldBit.Spectron.Helpers;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Services;
@@ -31,7 +30,11 @@ namespace OldBit.Spectron.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
+    private readonly EmulatorFactory _emulatorFactory;
+    private readonly SnapshotFile _snapshotFile;
+    private readonly SzxSnapshot _szxSnapshot;
     private readonly PreferencesService _preferencesService;
+    private readonly SessionService _sessionService;
     private readonly ILogger<MainWindowViewModel> _logger;
     private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
     private readonly Timer _statusBarTimer;
@@ -48,7 +51,7 @@ public class MainWindowViewModel : ViewModelBase
     public Window? MainWindow { get; set; }
     public StatusBarViewModel StatusBar { get; } = new();
     public TapeMenuViewModel TapeMenuViewModel { get; } = new();
-    public TimeMachineViewModel TimeMachineViewModel { get; } = new();
+    public TimeMachineViewModel TimeMachineViewModel { get; }
     public RecentFilesViewModel RecentFilesViewModel { get; }
 
     public ReactiveCommand<Unit, Unit> WindowOpenedCommand { get; private set; }
@@ -70,12 +73,22 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> HelpKeyboardCommand { get; private set; }
 
     public MainWindowViewModel(
+        EmulatorFactory emulatorFactory,
+        SnapshotFile snapshotFile,
+        SzxSnapshot szxSnapshot,
         PreferencesService preferencesService,
+        SessionService sessionService,
         RecentFilesViewModel recentFilesViewModel,
+        TimeMachineViewModel timeMachineViewModel,
         ILogger<MainWindowViewModel> logger)
     {
+        _emulatorFactory = emulatorFactory;
+        _snapshotFile = snapshotFile;
+        _szxSnapshot = szxSnapshot;
         _preferencesService = preferencesService;
+        _sessionService = sessionService;
         RecentFilesViewModel = recentFilesViewModel;
+        TimeMachineViewModel = timeMachineViewModel;
         recentFilesViewModel.OpenRecentFileAsync = async fileName => await HandleLoadFileAsync(fileName);
 
         _logger = logger;
@@ -167,10 +180,11 @@ public class MainWindowViewModel : ViewModelBase
 
         await Task.WhenAll(
             _preferencesService.SaveAsync(_preferences),
-            RecentFilesViewModel.SaveAsync());
+            RecentFilesViewModel.SaveAsync(),
+            _sessionService.SaveAsync(Emulator));
     }
 
-    private void CreateEmulator() => InitializeEmulator(EmulatorFactory.Create(ComputerType, RomType));
+    private void CreateEmulator() => InitializeEmulator(_emulatorFactory.Create(ComputerType, RomType));
 
     private void InitializeEmulator(Emulator emulator)
     {
@@ -220,7 +234,7 @@ public class MainWindowViewModel : ViewModelBase
             var fileType = FileTypeHelper.GetFileType(filePath);
             if (fileType.IsSnapshot())
             {
-                var emulator = SnapshotFile.Load(filePath);
+                var emulator = _snapshotFile.Load(filePath);
                 InitializeEmulator(emulator);
             }
             else
@@ -421,7 +435,7 @@ public class MainWindowViewModel : ViewModelBase
 
     private void HandleTimeTravel(TimeMachineEntry entry)
     {
-        var emulator = EmulatorFactory.Create(entry.Snapshot);
+        var emulator = _szxSnapshot.CreateEmulator(entry.Snapshot);
         InitializeEmulator(emulator);
     }
 

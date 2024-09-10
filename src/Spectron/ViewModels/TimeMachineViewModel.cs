@@ -6,15 +6,16 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Snapshot;
-using OldBit.Spectron.Emulation.TimeTravel;
 using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
 
 public class TimeMachineViewModel : ViewModelBase
 {
+    private readonly TimeMachine _timeMachine;
     private const int PreviewHeight = 192;
     private const int PreviewWidth = 256;
 
@@ -22,14 +23,15 @@ public class TimeMachineViewModel : ViewModelBase
     public Control PreviewControl { get; set; } = null!;
     public Action<TimeMachineEntry>? OnTimeTravel { get; set; }
 
-    public TimeMachineViewModel()
+    public TimeMachineViewModel(TimeMachine timeMachine)
     {
+        _timeMachine = timeMachine;
         TimeTravelCommand = ReactiveCommand.Create(HandleTimeTravel);
     }
 
     public void BeforeShow()
     {
-        EntriesCount = TimeMachine.Instance.Entries.Count - 1;
+        EntriesCount = _timeMachine.Entries.Count - 1;
         CurrentEntryIndex = EntriesCount;
     }
 
@@ -70,9 +72,9 @@ public class TimeMachineViewModel : ViewModelBase
     private TimeMachineEntry? GetSelectedEntry()
     {
         var index = (int)_currentEntryIndex;
-        if (index >= 0 && index < TimeMachine.Instance.Entries.Count)
+        if (index >= 0 && index < _timeMachine.Entries.Count)
         {
-            return TimeMachine.Instance.Entries[index];
+            return _timeMachine.Entries[index];
         }
 
         return null;

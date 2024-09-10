@@ -2,7 +2,7 @@ using System.IO.Compression;
 using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.ZXTape.Szx;
 
-namespace OldBit.Spectron.Emulation.TimeTravel;
+namespace OldBit.Spectron.Emulation;
 
 public record TimeMachineEntry(DateTimeOffset Timestamp, SzxFile Snapshot);
 
@@ -13,12 +13,7 @@ public sealed class TimeMachine
 
     public static TimeSpan DefaultInterval { get; } = TimeSpan.FromSeconds(1);
     public static TimeSpan DefaultDuration { get; } = TimeSpan.FromMinutes(5);
-    public static TimeMachine Instance { get; } = new();
     public IReadOnlyList<TimeMachineEntry> Entries => _entries;
-
-    private TimeMachine()
-    {
-    }
 
     internal void AddEntry(Emulator emulator)
     {

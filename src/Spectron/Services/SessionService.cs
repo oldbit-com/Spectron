@@ -1,11 +1,10 @@
 using System;
 using System.IO;
 using System.IO.Compression;
-using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Snapshot;
-using OldBit.Spectron.Emulation.TimeTravel;
 using OldBit.Spectron.Settings;
 using OldBit.ZXTape.Szx;
 
@@ -13,35 +12,38 @@ namespace OldBit.Spectron.Services;
 
 public class SessionService(
     ApplicationDataService applicationDataService,
+    TimeMachine timeMachine,
     ILogger<SessionService> logger)
 {
     private readonly ILogger _logger = logger;
 
-    public void SaveSession(Emulator emulator)
+    public async Task SaveAsync(Emulator? emulator)
     {
-        var settings = new SessionSettings();
-        var filePath = ApplicationDataService.GetSettingsFilePath(settings);
-
-        if (!ApplicationDataService.TryCreateDirectory(filePath))
+        if (emulator is null)
         {
             return;
-        };
-
-        var snapshot = SzxSnapshot.CreateSnapshot(emulator, CompressionLevel.NoCompression);
-        var snapshotBase64 = ToBase64(snapshot);
-
-        settings.LastSnapshot = snapshotBase64;
-        foreach (var entry in TimeMachine.Instance.Entries)
-        {
-            settings.TimeMachineSnapshots.Add(ToBase64(entry.Snapshot));
         }
 
+        var session = new SessionSettings();
 
+        var snapshot = SzxSnapshot.CreateSnapshot(emulator, CompressionLevel.NoCompression);
+        var snapshotBase64 = SnapshotToBase64(snapshot);
 
-        var json = JsonSerializer.Serialize(settings);
+        session.LastSnapshot = snapshotBase64;
+        foreach (var entry in timeMachine.Entries)
+        {
+            session.TimeMachineSnapshots.Add(SnapshotToBase64(entry.Snapshot));
+        }
+
+        await applicationDataService.SaveAsync(session);
     }
 
-    private static string ToBase64(SzxFile szxFile)
+    public async Task LoadSessionAsync()
+    {
+        var session = await applicationDataService.LoadAsync<SessionSettings>();
+    }
+
+    private static string SnapshotToBase64(SzxFile szxFile)
     {
         using var memoryStream = new MemoryStream();
 
@@ -51,5 +53,15 @@ public class SessionService(
         }
 
         return Convert.ToBase64String(memoryStream.ToArray());
+    }
+
+    private static SzxFile SnapshotFromBase64(string base64)
+    {
+        var bytes = Convert.FromBase64String(base64);
+
+        using var memoryStream = new MemoryStream(bytes);
+        using var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
+
+        return SzxFile.Load(gzipStream);
     }
 }
