@@ -23,6 +23,7 @@ using OldBit.Spectron.Models;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.Views;
+using OldBit.ZXTape.Szx;
 using ReactiveUI;
 using Timer = System.Timers.Timer;
 
@@ -31,16 +32,15 @@ namespace OldBit.Spectron.ViewModels;
 public class MainWindowViewModel : ViewModelBase
 {
     private readonly EmulatorFactory _emulatorFactory;
+    private readonly TimeMachine _timeMachine;
     private readonly SnapshotFile _snapshotFile;
     private readonly SzxSnapshot _szxSnapshot;
     private readonly PreferencesService _preferencesService;
     private readonly SessionService _sessionService;
-    private readonly ILogger<MainWindowViewModel> _logger;
     private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
     private readonly Timer _statusBarTimer;
 
     private Emulator? Emulator { get; set; }
-    private Preferences _preferences = new();
     private HelpKeyboardView? _helpKeyboardView;
 
     private int _frameCount;
@@ -72,17 +72,20 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<TapeLoadingSpeed, Unit> SetTapeLoadSpeedCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> HelpKeyboardCommand { get; private set; }
 
+    public Interaction<PreferencesViewModel, Preferences?> ShowPreferencesView { get; }
+
     public MainWindowViewModel(
         EmulatorFactory emulatorFactory,
+        TimeMachine timeMachine,
         SnapshotFile snapshotFile,
         SzxSnapshot szxSnapshot,
         PreferencesService preferencesService,
         SessionService sessionService,
         RecentFilesViewModel recentFilesViewModel,
-        TimeMachineViewModel timeMachineViewModel,
-        ILogger<MainWindowViewModel> logger)
+        TimeMachineViewModel timeMachineViewModel)
     {
         _emulatorFactory = emulatorFactory;
+        _timeMachine = timeMachine;
         _snapshotFile = snapshotFile;
         _szxSnapshot = szxSnapshot;
         _preferencesService = preferencesService;
@@ -90,8 +93,6 @@ public class MainWindowViewModel : ViewModelBase
         RecentFilesViewModel = recentFilesViewModel;
         TimeMachineViewModel = timeMachineViewModel;
         recentFilesViewModel.OpenRecentFileAsync = async fileName => await HandleLoadFileAsync(fileName);
-
-        _logger = logger;
 
         _statusBarTimer = new Timer(TimeSpan.FromSeconds(1));
         _statusBarTimer.AutoReset = true;
@@ -117,9 +118,33 @@ public class MainWindowViewModel : ViewModelBase
         SetTapeLoadSpeedCommand = ReactiveCommand.Create<TapeLoadingSpeed>(HandleSetTapeLoadingSpeed);
         HelpKeyboardCommand = ReactiveCommand.Create(HandleHelpKeyboardCommand);
 
-        TimeMachineViewModel.OnTimeTravel = HandleTimeTravel;
+        ShowPreferencesView = new Interaction<PreferencesViewModel, Preferences?>();
 
+        TimeMachineViewModel.OnTimeTravel = HandleTimeTravel;
         SpectrumScreen = _frameBufferConverter.Bitmap;
+    }
+
+    public async Task OpenPreferencesWindow()
+    {
+        Emulator?.Pause();
+
+        var viewModel = new PreferencesViewModel(Preferences);
+        var preferences = await ShowPreferencesView.Handle(viewModel);
+
+        if (preferences != null)
+        {
+            // ComputerType = preferences.ComputerType;
+            IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
+            // RomType = preferences.RomType == RomType.Custom ? RomType.Original : preferences.RomType;
+            JoystickType = preferences.JoystickType;
+            // TapeLoadingSpeed = preferences.TapeLoadingSpeed;
+
+            _timeMachine.IsEnabled = preferences.TimeMachine.IsEnabled;
+            _timeMachine.SnapshotInterval = preferences.TimeMachine.SnapshotInterval;
+            _timeMachine.MaxDuration = preferences.TimeMachine.MaxDuration;
+        }
+
+        Emulator?.Resume();
     }
 
     private void StatusBarTimerOnElapsed(object? sender, ElapsedEventArgs e)
@@ -155,36 +180,38 @@ public class MainWindowViewModel : ViewModelBase
 
     private async Task WindowOpenedAsync()
     {
-        _preferences = await _preferencesService.LoadAsync();
+        var preferences = await _preferencesService.LoadAsync();
 
-        HandleChangeBorderSize(_preferences.BorderSize);
-        ComputerType = _preferences.ComputerType;
-        IsUlaPlusEnabled = _preferences.IsUlaPlusEnabled;
-        RomType = _preferences.RomType == RomType.Custom ? RomType.Original : _preferences.RomType;
-        JoystickType = _preferences.JoystickType;
-        TapeLoadingSpeed = _preferences.TapeLoadingSpeed;
+        HandleChangeBorderSize(preferences.BorderSize);
+        ComputerType = preferences.ComputerType;
+        IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
+        RomType = preferences.RomType == RomType.Custom ? RomType.Original : preferences.RomType;
+        JoystickType = preferences.JoystickType;
+        TapeLoadingSpeed = preferences.TapeLoadingSpeed;
+
+        _timeMachine.IsEnabled = preferences.TimeMachine.IsEnabled;
+        _timeMachine.SnapshotInterval = preferences.TimeMachine.SnapshotInterval;
+        _timeMachine.MaxDuration = preferences.TimeMachine.MaxDuration;
 
         await RecentFilesViewModel.LoadAsync();
+        var snapshot = await _sessionService.LoadAsync();
 
-        CreateEmulator();
+        CreateEmulator(snapshot);
     }
 
-    private async Task WindowClosingAsync()
+    private async Task WindowClosingAsync() => await Task.WhenAll(
+        _preferencesService.SaveAsync(Preferences),
+        RecentFilesViewModel.SaveAsync(),
+        _sessionService.SaveAsync(Emulator));
+
+    private void CreateEmulator(SzxFile? snapshot = null)
     {
-        _preferences.BorderSize = BorderSize;
-        _preferences.ComputerType = ComputerType;
-        _preferences.IsUlaPlusEnabled = IsUlaPlusEnabled;
-        _preferences.RomType = RomType;
-        _preferences.JoystickType = JoystickType;
-        _preferences.TapeLoadingSpeed = TapeLoadingSpeed;
+        var emulator = snapshot == null ?
+            _emulatorFactory.Create(ComputerType, RomType) :
+            _szxSnapshot.CreateEmulator(snapshot);
 
-        await Task.WhenAll(
-            _preferencesService.SaveAsync(_preferences),
-            RecentFilesViewModel.SaveAsync(),
-            _sessionService.SaveAsync(Emulator));
+        InitializeEmulator(emulator);
     }
-
-    private void CreateEmulator() => InitializeEmulator(_emulatorFactory.Create(ComputerType, RomType));
 
     private void InitializeEmulator(Emulator emulator)
     {
@@ -433,11 +460,24 @@ public class MainWindowViewModel : ViewModelBase
         Emulator?.KeyboardHandler.HandleKeyDown(keys);
     }
 
-    private void HandleTimeTravel(TimeMachineEntry entry)
+    private void HandleTimeTravel(TimeMachineEntry entry) => CreateEmulator(entry.Snapshot);
+
+    private Preferences Preferences => new()
     {
-        var emulator = _szxSnapshot.CreateEmulator(entry.Snapshot);
-        InitializeEmulator(emulator);
-    }
+        BorderSize = BorderSize,
+        ComputerType = ComputerType,
+        IsUlaPlusEnabled = IsUlaPlusEnabled,
+        RomType = RomType,
+        JoystickType = JoystickType,
+        TapeLoadingSpeed = TapeLoadingSpeed,
+
+        TimeMachine = new TimeMachineSettings
+        {
+            IsEnabled = _timeMachine.IsEnabled,
+            SnapshotInterval = _timeMachine.SnapshotInterval,
+            MaxDuration = _timeMachine.MaxDuration
+        }
+    };
 
     private BorderSize _borderSize = BorderSize.Medium;
     public BorderSize BorderSize

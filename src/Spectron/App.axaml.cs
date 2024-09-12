@@ -14,6 +14,10 @@ namespace OldBit.Spectron;
 
 public partial class App : Application
 {
+    private ServiceProvider? _serviceProvider;
+
+    public MainWindowViewModel? MainWindowViewModel { get; private set; }
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -27,15 +31,15 @@ public partial class App : Application
         services.AddViewModels();
         services.AddLogging();
 
-        var provider = services.BuildServiceProvider();
+        _serviceProvider = services.BuildServiceProvider();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var mainWindowViewModel = provider.GetRequiredService<MainWindowViewModel>();
+            MainWindowViewModel = _serviceProvider.GetRequiredService<MainWindowViewModel>();
 
             desktop.MainWindow = new MainWindow
             {
-                DataContext = mainWindowViewModel,
+                DataContext = MainWindowViewModel,
             };
         }
 
@@ -62,7 +66,6 @@ public partial class App : Application
             return;
         }
 
-        var settingsView = new SettingsView();
-        settingsView.ShowDialog(MainWindow);
+        MainWindowViewModel?.OpenPreferencesWindow();
     }
 }

@@ -21,4 +21,6 @@ public class Preferences
     public int MaxRecentFiles { get; set; } = 10;
 
     public TapeLoadingSpeed TapeLoadingSpeed { get; set; } = TapeLoadingSpeed.Instant;
+
+    public TimeMachineSettings TimeMachine { get; set; } = new();
 }

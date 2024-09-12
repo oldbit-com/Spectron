@@ -6,8 +6,8 @@ public static class ServiceCollectionExtensions
 {
     public static void AddViewModels(this IServiceCollection services)
     {
-        services.AddTransient<MainWindowViewModel>();
-        services.AddTransient<RecentFilesViewModel>();
-        services.AddTransient<TimeMachineViewModel>();
+        services.AddSingleton<MainWindowViewModel>();
+        services.AddSingleton<RecentFilesViewModel>();
+        services.AddSingleton<TimeMachineViewModel>();
     }
 }

@@ -1,18 +1,32 @@
 using System;
+using System.Threading.Tasks;
 using Avalonia.Controls;
-using DynamicData;
+using Avalonia.ReactiveUI;
 using OldBit.Spectron.Dialogs;
+using OldBit.Spectron.Settings;
 using OldBit.Spectron.ViewModels;
+using ReactiveUI;
 
 namespace OldBit.Spectron.Views;
 
-public partial class MainWindow : Window
+public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 {
     private MainWindowViewModel? _viewModel;
 
     public MainWindow()
     {
         InitializeComponent();
+
+        this.WhenActivated(action =>
+            action(ViewModel!.ShowPreferencesView.RegisterHandler(ShowPreferencesViewAsync)));
+    }
+
+    private async Task ShowPreferencesViewAsync(InteractionContext<PreferencesViewModel, Preferences?> interaction)
+    {
+        var dialog = new PreferencesView { DataContext = interaction.Input };
+        var result = await dialog.ShowDialog<Preferences?>(this);
+
+        interaction.SetOutput(result);
     }
 
     protected override void OnDataContextChanged(EventArgs e)
