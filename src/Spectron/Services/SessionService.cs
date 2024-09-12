@@ -32,15 +32,38 @@ public class SessionService(
         session.LastSnapshot = snapshotBase64;
         foreach (var entry in timeMachine.Entries)
         {
-            session.TimeMachineSnapshots.Add(SnapshotToBase64(entry.Snapshot));
+            snapshotBase64 = SnapshotToBase64(entry.Snapshot);
+            session.TimeMachineSnapshots.Add(new TimeMachineSnapshot(snapshotBase64, entry.Timestamp));
         }
 
         await applicationDataService.SaveAsync(session);
     }
 
-    public async Task LoadSessionAsync()
+    public async Task<SzxFile?> LoadAsync()
     {
         var session = await applicationDataService.LoadAsync<SessionSettings>();
+
+        try
+        {
+            timeMachine.Entries.Clear();
+
+            foreach (var timeMachineSnapshot in session.TimeMachineSnapshots)
+            {
+                var snapshot = SnapshotFromBase64(timeMachineSnapshot.Snapshot);
+                timeMachine.Entries.Add(new TimeMachineEntry(timeMachineSnapshot.Timestamp, snapshot));
+            }
+
+            if (session.LastSnapshot != null)
+            {
+                return SnapshotFromBase64(session.LastSnapshot);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load session");
+        }
+
+        return null;
     }
 
     private static string SnapshotToBase64(SzxFile szxFile)
