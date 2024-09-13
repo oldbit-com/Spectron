@@ -40,17 +40,17 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="OldBit.ZXTape">
-        <HintPath>..\..\..\ZXTape\src\ZXTape\bin\Debug\net8.0\OldBit.ZXTape.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
-    <ItemGroup>
       <Compile Update="ViewModels\MainWindowViewModel.Handlers.cs">
         <DependentUpon>MainWindowViewModel.cs</DependentUpon>
       </Compile>
       <Compile Update="ViewModels\MainWindowViewModel.Properties.cs">
         <DependentUpon>MainWindowViewModel.cs</DependentUpon>
       </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="OldBit.ZX.Files">
+        <HintPath>..\..\..\ZX.Files\src\ZX.Files\bin\Debug\net8.0\OldBit.ZX.Files.dll</HintPath>
+      </Reference>
     </ItemGroup>
 </Project>

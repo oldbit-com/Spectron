@@ -27,8 +27,8 @@
       <Reference Include="OldBit.Z80Cpu">
         <HintPath>..\..\..\Z80.Spectron\src\Z80Cpu\bin\Debug\net8.0\OldBit.Z80Cpu.dll</HintPath>
       </Reference>
-      <Reference Include="OldBit.ZXTape">
-        <HintPath>..\..\..\ZXTape\src\ZXTape\bin\Debug\net8.0\OldBit.ZXTape.dll</HintPath>
+      <Reference Include="OldBit.ZX.Files">
+        <HintPath>..\..\..\ZX.Files\src\ZX.Files\bin\Debug\net8.0\OldBit.ZX.Files.dll</HintPath>
       </Reference>
     </ItemGroup>
 

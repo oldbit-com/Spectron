@@ -1,6 +1,6 @@
 using System.IO.Compression;
 using OldBit.Spectron.Emulation.Snapshot;
-using OldBit.ZXTape.Szx;
+using OldBit.ZX.Files.Szx;
 
 namespace OldBit.Spectron.Emulation;
 

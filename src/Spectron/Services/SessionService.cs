@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Settings;
-using OldBit.ZXTape.Szx;
+using OldBit.ZX.Files.Szx;
 
 namespace OldBit.Spectron.Services;
 

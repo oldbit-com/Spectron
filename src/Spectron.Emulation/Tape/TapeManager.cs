@@ -1,8 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using OldBit.Spectron.Emulation.Storage;
-using OldBit.ZXTape.Extensions;
-using OldBit.ZXTape.Tap;
-using OldBit.ZXTape.Tzx;
+using OldBit.ZX.Files.Extensions;
+using OldBit.ZX.Files.Tap;
+using OldBit.ZX.Files.Tzx;
 
 namespace OldBit.Spectron.Emulation.Tape;
 

@@ -20,7 +20,7 @@ using OldBit.Spectron.Models;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.Views;
-using OldBit.ZXTape.Szx;
+using OldBit.ZX.Files.Szx;
 using ReactiveUI;
 using Timer = System.Timers.Timer;
 

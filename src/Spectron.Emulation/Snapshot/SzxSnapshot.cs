@@ -5,8 +5,8 @@ using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Z80Cpu;
-using OldBit.ZXTape.Szx;
-using OldBit.ZXTape.Szx.Blocks;
+using OldBit.ZX.Files.Szx;
+using OldBit.ZX.Files.Szx.Blocks;
 
 namespace OldBit.Spectron.Emulation.Snapshot;
 

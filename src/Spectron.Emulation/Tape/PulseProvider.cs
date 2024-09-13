@@ -1,6 +1,6 @@
 using OldBit.Spectron.Emulation.Extensions;
-using OldBit.ZXTape.Tap;
-using OldBit.ZXTape.Tzx;
+using OldBit.ZX.Files.Tap;
+using OldBit.ZX.Files.Tzx;
 
 namespace OldBit.Spectron.Emulation.Tape;
 

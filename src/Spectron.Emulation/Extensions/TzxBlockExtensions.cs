@@ -1,4 +1,4 @@
-using OldBit.ZXTape.Tzx.Blocks;
+using OldBit.ZX.Files.Tzx.Blocks;
 
 namespace OldBit.Spectron.Emulation.Extensions;
 
