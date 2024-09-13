@@ -44,4 +44,13 @@
         <HintPath>..\..\..\ZXTape\src\ZXTape\bin\Debug\net8.0\OldBit.ZXTape.dll</HintPath>
       </Reference>
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="ViewModels\MainWindowViewModel.Handlers.cs">
+        <DependentUpon>MainWindowViewModel.cs</DependentUpon>
+      </Compile>
+      <Compile Update="ViewModels\MainWindowViewModel.Properties.cs">
+        <DependentUpon>MainWindowViewModel.cs</DependentUpon>
+      </Compile>
+    </ItemGroup>
 </Project>
