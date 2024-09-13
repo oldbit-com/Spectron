@@ -41,7 +41,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private HelpKeyboardView? _helpKeyboardView;
 
     private bool _isResumeEnabled;
-    private bool _useCorsorKeysAsJoystick;
+    private bool _useCursorKeysAsJoystick;
     private int _frameCount;
     private readonly Stopwatch _renderStopwatch = new();
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
@@ -155,7 +155,7 @@ public partial class MainWindowViewModel : ViewModelBase
             // TapeLoadingSpeed = preferences.TapeLoadingSpeed;
 
             _isResumeEnabled = preferences.IsResumeEnabled;
-            _useCorsorKeysAsJoystick = preferences.Joystick.UseCursorKeys;
+            _useCursorKeysAsJoystick = preferences.Joystick.UseCursorKeys;
 
             _timeMachine.IsEnabled = preferences.TimeMachine.IsEnabled;
             _timeMachine.SnapshotInterval = preferences.TimeMachine.SnapshotInterval;
@@ -213,7 +213,7 @@ public partial class MainWindowViewModel : ViewModelBase
         TapeLoadingSpeed = preferences.TapeLoadingSpeed;
 
         _isResumeEnabled = preferences.IsResumeEnabled;
-        _useCorsorKeysAsJoystick = preferences.Joystick.UseCursorKeys;
+        _useCursorKeysAsJoystick = preferences.Joystick.UseCursorKeys;
 
         _timeMachine.IsEnabled = preferences.TimeMachine.IsEnabled;
         _timeMachine.SnapshotInterval = preferences.TimeMachine.SnapshotInterval;
@@ -288,7 +288,7 @@ public partial class MainWindowViewModel : ViewModelBase
         Joystick = new JoystickSettings
         {
             JoystickType = JoystickType,
-            UseCursorKeys = _useCorsorKeysAsJoystick
+            UseCursorKeys = _useCursorKeysAsJoystick
         },
         TapeLoadingSpeed = TapeLoadingSpeed,
         IsResumeEnabled = _isResumeEnabled,

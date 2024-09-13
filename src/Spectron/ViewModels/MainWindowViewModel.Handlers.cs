@@ -221,7 +221,7 @@ partial class MainWindowViewModel
             return;
         }
 
-        if (JoystickType != JoystickType.None && _useCorsorKeysAsJoystick)
+        if (JoystickType != JoystickType.None && _useCursorKeysAsJoystick)
         {
             var joystickKeys = KeyMappings.ToJoystickAction(e);
             if (joystickKeys != JoystickInput.None)
