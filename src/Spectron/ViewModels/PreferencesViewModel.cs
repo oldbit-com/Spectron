@@ -17,7 +17,9 @@ public class PreferencesViewModel : ViewModelBase
         ComputerType = preferences.ComputerType;
         IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
         RomType = preferences.RomType;
-        JoystickType = preferences.JoystickType;
+        JoystickType = preferences.Joystick.JoystickType;
+        JoystickUseCursorKeys = preferences.Joystick.UseCursorKeys;
+        IsResumeEnabled = preferences.IsResumeEnabled;
 
         IsTimeMachineEnabled = preferences.TimeMachine.IsEnabled;
         SnapshotInterval = preferences.TimeMachine.SnapshotInterval.TotalSeconds;
@@ -28,7 +30,12 @@ public class PreferencesViewModel : ViewModelBase
             ComputerType = ComputerType,
             IsUlaPlusEnabled = IsUlaPlusEnabled,
             RomType = RomType,
-            JoystickType = JoystickType,
+            Joystick = new JoystickSettings
+            {
+                JoystickType = JoystickType,
+                UseCursorKeys = JoystickUseCursorKeys,
+            },
+            IsResumeEnabled = IsResumeEnabled,
 
             TimeMachine = new TimeMachineSettings
             {
@@ -86,5 +93,19 @@ public class PreferencesViewModel : ViewModelBase
     {
         get => _maxDuration;
         set => this.RaiseAndSetIfChanged(ref _maxDuration, value);
+    }
+
+    private bool _isResumeEnabled;
+    public bool IsResumeEnabled
+    {
+        get => _isResumeEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isResumeEnabled, value);
+    }
+
+    private bool _joystickUseCursorKeys;
+    public bool JoystickUseCursorKeys
+    {
+        get => _joystickUseCursorKeys;
+        set => this.RaiseAndSetIfChanged(ref _joystickUseCursorKeys, value);
     }
 }

@@ -1,5 +1,4 @@
 using OldBit.Spectron.Emulation;
-using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Models;
@@ -8,19 +7,21 @@ namespace OldBit.Spectron.Settings;
 
 public class Preferences
 {
-    public bool IsUlaPlusEnabled { get; set; }
+    public bool IsUlaPlusEnabled { get; init; }
 
-    public BorderSize BorderSize { get; set; } = BorderSize.Medium;
+    public BorderSize BorderSize { get; init; } = BorderSize.Medium;
 
-    public ComputerType ComputerType { get; set; } = ComputerType.Spectrum48K;
+    public ComputerType ComputerType { get; init; } = ComputerType.Spectrum48K;
 
-    public RomType RomType { get; set; } = RomType.Original;
+    public RomType RomType { get; init; } = RomType.Original;
 
-    public JoystickType JoystickType { get; set; } = JoystickType.None;
+    public JoystickSettings Joystick { get; init; } = new();
 
     public int MaxRecentFiles { get; set; } = 10;
 
-    public TapeLoadingSpeed TapeLoadingSpeed { get; set; } = TapeLoadingSpeed.Instant;
+    public TapeLoadingSpeed TapeLoadingSpeed { get; init; } = TapeLoadingSpeed.Instant;
 
-    public TimeMachineSettings TimeMachine { get; set; } = new();
+    public TimeMachineSettings TimeMachine { get; init; } = new();
+
+    public bool IsResumeEnabled { get; init; } = true;
 }

@@ -14,7 +14,7 @@
         Height="400"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
-        Title="SettingsView">
+        Title="Preferences">
 
     <Window.Resources>
         <converters:ValueEqualityConverter x:Key="ValueEqualityConverter"/>
@@ -38,7 +38,7 @@
             <TabItem Header="General">
                 <Border Classes="Tab">
                     <StackPanel>
-                        <CheckBox Content="Automatically save/restore state" Classes="Center"/>
+                        <CheckBox Content="Resume after restart" Classes="Center" IsChecked="{Binding IsResumeEnabled}"/>
                         <CheckBox Content="Pause after state restore" Classes="Center"/>
                     </StackPanel>
                 </Border>
@@ -77,7 +77,7 @@
                         <RadioButton Content="Cursor" Classes="Center" GroupName="Joy" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Cursor}}"/>
                         <RadioButton Content="Fuller" Classes="Center" GroupName="Joy" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Fuller}}"/>
                         <Separator Margin="0 10 0 10" />
-                        <CheckBox Content="Emulate using Cursor Keys and Tab as Fire" Classes="Center"/>
+                        <CheckBox Content="Use cursor keys and Tab key as fire" Classes="Center" IsChecked="{Binding JoystickUseCursorKeys}"/>
                     </StackPanel>
                 </Border>
             </TabItem>

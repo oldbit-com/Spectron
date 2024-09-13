@@ -263,7 +263,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
 
     private static void SaveUlaPlus(UlaPlus ulaPlus, SzxFile snapshot)
     {
-        if (!ulaPlus.IsEnabled)
+        if (!ulaPlus.IsEnabled || !ulaPlus.IsActive)
         {
             return;
         }

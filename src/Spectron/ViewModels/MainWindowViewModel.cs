@@ -9,7 +9,6 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
-using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Joystick;
@@ -43,6 +42,8 @@ public class MainWindowViewModel : ViewModelBase
     private Emulator? Emulator { get; set; }
     private HelpKeyboardView? _helpKeyboardView;
 
+    private bool _isResumeEnabled;
+    private bool _useCorsorKeysAsJoystick;
     private int _frameCount;
     private readonly Stopwatch _renderStopwatch = new();
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
@@ -133,15 +134,27 @@ public class MainWindowViewModel : ViewModelBase
 
         if (preferences != null)
         {
-            // ComputerType = preferences.ComputerType;
+            var initialize = ComputerType != preferences.ComputerType || RomType != preferences.RomType;
+
+            ComputerType = preferences.ComputerType;
             IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
-            // RomType = preferences.RomType == RomType.Custom ? RomType.Original : preferences.RomType;
-            JoystickType = preferences.JoystickType;
+            RomType = preferences.RomType;
+
+            JoystickType = preferences.Joystick.JoystickType;
+            Emulator?.JoystickManager.SetupJoystick(JoystickType);
             // TapeLoadingSpeed = preferences.TapeLoadingSpeed;
+
+            _isResumeEnabled = preferences.IsResumeEnabled;
+            _useCorsorKeysAsJoystick = preferences.Joystick.UseCursorKeys;
 
             _timeMachine.IsEnabled = preferences.TimeMachine.IsEnabled;
             _timeMachine.SnapshotInterval = preferences.TimeMachine.SnapshotInterval;
             _timeMachine.MaxDuration = preferences.TimeMachine.MaxDuration;
+
+            if (initialize)
+            {
+                CreateEmulator();
+            }
         }
 
         Emulator?.Resume();
@@ -186,8 +199,11 @@ public class MainWindowViewModel : ViewModelBase
         ComputerType = preferences.ComputerType;
         IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
         RomType = preferences.RomType == RomType.Custom ? RomType.Original : preferences.RomType;
-        JoystickType = preferences.JoystickType;
+        JoystickType = preferences.Joystick.JoystickType;
         TapeLoadingSpeed = preferences.TapeLoadingSpeed;
+
+        _isResumeEnabled = preferences.IsResumeEnabled;
+        _useCorsorKeysAsJoystick = preferences.Joystick.UseCursorKeys;
 
         _timeMachine.IsEnabled = preferences.TimeMachine.IsEnabled;
         _timeMachine.SnapshotInterval = preferences.TimeMachine.SnapshotInterval;
@@ -202,10 +218,12 @@ public class MainWindowViewModel : ViewModelBase
     private async Task WindowClosingAsync() => await Task.WhenAll(
         _preferencesService.SaveAsync(Preferences),
         RecentFilesViewModel.SaveAsync(),
-        _sessionService.SaveAsync(Emulator));
+        _sessionService.SaveAsync(Emulator, _isResumeEnabled));
 
     private void CreateEmulator(SzxFile? snapshot = null)
     {
+        ShutdownEmulator();
+
         var emulator = snapshot == null ?
             _emulatorFactory.Create(ComputerType, RomType) :
             _szxSnapshot.CreateEmulator(snapshot);
@@ -237,6 +255,18 @@ public class MainWindowViewModel : ViewModelBase
         Emulator.Start();
 
         _statusBarTimer.Start();
+    }
+
+    private void ShutdownEmulator()
+    {
+        if (Emulator == null)
+        {
+            return;
+        }
+
+        Emulator.Stop();
+        Emulator.RenderScreen -= EmulatorOnRenderScreen;
+        Emulator = null;
     }
 
     private async Task HandleLoadFileAsync() => await HandleLoadFileAsync(null);
@@ -316,12 +346,6 @@ public class MainWindowViewModel : ViewModelBase
     {
         RomType = romType;
 
-        if (Emulator != null)
-        {
-            Emulator.Stop();
-            Emulator.RenderScreen -= EmulatorOnRenderScreen;
-        }
-
         CreateEmulator();
     }
 
@@ -329,7 +353,6 @@ public class MainWindowViewModel : ViewModelBase
     {
         ComputerType = computerType;
 
-        Emulator?.Stop();
         CreateEmulator();
     }
 
@@ -446,7 +469,7 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        if (JoystickType != JoystickType.None)
+        if (JoystickType != JoystickType.None && _useCorsorKeysAsJoystick)
         {
             var joystickKeys = KeyMappings.ToJoystickAction(e);
             if (joystickKeys != JoystickInput.None)
@@ -468,8 +491,13 @@ public class MainWindowViewModel : ViewModelBase
         ComputerType = ComputerType,
         IsUlaPlusEnabled = IsUlaPlusEnabled,
         RomType = RomType,
-        JoystickType = JoystickType,
+        Joystick = new JoystickSettings
+        {
+            JoystickType = JoystickType,
+            UseCursorKeys = _useCorsorKeysAsJoystick
+        },
         TapeLoadingSpeed = TapeLoadingSpeed,
+        IsResumeEnabled = _isResumeEnabled,
 
         TimeMachine = new TimeMachineSettings
         {
