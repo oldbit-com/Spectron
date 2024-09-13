@@ -17,6 +17,7 @@ using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.Storage;
 using OldBit.Spectron.Emulation.Tape;
+using OldBit.Spectron.Extensions;
 using OldBit.Spectron.Helpers;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Services;
@@ -28,7 +29,7 @@ using Timer = System.Timers.Timer;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class MainWindowViewModel : ViewModelBase
+public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly EmulatorFactory _emulatorFactory;
     private readonly TimeMachine _timeMachine;
@@ -72,6 +73,7 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> ToggleFullScreenCommand { get; private set; }
     public ReactiveCommand<TapeLoadingSpeed, Unit> SetTapeLoadSpeedCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> HelpKeyboardCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ShowTimeMachineCommand { get; private set; }
 
     public Interaction<PreferencesViewModel, Preferences?> ShowPreferencesView { get; }
 
@@ -101,6 +103,16 @@ public class MainWindowViewModel : ViewModelBase
 
         var emulatorNotNull = this.WhenAnyValue(x => x.Emulator).Select(emulator => emulator is null);
 
+        var timeMachineEnabled = this.WhenAnyValue(x => x._timeMachine.IsEnabled).Select(x => x);
+
+        this.WhenAny(x => x.WindowState, x => x.Value)
+            .Subscribe(x => WindowStateCommandName = x == WindowState.FullScreen ? "Exit Full Screen" : "Enter Full Screen");
+
+        this.WhenAny(x => x.TapeLoadingSpeed, x => x.Value)
+            .Subscribe(_ => Emulator?.SetTapeLoadingSpeed(TapeLoadingSpeed));
+
+        timeMachineEnabled.Subscribe(Console.WriteLine);
+
         WindowOpenedCommand = ReactiveCommand.CreateFromTask(WindowOpenedAsync);
         WindowClosingCommand = ReactiveCommand.CreateFromTask(WindowClosingAsync);
         KeyDownCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyDown);
@@ -118,6 +130,7 @@ public class MainWindowViewModel : ViewModelBase
         ToggleFullScreenCommand = ReactiveCommand.Create(HandleToggleFullScreen);
         SetTapeLoadSpeedCommand = ReactiveCommand.Create<TapeLoadingSpeed>(HandleSetTapeLoadingSpeed);
         HelpKeyboardCommand = ReactiveCommand.Create(HandleHelpKeyboardCommand);
+        ShowTimeMachineCommand = ReactiveCommand.Create(HandleShowTimeMachineCommand, timeMachineEnabled);
 
         ShowPreferencesView = new Interaction<PreferencesViewModel, Preferences?>();
 
@@ -437,6 +450,10 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
+    private void HandleShowTimeMachineCommand()
+    {
+    }
+
     private void HandleKeyUp(KeyEventArgs e)
     {
         if (IsPaused)
@@ -567,14 +584,10 @@ public class MainWindowViewModel : ViewModelBase
     public WindowState WindowState
     {
         get => _windowState;
-        set
-        {
-            WindowStateCommandName = value == WindowState.FullScreen ? "Exit Full Screen" : "Enter Full Screen";
-            this.RaiseAndSetIfChanged(ref _windowState, value);
-        }
+        set => this.RaiseAndSetIfChanged(ref _windowState, value);
     }
 
-    private string _windowStateCommandName = "Enter Full Screen";
+    private string _windowStateCommandName = string.Empty;
     public string WindowStateCommandName
     {
         get => _windowStateCommandName;
@@ -585,13 +598,6 @@ public class MainWindowViewModel : ViewModelBase
     public TapeLoadingSpeed TapeLoadingSpeed
     {
         get => _tapeLoadingSpeed;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _tapeLoadingSpeed, value);
-            if (Emulator != null)
-            {
-                Emulator.TapeLoadingSpeed = TapeLoadingSpeed;
-            }
-        }
+        set => this.RaiseAndSetIfChanged(ref _tapeLoadingSpeed, value);
     }
 }

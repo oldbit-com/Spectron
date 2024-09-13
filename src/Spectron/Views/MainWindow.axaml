@@ -107,6 +107,8 @@
                     </NativeMenuItem>
                     <NativeMenuItemSeparator/>
                     <NativeMenuItem Header="Pause" Gesture="F10" Command="{Binding TogglePauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
+                    <NativeMenuItem Header="Time Machine" Command="{Binding ShowTimeMachineCommand}"/>
+                    <NativeMenuItemSeparator/>
                     <NativeMenuItem Header="Reset" Command="{Binding ResetCommand}"/>
                 </NativeMenu>
             </NativeMenuItem>

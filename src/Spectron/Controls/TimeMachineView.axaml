@@ -17,7 +17,7 @@
     <Grid>
         <StackPanel>
             <Border Padding="0 0 0 10" CornerRadius="20">
-                <TextBlock Text="Time Machine Travel" HorizontalAlignment="Center" FontSize="25" Classes="ZX" Foreground="{StaticResource SpectrumMagenta}"/>
+                <TextBlock Text="Time Machine" HorizontalAlignment="Center" FontSize="25" Classes="ZX" Foreground="{StaticResource SpectrumMagenta}"/>
             </Border>
             <Border CornerRadius="10" HorizontalAlignment="Center" ClipToBounds="True">
                 <Border Padding="40 40 40 30" Background="{Binding ScreenBorderBrush}">
