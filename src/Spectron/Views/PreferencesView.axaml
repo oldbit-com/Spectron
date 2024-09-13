@@ -35,14 +35,6 @@
 
     <Grid RowDefinitions="*,50">
         <TabControl TabStripPlacement="Left">
-            <TabItem Header="General">
-                <Border Classes="Tab">
-                    <StackPanel>
-                        <CheckBox Content="Resume after restart" Classes="Center" IsChecked="{Binding IsResumeEnabled}"/>
-                        <CheckBox Content="Pause after state restore" Classes="Center"/>
-                    </StackPanel>
-                </Border>
-            </TabItem>
             <TabItem Header="Hardware">
                 <Border Classes="Tab">
                     <StackPanel>
@@ -99,6 +91,14 @@
                                 <TextBlock Text="{Binding #TimeMachineInterval.Value, StringFormat='Snapshot Every {0} s'}" HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Grid>
+                    </StackPanel>
+                </Border>
+            </TabItem>
+            <TabItem Header="Emulator">
+                <Border Classes="Tab">
+                    <StackPanel>
+                        <CheckBox Content="Auto Resume" Classes="Center" IsChecked="{Binding IsResumeEnabled}"/>
+                        <CheckBox Content="Pause after state restore" Classes="Center"/>
                     </StackPanel>
                 </Border>
             </TabItem>

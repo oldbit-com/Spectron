@@ -140,7 +140,7 @@ internal sealed class UlaPlus : IDevice
         }
     }
 
-    private static Color ColorFromValue(int value)
+    internal static Color ColorFromValue(int value)
     {
         var green = (value & 0b11100000) >> 5;
         green = Scale3BitsColor(green);
