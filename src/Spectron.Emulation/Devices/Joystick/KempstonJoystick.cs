@@ -12,7 +12,7 @@ internal class KempstonJoystick : IJoystick
 
     private byte _joystickState = None;
 
-    public byte? ReadPort(Word address) => address != KempstonPort ? null : _joystickState;
+    public byte? ReadPort(Word address) => (address & 0x1F) != KempstonPort ? null : _joystickState;
 
     public void HandleInput(JoystickInput input, bool isOn)
     {
