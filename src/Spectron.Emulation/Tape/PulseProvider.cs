@@ -1,6 +1,7 @@
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.ZX.Files.Tap;
 using OldBit.ZX.Files.Tzx;
+using OldBit.ZX.Files.Tzx.Blocks;
 
 namespace OldBit.Spectron.Emulation.Tape;
 
@@ -18,56 +19,48 @@ internal sealed record Pulse(int RepeatCount, int Duration, bool IsSilence = fal
 /// </summary>
 internal sealed class PulseProvider(TzxFile tzxFile, HardwareSettings hardware)
 {
-    private const int PilotHeaderPulseCount = 8063;         // Before each header block is a sequence of 8063 pulses
-    private const int PilotDataPulseCount = 3223;           // Before each data block is a sequence of 3223 pulses
-    private const int PilotPulseLength = 2168;              // Pilot tone length is 2168 T-states
-    private const int FirstSyncPulseLength = 667;           // The pilot tone is followed by two sync pulses of 667
-    private const int SecondSyncPulseLength = 735;          // and 735 T-states each
-    private const int ZeroBitPulseLength = 855;             // '0' bit is encoded as 2 pulses of 855 T-states each
-    private const int OneBitPulseLength = 1710;             // '1' bit is encoded as 2 pulses of 1710 T-states each
-
-    private static readonly byte[] BitMasks = [0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01];
-
-    private static readonly Pulse PilotHeaderPulse = new(PilotHeaderPulseCount, PilotPulseLength);
-    private static readonly Pulse PilotDataPulse = new(PilotDataPulseCount, PilotPulseLength);
-    private static readonly Pulse FirstSyncPulse = new(RepeatCount: 1, FirstSyncPulseLength);
-    private static readonly Pulse SecondSyncPulse = new(RepeatCount: 1, SecondSyncPulseLength);
-    private static readonly Pulse ZeroBitPulse = new(RepeatCount: 2, ZeroBitPulseLength);
-    private static readonly Pulse OneBitPulse = new(RepeatCount: 2, OneBitPulseLength);
-
     internal IEnumerable<Pulse> GetAll()
     {
-        foreach (var block in tzxFile.Blocks.GetStandardSpeedDataBlocks())
+        foreach (var block in tzxFile.Blocks)
         {
-            if (!TapData.TryParse(block.Data, out var tapData))
+            var pulseSettings = PulseFactory.Create(block, hardware);
+
+            if (pulseSettings == null)
+            {
+                continue;
+            }
+
+            TapData? tapData = null;
+            switch (block)
+            {
+                case StandardSpeedDataBlock standardSpeedDataBlock when !TapData.TryParse(standardSpeedDataBlock.Data, out tapData):
+                case TurboSpeedDataBlock turboSpeedDataBlock when !TapData.TryParse(turboSpeedDataBlock.Data, out tapData):
+                    continue;
+            }
+
+            if (tapData == null)
             {
                 continue;
             }
 
             if (tapData.IsHeader)
             {
-                yield return PilotHeaderPulse;
+                yield return pulseSettings.PilotHeaderPulse;
             }
             else
             {
-                yield return PilotDataPulse;
+                yield return pulseSettings.PilotDataPulse;
             }
 
-            yield return FirstSyncPulse;
-            yield return SecondSyncPulse;
+            yield return pulseSettings.FirstSyncPulse;
+            yield return pulseSettings.SecondSyncPulse;
 
-            var pulses = block.Data
-                .SelectMany(item => BitMasks.Select(mask => (item & mask) == 0 ? ZeroBitPulse : OneBitPulse));
-
-            foreach (var pulse in pulses)
+            foreach (var pulse in pulseSettings.DataPulses)
             {
                 yield return pulse;
             }
 
-            var pauseMilliseconds = block.PauseDuration == 0 ? 500 : block.PauseDuration;
-            var duration = (int)(pauseMilliseconds / 1000f * hardware.TicksPerFrame * hardware.InterruptFrequency);
-
-            yield return new Pulse(RepeatCount: 1, Duration: duration, IsSilence: true);
+            yield return pulseSettings.PausePulse;
         }
     }
 }
