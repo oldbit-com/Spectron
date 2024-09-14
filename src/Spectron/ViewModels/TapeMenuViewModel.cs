@@ -9,11 +9,15 @@ namespace OldBit.Spectron.ViewModels;
 
 public class TapeMenuViewModel : ViewModelBase
 {
+    public ReactiveCommand<Unit, Unit> NewCommand { get; private set; }
     public ReactiveCommand<Unit, Task> InsertCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> PlayCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> StopCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> RewindCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> EjectCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> ViewCommand { get; private set; }
+
+    public Interaction<TapeViewModel, Unit?> ShowTapeView { get; }
 
     private TapeManager? _tapeManager;
 
@@ -23,14 +27,30 @@ public class TapeMenuViewModel : ViewModelBase
         var isTapePlaying = this.WhenAnyValue(x => x.IsTapePlaying).Select(playing => playing);
         var isTapeInsertedAndNotPlaying = this.WhenAnyValue(x => x.IsTapeInserted, x => x.IsTapePlaying, (inserted, playing) => inserted && !playing);
 
-        InsertCommand = ReactiveCommand.Create(Insert);
+        NewCommand = ReactiveCommand.Create(NewTape);
+        InsertCommand = ReactiveCommand.Create(InsertTape);
         PlayCommand = ReactiveCommand.Create(() => { TapeManager?.PlayTape(); }, isTapeInsertedAndNotPlaying);
         StopCommand = ReactiveCommand.Create(() => { TapeManager?.StopTape(); }, isTapePlaying);
         RewindCommand = ReactiveCommand.Create(Rewind, isTapeInserted);
         EjectCommand = ReactiveCommand.Create(() => { TapeManager?.EjectTape(); }, isTapeInserted);
+        ViewCommand = ReactiveCommand.Create(OpenTapeView, isTapeInserted);
+
+        ShowTapeView = new Interaction<TapeViewModel, Unit?>();
     }
 
-    private async Task Insert()
+    private async Task OpenTapeView()
+    {
+        var viewModel = new TapeViewModel();
+        await ShowTapeView.Handle(viewModel);
+    }
+
+    private void NewTape()
+    {
+        TapeManager?.NewTape();
+        IsTapeInserted = true;
+    }
+
+    private async Task InsertTape()
     {
         var files = await FileDialogs.OpenTapeFileAsync();
 
@@ -39,7 +59,7 @@ public class TapeMenuViewModel : ViewModelBase
             return;
         }
 
-        TapeManager?.TryInsertTape(files[0].Path.LocalPath);
+        TapeManager?.InsertTape(files[0].Path.LocalPath);
     }
 
     private void Rewind() { }

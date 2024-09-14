@@ -36,30 +36,19 @@ public sealed class TapeManager
     {
     }
 
-    public bool TryLoadTape(string fileName)
-    {
-        Tape.Load(fileName);
-
-        if (!TryInsertTape(fileName))
-        {
-            return false;
-        }
-
-        PlayTape();
-
-        return true;
-    }
-
-    public bool TryInsertTape(string fileName)
+    public void InsertTape(string fileName, bool autoPlay = false)
     {
         StopTape();
 
         Tape.Load(fileName);
-
         TapePlayer.LoadTape(Tape);
+
         TapeInserted?.Invoke(EventArgs.Empty);
 
-        return true;
+        if (autoPlay)
+        {
+            PlayTape();
+        }
     }
 
     public void StopTape()

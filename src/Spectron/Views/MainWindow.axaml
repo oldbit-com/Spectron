@@ -129,11 +129,15 @@
             </NativeMenuItem>
             <NativeMenuItem Header="Tape">
                 <NativeMenu>
-                    <NativeMenuItem Header="Insert..." Gesture="Cmd+T" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
+                    <NativeMenuItem Header="New Tape"/>
+                    <NativeMenuItem Header="Insert Tape" Gesture="Cmd+T" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
+                    <NativeMenuItem Header="Save Tape"/>
+                    <NativeMenuItemSeparator/>
                     <NativeMenuItem Header="Play" Command="{Binding TapeMenuViewModel.PlayCommand}"/>
                     <NativeMenuItem Header="Stop" Command="{Binding TapeMenuViewModel.StopCommand}"/>
                     <NativeMenuItem Header="Rewind" Command="{Binding TapeMenuViewModel.RewindCommand}"/>
                     <NativeMenuItem Header="Eject" Command="{Binding TapeMenuViewModel.EjectCommand}"/>
+                    <NativeMenuItem Header="View" Command="{Binding TapeMenuViewModel.ViewCommand}"/>
                     <NativeMenuItemSeparator/>
                     <NativeMenuItem Header="Loading Speed">
                         <NativeMenu>

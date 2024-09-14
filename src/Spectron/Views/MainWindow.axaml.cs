@@ -1,4 +1,5 @@
 using System;
+using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.ReactiveUI;
@@ -19,12 +20,23 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
         this.WhenActivated(action =>
             action(ViewModel!.ShowPreferencesView.RegisterHandler(ShowPreferencesViewAsync)));
+
+        this.WhenActivated(action =>
+            action(ViewModel!.TapeMenuViewModel.ShowTapeView.RegisterHandler(ShowTapeViewAsync)));
     }
 
     private async Task ShowPreferencesViewAsync(InteractionContext<PreferencesViewModel, Preferences?> interaction)
     {
         var dialog = new PreferencesView { DataContext = interaction.Input };
         var result = await dialog.ShowDialog<Preferences?>(this);
+
+        interaction.SetOutput(result);
+    }
+
+    private async Task ShowTapeViewAsync(InteractionContext<TapeViewModel, Unit?> interaction)
+    {
+        var dialog = new TapeView { DataContext = interaction.Input };
+        var result = await dialog.ShowDialog<Unit?>(this);
 
         interaction.SetOutput(result);
     }

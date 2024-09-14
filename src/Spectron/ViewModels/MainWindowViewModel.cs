@@ -36,6 +36,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly SessionService _sessionService;
     private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
     private readonly Timer _statusBarTimer;
+    private readonly TapeFile _tape = new();
 
     private Emulator? Emulator { get; set; }
     private HelpKeyboardView? _helpKeyboardView;
@@ -261,6 +262,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
         _renderStopwatch.Restart();
         _lastScreenRender = TimeSpan.Zero;
+
+        Emulator.TapeManager.Tape = _tape;
 
         Emulator.Start();
 

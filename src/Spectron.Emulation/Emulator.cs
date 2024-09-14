@@ -95,10 +95,7 @@ public sealed class Emulator
 
     public void LoadTape(string fileName)
     {
-        if (!TapeManager.TryLoadTape(fileName))
-        {
-            return;
-        }
+        TapeManager.InsertTape(fileName, autoPlay: true);
 
         // TODO: Simulate LOAD "" to start the loader
     }

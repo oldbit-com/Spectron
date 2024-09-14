@@ -25,15 +25,15 @@ internal sealed class TapePlayer(Clock clock, HardwareSettings hardware) : IDisp
             return;
         }
 
-        clock.TicksAdded -= ReadTape;
-        clock.TicksAdded += ReadTape;
+        clock.TicksAdded -= ReadTapePulses;
+        clock.TicksAdded += ReadTapePulses;
 
         IsPlaying = true;
     }
 
     internal void Stop()
     {
-        clock.TicksAdded -= ReadTape;
+        clock.TicksAdded -= ReadTapePulses;
 
         IsPlaying = false;
     }
@@ -56,7 +56,7 @@ internal sealed class TapePlayer(Clock clock, HardwareSettings hardware) : IDisp
         _pulses.MoveNext();
     }
 
-    private void ReadTape(int addedTicks, int previousFrameTicks, int currentFrameTicks)
+    private void ReadTapePulses(int addedTicks, int previousFrameTicks, int currentFrameTicks)
     {
         if (!IsPlaying || _pulses == null)
         {

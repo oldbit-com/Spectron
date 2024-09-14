@@ -44,6 +44,8 @@ partial class MainWindowViewModel
             }
             else
             {
+                _tape.Load(filePath);
+
                 Emulator?.LoadTape(filePath);
             }
 

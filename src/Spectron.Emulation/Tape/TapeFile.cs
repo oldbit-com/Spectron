@@ -9,14 +9,7 @@ namespace OldBit.Spectron.Emulation.Tape;
 public sealed class TapeFile : ITapDataProvider, ITapeBlockDataProvider
 {
     private int _currentBlockIndex;
-
-    private TzxFile File { get; set; } = new();
-
-    public void NewTape()
-    {
-        _currentBlockIndex = 0;
-        File = new TzxFile();
-    }
+    private TzxFile _file  = new();
 
     public void Load(string filePath)
     {
@@ -27,20 +20,20 @@ public sealed class TapeFile : ITapDataProvider, ITapeBlockDataProvider
         {
             case FileType.Tap:
                 var tapFile = TapFile.Load(filePath);
-                File = tapFile.ToTzx();
+                _file = tapFile.ToTzx();
                 break;
 
             case FileType.Tzx:
-                File = TzxFile.Load(filePath);
+                _file = TzxFile.Load(filePath);
                 break;
         }
     }
 
     public TapData? GetNextTapData()
     {
-        while (_currentBlockIndex < File.Blocks.Count)
+        while (_currentBlockIndex < _file.Blocks.Count)
         {
-            var block = File.Blocks[_currentBlockIndex];
+            var block = _file.Blocks[_currentBlockIndex];
             _currentBlockIndex += 1;
 
             if (block is not StandardSpeedDataBlock standardSpeedDataBlock)
@@ -59,12 +52,12 @@ public sealed class TapeFile : ITapDataProvider, ITapeBlockDataProvider
 
     public IBlock? GetNextBlock()
     {
-        if (_currentBlockIndex >= File.Blocks.Count)
+        if (_currentBlockIndex >= _file.Blocks.Count)
         {
             return null;
         }
 
-        var block = File.Blocks[_currentBlockIndex];
+        var block = _file.Blocks[_currentBlockIndex];
         _currentBlockIndex += 1;
 
         return block;
@@ -72,6 +65,5 @@ public sealed class TapeFile : ITapDataProvider, ITapeBlockDataProvider
 
     public void SaveTape(string filePath)
     {
-
     }
 }
