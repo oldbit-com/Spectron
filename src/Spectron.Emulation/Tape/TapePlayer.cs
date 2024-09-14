@@ -11,12 +11,10 @@ namespace OldBit.Spectron.Emulation.Tape;
 internal sealed class TapePlayer(Clock clock, HardwareSettings hardware) : IDisposable
 {
     private IEnumerator<Pulse>? _pulses;
-    private IEnumerator<TapData>? _tapeBlocks;
 
     private int _runningPulseDuration;
     private int _runningPulseCount;
 
-    internal TzxFile? TzxFile { get; private set; }
     internal bool EarBit { get; private set; }
     internal bool IsPlaying { get; private set; }
 
@@ -48,28 +46,14 @@ internal sealed class TapePlayer(Clock clock, HardwareSettings hardware) : IDisp
         IsPlaying = false;
     }
 
-    internal void LoadTape(TzxFile tzxFile)
+    internal void LoadTape(TapeFile tape)
     {
         Close();
 
-        TzxFile = tzxFile;
-        var tapePulseProvider = new PulseProvider(tzxFile, hardware);
+        var pulseProvider = new PulseProvider(tape, hardware);
 
-        _pulses = tapePulseProvider.GetAll().GetEnumerator();
+        _pulses = pulseProvider.GetAllPulses().GetEnumerator();
         _pulses.MoveNext();
-
-        _tapeBlocks = GetTapBlocs(tzxFile);
-
-    }
-
-    internal TapData? NextBlock()
-    {
-        if (_tapeBlocks == null || !_tapeBlocks.MoveNext())
-        {
-            return null;
-        }
-
-        return _tapeBlocks.Current;
     }
 
     private void ReadTape(int addedTicks, int previousFrameTicks, int currentFrameTicks)
@@ -112,25 +96,12 @@ internal sealed class TapePlayer(Clock clock, HardwareSettings hardware) : IDisp
        EarBit = !EarBit;
     }
 
-    private static IEnumerator<TapData> GetTapBlocs(TzxFile tzxFile)
-    {
-        foreach (var block in tzxFile.Blocks.GetStandardSpeedDataBlocks())
-        {
-            if (TapData.TryParse(block.Data, out var tapData))
-            {
-                yield return tapData;
-            }
-        }
-    }
-
     private void Close()
     {
-        TzxFile = null;
         _runningPulseDuration = 0;
         _runningPulseCount = 0;
 
         _pulses?.Dispose();
-        _tapeBlocks?.Dispose();
     }
 
     public void Dispose() => Close();

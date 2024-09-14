@@ -8,8 +8,11 @@ namespace OldBit.Spectron.Emulation.Tape;
 
 public sealed class TapeManager
 {
+    private readonly InstantLoader _instantLoader;
+
+    public TapeFile Tape { get; set; } = new();
+
     internal TapePlayer TapePlayer { get; }
-    internal InstantTapeLoader InstantTapeLoader { get; }
 
     public delegate void TapeInsertedEvent(EventArgs e);
     public event TapeInsertedEvent? TapeInserted;
@@ -26,11 +29,17 @@ public sealed class TapeManager
     internal TapeManager(Emulator emulator, HardwareSettings hardware)
     {
         TapePlayer = new TapePlayer(emulator.Cpu.Clock, hardware);
-        InstantTapeLoader = new InstantTapeLoader(emulator.Cpu, emulator.Memory, TapePlayer);
+        _instantLoader = new InstantLoader(emulator.Cpu, emulator.Memory);
+    }
+
+    public void NewTape()
+    {
     }
 
     public bool TryLoadTape(string fileName)
     {
+        Tape.Load(fileName);
+
         if (!TryInsertTape(fileName))
         {
             return false;
@@ -45,12 +54,9 @@ public sealed class TapeManager
     {
         StopTape();
 
-        if (!TryLoadTape(fileName, out var tzxFile))
-        {
-            return false;
-        }
+        Tape.Load(fileName);
 
-        TapePlayer.LoadTape(tzxFile);
+        TapePlayer.LoadTape(Tape);
         TapeInserted?.Invoke(EventArgs.Empty);
 
         return true;
@@ -73,6 +79,8 @@ public sealed class TapeManager
         StopTape();
         TapeEjected?.Invoke(EventArgs.Empty);
     }
+
+    internal void InstantLoad() => _instantLoader.LoadBytes(Tape);
 
     private static bool TryLoadTape(string fileName, [NotNullWhen(true)] out TzxFile? tzxFile)
     {

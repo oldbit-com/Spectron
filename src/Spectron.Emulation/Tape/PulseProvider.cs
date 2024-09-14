@@ -14,15 +14,22 @@ namespace OldBit.Spectron.Emulation.Tape;
 internal sealed record Pulse(int RepeatCount, int Duration, bool IsSilence = false);
 
 /// <summary>
-/// Memory efficient tape pulse provider. Only supports Standard Speed Data Blocks.
-/// Normally there are many thousands of pulses in a file, so we don't want to store them all in memory.
+/// Memory efficient tape pulse provider. Normally there are many thousands of pulses in a file,
+/// so we don't want to store them all in memory, just generate them on the fly.
 /// </summary>
-internal sealed class PulseProvider(TzxFile tzxFile, HardwareSettings hardware)
+internal sealed class PulseProvider(ITapeBlockDataProvider blockDataProvider, HardwareSettings hardware)
 {
-    internal IEnumerable<Pulse> GetAll()
+    internal IEnumerable<Pulse> GetAllPulses()
     {
-        foreach (var block in tzxFile.Blocks)
+        while (true)
         {
+            var block = blockDataProvider.GetNextBlock();
+
+            if (block == null)
+            {
+                yield break;
+            }
+
             var pulseSettings = PulseFactory.Create(block, hardware);
 
             if (pulseSettings == null)

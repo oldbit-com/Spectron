@@ -173,7 +173,7 @@ public sealed class Emulator
             case RomRoutines.LD_BYTES:
                 if (TapeLoadingSpeed == TapeLoadingSpeed.Instant)
                 {
-                    TapeManager.InstantTapeLoader.LoadBytes();
+                    TapeManager.InstantLoad();
                 }
                 else if (TapeLoadingSpeed == TapeLoadingSpeed.Accelerated)
                 {
