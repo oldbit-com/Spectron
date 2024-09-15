@@ -30,44 +30,102 @@ internal sealed class PulseProvider(ITapeBlockDataProvider blockDataProvider, Ha
                 yield break;
             }
 
-            var pulseSettings = PulseFactory.Create(block, hardware);
+            IEnumerable<Pulse> pulses = [];
 
-            if (pulseSettings == null)
-            {
-                continue;
-            }
-
-            TapData? tapData = null;
             switch (block)
             {
-                case StandardSpeedDataBlock standardSpeedDataBlock when !TapData.TryParse(standardSpeedDataBlock.Data, out tapData):
-                case TurboSpeedDataBlock turboSpeedDataBlock when !TapData.TryParse(turboSpeedDataBlock.Data, out tapData):
+                case PauseBlock pauseBlock:
+                    var pausePulse = PulseFactory.CreatePausePulse(pauseBlock.Duration, hardware);
+                    if (pausePulse != null)
+                    {
+                        yield return pausePulse;
+                    }
                     continue;
+
+                case PureToneBlock pureToneBlock:
+                    yield return PulseFactory.Create(pureToneBlock);
+                    continue;
+
+                case PulseSequenceBlock pulseSequenceBlock:
+                    pulses = PulseFactory.Create(pulseSequenceBlock);
+                    break;
+
+                case PureDataBlock pureDataBlock:
+                    pulses = GetPureDataBlockPulses(pureDataBlock, hardware);
+                    break;
+
+                case StandardSpeedDataBlock standardSpeedDataBlock:
+                    pulses = GetStandardSpeedDataBlockPulses(standardSpeedDataBlock, hardware);
+                    break;
+
+                case TurboSpeedDataBlock turboSpeedDataBlock:
+                    pulses = GetTurboSpeedDataBlockPulses(turboSpeedDataBlock, hardware);
+                    break;
             }
 
-            if (tapData == null)
-            {
-                continue;
-            }
-
-            if (tapData.IsHeader)
-            {
-                yield return pulseSettings.PilotHeaderPulse;
-            }
-            else
-            {
-                yield return pulseSettings.PilotDataPulse;
-            }
-
-            yield return pulseSettings.FirstSyncPulse;
-            yield return pulseSettings.SecondSyncPulse;
-
-            foreach (var pulse in pulseSettings.DataPulses)
+            foreach (var pulse in pulses)
             {
                 yield return pulse;
             }
+        }
+    }
 
-            yield return pulseSettings.PausePulse;
+    private static IEnumerable<Pulse> GetStandardSpeedDataBlockPulses(StandardSpeedDataBlock block, HardwareSettings hardware)
+    {
+        var pulseSettings = PulseFactory.Create(block, hardware);
+
+        return !TapData.TryParse(block.Data, out var tapData) ? [] : GetTapeDataPulses(tapData, pulseSettings);
+    }
+
+    private static IEnumerable<Pulse> GetTurboSpeedDataBlockPulses(TurboSpeedDataBlock block, HardwareSettings hardware)
+    {
+        var pulseSettings = PulseFactory.Create(block, hardware);
+
+        return !TapData.TryParse(block.Data, out var tapData) ? [] : GetTapeDataPulses(tapData, pulseSettings);
+    }
+
+    private static IEnumerable<Pulse> GetPureDataBlockPulses(PureDataBlock block, HardwareSettings hardware)
+    {
+        var pulseSettings = PulseFactory.Create(block, hardware);
+
+        return GetTapeDataPulses(null, pulseSettings);
+    }
+
+    private static IEnumerable<Pulse> GetTapeDataPulses(TapData? tapData, BlockPulses blockPulses)
+    {
+        if (tapData?.IsHeader == true)
+        {
+            if (blockPulses.PilotHeaderPulse != null)
+            {
+                yield return blockPulses.PilotHeaderPulse;
+            }
+        }
+        else
+        {
+            if (blockPulses.PilotDataPulse != null)
+            {
+                yield return blockPulses.PilotDataPulse;
+            }
+        }
+
+        if (blockPulses.FirstSyncPulse != null)
+        {
+            yield return blockPulses.FirstSyncPulse;
+        }
+
+        if (blockPulses.SecondSyncPulse != null)
+        {
+            yield return blockPulses.SecondSyncPulse;
+        }
+
+        foreach (var pulse in blockPulses.DataPulses)
+        {
+            yield return pulse;
+        }
+
+        if (blockPulses.PausePulse != null)
+        {
+            yield return blockPulses.PausePulse;
         }
     }
 }
