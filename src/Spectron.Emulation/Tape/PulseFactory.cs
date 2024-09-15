@@ -17,13 +17,13 @@ internal static class PulseFactory
 
     internal static BlockPulses Create(StandardSpeedDataBlock block, HardwareSettings hardware)
     {
-        const int pilotHeaderPulseCount = 8063; // Before each header block is a sequence of 8063 pulses
-        const int pilotDataPulseCount = 3223; // Before each data block is a sequence of 3223 pulses
-        const int pilotPulseLength = 2168; // Pilot tone length is 2168 T-states
-        const int firstSyncPulseLength = 667; // The pilot tone is followed by two sync pulses of 667
-        const int secondSyncPulseLength = 735; // and 735 T-states each
-        const int zeroBitPulseLength = 855; // '0' bit is encoded as 2 pulses of 855 T-states each
-        const int oneBitPulseLength = 1710; // '1' bit is encoded as 2 pulses of 1710 T-states each
+        const int pilotHeaderPulseCount = 8063;     // Before each header block is a sequence of 8063 pulses
+        const int pilotDataPulseCount = 3223;       // Before each data block is a sequence of 3223 pulses
+        const int pilotPulseLength = 2168;          // Pilot tone length is 2168 T-states
+        const int firstSyncPulseLength = 667;       // The pilot tone is followed by two sync pulses of 667
+        const int secondSyncPulseLength = 735;      // and 735 T-states each
+        const int zeroBitPulseLength = 855;         // '0' bit is encoded as 2 pulses of 855 T-states each
+        const int oneBitPulseLength = 1710;         // '1' bit is encoded as 2 pulses of 1710 T-states each
 
         var zeroBitPulse = new Pulse(RepeatCount: 2, zeroBitPulseLength);
         var oneBitPulse = new Pulse(RepeatCount: 2, oneBitPulseLength);
