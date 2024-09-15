@@ -70,26 +70,4 @@ public sealed class TapeManager
     }
 
     internal void InstantLoad() => _instantLoader.LoadBytes(Tape);
-
-    private static bool TryLoadTape(string fileName, [NotNullWhen(true)] out TzxFile? tzxFile)
-    {
-        var fileType = FileTypeHelper.GetFileType(fileName);
-        tzxFile = null;
-
-        switch (fileType)
-        {
-            case FileType.Tap:
-            {
-                var tapFile = TapFile.Load(fileName);
-                tzxFile = tapFile.ToTzx();
-                break;
-            }
-
-            case FileType.Tzx:
-                tzxFile = TzxFile.Load(fileName);
-                break;
-        }
-
-        return tzxFile != null;
-    }
 }
