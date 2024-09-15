@@ -1,7 +1,4 @@
-using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Z80Cpu;
-using OldBit.ZX.Files.Tap;
-using OldBit.ZX.Files.Tzx;
 
 namespace OldBit.Spectron.Emulation.Tape;
 
@@ -28,6 +25,11 @@ internal sealed class TapePlayer(Clock clock, HardwareSettings hardware) : IDisp
         clock.TicksAdded -= ReadTapePulses;
         clock.TicksAdded += ReadTapePulses;
 
+        if (_pulses?.Current == null)
+        {
+            _pulses?.MoveNext();
+        }
+
         IsPlaying = true;
     }
 
@@ -53,7 +55,6 @@ internal sealed class TapePlayer(Clock clock, HardwareSettings hardware) : IDisp
         var pulseProvider = new PulseProvider(tape, hardware);
 
         _pulses = pulseProvider.GetAllPulses().GetEnumerator();
-        _pulses.MoveNext();
     }
 
     private void ReadTapePulses(int addedTicks, int previousFrameTicks, int currentFrameTicks)
