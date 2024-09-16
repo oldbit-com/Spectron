@@ -44,9 +44,9 @@ partial class MainWindowViewModel
             }
             else
             {
-                _tape.Load(filePath);
-
-                Emulator?.LoadTape(filePath);
+                var emulator = _tapeLoader.SimulateLoad(ComputerType);
+                InitializeEmulator(emulator);
+                emulator.TapeManager.InsertTape(filePath, autoPlay: true);
             }
 
             RecentFilesViewModel.Add(filePath);
