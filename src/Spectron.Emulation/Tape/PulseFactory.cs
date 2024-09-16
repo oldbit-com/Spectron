@@ -33,7 +33,7 @@ internal static class PulseFactory
             PilotDataPulse: new Pulse(pilotDataPulseCount, pilotPulseLength),
             FirstSyncPulse: new Pulse(RepeatCount: 1, firstSyncPulseLength),
             SecondSyncPulse: new Pulse(RepeatCount: 1, secondSyncPulseLength),
-            PausePulse: CreatePausePulse(block.PauseDuration == 0 ? 1000 : block.PauseDuration, hardware),
+            PausePulse: CreatePausePulse(block.PauseDuration, hardware),
             DataPulses: block.Data
                 .SelectMany(item => BitMasks.Select(mask => (item & mask) == 0 ? zeroBitPulse : oneBitPulse)));
     }
@@ -63,7 +63,7 @@ internal static class PulseFactory
             PilotDataPulse: new Pulse(pilotDataPulseCount, block.PilotPulseLength),
             FirstSyncPulse: new Pulse(RepeatCount: 1, block.FirstSyncPulseLength),
             SecondSyncPulse: new Pulse(RepeatCount: 1, block.SecondSyncPulseLength),
-            PausePulse: CreatePausePulse(block.PauseDuration == 0 ? 1000 : block.PauseDuration, hardware),
+            PausePulse: CreatePausePulse(block.PauseDuration, hardware),
             DataPulses: GetDataPulses(block.Data, zeroBitPulse, oneBitPulse, block.UsedBitsInLastByte));
     }
 
