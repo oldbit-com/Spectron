@@ -93,13 +93,6 @@ public sealed class Emulator
     public void SetEmulationSpeed(int emulationSpeedPercentage) =>
         _emulationTimer.Interval = TimeSpan.FromMilliseconds(20 * (100f / emulationSpeedPercentage));
 
-    public void LoadTape(string fileName)
-    {
-        TapeManager.InsertTape(fileName, autoPlay: true);
-
-        // TODO: Simulate LOAD "" to start the loader
-    }
-
     private void SetupEventHandlers()
     {
         Memory.ScreenMemoryUpdated += address => ScreenBuffer.UpdateScreen(address);
@@ -190,7 +183,9 @@ public sealed class Emulator
                 break;
 
             case RomRoutines.SAVE_ETC:
-                //
+                // var szx = SzxSnapshot.CreateSnapshot(this);
+                // szx.Save("/Users/voytas/Projects/ZX/Spectron/src/Spectron.Emulation/Tape/Loader/Files/48.szx");
+
                 break;
         }
     }
