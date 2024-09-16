@@ -14,6 +14,7 @@ using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.Tape;
+using OldBit.Spectron.Emulation.Tape.Loader;
 using OldBit.Spectron.Extensions;
 using OldBit.Spectron.Helpers;
 using OldBit.Spectron.Models;
@@ -34,6 +35,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly SzxSnapshot _szxSnapshot;
     private readonly PreferencesService _preferencesService;
     private readonly SessionService _sessionService;
+    private readonly TapeLoader _tapeLoader;
     private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
     private readonly Timer _statusBarTimer;
     private readonly TapeFile _tape = new();
@@ -82,6 +84,7 @@ public partial class MainWindowViewModel : ViewModelBase
         SzxSnapshot szxSnapshot,
         PreferencesService preferencesService,
         SessionService sessionService,
+        TapeLoader tapeLoader,
         RecentFilesViewModel recentFilesViewModel,
         TimeMachineViewModel timeMachineViewModel)
     {
@@ -91,6 +94,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _szxSnapshot = szxSnapshot;
         _preferencesService = preferencesService;
         _sessionService = sessionService;
+        _tapeLoader = tapeLoader;
         RecentFilesViewModel = recentFilesViewModel;
         TimeMachineViewModel = timeMachineViewModel;
         recentFilesViewModel.OpenRecentFileAsync = async fileName => await HandleLoadFileAsync(fileName);
