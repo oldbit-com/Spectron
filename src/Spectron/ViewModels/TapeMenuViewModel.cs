@@ -40,7 +40,12 @@ public class TapeMenuViewModel : ViewModelBase
 
     private async Task OpenTapeView()
     {
-        var viewModel = new TapeViewModel();
+        if (TapeManager == null)
+        {
+            return;
+        }
+
+        var viewModel = new TapeViewModel(TapeManager);
         await ShowTapeView.Handle(viewModel);
     }
 

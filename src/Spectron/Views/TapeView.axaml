@@ -18,10 +18,23 @@
                   IsReadOnly="True"
                   GridLinesVisibility="All"
                   CanUserSortColumns="False"
-                  BorderThickness="1" BorderBrush="{StaticResource ButtonBorderBrush}">
+                  CanUserResizeColumns="True"
+                  BorderThickness="2"
+                  BorderBrush="{DynamicResource DataGridGridLinesBrush}">
+
+            <DataGrid.Styles>
+                <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+                    <Setter Property="IsVisible" Value="false" />
+                </Style>
+                <Style Selector="DataGridCell.index">
+                    <Setter Property="HorizontalContentAlignment" Value="Right" />
+                </Style>
+            </DataGrid.Styles>
+
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Tape Block" Binding="{Binding Name}" Width="250"/>
-                <DataGridTextColumn Header="Data" Binding="{Binding Data}" />
+                <DataGridTextColumn Binding="{Binding Index}" CellStyleClasses="index"/>
+                <DataGridTextColumn Header="Tape Block" Binding="{Binding Name}"/>
+                <DataGridTextColumn Header="Data" Binding="{Binding Data}"/>
             </DataGrid.Columns>
         </DataGrid>
         <Button Grid.Row="1" Content="Close" HorizontalAlignment="Right" HorizontalContentAlignment="Center" Margin="0 0 20 0" Width="100"/>
