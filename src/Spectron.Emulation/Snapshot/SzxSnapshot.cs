@@ -23,7 +23,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
     {
         var computerType = snapshot.Header.MachineId switch
         {
-            SzxHeader.MachineId16K => ComputerType.Spectrum48K,
+            SzxHeader.MachineId16K => ComputerType.Spectrum16K,
             SzxHeader.MachineId48K => ComputerType.Spectrum48K,
             SzxHeader.MachineId128K => ComputerType.Spectrum128K,
             _ => throw new NotSupportedException($"Snapshot hardware mode not supported: {snapshot.Header.MachineId}")
@@ -53,7 +53,23 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
 
     public static SzxFile CreateSnapshot(Emulator emulator, CompressionLevel compressionLevel = CompressionLevel.SmallestSize)
     {
-        var snapshot = new SzxFile();
+        var snapshot = new SzxFile
+        {
+            Creator = new CreatorBlock()
+            {
+                Name = "Spectron",
+                MinorVersion = 1,
+                MajorVersion = 0,
+            }
+        };
+
+        snapshot.Header.MachineId = emulator.ComputerType switch
+        {
+            ComputerType.Spectrum16K => SzxHeader.MachineId16K,
+            ComputerType.Spectrum48K => SzxHeader.MachineId48K,
+            ComputerType.Spectrum128K => SzxHeader.MachineId128K,
+            _ => snapshot.Header.MachineId
+        };
 
         SaveRegisters(emulator.Cpu, snapshot.Z80Registers);
         SaveMemory(emulator.Memory, snapshot.RamPages, snapshot.SpecRegs, compressionLevel);
