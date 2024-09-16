@@ -20,6 +20,7 @@
       <EmbeddedResource Include="Rom\Files\TC2048.rom" />
       <EmbeddedResource Include="Tape\Loader\Files\48.szx" />
       <EmbeddedResource Include="Tape\Loader\Files\16.szx" />
+      <EmbeddedResource Include="Tape\Loader\Files\128.szx" />
     </ItemGroup>
 
     <ItemGroup>

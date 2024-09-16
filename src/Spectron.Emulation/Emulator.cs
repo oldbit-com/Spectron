@@ -5,6 +5,7 @@ using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
+using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Z80Cpu;
 
@@ -182,9 +183,10 @@ public sealed class Emulator
 
                 break;
 
+            case 0x1AF1:
             case RomRoutines.SAVE_ETC:
                 // var szx = SzxSnapshot.CreateSnapshot(this);
-                // szx.Save("/Users/voytas/Projects/ZX/Spectron/src/Spectron.Emulation/Tape/Loader/Files/48.szx");
+                // szx.Save("/Users/voytas/Projects/ZX/Spectron/src/Spectron.Emulation/Tape/Loader/Files/128.szx");
 
                 break;
         }

@@ -138,25 +138,22 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
                     break;
                 }
                 case Memory128K memory128:
-                    var bankNumber = ramPage.PageNumber - 3;
-                    if (bankNumber is < 0 or >= 8)
-                    {
-                        continue;
-                    }
-
-                    var bank = memory128.Banks[bankNumber];
+                    var bank = memory128.Banks[ramPage.PageNumber];
                     for (var i = 0; i < ramPage.Data.Length; i++)
                     {
                         bank[i] = ramPage.Data[i];
                     }
-
-                    memory128.SetPagingMode(specRegs.Port7FFD);
 
                     break;
 
                 default:
                     throw new NotSupportedException($"Memory type not supported: {memory.GetType()}");
             }
+        }
+
+        if (memory is Memory128K mem128)
+        {
+            mem128.SetPagingMode(specRegs.Port7FFD);
         }
     }
 
