@@ -46,7 +46,10 @@ partial class MainWindowViewModel
             {
                 var emulator = _tapeLoader.SimulateLoad(ComputerType);
                 InitializeEmulator(emulator);
-                emulator.TapeManager.InsertTape(filePath, autoPlay: true);
+
+                emulator.TapeManager.InsertTape(
+                    filePath,
+                    autoPlay: TapeLoadingSpeed != TapeLoadingSpeed.Instant);
             }
 
             RecentFilesViewModel.Add(filePath);

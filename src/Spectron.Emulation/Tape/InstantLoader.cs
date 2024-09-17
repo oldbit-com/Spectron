@@ -9,38 +9,44 @@ namespace OldBit.Spectron.Emulation.Tape;
 /// </summary>
 internal sealed class InstantLoader
 {
-    private readonly Z80 _z80;
+    private readonly Z80 _cpu;
     private readonly IMemory _memory;
 
-    internal InstantLoader(Z80 z80, IMemory memory)
+    internal InstantLoader(Z80 cpu, IMemory memory)
     {
-        _z80 = z80;
+        _cpu = cpu;
         _memory = memory;
     }
 
-    internal void LoadBytes(ITapDataProvider tapeDataProvider)
+    internal void LoadBytes(TapeFile tapeFile)
     {
-        var tap = tapeDataProvider.GetNextTapData();
+        var tap = tapeFile.GetNextTapData();
         if (tap == null)
         {
             return;
         }
 
         // Check if running Load (CF=1) or Verify (CF = 0)
-        if ((_z80.Registers.F & Flags.C) == 0)
+        if ((_cpu.Registers.F & Flags.C) == 0)
         {
             return;
         }
 
         var checksum = tap.Flag;
-        var startAddress = _z80.Registers.IX;
-        var blockLength = _z80.Registers.DE;
+        var startAddress = _cpu.Registers.IX;
+        var blockLength = _cpu.Registers.DE;
 
         // Load data directly to memory
-        if (_z80.Registers.A == tap.Flag)
+        if (_cpu.Registers.A == tap.Flag)
         {
             for (var i = 0; i < blockLength; i++)
             {
+                if (i >= tap.BlockData.Count)
+                {
+                    // More bytes requested than the block contains
+                    break;
+                }
+
                 _memory.Write((Word)(startAddress + i), tap.BlockData[i]);
                 checksum ^= tap.BlockData[i];
             }
@@ -49,9 +55,9 @@ internal sealed class InstantLoader
         }
 
         // Set registers as if the data was loaded and return to the caller
-        _z80.Registers.DE = 0;
-        _z80.Registers.IX = (Word)(startAddress + blockLength);
-        _z80.Registers.A = checksum;
-        _z80.Registers.PC = 0x05E0;
+        _cpu.Registers.DE = 0;
+        _cpu.Registers.IX = (Word)(startAddress + blockLength);
+        _cpu.Registers.A = checksum;
+        _cpu.Registers.PC = 0x05E0;
     }
 }

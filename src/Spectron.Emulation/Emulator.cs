@@ -20,6 +20,8 @@ public sealed class Emulator
     private readonly Beeper _beeper;
     private readonly SpectrumBus _spectrumBus;
     private readonly EmulatorTimer _emulationTimer;
+    private readonly InstantLoader _instantLoader;
+
     private bool _invalidateScreen;
     private bool _isAcceleratedLoading;
 
@@ -53,6 +55,7 @@ public sealed class Emulator
         ScreenBuffer = new ScreenBuffer(emulator.Memory, UlaPlus);
         Cpu = new Z80(emulator.Memory, emulator.ContentionProvider);
 
+        _instantLoader = new InstantLoader(Cpu, Memory);
         TapeManager = new TapeManager(this, hardware);
         JoystickManager = new JoystickManager(_spectrumBus, KeyboardHandler);
 
@@ -164,7 +167,7 @@ public sealed class Emulator
             case RomRoutines.LD_BYTES:
                 if (TapeLoadingSpeed == TapeLoadingSpeed.Instant)
                 {
-                    TapeManager.InstantLoad();
+                    _instantLoader.LoadBytes(TapeManager.TapeFile);
                 }
                 else if (TapeLoadingSpeed == TapeLoadingSpeed.Accelerated)
                 {
