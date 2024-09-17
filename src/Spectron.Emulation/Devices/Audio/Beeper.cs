@@ -71,7 +71,7 @@ internal sealed class Beeper
 
     private void WriteBuffer(byte amplitude, int length)
     {
-        _beeperBuffer.Write(Enumerable.Repeat(amplitude, length).ToArray());
+     //   _beeperBuffer.Write(Enumerable.Repeat(amplitude, length).ToArray());
     }
 
     public void Stop()
