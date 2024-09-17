@@ -7,7 +7,7 @@ namespace OldBit.Spectron.Emulation.Tape;
 /// </summary>
 internal sealed class TapePlayer(Clock clock, HardwareSettings hardware) : IDisposable
 {
-    private IEnumerator<Pulse>? _pulses;
+    private PulseStream? _pulseStream;
 
     private int _runningPulseDuration;
     private int _runningPulseCount;
@@ -24,11 +24,6 @@ internal sealed class TapePlayer(Clock clock, HardwareSettings hardware) : IDisp
 
         clock.TicksAdded -= ReadTapePulses;
         clock.TicksAdded += ReadTapePulses;
-
-        if (_pulses?.Current == null)
-        {
-            _pulses?.MoveNext();
-        }
 
         IsPlaying = true;
     }
@@ -52,19 +47,18 @@ internal sealed class TapePlayer(Clock clock, HardwareSettings hardware) : IDisp
     {
         Close();
 
-        var pulseProvider = new PulseProvider(tape, hardware);
-
-        _pulses = pulseProvider.GetAllPulses().GetEnumerator();
+        _pulseStream = new PulseStream(tape, hardware);
     }
 
     private void ReadTapePulses(int addedTicks, int previousFrameTicks, int currentFrameTicks)
     {
-        if (!IsPlaying || _pulses == null)
+        if (!IsPlaying || _pulseStream == null)
         {
             return;
         }
 
-        var pulse = _pulses.Current;
+        var pulse = _pulseStream.Current;
+
        _runningPulseDuration += addedTicks;
 
        // If the pulse length is less than the current pulse length, then we need to wait for the next pulse
@@ -79,7 +73,7 @@ internal sealed class TapePlayer(Clock clock, HardwareSettings hardware) : IDisp
        // If we have reached the pulse count, then move to the next pulse
        if (_runningPulseCount >= pulse.RepeatCount)
        {
-           if (!_pulses.MoveNext())
+           if (!_pulseStream.Next())
            {
                Stop();
                return;
@@ -102,7 +96,7 @@ internal sealed class TapePlayer(Clock clock, HardwareSettings hardware) : IDisp
         _runningPulseDuration = 0;
         _runningPulseCount = 0;
 
-        _pulses?.Dispose();
+        _pulseStream?.Dispose();
     }
 
     public void Dispose() => Close();
