@@ -21,11 +21,14 @@ public partial class PreferencesView : ReactiveWindow<PreferencesViewModel>
         this.WhenActivated(action => action(ViewModel!.UpdatePreferencesCommand.Subscribe(Close)));
     }
 
-    protected override void OnKeyUp(KeyEventArgs e)
+    protected override void OnKeyDown(KeyEventArgs e)
     {
-        if (e.Key == Key.Escape)
+        if (e.Key != Key.Escape)
         {
-            Close();
+            return;
         }
+
+        e.Handled = true;
+        Close();
     }
 }
