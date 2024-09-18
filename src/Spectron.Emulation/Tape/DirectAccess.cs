@@ -20,9 +20,9 @@ internal sealed class DirectAccess
         _memory = memory;
     }
 
-    internal void LoadBytes(TapeFile tapeFile)
+    internal void LoadBytes(VirtualTape virtualTape)
     {
-        var tap = tapeFile.GetNextTapData();
+        var tap = virtualTape.GetNextTapData();
         if (tap == null)
         {
             return;
@@ -63,7 +63,7 @@ internal sealed class DirectAccess
         _cpu.Registers.PC = 0x05E0;
     }
 
-    internal void SaveBytes(TapeFile tapeFile)
+    internal void SaveBytes(VirtualTape virtualTape)
     {
         var blockType = _cpu.Registers.A;
         var length = _cpu.Registers.DE;
@@ -72,7 +72,7 @@ internal sealed class DirectAccess
         var data = _memory.ReadBytes(startAddress, length);
         var tapData = new TapData(blockType, data);
 
-        tapeFile.FileImage.Blocks.Add(new StandardSpeedDataBlock(tapData));
+        virtualTape.CurrentFile.Blocks.Add(new StandardSpeedDataBlock(tapData));
 
         _cpu.Registers.PC = 0x053A;
     }

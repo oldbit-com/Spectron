@@ -26,6 +26,8 @@ internal sealed class TapePlayer(Clock clock, HardwareSettings hardware) : IDisp
         clock.TicksAdded -= ReadTapePulses;
         clock.TicksAdded += ReadTapePulses;
 
+        _pulseStream?.Start();
+
         IsPlaying = true;
     }
 
@@ -44,11 +46,11 @@ internal sealed class TapePlayer(Clock clock, HardwareSettings hardware) : IDisp
         IsPlaying = false;
     }
 
-    internal void LoadTape(TapeFile tape)
+    internal void LoadTape(VirtualTape virtualTape)
     {
         Close();
 
-        _pulseStream = new PulseStream(tape, hardware);
+        _pulseStream = new PulseStream(virtualTape, hardware);
     }
 
     private void ReadTapePulses(int addedTicks, int previousFrameTicks, int currentFrameTicks)
@@ -59,37 +61,42 @@ internal sealed class TapePlayer(Clock clock, HardwareSettings hardware) : IDisp
         }
 
         var pulse = _pulseStream.Current;
+        if (pulse == null)
+        {
+            Stop();
+            return;
+        }
 
-       _runningPulseDuration += addedTicks;
+        _runningPulseDuration += addedTicks;
 
-       // If the pulse length is less than the current pulse length, then we need to wait for the next pulse
-       if (_runningPulseDuration < pulse.Duration)
-       {
-           return;
-       }
+        // If the pulse length is less than the current pulse length, then we need to wait for the next pulse
+        if (_runningPulseDuration < pulse.Duration)
+        {
+            return;
+        }
 
-       _runningPulseDuration = 0;
-       _runningPulseCount += 1;
+        _runningPulseDuration = 0;
+        _runningPulseCount += 1;
 
-       // If we have reached the pulse count, then move to the next pulse
-       if (_runningPulseCount >= pulse.RepeatCount)
-       {
-           if (!_pulseStream.Next())
-           {
-               Stop();
-               return;
-           }
+        // If we have reached the pulse count, then move to the next pulse
+        if (_runningPulseCount >= pulse.RepeatCount)
+        {
+            if (!_pulseStream.Next())
+            {
+                Stop();
+                return;
+            }
 
-           _runningPulseCount = 0;
-       }
+            _runningPulseCount = 0;
+        }
 
-       if (pulse.IsSilence)
-       {
-           EarBit = false;
-           return;
-       }
+        if (pulse.IsSilence)
+        {
+            EarBit = false;
+            return;
+        }
 
-       EarBit = !EarBit;
+        EarBit = !EarBit;
     }
 
     private void Close()

@@ -214,12 +214,12 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         if (tapeBlock.FileExtension.EndsWith("tap", StringComparison.OrdinalIgnoreCase))
         {
             var tapFile = TapFile.Load(data);
-            tapeManager.InsertTape(tapFile.ToTzx());
+            tapeManager.InsertTape(tapFile.ToTzx(), tapeBlock.CurrentBlockNo);
         }
         else if (tapeBlock.FileExtension.EndsWith("tzx", StringComparison.OrdinalIgnoreCase))
         {
             var tzx = TzxFile.Load(data);
-            tapeManager.InsertTape(tzx);
+            tapeManager.InsertTape(tzx, tapeBlock.CurrentBlockNo);
         }
     }
 

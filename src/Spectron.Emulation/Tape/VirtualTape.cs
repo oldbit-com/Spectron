@@ -6,25 +6,25 @@ using OldBit.ZX.Files.Tzx.Blocks;
 
 namespace OldBit.Spectron.Emulation.Tape;
 
-public class TapeBlockSelectedEventArgs(int blockIndex) : EventArgs
+public class TapeBlockSelectedEventArgs(int blockNumber) : EventArgs
 {
-    public int BlockIndex { get; } = blockIndex;
+    public int BlockNumber { get; } = blockNumber;
 }
 
 /// <summary>
 /// Represents a virtual tape, e.g. a file that contains data that can be loaded into the ZX Spectrum.
 /// </summary>
-public sealed class TapeFile
+public sealed class VirtualTape
 {
-    public int BlockIndex { get; set; }
-    public TzxFile FileImage { get; private set; } = new();
+    public int BlockNumber { get; set; }
+    public TzxFile CurrentFile { get; private set; } = new();
 
     public delegate void TapeBlockSelectedEvent(TapeBlockSelectedEventArgs e);
     public event TapeBlockSelectedEvent? TapeBlockSelected;
 
     public void Load(string filePath)
     {
-        BlockIndex = 0;
+        BlockNumber = 0;
         var fileType = FileTypeHelper.GetFileType(filePath);
 
         switch (fileType)
@@ -41,18 +41,18 @@ public sealed class TapeFile
         }
     }
 
-    internal void Load(TzxFile tzxFile)
+    internal void Load(TzxFile tzxFile, int blockIndex = 0)
     {
-        BlockIndex = 0;
-        FileImage = tzxFile;
+        BlockNumber = blockIndex;
+        CurrentFile = tzxFile;
     }
 
     public TapData? GetNextTapData()
     {
-        while (BlockIndex < FileImage.Blocks.Count)
+        while (BlockNumber < CurrentFile.Blocks.Count)
         {
-            var block = FileImage.Blocks[BlockIndex];
-            BlockIndex += 1;
+            var block = CurrentFile.Blocks[BlockNumber];
+            BlockNumber += 1;
 
             if (block is not StandardSpeedDataBlock standardSpeedDataBlock)
             {
@@ -70,20 +70,16 @@ public sealed class TapeFile
 
     public IBlock? GetNextBlock()
     {
-        if (BlockIndex >= FileImage.Blocks.Count)
+        if (BlockNumber >= CurrentFile.Blocks.Count)
         {
             return null;
         }
 
-        TapeBlockSelected?.Invoke(new TapeBlockSelectedEventArgs(BlockIndex));
+        TapeBlockSelected?.Invoke(new TapeBlockSelectedEventArgs(BlockNumber));
 
-        var block = FileImage.Blocks[BlockIndex];
-        BlockIndex += 1;
+        var block = CurrentFile.Blocks[BlockNumber];
+        BlockNumber += 1;
 
         return block;
-    }
-
-    public void SaveTape(string filePath)
-    {
     }
 }
