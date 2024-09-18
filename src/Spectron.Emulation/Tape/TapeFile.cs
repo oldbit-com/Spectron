@@ -6,15 +6,22 @@ using OldBit.ZX.Files.Tzx.Blocks;
 
 namespace OldBit.Spectron.Emulation.Tape;
 
+public class TapeBlockSelectedEventArgs(int blockIndex) : EventArgs
+{
+    public int BlockIndex { get; } = blockIndex;
+}
+
 public sealed class TapeFile : ITapeBlockDataProvider
 {
-    private int _blockIndex;
-
+    public int BlockIndex { get; set; }
     public TzxFile CurrentFile { get; private set; } = new();
+
+    public delegate void TapeBlockSelectedEvent(TapeBlockSelectedEventArgs e);
+    public event TapeBlockSelectedEvent? TapeBlockSelected;
 
     public void Load(string filePath)
     {
-        _blockIndex = 0;
+        BlockIndex = 0;
         var fileType = FileTypeHelper.GetFileType(filePath);
 
         switch (fileType)
@@ -32,10 +39,10 @@ public sealed class TapeFile : ITapeBlockDataProvider
 
     public TapData? GetNextTapData()
     {
-        while (_blockIndex < CurrentFile.Blocks.Count)
+        while (BlockIndex < CurrentFile.Blocks.Count)
         {
-            var block = CurrentFile.Blocks[_blockIndex];
-            _blockIndex += 1;
+            var block = CurrentFile.Blocks[BlockIndex];
+            BlockIndex += 1;
 
             if (block is not StandardSpeedDataBlock standardSpeedDataBlock)
             {
@@ -53,13 +60,15 @@ public sealed class TapeFile : ITapeBlockDataProvider
 
     public IBlock? GetNextBlock()
     {
-        if (_blockIndex >= CurrentFile.Blocks.Count)
+        if (BlockIndex >= CurrentFile.Blocks.Count)
         {
             return null;
         }
 
-        var block = CurrentFile.Blocks[_blockIndex];
-        _blockIndex += 1;
+        TapeBlockSelected?.Invoke(new TapeBlockSelectedEventArgs(BlockIndex));
+
+        var block = CurrentFile.Blocks[BlockIndex];
+        BlockIndex += 1;
 
         return block;
     }

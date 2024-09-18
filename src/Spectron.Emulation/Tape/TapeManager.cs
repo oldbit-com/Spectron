@@ -2,7 +2,7 @@ namespace OldBit.Spectron.Emulation.Tape;
 
 public sealed class TapeManager
 {
-    private readonly InstantLoader _instantLoader;
+    private readonly DirectAccess _directAccess;
 
     public TapeFile TapeFile { get; set; } = new();
 
@@ -23,14 +23,14 @@ public sealed class TapeManager
     internal TapeManager(Emulator emulator, HardwareSettings hardware)
     {
         TapePlayer = new TapePlayer(emulator.Cpu.Clock, hardware);
-        _instantLoader = new InstantLoader(emulator.Cpu, emulator.Memory);
+        _directAccess = new DirectAccess(emulator.Cpu, emulator.Memory);
     }
 
-    public void NewTape()
-    {
-    }
+    public void NewTape() => TapeFile = new TapeFile();
 
-    public void LoadInstantly() => _instantLoader.LoadBytes(TapeFile);
+    public void LoadDirect() => _directAccess.LoadBytes(TapeFile);
+
+    public void SaveDirect() => _directAccess.SaveBytes(TapeFile);
 
     public void InsertTape(string fileName, bool autoPlay = false)
     {

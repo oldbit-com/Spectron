@@ -1,18 +1,20 @@
+using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Z80Cpu;
 using OldBit.Z80Cpu.Registers;
+using OldBit.ZX.Files.Tap;
+using OldBit.ZX.Files.Tzx.Blocks;
 
 namespace OldBit.Spectron.Emulation.Tape;
 
 /// <summary>
-/// Allows fast data loading by skipping standard
-/// ROM routines and loading the data directly to the memory.
+/// Allows fast data loading and saving data by skipping standard ROM routines.
 /// </summary>
-internal sealed class InstantLoader
+internal sealed class DirectAccess
 {
     private readonly Z80 _cpu;
     private readonly IMemory _memory;
 
-    internal InstantLoader(Z80 cpu, IMemory memory)
+    internal DirectAccess(Z80 cpu, IMemory memory)
     {
         _cpu = cpu;
         _memory = memory;
@@ -41,14 +43,14 @@ internal sealed class InstantLoader
         {
             for (var i = 0; i < blockLength; i++)
             {
-                if (i >= tap.BlockData.Count)
+                if (i >= tap.Data.Count)
                 {
                     // More bytes requested than the block contains
                     break;
                 }
 
-                _memory.Write((Word)(startAddress + i), tap.BlockData[i]);
-                checksum ^= tap.BlockData[i];
+                _memory.Write((Word)(startAddress + i), tap.Data[i]);
+                checksum ^= tap.Data[i];
             }
 
             checksum ^= tap.Checksum;
@@ -59,5 +61,19 @@ internal sealed class InstantLoader
         _cpu.Registers.IX = (Word)(startAddress + blockLength);
         _cpu.Registers.A = checksum;
         _cpu.Registers.PC = 0x05E0;
+    }
+
+    internal void SaveBytes(TapeFile tapeFile)
+    {
+        var blockType = _cpu.Registers.A;
+        var length = _cpu.Registers.DE;
+        var startAddress = _cpu.Registers.IX;
+
+        var data = _memory.ReadBytes(startAddress, length);
+        var tapData = new TapData(blockType, data);
+
+        tapeFile.CurrentFile.Blocks.Add(new StandardSpeedDataBlock(tapData));
+
+        _cpu.Registers.PC = 0x053A;
     }
 }

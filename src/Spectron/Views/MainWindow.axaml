@@ -129,7 +129,7 @@
             </NativeMenuItem>
             <NativeMenuItem Header="Tape">
                 <NativeMenu>
-                    <NativeMenuItem Header="New Tape"/>
+                    <NativeMenuItem Header="New Tape" Command="{Binding TapeMenuViewModel.NewCommand}"/>
                     <NativeMenuItem Header="Insert Tape" Gesture="Cmd+T" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
                     <NativeMenuItem Header="Save Tape"/>
                     <NativeMenuItemSeparator/>

@@ -166,7 +166,7 @@ public sealed class Emulator
                 switch (TapeLoadingSpeed)
                 {
                     case TapeLoadingSpeed.Instant:
-                        TapeManager.LoadInstantly();
+                        TapeManager.LoadDirect();
                         break;
 
                     case TapeLoadingSpeed.Accelerated:
@@ -174,6 +174,10 @@ public sealed class Emulator
                         _isAcceleratedLoading = true;
                         break;
                 }
+                break;
+
+            case RomRoutines.SA_BYTES:
+                TapeManager.SaveDirect();
                 break;
 
             case RomRoutines.LD_BYTES_RET:
