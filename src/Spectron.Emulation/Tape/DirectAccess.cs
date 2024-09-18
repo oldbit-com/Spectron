@@ -7,7 +7,7 @@ using OldBit.ZX.Files.Tzx.Blocks;
 namespace OldBit.Spectron.Emulation.Tape;
 
 /// <summary>
-/// Allows fast data loading and saving data by skipping standard ROM routines.
+/// Allows fast loading and saving data by skipping standard ROM routines.
 /// </summary>
 internal sealed class DirectAccess
 {
