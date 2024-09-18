@@ -72,7 +72,7 @@ internal sealed class DirectAccess
         var data = _memory.ReadBytes(startAddress, length);
         var tapData = new TapData(blockType, data);
 
-        tapeFile.CurrentFile.Blocks.Add(new StandardSpeedDataBlock(tapData));
+        tapeFile.FileImage.Blocks.Add(new StandardSpeedDataBlock(tapData));
 
         _cpu.Registers.PC = 0x053A;
     }

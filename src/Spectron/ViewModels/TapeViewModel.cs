@@ -18,9 +18,9 @@ public class TapeViewModel : ViewModelBase, IDisposable
 
         _tapeManager.TapeFile.TapeBlockSelected += TapeFileOnTapeBlockSelected;
 
-        for (var i = 0; i <  _tapeManager.TapeFile.CurrentFile.Blocks.Count; i++)
+        for (var i = 0; i <  _tapeManager.TapeFile.FileImage.Blocks.Count; i++)
         {
-            var block = _tapeManager.TapeFile.CurrentFile.Blocks[i];
+            var block = _tapeManager.TapeFile.FileImage.Blocks[i];
             Blocks.Add(new TapeBlock(i + 1, block.GetBlockName(), block.ToString() ?? string.Empty));
         }
     }

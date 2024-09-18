@@ -1,4 +1,5 @@
 using OldBit.Z80Cpu;
+using OldBit.ZX.Files.Tzx;
 
 namespace OldBit.Spectron.Emulation.Tape;
 
@@ -39,14 +40,25 @@ public sealed class TapeManager
         StopTape();
 
         TapeFile.Load(fileName);
-        TapePlayer?.LoadTape(TapeFile);
-
-        TapeInserted?.Invoke(EventArgs.Empty);
+        InsertTape();
 
         if (autoPlay)
         {
             PlayTape();
         }
+    }
+
+    public void InsertTape(TzxFile tzxFile)
+    {
+        TapeFile.Load(tzxFile);
+        InsertTape();
+    }
+
+    private void InsertTape()
+    {
+        TapePlayer?.LoadTape(TapeFile);
+
+        TapeInserted?.Invoke(EventArgs.Empty);
     }
 
     public void StopTape()

@@ -4,9 +4,14 @@ using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
+using OldBit.Spectron.Emulation.Tape;
 using OldBit.Z80Cpu;
+using OldBit.ZX.Files.Extensions;
 using OldBit.ZX.Files.Szx;
 using OldBit.ZX.Files.Szx.Blocks;
+using OldBit.ZX.Files.Tap;
+using OldBit.ZX.Files.Tzx;
+using JoystickType = OldBit.Spectron.Emulation.Devices.Joystick.JoystickType;
 
 namespace OldBit.Spectron.Emulation.Snapshot;
 
@@ -198,8 +203,24 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         });
     }
 
-    private void LoadTape(object tapePlayer, TapeBlock? snapshotTape)
+    private void LoadTape(TapeManager tapeManager, TapeBlock? tapeBlock)
     {
+        if (tapeBlock == null)
+        {
+            return;
+        }
+
+        using var data = new MemoryStream(tapeBlock.Data);
+        if (tapeBlock.FileExtension.EndsWith("tap", StringComparison.OrdinalIgnoreCase))
+        {
+            var tapFile = TapFile.Load(data);
+            tapeManager.InsertTape(tapFile.ToTzx());
+        }
+        else if (tapeBlock.FileExtension.EndsWith("tzx", StringComparison.OrdinalIgnoreCase))
+        {
+            var tzx = TzxFile.Load(data);
+            tapeManager.InsertTape(tzx);
+        }
     }
 
     private static void SaveRegisters(Z80 cpu, Z80RegsBlock registers)

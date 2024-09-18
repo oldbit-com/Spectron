@@ -11,10 +11,13 @@ public class TapeBlockSelectedEventArgs(int blockIndex) : EventArgs
     public int BlockIndex { get; } = blockIndex;
 }
 
-public sealed class TapeFile : ITapeBlockDataProvider
+/// <summary>
+/// Represents a virtual tape, e.g. a file that contains data that can be loaded into the ZX Spectrum.
+/// </summary>
+public sealed class TapeFile
 {
     public int BlockIndex { get; set; }
-    public TzxFile CurrentFile { get; private set; } = new();
+    public TzxFile FileImage { get; private set; } = new();
 
     public delegate void TapeBlockSelectedEvent(TapeBlockSelectedEventArgs e);
     public event TapeBlockSelectedEvent? TapeBlockSelected;
@@ -28,20 +31,27 @@ public sealed class TapeFile : ITapeBlockDataProvider
         {
             case FileType.Tap:
                 var tapFile = TapFile.Load(filePath);
-                CurrentFile = tapFile.ToTzx();
+                Load(tapFile.ToTzx());
                 break;
 
             case FileType.Tzx:
-                CurrentFile = TzxFile.Load(filePath);
+                var tzxFile = TzxFile.Load(filePath);
+                Load(tzxFile);
                 break;
         }
     }
 
+    internal void Load(TzxFile tzxFile)
+    {
+        BlockIndex = 0;
+        FileImage = tzxFile;
+    }
+
     public TapData? GetNextTapData()
     {
-        while (BlockIndex < CurrentFile.Blocks.Count)
+        while (BlockIndex < FileImage.Blocks.Count)
         {
-            var block = CurrentFile.Blocks[BlockIndex];
+            var block = FileImage.Blocks[BlockIndex];
             BlockIndex += 1;
 
             if (block is not StandardSpeedDataBlock standardSpeedDataBlock)
@@ -60,14 +70,14 @@ public sealed class TapeFile : ITapeBlockDataProvider
 
     public IBlock? GetNextBlock()
     {
-        if (BlockIndex >= CurrentFile.Blocks.Count)
+        if (BlockIndex >= FileImage.Blocks.Count)
         {
             return null;
         }
 
         TapeBlockSelected?.Invoke(new TapeBlockSelectedEventArgs(BlockIndex));
 
-        var block = CurrentFile.Blocks[BlockIndex];
+        var block = FileImage.Blocks[BlockIndex];
         BlockIndex += 1;
 
         return block;
