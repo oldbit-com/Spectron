@@ -3,7 +3,8 @@ using OldBit.Z80Cpu;
 namespace OldBit.Spectron.Emulation.Tape;
 
 /// <summary>
-/// Simulates a tape player that converts tape data into pulses that can be read by the Spectrum.
+/// Simulates the tape player that converts tape data into pulses
+/// that can be read by the ZX Spectrum by reading the EAR port signals.
 /// </summary>
 internal sealed class TapePlayer(Clock clock, HardwareSettings hardware) : IDisposable
 {

@@ -41,8 +41,13 @@ public sealed class Emulator
     internal ScreenBuffer ScreenBuffer { get; }
     internal UlaPlus UlaPlus { get; }
 
-    internal Emulator(EmulatorSettings emulator, HardwareSettings hardware, TimeMachine timeMachine)
+    internal Emulator(
+        EmulatorSettings emulator,
+        HardwareSettings hardware,
+        TapeManager tapeManager,
+        TimeMachine timeMachine)
     {
+        TapeManager = tapeManager;
         _timeMachine = timeMachine;
         ComputerType = emulator.ComputerType;
         RomType = emulator.RomType;
@@ -54,8 +59,8 @@ public sealed class Emulator
         ScreenBuffer = new ScreenBuffer(emulator.Memory, UlaPlus);
         Cpu = new Z80(emulator.Memory, emulator.ContentionProvider);
 
-        TapeManager = new TapeManager(this, hardware);
         JoystickManager = new JoystickManager(_spectrumBus, KeyboardHandler);
+        TapeManager.Attach(Cpu, Memory, hardware);
 
         SetupUlaAndDevices(emulator.UseAYSound);
         SetupEventHandlers();
@@ -105,7 +110,7 @@ public sealed class Emulator
 
     private void SetupUlaAndDevices(bool useAYSound)
     {
-        var ula = new Ula(KeyboardHandler, _beeper, ScreenBuffer, Cpu.Clock, TapeManager.TapePlayer);
+        var ula = new Ula(KeyboardHandler, _beeper, ScreenBuffer, Cpu.Clock, TapeManager?.TapePlayer);
 
         _spectrumBus.AddDevice(ula);
         _spectrumBus.AddDevice(UlaPlus);

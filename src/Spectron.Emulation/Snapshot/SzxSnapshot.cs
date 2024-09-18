@@ -19,7 +19,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         return CreateEmulator(snapshot);
     }
 
-    public Emulator CreateEmulator(SzxFile snapshot)
+    internal Emulator CreateEmulator(SzxFile snapshot)
     {
         var computerType = snapshot.Header.MachineId switch
         {
@@ -38,6 +38,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         LoadSpectrumRegisters(emulator.ScreenBuffer, snapshot.SpecRegs);
         LoadUlaPlus(emulator.UlaPlus, snapshot.Palette);
         LoadJoystick(emulator.JoystickManager, snapshot.Joystick);
+        LoadTape(emulator.TapeManager, snapshot.Tape);
 
         // TODO: Load the rest of the snapshot
 
@@ -195,6 +196,10 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
             JoystickBlock.JoystickFuller => JoystickType.Fuller,
             _ => JoystickType.None,
         });
+    }
+
+    private void LoadTape(object tapePlayer, TapeBlock? snapshotTape)
+    {
     }
 
     private static void SaveRegisters(Z80 cpu, Z80RegsBlock registers)

@@ -11,7 +11,7 @@ internal sealed class Ula(
     Beeper beeper,
     ScreenBuffer screenBuffer,
     Clock clock,
-    TapePlayer tapePlayer) : IDevice
+    TapePlayer? tapePlayer) : IDevice
 {
     public byte? ReadPort(Word address)
     {
@@ -44,7 +44,7 @@ internal sealed class Ula(
 
     private void UpdateEarBit(ref byte value)
     {
-        if (!tapePlayer.IsPlaying)
+        if (tapePlayer is not { IsPlaying: true })
         {
             return;
         }
@@ -54,7 +54,7 @@ internal sealed class Ula(
 
     private void UpdateTapeLoadingBeeper(ref byte value)
     {
-        if (!tapePlayer.IsPlaying)
+        if (tapePlayer is not { IsPlaying: true })
         {
             return;
         }

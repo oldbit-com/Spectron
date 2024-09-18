@@ -19,39 +19,41 @@ public class TapeMenuViewModel : ViewModelBase
 
     public Interaction<TapeViewModel, Unit?> ShowTapeView { get; }
 
-    private TapeManager? _tapeManager;
+    private readonly TapeManager _tapeManager;
 
-    public TapeMenuViewModel()
+    public TapeMenuViewModel(TapeManager tapeManager)
     {
+        _tapeManager = tapeManager;
+
         var isTapeInserted = this.WhenAnyValue(x => x.IsTapeInserted).Select(inserted => inserted);
         var isTapePlaying = this.WhenAnyValue(x => x.IsTapePlaying).Select(playing => playing);
         var isTapeInsertedAndNotPlaying = this.WhenAnyValue(x => x.IsTapeInserted, x => x.IsTapePlaying, (inserted, playing) => inserted && !playing);
 
         NewCommand = ReactiveCommand.Create(NewTape);
         InsertCommand = ReactiveCommand.Create(InsertTape);
-        PlayCommand = ReactiveCommand.Create(() => { TapeManager?.PlayTape(); }, isTapeInsertedAndNotPlaying);
-        StopCommand = ReactiveCommand.Create(() => { TapeManager?.StopTape(); }, isTapePlaying);
+        PlayCommand = ReactiveCommand.Create(() => { _tapeManager?.PlayTape(); }, isTapeInsertedAndNotPlaying);
+        StopCommand = ReactiveCommand.Create(() => { _tapeManager?.StopTape(); }, isTapePlaying);
         RewindCommand = ReactiveCommand.Create(Rewind, isTapeInserted);
-        EjectCommand = ReactiveCommand.Create(() => { TapeManager?.EjectTape(); }, isTapeInserted);
+        EjectCommand = ReactiveCommand.Create(() => { _tapeManager?.EjectTape(); }, isTapeInserted);
         ViewCommand = ReactiveCommand.Create(OpenTapeView, isTapeInserted);
 
         ShowTapeView = new Interaction<TapeViewModel, Unit?>();
+
+        _tapeManager.TapeInserted += _ => IsTapeInserted = true;
+        _tapeManager.TapePlaying += _ => IsTapePlaying = true;
+        _tapeManager.TapeStopped += _ => IsTapePlaying = false;
+        _tapeManager.TapeEjected += _ => IsTapeInserted = false;
     }
 
     private async Task OpenTapeView()
     {
-        if (TapeManager == null)
-        {
-            return;
-        }
-
-        var viewModel = new TapeViewModel(TapeManager);
+        using var viewModel = new TapeViewModel(_tapeManager);
         await ShowTapeView.Handle(viewModel);
     }
 
     private void NewTape()
     {
-        TapeManager?.NewTape();
+        _tapeManager.NewTape();
         IsTapeInserted = true;
     }
 
@@ -64,7 +66,7 @@ public class TapeMenuViewModel : ViewModelBase
             return;
         }
 
-        TapeManager?.InsertTape(files[0].Path.LocalPath);
+        _tapeManager.InsertTape(files[0].Path.LocalPath);
     }
 
     private void Rewind() { }
@@ -81,23 +83,5 @@ public class TapeMenuViewModel : ViewModelBase
     {
         get => _isTapePlaying;
         set => this.RaiseAndSetIfChanged(ref _isTapePlaying, value);
-    }
-
-    internal TapeManager? TapeManager
-    {
-        get  => _tapeManager;
-        set
-        {
-            _tapeManager = value;
-            if (_tapeManager == null)
-            {
-                return;
-            }
-
-            _tapeManager.TapeInserted += _ => IsTapeInserted = true;
-            _tapeManager.TapePlaying += _ => IsTapePlaying = true;
-            _tapeManager.TapeStopped += _ => IsTapePlaying = false;
-            _tapeManager.TapeEjected += _ => IsTapeInserted = false;
-        }
     }
 }

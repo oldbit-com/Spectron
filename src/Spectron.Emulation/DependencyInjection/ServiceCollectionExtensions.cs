@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using OldBit.Spectron.Emulation.Snapshot;
+using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Emulation.Tape.Loader;
 
 namespace OldBit.Spectron.Emulation.DependencyInjection;
@@ -13,7 +14,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<SnaSnapshot>();
         services.AddSingleton<SzxSnapshot>();
         services.AddSingleton<Z80Snapshot>();
-        services.AddSingleton<SnapshotFile>();
+        services.AddSingleton<SnapshotLoader>();
         services.AddSingleton<TapeLoader>();
+        services.AddSingleton<TapeManager>();
     }
 }

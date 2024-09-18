@@ -1,6 +1,7 @@
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
+using OldBit.Spectron.Emulation.Tape;
 using OldBit.Z80Cpu.Contention;
 
 namespace OldBit.Spectron.Emulation;
@@ -13,7 +14,7 @@ internal sealed record EmulatorSettings(
     Beeper Beeper,
     bool UseAYSound);
 
-public sealed class EmulatorFactory(TimeMachine timeMachine)
+public sealed class EmulatorFactory(TimeMachine timeMachine, TapeManager tapeManager)
 {
     public Emulator Create(ComputerType computerType, RomType romType, byte[]? customRom = null)
     {
@@ -58,7 +59,7 @@ public sealed class EmulatorFactory(TimeMachine timeMachine)
             new Beeper(Hardware.Spectrum128K.ClockMhz),
             UseAYSound: true);
 
-        return new Emulator(emulatorSettings, Hardware.Spectrum128K, timeMachine);
+        return new Emulator(emulatorSettings, Hardware.Spectrum128K, tapeManager, timeMachine);
     }
 
     private Emulator CreateSpectrum(ComputerType computerType, RomType romType, IEmulatorMemory memory)
@@ -75,7 +76,7 @@ public sealed class EmulatorFactory(TimeMachine timeMachine)
             new Beeper(Hardware.Spectrum48K.ClockMhz),
             UseAYSound: false);
 
-        return new Emulator(emulatorSettings, Hardware.Spectrum48K, timeMachine);
+        return new Emulator(emulatorSettings, Hardware.Spectrum48K, tapeManager, timeMachine);
     }
 
     private static byte[] GetSpectrum48KRom(RomType romType) =>

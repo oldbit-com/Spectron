@@ -1,12 +1,14 @@
+using OldBit.Z80Cpu;
+
 namespace OldBit.Spectron.Emulation.Tape;
 
 public sealed class TapeManager
 {
-    private readonly DirectAccess _directAccess;
+    private DirectAccess? _directAccess;
 
     public TapeFile TapeFile { get; set; } = new();
 
-    internal TapePlayer TapePlayer { get; }
+    internal TapePlayer? TapePlayer { get; private set; }
 
     public delegate void TapeInsertedEvent(EventArgs e);
     public event TapeInsertedEvent? TapeInserted;
@@ -20,24 +22,24 @@ public sealed class TapeManager
     public delegate void TapeEjectedEvent(EventArgs e);
     public event TapeEjectedEvent? TapeEjected;
 
-    internal TapeManager(Emulator emulator, HardwareSettings hardware)
+    internal void Attach(Z80 cpu, IMemory memory, HardwareSettings hardware)
     {
-        TapePlayer = new TapePlayer(emulator.Cpu.Clock, hardware);
-        _directAccess = new DirectAccess(emulator.Cpu, emulator.Memory);
+        TapePlayer = new TapePlayer(cpu.Clock, hardware);
+        _directAccess = new DirectAccess(cpu, memory);
     }
 
     public void NewTape() => TapeFile = new TapeFile();
 
-    public void LoadDirect() => _directAccess.LoadBytes(TapeFile);
+    public void LoadDirect() => _directAccess?.LoadBytes(TapeFile);
 
-    public void SaveDirect() => _directAccess.SaveBytes(TapeFile);
+    public void SaveDirect() => _directAccess?.SaveBytes(TapeFile);
 
     public void InsertTape(string fileName, bool autoPlay = false)
     {
         StopTape();
 
         TapeFile.Load(fileName);
-        TapePlayer.LoadTape(TapeFile);
+        TapePlayer?.LoadTape(TapeFile);
 
         TapeInserted?.Invoke(EventArgs.Empty);
 
@@ -49,13 +51,13 @@ public sealed class TapeManager
 
     public void StopTape()
     {
-        TapePlayer.Stop();
+        TapePlayer?.Stop();
         TapeStopped?.Invoke(EventArgs.Empty);
     }
 
     public void PlayTape()
     {
-        TapePlayer.Play();
+        TapePlayer?.Play();
         TapePlaying?.Invoke(EventArgs.Empty);
     }
 

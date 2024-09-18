@@ -39,7 +39,7 @@ partial class MainWindowViewModel
             var fileType = FileTypeHelper.GetFileType(filePath);
             if (fileType.IsSnapshot())
             {
-                var emulator = _snapshotFile.Load(filePath);
+                var emulator = _snapshotLoader.Load(filePath);
                 InitializeEmulator(emulator);
             }
             else
@@ -74,7 +74,7 @@ partial class MainWindowViewModel
             var file = await FileDialogs.SaveSnapshotFileAsync();
             if (file != null && Emulator != null)
             {
-                SnapshotFile.Save(file.Path.LocalPath, Emulator);
+                SnapshotLoader.Save(file.Path.LocalPath, Emulator);
             }
         }
         catch (Exception ex)

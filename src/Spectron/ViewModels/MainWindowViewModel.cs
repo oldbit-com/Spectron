@@ -31,14 +31,14 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly EmulatorFactory _emulatorFactory;
     private readonly TimeMachine _timeMachine;
-    private readonly SnapshotFile _snapshotFile;
-    private readonly SzxSnapshot _szxSnapshot;
+
+    private readonly SnapshotLoader _snapshotLoader;
+    private readonly TapeLoader _tapeLoader;
+
     private readonly PreferencesService _preferencesService;
     private readonly SessionService _sessionService;
-    private readonly TapeLoader _tapeLoader;
     private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
     private readonly Timer _statusBarTimer;
-    private readonly TapeFile _tapeFile = new();
 
     private Emulator? Emulator { get; set; }
     private HelpKeyboardView? _helpKeyboardView;
@@ -52,7 +52,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public Control ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }
     public StatusBarViewModel StatusBar { get; } = new();
-    public TapeMenuViewModel TapeMenuViewModel { get; } = new();
+    public TapeMenuViewModel TapeMenuViewModel { get; }
     public TimeMachineViewModel TimeMachineViewModel { get; }
     public RecentFilesViewModel RecentFilesViewModel { get; }
 
@@ -80,23 +80,23 @@ public partial class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel(
         EmulatorFactory emulatorFactory,
         TimeMachine timeMachine,
-        SnapshotFile snapshotFile,
-        SzxSnapshot szxSnapshot,
+        SnapshotLoader snapshotLoader,
+        TapeLoader tapeLoader,
         PreferencesService preferencesService,
         SessionService sessionService,
-        TapeLoader tapeLoader,
         RecentFilesViewModel recentFilesViewModel,
-        TimeMachineViewModel timeMachineViewModel)
+        TimeMachineViewModel timeMachineViewModel,
+        TapeMenuViewModel tapeMenuViewModel)
     {
         _emulatorFactory = emulatorFactory;
         _timeMachine = timeMachine;
-        _snapshotFile = snapshotFile;
-        _szxSnapshot = szxSnapshot;
+        _snapshotLoader = snapshotLoader;
+        _tapeLoader = tapeLoader;
         _preferencesService = preferencesService;
         _sessionService = sessionService;
-        _tapeLoader = tapeLoader;
         RecentFilesViewModel = recentFilesViewModel;
         TimeMachineViewModel = timeMachineViewModel;
+        TapeMenuViewModel = tapeMenuViewModel;
         recentFilesViewModel.OpenRecentFileAsync = async fileName => await HandleLoadFileAsync(fileName);
 
         _statusBarTimer = new Timer(TimeSpan.FromSeconds(1));
@@ -241,7 +241,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         var emulator = snapshot == null ?
             _emulatorFactory.Create(ComputerType, RomType) :
-            _szxSnapshot.CreateEmulator(snapshot);
+            _snapshotLoader.Load(snapshot);
 
         InitializeEmulator(emulator);
     }
@@ -262,12 +262,8 @@ public partial class MainWindowViewModel : ViewModelBase
         Emulator.JoystickManager.SetupJoystick(JoystickType);
         Emulator.RenderScreen += EmulatorOnRenderScreen;
 
-        TapeMenuViewModel.TapeManager = Emulator.TapeManager;
-
         _renderStopwatch.Restart();
         _lastScreenRender = TimeSpan.Zero;
-
-        Emulator.TapeManager.TapeFile = _tapeFile;
 
         Emulator.Start();
 
