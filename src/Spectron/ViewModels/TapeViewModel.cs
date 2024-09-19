@@ -16,22 +16,22 @@ public class TapeViewModel : ViewModelBase, IDisposable
     {
         _tapeManager = tapeManager;
 
-        _tapeManager.VirtualTape.TapeBlockSelected += VirtualTapeOnVirtualTapeBlockSelected;
+        _tapeManager.Cassette.TapeBlockSelected += CassetteOnCassetteBlockSelected;
 
-        for (var i = 0; i <  _tapeManager.VirtualTape.CurrentFile.Blocks.Count; i++)
+        for (var i = 0; i <  _tapeManager.Cassette.Content.Blocks.Count; i++)
         {
-            var block = _tapeManager.VirtualTape.CurrentFile.Blocks[i];
+            var block = _tapeManager.Cassette.Content.Blocks[i];
             Blocks.Add(new TapeBlock(i + 1, block.GetBlockName(), block.ToString() ?? string.Empty));
         }
     }
 
-    private void VirtualTapeOnVirtualTapeBlockSelected(TapeBlockSelectedEventArgs e)
+    private void CassetteOnCassetteBlockSelected(TapePositionChangedEventArgs e)
     {
         // Handle block selected event
     }
 
     public void Dispose()
     {
-        _tapeManager.VirtualTape.TapeBlockSelected -= VirtualTapeOnVirtualTapeBlockSelected;
+        _tapeManager.Cassette.TapeBlockSelected -= CassetteOnCassetteBlockSelected;
     }
 }

@@ -17,21 +17,18 @@ internal sealed record Pulse(int RepeatCount, int Duration, bool IsSilence = fal
 /// </summary>
 internal class PulseStream : IDisposable
 {
-    private readonly VirtualTape _virtualTape;
+    private readonly Cassette _cassette;
     private readonly HardwareSettings _hardware;
 
     private IEnumerator<Pulse>? _pulseEnumerator;
 
-    internal PulseStream(VirtualTape virtualTape, HardwareSettings hardware)
+    internal PulseStream(Cassette cassette, HardwareSettings hardware)
     {
-        _virtualTape = virtualTape;
+        _cassette = cassette;
         _hardware = hardware;
     }
 
-    internal void Start()
-    {
-        _pulseEnumerator = GetNextEnumerator();
-    }
+    internal void Start() => _pulseEnumerator = GetNextEnumerator();
 
     internal Pulse? Current => _pulseEnumerator?.Current;
 
@@ -57,7 +54,7 @@ internal class PulseStream : IDisposable
     {
         while (true)
         {
-            var block = _virtualTape.GetNextBlock();
+            var block = _cassette.GetNextBlock();
             if (block == null)
             {
                 return null;

@@ -7,7 +7,7 @@ public sealed class TapeManager
 {
     private DirectAccess? _directAccess;
 
-    public VirtualTape VirtualTape { get; set; } = new();
+    public Cassette Cassette { get; set; } = new();
 
     internal TapePlayer? TapePlayer { get; private set; }
 
@@ -29,17 +29,17 @@ public sealed class TapeManager
         _directAccess = new DirectAccess(cpu, memory);
     }
 
-    public void NewTape() => VirtualTape = new VirtualTape();
+    public void NewTape() => Cassette = new Cassette();
 
-    public void LoadDirect() => _directAccess?.LoadBytes(VirtualTape);
+    public void LoadDirect() => _directAccess?.LoadBytes(Cassette);
 
-    public void SaveDirect() => _directAccess?.SaveBytes(VirtualTape);
+    public void SaveDirect() => _directAccess?.SaveBytes(Cassette);
 
     public void InsertTape(string fileName, bool autoPlay = false)
     {
         StopTape();
 
-        VirtualTape.Load(fileName);
+        Cassette.Load(fileName);
         InsertTape();
 
         if (autoPlay)
@@ -50,13 +50,13 @@ public sealed class TapeManager
 
     public void InsertTape(TzxFile tzxFile, int currentBlockIndex)
     {
-        VirtualTape.Load(tzxFile, currentBlockIndex);
+        Cassette.Load(tzxFile, currentBlockIndex);
         InsertTape();
     }
 
     private void InsertTape()
     {
-        TapePlayer?.LoadTape(VirtualTape);
+        TapePlayer?.LoadTape(Cassette);
 
         TapeInserted?.Invoke(EventArgs.Empty);
     }

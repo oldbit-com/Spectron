@@ -6,25 +6,25 @@ using OldBit.ZX.Files.Tzx.Blocks;
 
 namespace OldBit.Spectron.Emulation.Tape;
 
-public class TapeBlockSelectedEventArgs(int blockNumber) : EventArgs
+public class TapePositionChangedEventArgs(int position) : EventArgs
 {
-    public int BlockNumber { get; } = blockNumber;
+    public int Position { get; } = position;
 }
 
 /// <summary>
-/// Represents a virtual tape, e.g. a file that contains data that can be loaded into the ZX Spectrum.
+/// Represents a virtual cassette that can contain multiple data files.
 /// </summary>
-public sealed class VirtualTape
+public sealed class Cassette
 {
-    public int BlockNumber { get; set; }
-    public TzxFile CurrentFile { get; private set; } = new();
+    public int Position { get; set; }
+    public TzxFile Content { get; private set; } = new();
 
-    public delegate void TapeBlockSelectedEvent(TapeBlockSelectedEventArgs e);
-    public event TapeBlockSelectedEvent? TapeBlockSelected;
+    public delegate void TapePositionChangedEvent(TapePositionChangedEventArgs e);
+    public event TapePositionChangedEvent? TapeBlockSelected;
 
     public void Load(string filePath)
     {
-        BlockNumber = 0;
+        Position = 0;
         var fileType = FileTypeHelper.GetFileType(filePath);
 
         switch (fileType)
@@ -43,16 +43,16 @@ public sealed class VirtualTape
 
     internal void Load(TzxFile tzxFile, int blockIndex = 0)
     {
-        BlockNumber = blockIndex;
-        CurrentFile = tzxFile;
+        Position = blockIndex;
+        Content = tzxFile;
     }
 
     public TapData? GetNextTapData()
     {
-        while (BlockNumber < CurrentFile.Blocks.Count)
+        while (Position < Content.Blocks.Count)
         {
-            var block = CurrentFile.Blocks[BlockNumber];
-            BlockNumber += 1;
+            var block = Content.Blocks[Position];
+            Position += 1;
 
             if (block is not StandardSpeedDataBlock standardSpeedDataBlock)
             {
@@ -70,15 +70,15 @@ public sealed class VirtualTape
 
     public IBlock? GetNextBlock()
     {
-        if (BlockNumber >= CurrentFile.Blocks.Count)
+        if (Position >= Content.Blocks.Count)
         {
             return null;
         }
 
-        TapeBlockSelected?.Invoke(new TapeBlockSelectedEventArgs(BlockNumber));
+        TapeBlockSelected?.Invoke(new TapePositionChangedEventArgs(Position));
 
-        var block = CurrentFile.Blocks[BlockNumber];
-        BlockNumber += 1;
+        var block = Content.Blocks[Position];
+        Position += 1;
 
         return block;
     }

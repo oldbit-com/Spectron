@@ -46,11 +46,11 @@ internal sealed class TapePlayer(Clock clock, HardwareSettings hardware) : IDisp
         IsPlaying = false;
     }
 
-    internal void LoadTape(VirtualTape virtualTape)
+    internal void LoadTape(Cassette cassette)
     {
         Close();
 
-        _pulseStream = new PulseStream(virtualTape, hardware);
+        _pulseStream = new PulseStream(cassette, hardware);
     }
 
     private void ReadTapePulses(int addedTicks, int previousFrameTicks, int currentFrameTicks)
