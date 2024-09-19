@@ -4,15 +4,17 @@ using OldBit.ZX.Files.Szx;
 
 namespace OldBit.Spectron.Emulation.Tape.Loader;
 
-public sealed class TapeLoader(SzxSnapshot szxSnapshot)
+/// <summary>
+/// The loader is responsible for entering the LOAD "" command into the emulator.
+/// Basically it loads a snapshot that it is the state after the LOAD "" command has been entered.
+/// </summary>
+public sealed class Loader(SzxSnapshot szxSnapshot)
 {
-    // Below resources are simply snapshots created when LOAD "" has been executed from BASIC.
-    // This way we can just load these snapshots and it will be in the state after LOAD "" has been just entered.
     private const string Loader16ResourceName = "OldBit.Spectron.Emulation.Tape.Loader.Files.16.szx";
     private const string Loader48ResourceName = "OldBit.Spectron.Emulation.Tape.Loader.Files.48.szx";
     private const string Loader128ResourceName = "OldBit.Spectron.Emulation.Tape.Loader.Files.128.szx";
 
-    public Emulator SimulateLoad(ComputerType computerType)
+    public Emulator EnterLoadCommand(ComputerType computerType)
     {
         var romResourceName = computerType switch
         {

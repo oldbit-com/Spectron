@@ -6,7 +6,7 @@ namespace OldBit.Spectron.Emulation.Tape;
 /// Simulates the tape player that converts tape data into pulses
 /// that can be read by the ZX Spectrum by reading the EAR port signals.
 /// </summary>
-internal sealed class TapePlayer(Clock clock, HardwareSettings hardware) : IDisposable
+internal sealed class CassettePlayer(Clock clock, HardwareSettings hardware) : IDisposable
 {
     private PulseStream? _pulseStream;
 

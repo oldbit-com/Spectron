@@ -6,6 +6,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="300"
         x:Class="OldBit.Spectron.Views.TapeView"
         x:DataType="viewModels:TapeViewModel"
+        Height="450" Width="600"
         WindowStartupLocation="CenterOwner"
         Title="Tape Browser">
 
@@ -32,6 +33,13 @@
             </DataGrid.Styles>
 
             <DataGrid.Columns>
+                <DataGridTemplateColumn Width="25" CanUserResize="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Path Data="M2 2 L10 10 L2 18 Z" IsVisible="{Binding IsSelected}" Fill="{StaticResource ButtonBackground}" Margin="4 0 0 4"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding Index}" CellStyleClasses="index"/>
                 <DataGridTextColumn Header="Tape Block" Binding="{Binding Name}"/>
                 <DataGridTextColumn Header="Data" Binding="{Binding Data}"/>

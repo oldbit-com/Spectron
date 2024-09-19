@@ -11,7 +11,7 @@ internal sealed class Ula(
     Beeper beeper,
     ScreenBuffer screenBuffer,
     Clock clock,
-    TapePlayer? tapePlayer) : IDevice
+    CassettePlayer? tapePlayer) : IDevice
 {
     public byte? ReadPort(Word address)
     {

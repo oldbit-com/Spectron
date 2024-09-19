@@ -9,7 +9,7 @@ public sealed class TapeManager
 
     public Cassette Cassette { get; set; } = new();
 
-    internal TapePlayer? TapePlayer { get; private set; }
+    internal CassettePlayer? TapePlayer { get; private set; }
 
     public delegate void TapeInsertedEvent(EventArgs e);
     public event TapeInsertedEvent? TapeInserted;
@@ -25,9 +25,11 @@ public sealed class TapeManager
 
     internal void Attach(Z80 cpu, IMemory memory, HardwareSettings hardware)
     {
-        TapePlayer = new TapePlayer(cpu.Clock, hardware);
+        TapePlayer = new CassettePlayer(cpu.Clock, hardware);
         _directAccess = new DirectAccess(cpu, memory);
     }
+
+    public bool IsPlaying => TapePlayer?.IsPlaying ?? false;
 
     public void NewTape() => Cassette = new Cassette();
 

@@ -15,7 +15,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<SzxSnapshot>();
         services.AddSingleton<Z80Snapshot>();
         services.AddSingleton<SnapshotLoader>();
-        services.AddSingleton<TapeLoader>();
+        services.AddSingleton<Loader>();
         services.AddSingleton<TapeManager>();
     }
 }

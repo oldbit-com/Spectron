@@ -33,7 +33,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly TimeMachine _timeMachine;
 
     private readonly SnapshotLoader _snapshotLoader;
-    private readonly TapeLoader _tapeLoader;
+    private readonly Loader _loader;
 
     private readonly PreferencesService _preferencesService;
     private readonly SessionService _sessionService;
@@ -81,7 +81,7 @@ public partial class MainWindowViewModel : ViewModelBase
         EmulatorFactory emulatorFactory,
         TimeMachine timeMachine,
         SnapshotLoader snapshotLoader,
-        TapeLoader tapeLoader,
+        Loader loader,
         PreferencesService preferencesService,
         SessionService sessionService,
         RecentFilesViewModel recentFilesViewModel,
@@ -91,7 +91,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _emulatorFactory = emulatorFactory;
         _timeMachine = timeMachine;
         _snapshotLoader = snapshotLoader;
-        _tapeLoader = tapeLoader;
+        _loader = loader;
         _preferencesService = preferencesService;
         _sessionService = sessionService;
         RecentFilesViewModel = recentFilesViewModel;

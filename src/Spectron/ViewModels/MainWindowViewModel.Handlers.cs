@@ -44,7 +44,7 @@ partial class MainWindowViewModel
             }
             else
             {
-                var emulator = _tapeLoader.SimulateLoad(ComputerType);
+                var emulator = _loader.EnterLoadCommand(ComputerType);
                 InitializeEmulator(emulator);
 
                 emulator.TapeManager.InsertTape(

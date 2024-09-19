@@ -6,7 +6,7 @@ using OldBit.ZX.Files.Tzx.Blocks;
 
 namespace OldBit.Spectron.Emulation.Tape;
 
-public class TapePositionChangedEventArgs(int position) : EventArgs
+public class BlockSelectedEventArgs(int position) : EventArgs
 {
     public int Position { get; } = position;
 }
@@ -19,8 +19,10 @@ public sealed class Cassette
     public int Position { get; set; }
     public TzxFile Content { get; private set; } = new();
 
-    public delegate void TapePositionChangedEvent(TapePositionChangedEventArgs e);
-    public event TapePositionChangedEvent? TapeBlockSelected;
+    public delegate void BlockSelectedEvent(BlockSelectedEventArgs e);
+    public event BlockSelectedEvent? BlockSelected;
+
+    public event EventHandler? EndOfTape;
 
     public void Load(string filePath)
     {
@@ -52,6 +54,9 @@ public sealed class Cassette
         while (Position < Content.Blocks.Count)
         {
             var block = Content.Blocks[Position];
+
+            BlockSelected?.Invoke(new BlockSelectedEventArgs(Position));
+
             Position += 1;
 
             if (block is not StandardSpeedDataBlock standardSpeedDataBlock)
@@ -72,12 +77,14 @@ public sealed class Cassette
     {
         if (Position >= Content.Blocks.Count)
         {
+            EndOfTape?.Invoke(this, EventArgs.Empty);
             return null;
         }
 
-        TapeBlockSelected?.Invoke(new TapePositionChangedEventArgs(Position));
-
         var block = Content.Blocks[Position];
+
+        BlockSelected?.Invoke(new BlockSelectedEventArgs(Position));
+
         Position += 1;
 
         return block;
