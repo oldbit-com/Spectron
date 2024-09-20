@@ -24,15 +24,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="OldBit.Beep">
-        <HintPath>..\..\..\..\Beep\src\Beep\bin\Debug\net8.0\OldBit.Beep.dll</HintPath>
-      </Reference>
-      <Reference Include="OldBit.ZX.Files">
-        <HintPath>..\..\..\ZX.Files\src\ZX.Files\bin\Debug\net8.0\OldBit.ZX.Files.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
-    <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>OldBit.Spectron.Emulator.Tests</_Parameter1>
         </AssemblyAttribute>
@@ -40,7 +31,9 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
+      <PackageReference Include="OldBit.Beep" Version="0.9.1-rc.1" />
       <PackageReference Include="OldBit.Z80Cpu.Spectron" Version="0.9.5-rc.6" />
+      <PackageReference Include="OldBit.ZX.Files" Version="0.9.5-rc.1" />
     </ItemGroup>
 
 </Project>

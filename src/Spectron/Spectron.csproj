@@ -48,10 +48,4 @@
         <DependentUpon>MainWindowViewModel.cs</DependentUpon>
       </Compile>
     </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="OldBit.ZX.Files">
-        <HintPath>..\..\..\ZX.Files\src\ZX.Files\bin\Debug\net8.0\OldBit.ZX.Files.dll</HintPath>
-      </Reference>
-    </ItemGroup>
 </Project>

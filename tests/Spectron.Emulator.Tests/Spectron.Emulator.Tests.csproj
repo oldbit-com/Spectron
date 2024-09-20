@@ -33,10 +33,4 @@
       <Folder Include="Tape\" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Reference Include="OldBit.Z80Cpu">
-        <HintPath>..\..\..\Z80.Spectron\src\Z80Cpu\bin\Debug\net8.0\OldBit.Z80Cpu.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
 </Project>
