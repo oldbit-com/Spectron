@@ -22,9 +22,14 @@ internal sealed class Beeper
 
     internal Beeper(float clockMHz)
     {
+        // TODO: This can crash badly
         _statesPerSample = (int)(clockMHz * 1_000_000 / PlayerSampleRate);
 
-        _audioPlayer = new AudioPlayer(AudioFormat.Unsigned8Bit, PlayerSampleRate, 1);
+        _audioPlayer = new AudioPlayer(
+            AudioFormat.Unsigned8Bit, 
+            PlayerSampleRate,
+            channelCount: 1,
+            new PlayerOptions { BufferSizeInBytes = 4096 });
         _beeperBuffer = new BeeperBuffer(16384 * 4, () => _amplitude);
 
         Start();
