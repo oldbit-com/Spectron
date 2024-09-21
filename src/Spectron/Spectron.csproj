@@ -48,4 +48,8 @@
         <DependentUpon>MainWindowViewModel.cs</DependentUpon>
       </Compile>
     </ItemGroup>
+
+    <ItemGroup>
+      <AvaloniaXaml Remove="Controls\NativeMenuControl.axaml" />
+    </ItemGroup>
 </Project>

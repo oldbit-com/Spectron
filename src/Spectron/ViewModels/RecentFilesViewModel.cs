@@ -51,6 +51,21 @@ public class RecentFilesViewModel : ViewModelBase
         }
     }
 
+    public void Opening(ItemCollection items)
+    {
+        items.Clear();
+
+        foreach (var file in _recentFilesSettings.Files)
+        {
+            items.Add(new MenuItem
+            {
+                Header = file,
+                Command = _openRecentFileCommand,
+                CommandParameter = file
+            });
+        }
+    }
+
     public void Add(string filePath)
     {
         _recentFilesSettings.Files.Remove(filePath);

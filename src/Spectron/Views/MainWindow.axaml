@@ -41,143 +41,122 @@
         <converters:ValueEqualityConverter x:Key="ValueEqualityConverter"/>
     </Window.Resources>
 
-    <NativeMenu.Menu>
-        <NativeMenu>
-            <NativeMenuItem Header="File">
-                <NativeMenu>
-                    <NativeMenuItem Header="Load..." Gesture="Cmd+O" Command="{Binding LoadFileCommand}"/>
-                    <NativeMenuItem Header="Recent...">
-                        <NativeMenu Opening="RecentFilesMenu_OnOpening" />
-                    </NativeMenuItem>
-                    <NativeMenuItem Header="Save Snapshot..." Gesture="Cmd+S" Command="{Binding SaveFileCommand}"/>
-                </NativeMenu>
-            </NativeMenuItem>
-            <NativeMenuItem Header="Emulator">
-                <NativeMenu>
-                    <NativeMenuItem Header="Machine">
-                        <NativeMenu>
-                            <NativeMenuItem Header="ZX Spectrum 16" ToggleType="CheckBox" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum16K}" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum16K}}"/>
-                            <NativeMenuItem Header="ZX Spectrum 48" ToggleType="CheckBox" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum48K}" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum48K}}"/>
-                            <NativeMenuItem Header="ZX Spectrum 128" ToggleType="CheckBox" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum128K}" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum128K}}"/>
-                        </NativeMenu>
-                    </NativeMenuItem>
-                    <NativeMenuItem Header="ROM">
-                        <NativeMenu>
-                            <NativeMenuItem Header="Original" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Original}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.Original}}"/>
-                            <NativeMenuItem Header="Gosh Wonderful" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.GoshWonderful}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.GoshWonderful}}"/>
-                            <NativeMenuItem Header="Busy Soft v1.40" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.BusySoft}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.BusySoft}}"/>
-                            <NativeMenuItem Header="J.G. Harston v0.77" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Harston}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.Harston}}"/>
-                            <NativeMenuItem Header="Diagnostics">
-                                <NativeMenu>
-                                    <NativeMenuItem Header="Retroleum v1.71" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Retroleum}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.Retroleum}}"/>
-                                    <NativeMenuItem Header="B. Alford v1.37" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.BrendanAlford}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.BrendanAlford}}"/>
-                                </NativeMenu>
-                            </NativeMenuItem>
-                        </NativeMenu>
-                    </NativeMenuItem>
-                    <NativeMenuItem Header="Joystick">
-                        <NativeMenu>
-                            <NativeMenuItem Header="None" ToggleType="CheckBox" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.None}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.None}}"/>
-                            <NativeMenuItem Header="Kempston" ToggleType="CheckBox" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Kempston}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Kempston}}"/>
-                            <NativeMenuItem Header="Sinclair 1" ToggleType="CheckBox" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Sinclair1}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Sinclair1}}"/>
-                            <NativeMenuItem Header="Sinclair 2" ToggleType="CheckBox" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Sinclair2}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Sinclair2}}"/>
-                            <NativeMenuItem Header="Cursor" ToggleType="CheckBox" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Cursor}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Cursor}}"/>
-                            <NativeMenuItem Header="Fuller" ToggleType="CheckBox" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Fuller}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Fuller}}"/>
-                        </NativeMenu>
-                    </NativeMenuItem>
-                    <NativeMenuItem Header="Enable ULA+" ToggleType="CheckBox" Command="{Binding ToggleUlaPlus}" IsChecked="{Binding IsUlaPlusEnabled}"/>
-                </NativeMenu>
-            </NativeMenuItem>
-            <NativeMenuItem Header="Control">
-                <NativeMenu>
-                    <NativeMenuItem Header="Speed">
-                        <NativeMenu>
-                            <NativeMenuItem Header="25%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="25" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='25'}"/>
-                            <NativeMenuItem Header="50%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="50" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='50'}"/>
-                            <NativeMenuItem Header="75%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="75" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='75'}"/>
-                            <NativeMenuItem Header="100%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="100" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='100'}"/>
-                            <NativeMenuItem Header="125%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="125" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='125'}"/>
-                            <NativeMenuItem Header="150%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="150" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='150'}"/>
-                            <NativeMenuItem Header="200%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="200" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='200'}"/>
-                            <NativeMenuItem Header="250%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="250" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='250'}"/>
-                            <NativeMenuItem Header="300%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="300" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='300'}"/>
-                            <NativeMenuItem Header="400%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="400" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='400'}"/>
-                            <NativeMenuItem Header="500%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="500" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='500'}"/>
-                        </NativeMenu>
-                    </NativeMenuItem>
-                    <NativeMenuItemSeparator/>
-                    <NativeMenuItem Header="Pause" Gesture="F10" Command="{Binding TogglePauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
-                    <NativeMenuItem Header="Time Machine" Command="{Binding ShowTimeMachineCommand}"/>
-                    <NativeMenuItemSeparator/>
-                    <NativeMenuItem Header="Reset" Command="{Binding ResetCommand}"/>
-                </NativeMenu>
-            </NativeMenuItem>
-            <NativeMenuItem Header="View">
-                <NativeMenu>
-                    <NativeMenuItem Header="Border">
-                        <NativeMenu>
-                            <NativeMenuItem Header="None" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.None}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.None}}"/>
-                            <NativeMenuItem Header="Small" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Small}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.Small}}"/>
-                            <NativeMenuItem Header="Medium" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Medium}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.Medium}}"/>
-                            <NativeMenuItem Header="Large" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Large}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.Large}}"/>
-                            <NativeMenuItem Header="Full" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Full}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.Full}}"/>
-                        </NativeMenu>
-                    </NativeMenuItem>
-                    <NativeMenuItemSeparator/>
-                    <NativeMenuItem Header="{Binding WindowStateCommandName}" Gesture="Ctrl+Enter" Command="{Binding ToggleFullScreenCommand}"/>
-                </NativeMenu>
-            </NativeMenuItem>
-            <NativeMenuItem Header="Tape">
-                <NativeMenu>
-                    <NativeMenuItem Header="New Tape" Command="{Binding TapeMenuViewModel.NewCommand}"/>
-                    <NativeMenuItem Header="Insert Tape" Gesture="Cmd+T" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
-                    <NativeMenuItem Header="Save Tape"/>
-                    <NativeMenuItemSeparator/>
-                    <NativeMenuItem Header="Play" Command="{Binding TapeMenuViewModel.PlayCommand}"/>
-                    <NativeMenuItem Header="Stop" Command="{Binding TapeMenuViewModel.StopCommand}"/>
-                    <NativeMenuItem Header="Rewind" Command="{Binding TapeMenuViewModel.RewindCommand}"/>
-                    <NativeMenuItem Header="Eject" Command="{Binding TapeMenuViewModel.EjectCommand}"/>
-                    <NativeMenuItem Header="View" Command="{Binding TapeMenuViewModel.ViewCommand}"/>
-                    <NativeMenuItemSeparator/>
-                    <NativeMenuItem Header="Loading Speed">
-                        <NativeMenu>
-                            <NativeMenuItem Header="Normal" ToggleType="CheckBox" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeLoadingSpeed.Normal}" IsChecked="{Binding TapeLoadingSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeLoadingSpeed.Normal}}"/>
-                            <NativeMenuItem Header="Instant" ToggleType="CheckBox" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeLoadingSpeed.Instant}" IsChecked="{Binding TapeLoadingSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeLoadingSpeed.Instant}}"/>
-                            <NativeMenuItem Header="Accelerated" ToggleType="CheckBox" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeLoadingSpeed.Accelerated}" IsChecked="{Binding TapeLoadingSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeLoadingSpeed.Accelerated}}"/>
-                        </NativeMenu>
-                    </NativeMenuItem>
-                </NativeMenu>
-            </NativeMenuItem>
-            <NativeMenuItem Header="Help">
-                <NativeMenu>
-                    <NativeMenuItem Header="Keyboard" Gesture="F1" Command="{Binding HelpKeyboardCommand}"/>
-                </NativeMenu>
-            </NativeMenuItem>
-        </NativeMenu>
-    </NativeMenu.Menu>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="Load..." HotKey="Cmd+O" InputGesture="Cmd+O" Command="{Binding LoadFileCommand}"/>
+                <MenuItem Header="Recent..." SubmenuOpened="RecentFilesSubmenuOpened">
+                    <MenuItem />
+                </MenuItem>
+                <MenuItem Header="Save Snapshot..." HotKey="Cmd+S" InputGesture="Cmd+S" Command="{Binding SaveFileCommand}"/>
+            </MenuItem>
 
-    <Grid RowDefinitions="*,Auto">
-        <Border>
-            <Grid>
-                <Border CornerRadius="15" HorizontalAlignment="Center" ClipToBounds="True">
-                    <Grid>
-                        <Image x:Name="ScreenImage" Source="{Binding SpectrumScreen}" Stretch="Uniform" Classes.IsPaused="{Binding IsPaused}">
-                            <Image.Styles>
-                                <Style Selector="Image.IsPaused">
-                                    <Setter Property="Effect">
-                                        <BlurEffect Radius="7"/>
-                                    </Setter>
-                                </Style>
-                            </Image.Styles>
-                        </Image>
-                    </Grid>
-                </Border>
-                <Border Padding="20" CornerRadius="10" BoxShadow="15 15 25 0 DarkGray" IsVisible="{Binding IsPaused}" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Silver" >
-                    <controls:TimeMachineView DataContext="{Binding TimeMachineViewModel}"/>
-                </Border>
-            </Grid>
-        </Border>
-        <controls:StatusBar Grid.Row="1" Height="30" DataContext="{Binding StatusBar}" IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}"/>
-    </Grid>
+            <MenuItem Header="_Emulator">
+                <MenuItem Header="Machine">
+                    <MenuItem Header="ZX Spectrum 16" ToggleType="CheckBox" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum16K}" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum16K}}"/>
+                    <MenuItem Header="ZX Spectrum 48" ToggleType="CheckBox" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum48K}" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum48K}}"/>
+                    <MenuItem Header="ZX Spectrum 128" ToggleType="CheckBox" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum128K}" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum128K}}"/>
+                </MenuItem>
+                <MenuItem Header="ROM">
+                    <MenuItem Header="Original" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Original}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.Original}}"/>
+                    <MenuItem Header="Gosh Wonderful" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.GoshWonderful}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.GoshWonderful}}"/>
+                    <MenuItem Header="Busy Soft v1.40" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.BusySoft}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.BusySoft}}"/>
+                    <MenuItem Header="J.G. Harston v0.77" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Harston}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.Harston}}"/>
+                    <MenuItem Header="Diagnostics">
+                        <MenuItem Header="Retroleum v1.71" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Retroleum}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.Retroleum}}"/>
+                        <MenuItem Header="B. Alford v1.37" ToggleType="CheckBox" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.BrendanAlford}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.BrendanAlford}}"/>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="Joystick">
+                    <MenuItem Header="None" ToggleType="CheckBox" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.None}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.None}}"/>
+                    <MenuItem Header="Kempston" ToggleType="CheckBox" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Kempston}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Kempston}}"/>
+                    <MenuItem Header="Sinclair 1" ToggleType="CheckBox" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Sinclair1}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Sinclair1}}"/>
+                    <MenuItem Header="Sinclair 2" ToggleType="CheckBox" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Sinclair2}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Sinclair2}}"/>
+                    <MenuItem Header="Cursor" ToggleType="CheckBox" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Cursor}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Cursor}}"/>
+                    <MenuItem Header="Fuller" ToggleType="CheckBox" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Fuller}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Fuller}}"/>
+                </MenuItem>
+                <MenuItem Header="Enable ULA+" ToggleType="CheckBox" Command="{Binding ToggleUlaPlus}" IsChecked="{Binding IsUlaPlusEnabled}"/>
+            </MenuItem>
+
+            <MenuItem Header="_Control">
+                <MenuItem Header="Speed">
+                    <MenuItem Header="25%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="25" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='25'}"/>
+                    <MenuItem Header="50%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="50" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='50'}"/>
+                    <MenuItem Header="75%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="75" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='75'}"/>
+                    <MenuItem Header="100%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="100" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='100'}"/>
+                    <MenuItem Header="125%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="125" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='125'}"/>
+                    <MenuItem Header="150%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="150" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='150'}"/>
+                    <MenuItem Header="200%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="200" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='200'}"/>
+                    <MenuItem Header="250%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="250" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='250'}"/>
+                    <MenuItem Header="300%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="300" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='300'}"/>
+                    <MenuItem Header="400%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="400" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='400'}"/>
+                    <MenuItem Header="500%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="500" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='500'}"/>
+                </MenuItem>
+                <MenuItem Header="-" />
+                <MenuItem Header="Pause" HotKey="F10" InputGesture="F10" Command="{Binding TogglePauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
+                <MenuItem Header="Time Machine" Command="{Binding ShowTimeMachineCommand}"/>
+                <MenuItem Header="-" />
+                <MenuItem Header="Reset" Command="{Binding ResetCommand}"/>
+            </MenuItem>
+
+            <MenuItem Header="_View">
+                <MenuItem Header="Border">
+                    <MenuItem Header="None" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.None}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.None}}"/>
+                    <MenuItem Header="Small" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Small}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.Small}}"/>
+                    <MenuItem Header="Medium" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Medium}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.Medium}}"/>
+                    <MenuItem Header="Large" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Large}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.Large}}"/>
+                    <MenuItem Header="Full" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Full}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.Full}}"/>
+                </MenuItem>
+                <MenuItem Header="-" />
+                <MenuItem Header="{Binding WindowStateCommandName}" HotKey="Ctrl+Enter" InputGesture="Ctrl+Enter" Command="{Binding ToggleFullScreenCommand}"/>
+            </MenuItem>
+
+            <MenuItem Header="_Tape">
+                <MenuItem Header="New Tape" Command="{Binding TapeMenuViewModel.NewCommand}"/>
+                <MenuItem Header="Insert Tape" HotKey="Cmd+T" InputGesture="Cmd+T" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
+                <MenuItem Header="Save Tape"/>
+                <MenuItem Header="-" />
+                <MenuItem Header="Play" Command="{Binding TapeMenuViewModel.PlayCommand}"/>
+                <MenuItem Header="Stop" Command="{Binding TapeMenuViewModel.StopCommand}"/>
+                <MenuItem Header="Rewind" Command="{Binding TapeMenuViewModel.RewindCommand}"/>
+                <MenuItem Header="Eject" Command="{Binding TapeMenuViewModel.EjectCommand}"/>
+                <MenuItem Header="View" Command="{Binding TapeMenuViewModel.ViewCommand}"/>
+                <MenuItem Header="-" />
+                <MenuItem Header="Loading Speed">
+                    <MenuItem Header="Normal" ToggleType="CheckBox" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeLoadingSpeed.Normal}" IsChecked="{Binding TapeLoadingSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeLoadingSpeed.Normal}}"/>
+                    <MenuItem Header="Instant" ToggleType="CheckBox" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeLoadingSpeed.Instant}" IsChecked="{Binding TapeLoadingSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeLoadingSpeed.Instant}}"/>
+                    <MenuItem Header="Accelerated" ToggleType="CheckBox" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeLoadingSpeed.Accelerated}" IsChecked="{Binding TapeLoadingSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeLoadingSpeed.Accelerated}}"/>
+                </MenuItem>
+            </MenuItem>
+
+            <MenuItem Header="_Help">
+                <MenuItem Header="Keyboard" HotKey="F1" InputGesture="F1" Command="{Binding HelpKeyboardCommand}"/>
+            </MenuItem>
+        </Menu>
+
+        <Grid RowDefinitions="*,Auto">
+            <Border>
+                <Grid>
+                    <Border CornerRadius="15" HorizontalAlignment="Center" ClipToBounds="True">
+                        <Grid>
+                            <Image x:Name="ScreenImage" Source="{Binding SpectrumScreen}" Stretch="Uniform" Classes.IsPaused="{Binding IsPaused}">
+                                <Image.Styles>
+                                    <Style Selector="Image.IsPaused">
+                                        <Setter Property="Effect">
+                                            <BlurEffect Radius="7"/>
+                                        </Setter>
+                                    </Style>
+                                </Image.Styles>
+                            </Image>
+                        </Grid>
+                    </Border>
+                    <Border Padding="20" CornerRadius="10" BoxShadow="15 15 25 0 DarkGray" IsVisible="{Binding IsPaused}" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Silver" >
+                        <controls:TimeMachineView DataContext="{Binding TimeMachineViewModel}"/>
+                    </Border>
+                </Grid>
+            </Border>
+            <controls:StatusBar Grid.Row="1" Height="30" DataContext="{Binding StatusBar}" IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}"/>
+        </Grid>
+    </DockPanel>
 
 </Window>

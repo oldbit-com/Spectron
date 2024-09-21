@@ -2,6 +2,7 @@ using System;
 using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.ReactiveUI;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Settings;
@@ -64,5 +65,15 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         }
 
         _viewModel?.RecentFilesViewModel.Opening(recentFilesMenu.Items);
+    }
+
+    private void RecentFilesSubmenuOpened(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem menuItem)
+        {
+            return;
+        }
+
+        _viewModel?.RecentFilesViewModel.Opening(menuItem.Items);
     }
 }
