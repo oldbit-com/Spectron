@@ -195,15 +195,15 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
+        _lastScreenRender = _renderStopwatch.Elapsed;
+        Interlocked.Increment(ref _frameCount);
+
         Dispatcher.UIThread.Post(() =>
         {
             _frameBufferConverter.UpdateBitmap(framebuffer);
             ScreenControl.InvalidateVisual();
         });
 
-        Interlocked.Increment(ref _frameCount);
-
-        _lastScreenRender = _renderStopwatch.Elapsed;
     }
 
     private async Task WindowOpenedAsync()

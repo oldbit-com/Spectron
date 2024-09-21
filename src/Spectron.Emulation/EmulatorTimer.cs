@@ -8,17 +8,17 @@ namespace OldBit.Spectron.Emulation;
 /// </summary>
 internal sealed class EmulatorTimer
 {
-    private readonly Action _callback;
     private readonly Thread _thread;
     private bool _isRunning;
 
     internal bool IsPaused { get; private set; }
     internal TimeSpan Interval { get; set; } = TimeSpan.FromMilliseconds(20);
 
-    internal EmulatorTimer(Action callback)
-    {
-        _callback = callback;
+    internal delegate void ElapsedEvent(EventArgs e);
+    internal event ElapsedEvent? Elapsed;
 
+    internal EmulatorTimer()
+    {
         _thread = new Thread(Worker)
         {
             IsBackground = true,
@@ -52,15 +52,13 @@ internal sealed class EmulatorTimer
     {
         var stopwatch = Stopwatch.StartNew();
         var nextTrigger = TimeSpan.Zero;
+        var timeToWait = Interval;
 
         while (_isRunning)
         {
-            nextTrigger += Interval;
-
             if (IsPaused)
             {
                 Thread.Sleep(500);
-
                 ResetTimer();
 
                 continue;
@@ -68,32 +66,35 @@ internal sealed class EmulatorTimer
 
             while (_isRunning)
             {
-                var timeToWait = (nextTrigger - stopwatch.Elapsed).TotalMilliseconds;
+                var elapsed = stopwatch.Elapsed;
 
-                if (timeToWait <= 0)
+                if (elapsed >= nextTrigger)
                 {
-                    if (timeToWait < -Interval.TotalMilliseconds)
+                    if (timeToWait < -Interval)
                     {
                         ResetTimer();
                     }
 
-                    _callback();
+                    Elapsed?.Invoke(EventArgs.Empty);
+                    nextTrigger += Interval;
 
                     break;
                 }
 
-                switch (timeToWait)
+                timeToWait = nextTrigger - stopwatch.Elapsed;
+
+                switch (timeToWait.TotalMilliseconds)
                 {
                     case < 1:
-                        Thread.SpinWait(5);
+                        Thread.SpinWait(1);
                         break;
 
                     case < 5:
-                        Thread.SpinWait(10);
+                        Thread.SpinWait(2);
                         break;
 
                     case < 10:
-                        Thread.Sleep(5);
+                        Thread.SpinWait(5);
                         break;
                 }
             }

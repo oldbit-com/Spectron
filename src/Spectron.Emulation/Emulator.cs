@@ -5,7 +5,6 @@ using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
-using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Z80Cpu;
 
@@ -65,7 +64,8 @@ public sealed class Emulator
         SetupUlaAndDevices(emulator.UseAYSound);
         SetupEventHandlers();
 
-        _emulationTimer = new EmulatorTimer(RunFrame);
+        _emulationTimer = new EmulatorTimer();
+        _emulationTimer.Elapsed += _ => RunFrame();
     }
 
     public void Start() => _emulationTimer.Start();
