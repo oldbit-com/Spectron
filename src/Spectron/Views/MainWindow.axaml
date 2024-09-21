@@ -49,6 +49,10 @@
                     <MenuItem />
                 </MenuItem>
                 <MenuItem Header="Save Snapshot..." HotKey="Cmd+S" InputGesture="Cmd+S" Command="{Binding SaveFileCommand}"/>
+                <MenuItem Header="-" />
+                <MenuItem Header="Preferences" HotKey="Cmd+," InputGesture="Cmd+,"/>
+                <MenuItem Header="-" />
+                <MenuItem Header="Exit" HotKey="Cmd+Q" InputGesture="Cmd+Q"/>
             </MenuItem>
 
             <MenuItem Header="_Emulator">
@@ -92,10 +96,10 @@
                     <MenuItem Header="400%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="400" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='400'}"/>
                     <MenuItem Header="500%" ToggleType="CheckBox" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="500" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='500'}"/>
                 </MenuItem>
-                <MenuItem Header="-" />
+                <MenuItem Header="-"/>
                 <MenuItem Header="Pause" HotKey="F10" InputGesture="F10" Command="{Binding TogglePauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
                 <MenuItem Header="Time Machine" Command="{Binding ShowTimeMachineCommand}"/>
-                <MenuItem Header="-" />
+                <MenuItem Header="-"/>
                 <MenuItem Header="Reset" Command="{Binding ResetCommand}"/>
             </MenuItem>
 
@@ -107,7 +111,7 @@
                     <MenuItem Header="Large" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Large}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.Large}}"/>
                     <MenuItem Header="Full" ToggleType="CheckBox" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Full}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.Full}}"/>
                 </MenuItem>
-                <MenuItem Header="-" />
+                <MenuItem Header="-"/>
                 <MenuItem Header="{Binding WindowStateCommandName}" HotKey="Ctrl+Enter" InputGesture="Ctrl+Enter" Command="{Binding ToggleFullScreenCommand}"/>
             </MenuItem>
 
@@ -115,13 +119,13 @@
                 <MenuItem Header="New Tape" Command="{Binding TapeMenuViewModel.NewCommand}"/>
                 <MenuItem Header="Insert Tape" HotKey="Cmd+T" InputGesture="Cmd+T" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
                 <MenuItem Header="Save Tape"/>
-                <MenuItem Header="-" />
+                <MenuItem Header="-"/>
                 <MenuItem Header="Play" Command="{Binding TapeMenuViewModel.PlayCommand}"/>
                 <MenuItem Header="Stop" Command="{Binding TapeMenuViewModel.StopCommand}"/>
                 <MenuItem Header="Rewind" Command="{Binding TapeMenuViewModel.RewindCommand}"/>
                 <MenuItem Header="Eject" Command="{Binding TapeMenuViewModel.EjectCommand}"/>
                 <MenuItem Header="View" Command="{Binding TapeMenuViewModel.ViewCommand}"/>
-                <MenuItem Header="-" />
+                <MenuItem Header="-"/>
                 <MenuItem Header="Loading Speed">
                     <MenuItem Header="Normal" ToggleType="CheckBox" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeLoadingSpeed.Normal}" IsChecked="{Binding TapeLoadingSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeLoadingSpeed.Normal}}"/>
                     <MenuItem Header="Instant" ToggleType="CheckBox" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeLoadingSpeed.Instant}" IsChecked="{Binding TapeLoadingSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeLoadingSpeed.Instant}}"/>
@@ -131,6 +135,7 @@
 
             <MenuItem Header="_Help">
                 <MenuItem Header="Keyboard" HotKey="F1" InputGesture="F1" Command="{Binding HelpKeyboardCommand}"/>
+                <MenuItem Header="About"/>
             </MenuItem>
         </Menu>
 

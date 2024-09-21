@@ -4,7 +4,6 @@ namespace OldBit.Spectron.Emulation;
 
 /// <summary>
 /// Custom timer that supports more accurate timing than the built-in .NET timer.
-/// Standard timers are not accurate enough for emulators.
 /// </summary>
 internal sealed class EmulatorTimer
 {
