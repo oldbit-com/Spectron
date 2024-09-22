@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
@@ -44,7 +45,8 @@ public sealed class Emulator
         EmulatorSettings emulator,
         HardwareSettings hardware,
         TapeManager tapeManager,
-        TimeMachine timeMachine)
+        TimeMachine timeMachine,
+        ILogger logger)
     {
         TapeManager = tapeManager;
         _timeMachine = timeMachine;
@@ -65,7 +67,17 @@ public sealed class Emulator
         SetupEventHandlers();
 
         _emulationTimer = new EmulatorTimer();
-        _emulationTimer.Elapsed += _ => RunFrame();
+        _emulationTimer.Elapsed += _ =>
+        {
+            try
+            {
+                RunFrame();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error during frame execution");
+            }
+        };
     }
 
     public void Start() => _emulationTimer.Start();

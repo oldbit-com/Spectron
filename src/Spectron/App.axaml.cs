@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation.DependencyInjection;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.ViewModels;
@@ -15,8 +16,7 @@ namespace OldBit.Spectron;
 public partial class App : Application
 {
     private ServiceProvider? _serviceProvider;
-
-    public MainWindowViewModel? MainWindowViewModel { get; private set; }
+    private MainWindowViewModel? MainWindowViewModel { get; set; }
 
     public override void Initialize()
     {
@@ -29,7 +29,7 @@ public partial class App : Application
         services.AddEmulation();
         services.AddServices();
         services.AddViewModels();
-        services.AddLogging();
+        services.AddLogging(builder => builder.AddConsole());
 
         _serviceProvider = services.BuildServiceProvider();
 
