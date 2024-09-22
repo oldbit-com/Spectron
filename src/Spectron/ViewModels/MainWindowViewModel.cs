@@ -170,6 +170,8 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 CreateEmulator();
             }
+
+            Emulator?.SetTapeSavingSettings(preferences.TapeSaving);
         }
 
         Emulator?.Resume();
@@ -228,6 +230,8 @@ public partial class MainWindowViewModel : ViewModelBase
         var snapshot = await _sessionService.LoadAsync();
 
         CreateEmulator(snapshot);
+
+        Emulator?.SetTapeSavingSettings(preferences.TapeSaving);
     }
 
     private async Task WindowClosingAsync() => await Task.WhenAll(
@@ -261,6 +265,8 @@ public partial class MainWindowViewModel : ViewModelBase
         Emulator.TapeLoadingSpeed = TapeLoadingSpeed;
         Emulator.JoystickManager.SetupJoystick(JoystickType);
         Emulator.RenderScreen += EmulatorOnRenderScreen;
+
+        //Emulator.TapeManager.IsTapeSaveEnabled = Preferences.TapeSaving.IsEnabled;
 
         _renderStopwatch.Restart();
         _lastScreenRender = TimeSpan.Zero;
@@ -301,6 +307,10 @@ public partial class MainWindowViewModel : ViewModelBase
             IsEnabled = _timeMachine.IsEnabled,
             SnapshotInterval = _timeMachine.SnapshotInterval,
             MaxDuration = _timeMachine.MaxDuration
-        }
+        },
+
+        TapeSaving = new TapeSavingSettings(
+            Emulator?.TapeManager.IsTapeSaveEnabled ?? true,
+            Emulator?.TapeManager.IsFastTapeSaveEnabled ?? true)
     };
 }

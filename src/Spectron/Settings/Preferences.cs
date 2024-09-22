@@ -5,6 +5,8 @@ using OldBit.Spectron.Models;
 
 namespace OldBit.Spectron.Settings;
 
+public record TapeSavingSettings(bool IsEnabled, bool IsFastSaveEnabled);
+
 public class Preferences
 {
     public bool IsUlaPlusEnabled { get; init; }
@@ -24,4 +26,6 @@ public class Preferences
     public TimeMachineSettings TimeMachine { get; init; } = new();
 
     public bool IsResumeEnabled { get; init; } = true;
+
+    public TapeSavingSettings TapeSaving { get; init; } = new(true, true);
 }

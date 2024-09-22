@@ -1,4 +1,5 @@
 using OldBit.Spectron.Emulation.Extensions;
+using OldBit.Spectron.Emulation.Rom;
 using OldBit.Z80Cpu;
 using OldBit.Z80Cpu.Registers;
 using OldBit.ZX.Files.Tap;
@@ -63,7 +64,7 @@ internal sealed class DirectAccess
         _cpu.Registers.PC = 0x05E0;
     }
 
-    internal void SaveBytes(Cassette cassette)
+    internal void SaveBytes(Cassette cassette, bool isFastSaveEnabled)
     {
         var blockType = _cpu.Registers.A;
         var length = _cpu.Registers.DE;
@@ -74,6 +75,9 @@ internal sealed class DirectAccess
 
         cassette.Content.Blocks.Add(new StandardSpeedDataBlock(tapData));
 
-        _cpu.Registers.PC = 0x053A;
+        if (isFastSaveEnabled)
+        {
+            _cpu.Registers.PC = RomRoutines.SA_DELAY - 2;
+        }
     }
 }

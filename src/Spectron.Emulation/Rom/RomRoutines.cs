@@ -32,6 +32,11 @@ internal static class RomRoutines
     internal const Word SA_BYTES = 0x04C2;
 
     /// <summary>
+    /// Short delay before saving is complete.
+    /// </summary>
+    internal const Word SA_DELAY = 0x053C;
+
+    /// <summary>
     /// LD_BYTES subroutine return
     /// </summary>
     internal const Word LD_BYTES_RET = 0x05E2;

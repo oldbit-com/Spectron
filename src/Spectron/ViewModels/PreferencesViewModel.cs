@@ -25,6 +25,9 @@ public class PreferencesViewModel : ViewModelBase
         SnapshotInterval = preferences.TimeMachine.SnapshotInterval.TotalSeconds;
         MaxDuration = preferences.TimeMachine.MaxDuration.TotalSeconds;
 
+        IsTapeSaveEnabled = preferences.TapeSaving.IsEnabled;
+        IsFastTapeSaveEnabled = preferences.TapeSaving.IsFastSaveEnabled;
+
         UpdatePreferencesCommand = ReactiveCommand.Create(() => new Preferences
         {
             ComputerType = ComputerType,
@@ -42,7 +45,9 @@ public class PreferencesViewModel : ViewModelBase
                 IsEnabled = IsTimeMachineEnabled,
                 SnapshotInterval = TimeSpan.FromSeconds(SnapshotInterval),
                 MaxDuration = TimeSpan.FromSeconds(MaxDuration)
-            }
+            },
+
+            TapeSaving = new TapeSavingSettings(IsTapeSaveEnabled, IsFastTapeSaveEnabled)
         });
     }
 
@@ -107,5 +112,19 @@ public class PreferencesViewModel : ViewModelBase
     {
         get => _joystickUseCursorKeys;
         set => this.RaiseAndSetIfChanged(ref _joystickUseCursorKeys, value);
+    }
+
+    private bool _isTapeSaveEnabled;
+    public bool IsTapeSaveEnabled
+    {
+        get => _isTapeSaveEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isTapeSaveEnabled, value);
+    }
+
+    private bool _isFastTapeSaveEnabled;
+    public bool IsFastTapeSaveEnabled
+    {
+        get => _isFastTapeSaveEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isFastTapeSaveEnabled, value);
     }
 }

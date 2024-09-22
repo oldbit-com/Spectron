@@ -102,14 +102,15 @@
                     </StackPanel>
                 </Border>
             </TabItem>
-            <TabItem Header="Tape" IsSelected="True">
+            <TabItem Header="Tape">
                 <Border Classes="Tab">
                     <StackPanel>
                         <Border Classes="Tab">
                             <StackPanel>
                                 <CheckBox Content="Normal speed tape loader" Classes="Center"/>
                                 <CheckBox Content="Automatically load and play tape files" Classes="Center"/>
-                                <CheckBox Content="Fast tape save (skip audio/visual effects)" Classes="Center"/>
+                                <CheckBox Content="Enable tape save (virtual tape)" Classes="Center" IsChecked="{Binding IsTapeSaveEnabled}" x:Name="IsTapeSaveEnabled"/>
+                                <CheckBox Content="Fast tape save (skip border/sound effects)" Classes="Center" IsChecked="{Binding IsFastTapeSaveEnabled}" IsEnabled="{Binding #IsTapeSaveEnabled.IsChecked}" Margin="28 0 0 0"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>

@@ -7,7 +7,10 @@ public sealed class TapeManager
 {
     private DirectAccess? _directAccess;
 
-    public Cassette Cassette { get; set; } = new();
+    public Cassette Cassette { get; private set; } = new();
+
+    public bool IsTapeSaveEnabled { get; set; }
+    public bool IsFastTapeSaveEnabled { get; set; }
 
     internal CassettePlayer? TapePlayer { get; private set; }
 
@@ -35,7 +38,13 @@ public sealed class TapeManager
 
     public void LoadDirect() => _directAccess?.LoadBytes(Cassette);
 
-    public void SaveDirect() => _directAccess?.SaveBytes(Cassette);
+    public void SaveDirect()
+    {
+        if (IsTapeSaveEnabled)
+        {
+            _directAccess?.SaveBytes(Cassette, IsFastTapeSaveEnabled);
+        }
+    }
 
     public void InsertTape(string fileName, bool autoPlay = false)
     {
