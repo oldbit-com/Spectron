@@ -22,7 +22,7 @@ public sealed class Emulator
     private readonly EmulatorTimer _emulationTimer;
 
     private bool _invalidateScreen;
-    private bool _isAcceleratedTape;
+    private bool _isAcceleratedTapeSpeed;
 
     public delegate void RenderScreenEvent(FrameBuffer frameBuffer);
     public event RenderScreenEvent? RenderScreen;
@@ -195,21 +195,32 @@ public sealed class Emulator
 
                     case TapeSpeed.Accelerated:
                         SetEmulationSpeed(int.MaxValue);
-                        _isAcceleratedTape = true;
+                        _isAcceleratedTapeSpeed = true;
                         break;
                 }
                 break;
 
             case RomRoutines.SA_BYTES:
-                TapeManager.SaveDirect();
+                switch (TapeManager.TapeSaveSpeed)
+                {
+                    case TapeSpeed.Instant:
+                        TapeManager.SaveDirect();
+                        break;
+
+                    case TapeSpeed.Accelerated:
+                        SetEmulationSpeed(int.MaxValue);
+                        _isAcceleratedTapeSpeed = true;
+                        break;
+                }
                 break;
 
             case RomRoutines.LD_BYTES_RET:
+            case RomRoutines.SA_BYTES_RET:
             case RomRoutines.ERROR_1:
-                if (_isAcceleratedTape)
+                if (_isAcceleratedTapeSpeed)
                 {
                     SetEmulationSpeed(100);
-                    _isAcceleratedTape = false;
+                    _isAcceleratedTapeSpeed = false;
                 }
 
                 break;

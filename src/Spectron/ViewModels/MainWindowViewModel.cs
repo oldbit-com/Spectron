@@ -322,6 +322,6 @@ public partial class MainWindowViewModel : ViewModelBase
 
         TapeSaving = new TapeSavingSettings(
             Emulator?.TapeManager.IsTapeSaveEnabled ?? true,
-            Emulator?.TapeManager.SaveTapeSpeed ?? TapeSpeed.Instant)
+            Emulator?.TapeManager.TapeSaveSpeed ?? TapeSpeed.Instant)
     };
 }

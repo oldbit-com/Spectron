@@ -22,6 +22,6 @@ public static class EmulatorExtensions
         }
 
         emulator.TapeManager.IsTapeSaveEnabled = tapeSavingSettings.IsEnabled;
-        emulator.TapeManager.SaveTapeSpeed = tapeSavingSettings.Speed;
+        emulator.TapeManager.TapeSaveSpeed = tapeSavingSettings.Speed;
     }
 }

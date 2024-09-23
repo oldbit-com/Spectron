@@ -28,7 +28,7 @@ public class PreferencesViewModel : ViewModelBase
         MaxDuration = preferences.TimeMachine.MaxDuration.TotalSeconds;
 
         IsTapeSaveEnabled = preferences.TapeSaving.IsEnabled;
-        SaveTapeSpeed = preferences.TapeSaving.Speed;
+        TapeSaveSpeed = preferences.TapeSaving.Speed;
 
         UpdatePreferencesCommand = ReactiveCommand.Create(() => new Preferences
         {
@@ -49,7 +49,7 @@ public class PreferencesViewModel : ViewModelBase
                 MaxDuration = TimeSpan.FromSeconds(MaxDuration)
             },
 
-            TapeSaving = new TapeSavingSettings(IsTapeSaveEnabled, SaveTapeSpeed)
+            TapeSaving = new TapeSavingSettings(IsTapeSaveEnabled, TapeSaveSpeed)
         });
     }
 
@@ -123,11 +123,11 @@ public class PreferencesViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _isTapeSaveEnabled, value);
     }
 
-    private TapeSpeed _saveTapeSpeed = TapeSpeed.Normal;
-    public TapeSpeed SaveTapeSpeed
+    private TapeSpeed _tapeSaveSpeed = TapeSpeed.Normal;
+    public TapeSpeed TapeSaveSpeed
     {
-        get => _saveTapeSpeed;
-        set => this.RaiseAndSetIfChanged(ref _saveTapeSpeed, value);
+        get => _tapeSaveSpeed;
+        set => this.RaiseAndSetIfChanged(ref _tapeSaveSpeed, value);
     }
 
     public List<NameValuePair<TapeSpeed>> TapeSpeeds { get; } =

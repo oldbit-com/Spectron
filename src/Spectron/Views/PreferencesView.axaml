@@ -111,7 +111,7 @@
                                 <CheckBox Content="Automatically load and play tape files" Classes="Center"/>
                                 <StackPanel Orientation="Horizontal">
                                     <CheckBox Content="Enable tape saving (virtual tape). Speed: " Classes="Center" IsChecked="{Binding IsTapeSaveEnabled}" x:Name="IsTapeSaveEnabled"/>
-                                    <ComboBox Margin="5 0 0 0" Width="150" ItemsSource="{Binding TapeSpeeds}" SelectedValue="{Binding SaveTapeSpeed}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}" IsEnabled="{Binding #IsTapeSaveEnabled.IsChecked}" Padding="10 2 0 0"/>
+                                    <ComboBox Margin="5 0 0 0" Width="150" ItemsSource="{Binding TapeSpeeds}" SelectedValue="{Binding TapeSaveSpeed}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}" IsEnabled="{Binding #IsTapeSaveEnabled.IsChecked}" Padding="10 2 0 0"/>
                                 </StackPanel>
                             </StackPanel>
                         </Border>
