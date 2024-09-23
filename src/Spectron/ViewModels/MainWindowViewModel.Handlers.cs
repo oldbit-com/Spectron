@@ -154,13 +154,21 @@ partial class MainWindowViewModel
 
     private void HandleSetEmulationSpeed(string emulationSpeed)
     {
-        if (!int.TryParse(emulationSpeed, out var emulationSpeedValue))
+        int emulationSpeedValue;
+
+        if (emulationSpeed.Equals("max", StringComparison.OrdinalIgnoreCase))
         {
-            return;
+            emulationSpeedValue = int.MaxValue;
+        }
+        else
+        {
+            if (!int.TryParse(emulationSpeed, out emulationSpeedValue))
+            {
+                return;
+            }
         }
 
         Emulator?.SetEmulationSpeed(emulationSpeedValue);
-        EmulationSpeed = emulationSpeed;
     }
 
     private void HandleToggleFullScreen() =>

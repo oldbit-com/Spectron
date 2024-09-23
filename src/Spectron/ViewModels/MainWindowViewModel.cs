@@ -200,8 +200,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void EmulatorOnRenderScreen(FrameBuffer framebuffer)
     {
-        // If we are running in accelerated mode, we don't need to exceed 100 FPS
-        if (_renderStopwatch.Elapsed - _lastScreenRender < TimeSpan.FromMilliseconds(8))
+        // Keep max 50 FPS
+        if (_renderStopwatch.Elapsed - _lastScreenRender < TimeSpan.FromMilliseconds(19))
         {
             return;
         }
@@ -214,7 +214,6 @@ public partial class MainWindowViewModel : ViewModelBase
             _frameBufferConverter.UpdateBitmap(framebuffer);
             ScreenControl.InvalidateVisual();
         });
-
     }
 
     private async Task WindowOpenedAsync()

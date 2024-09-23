@@ -9,6 +9,11 @@ public static class KeyMappings
 {
     public static List<SpectrumKey> ToSpectrumKey(KeyEventArgs e)
     {
+        if ((e.KeyModifiers & KeyModifiers.Alt) != 0)
+        {
+            return [];
+        }
+
         return e.KeySymbol switch
         {
             ":" => [SpectrumKey.SymbolShift, SpectrumKey.Z],
@@ -57,8 +62,8 @@ public static class KeyMappings
                 PhysicalKey.Digit9 => [SpectrumKey.D9],
                 PhysicalKey.ShiftLeft => [SpectrumKey.CapsShift],
                 PhysicalKey.Enter => [SpectrumKey.Enter],
-                PhysicalKey.AltLeft => [SpectrumKey.SymbolShift],
-                PhysicalKey.AltRight => [SpectrumKey.SymbolShift],
+                PhysicalKey.ControlLeft => [SpectrumKey.SymbolShift],
+                PhysicalKey.ControlRight => [SpectrumKey.SymbolShift],
                 PhysicalKey.Space => [SpectrumKey.Space],
 
                 // Extra keys on standard keyboard mapped to ZX Spectrum keys

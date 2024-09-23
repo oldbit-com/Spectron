@@ -109,8 +109,10 @@ public sealed class Emulator
         }
     }
 
-    public void SetEmulationSpeed(int emulationSpeedPercentage) =>
-        _emulationTimer.Interval = TimeSpan.FromMilliseconds(20 * (100f / emulationSpeedPercentage));
+    public void SetEmulationSpeed(int emulationSpeedPercentage) => _emulationTimer.Interval =
+        emulationSpeedPercentage == int.MaxValue ?
+            TimeSpan.Zero :
+            TimeSpan.FromMilliseconds(20 * (100f / emulationSpeedPercentage));
 
     private void SetupEventHandlers()
     {
@@ -187,7 +189,7 @@ public sealed class Emulator
                         break;
 
                     case TapeLoadingSpeed.Accelerated:
-                        SetEmulationSpeed(1000);
+                        SetEmulationSpeed(int.MaxValue);
                         _isAcceleratedLoading = true;
                         break;
                 }

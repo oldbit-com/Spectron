@@ -37,15 +37,9 @@ internal sealed class EmulatorTimer
         _thread.Join();
     }
 
-    internal void Pause()
-    {
-        IsPaused = true;
-    }
+    internal void Pause() => IsPaused = true;
 
-    internal void Resume()
-    {
-        IsPaused = false;
-    }
+    internal void Resume() => IsPaused = false;
 
     private void Worker()
     {
