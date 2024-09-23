@@ -351,7 +351,10 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         using var stream = new MemoryStream();
         tzx.Save(stream);
 
-        snapshot.Tape = new TapeBlock(stream.ToArray(), compressionLevel);
+        snapshot.Tape = new TapeBlock(stream.ToArray(), compressionLevel)
+        {
+            FileExtension = "tzx"
+        };
     }
 
     private static T[] ConcatenateArrays<T>(T[] first, T[] second)
