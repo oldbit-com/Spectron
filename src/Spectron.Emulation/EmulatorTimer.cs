@@ -11,6 +11,8 @@ internal sealed class EmulatorTimer
     private bool _isRunning;
 
     internal bool IsPaused { get; private set; }
+    internal bool IsStopped { get; private set; }
+
     internal TimeSpan Interval { get; set; } = TimeSpan.FromMilliseconds(20);
 
     internal delegate void ElapsedEvent(EventArgs e);
@@ -43,6 +45,8 @@ internal sealed class EmulatorTimer
 
     private void Worker()
     {
+        IsStopped = false;
+
         var stopwatch = Stopwatch.StartNew();
         var nextTrigger = TimeSpan.Zero;
         var timeToWait = Interval;
@@ -93,7 +97,9 @@ internal sealed class EmulatorTimer
             }
         }
 
+        IsStopped = true;
         stopwatch.Stop();
+
         return;
 
         void ResetTimer()

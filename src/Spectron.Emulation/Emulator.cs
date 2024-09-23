@@ -86,6 +86,11 @@ public sealed class Emulator
     {
         _beeper.Stop();
         _emulationTimer.Stop();
+
+        while (!_emulationTimer.IsStopped)
+        {
+            Thread.Sleep(TimeSpan.FromMilliseconds(50));
+        }
     }
 
     public void Pause()

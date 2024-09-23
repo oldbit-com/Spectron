@@ -242,10 +242,15 @@ public partial class MainWindowViewModel : ViewModelBase
         Emulator?.SetTapeSavingSettings(preferences.TapeSaving);
     }
 
-    private async Task WindowClosingAsync() => await Task.WhenAll(
-        _preferencesService.SaveAsync(Preferences),
-        RecentFilesViewModel.SaveAsync(),
-        _sessionService.SaveAsync(Emulator, _isResumeEnabled));
+    private async Task WindowClosingAsync()
+    {
+        Emulator?.Stop();
+
+        await Task.WhenAll(
+            _preferencesService.SaveAsync(Preferences),
+            RecentFilesViewModel.SaveAsync(),
+            _sessionService.SaveAsync(Emulator, _isResumeEnabled));
+    }
 
     private void CreateEmulator(SzxFile? snapshot = null)
     {
@@ -273,8 +278,6 @@ public partial class MainWindowViewModel : ViewModelBase
         Emulator.TapeLoadingSpeed = TapeLoadingSpeed;
         Emulator.JoystickManager.SetupJoystick(JoystickType);
         Emulator.RenderScreen += EmulatorOnRenderScreen;
-
-        //Emulator.TapeManager.IsTapeSaveEnabled = Preferences.TapeSaving.IsEnabled;
 
         _renderStopwatch.Restart();
         _lastScreenRender = TimeSpan.Zero;
