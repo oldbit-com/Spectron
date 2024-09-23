@@ -69,7 +69,7 @@
                         <RadioButton Content="Cursor" Classes="Center" GroupName="Joy" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Cursor}}"/>
                         <RadioButton Content="Fuller" Classes="Center" GroupName="Joy" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Fuller}}"/>
                         <Separator Margin="0 10 0 10" />
-                        <CheckBox Content="Use cursor keys and Tab key as fire" Classes="Center" IsChecked="{Binding JoystickUseCursorKeys}"/>
+                        <CheckBox Content="Emulate using cursor keys and Tab (fire)" Classes="Center" IsChecked="{Binding JoystickUseCursorKeys}"/>
                     </StackPanel>
                 </Border>
             </TabItem>

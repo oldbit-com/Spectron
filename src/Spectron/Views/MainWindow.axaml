@@ -41,6 +41,12 @@
         <converters:ValueEqualityConverter x:Key="ValueEqualityConverter"/>
     </Window.Resources>
 
+    <Window.Styles>
+        <Style Selector="MenuItem">
+            <Setter Property="Padding" Value="10 8 10 8"/>
+        </Style>
+    </Window.Styles>
+
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">

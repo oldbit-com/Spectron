@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -57,9 +58,11 @@ public class RecentFilesViewModel : ViewModelBase
 
         foreach (var file in _recentFilesSettings.Files)
         {
+            var fileName = Path.GetFileName(file);
+
             items.Add(new MenuItem
             {
-                Header = file,
+                Header = fileName,
                 Command = _openRecentFileCommand,
                 CommandParameter = file
             });
