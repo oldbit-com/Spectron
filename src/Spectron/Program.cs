@@ -1,6 +1,9 @@
 ﻿using System;
 using Avalonia;
+using Avalonia.Logging;
 using Avalonia.ReactiveUI;
+using OldBit.Spectron.Extensions;
+using ReactiveUI;
 
 namespace OldBit.Spectron;
 
@@ -12,6 +15,10 @@ class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        Console.WriteLine("Starting Spectron...");
+
+        RxApp.DefaultExceptionHandler = new ObservableExceptionHandler();
+
         try
         {
             BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
@@ -23,9 +30,9 @@ class Program
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.
-    public static AppBuilder BuildAvaloniaApp()
+    private static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            .LogToTrace()
+            .LogToConsole(LogEventLevel.Debug)
             .UseReactiveUI();
 }
