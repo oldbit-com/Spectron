@@ -82,6 +82,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         SaveSpectrumRegisters(emulator.ScreenBuffer, snapshot.SpecRegs);
         SaveUlaPlus(emulator.UlaPlus, snapshot);
         SaveJoystick(emulator.JoystickManager, snapshot);
+        SaveTape(emulator.TapeManager, snapshot, compressionLevel);
 
         if (emulator.RomType.IsCustomRom())
         {
@@ -336,6 +337,21 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
             },
             JoystickTypePlayer2 = JoystickBlock.JoystickDisabled
         };
+    }
+
+    private static void SaveTape(TapeManager tapeManager, SzxFile snapshot, CompressionLevel compressionLevel)
+    {
+        var tzx = tapeManager.Cassette.Content;
+
+        if (tzx.Blocks.Count == 0)
+        {
+            return;
+        }
+
+        using var stream = new MemoryStream();
+        tzx.Save(stream);
+
+        snapshot.Tape = new TapeBlock(stream.ToArray(), compressionLevel);
     }
 
     private static T[] ConcatenateArrays<T>(T[] first, T[] second)
