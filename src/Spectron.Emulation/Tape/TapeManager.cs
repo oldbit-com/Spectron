@@ -11,7 +11,7 @@ public sealed class TapeManager
     public Cassette Cassette { get; private set; } = new();
 
     public bool IsTapeSaveEnabled { get; set; }
-    public bool IsFastTapeSaveEnabled { get; set; }
+    public TapeSpeed SaveTapeSpeed { get; set; }
 
     internal CassettePlayer? TapePlayer { get; private set; }
 
@@ -57,7 +57,7 @@ public sealed class TapeManager
             NewTape();
         }
 
-        _directAccess?.SaveBytes(Cassette, IsFastTapeSaveEnabled);
+        _directAccess?.SaveBytes(Cassette, SaveTapeSpeed);
     }
 
     public void InsertTape(string fileName, bool autoPlay = false)

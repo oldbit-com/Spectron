@@ -22,7 +22,7 @@ public sealed class Emulator
     private readonly EmulatorTimer _emulationTimer;
 
     private bool _invalidateScreen;
-    private bool _isAcceleratedLoading;
+    private bool _isAcceleratedTape;
 
     public delegate void RenderScreenEvent(FrameBuffer frameBuffer);
     public event RenderScreenEvent? RenderScreen;
@@ -34,7 +34,7 @@ public sealed class Emulator
     public JoystickManager JoystickManager { get; }
     public ComputerType ComputerType { get; }
     public RomType RomType { get; }
-    public TapeLoadingSpeed TapeLoadingSpeed { get; set; }
+    public TapeSpeed TapeLoadSpeed { get; set; }
 
     internal Z80 Cpu { get; }
     internal IEmulatorMemory Memory { get; }
@@ -187,15 +187,15 @@ public sealed class Emulator
         switch (pc)
         {
             case RomRoutines.LD_BYTES:
-                switch (TapeLoadingSpeed)
+                switch (TapeLoadSpeed)
                 {
-                    case TapeLoadingSpeed.Instant:
+                    case TapeSpeed.Instant:
                         TapeManager.LoadDirect();
                         break;
 
-                    case TapeLoadingSpeed.Accelerated:
+                    case TapeSpeed.Accelerated:
                         SetEmulationSpeed(int.MaxValue);
-                        _isAcceleratedLoading = true;
+                        _isAcceleratedTape = true;
                         break;
                 }
                 break;
@@ -206,10 +206,10 @@ public sealed class Emulator
 
             case RomRoutines.LD_BYTES_RET:
             case RomRoutines.ERROR_1:
-                if (_isAcceleratedLoading)
+                if (_isAcceleratedTape)
                 {
                     SetEmulationSpeed(100);
-                    _isAcceleratedLoading = false;
+                    _isAcceleratedTape = false;
                 }
 
                 break;

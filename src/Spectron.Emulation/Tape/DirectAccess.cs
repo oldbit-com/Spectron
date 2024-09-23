@@ -64,7 +64,7 @@ internal sealed class DirectAccess
         _cpu.Registers.PC = 0x05E0;
     }
 
-    internal void SaveBytes(Cassette cassette, bool isFastSaveEnabled)
+    internal void SaveBytes(Cassette cassette, TapeSpeed speed)
     {
         var blockType = _cpu.Registers.A;
         var length = _cpu.Registers.DE;
@@ -75,7 +75,7 @@ internal sealed class DirectAccess
 
         cassette.Content.Blocks.Add(new StandardSpeedDataBlock(tapData));
 
-        if (isFastSaveEnabled)
+        if (speed == TapeSpeed.Instant)
         {
             _cpu.Registers.PC = RomRoutines.SA_DELAY - 2;
         }

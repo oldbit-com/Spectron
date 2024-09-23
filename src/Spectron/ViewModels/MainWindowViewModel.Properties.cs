@@ -81,10 +81,10 @@ partial class MainWindowViewModel
         set => this.RaiseAndSetIfChanged(ref _windowStateCommandName, value);
     }
 
-    private TapeLoadingSpeed _tapeLoadingSpeed = TapeLoadingSpeed.Instant;
-    public TapeLoadingSpeed TapeLoadingSpeed
+    private TapeSpeed _tapeLoadSpeed = TapeSpeed.Instant;
+    public TapeSpeed TapeLoadSpeed
     {
-        get => _tapeLoadingSpeed;
-        set => this.RaiseAndSetIfChanged(ref _tapeLoadingSpeed, value);
+        get => _tapeLoadSpeed;
+        set => this.RaiseAndSetIfChanged(ref _tapeLoadSpeed, value);
     }
 }

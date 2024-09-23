@@ -6,11 +6,11 @@ namespace OldBit.Spectron.Extensions;
 
 public static class EmulatorExtensions
 {
-    public static void SetTapeLoadingSpeed(this Emulator? emulator, TapeLoadingSpeed tapeLoadingSpeed)
+    public static void SetTapeLoadingSpeed(this Emulator? emulator, TapeSpeed tapeSpeed)
     {
         if (emulator != null)
         {
-            emulator.TapeLoadingSpeed = tapeLoadingSpeed;
+            emulator.TapeLoadSpeed = tapeSpeed;
         }
     }
 
@@ -22,6 +22,6 @@ public static class EmulatorExtensions
         }
 
         emulator.TapeManager.IsTapeSaveEnabled = tapeSavingSettings.IsEnabled;
-        emulator.TapeManager.IsFastTapeSaveEnabled = tapeSavingSettings.IsFastSaveEnabled;
+        emulator.TapeManager.SaveTapeSpeed = tapeSavingSettings.Speed;
     }
 }

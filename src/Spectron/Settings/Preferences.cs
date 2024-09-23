@@ -5,7 +5,7 @@ using OldBit.Spectron.Models;
 
 namespace OldBit.Spectron.Settings;
 
-public record TapeSavingSettings(bool IsEnabled, bool IsFastSaveEnabled);
+public record TapeSavingSettings(bool IsEnabled, TapeSpeed Speed);
 
 public class Preferences
 {
@@ -21,11 +21,11 @@ public class Preferences
 
     public int MaxRecentFiles { get; set; } = 10;
 
-    public TapeLoadingSpeed TapeLoadingSpeed { get; init; } = TapeLoadingSpeed.Instant;
+    public TapeSpeed TapeLoadSpeed { get; init; } = TapeSpeed.Instant;
 
     public TimeMachineSettings TimeMachine { get; init; } = new();
 
     public bool IsResumeEnabled { get; init; } = true;
 
-    public TapeSavingSettings TapeSaving { get; init; } = new(true, true);
+    public TapeSavingSettings TapeSaving { get; init; } = new(true, TapeSpeed.Instant);
 }

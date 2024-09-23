@@ -134,9 +134,9 @@
                 <MenuItem Header="View" Command="{Binding TapeMenuViewModel.ViewCommand}"/>
                 <MenuItem Header="-"/>
                 <MenuItem Header="Loading Speed">
-                    <MenuItem Header="Normal" ToggleType="Radio" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeLoadingSpeed.Normal}" IsChecked="{Binding TapeLoadingSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeLoadingSpeed.Normal}}"/>
-                    <MenuItem Header="Instant" ToggleType="Radio" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeLoadingSpeed.Instant}" IsChecked="{Binding TapeLoadingSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeLoadingSpeed.Instant}}"/>
-                    <MenuItem Header="Accelerated" ToggleType="Radio" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeLoadingSpeed.Accelerated}" IsChecked="{Binding TapeLoadingSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeLoadingSpeed.Accelerated}}"/>
+                    <MenuItem Header="Normal" ToggleType="Radio" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeSpeed.Normal}" IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Normal}}"/>
+                    <MenuItem Header="Instant" ToggleType="Radio" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeSpeed.Instant}" IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Instant}}"/>
+                    <MenuItem Header="Accelerated" ToggleType="Radio" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeSpeed.Accelerated}" IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Accelerated}}"/>
                 </MenuItem>
             </MenuItem>
 

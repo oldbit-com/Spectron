@@ -49,7 +49,7 @@ partial class MainWindowViewModel
 
                 emulator.TapeManager.InsertTape(
                     filePath,
-                    autoPlay: TapeLoadingSpeed != TapeLoadingSpeed.Instant);
+                    autoPlay: TapeLoadSpeed != TapeSpeed.Instant);
             }
 
             RecentFilesViewModel.Add(filePath);
@@ -174,7 +174,7 @@ partial class MainWindowViewModel
     private void HandleToggleFullScreen() =>
         WindowState = WindowState == WindowState.FullScreen ? WindowState.Normal : WindowState.FullScreen;
 
-    private void HandleSetTapeLoadingSpeed(TapeLoadingSpeed tapeLoadingSpeed) => TapeLoadingSpeed = tapeLoadingSpeed;
+    private void HandleSetTapeLoadingSpeed(TapeSpeed tapeSpeed) => TapeLoadSpeed = tapeSpeed;
 
     private void HandleHelpKeyboardCommand()
     {

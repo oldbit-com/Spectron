@@ -10,7 +10,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.PreferencesView"
         x:DataType="viewModels:PreferencesViewModel"
-        Width="600"
+        Width="750"
         Height="400"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
@@ -109,8 +109,10 @@
                             <StackPanel>
                                 <CheckBox Content="Normal speed tape loader" Classes="Center"/>
                                 <CheckBox Content="Automatically load and play tape files" Classes="Center"/>
-                                <CheckBox Content="Enable tape save (virtual tape)" Classes="Center" IsChecked="{Binding IsTapeSaveEnabled}" x:Name="IsTapeSaveEnabled"/>
-                                <CheckBox Content="Fast tape save (skip border/sound effects)" Classes="Center" IsChecked="{Binding IsFastTapeSaveEnabled}" IsEnabled="{Binding #IsTapeSaveEnabled.IsChecked}" Margin="28 0 0 0"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Content="Enable tape saving (virtual tape). Speed: " Classes="Center" IsChecked="{Binding IsTapeSaveEnabled}" x:Name="IsTapeSaveEnabled"/>
+                                    <ComboBox Margin="5 0 0 0" Width="150" ItemsSource="{Binding TapeSpeeds}" SelectedValue="{Binding SaveTapeSpeed}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}" IsEnabled="{Binding #IsTapeSaveEnabled.IsChecked}" Padding="10 2 0 0"/>
+                                </StackPanel>
                             </StackPanel>
                         </Border>
                     </StackPanel>

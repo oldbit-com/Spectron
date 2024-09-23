@@ -71,7 +71,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> TogglePauseCommand { get; private set; }
     public ReactiveCommand<string, Unit> SetEmulationSpeedCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleFullScreenCommand { get; private set; }
-    public ReactiveCommand<TapeLoadingSpeed, Unit> SetTapeLoadSpeedCommand { get; private set; }
+    public ReactiveCommand<TapeSpeed, Unit> SetTapeLoadSpeedCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> HelpKeyboardCommand { get; private set; }
     public ReactiveCommand<Unit, Task> ShowPreferencesViewCommand { get; private set; }
     public ReactiveCommand<Unit, Task> ShowAboutViewCommand { get; private set; }
@@ -113,8 +113,8 @@ public partial class MainWindowViewModel : ViewModelBase
         this.WhenAny(x => x.WindowState, x => x.Value)
             .Subscribe(x => WindowStateCommandName = x == WindowState.FullScreen ? "Exit Full Screen" : "Enter Full Screen");
 
-        this.WhenAny(x => x.TapeLoadingSpeed, x => x.Value)
-            .Subscribe(_ => Emulator?.SetTapeLoadingSpeed(TapeLoadingSpeed));
+        this.WhenAny(x => x.TapeLoadSpeed, x => x.Value)
+            .Subscribe(_ => Emulator?.SetTapeLoadingSpeed(TapeLoadSpeed));
 
         WindowOpenedCommand = ReactiveCommand.CreateFromTask(WindowOpenedAsync);
         WindowClosingCommand = ReactiveCommand.CreateFromTask(WindowClosingAsync);
@@ -131,7 +131,7 @@ public partial class MainWindowViewModel : ViewModelBase
         ResetCommand = ReactiveCommand.Create(HandleMachineReset, emulatorNotNull);
         SetEmulationSpeedCommand = ReactiveCommand.Create<string>(HandleSetEmulationSpeed);
         ToggleFullScreenCommand = ReactiveCommand.Create(HandleToggleFullScreen);
-        SetTapeLoadSpeedCommand = ReactiveCommand.Create<TapeLoadingSpeed>(HandleSetTapeLoadingSpeed);
+        SetTapeLoadSpeedCommand = ReactiveCommand.Create<TapeSpeed>(HandleSetTapeLoadingSpeed);
         HelpKeyboardCommand = ReactiveCommand.Create(HandleHelpKeyboardCommand);
         ShowPreferencesViewCommand = ReactiveCommand.Create(OpenPreferencesWindow);
         ShowAboutViewCommand = ReactiveCommand.Create(OpenAboutView);
@@ -225,7 +225,7 @@ public partial class MainWindowViewModel : ViewModelBase
         IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
         RomType = preferences.RomType == RomType.Custom ? RomType.Original : preferences.RomType;
         JoystickType = preferences.Joystick.JoystickType;
-        TapeLoadingSpeed = preferences.TapeLoadingSpeed;
+        TapeLoadSpeed = preferences.TapeLoadSpeed;
 
         _isResumeEnabled = preferences.IsResumeEnabled;
         _useCursorKeysAsJoystick = preferences.Joystick.UseCursorKeys;
@@ -275,7 +275,7 @@ public partial class MainWindowViewModel : ViewModelBase
         IsUlaPlusEnabled = emulator.IsUlaPlusEnabled;
 
         Emulator.IsUlaPlusEnabled = IsUlaPlusEnabled;
-        Emulator.TapeLoadingSpeed = TapeLoadingSpeed;
+        Emulator.TapeLoadSpeed = TapeLoadSpeed;
         Emulator.JoystickManager.SetupJoystick(JoystickType);
         Emulator.RenderScreen += EmulatorOnRenderScreen;
 
@@ -310,7 +310,7 @@ public partial class MainWindowViewModel : ViewModelBase
             JoystickType = JoystickType,
             UseCursorKeys = _useCursorKeysAsJoystick
         },
-        TapeLoadingSpeed = TapeLoadingSpeed,
+        TapeLoadSpeed = TapeLoadSpeed,
         IsResumeEnabled = _isResumeEnabled,
 
         TimeMachine = new TimeMachineSettings
@@ -322,6 +322,6 @@ public partial class MainWindowViewModel : ViewModelBase
 
         TapeSaving = new TapeSavingSettings(
             Emulator?.TapeManager.IsTapeSaveEnabled ?? true,
-            Emulator?.TapeManager.IsFastTapeSaveEnabled ?? true)
+            Emulator?.TapeManager.SaveTapeSpeed ?? TapeSpeed.Instant)
     };
 }

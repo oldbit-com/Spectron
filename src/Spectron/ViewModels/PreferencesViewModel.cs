@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Reactive;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Rom;
+using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Settings;
 using ReactiveUI;
 
@@ -26,7 +28,7 @@ public class PreferencesViewModel : ViewModelBase
         MaxDuration = preferences.TimeMachine.MaxDuration.TotalSeconds;
 
         IsTapeSaveEnabled = preferences.TapeSaving.IsEnabled;
-        IsFastTapeSaveEnabled = preferences.TapeSaving.IsFastSaveEnabled;
+        SaveTapeSpeed = preferences.TapeSaving.Speed;
 
         UpdatePreferencesCommand = ReactiveCommand.Create(() => new Preferences
         {
@@ -47,7 +49,7 @@ public class PreferencesViewModel : ViewModelBase
                 MaxDuration = TimeSpan.FromSeconds(MaxDuration)
             },
 
-            TapeSaving = new TapeSavingSettings(IsTapeSaveEnabled, IsFastTapeSaveEnabled)
+            TapeSaving = new TapeSavingSettings(IsTapeSaveEnabled, SaveTapeSpeed)
         });
     }
 
@@ -121,10 +123,17 @@ public class PreferencesViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _isTapeSaveEnabled, value);
     }
 
-    private bool _isFastTapeSaveEnabled;
-    public bool IsFastTapeSaveEnabled
+    private TapeSpeed _saveTapeSpeed = TapeSpeed.Normal;
+    public TapeSpeed SaveTapeSpeed
     {
-        get => _isFastTapeSaveEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isFastTapeSaveEnabled, value);
+        get => _saveTapeSpeed;
+        set => this.RaiseAndSetIfChanged(ref _saveTapeSpeed, value);
     }
+
+    public List<NameValuePair<TapeSpeed>> TapeSpeeds { get; } =
+    [
+        new("Normal", TapeSpeed.Normal),
+        new("Accelerated", TapeSpeed.Accelerated),
+        new("Instant", TapeSpeed.Instant)
+    ];
 }
