@@ -6,6 +6,7 @@ namespace OldBit.Spectron.Emulation.Tape;
 public sealed class TapeManager
 {
     private DirectAccess? _directAccess;
+    private bool _isTapeLoaded;
 
     public Cassette Cassette { get; private set; } = new();
 
@@ -34,16 +35,29 @@ public sealed class TapeManager
 
     public bool IsPlaying => TapePlayer?.IsPlaying ?? false;
 
-    public void NewTape() => Cassette = new Cassette();
+    public void NewTape()
+    {
+        Cassette = new Cassette();
+        TapeInserted?.Invoke(EventArgs.Empty);
+
+        _isTapeLoaded = true;
+    }
 
     public void LoadDirect() => _directAccess?.LoadBytes(Cassette);
 
     public void SaveDirect()
     {
-        if (IsTapeSaveEnabled)
+        if (!IsTapeSaveEnabled)
         {
-            _directAccess?.SaveBytes(Cassette, IsFastTapeSaveEnabled);
+            return;
         }
+
+        if (!_isTapeLoaded)
+        {
+            NewTape();
+        }
+
+        _directAccess?.SaveBytes(Cassette, IsFastTapeSaveEnabled);
     }
 
     public void InsertTape(string fileName, bool autoPlay = false)
@@ -68,8 +82,9 @@ public sealed class TapeManager
     private void InsertTape()
     {
         TapePlayer?.LoadTape(Cassette);
-
         TapeInserted?.Invoke(EventArgs.Empty);
+
+        _isTapeLoaded = true;
     }
 
     public void StopTape()
@@ -88,5 +103,7 @@ public sealed class TapeManager
     {
         StopTape();
         TapeEjected?.Invoke(EventArgs.Empty);
+
+        _isTapeLoaded = false;
     }
 }

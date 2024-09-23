@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Avalonia.Threading;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Extensions;
 using OldBit.ZX.Files.Tzx.Extensions;
@@ -50,9 +51,11 @@ public class TapeViewModel : ViewModelBase, IDisposable
         SelectBlock(_tapeManager.IsPlaying ? _tapeManager.Cassette.Position - 1 : _tapeManager.Cassette.Position);
     }
 
-    private void CassetteOnCassettePositionChanged(BlockSelectedEventArgs e) => SelectBlock(e.Position);
+    private void CassetteOnCassettePositionChanged(BlockSelectedEventArgs e) =>
+        Dispatcher.UIThread.Post(() => SelectBlock(e.Position));
 
-    private void CassetteOnEndOfTape(object? sender, EventArgs e) => SelectBlock(Blocks.Count - 1);
+    private void CassetteOnEndOfTape(object? sender, EventArgs e) =>
+        Dispatcher.UIThread.Post(() => SelectBlock(Blocks.Count - 1));
 
     private void SelectBlock(int position)
     {

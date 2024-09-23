@@ -1,6 +1,7 @@
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation.Tape;
 using ReactiveUI;
@@ -39,10 +40,10 @@ public class TapeMenuViewModel : ViewModelBase
 
         ShowTapeView = new Interaction<TapeViewModel, Unit?>();
 
-        _tapeManager.TapeInserted += _ => IsTapeInserted = true;
-        _tapeManager.TapePlaying += _ => IsTapePlaying = true;
-        _tapeManager.TapeStopped += _ => IsTapePlaying = false;
-        _tapeManager.TapeEjected += _ => IsTapeInserted = false;
+        _tapeManager.TapeInserted += _ => Dispatcher.UIThread.Post(() => IsTapeInserted = true);
+        _tapeManager.TapePlaying += _ => Dispatcher.UIThread.Post(() => IsTapePlaying = true);
+        _tapeManager.TapeStopped += _ => Dispatcher.UIThread.Post(() => IsTapePlaying = false);
+        _tapeManager.TapeEjected += _ => Dispatcher.UIThread.Post(() => IsTapeInserted = false);
     }
 
     private async Task OpenTapeView()
@@ -51,11 +52,7 @@ public class TapeMenuViewModel : ViewModelBase
         await ShowTapeView.Handle(viewModel);
     }
 
-    private void NewTape()
-    {
-        _tapeManager.NewTape();
-        IsTapeInserted = true;
-    }
+    private void NewTape() => _tapeManager.NewTape();
 
     private async Task InsertTape()
     {
