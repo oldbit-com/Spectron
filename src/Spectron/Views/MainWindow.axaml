@@ -50,7 +50,7 @@
                 </MenuItem>
                 <MenuItem Header="Save Snapshot..." HotKey="Cmd+S" InputGesture="Cmd+S" Command="{Binding SaveFileCommand}"/>
                 <MenuItem Header="-" />
-                <MenuItem Header="Settings" HotKey="Cmd+," InputGesture="Cmd+,"/>
+                <MenuItem Header="Settings" HotKey="Cmd+," InputGesture="Cmd+," Command="{Binding ShowPreferencesViewCommand}"/>
                 <MenuItem Header="-" />
                 <MenuItem Header="Exit" HotKey="Cmd+Q" InputGesture="Cmd+Q"/>
             </MenuItem>
@@ -135,7 +135,7 @@
 
             <MenuItem Header="_Help">
                 <MenuItem Header="Keyboard" HotKey="F1" InputGesture="F1" Command="{Binding HelpKeyboardCommand}"/>
-                <MenuItem Header="About"/>
+                <MenuItem Header="About" Command="{Binding ShowAboutViewCommand}"/>
             </MenuItem>
         </Menu>
 

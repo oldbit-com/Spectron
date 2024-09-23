@@ -73,9 +73,12 @@ public partial class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> ToggleFullScreenCommand { get; private set; }
     public ReactiveCommand<TapeLoadingSpeed, Unit> SetTapeLoadSpeedCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> HelpKeyboardCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> ShowPreferencesViewCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> ShowAboutViewCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ShowTimeMachineCommand { get; private set; }
 
     public Interaction<PreferencesViewModel, Preferences?> ShowPreferencesView { get; }
+    public Interaction<Unit, Unit?> ShowAboutView { get; }
 
     public MainWindowViewModel(
         EmulatorFactory emulatorFactory,
@@ -113,8 +116,6 @@ public partial class MainWindowViewModel : ViewModelBase
         this.WhenAny(x => x.TapeLoadingSpeed, x => x.Value)
             .Subscribe(_ => Emulator?.SetTapeLoadingSpeed(TapeLoadingSpeed));
 
-        timeMachineEnabled.Subscribe(Console.WriteLine);
-
         WindowOpenedCommand = ReactiveCommand.CreateFromTask(WindowOpenedAsync);
         WindowClosingCommand = ReactiveCommand.CreateFromTask(WindowClosingAsync);
         KeyDownCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyDown);
@@ -132,12 +133,20 @@ public partial class MainWindowViewModel : ViewModelBase
         ToggleFullScreenCommand = ReactiveCommand.Create(HandleToggleFullScreen);
         SetTapeLoadSpeedCommand = ReactiveCommand.Create<TapeLoadingSpeed>(HandleSetTapeLoadingSpeed);
         HelpKeyboardCommand = ReactiveCommand.Create(HandleHelpKeyboardCommand);
+        ShowPreferencesViewCommand = ReactiveCommand.Create(OpenPreferencesWindow);
+        ShowAboutViewCommand = ReactiveCommand.Create(OpenAboutView);
         ShowTimeMachineCommand = ReactiveCommand.Create(HandleShowTimeMachineCommand, timeMachineEnabled);
 
         ShowPreferencesView = new Interaction<PreferencesViewModel, Preferences?>();
+        ShowAboutView = new Interaction<Unit, Unit?>();
 
         TimeMachineViewModel.OnTimeTravel = HandleTimeTravel;
         SpectrumScreen = _frameBufferConverter.Bitmap;
+    }
+
+    private async Task OpenAboutView()
+    {
+        await ShowAboutView.Handle(Unit.Default);
     }
 
     public async Task OpenPreferencesWindow()

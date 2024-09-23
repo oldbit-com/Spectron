@@ -24,6 +24,9 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
         this.WhenActivated(action =>
             action(ViewModel!.TapeMenuViewModel.ShowTapeView.RegisterHandler(ShowTapeViewAsync)));
+
+        this.WhenActivated(action =>
+            action(ViewModel!.ShowAboutView.RegisterHandler(ShowAboutViewAsync)));
     }
 
     private async Task ShowPreferencesViewAsync(InteractionContext<PreferencesViewModel, Preferences?> interaction)
@@ -42,6 +45,12 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         interaction.SetOutput(result);
     }
 
+    private async Task ShowAboutViewAsync(InteractionContext<Unit, Unit?> interaction)
+    {
+        var dialog = new AboutView();
+        await dialog.ShowDialog<Unit?>(this);
+    }
+
     protected override void OnDataContextChanged(EventArgs e)
     {
         if (DataContext is not MainWindowViewModel viewModel)
@@ -55,16 +64,6 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         FileDialogs.MainWindow = this;
         MessageDialogs.MainWindow = this;
         viewModel.MainWindow = this;
-    }
-
-    private void RecentFilesMenu_OnOpening(object? sender, EventArgs e)
-    {
-        if (sender is not NativeMenu recentFilesMenu)
-        {
-            return;
-        }
-
-        _viewModel?.RecentFilesViewModel.Opening(recentFilesMenu.Items);
     }
 
     private void RecentFilesSubmenuOpened(object? sender, RoutedEventArgs e)
