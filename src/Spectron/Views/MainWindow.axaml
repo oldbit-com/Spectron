@@ -49,7 +49,7 @@
 
     <DockPanel>
         <Menu DockPanel.Dock="Top" Focusable="False">
-            <MenuItem Header="_File">
+            <MenuItem Header="_File" Padding="10 0 10 0">
                 <MenuItem Header="Load..." HotKey="Cmd+O" InputGesture="Cmd+O" Command="{Binding LoadFileCommand}"/>
                 <MenuItem Header="Recent..." SubmenuOpened="RecentFilesSubmenuOpened">
                     <MenuItem />
@@ -61,7 +61,7 @@
                 <MenuItem Header="Exit" HotKey="Cmd+Q" InputGesture="Cmd+Q"/>
             </MenuItem>
 
-            <MenuItem Header="_Emulator">
+            <MenuItem Header="_Emulator" Padding="10 0 10 0">
                 <MenuItem Header="Machine">
                     <MenuItem Header="ZX Spectrum 16" ToggleType="Radio" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum16K}" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum16K}}"/>
                     <MenuItem Header="ZX Spectrum 48" ToggleType="Radio" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum48K}" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum48K}}"/>
@@ -88,7 +88,7 @@
                 <MenuItem Header="Enable ULA+" ToggleType="CheckBox" Command="{Binding ToggleUlaPlus}" IsChecked="{Binding IsUlaPlusEnabled}"/>
             </MenuItem>
 
-            <MenuItem Header="_Control">
+            <MenuItem Header="_Control" Padding="10 0 10 0">
                 <MenuItem Header="Speed">
                     <MenuItem Header="25%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="25" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='25'}"/>
                     <MenuItem Header="50%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="50" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='50'}"/>
@@ -110,7 +110,7 @@
                 <MenuItem Header="Reset" Command="{Binding ResetCommand}"/>
             </MenuItem>
 
-            <MenuItem Header="_View">
+            <MenuItem Header="_View" Padding="10 0 10 0">
                 <MenuItem Header="Border">
                     <MenuItem Header="None" ToggleType="Radio" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.None}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.None}}"/>
                     <MenuItem Header="Small" ToggleType="Radio" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Small}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.Small}}"/>
@@ -122,7 +122,7 @@
                 <MenuItem Header="{Binding WindowStateCommandName}" HotKey="Ctrl+Enter" InputGesture="Ctrl+Enter" Command="{Binding ToggleFullScreenCommand}"/>
             </MenuItem>
 
-            <MenuItem Header="_Tape">
+            <MenuItem Header="_Tape" Padding="10 0 10 0">
                 <MenuItem Header="New Tape" Command="{Binding TapeMenuViewModel.NewCommand}"/>
                 <MenuItem Header="Insert Tape" HotKey="Cmd+T" InputGesture="Cmd+T" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
                 <MenuItem Header="Save Tape"/>
@@ -140,7 +140,7 @@
                 </MenuItem>
             </MenuItem>
 
-            <MenuItem Header="_Help">
+            <MenuItem Header="_Help" Padding="10 0 10 0">
                 <MenuItem Header="Keyboard" HotKey="F1" InputGesture="F1" Command="{Binding HelpKeyboardCommand}"/>
                 <MenuItem Header="About" Command="{Binding ShowAboutViewCommand}"/>
             </MenuItem>
