@@ -16,6 +16,7 @@ namespace OldBit.Spectron.Emulation;
 /// </summary>
 public sealed class Emulator
 {
+    private readonly HardwareSettings _hardware;
     private readonly TimeMachine _timeMachine;
     private readonly Beeper _beeper;
     private readonly SpectrumBus _spectrumBus;
@@ -42,28 +43,29 @@ public sealed class Emulator
     internal UlaPlus UlaPlus { get; }
 
     internal Emulator(
-        EmulatorSettings emulator,
+        EmulatorArgs emulatorArgs,
         HardwareSettings hardware,
         TapeManager tapeManager,
         TimeMachine timeMachine,
         ILogger logger)
     {
         TapeManager = tapeManager;
+        _hardware = hardware;
         _timeMachine = timeMachine;
-        ComputerType = emulator.ComputerType;
-        RomType = emulator.RomType;
-        Memory = emulator.Memory;
-        _beeper = emulator.Beeper;
+        ComputerType = emulatorArgs.ComputerType;
+        RomType = emulatorArgs.RomType;
+        Memory = emulatorArgs.Memory;
+        _beeper = new Beeper(hardware);
 
         UlaPlus = new UlaPlus();
         _spectrumBus = new SpectrumBus();
-        ScreenBuffer = new ScreenBuffer(emulator.Memory, UlaPlus);
-        Cpu = new Z80(emulator.Memory, emulator.ContentionProvider);
+        ScreenBuffer = new ScreenBuffer(emulatorArgs.Memory, UlaPlus);
+        Cpu = new Z80(emulatorArgs.Memory, emulatorArgs.ContentionProvider);
 
         JoystickManager = new JoystickManager(_spectrumBus, KeyboardHandler);
         TapeManager.Attach(Cpu, Memory, hardware);
 
-        SetupUlaAndDevices(emulator.UseAYSound);
+        SetupUlaAndDevices(emulatorArgs.UseAYSound);
         SetupEventHandlers();
 
         _emulationTimer = new EmulatorTimer();
@@ -150,7 +152,7 @@ public sealed class Emulator
     {
         StartFrame();
 
-        Cpu.Run(DefaultTimings.FrameTicks);
+        Cpu.Run(_hardware.TicksPerFrame);
 
         EndFrame();
 
@@ -169,6 +171,8 @@ public sealed class Emulator
 
     private void EndFrame()
     {
+        _beeper.EndFrame();
+
         ScreenBuffer.UpdateBorder(Cpu.Clock.FrameTicks);
         Cpu.TriggerInt(0xFF);
         RenderScreen?.Invoke(ScreenBuffer.FrameBuffer);

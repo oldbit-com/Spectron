@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
@@ -7,12 +6,11 @@ using OldBit.Z80Cpu.Contention;
 
 namespace OldBit.Spectron.Emulation;
 
-internal sealed record EmulatorSettings(
+internal sealed record EmulatorArgs(
     ComputerType ComputerType,
     RomType RomType,
     IEmulatorMemory Memory,
     IContentionProvider ContentionProvider,
-    Beeper Beeper,
     bool UseAYSound);
 
 public sealed class EmulatorFactory(TimeMachine timeMachine, TapeManager tapeManager, ILogger<EmulatorFactory> logger)
@@ -52,12 +50,11 @@ public sealed class EmulatorFactory(TimeMachine timeMachine, TapeManager tapeMan
 
         memory.BankPaged += bankId => contentionProvider.MemoryBankId = bankId;
 
-        var emulatorSettings = new EmulatorSettings(
+        var emulatorSettings = new EmulatorArgs(
             ComputerType.Spectrum128K,
             romType,
             memory,
             contentionProvider,
-            new Beeper(Hardware.Spectrum128K.ClockMhz),
             UseAYSound: true);
 
         return new Emulator(emulatorSettings, Hardware.Spectrum128K, tapeManager, timeMachine, logger);
@@ -69,12 +66,11 @@ public sealed class EmulatorFactory(TimeMachine timeMachine, TapeManager tapeMan
             Hardware.Spectrum48K.FirstPixelTick,
             Hardware.Spectrum48K.TicksPerLine);
 
-        var emulatorSettings = new EmulatorSettings(
+        var emulatorSettings = new EmulatorArgs(
             computerType,
             romType,
             memory,
             contentionProvider,
-            new Beeper(Hardware.Spectrum48K.ClockMhz),
             UseAYSound: false);
 
         return new Emulator(emulatorSettings, Hardware.Spectrum48K, tapeManager, timeMachine, logger);
