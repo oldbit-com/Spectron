@@ -2,85 +2,102 @@ using OldBit.Beep;
 
 namespace OldBit.Spectron.Emulation.Devices.Audio;
 
+internal record BeeperState(int Ticks, byte Ear)
+{
+    public int Ticks { get; set; } = Ticks;
+}
+
 internal sealed class Beeper
 {
     private const int PlayerSampleRate = 44100;
-    private const int MaxBeepTicks = 214042;     // BEEP x,-60 - assume the longest lasting note
+    private const int Multiplier = 100;         // Used to avoid floating point arithmetic and rounding errors
+    private const int FramesPerSecond = 50;
+    private const int SamplesPerFrame = PlayerSampleRate / FramesPerSecond;
 
     private const byte LowAmplitude = 0x40;
     private const byte HighAmplitude = 0xBF;
 
-    private int _lastEar;
-    private long _lastTicks;
-    private float _remainingTicks;
-    private byte _amplitude = LowAmplitude;
-    private readonly AudioPlayer _audioPlayer;
+    private byte _lastEar;
+    private readonly int _ticksPerFrame;
+    private readonly int _statesPerSample;
+
+    private AudioPlayer? _audioPlayer;
     private readonly BeeperBuffer _beeperBuffer;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private readonly List<BeeperState> _beeperStates = [];
 
-    private readonly float _statesPerSample;
-
-    internal Beeper(float clockMHz)
+    internal Beeper(HardwareSettings hardware)
     {
-        // TODO: This can crash badly
-        _statesPerSample = (int)(clockMHz * 1_000_000 / PlayerSampleRate);
+        _ticksPerFrame = hardware.TicksPerFrame;
+        _statesPerSample = Multiplier * _ticksPerFrame / SamplesPerFrame;
+        _beeperBuffer = new BeeperBuffer(16384 * 4, () => LowAmplitude);
+    }
 
+    internal void EndFrame()
+    {
+        UpdateBeeper(_ticksPerFrame, _lastEar);
+
+        var buffer = new List<byte>();
+        var remainingTicks = 0;
+        var runningTicks = 0;
+
+        foreach (var state in _beeperStates)
+        {
+            var duration = state.Ticks * Multiplier - runningTicks;
+            runningTicks += duration;
+            duration += remainingTicks;
+
+            while (duration >= _statesPerSample)
+            {
+                duration -= _statesPerSample;
+                buffer.Add(state.Ear != 0 ? LowAmplitude : HighAmplitude);
+            }
+
+            remainingTicks = duration;
+        }
+
+        _beeperBuffer.Write(buffer.ToArray());
+        _beeperStates.Clear();
+    }
+
+    internal void UpdateBeeper(int ticks, byte value)
+    {
+        var ear = (byte)(value & 0x10);
+        _lastEar = ear;
+
+        if (_beeperStates.Count > 0)
+        {
+            var lastState = _beeperStates[^1];
+            if (lastState.Ear == ear)
+            {
+                lastState.Ticks = ticks;
+                return;
+            }
+        }
+
+        _beeperStates.Add(new BeeperState(ticks, ear));
+    }
+
+    internal void Start()
+    {
         _audioPlayer = new AudioPlayer(
-            AudioFormat.Unsigned8Bit, 
+            AudioFormat.Unsigned8Bit,
             PlayerSampleRate,
             channelCount: 1,
-            new PlayerOptions { BufferSizeInBytes = 4096 });
-        _beeperBuffer = new BeeperBuffer(16384 * 4, () => _amplitude);
+            new PlayerOptions { BufferSizeInBytes = 2048 });
 
-        Start();
-    }
-
-    internal void UpdateBeeper(byte value, long ticks)
-    {
-        // TODO: Sound is more or less ok, but not perfect, need some more work, sampling most likely.
-
-        var ear = value & 0x10;
-        if (ear == _lastEar)
-        {
-            return;
-        }
-
-        var ticksElapsed = ticks - _lastTicks;
-        if (ticksElapsed > MaxBeepTicks)
-        {
-            // This when there was no real beeper event for some time, no real sound was generated
-            ticksElapsed = 0;
-        }
-
-        _remainingTicks += ticksElapsed;
-
-        var sampleCount = (int)(_remainingTicks / _statesPerSample);
-        if (sampleCount > 0)
-        {
-            WriteBuffer(_amplitude, sampleCount);
-            _remainingTicks -= sampleCount * _statesPerSample;
-        }
-
-        _amplitude = _amplitude == LowAmplitude ? HighAmplitude : LowAmplitude;
-        _lastEar = ear;
-        _lastTicks = ticks;
-    }
-
-    private void Start()
-    {
         Task.Run(async () =>
         {
-             //await _audioPlayer.PlayAsync(_beeperBuffer, _cancellationTokenSource.Token);
+            try
+            {
+                await _audioPlayer.PlayAsync(_beeperBuffer, _cancellationTokenSource.Token);
+            }
+            catch (OperationCanceledException e)
+            {
+                _audioPlayer.Dispose();
+            }
         }, _cancellationTokenSource.Token);
     }
 
-    private void WriteBuffer(byte amplitude, int length)
-    {
-     //   _beeperBuffer.Write(Enumerable.Repeat(amplitude, length).ToArray());
-    }
-
-    public void Stop()
-    {
-        _cancellationTokenSource.Cancel();
-    }
+    internal void Stop() => _cancellationTokenSource.Cancel();
 }

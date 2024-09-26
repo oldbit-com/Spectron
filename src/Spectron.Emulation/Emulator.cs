@@ -82,7 +82,11 @@ public sealed class Emulator
         };
     }
 
-    public void Start() => _emulationTimer.Start();
+    public void Start()
+    {
+        _beeper.Start();
+        _emulationTimer.Start();
+    }
 
     public void Stop()
     {
