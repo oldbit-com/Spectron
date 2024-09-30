@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using OldBit.Beep;
 
 namespace OldBit.Spectron.Emulation.Devices.Audio;
@@ -18,11 +19,12 @@ internal sealed class Beeper
     private const byte HighAmplitude = 0xBF;
 
     private byte _lastEar;
+    private bool _isMuted;
     private readonly int _ticksPerFrame;
     private readonly int _statesPerSample;
 
     private AudioPlayer? _audioPlayer;
-    private readonly BeeperBuffer _beeperBuffer;
+    private bool _isAudioPlayerRunning;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly List<BeeperState> _beeperStates = [];
 
@@ -30,7 +32,6 @@ internal sealed class Beeper
     {
         _ticksPerFrame = hardware.TicksPerFrame;
         _statesPerSample = Multiplier * _ticksPerFrame / SamplesPerFrame;
-        _beeperBuffer = new BeeperBuffer(16384 * 4, () => LowAmplitude);
     }
 
     internal void EndFrame()
@@ -50,18 +51,27 @@ internal sealed class Beeper
             while (duration >= _statesPerSample)
             {
                 duration -= _statesPerSample;
-                buffer.Add(state.Ear != 0 ? LowAmplitude : HighAmplitude);
+                buffer.Add(state.Ear != 0 ? HighAmplitude : LowAmplitude);
             }
 
             remainingTicks = duration;
         }
 
-        _beeperBuffer.Write(buffer.ToArray());
+        if (_isAudioPlayerRunning && !_isMuted)
+        {
+            _audioPlayer?.EnqueueAsync(buffer, _cancellationTokenSource.Token).Wait();
+        }
+
         _beeperStates.Clear();
     }
 
     internal void UpdateBeeper(int ticks, byte value)
     {
+        if (_isMuted)
+        {
+            return;
+        }
+
         var ear = (byte)(value & 0x10);
         _lastEar = ear;
 
@@ -78,26 +88,35 @@ internal sealed class Beeper
         _beeperStates.Add(new BeeperState(ticks, ear));
     }
 
+    internal void Reset()
+    {
+        _beeperStates.Clear();
+        _lastEar = 0;
+    }
+
     internal void Start()
     {
         _audioPlayer = new AudioPlayer(
             AudioFormat.Unsigned8Bit,
             PlayerSampleRate,
             channelCount: 1,
-            new PlayerOptions { BufferSizeInBytes = 2048 });
+            new PlayerOptions { BufferSizeInBytes = 8192 });
 
-        Task.Run(async () =>
-        {
-            try
-            {
-                await _audioPlayer.PlayAsync(_beeperBuffer, _cancellationTokenSource.Token);
-            }
-            catch (OperationCanceledException e)
-            {
-                _audioPlayer.Dispose();
-            }
-        }, _cancellationTokenSource.Token);
+        _audioPlayer.Volume = 50;
+        _audioPlayer.Start();
+        _isAudioPlayerRunning = true;
     }
 
-    internal void Stop() => _cancellationTokenSource.Cancel();
+    internal void Stop()
+    {
+        _isAudioPlayerRunning = false;
+        _audioPlayer?.Stop();
+
+        _audioPlayer?.Dispose();
+        _cancellationTokenSource.Dispose();
+    }
+
+    internal void Mute() => _isMuted = true;
+
+    internal void UnMute() => _isMuted = false;
 }

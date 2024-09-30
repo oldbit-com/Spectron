@@ -249,4 +249,18 @@ partial class MainWindowViewModel
     }
 
     private void HandleTimeTravel(TimeMachineEntry entry) => CreateEmulator(entry.Snapshot);
+
+    private void HandleToggleMute()
+    {
+        IsMuted = !IsMuted;
+
+        if (IsMuted)
+        {
+            Emulator?.Mute();
+        }
+        else
+        {
+            Emulator?.UnMute();
+        }
+    }
 }

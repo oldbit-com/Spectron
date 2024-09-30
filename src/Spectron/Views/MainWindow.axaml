@@ -48,7 +48,7 @@
     </Window.Styles>
 
     <DockPanel>
-        <Menu DockPanel.Dock="Top" Focusable="False">
+        <Menu DockPanel.Dock="Top" Focusable="False" IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}">
             <MenuItem Header="_File" Padding="10 0 10 0">
                 <MenuItem Header="Load..." HotKey="Cmd+O" InputGesture="Cmd+O" Command="{Binding LoadFileCommand}"/>
                 <MenuItem Header="Recent..." SubmenuOpened="RecentFilesSubmenuOpened">
@@ -106,6 +106,8 @@
                 <MenuItem Header="-"/>
                 <MenuItem Header="Pause" HotKey="F10" InputGesture="F10" Command="{Binding TogglePauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
                 <MenuItem Header="Time Machine" Command="{Binding ShowTimeMachineCommand}"/>
+                <MenuItem Header="-"/>
+                <MenuItem Header="Mute" ToggleType="CheckBox" Command="{Binding ToggleMuteCommand}" IsChecked="{Binding IsMuted}"/>
                 <MenuItem Header="-"/>
                 <MenuItem Header="Reset" Command="{Binding ResetCommand}"/>
             </MenuItem>

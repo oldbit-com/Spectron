@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using OldBit.Spectron.Emulation.Utilities;
 
 namespace OldBit.Spectron.Emulation;
 
@@ -49,14 +50,14 @@ internal sealed class EmulatorTimer
 
         var stopwatch = Stopwatch.StartNew();
         var nextTrigger = TimeSpan.Zero;
-        var timeToWait = Interval;
 
         while (_isRunning)
         {
             if (IsPaused)
             {
                 Thread.Sleep(500);
-                ResetTimer();
+                nextTrigger = Interval;
+                stopwatch.Restart();
 
                 continue;
             }
@@ -67,18 +68,17 @@ internal sealed class EmulatorTimer
 
                 if (elapsed >= nextTrigger)
                 {
-                    if (timeToWait < -Interval)
-                    {
-                        ResetTimer();
-                    }
+                    stopwatch.Restart();
+                    nextTrigger = Interval;
+
+                   // PerformanceLogger.Instance.Log("TimerWorker");
 
                     Elapsed?.Invoke(EventArgs.Empty);
-                    nextTrigger += Interval;
 
                     break;
                 }
 
-                timeToWait = nextTrigger - stopwatch.Elapsed;
+                var timeToWait = nextTrigger - stopwatch.Elapsed;
 
                 switch (timeToWait.TotalMilliseconds)
                 {
@@ -99,13 +99,5 @@ internal sealed class EmulatorTimer
 
         IsStopped = true;
         stopwatch.Stop();
-
-        return;
-
-        void ResetTimer()
-        {
-            nextTrigger = TimeSpan.Zero;
-            stopwatch.Restart();
-        }
     }
 }

@@ -33,6 +33,6 @@ class Program
     private static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            .LogToConsole(LogEventLevel.Debug)
+            .LogToConsole()
             .UseReactiveUI();
 }

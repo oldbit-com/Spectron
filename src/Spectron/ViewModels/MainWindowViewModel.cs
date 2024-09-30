@@ -76,6 +76,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Task> ShowPreferencesViewCommand { get; private set; }
     public ReactiveCommand<Unit, Task> ShowAboutViewCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ShowTimeMachineCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ToggleMuteCommand { get; private set; }
 
     public Interaction<PreferencesViewModel, Preferences?> ShowPreferencesView { get; }
     public Interaction<Unit, Unit?> ShowAboutView { get; }
@@ -136,6 +137,7 @@ public partial class MainWindowViewModel : ViewModelBase
         ShowPreferencesViewCommand = ReactiveCommand.Create(OpenPreferencesWindow);
         ShowAboutViewCommand = ReactiveCommand.Create(OpenAboutView);
         ShowTimeMachineCommand = ReactiveCommand.Create(HandleShowTimeMachineCommand, timeMachineEnabled);
+        ToggleMuteCommand = ReactiveCommand.Create(HandleToggleMute);
 
         ShowPreferencesView = new Interaction<PreferencesViewModel, Preferences?>();
         ShowAboutView = new Interaction<Unit, Unit?>();
@@ -244,7 +246,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private async Task WindowClosingAsync()
     {
-        Emulator?.Stop();
+        Emulator?.Shutdown();
 
         await Task.WhenAll(
             _preferencesService.SaveAsync(Preferences),
@@ -265,7 +267,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void InitializeEmulator(Emulator emulator)
     {
-        Emulator?.Stop();
+        Emulator?.Shutdown();
         Emulator = emulator;
         IsPaused = false;
 
@@ -278,6 +280,11 @@ public partial class MainWindowViewModel : ViewModelBase
         Emulator.TapeLoadSpeed = TapeLoadSpeed;
         Emulator.JoystickManager.SetupJoystick(JoystickType);
         Emulator.RenderScreen += EmulatorOnRenderScreen;
+
+        if (IsMuted)
+        {
+            Emulator.Mute();
+        }
 
         _renderStopwatch.Restart();
         _lastScreenRender = TimeSpan.Zero;
@@ -294,7 +301,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        Emulator.Stop();
+        Emulator.Shutdown();
         Emulator.RenderScreen -= EmulatorOnRenderScreen;
         Emulator = null;
     }

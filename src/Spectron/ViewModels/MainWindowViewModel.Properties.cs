@@ -87,4 +87,11 @@ partial class MainWindowViewModel
         get => _tapeLoadSpeed;
         set => this.RaiseAndSetIfChanged(ref _tapeLoadSpeed, value);
     }
+
+    private bool _isMuted;
+    public bool IsMuted
+    {
+        get => _isMuted;
+        set => this.RaiseAndSetIfChanged(ref _isMuted, value);
+    }
 }
