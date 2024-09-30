@@ -88,7 +88,7 @@ public sealed class Emulator
         _emulationTimer.Start();
     }
 
-    public void Stop()
+    public void Shutdown()
     {
         _beeper.Stop();
         _emulationTimer.Stop();
@@ -109,6 +109,7 @@ public sealed class Emulator
 
     public void Reset()
     {
+        _beeper.Reset();
         Memory.Reset();
         Cpu.Reset();
         ScreenBuffer.Reset();
@@ -119,6 +120,10 @@ public sealed class Emulator
             Resume();
         }
     }
+
+    public void Mute() => _beeper.Mute();
+
+    public void UnMute() => _beeper.UnMute();
 
     public void SetEmulationSpeed(int emulationSpeedPercentage) => _emulationTimer.Interval =
         emulationSpeedPercentage == int.MaxValue ?
