@@ -8,6 +8,7 @@
         Height="250"
         Width="350"
         WindowStartupLocation="CenterOwner"
+        Focusable="True"
         CanResize="False">
 
     <Grid RowDefinitions="96,*" Margin="10">

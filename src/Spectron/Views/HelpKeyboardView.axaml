@@ -7,6 +7,7 @@
         Background="Transparent"
         Width="756"
         Height="338"
+        Focusable="True"
         WindowStartupLocation="CenterOwner"
         SystemDecorations="BorderOnly"
         Title="ZX Spectrum Keyboard">
