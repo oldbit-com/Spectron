@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using OldBit.Beep;
 
 namespace OldBit.Spectron.Emulation.Devices.Audio;
@@ -15,8 +14,8 @@ internal sealed class Beeper
     private const int FramesPerSecond = 50;
     private const int SamplesPerFrame = PlayerSampleRate / FramesPerSecond;
 
-    private const byte LowAmplitude = 0x40;
-    private const byte HighAmplitude = 0xBF;
+    private const short LowAmplitude = -32000;
+    private const short HighAmplitude = 0;
 
     private byte _lastEar;
     private bool _isMuted;
@@ -51,7 +50,9 @@ internal sealed class Beeper
             while (duration >= _statesPerSample)
             {
                 duration -= _statesPerSample;
-                buffer.Add(state.Ear != 0 ? HighAmplitude : LowAmplitude);
+
+                var sample = state.Ear != 0 ? HighAmplitude : LowAmplitude;
+                buffer.AddRange(BitConverter.GetBytes(sample));
             }
 
             remainingTicks = duration;
@@ -59,7 +60,7 @@ internal sealed class Beeper
 
         if (_isAudioPlayerRunning && !_isMuted)
         {
-            _audioPlayer?.EnqueueAsync(buffer, _cancellationTokenSource.Token).Wait();
+            _audioPlayer?.TryEnqueue(buffer);
         }
 
         _beeperStates.Clear();
@@ -97,10 +98,12 @@ internal sealed class Beeper
     internal void Start()
     {
         _audioPlayer = new AudioPlayer(
-            AudioFormat.Unsigned8Bit,
+            AudioFormat.Signed16BitIntegerLittleEndian,
             PlayerSampleRate,
             channelCount: 1,
-            new PlayerOptions { BufferSizeInBytes = 8192 });
+            new PlayerOptions { BufferSizeInBytes = 16384, MaxBuffers = 5 });
+
+        _audioPlayer.AddFilter(new BeeperFilter());
 
         _audioPlayer.Volume = 50;
         _audioPlayer.Start();
