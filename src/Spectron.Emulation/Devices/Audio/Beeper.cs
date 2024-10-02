@@ -35,6 +35,12 @@ internal sealed class Beeper
 
     internal void EndFrame()
     {
+        if (!_isAudioPlayerRunning || _isMuted)
+        {
+            _beeperStates.Clear();
+            return;
+        }
+
         UpdateBeeper(_ticksPerFrame, _lastEar);
 
         var buffer = new List<byte>();
@@ -58,10 +64,7 @@ internal sealed class Beeper
             remainingTicks = duration;
         }
 
-        if (_isAudioPlayerRunning && !_isMuted)
-        {
-            _audioPlayer?.TryEnqueue(buffer);
-        }
+        _audioPlayer?.TryEnqueue(buffer);
 
         _beeperStates.Clear();
     }
