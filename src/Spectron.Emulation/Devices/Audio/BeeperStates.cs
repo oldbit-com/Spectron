@@ -8,7 +8,7 @@ internal record BeeperState(int Ticks, byte Ear)
 
 /// <summary>
 /// Provides a reusable buffer for beeper states. Once the buffer is primed, it will start reusing existing records.
-/// This way it is memory efficient and avoids creating new instances when we dont need to.
+/// This way it is memory efficient and avoids creating new instances when we don't need to. Beeper uses a lot of states.
 /// </summary>
 internal sealed class BeeperStates
 {
@@ -34,13 +34,11 @@ internal sealed class BeeperStates
 
         if (_beeperStates.Count > Count)
         {
-            // Reuse record to avoid creating new instances
             _beeperStates[Count].Ticks = ticks;
             _beeperStates[Count].Ear = ear;
         }
         else
         {
-            // Create new record
             _beeperStates.Add(new BeeperState(ticks, ear));
         }
 
