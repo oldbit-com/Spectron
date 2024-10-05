@@ -1,12 +1,6 @@
 using OldBit.Beep;
-using OldBit.Spectron.Emulation.Utilities;
 
 namespace OldBit.Spectron.Emulation.Devices.Audio;
-
-internal record BeeperState(int Ticks, byte Ear)
-{
-    public int Ticks { get; set; } = Ticks;
-}
 
 internal sealed class Beeper
 {
@@ -23,11 +17,10 @@ internal sealed class Beeper
     private bool _isMuted;
     private AudioPlayer? _audioPlayer;
     private bool _isAudioPlayerRunning;
-    private int _currentBeeperStateIndex = 0;
 
     private readonly int _statesPerSample;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-    private readonly List<BeeperState> _beeperStates = [];
+    private readonly BeeperStates _beeperStates = new();
 
     private readonly byte[] _buffer = new byte[SamplesPerFrame * 2];
 
@@ -41,7 +34,7 @@ internal sealed class Beeper
     {
         if (!_isAudioPlayerRunning || _isMuted)
         {
-            _beeperStates.Clear();
+            _beeperStates.Reset();
             return;
         }
 
@@ -49,10 +42,6 @@ internal sealed class Beeper
         var runningTicks = 0;
         var bufferIndex = 0;
         // Array.Fill(_buffer, _lastEar);
-
-
-        // First duration
-
 
         var buffer = new List<byte>();
 
@@ -107,8 +96,7 @@ internal sealed class Beeper
 
         _audioPlayer?.TryEnqueue(buffer);
 
-        _currentBeeperStateIndex = 0;
-        _beeperStates.Clear();
+        _beeperStates.Reset();
     }
 
     internal void UpdateBeeper(int frameTicks, byte value)
@@ -119,30 +107,12 @@ internal sealed class Beeper
         }
 
         var ear = (byte)(value & 0x10);
-
-        if (_beeperStates.Count > 0)
-        {
-            var lastState = _beeperStates[^1];
-            if (lastState.Ear == ear)
-            {
-                lastState.Ticks = frameTicks;
-                return;
-            }
-        }
-
-        // TODO: Do not allocate BeeperState, reuse it, avoid GC pressure
-        // _currentBeeperStateIndex += 1;
-        // if (_beeperStates.Count >= _currentBeeperStateIndex)
-        // {
-        //
-        // }
-
-        _beeperStates.Add(new BeeperState(frameTicks, ear));
+        _beeperStates.Add(frameTicks, ear);
     }
 
     internal void Reset()
     {
-        _beeperStates.Clear();
+        _beeperStates.Reset();;
     }
 
     internal void Start()
