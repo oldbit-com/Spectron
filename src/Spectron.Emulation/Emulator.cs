@@ -180,7 +180,7 @@ public sealed class Emulator
 
     private void EndFrame()
     {
-        _beeper.EndFrame();
+        _beeper.EndFrame(Cpu.Clock.FrameTicks);
 
         ScreenBuffer.UpdateBorder(Cpu.Clock.FrameTicks);
         Cpu.TriggerInt(0xFF);
