@@ -267,7 +267,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void InitializeEmulator(Emulator emulator)
     {
-        Emulator?.Shutdown();
+        ShutdownEmulator();
+
         Emulator = emulator;
         IsPaused = false;
 

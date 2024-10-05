@@ -8,7 +8,7 @@ namespace OldBit.Spectron.Emulation;
 /// </summary>
 internal sealed class EmulatorTimer
 {
-    private readonly Thread _thread;
+    private readonly Thread _worker;
     private bool _isRunning;
 
     internal bool IsPaused { get; private set; }
@@ -21,7 +21,7 @@ internal sealed class EmulatorTimer
 
     internal EmulatorTimer()
     {
-        _thread = new Thread(Worker)
+        _worker = new Thread(Worker)
         {
             IsBackground = true,
             Priority = ThreadPriority.AboveNormal
@@ -30,14 +30,14 @@ internal sealed class EmulatorTimer
 
     internal void Start()
     {
-        _thread.Start();
         _isRunning = true;
+        _worker.Start();
     }
 
     internal void Stop()
     {
         _isRunning = false;
-        _thread.Join();
+        _worker.Join();
     }
 
     internal void Pause() => IsPaused = true;
@@ -70,8 +70,6 @@ internal sealed class EmulatorTimer
                 {
                     stopwatch.Restart();
                     nextTrigger = Interval;
-
-                   // PerformanceLogger.Instance.Log("TimerWorker");
 
                     Elapsed?.Invoke(EventArgs.Empty);
 
