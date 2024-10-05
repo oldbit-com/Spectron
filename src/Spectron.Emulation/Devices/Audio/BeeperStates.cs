@@ -7,14 +7,14 @@ internal record BeeperState(int Ticks, byte Ear)
 }
 
 /// <summary>
-/// Provides a buffer for beeper states. Reuses instances to avoid creating new records.
+/// Provides a reusable buffer for beeper states. Once the buffer is primed, it will start reusing existing records.
+/// This way it is memory efficient and avoids creating new instances when we dont need to.
 /// </summary>
 internal sealed class BeeperStates
 {
     private readonly List<BeeperState> _beeperStates = [];
 
     internal int Count { get; private set; }
-
     internal BeeperState this[int index] => _beeperStates[index];
 
     internal void Add(int ticks, byte ear)

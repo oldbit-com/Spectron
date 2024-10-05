@@ -21,8 +21,7 @@ internal sealed class Beeper
     private readonly int _statesPerSample;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly BeeperStates _beeperStates = new();
-
-    private readonly byte[] _buffer = new byte[SamplesPerFrame * 2];
+    private readonly BeeperSamples _beeperSamples = new();
 
     internal Beeper(HardwareSettings hardware)
     {
@@ -38,18 +37,14 @@ internal sealed class Beeper
             return;
         }
 
-
         var runningTicks = 0;
-        var bufferIndex = 0;
-        // Array.Fill(_buffer, _lastEar);
-
-        var buffer = new List<byte>();
-
         var duration = 0;
         var remainingTicks = 0;
 
         var ticks = _beeperStates.Count == 0 ? frameTicks : _beeperStates[0].Ticks;
         duration = ticks * Multiplier;
+
+        _beeperSamples.Reset();
 
         for (var i = 0; i <= _beeperStates.Count; i++)
         {
@@ -58,15 +53,10 @@ internal sealed class Beeper
             runningTicks += duration;
             duration += remainingTicks;
 
-
             while (duration >= _statesPerSample)
             {
                 duration -= _statesPerSample;
-
-                buffer.Add((byte)sample);
-                buffer.Add((byte)(sample >> 8));
-                // _buffer[bufferIndex++] = (byte)sample;
-                // _buffer[bufferIndex++] = (byte)(sample >> 8);
+                _beeperSamples.Add(sample);
             }
 
             remainingTicks = duration;
@@ -82,8 +72,7 @@ internal sealed class Beeper
             duration = ticks * Multiplier - runningTicks;
         }
 
-        _audioPlayer?.TryEnqueue(buffer);
-
+        _audioPlayer?.TryEnqueue(_beeperSamples.Buffer);
         _beeperStates.Reset();
     }
 
@@ -98,10 +87,7 @@ internal sealed class Beeper
         _beeperStates.Add(frameTicks, ear);
     }
 
-    internal void Reset()
-    {
-        _beeperStates.Reset();;
-    }
+    internal void Reset() => _beeperStates.Reset();
 
     internal void Start()
     {
