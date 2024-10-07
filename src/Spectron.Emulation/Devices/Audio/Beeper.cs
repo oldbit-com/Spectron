@@ -7,7 +7,6 @@ internal sealed class Beeper
     private const int PlayerSampleRate = 44100;
     private const int Volume = 32000;
 
-    // TODO: Maybe use long instead of int?
     private const int Multiplier = 1000;         // Used to avoid floating point arithmetic and rounding errors
     private const int FramesPerSecond = 50;
     private const int SamplesPerFrame = PlayerSampleRate / FramesPerSecond;
@@ -103,7 +102,7 @@ internal sealed class Beeper
             channelCount: 1,
             new PlayerOptions
             {
-                BufferSizeInBytes = 16384
+                BufferSizeInBytes = 32768
             });
 
         _audioPlayer.AddFilter(new BeeperFilter());
