@@ -1,9 +1,9 @@
 namespace OldBit.Spectron.Emulation.Devices.Audio;
 
-internal record BeeperState(int Ticks, byte Ear)
+internal record BeeperState(int Ticks, byte EarMic)
 {
     public int Ticks { get; set; } = Ticks;
-    public byte Ear { get; set; } = Ear;
+    public byte EarMic { get; set; } = EarMic;
 }
 
 /// <summary>
@@ -17,14 +17,14 @@ internal sealed class BeeperStates
     internal int Count { get; private set; }
     internal BeeperState this[int index] => _beeperStates[index];
 
-    internal void Add(int ticks, byte ear)
+    internal void Add(int ticks, byte earMic)
     {
         // If the last state has the same value, simply extend the ticks
         if (Count > 0)
         {
             var lastState = _beeperStates[Count - 1];
 
-            if (lastState.Ear == ear)
+            if (lastState.EarMic == earMic)
             {
                 lastState.Ticks = ticks;
 
@@ -35,11 +35,11 @@ internal sealed class BeeperStates
         if (_beeperStates.Count > Count)
         {
             _beeperStates[Count].Ticks = ticks;
-            _beeperStates[Count].Ear = ear;
+            _beeperStates[Count].EarMic = earMic;
         }
         else
         {
-            _beeperStates.Add(new BeeperState(ticks, ear));
+            _beeperStates.Add(new BeeperState(ticks, earMic));
         }
 
         Count += 1;

@@ -5,15 +5,14 @@ namespace OldBit.Spectron.Emulation.Devices.Audio;
 internal sealed class Beeper
 {
     private const int PlayerSampleRate = 44100;
+    private const int Volume = 32000;
+
     // TODO: Maybe use long instead of int?
     private const int Multiplier = 1000;         // Used to avoid floating point arithmetic and rounding errors
     private const int FramesPerSecond = 50;
     private const int SamplesPerFrame = PlayerSampleRate / FramesPerSecond;
 
-    private const short LowAmplitude = -32000;
-    private const short HighAmplitude = 0;
-
-    private int _lastEar;
+    private int _lastEarMic;
     private bool _isMuted;
     private AudioPlayer? _audioPlayer;
     private bool _isAudioPlayerRunning;
@@ -22,6 +21,14 @@ internal sealed class Beeper
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly BeeperStates _beeperStates = new();
     private readonly BeeperSamples _beeperSamples = new();
+
+    private readonly short[] _volumeLevels =
+    [
+        -Volume,
+        (short)(0.66f / 3.70f * Volume),
+        (short)(3.56f / 3.70f * Volume),
+        Volume
+    ];
 
     internal Beeper(HardwareSettings hardware)
     {
@@ -38,17 +45,16 @@ internal sealed class Beeper
         }
 
         var runningTicks = 0;
-        var duration = 0;
         var remainingTicks = 0;
 
         var ticks = _beeperStates.Count == 0 ? frameTicks : _beeperStates[0].Ticks;
-        duration = ticks * Multiplier;
+        var duration = ticks * Multiplier;
 
         _beeperSamples.Reset();
 
         for (var i = 0; i <= _beeperStates.Count; i++)
         {
-            var sample = _lastEar != 0 ? HighAmplitude : LowAmplitude;
+            var sample = _volumeLevels[_lastEarMic];
 
             runningTicks += duration;
             duration += remainingTicks;
@@ -66,7 +72,7 @@ internal sealed class Beeper
                 break;
             }
 
-            _lastEar = _beeperStates[i].Ear;
+            _lastEarMic = _beeperStates[i].EarMic;
 
             ticks = i == _beeperStates.Count - 1 ? frameTicks : _beeperStates[i + 1].Ticks;
             duration = ticks * Multiplier - runningTicks;
@@ -76,15 +82,15 @@ internal sealed class Beeper
         _beeperStates.Reset();
     }
 
-    internal void UpdateBeeper(int frameTicks, byte value)
+    internal void Update(int frameTicks, byte value)
     {
         if (_isMuted)
         {
             return;
         }
 
-        var ear = (byte)(value & 0x10);
-        _beeperStates.Add(frameTicks, ear);
+        var earMic = (value >> 3) & 0x03;
+        _beeperStates.Add(frameTicks, (byte)earMic);
     }
 
     internal void Reset() => _beeperStates.Reset();
