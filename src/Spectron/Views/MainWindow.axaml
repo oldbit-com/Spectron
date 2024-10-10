@@ -48,7 +48,7 @@
     </Window.Styles>
 
     <DockPanel>
-        <Menu DockPanel.Dock="Top" Focusable="False" IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}">
+        <Menu DockPanel.Dock="Top" IsTabStop="False" IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}">
             <MenuItem Header="_File" Padding="10 0 10 0">
                 <MenuItem Header="Load..." HotKey="Cmd+O" InputGesture="Cmd+O" Command="{Binding LoadFileCommand}"/>
                 <MenuItem Header="Recent..." SubmenuOpened="RecentFilesSubmenuOpened">

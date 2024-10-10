@@ -9,7 +9,6 @@ public sealed class PerformanceLogger
     private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
     private TimeSpan _lastElapsed = TimeSpan.Zero;
 
-
     public void Log(string message)
     {
         var elapsed = _stopwatch.Elapsed;
