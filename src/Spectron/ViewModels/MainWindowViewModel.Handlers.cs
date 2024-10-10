@@ -256,11 +256,11 @@ partial class MainWindowViewModel
 
         if (IsMuted)
         {
-            Emulator?.Mute();
+            Emulator?.AudioManager.Mute();
         }
         else
         {
-            Emulator?.UnMute();
+            Emulator?.AudioManager.UnMute();
         }
     }
 }

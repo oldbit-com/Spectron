@@ -43,6 +43,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private Emulator? Emulator { get; set; }
     private HelpKeyboardView? _helpKeyboardView;
 
+    private Preferences _preferences = new();
     private bool _isResumeEnabled;
     private bool _useCursorKeysAsJoystick;
     private int _frameCount;
@@ -160,6 +161,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
         if (preferences != null)
         {
+            _preferences = preferences;
+
             var initialize = ComputerType != preferences.ComputerType || RomType != preferences.RomType;
 
             ComputerType = preferences.ComputerType;
@@ -182,6 +185,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 CreateEmulator();
             }
 
+            Emulator?.SetAudioSettings(preferences.AudioSettings);
             Emulator?.SetTapeSavingSettings(preferences.TapeSaving);
         }
 
@@ -220,28 +224,29 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private async Task WindowOpenedAsync()
     {
-        var preferences = await _preferencesService.LoadAsync();
+        _preferences = await _preferencesService.LoadAsync();
 
-        HandleChangeBorderSize(preferences.BorderSize);
-        ComputerType = preferences.ComputerType;
-        IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
-        RomType = preferences.RomType == RomType.Custom ? RomType.Original : preferences.RomType;
-        JoystickType = preferences.Joystick.JoystickType;
-        TapeLoadSpeed = preferences.TapeLoadSpeed;
+        HandleChangeBorderSize(_preferences.BorderSize);
+        ComputerType = _preferences.ComputerType;
+        IsUlaPlusEnabled = _preferences.IsUlaPlusEnabled;
+        RomType = _preferences.RomType == RomType.Custom ? RomType.Original : _preferences.RomType;
+        JoystickType = _preferences.Joystick.JoystickType;
+        TapeLoadSpeed = _preferences.TapeLoadSpeed;
 
-        _isResumeEnabled = preferences.IsResumeEnabled;
-        _useCursorKeysAsJoystick = preferences.Joystick.UseCursorKeys;
+        _isResumeEnabled = _preferences.IsResumeEnabled;
+        _useCursorKeysAsJoystick = _preferences.Joystick.UseCursorKeys;
 
-        _timeMachine.IsEnabled = preferences.TimeMachine.IsEnabled;
-        _timeMachine.SnapshotInterval = preferences.TimeMachine.SnapshotInterval;
-        _timeMachine.MaxDuration = preferences.TimeMachine.MaxDuration;
+        _timeMachine.IsEnabled = _preferences.TimeMachine.IsEnabled;
+        _timeMachine.SnapshotInterval = _preferences.TimeMachine.SnapshotInterval;
+        _timeMachine.MaxDuration = _preferences.TimeMachine.MaxDuration;
 
         await RecentFilesViewModel.LoadAsync();
         var snapshot = await _sessionService.LoadAsync();
 
         CreateEmulator(snapshot);
 
-        Emulator?.SetTapeSavingSettings(preferences.TapeSaving);
+        Emulator?.SetTapeSavingSettings(_preferences.TapeSaving);
+        Emulator?.SetAudioSettings(_preferences.AudioSettings);
     }
 
     private async Task WindowClosingAsync()
@@ -282,9 +287,13 @@ public partial class MainWindowViewModel : ViewModelBase
         Emulator.JoystickManager.SetupJoystick(JoystickType);
         Emulator.RenderScreen += EmulatorOnRenderScreen;
 
+        Emulator.AudioManager.IsBeeperEnabled = _preferences.AudioSettings.IsBeeperEnabled;
+        Emulator.AudioManager.IsAyAudioEnabled = _preferences.AudioSettings.IsAyAudioEnabled;
+        Emulator.AudioManager.IsAyAudioEnabled48K = _preferences.AudioSettings.IsAyAudioEnabled48K;
+
         if (IsMuted)
         {
-            Emulator.Mute();
+            Emulator.AudioManager.Mute();
         }
 
         _renderStopwatch.Restart();
@@ -313,6 +322,12 @@ public partial class MainWindowViewModel : ViewModelBase
         ComputerType = ComputerType,
         IsUlaPlusEnabled = IsUlaPlusEnabled,
         RomType = RomType,
+        AudioSettings = new AudioSettings
+        {
+            IsBeeperEnabled = Emulator?.AudioManager.IsBeeperEnabled ?? true,
+            IsAyAudioEnabled = Emulator?.AudioManager.IsAyAudioEnabled ?? true,
+            IsAyAudioEnabled48K = Emulator?.AudioManager.IsAyAudioEnabled48K ?? true
+        },
         Joystick = new JoystickSettings
         {
             JoystickType = JoystickType,

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Audio;
+using OldBit.Spectron.Emulation.Devices.Audio.AY;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Devices.Memory;
@@ -18,7 +19,6 @@ public sealed class Emulator
 {
     private readonly HardwareSettings _hardware;
     private readonly TimeMachine _timeMachine;
-    private readonly Beeper _beeper;
     private readonly SpectrumBus _spectrumBus;
     private readonly EmulatorTimer _emulationTimer;
 
@@ -33,6 +33,7 @@ public sealed class Emulator
     public KeyboardHandler KeyboardHandler { get; } = new();
     public TapeManager TapeManager { get; }
     public JoystickManager JoystickManager { get; }
+    public AudioManager AudioManager { get; }
     public ComputerType ComputerType { get; }
     public RomType RomType { get; }
     public TapeSpeed TapeLoadSpeed { get; set; }
@@ -55,7 +56,7 @@ public sealed class Emulator
         ComputerType = emulatorArgs.ComputerType;
         RomType = emulatorArgs.RomType;
         Memory = emulatorArgs.Memory;
-        _beeper = new Beeper(hardware);
+        AudioManager = new AudioManager(hardware);
 
         UlaPlus = new UlaPlus();
         _spectrumBus = new SpectrumBus();
@@ -84,13 +85,13 @@ public sealed class Emulator
 
     public void Start()
     {
-        _beeper.Start();
+        AudioManager.Start();
         _emulationTimer.Start();
     }
 
     public void Shutdown()
     {
-        _beeper.Stop();
+        AudioManager.Stop();
         _emulationTimer.Stop();
 
         while (!_emulationTimer.IsStopped)
@@ -109,7 +110,7 @@ public sealed class Emulator
 
     public void Reset()
     {
-        _beeper.Reset();
+        AudioManager.ResetAudio();
         Memory.Reset();
         Cpu.Reset();
         ScreenBuffer.Reset();
@@ -120,10 +121,6 @@ public sealed class Emulator
             Resume();
         }
     }
-
-    public void Mute() => _beeper.Mute();
-
-    public void UnMute() => _beeper.UnMute();
 
     public void SetEmulationSpeed(int emulationSpeedPercentage) => _emulationTimer.Interval =
         emulationSpeedPercentage == int.MaxValue ?
@@ -140,7 +137,7 @@ public sealed class Emulator
 
     private void SetupUlaAndDevices(bool useAYSound)
     {
-        var ula = new Ula(KeyboardHandler, _beeper, ScreenBuffer, Cpu.Clock, TapeManager?.TapePlayer);
+        var ula = new Ula(KeyboardHandler, AudioManager, ScreenBuffer, Cpu.Clock, TapeManager?.TapePlayer);
 
         _spectrumBus.AddDevice(ula);
         _spectrumBus.AddDevice(UlaPlus);
@@ -180,7 +177,7 @@ public sealed class Emulator
 
     private void EndFrame()
     {
-        _beeper.EndFrame(Cpu.Clock.FrameTicks);
+        AudioManager.EndFrame(Cpu.Clock.FrameTicks);
 
         ScreenBuffer.UpdateBorder(Cpu.Clock.FrameTicks);
         Cpu.TriggerInt(0xFF);
