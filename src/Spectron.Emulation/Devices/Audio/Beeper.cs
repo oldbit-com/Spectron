@@ -117,8 +117,6 @@ internal sealed class Beeper
                 MaxQueueSize = BufferCount,
             });
 
-        _audioPlayer.AddFilter(new BeeperFilter());
-
         _audioPlayer.Volume = 50;
         _audioPlayer.Start();
         _isAudioPlayerRunning = true;
