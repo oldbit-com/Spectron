@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>OldBit.Spectron.Emulation</AssemblyName>
+        <RootNamespace>OldBit.Spectron.Emulation</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Rom\Files\128-0.rom" />
+      <EmbeddedResource Include="Rom\Files\128-1.rom" />
+      <EmbeddedResource Include="Rom\Files\48.rom" />
+      <EmbeddedResource Include="Rom\Files\bsrom140.rom" />
+      <EmbeddedResource Include="Rom\Files\DiagROMv.171" />
+      <EmbeddedResource Include="Rom\Files\gw03.rom" />
+      <EmbeddedResource Include="Rom\Files\JGH077.ROM" />
+      <EmbeddedResource Include="Rom\Files\testrom1.37.bin" />
+      <EmbeddedResource Include="Rom\Files\TC2048.rom" />
+      <EmbeddedResource Include="Tape\Loader\Files\48.szx" />
+      <EmbeddedResource Include="Tape\Loader\Files\16.szx" />
+      <EmbeddedResource Include="Tape\Loader\Files\128.szx" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>OldBit.Spectron.Emulator.Tests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
+      <PackageReference Include="OldBit.Beep" Version="0.9.1-rc.3" />
+      <PackageReference Include="OldBit.Z80Cpu.Spectron" Version="0.9.5-rc.6" />
+      <PackageReference Include="OldBit.ZX.Files" Version="0.9.5-rc.1" />
+    </ItemGroup>
+
+</Project>

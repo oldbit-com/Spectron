@@ -1,0 +1,76 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="300"
+        x:Class="OldBit.Spectron.Views.TapeView"
+        x:DataType="viewModels:TapeViewModel"
+        Height="450" Width="600"
+        WindowStartupLocation="CenterOwner"
+        Title="Tape Browser">
+
+    <Design.DataContext>
+        <viewModels:TapeViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="*,Auto">
+        <DataGrid Margin="20" ItemsSource="{Binding Blocks}"
+                  IsReadOnly="True"
+                  GridLinesVisibility="All"
+                  CanUserSortColumns="False"
+                  CanUserResizeColumns="True"
+                  BorderThickness="2"
+                  BorderBrush="{DynamicResource DataGridGridLinesBrush}">
+
+            <DataGrid.Styles>
+                <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+                    <Setter Property="IsVisible" Value="false" />
+                </Style>
+                <Style Selector="DataGridCell.index">
+                    <Setter Property="HorizontalContentAlignment" Value="Right" />
+                </Style>
+            </DataGrid.Styles>
+
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Width="25" CanUserResize="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Path Data="M2 2 L10 10 L2 18 Z" IsVisible="{Binding IsSelected}" Fill="{StaticResource ButtonBackground}" Margin="4 0 0 4"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding Index}" CellStyleClasses="index"/>
+                <DataGridTextColumn Header="Tape Block" Binding="{Binding Name}"/>
+                <DataGridTextColumn Header="Data" Binding="{Binding Data}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="20 0 0 20">
+                <Button Background="Transparent">
+                    <Path Data="M20 2 L8 12 L20 22 Z M4 2 H8 V22 H4 Z" Fill="{StaticResource ButtonBackground}"/>
+                </Button>
+                <Button Background="Transparent">
+                    <Path Data="M2 2 L20 12 L2 22 Z" Fill="{StaticResource ButtonBackground}"/>
+                </Button>
+                <Button Background="Transparent">
+                    <Path Data="M2 2 H8 V22 H2 Z M14 2 H20 V22 H14 Z" Fill="{StaticResource ButtonBackground}"/>
+                </Button>
+                <Button Background="Transparent">
+                    <Path Data="M2 2 H22 V22 H2 Z" Fill="{StaticResource ButtonBackground}"/>
+                </Button>
+                <Button Background="Transparent">
+                    <Path Data="M4 2 L16 12 L4 22 Z M16 2 H20 V22 H16 Z" Fill="{StaticResource ButtonBackground}"/>
+                </Button>
+                <Button Background="Transparent">
+                    <Path Data="M4 16 L12 8 L20 16 Z M4 18 H20 V20 H4 Z" Fill="{StaticResource ButtonBackground}"/>
+                </Button>
+                <Button Background="Transparent" HorizontalContentAlignment="Center">
+
+                        <Path Data="M4 16 L12 8 L20 16 Z M4 18 H20 V20 H4 Z" Fill="{StaticResource ButtonBackground}"/>
+                </Button>
+            </StackPanel>
+            <Button Grid.Column="1" Content="Close" HorizontalAlignment="Right" HorizontalContentAlignment="Center" Margin="0 0 20 20" Width="100" Click="CancelButton_OnClick"/>
+        </Grid>
+    </Grid>
+</Window>
