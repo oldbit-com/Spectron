@@ -1,4 +1,4 @@
-namespace OldBit.Spectral.Emulation.Devices.Audio.AY;
+namespace OldBit.Spectron.Emulation.Devices.Audio;
 
 internal static class Register
 {
