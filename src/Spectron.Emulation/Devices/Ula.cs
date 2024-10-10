@@ -8,7 +8,7 @@ namespace OldBit.Spectron.Emulation.Devices;
 
 internal sealed class Ula(
     KeyboardHandler keyboardHandler,
-    Beeper beeper,
+    AudioManager audioManager,
     ScreenBuffer screenBuffer,
     Clock clock,
     CassettePlayer? tapePlayer) : IDevice
@@ -37,7 +37,7 @@ internal sealed class Ula(
         screenBuffer.UpdateBorder(color, clock.FrameTicks);
 
         UpdateTapeLoadingBeeper(ref value);
-        beeper.Update(clock.FrameTicks, value);
+        audioManager.UpdateBeeper(clock.FrameTicks, value);
     }
 
     internal static bool IsUlaPort(Word address) => (address & 0x01) == 0x00;
