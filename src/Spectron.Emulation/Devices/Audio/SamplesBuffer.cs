@@ -4,7 +4,7 @@ namespace OldBit.Spectron.Emulation.Devices.Audio;
 /// Provides a reusable buffer for beeper samples. Once the buffer is primed, it will start reusing existing records.
 /// Beeper output means thousands of samples per second, so we need to be efficient.
 /// </summary>
-internal sealed class BeeperSamples
+internal sealed class SamplesBuffer
 {
     private readonly List<byte> _buffer = [];
     private int _count;

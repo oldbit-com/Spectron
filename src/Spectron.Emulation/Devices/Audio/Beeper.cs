@@ -5,22 +5,25 @@ namespace OldBit.Spectron.Emulation.Devices.Audio;
 internal sealed class Beeper
 {
     private const int PlayerSampleRate = 44100;
-    private const int Volume = 32000;
+    private const int BufferCount = 4;
+    private const float Alpha = 0.6f;
 
     private const int Multiplier = 1000;         // Used to avoid floating point arithmetic and rounding errors
     private const int FramesPerSecond = 50;
     private const int SamplesPerFrame = PlayerSampleRate / FramesPerSecond;
 
-    private int _lastEarMic;
+    private byte _lastEarMic;
     private bool _isMuted;
     private AudioPlayer? _audioPlayer;
     private bool _isAudioPlayerRunning;
+    private short _previousSample;
 
     private readonly int _statesPerSample;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly BeeperStates _beeperStates = new();
-    private readonly BeeperSamples _beeperSamples = new();
+    private readonly SamplesBufferPool _samplesBufferPool = new(BufferCount);
 
+    private const int Volume = 24000;
     private readonly short[] _volumeLevels =
     [
         -Volume,
@@ -49,19 +52,23 @@ internal sealed class Beeper
         var ticks = _beeperStates.Count == 0 ? frameTicks : _beeperStates[0].Ticks;
         var duration = ticks * Multiplier;
 
-        _beeperSamples.Reset();
+        var samplesBuffer = _samplesBufferPool.GetBuffer();
 
         for (var i = 0; i <= _beeperStates.Count; i++)
         {
-            var sample = _volumeLevels[_lastEarMic];
-
             runningTicks += duration;
             duration += remainingTicks;
 
             while (duration >= _statesPerSample)
             {
                 duration -= _statesPerSample;
-                _beeperSamples.Add(sample);
+
+                // Get sample and apply simple low-pass filter to make edges smoother
+                var sample = i < _beeperStates.Count ? _volumeLevels[_beeperStates[i].EarMic] : _volumeLevels[_lastEarMic];
+                sample = (short)(Alpha * sample + (1 - Alpha) * _previousSample);
+                _previousSample = sample;
+
+                samplesBuffer.Add(sample);
             }
 
             remainingTicks = duration;
@@ -71,13 +78,11 @@ internal sealed class Beeper
                 break;
             }
 
-            _lastEarMic = _beeperStates[i].EarMic;
-
             ticks = i == _beeperStates.Count - 1 ? frameTicks : _beeperStates[i + 1].Ticks;
             duration = ticks * Multiplier - runningTicks;
         }
 
-        _audioPlayer?.TryEnqueue(_beeperSamples.Buffer);
+        _audioPlayer?.TryEnqueue(samplesBuffer.Buffer);
         _beeperStates.Reset();
     }
 
@@ -89,7 +94,13 @@ internal sealed class Beeper
         }
 
         var earMic = (value >> 3) & 0x03;
-        _beeperStates.Add(frameTicks, (byte)earMic);
+
+        if (_lastEarMic != earMic)
+        {
+            _beeperStates.Add(frameTicks, _lastEarMic);
+        }
+
+        _lastEarMic = (byte)earMic;
     }
 
     internal void Reset() => _beeperStates.Reset();
@@ -102,7 +113,8 @@ internal sealed class Beeper
             channelCount: 1,
             new PlayerOptions
             {
-                BufferSizeInBytes = 32768
+                BufferSizeInBytes = 32768,
+                MaxQueueSize = BufferCount,
             });
 
         _audioPlayer.AddFilter(new BeeperFilter());
