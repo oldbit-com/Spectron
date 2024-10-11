@@ -227,6 +227,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _preferences = await _preferencesService.LoadAsync();
 
         HandleChangeBorderSize(_preferences.BorderSize);
+
         ComputerType = _preferences.ComputerType;
         IsUlaPlusEnabled = _preferences.IsUlaPlusEnabled;
         RomType = _preferences.RomType == RomType.Custom ? RomType.Original : _preferences.RomType;

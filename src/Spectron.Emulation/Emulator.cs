@@ -66,7 +66,7 @@ public sealed class Emulator
         JoystickManager = new JoystickManager(_spectrumBus, KeyboardHandler);
         TapeManager.Attach(Cpu, Memory, hardware);
 
-        SetupUlaAndDevices(emulatorArgs.UseAYSound);
+        SetupUlaAndDevices();
         SetupEventHandlers();
 
         _emulationTimer = new EmulatorTimer();
@@ -135,18 +135,14 @@ public sealed class Emulator
         UlaPlus.ActiveChanged += (_) => _invalidateScreen = true;
     }
 
-    private void SetupUlaAndDevices(bool useAYSound)
+    private void SetupUlaAndDevices()
     {
         var ula = new Ula(KeyboardHandler, AudioManager, ScreenBuffer, Cpu.Clock, TapeManager?.TapePlayer);
 
         _spectrumBus.AddDevice(ula);
         _spectrumBus.AddDevice(UlaPlus);
         _spectrumBus.AddDevice(Memory);
-
-        if (useAYSound)
-        {
-            _spectrumBus.AddDevice(new AY8910());
-        }
+        _spectrumBus.AddDevice(AudioManager.Ay);
 
         var floatingBus = new FloatingBus(Memory, Cpu.Clock);
         _spectrumBus.AddDevice(floatingBus);

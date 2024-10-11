@@ -4,24 +4,18 @@ namespace OldBit.Spectron.Emulation.Devices.Audio;
 
 internal sealed class Beeper
 {
-    private const int PlayerSampleRate = 44100;
-    private const int BufferCount = 4;
     private const float Alpha = 0.6f;
 
     private const int Multiplier = 1000;         // Used to avoid floating point arithmetic and rounding errors
     private const int FramesPerSecond = 50;
-    private const int SamplesPerFrame = PlayerSampleRate / FramesPerSecond;
 
     private byte _lastEarMic;
     private bool _isMuted;
-    private AudioPlayer? _audioPlayer;
-    private bool _isAudioPlayerRunning;
     private short _previousSample;
 
     private readonly int _statesPerSample;
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly BeeperStates _beeperStates = new();
-    private readonly SamplesBufferPool _samplesBufferPool = new(BufferCount);
+    private readonly SamplesBufferPool _samplesBufferPool;
 
     private const int Volume = 24000;
     private readonly short[] _volumeLevels =
@@ -32,18 +26,22 @@ internal sealed class Beeper
         Volume
     ];
 
-    internal Beeper(HardwareSettings hardware)
+    internal bool IsEnabled { get; set; }
+
+    internal Beeper(HardwareSettings hardware, int playerSampleRate, int bufferCount)
     {
+        var samplesPerFrame = playerSampleRate / FramesPerSecond;
         var ticksPerFrame = hardware.TicksPerFrame;
-        _statesPerSample = Multiplier * ticksPerFrame / SamplesPerFrame;
+
+        _samplesBufferPool = new SamplesBufferPool(bufferCount);
+        _statesPerSample = Multiplier * ticksPerFrame / samplesPerFrame;
     }
 
-    internal void EndFrame(int frameTicks)
+    internal SamplesBuffer? EndFrame(int frameTicks)
     {
-        if (!_isAudioPlayerRunning || _isMuted)
+        if (!IsEnabled || _isMuted)
         {
-            _beeperStates.Reset();
-            return;
+            return null;
         }
 
         var runningTicks = 0;
@@ -82,13 +80,14 @@ internal sealed class Beeper
             duration = ticks * Multiplier - runningTicks;
         }
 
-        _audioPlayer?.TryEnqueue(samplesBuffer.Buffer);
         _beeperStates.Reset();
+
+        return samplesBuffer;
     }
 
     internal void Update(int frameTicks, byte value)
     {
-        if (_isMuted)
+        if (!IsEnabled || _isMuted)
         {
             return;
         }
@@ -105,33 +104,13 @@ internal sealed class Beeper
 
     internal void Reset() => _beeperStates.Reset();
 
-    internal void Start()
+    internal void Stop() => _beeperStates.Reset();
+
+    internal void Mute()
     {
-        _audioPlayer = new AudioPlayer(
-            AudioFormat.Signed16BitIntegerLittleEndian,
-            PlayerSampleRate,
-            channelCount: 1,
-            new PlayerOptions
-            {
-                BufferSizeInBytes = 32768,
-                MaxQueueSize = BufferCount,
-            });
-
-        _audioPlayer.Volume = 50;
-        _audioPlayer.Start();
-        _isAudioPlayerRunning = true;
+        _isMuted = true;
+        _beeperStates.Reset();
     }
-
-    internal void Stop()
-    {
-        _isAudioPlayerRunning = false;
-        _audioPlayer?.Stop();
-
-        _audioPlayer?.Dispose();
-        _cancellationTokenSource.Dispose();
-    }
-
-    internal void Mute() => _isMuted = true;
 
     internal void UnMute() => _isMuted = false;
 }

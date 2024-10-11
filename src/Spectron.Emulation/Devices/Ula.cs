@@ -37,7 +37,7 @@ internal sealed class Ula(
         screenBuffer.UpdateBorder(color, clock.FrameTicks);
 
         UpdateTapeLoadingBeeper(ref value);
-        audioManager.UpdateBeeper(clock.FrameTicks, value);
+        audioManager.Beeper.Update(clock.FrameTicks, value);
     }
 
     internal static bool IsUlaPort(Word address) => (address & 0x01) == 0x00;
