@@ -1,19 +1,19 @@
 namespace OldBit.Spectron.Emulation.Devices.Audio;
 
-internal sealed class SamplesBufferPool
+internal sealed class BeeperSamplesPool
 {
-    private readonly List<SamplesBuffer> _pool = [];
+    private readonly List<BeeperSamples> _pool = [];
     private int _position;
 
-    internal SamplesBufferPool(int capacity)
+    internal BeeperSamplesPool(int capacity)
     {
         for (var i = 0; i < capacity; i++)
         {
-            _pool.Add(new SamplesBuffer());
+            _pool.Add(new BeeperSamples());
         }
     }
 
-    internal SamplesBuffer GetBuffer()
+    internal BeeperSamples GetBuffer()
     {
         var buffer = _pool[_position];
         buffer.Reset();

@@ -15,7 +15,7 @@ internal sealed class Beeper
 
     private readonly int _statesPerSample;
     private readonly BeeperStates _beeperStates = new();
-    private readonly SamplesBufferPool _samplesBufferPool;
+    private readonly BeeperSamplesPool _beeperSamplesPool;
 
     private const int Volume = 24000;
     private readonly short[] _volumeLevels =
@@ -33,11 +33,11 @@ internal sealed class Beeper
         var samplesPerFrame = playerSampleRate / FramesPerSecond;
         var ticksPerFrame = hardware.TicksPerFrame;
 
-        _samplesBufferPool = new SamplesBufferPool(bufferCount);
+        _beeperSamplesPool = new BeeperSamplesPool(bufferCount);
         _statesPerSample = Multiplier * ticksPerFrame / samplesPerFrame;
     }
 
-    internal SamplesBuffer? EndFrame(int frameTicks)
+    internal BeeperSamples? EndFrame(int frameTicks)
     {
         if (!IsEnabled || _isMuted)
         {
@@ -50,7 +50,7 @@ internal sealed class Beeper
         var ticks = _beeperStates.Count == 0 ? frameTicks : _beeperStates[0].Ticks;
         var duration = ticks * Multiplier;
 
-        var samplesBuffer = _samplesBufferPool.GetBuffer();
+        var samplesBuffer = _beeperSamplesPool.GetBuffer();
 
         for (var i = 0; i <= _beeperStates.Count; i++)
         {
