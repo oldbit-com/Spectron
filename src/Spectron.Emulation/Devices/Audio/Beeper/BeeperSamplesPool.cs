@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.Devices.Audio;
+namespace OldBit.Spectron.Emulation.Devices.Audio.Beeper;
 
 internal sealed class BeeperSamplesPool
 {

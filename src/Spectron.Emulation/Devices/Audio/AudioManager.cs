@@ -12,7 +12,7 @@ public sealed class AudioManager
     private AudioPlayer? _audioPlayer;
     private bool _isAudioPlayerRunning;
 
-    internal Beeper Beeper { get; }
+    internal Beeper.Beeper Beeper { get; }
 
     internal AY8910 Ay { get; }
 
@@ -42,7 +42,7 @@ public sealed class AudioManager
 
     internal AudioManager(HardwareSettings hardware)
     {
-        Beeper = new Beeper(hardware, PlayerSampleRate, BufferCount);
+        Beeper = new Beeper.Beeper(hardware, PlayerSampleRate, BufferCount);
         Ay = new AY8910();
     }
 

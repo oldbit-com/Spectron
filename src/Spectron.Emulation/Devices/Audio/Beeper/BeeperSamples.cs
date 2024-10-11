@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.Devices.Audio;
+namespace OldBit.Spectron.Emulation.Devices.Audio.Beeper;
 
 /// <summary>
 /// Provides a reusable buffer for beeper samples. Once the buffer is primed, it will start reusing existing records.
