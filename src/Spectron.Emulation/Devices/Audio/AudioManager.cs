@@ -1,5 +1,8 @@
 using OldBit.Beep;
 using OldBit.Spectron.Emulation.Devices.Audio.AY;
+using OldBit.Spectron.Emulation.Devices.Audio.Beeper;
+using OldBit.Spectron.Emulation.Tape;
+using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.Devices.Audio;
 
@@ -8,20 +11,22 @@ public sealed class AudioManager
     private const int PlayerSampleRate = 44100;
     private const int BufferCount = 4;
 
+    private readonly BeeperAudio _beeperAudio;
+
     private bool _isAyAudioEnabled;
     private AudioPlayer? _audioPlayer;
     private bool _isAudioPlayerRunning;
 
-    internal Beeper.Beeper Beeper { get; }
+    internal BeeperDevice Beeper { get; }
 
     internal AY8910 Ay { get; }
 
     public bool IsBeeperEnabled
     {
-        get => Beeper.IsEnabled;
+        get => _beeperAudio.IsEnabled;
         set
         {
-            if (Beeper.IsEnabled == value) return;
+            if (_beeperAudio.IsEnabled == value) return;
             ToggleBeeperEnabled(value);
         }
     }
@@ -40,17 +45,22 @@ public sealed class AudioManager
 
     public bool IsAyAudioEnabled48K { get; set; }
 
-    internal AudioManager(HardwareSettings hardware)
+    internal AudioManager(Clock clock, CassettePlayer? tapePlayer, HardwareSettings hardware)
     {
-        Beeper = new Beeper.Beeper(hardware, PlayerSampleRate, BufferCount);
-        Ay = new AY8910();
+        _beeperAudio = new BeeperAudio(clock, hardware, PlayerSampleRate, BufferCount);
+        Ay = new AY8910(clock);
+
+        Beeper = new BeeperDevice(tapePlayer)
+        {
+            BeeperUpdated = _beeperAudio.Update
+        };
     }
 
     internal void EndFrame(int frameTicks)
     {
         Ay.EndFrame(frameTicks);
 
-        var buffer = Beeper.EndFrame(frameTicks);
+        var buffer = _beeperAudio.EndFrame();
         if (buffer != null)
         {
             _audioPlayer?.TryEnqueue(buffer.Buffer);
@@ -81,7 +91,7 @@ public sealed class AudioManager
 
     internal void Stop()
     {
-        Beeper.Stop();
+        _beeperAudio.Stop();
 
         _isAudioPlayerRunning = false;
         _audioPlayer?.Stop();
@@ -91,22 +101,22 @@ public sealed class AudioManager
 
     internal void ResetAudio()
     {
-        Beeper.Reset();
+        _beeperAudio.Reset();
     }
 
     public void Mute()
     {
-        Beeper.Mute();
+        _beeperAudio.Mute();
     }
 
     public void UnMute()
     {
-        Beeper.UnMute();
+        _beeperAudio.UnMute();
     }
 
     private void ToggleBeeperEnabled(bool isEnabled)
     {
-        Beeper.IsEnabled = isEnabled;
+        _beeperAudio.IsEnabled = isEnabled;
 
         if (isEnabled)
         {

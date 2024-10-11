@@ -56,15 +56,16 @@ public sealed class Emulator
         ComputerType = emulatorArgs.ComputerType;
         RomType = emulatorArgs.RomType;
         Memory = emulatorArgs.Memory;
-        AudioManager = new AudioManager(hardware);
 
         UlaPlus = new UlaPlus();
         _spectrumBus = new SpectrumBus();
         ScreenBuffer = new ScreenBuffer(emulatorArgs.Memory, UlaPlus);
-        Cpu = new Z80(emulatorArgs.Memory, emulatorArgs.ContentionProvider);
+        Cpu = new Z80(emulatorArgs.Memory, emulatorArgs.ContentionProvider); ;
 
         JoystickManager = new JoystickManager(_spectrumBus, KeyboardHandler);
         TapeManager.Attach(Cpu, Memory, hardware);
+
+        AudioManager = new AudioManager(Cpu.Clock, tapeManager.TapePlayer, hardware);
 
         SetupUlaAndDevices();
         SetupEventHandlers();
@@ -137,11 +138,12 @@ public sealed class Emulator
 
     private void SetupUlaAndDevices()
     {
-        var ula = new Ula(KeyboardHandler, AudioManager, ScreenBuffer, Cpu.Clock, TapeManager?.TapePlayer);
+        var ula = new Ula(KeyboardHandler, ScreenBuffer, Cpu.Clock);
 
         _spectrumBus.AddDevice(ula);
         _spectrumBus.AddDevice(UlaPlus);
         _spectrumBus.AddDevice(Memory);
+        _spectrumBus.AddDevice(AudioManager.Beeper);
         _spectrumBus.AddDevice(AudioManager.Ay);
 
         var floatingBus = new FloatingBus(Memory, Cpu.Clock);

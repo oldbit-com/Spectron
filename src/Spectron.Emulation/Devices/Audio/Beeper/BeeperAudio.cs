@@ -1,7 +1,10 @@
+using OldBit.Z80Cpu;
+
 namespace OldBit.Spectron.Emulation.Devices.Audio.Beeper;
 
-internal sealed class Beeper
+internal sealed class BeeperAudio
 {
+    private readonly Clock _clock;
     private const float Alpha = 0.6f;
 
     private const int Multiplier = 1000;         // Used to avoid floating point arithmetic and rounding errors
@@ -26,8 +29,10 @@ internal sealed class Beeper
 
     internal bool IsEnabled { get; set; }
 
-    internal Beeper(HardwareSettings hardware, int playerSampleRate, int bufferCount)
+    internal BeeperAudio(Clock clock, HardwareSettings hardware, int playerSampleRate, int bufferCount)
     {
+        _clock = clock;
+
         var samplesPerFrame = playerSampleRate / FramesPerSecond;
         var ticksPerFrame = hardware.TicksPerFrame;
 
@@ -35,7 +40,7 @@ internal sealed class Beeper
         _statesPerSample = Multiplier * ticksPerFrame / samplesPerFrame;
     }
 
-    internal BeeperSamples? EndFrame(int frameTicks)
+    internal BeeperSamples? EndFrame()
     {
         if (!IsEnabled || _isMuted)
         {
@@ -45,7 +50,7 @@ internal sealed class Beeper
         var runningTicks = 0;
         var remainingTicks = 0;
 
-        var ticks = _beeperStates.Count == 0 ? frameTicks : _beeperStates[0].Ticks;
+        var ticks = _beeperStates.Count == 0 ? _clock.FrameTicks : _beeperStates[0].Ticks;
         var duration = ticks * Multiplier;
 
         var samplesBuffer = _beeperSamplesPool.GetBuffer();
@@ -74,7 +79,7 @@ internal sealed class Beeper
                 break;
             }
 
-            ticks = i == _beeperStates.Count - 1 ? frameTicks : _beeperStates[i + 1].Ticks;
+            ticks = i == _beeperStates.Count - 1 ? _clock.FrameTicks : _beeperStates[i + 1].Ticks;
             duration = ticks * Multiplier - runningTicks;
         }
 
@@ -83,7 +88,7 @@ internal sealed class Beeper
         return samplesBuffer;
     }
 
-    internal void Update(int frameTicks, byte value)
+    internal void Update(byte value)
     {
         if (!IsEnabled || _isMuted)
         {
@@ -94,7 +99,7 @@ internal sealed class Beeper
 
         if (_lastEarMic != earMic)
         {
-            _beeperStates.Add(frameTicks, _lastEarMic);
+            _beeperStates.Add(_clock.FrameTicks, _lastEarMic);
         }
 
         _lastEarMic = (byte)earMic;

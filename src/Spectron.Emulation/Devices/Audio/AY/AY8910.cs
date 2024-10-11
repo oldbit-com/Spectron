@@ -1,6 +1,8 @@
+using OldBit.Z80Cpu;
+
 namespace OldBit.Spectron.Emulation.Devices.Audio.AY;
 
-internal class AY8910 : IDevice
+internal class AY8910(Clock clock) : IDevice
 {
     private const Word RegisterPort = 0xFFFD;
     private const Word DataPort = 0xBFFD;
@@ -23,6 +25,8 @@ internal class AY8910 : IDevice
         }
         else if (IsDataPort(address))
         {
+            Update(clock.FrameTicks);
+
             switch (_selectedRegister)
             {
                 case Register.FineTuneA:
@@ -91,6 +95,11 @@ internal class AY8910 : IDevice
     }
 
     internal void EndFrame(int frameTicks)
+    {
+
+    }
+
+    internal void Update(int frameTicks)
     {
 
     }
