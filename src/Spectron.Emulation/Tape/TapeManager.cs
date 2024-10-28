@@ -13,7 +13,7 @@ public sealed class TapeManager
     public bool IsTapeSaveEnabled { get; set; }
     public TapeSpeed TapeSaveSpeed { get; set; }
 
-    internal CassettePlayer? TapePlayer { get; private set; }
+    internal CassettePlayer? Player { get; private set; }
 
     public delegate void TapeInsertedEvent(EventArgs e);
     public event TapeInsertedEvent? TapeInserted;
@@ -29,11 +29,11 @@ public sealed class TapeManager
 
     internal void Attach(Z80 cpu, IMemory memory, HardwareSettings hardware)
     {
-        TapePlayer = new CassettePlayer(cpu.Clock, hardware);
+        Player = new CassettePlayer(cpu.Clock, hardware);
         _directAccess = new DirectAccess(cpu, memory);
     }
 
-    public bool IsPlaying => TapePlayer?.IsPlaying ?? false;
+    public bool IsPlaying => Player?.IsPlaying ?? false;
 
     public void NewTape()
     {
@@ -81,7 +81,7 @@ public sealed class TapeManager
 
     private void InsertTape()
     {
-        TapePlayer?.LoadTape(Cassette);
+        Player?.LoadTape(Cassette);
         TapeInserted?.Invoke(EventArgs.Empty);
 
         _isTapeLoaded = true;
@@ -89,15 +89,15 @@ public sealed class TapeManager
 
     public void StopTape()
     {
-        TapePlayer?.Stop();
+        Player?.Stop();
         TapeStopped?.Invoke(EventArgs.Empty);
     }
 
     public void PlayTape()
     {
-        TapePlayer?.Play();
+        Player?.Play();
         TapePlaying?.Invoke(EventArgs.Empty);
-    }
+   }
 
     public void EjectTape()
     {

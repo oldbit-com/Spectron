@@ -45,12 +45,12 @@ public sealed class AudioManager
 
     public bool IsAyAudioEnabled48K { get; set; }
 
-    internal AudioManager(Clock clock, CassettePlayer? tapePlayer, HardwareSettings hardware)
+    internal AudioManager(Clock clock, CassettePlayer? cassettePlayer, HardwareSettings hardware)
     {
         _beeperAudio = new BeeperAudio(clock, hardware, PlayerSampleRate, NumberOfBuffers);
         AY = new AY8910(clock);
 
-        Beeper = new BeeperDevice(tapePlayer)
+        Beeper = new BeeperDevice(cassettePlayer)
         {
             OnUpdateBeeper = _beeperAudio.Update
         };

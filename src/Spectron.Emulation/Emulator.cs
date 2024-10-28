@@ -64,7 +64,7 @@ public sealed class Emulator
         JoystickManager = new JoystickManager(_spectrumBus, KeyboardHandler);
         TapeManager.Attach(Cpu, Memory, hardware);
 
-        AudioManager = new AudioManager(Cpu.Clock, tapeManager.TapePlayer, hardware);
+        AudioManager = new AudioManager(Cpu.Clock, tapeManager.Player, hardware);
 
         SetupUlaAndDevices();
         SetupEventHandlers();
@@ -137,7 +137,7 @@ public sealed class Emulator
 
     private void SetupUlaAndDevices()
     {
-        var ula = new Ula(KeyboardHandler, ScreenBuffer, Cpu.Clock);
+        var ula = new Ula(KeyboardHandler, ScreenBuffer, Cpu.Clock, TapeManager?.Player);
 
         _spectrumBus.AddDevice(ula);
         _spectrumBus.AddDevice(UlaPlus);

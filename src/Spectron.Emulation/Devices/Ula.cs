@@ -1,5 +1,6 @@
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Screen;
+using OldBit.Spectron.Emulation.Tape;
 using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.Devices;
@@ -7,7 +8,8 @@ namespace OldBit.Spectron.Emulation.Devices;
 internal sealed class Ula(
     KeyboardHandler keyboardHandler,
     ScreenBuffer screenBuffer,
-    Clock clock) : IDevice
+    Clock clock,
+    CassettePlayer? cassettePlayer) : IDevice
 {
     public byte? ReadPort(Word address)
     {
@@ -16,7 +18,10 @@ internal sealed class Ula(
             return null;
         }
 
-        return keyboardHandler.Read(address);
+        var value = keyboardHandler.Read(address);
+        UpdateEarBit(ref value);
+
+        return value;
     }
 
     public void WritePort(Word address, byte value)
@@ -31,4 +36,14 @@ internal sealed class Ula(
     }
 
     internal static bool IsUlaPort(Word address) => (address & 0x01) == 0x00;
+
+    private void UpdateEarBit(ref byte value)
+    {
+        if (cassettePlayer is not { IsPlaying: true })
+        {
+            return;
+        }
+
+        value = cassettePlayer.EarBit ? (byte)(value | 0x40) : (byte)(value & 0xBF);
+    }
 }
