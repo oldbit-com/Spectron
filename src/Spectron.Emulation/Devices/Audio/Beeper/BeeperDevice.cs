@@ -6,7 +6,7 @@ internal class BeeperDevice : IDevice
 {
     private readonly CassettePlayer? _tapePlayer;
 
-    internal Action<byte> BeeperUpdated { get; init; } = _ => { };
+    internal Action<byte> OnUpdateBeeper { get; init; } = _ => { };
 
     internal BeeperDevice(CassettePlayer? tapePlayer) => _tapePlayer = tapePlayer;
 
@@ -22,6 +22,6 @@ internal class BeeperDevice : IDevice
             value = _tapePlayer.EarBit ? (byte)(value | 0x10) : (byte)(value & 0xEF);
         }
 
-        BeeperUpdated(value);
+        OnUpdateBeeper(value);
     }
 }

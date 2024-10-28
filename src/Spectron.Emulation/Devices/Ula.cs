@@ -1,7 +1,5 @@
-using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Screen;
-using OldBit.Spectron.Emulation.Tape;
 using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.Devices;

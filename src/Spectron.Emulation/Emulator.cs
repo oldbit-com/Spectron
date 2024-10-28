@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Audio;
-using OldBit.Spectron.Emulation.Devices.Audio.AY;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Devices.Memory;
@@ -144,7 +143,7 @@ public sealed class Emulator
         _spectrumBus.AddDevice(UlaPlus);
         _spectrumBus.AddDevice(Memory);
         _spectrumBus.AddDevice(AudioManager.Beeper);
-        _spectrumBus.AddDevice(AudioManager.Ay);
+        _spectrumBus.AddDevice(AudioManager.AY);
 
         var floatingBus = new FloatingBus(Memory, Cpu.Clock);
         _spectrumBus.AddDevice(floatingBus);

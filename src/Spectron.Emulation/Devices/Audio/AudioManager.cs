@@ -9,7 +9,7 @@ namespace OldBit.Spectron.Emulation.Devices.Audio;
 public sealed class AudioManager
 {
     private const int PlayerSampleRate = 44100;
-    private const int BufferCount = 4;
+    private const int NumberOfBuffers = 4;
 
     private readonly BeeperAudio _beeperAudio;
 
@@ -19,7 +19,7 @@ public sealed class AudioManager
 
     internal BeeperDevice Beeper { get; }
 
-    internal AY8910 Ay { get; }
+    internal AY8910 AY { get; }
 
     public bool IsBeeperEnabled
     {
@@ -39,7 +39,7 @@ public sealed class AudioManager
             if (_isAyAudioEnabled == value) return;
 
             _isAyAudioEnabled = value;
-            Ay.IsEnabled = value;
+            AY.IsEnabled = value;
         }
     }
 
@@ -47,18 +47,18 @@ public sealed class AudioManager
 
     internal AudioManager(Clock clock, CassettePlayer? tapePlayer, HardwareSettings hardware)
     {
-        _beeperAudio = new BeeperAudio(clock, hardware, PlayerSampleRate, BufferCount);
-        Ay = new AY8910(clock);
+        _beeperAudio = new BeeperAudio(clock, hardware, PlayerSampleRate, NumberOfBuffers);
+        AY = new AY8910(clock);
 
         Beeper = new BeeperDevice(tapePlayer)
         {
-            BeeperUpdated = _beeperAudio.Update
+            OnUpdateBeeper = _beeperAudio.Update
         };
     }
 
     internal void EndFrame(int frameTicks)
     {
-        Ay.EndFrame(frameTicks);
+        AY.EndFrame(frameTicks);
 
         var buffer = _beeperAudio.EndFrame();
         if (buffer != null)
@@ -81,7 +81,7 @@ public sealed class AudioManager
             new PlayerOptions
             {
                 BufferSizeInBytes = 32768,
-                MaxQueueSize = BufferCount,
+                BufferQueueSize = NumberOfBuffers,
             });
 
         _audioPlayer.Volume = 50;

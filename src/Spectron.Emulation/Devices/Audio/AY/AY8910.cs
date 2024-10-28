@@ -2,6 +2,20 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.Devices.Audio.AY;
 
+/// <summary>
+///
+/// \_________    00xx
+/// /|________    01xx
+/// \|\|\|\|\|    1000
+/// \_________    1001
+/// \|‾‾‾‾‾‾‾‾    1011
+/// /|/|/|/|/|    1100
+/// /‾‾‾‾‾‾‾‾     1101
+/// /\/\/\/\/\    1110
+/// /|________    1111
+///
+/// </summary>
+
 internal class AY8910(Clock clock) : IDevice
 {
     private const Word RegisterPort = 0xFFFD;
@@ -101,7 +115,7 @@ internal class AY8910(Clock clock) : IDevice
 
     internal void Update(int frameTicks)
     {
-
+        //
     }
 
     private void SetRegister(int register, byte value) => _registers[register] = value;
