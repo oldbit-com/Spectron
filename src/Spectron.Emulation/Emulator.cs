@@ -174,7 +174,7 @@ public sealed class Emulator
 
     private void EndFrame()
     {
-        AudioManager.EndFrame(Cpu.Clock.FrameTicks);
+        AudioManager.EndFrame();
 
         ScreenBuffer.UpdateBorder(Cpu.Clock.FrameTicks);
         Cpu.TriggerInt(0xFF);

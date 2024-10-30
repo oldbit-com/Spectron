@@ -8,7 +8,9 @@ namespace OldBit.Spectron.Emulation.Devices.Audio;
 
 public sealed class AudioManager
 {
+    private const int FramesPerSecond = 50;
     private const int PlayerSampleRate = 44100;
+    private const int SamplesPerFrame = PlayerSampleRate / FramesPerSecond;
     private const int NumberOfBuffers = 4;
 
     private readonly BeeperAudio _beeperAudio;
@@ -47,20 +49,23 @@ public sealed class AudioManager
 
     internal AudioManager(Clock clock, CassettePlayer? cassettePlayer, HardwareSettings hardware)
     {
-        _beeperAudio = new BeeperAudio(clock, hardware, PlayerSampleRate, NumberOfBuffers);
-        AY = new AY8910(clock);
+        var statesPerSample = (double)hardware.TicksPerFrame / SamplesPerFrame;
 
+        _beeperAudio = new BeeperAudio(clock, statesPerSample, NumberOfBuffers);
         Beeper = new BeeperDevice(cassettePlayer)
         {
             OnUpdateBeeper = _beeperAudio.Update
         };
+
+        AY = new AY8910(clock, statesPerSample);
     }
 
-    internal void EndFrame(int frameTicks)
+    internal void EndFrame()
     {
-        AY.EndFrame(frameTicks);
+        AY.EndFrame();
 
         var buffer = _beeperAudio.EndFrame();
+
         if (buffer != null)
         {
             _audioPlayer?.TryEnqueue(buffer.Buffer);

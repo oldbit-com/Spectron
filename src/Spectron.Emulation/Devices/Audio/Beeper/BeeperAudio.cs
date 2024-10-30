@@ -8,7 +8,6 @@ internal sealed class BeeperAudio
     private const float Alpha = 0.6f;
 
     private const int Multiplier = 1000;         // Used to avoid floating point arithmetic and rounding errors
-    private const int FramesPerSecond = 50;
 
     private byte _lastEarMic;
     private bool _isMuted;
@@ -29,15 +28,12 @@ internal sealed class BeeperAudio
 
     internal bool IsEnabled { get; set; }
 
-    internal BeeperAudio(Clock clock, HardwareSettings hardware, int playerSampleRate, int bufferCount)
+    internal BeeperAudio(Clock clock, double statesPerSample, int bufferCount)
     {
         _clock = clock;
 
-        var samplesPerFrame = playerSampleRate / FramesPerSecond;
-        var ticksPerFrame = hardware.TicksPerFrame;
-
         _beeperSamplesPool = new BeeperSamplesPool(bufferCount);
-        _statesPerSample = Multiplier * ticksPerFrame / samplesPerFrame;
+        _statesPerSample = (int)(Multiplier * statesPerSample);
     }
 
     internal BeeperSamples? EndFrame()
