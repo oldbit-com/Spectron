@@ -170,6 +170,7 @@ public sealed class Emulator
     {
         Cpu.Clock.NewFrame();
         ScreenBuffer.NewFrame();
+        AudioManager.NewFrame();
     }
 
     private void EndFrame()

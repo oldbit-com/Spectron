@@ -4,18 +4,16 @@ namespace OldBit.Spectron.Emulation.Devices.Audio.Beeper;
 
 internal sealed class BeeperAudio
 {
-    private readonly Clock _clock;
     private const float Alpha = 0.6f;
-
-    private const int Multiplier = 1000;         // Used to avoid floating point arithmetic and rounding errors
+    private const int Multiplier = 1000;  // Used to avoid floating point arithmetic and rounding errors
 
     private byte _lastEarMic;
     private bool _isMuted;
     private short _previousSample;
 
+    private readonly Clock _clock;
     private readonly int _statesPerSample;
     private readonly BeeperStates _beeperStates = new();
-    private readonly BeeperSamplesPool _beeperSamplesPool;
 
     private const int Volume = 24000;
     private readonly short[] _volumeLevels =
@@ -27,20 +25,19 @@ internal sealed class BeeperAudio
     ];
 
     internal bool IsEnabled { get; set; }
+    internal AudioSamples Samples { get; } = new();
 
-    internal BeeperAudio(Clock clock, double statesPerSample, int bufferCount)
+    internal BeeperAudio(Clock clock, double statesPerSample)
     {
         _clock = clock;
-
-        _beeperSamplesPool = new BeeperSamplesPool(bufferCount);
         _statesPerSample = (int)(Multiplier * statesPerSample);
     }
 
-    internal BeeperSamples? EndFrame()
+    internal void EndFrame()
     {
         if (!IsEnabled || _isMuted)
         {
-            return null;
+            return;
         }
 
         var runningTicks = 0;
@@ -48,8 +45,6 @@ internal sealed class BeeperAudio
 
         var ticks = _beeperStates.Count == 0 ? _clock.FrameTicks : _beeperStates[0].Ticks;
         var duration = ticks * Multiplier;
-
-        var samplesBuffer = _beeperSamplesPool.GetBuffer();
 
         for (var i = 0; i <= _beeperStates.Count; i++)
         {
@@ -65,7 +60,7 @@ internal sealed class BeeperAudio
                 sample = (short)(Alpha * sample + (1 - Alpha) * _previousSample);
                 _previousSample = sample;
 
-                samplesBuffer.Add(sample);
+                Samples.Add(sample);
             }
 
             remainingTicks = duration;
@@ -80,8 +75,6 @@ internal sealed class BeeperAudio
         }
 
         _beeperStates.Reset();
-
-        return samplesBuffer;
     }
 
     internal void Update(byte value)

@@ -13,15 +13,17 @@ public sealed class AudioManager
     private const int SamplesPerFrame = PlayerSampleRate / FramesPerSecond;
     private const int NumberOfBuffers = 4;
 
+    private readonly AudioBufferPool _audioBufferPool;
     private readonly BeeperAudio _beeperAudio;
+    private readonly AyAudio _ayAudio;
 
+    private bool _isMuted;
     private bool _isAyAudioEnabled;
     private AudioPlayer? _audioPlayer;
     private bool _isAudioPlayerRunning;
 
     internal BeeperDevice Beeper { get; }
-
-    internal AY8910 AY { get; }
+    internal AyDevice AY { get; } = new();
 
     public bool IsBeeperEnabled
     {
@@ -38,7 +40,10 @@ public sealed class AudioManager
         get => _isAyAudioEnabled;
         set
         {
-            if (_isAyAudioEnabled == value) return;
+            if (_isAyAudioEnabled == value)
+            {
+                return;
+            }
 
             _isAyAudioEnabled = value;
             AY.IsEnabled = value;
@@ -51,24 +56,44 @@ public sealed class AudioManager
     {
         var statesPerSample = (double)hardware.TicksPerFrame / SamplesPerFrame;
 
-        _beeperAudio = new BeeperAudio(clock, statesPerSample, NumberOfBuffers);
+        _beeperAudio = new BeeperAudio(clock, statesPerSample);
         Beeper = new BeeperDevice(cassettePlayer)
         {
             OnUpdateBeeper = _beeperAudio.Update
         };
 
-        AY = new AY8910(clock, statesPerSample);
+        _ayAudio = new AyAudio(clock, AY, statesPerSample);
+        _audioBufferPool = new AudioBufferPool(NumberOfBuffers);
+    }
+
+    internal void NewFrame()
+    {
+        _beeperAudio.Samples.Clear();
     }
 
     internal void EndFrame()
     {
-        AY.EndFrame();
+        _ayAudio.EndFrame();
+        _beeperAudio.EndFrame();
 
-        var buffer = _beeperAudio.EndFrame();
+        var samples = _beeperAudio.Samples;
+        var audioBuffer = _audioBufferPool.GetBuffer();
 
-        if (buffer != null)
+        for (var i = 0; i < samples.Count; i++)
         {
-            _audioPlayer?.TryEnqueue(buffer.Buffer);
+            var sample = samples[i];
+
+            if (_isAyAudioEnabled)
+            {
+                sample += AY.ChannelA.Samples[i] + AY.ChannelB.Samples[i] + AY.ChannelC.Samples[i];
+            }
+
+            audioBuffer.Add((short)sample);
+        }
+
+        if (_beeperAudio.IsEnabled && !_isMuted)
+        {
+            _audioPlayer?.TryEnqueue(audioBuffer.Buffer);
         }
     }
 
@@ -111,11 +136,13 @@ public sealed class AudioManager
 
     public void Mute()
     {
+        _isMuted = true;
         _beeperAudio.Mute();
     }
 
     public void UnMute()
     {
+        _isMuted = false;
         _beeperAudio.UnMute();
     }
 
