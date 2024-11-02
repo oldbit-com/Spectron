@@ -5,7 +5,7 @@ internal sealed class Channel
     private int _counter;
     private int _period  = 1;
 
-    internal bool Tone { get; set; }
+    internal bool Tone { get; private set; }
     internal int Volume { get; set; }
     internal AudioSamples Samples { get; } = new();
 

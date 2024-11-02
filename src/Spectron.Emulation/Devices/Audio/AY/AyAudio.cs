@@ -2,7 +2,6 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.Devices.Audio.AY;
 
-
 /// <summary>
 /// AY audion chip emulation.
 /// Implementation based on JSpeccy code, e.g. copied the logic how AY audio is generated.
@@ -10,13 +9,15 @@ namespace OldBit.Spectron.Emulation.Devices.Audio.AY;
 /// </summary>
 internal sealed class AyAudio
 {
-    private const int Multiplier = 100_000;
+    private const int Multiplier = 100_000; // used to avoid floating point calculations and rounding errors
+    private const int ClockDivisor = 16;
+    private const int ClockStep = Multiplier * ClockDivisor;
 
     private readonly long _statesPerSample;
     private readonly double _sampleRate;
 
-    private int _audioTicks;
-    private long stepCounter;
+    private int _ayTicks;
+    private long _clockStepCounter;
     private readonly Clock _clock;
     private readonly AyDevice _ay;
 
@@ -26,7 +27,8 @@ internal sealed class AyAudio
         _ay = ay;
 
         _statesPerSample = (long)(Multiplier * statesPerSample);
-        _sampleRate = statesPerSample / 16.0;
+        _sampleRate = statesPerSample / ClockDivisor;
+
         _ay.OnUpdateAudio = () => Update(clock.FrameTicks);
     }
 
@@ -38,16 +40,16 @@ internal sealed class AyAudio
         _ay.ChannelB.Samples.Clear();
         _ay.ChannelC.Samples.Clear();
 
-        _audioTicks -= _clock.FrameTicks;
+        _ayTicks -= _clock.FrameTicks;
     }
 
     internal void Reset() => _ay.Reset();
 
     private void Update(int ticks)
     {
-        while (_audioTicks < ticks)
+        while (_ayTicks < ticks)
         {
-            _audioTicks += 16;
+            _ayTicks += 16;
 
             _ay.ChannelA.Update();
             _ay.ChannelB.Update();
@@ -70,10 +72,10 @@ internal sealed class AyAudio
                 _ay.SetAmplitudeUsingEnvelope(_ay.ChannelC);
             }
 
-            long diff = _statesPerSample - stepCounter;
-            stepCounter += Multiplier * 16;
+            var diff = _statesPerSample - _clockStepCounter;
+            _clockStepCounter += ClockStep;
 
-            if (diff > Multiplier * 16)
+            if (diff > ClockStep)
             {
                 if ((_ay.ChannelA.Tone || _ay.ChannelA.ToneDisabled) && (_ay.Noise.Tone || _ay.ChannelA.NoiseDisabled))
                 {
@@ -92,7 +94,7 @@ internal sealed class AyAudio
             }
             else
             {
-                var percent = diff / (double)Multiplier * 16;
+                var percent = diff / (double)ClockStep;
                 int lastA = 0, lastB = 0, lastC = 0;
 
                 if ((_ay.ChannelA.Tone || _ay.ChannelA.ToneDisabled) && (_ay.Noise.Tone || _ay.ChannelA.NoiseDisabled))
@@ -110,7 +112,7 @@ internal sealed class AyAudio
                     lastC = (int)(_ay.ChannelC.Amplitude * percent);
                 }
 
-                stepCounter -= _statesPerSample;
+                _clockStepCounter -= _statesPerSample;
 
                 _ay.ChannelA.Samples.Add((int)((_ay.ChannelA.Volume + lastA) / _sampleRate));
                 _ay.ChannelB.Samples.Add((int)((_ay.ChannelB.Volume + lastB) / _sampleRate));

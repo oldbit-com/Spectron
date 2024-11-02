@@ -2,12 +2,12 @@ namespace OldBit.Spectron.Emulation.Devices.Audio.AY;
 
 internal sealed class Noise
 {
+    private int _period  = 1;
     private int _counter;
     private byte _periodRegister;
     private int _rng = 1;
 
-    internal int Period { get; private set; } = 1;
-    internal bool Tone { get; set; }
+    internal bool Tone { get; private set; }
 
     internal void SetPeriod(byte period) => _periodRegister = (byte)(period & 0x1F);
 
@@ -15,19 +15,19 @@ internal sealed class Noise
     {
         _counter += 1;
 
-        if (_counter < Period)
+        if (_counter < _period)
         {
             return;
         }
 
         _counter = 0;
 
-        Period = _periodRegister;
-        if (Period == 0)
+        _period = _periodRegister;
+        if (_period == 0)
         {
-            Period = 1;
+            _period = 1;
         }
-        Period <<= 1;
+        _period <<= 1;
 
         if (((_rng + 1) & 0x02) != 0)
         {
@@ -43,7 +43,7 @@ internal sealed class Noise
 
     internal void Reset()
     {
-        Period = 1;
+        _period = 1;
         _counter = 0;
         Tone = false;
         _periodRegister = 0;
