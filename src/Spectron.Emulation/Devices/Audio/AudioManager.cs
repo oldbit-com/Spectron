@@ -53,7 +53,7 @@ public sealed class AudioManager
         }
     }
 
-    public bool IsAyAudioEnabled48K { get; set; }
+    public bool IsAyAudioEnabled48K { get; set; } = true;
 
     internal AudioManager(Clock clock, CassettePlayer? cassettePlayer, HardwareSettings hardware)
     {

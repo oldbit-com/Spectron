@@ -229,7 +229,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
 
     private void LoadAyRegisters(AudioManager audioManager, AyBlock? ay)
     {
-        if (ay == null) // || !audioManager.IsAySupported)
+        if (ay == null  || !audioManager.IsAySupported)
         {
             return;
         }
