@@ -11,7 +11,9 @@ internal sealed class AyDevice : IDevice
         0.1691, 0.2647, 0.3527, 0.4499, 0.5704, 0.6873, 0.8482, 1.0000];
 
     private readonly int[] _volumeLevels = SignalLevels.Select(x => (int)(x * MaxAmplitude)).ToArray();
-    private readonly byte[] _registers = new byte[16];
+
+    internal byte CurrentRegister { get; private set; }
+    internal byte[] Registers { get; } = new byte[16];
 
     internal Channel ChannelA { get; } = new();
     internal Channel ChannelB { get; } = new();
@@ -22,8 +24,6 @@ internal sealed class AyDevice : IDevice
     internal bool IsEnabled { get; set; }
     internal Action OnUpdateAudio { get; set; } = () => { };
 
-    private int _selectedRegister;
-
     public void WritePort(Word address, byte value)
     {
         if (!IsEnabled)
@@ -33,82 +33,11 @@ internal sealed class AyDevice : IDevice
 
         if (IsRegisterPort(address))
         {
-            _selectedRegister = value & 0x0F;
+            CurrentRegister = (byte)(value & 0x0F);
         }
         else if (IsDataPort(address))
         {
-            OnUpdateAudio();
-
-            SetRegister(_selectedRegister, value);
-
-            switch (_selectedRegister)
-            {
-                case FineTuneA:
-                case CoarseTuneA:
-                    ChannelA.SetPeriod(_registers[FineTuneA], _registers[CoarseTuneA]);
-                    break;
-
-                case FineTuneB:
-                case CoarseTuneB:
-                    ChannelB.SetPeriod(_registers[FineTuneB], _registers[CoarseTuneB]);
-                    break;
-
-                case FineTuneC:
-                case CoarseTuneC:
-                    ChannelC.SetPeriod(_registers[FineTuneC], _registers[CoarseTuneC]);
-                    break;
-
-                case NoisePeriod:
-                    Noise.SetPeriod(value);
-                    break;
-
-                case Mixer:
-                    ChannelA.ToneDisabled = (value & 0x01) != 0;
-                    ChannelB.ToneDisabled = (value & 0x02) != 0;
-                    ChannelC.ToneDisabled = (value & 0x04) != 0;
-
-                    ChannelA.NoiseDisabled = (value & 0x08) != 0;
-                    ChannelB.NoiseDisabled = (value & 0x10) != 0;
-                    ChannelC.NoiseDisabled = (value & 0x20) != 0;
-                    break;
-
-                case AmplitudeA:
-                    (ChannelA.AmplitudeMode, ChannelA.Amplitude) = GetAmplitude(value);
-                    break;
-
-                case AmplitudeB:
-                    (ChannelB.AmplitudeMode, ChannelB.Amplitude) = GetAmplitude(value);
-                    break;
-
-                case AmplitudeC:
-                    (ChannelC.AmplitudeMode, ChannelC.Amplitude) = GetAmplitude(value);
-                    break;
-
-                case FineTuneEnvelope:
-                case CoarseTuneEnvelope:
-                    Envelope.SetPeriod(_registers[FineTuneEnvelope], _registers[CoarseTuneEnvelope]);
-                    break;
-
-                case EnvelopeShape:
-                    Envelope.SetShape(value);
-
-                    if (ChannelA.AmplitudeMode == AmplitudeMode.VariableLevel)
-                    {
-                        ChannelA.Amplitude = _volumeLevels[Envelope.Amplitude];
-                    }
-
-                    if (ChannelB.AmplitudeMode == AmplitudeMode.VariableLevel)
-                    {
-                        ChannelB.Amplitude = _volumeLevels[Envelope.Amplitude];
-                    }
-
-                    if (ChannelC.AmplitudeMode == AmplitudeMode.VariableLevel)
-                    {
-                        ChannelC.Amplitude = _volumeLevels[Envelope.Amplitude];
-                    }
-
-                    break;
-            }
+            SetRegisterValue(CurrentRegister, value);
         }
     }
 
@@ -121,7 +50,7 @@ internal sealed class AyDevice : IDevice
 
         if (IsDataPort(address))
         {
-            return _registers[_selectedRegister];
+            return Registers[CurrentRegister];
         }
 
         return null;
@@ -132,15 +61,25 @@ internal sealed class AyDevice : IDevice
 
     internal void Reset()
     {
-        _selectedRegister = 0;
+        CurrentRegister = 0;
 
-        Array.Fill(_registers, (byte)0);
+        Array.Fill(Registers, (byte)0);
 
         ChannelA.Reset();
         ChannelB.Reset();
         ChannelC.Reset();
         Noise.Reset();
         Envelope.Reset();
+    }
+
+    internal void LoadRegisters(byte currentRegister, byte[] registers)
+    {
+        CurrentRegister = currentRegister;
+
+        for (var i = 0; i < registers.Length; i++)
+        {
+            SetRegisterValue(i, registers[i]);
+        }
     }
 
     private (AmplitudeMode Mode, int Amplitude) GetAmplitude(int value)
@@ -155,7 +94,80 @@ internal sealed class AyDevice : IDevice
         return (mode, amplitude);
     }
 
-    private void SetRegister(int register, byte value) => _registers[register] = value;
+    private void SetRegisterValue(int register, byte value)
+    {
+        OnUpdateAudio();
+        Registers[register] = value;
+
+        switch (register)
+        {
+            case FineTuneA:
+            case CoarseTuneA:
+                ChannelA.SetPeriod(Registers[FineTuneA], Registers[CoarseTuneA]);
+                break;
+
+            case FineTuneB:
+            case CoarseTuneB:
+                ChannelB.SetPeriod(Registers[FineTuneB], Registers[CoarseTuneB]);
+                break;
+
+            case FineTuneC:
+            case CoarseTuneC:
+                ChannelC.SetPeriod(Registers[FineTuneC], Registers[CoarseTuneC]);
+                break;
+
+            case NoisePeriod:
+                Noise.SetPeriod(value);
+                break;
+
+            case Mixer:
+                ChannelA.ToneDisabled = (value & 0x01) != 0;
+                ChannelB.ToneDisabled = (value & 0x02) != 0;
+                ChannelC.ToneDisabled = (value & 0x04) != 0;
+
+                ChannelA.NoiseDisabled = (value & 0x08) != 0;
+                ChannelB.NoiseDisabled = (value & 0x10) != 0;
+                ChannelC.NoiseDisabled = (value & 0x20) != 0;
+                break;
+
+            case AmplitudeA:
+                (ChannelA.AmplitudeMode, ChannelA.Amplitude) = GetAmplitude(value);
+                break;
+
+            case AmplitudeB:
+                (ChannelB.AmplitudeMode, ChannelB.Amplitude) = GetAmplitude(value);
+                break;
+
+            case AmplitudeC:
+                (ChannelC.AmplitudeMode, ChannelC.Amplitude) = GetAmplitude(value);
+                break;
+
+            case FineTuneEnvelope:
+            case CoarseTuneEnvelope:
+                Envelope.SetPeriod(Registers[FineTuneEnvelope], Registers[CoarseTuneEnvelope]);
+                break;
+
+            case EnvelopeShape:
+                Envelope.SetShape(value);
+
+                if (ChannelA.AmplitudeMode == AmplitudeMode.VariableLevel)
+                {
+                    ChannelA.Amplitude = _volumeLevels[Envelope.Amplitude];
+                }
+
+                if (ChannelB.AmplitudeMode == AmplitudeMode.VariableLevel)
+                {
+                    ChannelB.Amplitude = _volumeLevels[Envelope.Amplitude];
+                }
+
+                if (ChannelC.AmplitudeMode == AmplitudeMode.VariableLevel)
+                {
+                    ChannelC.Amplitude = _volumeLevels[Envelope.Amplitude];
+                }
+
+                break;
+        }
+    }
 
     // Register port 0xFFFD is decoded as: A15=1,A14=1 & A1=0
     private static bool IsRegisterPort(Word address) => (address & 0xC002) == 0xC000;

@@ -45,8 +45,8 @@ internal sealed class Noise
     {
         _period = 1;
         _counter = 0;
-        Tone = false;
         _periodRegister = 0;
         _rng = 1;
+        Tone = false;
     }
 }

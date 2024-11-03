@@ -143,7 +143,7 @@ public sealed class Emulator
         _spectrumBus.AddDevice(UlaPlus);
         _spectrumBus.AddDevice(Memory);
         _spectrumBus.AddDevice(AudioManager.Beeper);
-        _spectrumBus.AddDevice(AudioManager.AY);
+        _spectrumBus.AddDevice(AudioManager.Ay);
 
         var floatingBus = new FloatingBus(Memory, Cpu.Clock);
         _spectrumBus.AddDevice(floatingBus);

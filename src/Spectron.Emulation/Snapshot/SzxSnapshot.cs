@@ -1,5 +1,6 @@
 using System.IO.Compression;
 using OldBit.Spectron.Emulation.Devices;
+using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
@@ -44,6 +45,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         LoadUlaPlus(emulator.UlaPlus, snapshot.Palette);
         LoadJoystick(emulator.JoystickManager, snapshot.Joystick);
         LoadTape(emulator.TapeManager, snapshot.Tape);
+        LoadAyRegisters(emulator.AudioManager, snapshot.Ay);
 
         // TODO: Load the rest of the snapshot
 
@@ -83,6 +85,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         SaveUlaPlus(emulator.UlaPlus, snapshot);
         SaveJoystick(emulator.JoystickManager, snapshot);
         SaveTape(emulator.TapeManager, snapshot, compressionLevel);
+        SaveAyRegisters(emulator.AudioManager, snapshot);
 
         if (emulator.RomType.IsCustomRom())
         {
@@ -224,6 +227,16 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         }
     }
 
+    private void LoadAyRegisters(AudioManager audioManager, AyBlock? ay)
+    {
+        if (ay == null) // || !audioManager.IsAySupported)
+        {
+            return;
+        }
+
+        audioManager.Ay.LoadRegisters(ay.CurrentRegister, ay.Registers);
+    }
+
     private static void SaveRegisters(Z80 cpu, Z80RegsBlock registers)
     {
         registers.AF = cpu.Registers.AF;
@@ -355,6 +368,23 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         {
             FileExtension = "tzx"
         };
+    }
+
+    private static void SaveAyRegisters(AudioManager audioManager, SzxFile snapshot)
+    {
+        if (!audioManager.IsAySupported)
+        {
+            return;
+        }
+
+        snapshot.Ay = new AyBlock
+        {
+            CurrentRegister = audioManager.Ay.CurrentRegister
+        };
+        for (var i = 0; i <  audioManager.Ay.Registers.Length; i++)
+        {
+            snapshot.Ay.Registers[i] = audioManager.Ay.Registers[i];
+        }
     }
 
     private static T[] ConcatenateArrays<T>(T[] first, T[] second)

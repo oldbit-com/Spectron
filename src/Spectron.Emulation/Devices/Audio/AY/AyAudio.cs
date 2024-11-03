@@ -10,8 +10,8 @@ namespace OldBit.Spectron.Emulation.Devices.Audio.AY;
 internal sealed class AyAudio
 {
     private const int Multiplier = 100_000; // used to avoid floating point calculations and rounding errors
-    private const int ClockDivisor = 16;
-    private const int ClockStep = Multiplier * ClockDivisor;
+    private const int AyCycles = 16;
+    private const int ClockStep = Multiplier * AyCycles;
 
     private readonly long _statesPerSample;
     private readonly double _sampleRate;
@@ -27,7 +27,7 @@ internal sealed class AyAudio
         _ay = ay;
 
         _statesPerSample = (long)(Multiplier * statesPerSample);
-        _sampleRate = statesPerSample / ClockDivisor;
+        _sampleRate = statesPerSample / AyCycles;
 
         _ay.OnUpdateAudio = () => Update(clock.FrameTicks);
     }
