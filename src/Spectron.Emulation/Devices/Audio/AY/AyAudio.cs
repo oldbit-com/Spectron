@@ -71,10 +71,10 @@ internal sealed class AyAudio
                 _ay.SetAmplitudeUsingEnvelope(_ay.ChannelC);
             }
 
-            var diff = _statesPerSample - _clockStepCounter;
+            var remaining = _statesPerSample - _clockStepCounter;
             _clockStepCounter += ClockStep;
 
-            if (diff > ClockStep)
+            if (remaining > ClockStep)
             {
                 if ((_ay.ChannelA.Tone || _ay.ChannelA.ToneDisabled) && (_ay.Noise.Tone || _ay.ChannelA.NoiseDisabled))
                 {
@@ -93,7 +93,7 @@ internal sealed class AyAudio
             }
             else
             {
-                var percent = diff / (double)ClockStep;
+                var percent = remaining / (double)ClockStep;
                 int lastA = 0, lastB = 0, lastC = 0;
 
                 if ((_ay.ChannelA.Tone || _ay.ChannelA.ToneDisabled) && (_ay.Noise.Tone || _ay.ChannelA.NoiseDisabled))
