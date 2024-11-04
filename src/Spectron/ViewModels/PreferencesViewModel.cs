@@ -23,6 +23,10 @@ public class PreferencesViewModel : ViewModelBase
         JoystickUseCursorKeys = preferences.Joystick.UseCursorKeys;
         IsResumeEnabled = preferences.IsResumeEnabled;
 
+        IsBeeperEnabled = preferences.AudioSettings.IsBeeperEnabled;
+        IsAyAudioEnabled = preferences.AudioSettings.IsAyAudioEnabled;
+        IsAyAudioEnabled48K = preferences.AudioSettings.IsAyAudioEnabled48K;
+
         IsTimeMachineEnabled = preferences.TimeMachine.IsEnabled;
         SnapshotInterval = preferences.TimeMachine.SnapshotInterval.TotalSeconds;
         MaxDuration = preferences.TimeMachine.MaxDuration.TotalSeconds;
@@ -41,6 +45,13 @@ public class PreferencesViewModel : ViewModelBase
                 UseCursorKeys = JoystickUseCursorKeys,
             },
             IsResumeEnabled = IsResumeEnabled,
+
+            AudioSettings = new AudioSettings
+            {
+                IsBeeperEnabled = IsBeeperEnabled,
+                IsAyAudioEnabled = IsAyAudioEnabled,
+                IsAyAudioEnabled48K = IsAyAudioEnabled48K
+            },
 
             TimeMachine = new TimeMachineSettings
             {
@@ -136,4 +147,25 @@ public class PreferencesViewModel : ViewModelBase
         new("Accelerated", TapeSpeed.Accelerated),
         new("Instant", TapeSpeed.Instant)
     ];
+
+    private bool _isBeeperEnabled;
+    public bool IsBeeperEnabled
+    {
+        get => _isBeeperEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isBeeperEnabled, value);
+    }
+
+    private bool _isAyAudioEnabled;
+    public bool IsAyAudioEnabled
+    {
+        get => _isAyAudioEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isAyAudioEnabled, value);
+    }
+
+    private bool _isAyAudioEnabled48K;
+    public bool IsAyAudioEnabled48K
+    {
+        get => _isAyAudioEnabled48K;
+        set => this.RaiseAndSetIfChanged(ref _isAyAudioEnabled48K, value);
+    }
 }

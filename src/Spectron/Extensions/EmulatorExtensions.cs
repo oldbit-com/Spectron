@@ -24,4 +24,16 @@ public static class EmulatorExtensions
         emulator.TapeManager.IsTapeSaveEnabled = tapeSavingSettings.IsEnabled;
         emulator.TapeManager.TapeSaveSpeed = tapeSavingSettings.Speed;
     }
+
+    public static void SetAudioSettings(this Emulator? emulator, AudioSettings audioSettings)
+    {
+        if (emulator == null)
+        {
+            return;
+        }
+
+        emulator.AudioManager.IsBeeperEnabled = audioSettings.IsBeeperEnabled;
+        emulator.AudioManager.IsAyAudioEnabled = audioSettings.IsAyAudioEnabled;
+        emulator.AudioManager.IsAyAudioEnabled48K = audioSettings.IsAyAudioEnabled48K;
+    }
 }

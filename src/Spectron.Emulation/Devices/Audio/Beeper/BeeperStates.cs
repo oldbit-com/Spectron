@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.Devices.Audio;
+namespace OldBit.Spectron.Emulation.Devices.Audio.Beeper;
 
 internal record BeeperState(int Ticks, byte EarMic)
 {

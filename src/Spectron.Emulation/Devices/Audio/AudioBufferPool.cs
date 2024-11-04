@@ -1,22 +1,22 @@
 namespace OldBit.Spectron.Emulation.Devices.Audio;
 
-internal sealed class SamplesBufferPool
+internal sealed class AudioBufferPool
 {
-    private readonly List<SamplesBuffer> _pool = [];
+    private readonly List<AudioBuffer> _pool = [];
     private int _position;
 
-    internal SamplesBufferPool(int capacity)
+    internal AudioBufferPool(int capacity)
     {
         for (var i = 0; i < capacity; i++)
         {
-            _pool.Add(new SamplesBuffer());
+            _pool.Add(new AudioBuffer());
         }
     }
 
-    internal SamplesBuffer GetBuffer()
+    internal AudioBuffer GetBuffer()
     {
         var buffer = _pool[_position];
-        buffer.Reset();
+        buffer.Clear();
 
         _position = (_position + 1) % _pool.Count;
 

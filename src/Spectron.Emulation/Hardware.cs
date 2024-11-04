@@ -5,7 +5,8 @@ internal sealed record HardwareSettings(
     int TicksPerLine,
     int TicksPerFrame,
     int InterruptFrequency,
-    int FirstPixelTick);
+    int FirstPixelTick,
+    bool HasAyChip = false);
 
 internal static class Hardware
 {
@@ -21,7 +22,8 @@ internal static class Hardware
         TicksPerLine: 228,
         TicksPerFrame: 70908,
         InterruptFrequency: 50,
-        FirstPixelTick: 14361);
+        FirstPixelTick: 14361,
+        HasAyChip: true);
 
     internal static HardwareSettings Timex2048 { get; } = new HardwareSettings(
         ClockMhz: 3.5f,

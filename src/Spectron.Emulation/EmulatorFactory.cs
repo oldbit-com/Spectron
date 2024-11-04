@@ -10,8 +10,7 @@ internal sealed record EmulatorArgs(
     ComputerType ComputerType,
     RomType RomType,
     IEmulatorMemory Memory,
-    IContentionProvider ContentionProvider,
-    bool UseAYSound);
+    IContentionProvider ContentionProvider);
 
 public sealed class EmulatorFactory(TimeMachine timeMachine, TapeManager tapeManager, ILogger<EmulatorFactory> logger)
 {
@@ -54,8 +53,7 @@ public sealed class EmulatorFactory(TimeMachine timeMachine, TapeManager tapeMan
             ComputerType.Spectrum128K,
             romType,
             memory,
-            contentionProvider,
-            UseAYSound: true);
+            contentionProvider);
 
         return new Emulator(emulatorSettings, Hardware.Spectrum128K, tapeManager, timeMachine, logger);
     }
@@ -70,8 +68,7 @@ public sealed class EmulatorFactory(TimeMachine timeMachine, TapeManager tapeMan
             computerType,
             romType,
             memory,
-            contentionProvider,
-            UseAYSound: false);
+            contentionProvider);
 
         return new Emulator(emulatorSettings, Hardware.Spectrum48K, tapeManager, timeMachine, logger);
     }

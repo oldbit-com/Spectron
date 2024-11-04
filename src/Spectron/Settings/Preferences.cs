@@ -28,4 +28,6 @@ public class Preferences
     public bool IsResumeEnabled { get; init; } = true;
 
     public TapeSavingSettings TapeSaving { get; init; } = new(true, TapeSpeed.Instant);
+
+    public AudioSettings AudioSettings { get; init; } = new();
 }

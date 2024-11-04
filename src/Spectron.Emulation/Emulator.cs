@@ -18,7 +18,6 @@ public sealed class Emulator
 {
     private readonly HardwareSettings _hardware;
     private readonly TimeMachine _timeMachine;
-    private readonly Beeper _beeper;
     private readonly SpectrumBus _spectrumBus;
     private readonly EmulatorTimer _emulationTimer;
 
@@ -33,6 +32,7 @@ public sealed class Emulator
     public KeyboardHandler KeyboardHandler { get; } = new();
     public TapeManager TapeManager { get; }
     public JoystickManager JoystickManager { get; }
+    public AudioManager AudioManager { get; }
     public ComputerType ComputerType { get; }
     public RomType RomType { get; }
     public TapeSpeed TapeLoadSpeed { get; set; }
@@ -55,17 +55,18 @@ public sealed class Emulator
         ComputerType = emulatorArgs.ComputerType;
         RomType = emulatorArgs.RomType;
         Memory = emulatorArgs.Memory;
-        _beeper = new Beeper(hardware);
 
         UlaPlus = new UlaPlus();
         _spectrumBus = new SpectrumBus();
         ScreenBuffer = new ScreenBuffer(emulatorArgs.Memory, UlaPlus);
-        Cpu = new Z80(emulatorArgs.Memory, emulatorArgs.ContentionProvider);
+        Cpu = new Z80(emulatorArgs.Memory, emulatorArgs.ContentionProvider); ;
 
         JoystickManager = new JoystickManager(_spectrumBus, KeyboardHandler);
         TapeManager.Attach(Cpu, Memory, hardware);
 
-        SetupUlaAndDevices(emulatorArgs.UseAYSound);
+        AudioManager = new AudioManager(Cpu.Clock, tapeManager.Player, hardware);
+
+        SetupUlaAndDevices();
         SetupEventHandlers();
 
         _emulationTimer = new EmulatorTimer();
@@ -84,13 +85,13 @@ public sealed class Emulator
 
     public void Start()
     {
-        _beeper.Start();
+        AudioManager.Start();
         _emulationTimer.Start();
     }
 
     public void Shutdown()
     {
-        _beeper.Stop();
+        AudioManager.Stop();
         _emulationTimer.Stop();
 
         while (!_emulationTimer.IsStopped)
@@ -109,7 +110,7 @@ public sealed class Emulator
 
     public void Reset()
     {
-        _beeper.Reset();
+        AudioManager.ResetAudio();
         Memory.Reset();
         Cpu.Reset();
         ScreenBuffer.Reset();
@@ -120,10 +121,6 @@ public sealed class Emulator
             Resume();
         }
     }
-
-    public void Mute() => _beeper.Mute();
-
-    public void UnMute() => _beeper.UnMute();
 
     public void SetEmulationSpeed(int emulationSpeedPercentage) => _emulationTimer.Interval =
         emulationSpeedPercentage == int.MaxValue ?
@@ -138,18 +135,15 @@ public sealed class Emulator
         UlaPlus.ActiveChanged += (_) => _invalidateScreen = true;
     }
 
-    private void SetupUlaAndDevices(bool useAYSound)
+    private void SetupUlaAndDevices()
     {
-        var ula = new Ula(KeyboardHandler, _beeper, ScreenBuffer, Cpu.Clock, TapeManager?.TapePlayer);
+        var ula = new Ula(KeyboardHandler, ScreenBuffer, Cpu.Clock, TapeManager?.Player);
 
         _spectrumBus.AddDevice(ula);
         _spectrumBus.AddDevice(UlaPlus);
         _spectrumBus.AddDevice(Memory);
-
-        if (useAYSound)
-        {
-            _spectrumBus.AddDevice(new AY8910());
-        }
+        _spectrumBus.AddDevice(AudioManager.Beeper);
+        _spectrumBus.AddDevice(AudioManager.Ay);
 
         var floatingBus = new FloatingBus(Memory, Cpu.Clock);
         _spectrumBus.AddDevice(floatingBus);
@@ -176,11 +170,12 @@ public sealed class Emulator
     {
         Cpu.Clock.NewFrame();
         ScreenBuffer.NewFrame();
+        AudioManager.NewFrame();
     }
 
     private void EndFrame()
     {
-        _beeper.EndFrame(Cpu.Clock.FrameTicks);
+        AudioManager.EndFrame();
 
         ScreenBuffer.UpdateBorder(Cpu.Clock.FrameTicks);
         Cpu.TriggerInt(0xFF);

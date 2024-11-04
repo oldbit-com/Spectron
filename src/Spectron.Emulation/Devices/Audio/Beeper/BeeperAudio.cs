@@ -1,0 +1,108 @@
+using OldBit.Z80Cpu;
+
+namespace OldBit.Spectron.Emulation.Devices.Audio.Beeper;
+
+internal sealed class BeeperAudio
+{
+    private const float Alpha = 0.6f;
+    private const int Multiplier = 1000;  // Used to avoid floating point arithmetic and rounding errors
+
+    private byte _lastEarMic;
+    private bool _isMuted;
+    private short _previousSample;
+
+    private readonly Clock _clock;
+    private readonly int _statesPerSample;
+    private readonly BeeperStates _beeperStates = new();
+
+    private const int Volume = 24000;
+    private readonly short[] _volumeLevels =
+    [
+        -Volume,
+        (short)(0.66f / 3.70f * Volume),
+        (short)(3.56f / 3.70f * Volume),
+        Volume
+    ];
+
+    internal bool IsEnabled { get; set; }
+    internal AudioSamples Samples { get; } = new();
+
+    internal BeeperAudio(Clock clock, double statesPerSample)
+    {
+        _clock = clock;
+        _statesPerSample = (int)(Multiplier * statesPerSample);
+    }
+
+    internal void EndFrame()
+    {
+        if (!IsEnabled || _isMuted)
+        {
+            return;
+        }
+
+        var runningTicks = 0;
+        var remainingTicks = 0;
+
+        var ticks = _beeperStates.Count == 0 ? _clock.FrameTicks : _beeperStates[0].Ticks;
+        var duration = ticks * Multiplier;
+
+        for (var i = 0; i <= _beeperStates.Count; i++)
+        {
+            runningTicks += duration;
+            duration += remainingTicks;
+
+            while (duration >= _statesPerSample)
+            {
+                duration -= _statesPerSample;
+
+                // Get sample and apply simple low-pass filter to make edges smoother
+                var sample = i < _beeperStates.Count ? _volumeLevels[_beeperStates[i].EarMic] : _volumeLevels[_lastEarMic];
+                sample = (short)(Alpha * sample + (1 - Alpha) * _previousSample);
+                _previousSample = sample;
+
+                Samples.Add(sample);
+            }
+
+            remainingTicks = duration;
+
+            if (i == _beeperStates.Count)
+            {
+                break;
+            }
+
+            ticks = i == _beeperStates.Count - 1 ? _clock.FrameTicks : _beeperStates[i + 1].Ticks;
+            duration = ticks * Multiplier - runningTicks;
+        }
+
+        _beeperStates.Reset();
+    }
+
+    internal void Update(byte value)
+    {
+        if (!IsEnabled || _isMuted)
+        {
+            return;
+        }
+
+        var earMic = (value >> 3) & 0x03;
+
+        if (_lastEarMic != earMic)
+        {
+            _beeperStates.Add(_clock.FrameTicks, _lastEarMic);
+        }
+
+        _lastEarMic = (byte)earMic;
+    }
+
+    internal void Reset() => _beeperStates.Reset();
+
+    internal void Stop() => _beeperStates.Reset();
+
+    internal void Mute()
+    {
+        _isMuted = true;
+        _beeperStates.Reset();
+    }
+
+    internal void UnMute() => _isMuted = false;
+}

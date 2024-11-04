@@ -43,7 +43,15 @@
                         <RadioButton Content="ZX Spectrum 128k" Classes="Center" GroupName="ComputerType" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum128K}}"/>
                         <Separator Margin="0 10 0 10" />
                         <CheckBox Content="Enable ULA plus" Classes="Center" IsChecked="{Binding IsUlaPlusEnabled}"/>
-                        <CheckBox Content="Disable Beeper" Classes="Center"/>
+                    </StackPanel>
+                </Border>
+            </TabItem>
+            <TabItem Header="Audio">
+                <Border Classes="Tab">
+                    <StackPanel>
+                        <CheckBox Content="Beeper enabled" Classes="Center" IsChecked="{Binding IsBeeperEnabled}"/>
+                        <CheckBox x:Name="AyAudioEnabled" Content="AY sound enabled" Classes="Center" IsChecked="{Binding IsAyAudioEnabled}"/>
+                        <CheckBox Content="Enable AY in 16/48k mode" Classes="Center" Margin="25 0 0 0" IsChecked="{Binding IsAyAudioEnabled48K}" IsEnabled="{Binding #AyAudioEnabled.IsChecked}"/>
                     </StackPanel>
                 </Border>
             </TabItem>
