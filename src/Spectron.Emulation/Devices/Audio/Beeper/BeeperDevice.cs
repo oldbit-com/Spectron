@@ -6,13 +6,15 @@ internal class BeeperDevice : IDevice
 {
     private readonly CassettePlayer? _cassettePlayer;
 
+    internal bool IsEnabled { get; set; }
+
     internal Action<byte> OnUpdateBeeper { get; init; } = _ => { };
 
     internal BeeperDevice(CassettePlayer? cassettePlayer) => _cassettePlayer = cassettePlayer;
 
     public void WritePort(Word address, byte value)
     {
-        if (!Ula.IsUlaPort(address))
+        if (!IsEnabled || !Ula.IsUlaPort(address))
         {
             return;
         }

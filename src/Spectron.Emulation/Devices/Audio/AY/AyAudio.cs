@@ -31,14 +31,16 @@ internal sealed class AyAudio
         _ay.OnUpdateAudio = () => Update(clock.FrameTicks);
     }
 
-    internal void EndFrame()
+    internal void NewFrame()
     {
-        Update(_clock.FrameTicks);
-
         _ay.ChannelA.Samples.Clear();
         _ay.ChannelB.Samples.Clear();
         _ay.ChannelC.Samples.Clear();
+    }
 
+    internal void EndFrame()
+    {
+        Update(_clock.FrameTicks);
         _ayTicks -= _clock.FrameTicks;
     }
 
