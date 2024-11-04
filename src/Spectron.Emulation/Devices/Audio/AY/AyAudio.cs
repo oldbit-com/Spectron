@@ -4,8 +4,7 @@ namespace OldBit.Spectron.Emulation.Devices.Audio.AY;
 
 /// <summary>
 /// AY audion chip emulation.
-/// Implementation based on JSpeccy code, e.g. copied the logic how AY audio is generated.
-/// https://github.com/jsanchezv/JSpeccy/blob/master/src/main/java/machine/AY8912.java
+/// Based on JSpeccy implementation: https://github.com/jsanchezv/JSpeccy/blob/master/src/main/java/machine/AY8912.java
 /// </summary>
 internal sealed class AyAudio
 {
@@ -82,14 +81,14 @@ internal sealed class AyAudio
                     _ay.ChannelA.Volume += _ay.ChannelA.Amplitude;
                 }
 
-                if ((_ay.ChannelB.Tone || _ay.ChannelA.ToneDisabled) && (_ay.Noise.Tone || _ay.ChannelB.NoiseDisabled))
+                if ((_ay.ChannelB.Tone || _ay.ChannelB.ToneDisabled) && (_ay.Noise.Tone || _ay.ChannelB.NoiseDisabled))
                 {
                     _ay.ChannelB.Volume += _ay.ChannelB.Amplitude;
                 }
 
-                if ((_ay.ChannelC.Tone || _ay.ChannelA.ToneDisabled) && (_ay.Noise.Tone || _ay.ChannelC.NoiseDisabled))
+                if ((_ay.ChannelC.Tone || _ay.ChannelC.ToneDisabled) && (_ay.Noise.Tone || _ay.ChannelC.NoiseDisabled))
                 {
-                    _ay.ChannelC.Volume += _ay.ChannelB.Amplitude;
+                    _ay.ChannelC.Volume += _ay.ChannelC.Amplitude;
                 }
             }
             else
@@ -102,12 +101,12 @@ internal sealed class AyAudio
                     lastA = (int)(_ay.ChannelA.Amplitude * percent);
                 }
 
-                if ((_ay.ChannelB.Tone || _ay.ChannelA.ToneDisabled) && (_ay.Noise.Tone || _ay.ChannelB.NoiseDisabled))
+                if ((_ay.ChannelB.Tone || _ay.ChannelB.ToneDisabled) && (_ay.Noise.Tone || _ay.ChannelB.NoiseDisabled))
                 {
                     lastB = (int)(_ay.ChannelB.Amplitude * percent);
                 }
 
-                if ((_ay.ChannelC.Tone || _ay.ChannelA.ToneDisabled) && (_ay.Noise.Tone || _ay.ChannelC.NoiseDisabled))
+                if ((_ay.ChannelC.Tone || _ay.ChannelC.ToneDisabled) && (_ay.Noise.Tone || _ay.ChannelC.NoiseDisabled))
                 {
                     lastC = (int)(_ay.ChannelC.Amplitude * percent);
                 }

@@ -64,6 +64,7 @@ internal sealed class AyDevice : IDevice
         CurrentRegister = 0;
 
         Array.Fill(Registers, (byte)0);
+        Registers[Mixer] = 0xFF;
 
         ChannelA.Reset();
         ChannelB.Reset();

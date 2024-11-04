@@ -86,6 +86,8 @@ internal sealed class Envelope
     {
         _first = false;
         _attack = false;
+        _period = 0;
+        Amplitude = 0;
     }
 }
 

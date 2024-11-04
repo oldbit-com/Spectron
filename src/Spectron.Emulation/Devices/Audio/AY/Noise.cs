@@ -44,8 +44,8 @@ internal sealed class Noise
     internal void Reset()
     {
         _period = 1;
-        _counter = 0;
         _periodRegister = 0;
+        _counter = 0;
         _rng = 1;
         Tone = false;
     }
