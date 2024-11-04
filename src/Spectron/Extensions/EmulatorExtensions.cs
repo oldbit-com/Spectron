@@ -33,7 +33,7 @@ public static class EmulatorExtensions
         }
 
         emulator.AudioManager.IsBeeperEnabled = audioSettings.IsBeeperEnabled;
-        emulator.AudioManager.IsAyAudioEnabled = audioSettings.IsAyAudioEnabled;
-        emulator.AudioManager.IsAyAudioEnabled48K = audioSettings.IsAyAudioEnabled48K;
+        emulator.AudioManager.IsAyEnabled = audioSettings.IsAyAudioEnabled;
+        emulator.AudioManager.IsAySupportedStandardSpectrum = audioSettings.IsAySupportedStandardSpectrum;
     }
 }

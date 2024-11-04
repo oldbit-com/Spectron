@@ -19,41 +19,51 @@ public sealed class AudioManager
     private readonly AyAudio _ayAudio;
 
     private bool _isMuted;
-    private bool _isAyAudioEnabled;
+    private bool _isAyEnabled;
+    private bool _isBeeperEnabled;
     private AudioPlayer? _audioPlayer;
     private bool _isAudioPlayerRunning;
 
     internal BeeperDevice Beeper { get; }
     internal AyDevice Ay { get; } = new();
 
+    public bool IsAySupported => _hasAyChip || IsAySupportedStandardSpectrum;
+
     public bool IsBeeperEnabled
     {
-        get => _beeperAudio.IsEnabled;
+        get => _isBeeperEnabled;
         set
         {
-            if (_beeperAudio.IsEnabled == value) return;
-            ToggleBeeperEnabled(value);
-        }
-    }
-
-    public bool IsAySupported => _hasAyChip || IsAyAudioEnabled48K;
-
-    public bool IsAyAudioEnabled
-    {
-        get => _isAyAudioEnabled;
-        set
-        {
-            if (_isAyAudioEnabled == value)
+            if (_isBeeperEnabled == value)
             {
                 return;
             }
 
-            _isAyAudioEnabled = value;
-            Ay.IsEnabled = value;
+            _isBeeperEnabled = value;
+            Beeper.IsEnabled = value;
+
+            ToggleAudioPlayer();
         }
     }
 
-    public bool IsAyAudioEnabled48K { get; set; } = true;
+    public bool IsAyEnabled
+    {
+        get => _isAyEnabled;
+        set
+        {
+            if (_isAyEnabled == value)
+            {
+                return;
+            }
+
+            _isAyEnabled = value;
+            Ay.IsEnabled = value;
+
+            ToggleAudioPlayer();
+        }
+    }
+
+    public bool IsAySupportedStandardSpectrum { get; set; } = true;
 
     internal AudioManager(Clock clock, CassettePlayer? cassettePlayer, HardwareSettings hardware)
     {
@@ -72,33 +82,49 @@ public sealed class AudioManager
 
     internal void NewFrame()
     {
-        _beeperAudio.Samples.Clear();
+        _beeperAudio.NewFrame();
+        _ayAudio.NewFrame();
     }
 
     internal void EndFrame()
     {
-        _ayAudio.EndFrame();
-        _beeperAudio.EndFrame();
-
-        var samples = _beeperAudio.Samples;
-        var audioBuffer = _audioBufferPool.GetBuffer();
-
-        for (var i = 0; i < samples.Count; i++)
+        if (_isMuted)
         {
-            var sample = samples[i];
+            return;
+        }
 
-            if (_isAyAudioEnabled)
+        var playAudio = false;
+        if (IsAySupported && _isAyEnabled)
+        {
+            _ayAudio.EndFrame();
+            playAudio = true;
+        }
+
+        if (_isBeeperEnabled)
+        {
+            _beeperAudio.EndFrame();
+            playAudio = true;
+        }
+
+        if (!playAudio)
+        {
+            return;
+        }
+
+        var audioBuffer = _audioBufferPool.GetBuffer();
+        var samplesCount = _beeperAudio.Samples.Count == 0 ? Ay.ChannelA.Samples.Count : _beeperAudio.Samples.Count;
+
+        for (var i = 0; i < samplesCount; i++)
+        {
+            var sample = _beeperAudio.Samples.Count > i ? _beeperAudio.Samples[i] : 0;
+            if (Ay.ChannelA.Samples.Count > i)
             {
                 sample += Ay.ChannelA.Samples[i] + Ay.ChannelB.Samples[i] + Ay.ChannelC.Samples[i];
             }
-
             audioBuffer.Add((short)sample);
         }
 
-        if (_beeperAudio.IsEnabled && !_isMuted)
-        {
-            _audioPlayer?.TryEnqueue(audioBuffer.Buffer);
-        }
+        _audioPlayer?.TryEnqueue(audioBuffer.Buffer);
     }
 
     internal void Start()
@@ -139,23 +165,13 @@ public sealed class AudioManager
         _ayAudio.Reset();
     }
 
-    public void Mute()
-    {
-        _isMuted = true;
-        _beeperAudio.Mute();
-    }
+    public void Mute() => _isMuted = true;
 
-    public void UnMute()
-    {
-        _isMuted = false;
-        _beeperAudio.UnMute();
-    }
+    public void UnMute() => _isMuted = false;
 
-    private void ToggleBeeperEnabled(bool isEnabled)
+    private void ToggleAudioPlayer()
     {
-        _beeperAudio.IsEnabled = isEnabled;
-
-        if (isEnabled)
+        if (Beeper.IsEnabled || Ay.IsEnabled)
         {
             Start();
         }

@@ -8,7 +8,6 @@ internal sealed class BeeperAudio
     private const int Multiplier = 1000;  // Used to avoid floating point arithmetic and rounding errors
 
     private byte _lastEarMic;
-    private bool _isMuted;
     private short _previousSample;
 
     private readonly Clock _clock;
@@ -24,7 +23,6 @@ internal sealed class BeeperAudio
         Volume
     ];
 
-    internal bool IsEnabled { get; set; }
     internal AudioSamples Samples { get; } = new();
 
     internal BeeperAudio(Clock clock, double statesPerSample)
@@ -33,13 +31,10 @@ internal sealed class BeeperAudio
         _statesPerSample = (int)(Multiplier * statesPerSample);
     }
 
+    internal void NewFrame() => Samples.Clear();
+
     internal void EndFrame()
     {
-        if (!IsEnabled || _isMuted)
-        {
-            return;
-        }
-
         var runningTicks = 0;
         var remainingTicks = 0;
 
@@ -79,11 +74,6 @@ internal sealed class BeeperAudio
 
     internal void Update(byte value)
     {
-        if (!IsEnabled || _isMuted)
-        {
-            return;
-        }
-
         var earMic = (value >> 3) & 0x03;
 
         if (_lastEarMic != earMic)
@@ -97,12 +87,4 @@ internal sealed class BeeperAudio
     internal void Reset() => _beeperStates.Reset();
 
     internal void Stop() => _beeperStates.Reset();
-
-    internal void Mute()
-    {
-        _isMuted = true;
-        _beeperStates.Reset();
-    }
-
-    internal void UnMute() => _isMuted = false;
 }

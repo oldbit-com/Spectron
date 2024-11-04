@@ -289,8 +289,8 @@ public partial class MainWindowViewModel : ViewModelBase
         Emulator.RenderScreen += EmulatorOnRenderScreen;
 
         Emulator.AudioManager.IsBeeperEnabled = _preferences.AudioSettings.IsBeeperEnabled;
-        Emulator.AudioManager.IsAyAudioEnabled = _preferences.AudioSettings.IsAyAudioEnabled;
-        Emulator.AudioManager.IsAyAudioEnabled48K = _preferences.AudioSettings.IsAyAudioEnabled48K;
+        Emulator.AudioManager.IsAyEnabled = _preferences.AudioSettings.IsAyAudioEnabled;
+        Emulator.AudioManager.IsAySupportedStandardSpectrum = _preferences.AudioSettings.IsAySupportedStandardSpectrum;
 
         if (IsMuted)
         {
@@ -326,8 +326,8 @@ public partial class MainWindowViewModel : ViewModelBase
         AudioSettings = new AudioSettings
         {
             IsBeeperEnabled = Emulator?.AudioManager.IsBeeperEnabled ?? true,
-            IsAyAudioEnabled = Emulator?.AudioManager.IsAyAudioEnabled ?? true,
-            IsAyAudioEnabled48K = Emulator?.AudioManager.IsAyAudioEnabled48K ?? true
+            IsAyAudioEnabled = Emulator?.AudioManager.IsAyEnabled ?? true,
+            IsAySupportedStandardSpectrum = Emulator?.AudioManager.IsAySupportedStandardSpectrum ?? true
         },
         Joystick = new JoystickSettings
         {

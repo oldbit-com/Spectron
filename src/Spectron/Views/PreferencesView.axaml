@@ -50,8 +50,8 @@
                 <Border Classes="Tab">
                     <StackPanel>
                         <CheckBox Content="Beeper enabled" Classes="Center" IsChecked="{Binding IsBeeperEnabled}"/>
-                        <CheckBox x:Name="AyAudioEnabled" Content="AY sound enabled" Classes="Center" IsChecked="{Binding IsAyAudioEnabled}"/>
-                        <CheckBox Content="Enable AY in 16/48k mode" Classes="Center" Margin="25 0 0 0" IsChecked="{Binding IsAyAudioEnabled48K}" IsEnabled="{Binding #AyAudioEnabled.IsChecked}"/>
+                        <CheckBox x:Name="AyEnabled" Content="AY enabled" Classes="Center" IsChecked="{Binding IsAyEnabled}"/>
+                        <CheckBox Content="AY in 16/48k mode" Classes="Center" Margin="25 0 0 0" IsChecked="{Binding IsAySupportedStandardSpectrum}" IsEnabled="{Binding #AyEnabled.IsChecked}"/>
                     </StackPanel>
                 </Border>
             </TabItem>

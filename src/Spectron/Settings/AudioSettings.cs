@@ -6,5 +6,5 @@ public record AudioSettings
 
     public bool IsAyAudioEnabled { get; init; } = true;
 
-    public bool IsAyAudioEnabled48K { get; init; } = true;
+    public bool IsAySupportedStandardSpectrum { get; init; } = true;
 }

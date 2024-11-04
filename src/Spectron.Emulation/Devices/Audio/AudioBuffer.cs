@@ -16,12 +16,15 @@ internal sealed class AudioBuffer
         }
         else
         {
-            _buffer.Add((byte)sample);
-            _buffer.Add((byte)(sample >> 8));
+           _buffer.Add((byte)sample);
+           _buffer.Add((byte)(sample >> 8));
         }
 
         _count += 2;
     }
 
-    internal void Clear() => _count = 0;
+    internal void Clear()
+    {
+        _count = 0;
+    }
 }

@@ -24,8 +24,8 @@ public class PreferencesViewModel : ViewModelBase
         IsResumeEnabled = preferences.IsResumeEnabled;
 
         IsBeeperEnabled = preferences.AudioSettings.IsBeeperEnabled;
-        IsAyAudioEnabled = preferences.AudioSettings.IsAyAudioEnabled;
-        IsAyAudioEnabled48K = preferences.AudioSettings.IsAyAudioEnabled48K;
+        IsAyEnabled = preferences.AudioSettings.IsAyAudioEnabled;
+        IsAySupportedStandardSpectrum = preferences.AudioSettings.IsAySupportedStandardSpectrum;
 
         IsTimeMachineEnabled = preferences.TimeMachine.IsEnabled;
         SnapshotInterval = preferences.TimeMachine.SnapshotInterval.TotalSeconds;
@@ -49,8 +49,8 @@ public class PreferencesViewModel : ViewModelBase
             AudioSettings = new AudioSettings
             {
                 IsBeeperEnabled = IsBeeperEnabled,
-                IsAyAudioEnabled = IsAyAudioEnabled,
-                IsAyAudioEnabled48K = IsAyAudioEnabled48K
+                IsAyAudioEnabled = IsAyEnabled,
+                IsAySupportedStandardSpectrum = IsAySupportedStandardSpectrum
             },
 
             TimeMachine = new TimeMachineSettings
@@ -155,17 +155,17 @@ public class PreferencesViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _isBeeperEnabled, value);
     }
 
-    private bool _isAyAudioEnabled;
-    public bool IsAyAudioEnabled
+    private bool _isAyEnabled;
+    public bool IsAyEnabled
     {
-        get => _isAyAudioEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isAyAudioEnabled, value);
+        get => _isAyEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isAyEnabled, value);
     }
 
-    private bool _isAyAudioEnabled48K;
-    public bool IsAyAudioEnabled48K
+    private bool _isAySupportedStandardSpectrum;
+    public bool IsAySupportedStandardSpectrum
     {
-        get => _isAyAudioEnabled48K;
-        set => this.RaiseAndSetIfChanged(ref _isAyAudioEnabled48K, value);
+        get => _isAySupportedStandardSpectrum;
+        set => this.RaiseAndSetIfChanged(ref _isAySupportedStandardSpectrum, value);
     }
 }
