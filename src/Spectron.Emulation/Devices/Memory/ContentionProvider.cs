@@ -17,7 +17,7 @@ internal sealed class ContentionProvider(int firstPixelTick, int ticksPerLine) :
             return 0;
         }
 
-        if (ticks < _contentionTable.Length && ticks >= DefaultTimings.FirstPixelTick)
+        if (ticks < _contentionTable.Length && ticks >= firstPixelTick)
         {
             return _contentionTable[ticks];
         }

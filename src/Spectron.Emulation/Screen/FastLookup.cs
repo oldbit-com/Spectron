@@ -6,6 +6,8 @@ internal record ScreenRenderEvent(Word BitmapAddress, Word AttributeAddress, int
 
 internal static class FastLookup
 {
+    private static readonly Dictionary<ComputerType, ScreenRenderEvent[]> ScreenRenderEvents = new();
+
     /// <summary>
     /// Bit masks for each bit in a byte.
     /// </summary>
@@ -24,7 +26,19 @@ internal static class FastLookup
     /// <summary>
     /// List of events used to render the screen. Each event occurs at 8 ticks intervals and updates 2 bytes of the screen.
     /// </summary>
-    internal static ScreenRenderEvent[] ScreenRenderEvents { get; } = BuildScreenEventsTable();
+    /// <param name="hardware">The hardware settings.</param>
+    /// <returns>A list of <see cref="ScreenRenderEvent"/> events.</returns>
+    internal static ScreenRenderEvent[] GetScreenRenderEvents(HardwareSettings hardware)
+    {
+        if (ScreenRenderEvents.TryGetValue(hardware.ComputerType, out var events))
+        {
+            return events;
+        }
+
+        ScreenRenderEvents[hardware.ComputerType] = BuildScreenEventsTable(hardware);
+
+        return ScreenRenderEvents[hardware.ComputerType];
+    }
 
     private static AttributeColor[] BuildAttributeColorLookupTable()
     {
@@ -61,14 +75,13 @@ internal static class FastLookup
         return screenAddressLookup;
     }
 
-    // TODO: 128 mode
-    private static ScreenRenderEvent[] BuildScreenEventsTable()
+    private static ScreenRenderEvent[] BuildScreenEventsTable(HardwareSettings hardware)
     {
         var screenEvents = new List<ScreenRenderEvent>();
 
         for (var y = 0; y < ScreenSize.ContentHeight; y++)
         {
-            var rowTime = DefaultTimings.FirstPixelTick + DefaultTimings.LineTicks * y;
+            var rowTime = hardware.FirstPixelTicks + hardware.LineTicks * y;
             var bufferLineIndex = FrameBuffer.GetLineIndex(y);
 
             for (var x = 0; x < 16; x++)

@@ -1,6 +1,6 @@
 using OldBit.Spectron.Emulation.Devices.Memory;
 
-namespace OldBit.ZXSpectrum.Emulator.Tests.Fixtures;
+namespace OldBit.Spectron.Emulator.Tests.Fixtures;
 
 internal static class MemoryExtensions
 {
