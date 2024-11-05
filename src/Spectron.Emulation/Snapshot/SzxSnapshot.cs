@@ -211,6 +211,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
     {
         if (tapeBlock == null)
         {
+            tapeManager.EjectTape();
             return;
         }
 

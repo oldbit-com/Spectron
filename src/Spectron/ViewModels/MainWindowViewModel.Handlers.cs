@@ -49,7 +49,7 @@ partial class MainWindowViewModel
 
                 emulator.TapeManager.InsertTape(
                     filePath,
-                    autoPlay: TapeLoadSpeed != TapeSpeed.Instant);
+                    autoPlay: true);
             }
 
             RecentFilesViewModel.Add(filePath);

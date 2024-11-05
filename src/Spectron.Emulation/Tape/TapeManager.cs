@@ -103,6 +103,7 @@ public sealed class TapeManager
     {
         StopTape();
         TapeEjected?.Invoke(EventArgs.Empty);
+        Cassette = new Cassette();
 
         _isTapeLoaded = false;
     }
