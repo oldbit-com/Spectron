@@ -58,7 +58,7 @@ public sealed class Emulator
 
         UlaPlus = new UlaPlus();
         _spectrumBus = new SpectrumBus();
-        ScreenBuffer = new ScreenBuffer(emulatorArgs.Memory, UlaPlus);
+        ScreenBuffer = new ScreenBuffer(hardware, emulatorArgs.Memory, UlaPlus);
         Cpu = new Z80(emulatorArgs.Memory, emulatorArgs.ContentionProvider); ;
 
         JoystickManager = new JoystickManager(_spectrumBus, KeyboardHandler);
@@ -145,7 +145,7 @@ public sealed class Emulator
         _spectrumBus.AddDevice(AudioManager.Beeper);
         _spectrumBus.AddDevice(AudioManager.Ay);
 
-        var floatingBus = new FloatingBus(Memory, Cpu.Clock);
+        var floatingBus = new FloatingBus(_hardware, Memory, Cpu.Clock);
         _spectrumBus.AddDevice(floatingBus);
 
         Cpu.AddBus(_spectrumBus);

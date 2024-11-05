@@ -1,8 +1,8 @@
 using FluentAssertions;
 using OldBit.Spectron.Emulation.Devices.Memory;
-using OldBit.ZXSpectrum.Emulator.Tests.Fixtures;
+using OldBit.Spectron.Emulator.Tests.Fixtures;
 
-namespace OldBit.ZXSpectrum.Emulator.Tests.Devices.Memory;
+namespace OldBit.Spectron.Emulator.Tests.Devices.Memory;
 
 public class Memory48KTests
 {

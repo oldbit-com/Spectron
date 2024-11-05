@@ -1,4 +1,4 @@
-namespace OldBit.ZXSpectrum.Emulator.Tests.Screen;
+namespace OldBit.Spectron.Emulator.Tests.Screen;
 
 public class ContentTests
 {

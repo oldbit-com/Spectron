@@ -11,16 +11,20 @@ namespace OldBit.Spectron.Emulation.Devices;
 /// </summary>
 internal sealed class FloatingBus : IDevice
 {
+    private readonly HardwareSettings _hardware;
     private readonly IMemory _memory;
     private readonly Clock _clock;
     private readonly Dictionary<int, Word> _floatingBusAddressIndex = new();
 
-    internal FloatingBus(IMemory memory, Clock clock)
+    internal FloatingBus(HardwareSettings hardware, IMemory memory, Clock clock)
     {
+        _hardware = hardware;
         _memory = memory;
         _clock = clock;
 
-        foreach (var screenEvent in FastLookup.ScreenRenderEvents)
+        var screenRenderEvents = FastLookup.GetScreenRenderEvents(hardware);
+
+        foreach (var screenEvent in screenRenderEvents)
         {
             _floatingBusAddressIndex[screenEvent.Ticks + 0] = screenEvent.BitmapAddress;
             _floatingBusAddressIndex[screenEvent.Ticks + 1] = screenEvent.AttributeAddress;
@@ -36,13 +40,14 @@ internal sealed class FloatingBus : IDevice
             return null;
         }
 
-        if (_clock.FrameTicks is < DefaultTimings.FirstPixelTick or > DefaultTimings.LastPixelTick)
+        if (_clock.FrameTicks < _hardware.FirstPixelTicks || _clock.FrameTicks > _hardware.LastPixelTicks)
         {
             return null;
         }
 
-        return _floatingBusAddressIndex.TryGetValue(_clock.FrameTicks, out var screenAddress) ?
-            _memory.Read((Word)(0x4000 + screenAddress)) : null;
+        return _floatingBusAddressIndex.TryGetValue(_clock.FrameTicks, out var screenAddress)
+            ? _memory.Read((Word)(0x4000 + screenAddress))
+            : null;
     }
 
     public int Priority => int.MaxValue;

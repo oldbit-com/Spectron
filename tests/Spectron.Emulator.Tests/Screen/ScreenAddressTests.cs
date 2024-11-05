@@ -1,7 +1,7 @@
 using FluentAssertions;
 using OldBit.Spectron.Emulation.Screen;
 
-namespace OldBit.ZXSpectrum.Emulator.Tests.Screen;
+namespace OldBit.Spectron.Emulator.Tests.Screen;
 
 public class ScreenAddressTests
 {
@@ -27,6 +27,21 @@ public class ScreenAddressTests
     public void ScreenAddress_ShouldBeCalculatedForXY(byte x, byte y, Word expectedAddress)
     {
         var address = ScreenAddress.Calculate(x, y);
+
+        address.Should().Be(expectedAddress);
+    }
+
+    [Theory]
+    [InlineData(0, 0, 0x5800)]
+    [InlineData(0, 1, 0x5800)]
+    [InlineData(0, 7, 0x5800)]
+    [InlineData(0, 8, 0x5820)]
+    [InlineData(31, 0, 0x581F)]
+    [InlineData(31, 4, 0x581F)]
+    [InlineData(31, 191, 0x5AFF)]
+    public void AttributeAddress_ShouldBeCalculatedForXY(byte x, byte y, Word expectedAddress)
+    {
+        var address = ScreenAddress.CalculateAttribute(x, y);
 
         address.Should().Be(expectedAddress);
     }

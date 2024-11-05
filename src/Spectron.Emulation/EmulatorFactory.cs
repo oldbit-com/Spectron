@@ -44,7 +44,7 @@ public sealed class EmulatorFactory(TimeMachine timeMachine, TapeManager tapeMan
     private Emulator CreateSpectrum128K(RomType romType, Memory128K memory)
     {
         var contentionProvider = new ContentionProvider(
-            Hardware.Spectrum128K.FirstPixelTick,
+            Hardware.Spectrum128K.FirstPixelTicks,
             Hardware.Spectrum128K.TicksPerLine);
 
         memory.BankPaged += bankId => contentionProvider.MemoryBankId = bankId;
@@ -61,7 +61,7 @@ public sealed class EmulatorFactory(TimeMachine timeMachine, TapeManager tapeMan
     private Emulator CreateSpectrum(ComputerType computerType, RomType romType, IEmulatorMemory memory)
     {
         var contentionProvider = new ContentionProvider(
-            Hardware.Spectrum48K.FirstPixelTick,
+            Hardware.Spectrum48K.FirstPixelTicks,
             Hardware.Spectrum48K.TicksPerLine);
 
         var emulatorSettings = new EmulatorArgs(

@@ -1,7 +1,7 @@
 using FluentAssertions;
 using OldBit.Spectron.Emulation.Devices;
 
-namespace OldBit.ZXSpectrum.Emulator.Tests.Devices;
+namespace OldBit.Spectron.Emulator.Tests.Devices;
 
 public class UlaPlusTests
 {

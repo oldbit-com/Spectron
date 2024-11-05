@@ -1,7 +1,7 @@
 using FluentAssertions;
 using OldBit.Spectron.Emulation.Devices.Memory;
 
-namespace OldBit.ZXSpectrum.Emulator.Tests.Devices.Memory;
+namespace OldBit.Spectron.Emulator.Tests.Devices.Memory;
 
 public class ContentionProviderTests
 {

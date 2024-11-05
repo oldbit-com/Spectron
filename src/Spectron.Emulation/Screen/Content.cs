@@ -3,9 +3,10 @@ using OldBit.Spectron.Emulation.Devices.Memory;
 
 namespace OldBit.Spectron.Emulation.Screen;
 
-internal sealed class Content(FrameBuffer frameBuffer, IEmulatorMemory memory, UlaPlus ulaPlus)
+internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer, IEmulatorMemory memory, UlaPlus ulaPlus)
 {
-    private readonly bool[] _bitmapDirty = new bool[32*24*8];
+    private readonly ScreenRenderEvent[] _screenRenderEvents = FastLookup.GetScreenRenderEvents(hardware);
+    private readonly bool[] _bitmapDirty = new bool[32 * 24 * 8];
 
     private int _frameCount = 1;
     private bool _isFlashOnFrame;
@@ -13,14 +14,15 @@ internal sealed class Content(FrameBuffer frameBuffer, IEmulatorMemory memory, U
 
     internal void Update(int frameTicks)
     {
-        if (frameTicks < DefaultTimings.FirstPixelTick || _fetchCycleIndex >= FastLookup.ScreenRenderEvents.Length)
+        if (frameTicks < hardware.FirstPixelTicks || _fetchCycleIndex >= _screenRenderEvents.Length)
         {
             return;
         }
 
         while (true)
         {
-            var fetchCycleData = FastLookup.ScreenRenderEvents[_fetchCycleIndex];
+            var fetchCycleData = _screenRenderEvents[_fetchCycleIndex];
+
             if (frameTicks < fetchCycleData.Ticks)
             {
                 break;
@@ -30,10 +32,12 @@ internal sealed class Content(FrameBuffer frameBuffer, IEmulatorMemory memory, U
             UpdateFrameBuffer(fetchCycleData.FrameBufferIndex, fetchCycleData.BitmapAddress, fetchCycleData.AttributeAddress);
 
             // Second screen byte and attribute
-            UpdateFrameBuffer(fetchCycleData.FrameBufferIndex + 8, (Word)(fetchCycleData.BitmapAddress + 1), (Word)(fetchCycleData.AttributeAddress + 1));
+            UpdateFrameBuffer(fetchCycleData.FrameBufferIndex + 8, (Word)(fetchCycleData.BitmapAddress + 1),
+                (Word)(fetchCycleData.AttributeAddress + 1));
 
             _fetchCycleIndex += 1;
-            if (_fetchCycleIndex >= FastLookup.ScreenRenderEvents.Length)
+
+            if (_fetchCycleIndex >= _screenRenderEvents.Length)
             {
                 break;
             }
@@ -85,15 +89,11 @@ internal sealed class Content(FrameBuffer frameBuffer, IEmulatorMemory memory, U
 
             if (ulaPlus is { IsEnabled: true, IsActive: true })
             {
-                color = (bitmap & FastLookup.BitMasks[bit]) != 0 ?
-                    ulaPlus.GetInkColor(attribute) :
-                    ulaPlus.GetPaperColor(attribute);
+                color = (bitmap & FastLookup.BitMasks[bit]) != 0 ? ulaPlus.GetInkColor(attribute) : ulaPlus.GetPaperColor(attribute);
             }
             else
             {
-                color = (bitmap & FastLookup.BitMasks[bit]) != 0 ^ isFlashOn ?
-                    attributeData.Ink :
-                    attributeData.Paper;
+                color = (bitmap & FastLookup.BitMasks[bit]) != 0 ^ isFlashOn ? attributeData.Ink : attributeData.Paper;
             }
 
             frameBuffer.Pixels[frameBufferIndex + bit] = color;
