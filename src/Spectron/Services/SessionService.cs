@@ -17,7 +17,7 @@ public class SessionService(
 {
     private readonly ILogger _logger = logger;
 
-    public async Task SaveAsync(Emulator? emulator, bool shouldSaveResumeState)
+    public async Task SaveAsync(Emulator? emulator, ResumeSettings resumeSettings)
     {
         if (emulator is null)
         {
@@ -26,13 +26,13 @@ public class SessionService(
 
         var session = new SessionSettings();
 
-        if (shouldSaveResumeState)
+        if (resumeSettings.IsResumeEnabled)
         {
             var snapshot = SzxSnapshot.CreateSnapshot(emulator, CompressionLevel.NoCompression);
             session.LastSnapshot = SnapshotToBase64(snapshot);;
         }
 
-        if (timeMachine.IsEnabled)
+        if (timeMachine.IsEnabled && resumeSettings.ShouldIncludeTimeMachine)
         {
             foreach (var entry in timeMachine.Entries)
             {

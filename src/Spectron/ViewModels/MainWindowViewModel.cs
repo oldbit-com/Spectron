@@ -248,7 +248,7 @@ public partial class MainWindowViewModel : ViewModelBase
         await Task.WhenAll(
             _preferencesService.SaveAsync(_preferences),
             RecentFilesViewModel.SaveAsync(),
-            _sessionService.SaveAsync(Emulator, _preferences.ResumeSettings.IsResumeEnabled));
+            _sessionService.SaveAsync(Emulator, _preferences.ResumeSettings));
     }
 
     private void CreateEmulator(Preferences preferences)
