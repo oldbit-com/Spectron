@@ -36,4 +36,12 @@ public static class EmulatorExtensions
         emulator.AudioManager.IsAyEnabled = audioSettings.IsAyAudioEnabled;
         emulator.AudioManager.IsAySupportedStandardSpectrum = audioSettings.IsAySupportedStandardSpectrum;
     }
+
+    public static void SetUlaPlus(this Emulator? emulator, bool isUlaPlusEnabled)
+    {
+        if (emulator != null)
+        {
+            emulator.IsUlaPlusEnabled = isUlaPlusEnabled;
+        }
+    }
 }

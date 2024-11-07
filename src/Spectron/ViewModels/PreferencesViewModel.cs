@@ -21,7 +21,10 @@ public class PreferencesViewModel : ViewModelBase
         RomType = preferences.RomType;
         JoystickType = preferences.Joystick.JoystickType;
         JoystickUseCursorKeys = preferences.Joystick.UseCursorKeys;
-        IsResumeEnabled = preferences.IsResumeEnabled;
+
+        IsResumeEnabled = preferences.ResumeSettings.IsResumeEnabled;
+        ShouldIncludeTapeInResume = preferences.ResumeSettings.ShouldIncludeTape;
+        ShouldIncludeTimeMachineInResume = preferences.ResumeSettings.ShouldIncludeTimeMachine;
 
         IsBeeperEnabled = preferences.AudioSettings.IsBeeperEnabled;
         IsAyEnabled = preferences.AudioSettings.IsAyAudioEnabled;
@@ -34,7 +37,7 @@ public class PreferencesViewModel : ViewModelBase
         IsTapeSaveEnabled = preferences.TapeSaving.IsEnabled;
         TapeSaveSpeed = preferences.TapeSaving.Speed;
 
-        UpdatePreferencesCommand = ReactiveCommand.Create(() => new Preferences
+        UpdatePreferencesCommand = ReactiveCommand.Create(() => new Settings.Preferences
         {
             ComputerType = ComputerType,
             IsUlaPlusEnabled = IsUlaPlusEnabled,
@@ -44,7 +47,13 @@ public class PreferencesViewModel : ViewModelBase
                 JoystickType = JoystickType,
                 UseCursorKeys = JoystickUseCursorKeys,
             },
-            IsResumeEnabled = IsResumeEnabled,
+
+            ResumeSettings = new ResumeSettings
+            {
+                IsResumeEnabled = IsResumeEnabled,
+                ShouldIncludeTape = ShouldIncludeTapeInResume,
+                ShouldIncludeTimeMachine = ShouldIncludeTimeMachineInResume
+            },
 
             AudioSettings = new AudioSettings
             {
@@ -63,6 +72,40 @@ public class PreferencesViewModel : ViewModelBase
             TapeSaving = new TapeSavingSettings(IsTapeSaveEnabled, TapeSaveSpeed)
         });
     }
+
+    public List<NameValuePair<TapeSpeed>> TapeSpeeds { get; } =
+    [
+        new("Normal", TapeSpeed.Normal),
+        new("Accelerated", TapeSpeed.Accelerated),
+        new("Instant", TapeSpeed.Instant)
+    ];
+
+    public List<NameValuePair<ComputerType>> ComputerTypes { get; } =
+    [
+        new("ZX Spectrum 16k", ComputerType.Spectrum16K),
+        new("ZX Spectrum 48k", ComputerType.Spectrum48K),
+        new("ZX Spectrum 128k", ComputerType.Spectrum128K),
+    ];
+
+    public List<NameValuePair<RomType>> RomTypes { get; } =
+    [
+        new("Original", RomType.Original),
+        new("Gosh Wonderful", RomType.GoshWonderful),
+        new("Busy Soft v1.40", RomType.BusySoft),
+        new("J.G. Harston v0.77", RomType.Harston),
+        new("Diagnostic: Retroleum v1.71", RomType.Retroleum),
+        new("Diagnostic: B. Alford v1.37", RomType.BrendanAlford),
+    ];
+
+    public List<NameValuePair<JoystickType>> JoystickTypes { get; } =
+    [
+        new("None", JoystickType.None),
+        new("Kempston", JoystickType.Kempston),
+        new("Sinclair 1", JoystickType.Sinclair1),
+        new("Sinclair 2", JoystickType.Sinclair2),
+        new("Cursor", JoystickType.Cursor),
+        new("Fuller", JoystickType.Fuller),
+    ];
 
     private ComputerType _computerType;
     public ComputerType ComputerType
@@ -120,6 +163,20 @@ public class PreferencesViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _isResumeEnabled, value);
     }
 
+    private bool _shouldIncludeTapeInResume;
+    public bool ShouldIncludeTapeInResume
+    {
+        get => _shouldIncludeTapeInResume;
+        set => this.RaiseAndSetIfChanged(ref _shouldIncludeTapeInResume, value);
+    }
+
+    private bool _shouldIncludeTimeMachineInResume;
+    public bool ShouldIncludeTimeMachineInResume
+    {
+        get => _shouldIncludeTimeMachineInResume;
+        set => this.RaiseAndSetIfChanged(ref _shouldIncludeTimeMachineInResume, value);
+    }
+
     private bool _joystickUseCursorKeys;
     public bool JoystickUseCursorKeys
     {
@@ -140,13 +197,6 @@ public class PreferencesViewModel : ViewModelBase
         get => _tapeSaveSpeed;
         set => this.RaiseAndSetIfChanged(ref _tapeSaveSpeed, value);
     }
-
-    public List<NameValuePair<TapeSpeed>> TapeSpeeds { get; } =
-    [
-        new("Normal", TapeSpeed.Normal),
-        new("Accelerated", TapeSpeed.Accelerated),
-        new("Instant", TapeSpeed.Instant)
-    ];
 
     private bool _isBeeperEnabled;
     public bool IsBeeperEnabled

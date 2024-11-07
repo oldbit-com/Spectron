@@ -9,6 +9,8 @@ public record TapeSavingSettings(bool IsEnabled, TapeSpeed Speed);
 
 public class Preferences
 {
+    public ResumeSettings ResumeSettings { get; init; } = new();
+
     public bool IsUlaPlusEnabled { get; init; }
 
     public BorderSize BorderSize { get; init; } = BorderSize.Medium;
@@ -24,8 +26,6 @@ public class Preferences
     public TapeSpeed TapeLoadSpeed { get; init; } = TapeSpeed.Instant;
 
     public TimeMachineSettings TimeMachine { get; init; } = new();
-
-    public bool IsResumeEnabled { get; init; } = true;
 
     public TapeSavingSettings TapeSaving { get; init; } = new(true, TapeSpeed.Instant);
 

@@ -30,7 +30,7 @@ public sealed class TimeMachine
         var snapshot = SzxSnapshot.CreateSnapshot(emulator, CompressionLevel.NoCompression);
         Entries.Add(new TimeMachineEntry(now, snapshot));
 
-        while (Entries.Count >MaxSnapshots)
+        while (Entries.Count > MaxSnapshots)
         {
             Entries.RemoveAt(0);
         }

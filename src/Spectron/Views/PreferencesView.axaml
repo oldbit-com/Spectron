@@ -4,14 +4,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
         xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
-        xmlns:emu="clr-namespace:OldBit.Spectron.Emulation;assembly=OldBit.Spectron.Emulation"
-        xmlns:rom="clr-namespace:OldBit.Spectron.Emulation.Rom;assembly=OldBit.Spectron.Emulation"
-        xmlns:joy="clr-namespace:OldBit.Spectron.Emulation.Devices.Joystick;assembly=OldBit.Spectron.Emulation"
+        xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.PreferencesView"
         x:DataType="viewModels:PreferencesViewModel"
-        Width="750"
-        Height="400"
+        Width="850"
+        Height="600"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
         Title="Preferences">
@@ -31,21 +29,37 @@
         <Style Selector="CheckBox.Center">
             <Setter Property="Padding" Value="8 2 0 0" />
         </Style>
+        <Style Selector="TextBlock.Center">
+            <Setter Property="Padding" Value="8 4 0 0" />
+        </Style>
     </Window.Styles>
 
     <Grid RowDefinitions="*,50">
         <TabControl TabStripPlacement="Left">
-            <TabItem Header="Hardware">
+            <TabItem Header="General">
                 <Border Classes="Tab">
                     <StackPanel>
-                        <RadioButton Content="ZX Spectrum 16k" Classes="Center" GroupName="ComputerType" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum16K}}"/>
-                        <RadioButton Content="ZX Spectrum 48k" Classes="Center" GroupName="ComputerType" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum48K}}"/>
-                        <RadioButton Content="ZX Spectrum 128k" Classes="Center" GroupName="ComputerType" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum128K}}"/>
-                        <Separator Margin="0 10 0 10" />
-                        <CheckBox Content="Enable ULA plus" Classes="Center" IsChecked="{Binding IsUlaPlusEnabled}"/>
+                        <controls:HeaderSeparator Text="Startup"/>
+                        <CheckBox x:Name="SaveState" Content="Save / Load state on exit" ToolTip.Tip="Saves emulator state as a snapshot on exit and loads it when application starts" Classes="Center" Margin="10 0 0 0" IsChecked="{Binding IsResumeEnabled}"/>
+                        <CheckBox Content="Include current tape" ToolTip.Tip="When saving current state, tape contents will be also saved and restored" Classes="Center" Margin="35 0 0 0" IsEnabled="{Binding #SaveState.IsChecked}" IsChecked="{Binding ShouldIncludeTapeInResume}"/>
+                        <CheckBox Content="Include time machine state" ToolTip.Tip="When saving current state, time machine state will be also saved and restored" Classes="Center" Margin="35 0 0 0" IsEnabled="{Binding #SaveState.IsChecked}" IsChecked="{Binding ShouldIncludeTimeMachineInResume}"/>
+
+                        <controls:HeaderSeparator Text="Emulator defaults"/>
+                        <Grid ColumnDefinitions="120,*" RowDefinitions="40,40,40">
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Machine" VerticalAlignment="Center" Classes="Center"/>
+                            <ComboBox  Grid.Row="0" Grid.Column="1" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding ComputerTypes}" SelectedValue="{Binding ComputerType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="ROM" VerticalAlignment="Center" Classes="Center"/>
+                            <ComboBox  Grid.Row="1" Grid.Column="1" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding RomTypes}" SelectedValue="{Binding RomType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Joystick" VerticalAlignment="Center" Classes="Center"/>
+                            <ComboBox  Grid.Row="2" Grid.Column="1" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding JoystickTypes}" SelectedValue="{Binding JoystickType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
+                        </Grid>
+
+                        <controls:HeaderSeparator Text="Screen"/>
+                        <CheckBox Content="Enable ULA plus" Classes="Center" IsChecked="{Binding IsUlaPlusEnabled}" Margin="10 0 0 0"/>
                     </StackPanel>
                 </Border>
             </TabItem>
+
             <TabItem Header="Audio">
                 <Border Classes="Tab">
                     <StackPanel>
@@ -55,28 +69,9 @@
                     </StackPanel>
                 </Border>
             </TabItem>
-            <TabItem Header="ROM">
-                <Border Classes="Tab">
-                    <StackPanel>
-                        <RadioButton Content="Original" Classes="Center" GroupName="ROM" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.Original}}"/>
-                        <RadioButton Content="Gosh Wonderful" Classes="Center" GroupName="ROM" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.GoshWonderful}}"/>
-                        <RadioButton Content="Busy Soft v1.40" Classes="Center" GroupName="ROM" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.BusySoft}}"/>
-                        <RadioButton Content="J.G. Harston v0.77" Classes="Center" GroupName="ROM" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.Harston}}"/>
-                        <RadioButton Content="Retroleum v1.71 (Diagnostic)" Classes="Center" GroupName="ROM" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.Retroleum}}"/>
-                        <RadioButton Content="B. Alford v1.37 (Diagnostic)" Classes="Center" GroupName="ROM" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.BrendanAlford}}"/>
-                    </StackPanel>
-                </Border>
-            </TabItem>
             <TabItem Header="Joystick">
                 <Border Classes="Tab">
                     <StackPanel>
-                        <RadioButton Content="None" Classes="Center" GroupName="Joy" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.None}}"/>
-                        <RadioButton Content="Kempston" Classes="Center" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Kempston}}"/>
-                        <RadioButton Content="Sinclair 1" Classes="Center" GroupName="Joy" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Sinclair1}}"/>
-                        <RadioButton Content="Sinclair 2" Classes="Center" GroupName="Joy" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Sinclair2}}"/>
-                        <RadioButton Content="Cursor" Classes="Center" GroupName="Joy" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Cursor}}"/>
-                        <RadioButton Content="Fuller" Classes="Center" GroupName="Joy" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Fuller}}"/>
-                        <Separator Margin="0 10 0 10" />
                         <CheckBox Content="Emulate using cursor keys and Tab (fire)" Classes="Center" IsChecked="{Binding JoystickUseCursorKeys}"/>
                     </StackPanel>
                 </Border>
@@ -105,7 +100,6 @@
             <TabItem Header="Emulator">
                 <Border Classes="Tab">
                     <StackPanel>
-                        <CheckBox Content="Auto Resume" Classes="Center" IsChecked="{Binding IsResumeEnabled}"/>
                         <CheckBox Content="Pause after state restore" Classes="Center"/>
                     </StackPanel>
                 </Border>
@@ -115,7 +109,8 @@
                     <StackPanel>
                         <Border Classes="Tab">
                             <StackPanel>
-                                <CheckBox Content="Normal speed tape loader" Classes="Center"/>
+                                <CheckBox Content="Standard tape loading speed" Classes="Center" ToolTip.Tip="Should be able to load any tape file"/>
+                                <CheckBox Content="Tape audio effects" ToolTip.Tip="If enabled, usual tape loading/saving audio will be generated"/>
                                 <CheckBox Content="Automatically load and play tape files" Classes="Center"/>
                                 <StackPanel Orientation="Horizontal">
                                     <CheckBox Content="Enable tape saving (virtual tape). Speed: " Classes="Center" IsChecked="{Binding IsTapeSaveEnabled}" x:Name="IsTapeSaveEnabled"/>
@@ -123,13 +118,6 @@
                                 </StackPanel>
                             </StackPanel>
                         </Border>
-                    </StackPanel>
-                </Border>
-            </TabItem>
-            <TabItem Header="Advanced">
-                <Border Classes="Tab">
-                    <StackPanel>
-
                     </StackPanel>
                 </Border>
             </TabItem>

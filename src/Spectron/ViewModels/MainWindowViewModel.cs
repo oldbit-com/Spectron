@@ -44,7 +44,6 @@ public partial class MainWindowViewModel : ViewModelBase
     private HelpKeyboardView? _helpKeyboardView;
 
     private Preferences _preferences = new();
-    private bool _isResumeEnabled;
     private bool _useCursorKeysAsJoystick;
     private int _frameCount;
     private readonly Stopwatch _renderStopwatch = new();
@@ -156,35 +155,24 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         Emulator?.Pause();
 
-        var viewModel = new PreferencesViewModel(Preferences);
+        var viewModel = new PreferencesViewModel(_preferences);
         var preferences = await ShowPreferencesView.Handle(viewModel);
 
         if (preferences != null)
         {
             _preferences = preferences;
 
-            var initialize = ComputerType != preferences.ComputerType || RomType != preferences.RomType;
+            //TapeLoadingSpeed = preferences.TapeLoadingSpeed;
 
-            ComputerType = preferences.ComputerType;
-            IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
-            RomType = preferences.RomType;
-
-            JoystickType = preferences.Joystick.JoystickType;
-            Emulator?.JoystickManager.SetupJoystick(JoystickType);
-            // TapeLoadingSpeed = preferences.TapeLoadingSpeed;
-
-            _isResumeEnabled = preferences.IsResumeEnabled;
             _useCursorKeysAsJoystick = preferences.Joystick.UseCursorKeys;
+
+            IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
 
             _timeMachine.IsEnabled = preferences.TimeMachine.IsEnabled;
             _timeMachine.SnapshotInterval = preferences.TimeMachine.SnapshotInterval;
             _timeMachine.MaxDuration = preferences.TimeMachine.MaxDuration;
 
-            if (initialize)
-            {
-                CreateEmulator();
-            }
-
+            Emulator?.SetUlaPlus(IsUlaPlusEnabled);
             Emulator?.SetAudioSettings(preferences.AudioSettings);
             Emulator?.SetTapeSavingSettings(preferences.TapeSaving);
         }
@@ -226,25 +214,28 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         _preferences = await _preferencesService.LoadAsync();
 
-        HandleChangeBorderSize(_preferences.BorderSize);
-
-        ComputerType = _preferences.ComputerType;
-        IsUlaPlusEnabled = _preferences.IsUlaPlusEnabled;
-        RomType = _preferences.RomType == RomType.Custom ? RomType.Original : _preferences.RomType;
-        JoystickType = _preferences.Joystick.JoystickType;
-        TapeLoadSpeed = _preferences.TapeLoadSpeed;
-
-        _isResumeEnabled = _preferences.IsResumeEnabled;
-        _useCursorKeysAsJoystick = _preferences.Joystick.UseCursorKeys;
-
         _timeMachine.IsEnabled = _preferences.TimeMachine.IsEnabled;
         _timeMachine.SnapshotInterval = _preferences.TimeMachine.SnapshotInterval;
         _timeMachine.MaxDuration = _preferences.TimeMachine.MaxDuration;
 
         await RecentFilesViewModel.LoadAsync();
-        var snapshot = await _sessionService.LoadAsync();
 
-        CreateEmulator(snapshot);
+        HandleChangeBorderSize(_preferences.BorderSize);
+
+        if (_preferences.ResumeSettings.IsResumeEnabled)
+        {
+            var snapshot = await _sessionService.LoadAsync();
+
+            if (snapshot != null)
+            {
+                CreateEmulator(snapshot);
+            }
+        }
+
+        if (Emulator == null)
+        {
+            CreateEmulator(_preferences);
+        }
 
         Emulator?.SetTapeSavingSettings(_preferences.TapeSaving);
         Emulator?.SetAudioSettings(_preferences.AudioSettings);
@@ -255,9 +246,20 @@ public partial class MainWindowViewModel : ViewModelBase
         Emulator?.Shutdown();
 
         await Task.WhenAll(
-            _preferencesService.SaveAsync(Preferences),
+            _preferencesService.SaveAsync(_preferences),
             RecentFilesViewModel.SaveAsync(),
-            _sessionService.SaveAsync(Emulator, _isResumeEnabled));
+            _sessionService.SaveAsync(Emulator, _preferences.ResumeSettings.IsResumeEnabled));
+    }
+
+    private void CreateEmulator(Preferences preferences)
+    {
+        var emulator = _emulatorFactory.Create(
+            preferences.ComputerType,
+            preferences.RomType);
+
+        emulator.IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
+
+        InitializeEmulator(emulator);
     }
 
     private void CreateEmulator(SzxFile? snapshot = null)
@@ -265,7 +267,7 @@ public partial class MainWindowViewModel : ViewModelBase
         ShutdownEmulator();
 
         var emulator = snapshot == null ?
-            _emulatorFactory.Create(ComputerType, RomType) :
+            _emulatorFactory.Create(ComputerType, RomType == RomType.Custom ? RomType.Original : RomType) :
             _snapshotLoader.Load(snapshot);
 
         InitializeEmulator(emulator);
@@ -335,7 +337,9 @@ public partial class MainWindowViewModel : ViewModelBase
             UseCursorKeys = _useCursorKeysAsJoystick
         },
         TapeLoadSpeed = TapeLoadSpeed,
-        IsResumeEnabled = _isResumeEnabled,
+
+        // TODO: Uncomment this when ResumeSettings is implemented
+       // IsResumeEnabled = _isResumeEnabled,
 
         TimeMachine = new TimeMachineSettings
         {
