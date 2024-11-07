@@ -216,6 +216,8 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         _preferences = await _preferencesService.LoadAsync();
 
+        IsMuted = _preferences.AudioSettings.IsMuted;
+
         _timeMachine.IsEnabled = _preferences.TimeMachine.IsEnabled;
         _timeMachine.SnapshotInterval = _preferences.TimeMachine.SnapshotInterval;
         _timeMachine.MaxDuration = _preferences.TimeMachine.MaxDuration;
@@ -246,6 +248,8 @@ public partial class MainWindowViewModel : ViewModelBase
     private async Task WindowClosingAsync()
     {
         Emulator?.Shutdown();
+
+        _preferences.AudioSettings.IsMuted = IsMuted;
 
         await Task.WhenAll(
             _preferencesService.SaveAsync(_preferences),
