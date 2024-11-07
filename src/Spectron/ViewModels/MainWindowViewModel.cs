@@ -253,11 +253,10 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void CreateEmulator(Preferences preferences)
     {
-        var emulator = _emulatorFactory.Create(
-            preferences.ComputerType,
-            preferences.RomType);
+        var emulator = _emulatorFactory.Create(preferences.ComputerType, preferences.RomType);
 
         emulator.IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
+        emulator.JoystickManager.SetupJoystick(_preferences.Joystick.JoystickType);
 
         InitializeEmulator(emulator);
     }
