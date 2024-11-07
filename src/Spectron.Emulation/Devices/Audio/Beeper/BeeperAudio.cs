@@ -9,6 +9,7 @@ internal sealed class BeeperAudio
 
     private byte _lastEarMic;
     private short _previousSample;
+    private int _remainingTicks;
 
     private readonly Clock _clock;
     private readonly int _statesPerSample;
@@ -17,10 +18,10 @@ internal sealed class BeeperAudio
     private const int Volume = 24000;
     private readonly short[] _volumeLevels =
     [
-        -Volume,
-        (short)(0.66f / 3.70f * Volume),
-        (short)(3.56f / 3.70f * Volume),
-        Volume
+        0,         // -Volume,
+        0,         // (short)(0.66f / 3.70f * Volume),
+        -(short)(3.56f / 3.70f * Volume),
+        -Volume
     ];
 
     internal AudioSamples Samples { get; } = new();
@@ -36,7 +37,6 @@ internal sealed class BeeperAudio
     internal void EndFrame()
     {
         var runningTicks = 0;
-        var remainingTicks = 0;
 
         var ticks = _beeperStates.Count == 0 ? _clock.FrameTicks : _beeperStates[0].Ticks;
         var duration = ticks * Multiplier;
@@ -44,7 +44,7 @@ internal sealed class BeeperAudio
         for (var i = 0; i <= _beeperStates.Count; i++)
         {
             runningTicks += duration;
-            duration += remainingTicks;
+            duration += _remainingTicks;
 
             while (duration >= _statesPerSample)
             {
@@ -58,7 +58,7 @@ internal sealed class BeeperAudio
                 Samples.Add(sample);
             }
 
-            remainingTicks = duration;
+            _remainingTicks = duration;
 
             if (i == _beeperStates.Count)
             {
@@ -84,7 +84,13 @@ internal sealed class BeeperAudio
         _lastEarMic = (byte)earMic;
     }
 
-    internal void Reset() => _beeperStates.Reset();
+    internal void Reset()
+    {
+        _beeperStates.Reset();
+        _remainingTicks = 0;
+        _lastEarMic = 0;
+        _previousSample = 0;
+    }
 
     internal void Stop() => _beeperStates.Reset();
 }

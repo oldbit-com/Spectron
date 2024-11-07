@@ -117,10 +117,12 @@ public sealed class AudioManager
         for (var i = 0; i < samplesCount; i++)
         {
             var sample = _beeperAudio.Samples.Count > i ? _beeperAudio.Samples[i] : 0;
+
             if (Ay.ChannelA.Samples.Count > i)
             {
                 sample += Ay.ChannelA.Samples[i] + Ay.ChannelB.Samples[i] + Ay.ChannelC.Samples[i];
             }
+
             audioBuffer.Add((short)sample);
         }
 
