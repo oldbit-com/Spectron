@@ -29,6 +29,7 @@
         </FluentTheme>
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
         <StyleInclude Source="avares://OldBit.Spectron/Controls/PausedOverlay.axaml" />
+        <StyleInclude Source="avares://OldBit.Spectron/Controls/HeaderSeparator.axaml" />
     </Application.Styles>
 
     <Application.Resources>

@@ -1,0 +1,28 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:OldBit.Spectron.Controls">
+    <Design.PreviewWith>
+        <controls:HeaderSeparator Text="Header text" Width="300" />
+    </Design.PreviewWith>
+
+    <Style Selector="controls|HeaderSeparator">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid ColumnDefinitions="Auto,*" Margin="0 5 0 5">
+                    <TextBlock
+                        Text="{TemplateBinding Text}" FontWeight="Medium"
+                        FontSize="15"
+                        Margin="0 0 -5 0"
+                        Foreground="{DynamicResource SystemControlForegroundChromeGrayBrush}"/>
+                    <Border Grid.Column="1"
+                            Height="{DynamicResource MenuFlyoutSeparatorThemeHeight}"
+                            Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                            HorizontalAlignment="Stretch"
+                            Focusable="False"
+                            Margin="{DynamicResource MenuFlyoutSeparatorThemePadding}"/>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>
