@@ -99,14 +99,14 @@ partial class MainWindowViewModel
     {
         RomType = romType;
 
-        CreateEmulator();
+        CreateEmulator(ComputerType, RomType);
     }
 
     private void HandleChangeComputerType(ComputerType computerType)
     {
         ComputerType = computerType;
 
-        CreateEmulator();
+        CreateEmulator(ComputerType, RomType);
     }
 
     private void HandleChangeJoystickType(JoystickType joystickType)
@@ -130,6 +130,9 @@ partial class MainWindowViewModel
         Emulator?.Reset();
         IsPaused = Emulator?.IsPaused ?? false;
     }
+
+    private void HandleMachineHardReset() =>
+        CreateEmulator(_preferences.ComputerType, _preferences.RomType);
 
     private void HandleTogglePause()
     {
@@ -225,19 +228,23 @@ partial class MainWindowViewModel
 
     private void HandleKeyDown(KeyEventArgs e)
     {
-        if (IsPaused)
+        switch (e)
         {
-            if (e.Key == Key.Escape)
-            {
-                HandleTogglePause();
-            }
-            return;
-        }
+            case{ Key: Key.Escape }:
+                if (IsPaused)
+                {
+                    HandleTogglePause();
+                    return;
+                }
+                break;
 
-        if (e.Key == Key.F1 && e.KeyModifiers == KeyModifiers.None)
-        {
-            HandleHelpKeyboardCommand();
-            return;
+            case { Key: Key.F1, KeyModifiers: KeyModifiers.None }:
+                HandleHelpKeyboardCommand();
+                return;
+
+            case { Key: Key.F5, KeyModifiers: KeyModifiers.Control }:
+                HandleMachineHardReset();
+                return;
         }
 
         if (JoystickType != JoystickType.None && _useCursorKeysAsJoystick)

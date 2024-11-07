@@ -68,6 +68,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<JoystickType, Unit> ChangeJoystickType { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleUlaPlus { get; private set; }
     public ReactiveCommand<Unit, Unit> ResetCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> HardResetCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> TogglePauseCommand { get; private set; }
     public ReactiveCommand<string, Unit> SetEmulationSpeedCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleFullScreenCommand { get; private set; }
@@ -130,6 +131,7 @@ public partial class MainWindowViewModel : ViewModelBase
         ToggleUlaPlus = ReactiveCommand.Create(HandleToggleUlaPlus);
         TogglePauseCommand = ReactiveCommand.Create(HandleTogglePause, emulatorNotNull);
         ResetCommand = ReactiveCommand.Create(HandleMachineReset, emulatorNotNull);
+        HardResetCommand = ReactiveCommand.Create(HandleMachineHardReset, emulatorNotNull);
         SetEmulationSpeedCommand = ReactiveCommand.Create<string>(HandleSetEmulationSpeed);
         ToggleFullScreenCommand = ReactiveCommand.Create(HandleToggleFullScreen);
         SetTapeLoadSpeedCommand = ReactiveCommand.Create<TapeSpeed>(HandleSetTapeLoadingSpeed);
@@ -234,7 +236,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         if (Emulator == null)
         {
-            CreateEmulator(_preferences);
+            CreateEmulator(_preferences.ComputerType, _preferences.RomType);
         }
 
         Emulator?.SetTapeSavingSettings(_preferences.TapeSaving);
@@ -251,11 +253,11 @@ public partial class MainWindowViewModel : ViewModelBase
             _sessionService.SaveAsync(Emulator, _preferences.ResumeSettings));
     }
 
-    private void CreateEmulator(Preferences preferences)
+    private void CreateEmulator(ComputerType computerType, RomType romType)
     {
-        var emulator = _emulatorFactory.Create(preferences.ComputerType, preferences.RomType);
+        var emulator = _emulatorFactory.Create(computerType, romType);
 
-        emulator.IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
+        emulator.IsUlaPlusEnabled = _preferences.IsUlaPlusEnabled;
         emulator.JoystickManager.SetupJoystick(_preferences.Joystick.JoystickType);
 
         InitializeEmulator(emulator);
@@ -266,7 +268,9 @@ public partial class MainWindowViewModel : ViewModelBase
         ShutdownEmulator();
 
         var emulator = snapshot == null ?
-            _emulatorFactory.Create(ComputerType, RomType == RomType.Custom ? RomType.Original : RomType) :
+            _emulatorFactory.Create(
+                ComputerType,
+                RomType == RomType.Custom ? RomType.Original : RomType) :
             _snapshotLoader.Load(snapshot);
 
         InitializeEmulator(emulator);

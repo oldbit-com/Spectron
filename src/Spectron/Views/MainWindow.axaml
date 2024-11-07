@@ -109,7 +109,8 @@
                 <MenuItem Header="-"/>
                 <MenuItem Header="Mute" ToggleType="CheckBox" Command="{Binding ToggleMuteCommand}" IsChecked="{Binding IsMuted}"/>
                 <MenuItem Header="-"/>
-                <MenuItem Header="Reset" Command="{Binding ResetCommand}"/>
+                <MenuItem Header="Reset" InputGesture="Ctrl+F5" HotKey="Ctrl+F5" Command="{Binding ResetCommand}"/>
+                <MenuItem Header="Hard Reset" Command="{Binding HardResetCommand}"/>
             </MenuItem>
 
             <MenuItem Header="_View" Padding="10 0 10 0" Focusable="False">
