@@ -310,10 +310,8 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         }
     }
 
-    private static void SaveSpectrumRegisters(ScreenBuffer screenBuffer, SpecRegsBlock specRegs)
-    {
+    private static void SaveSpectrumRegisters(ScreenBuffer screenBuffer, SpecRegsBlock specRegs) =>
         specRegs.Border = SpectrumPalette.ReverseBorderColors[screenBuffer.LastBorderColor];
-    }
 
     private static void SaveUlaPlus(UlaPlus ulaPlus, SzxFile snapshot)
     {
@@ -367,7 +365,8 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
 
         snapshot.Tape = new TapeBlock(stream.ToArray(), compressionLevel)
         {
-            FileExtension = "tzx"
+            FileExtension = "tzx",
+            CurrentBlockNo = (ushort)tapeManager.Cassette.Position
         };
     }
 

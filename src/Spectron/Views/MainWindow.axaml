@@ -48,8 +48,8 @@
     </Window.Styles>
 
     <DockPanel>
-        <Menu DockPanel.Dock="Top" IsTabStop="False" IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}">
-            <MenuItem Header="_File" Padding="10 0 10 0">
+        <Menu DockPanel.Dock="Top" IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}" Focusable="False">
+            <MenuItem Header="_File" Padding="10 0 10 0" IsTabStop="False" Focusable="False">
                 <MenuItem Header="Load..." HotKey="Cmd+O" InputGesture="Cmd+O" Command="{Binding LoadFileCommand}"/>
                 <MenuItem Header="Recent..." SubmenuOpened="RecentFilesSubmenuOpened">
                     <MenuItem />
@@ -61,7 +61,7 @@
                 <MenuItem Header="Exit" HotKey="Cmd+Q" InputGesture="Cmd+Q"/>
             </MenuItem>
 
-            <MenuItem Header="_Emulator" Padding="10 0 10 0">
+            <MenuItem Header="_Emulator" Padding="10 0 10 0" Focusable="False">
                 <MenuItem Header="Machine">
                     <MenuItem Header="ZX Spectrum 16" ToggleType="Radio" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum16K}" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum16K}}"/>
                     <MenuItem Header="ZX Spectrum 48" ToggleType="Radio" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum48K}" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum48K}}"/>
@@ -77,7 +77,7 @@
                         <MenuItem Header="B. Alford v1.37" ToggleType="Radio" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.BrendanAlford}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.BrendanAlford}}"/>
                     </MenuItem>
                 </MenuItem>
-                <MenuItem Header="Joystick">
+                <MenuItem Header="Joystick" Focusable="False">
                     <MenuItem Header="None" ToggleType="Radio" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.None}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.None}}"/>
                     <MenuItem Header="Kempston" ToggleType="Radio" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Kempston}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Kempston}}"/>
                     <MenuItem Header="Sinclair 1" ToggleType="Radio" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Sinclair1}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Sinclair1}}"/>
@@ -88,7 +88,7 @@
                 <MenuItem Header="Enable ULA+" ToggleType="CheckBox" Command="{Binding ToggleUlaPlus}" IsChecked="{Binding IsUlaPlusEnabled}"/>
             </MenuItem>
 
-            <MenuItem Header="_Control" Padding="10 0 10 0">
+            <MenuItem Header="_Control" Padding="10 0 10 0" Focusable="False">
                 <MenuItem Header="Speed">
                     <MenuItem Header="25%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="25" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='25'}"/>
                     <MenuItem Header="50%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="50" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='50'}"/>
@@ -112,7 +112,7 @@
                 <MenuItem Header="Reset" Command="{Binding ResetCommand}"/>
             </MenuItem>
 
-            <MenuItem Header="_View" Padding="10 0 10 0">
+            <MenuItem Header="_View" Padding="10 0 10 0" Focusable="False">
                 <MenuItem Header="Border">
                     <MenuItem Header="None" ToggleType="Radio" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.None}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.None}}"/>
                     <MenuItem Header="Small" ToggleType="Radio" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Small}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.Small}}"/>
@@ -124,7 +124,7 @@
                 <MenuItem Header="{Binding WindowStateCommandName}" HotKey="Ctrl+Enter" InputGesture="Ctrl+Enter" Command="{Binding ToggleFullScreenCommand}"/>
             </MenuItem>
 
-            <MenuItem Header="_Tape" Padding="10 0 10 0">
+            <MenuItem Header="_Tape" Padding="10 0 10 0" Focusable="False">
                 <MenuItem Header="New Tape" Command="{Binding TapeMenuViewModel.NewCommand}"/>
                 <MenuItem Header="Insert Tape" HotKey="Cmd+T" InputGesture="Cmd+T" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
                 <MenuItem Header="Save Tape"/>
@@ -142,13 +142,13 @@
                 </MenuItem>
             </MenuItem>
 
-            <MenuItem Header="_Help" Padding="10 0 10 0">
-                <MenuItem Header="Keyboard" HotKey="F1" InputGesture="F1" Command="{Binding HelpKeyboardCommand}"/>
+            <MenuItem Header="_Help" Padding="10 0 10 0" Focusable="False">
+                <MenuItem Header="Keyboard" InputGesture="F1" Command="{Binding HelpKeyboardCommand}"/>
                 <MenuItem Header="About" Command="{Binding ShowAboutViewCommand}"/>
             </MenuItem>
         </Menu>
 
-        <Grid RowDefinitions="*,Auto" Focusable="True">
+        <Grid RowDefinitions="*,Auto" Focusable="True" FocusAdorner="{x:Null}">
             <Border>
                 <Grid>
                     <Border CornerRadius="15" HorizontalAlignment="Center" ClipToBounds="True">

@@ -23,7 +23,7 @@ public partial class HelpKeyboardView : Window
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
-        if (e.Key != Key.Escape)
+        if (e.Key != Key.Escape && e.Key != Key.F1)
         {
             return;
         }

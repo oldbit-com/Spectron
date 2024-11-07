@@ -194,7 +194,7 @@ partial class MainWindowViewModel
         }
         else
         {
-            _helpKeyboardView.Activate();
+            _helpKeyboardView.Close();
         }
     }
 
@@ -231,6 +231,12 @@ partial class MainWindowViewModel
             {
                 HandleTogglePause();
             }
+            return;
+        }
+
+        if (e.Key == Key.F1 && e.KeyModifiers == KeyModifiers.None)
+        {
+            HandleHelpKeyboardCommand();
             return;
         }
 
