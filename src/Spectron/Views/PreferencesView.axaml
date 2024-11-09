@@ -63,9 +63,16 @@
             <TabItem Header="Audio">
                 <Border Classes="Tab">
                     <StackPanel>
-                        <CheckBox Content="Beeper enabled" Classes="Center" IsChecked="{Binding IsBeeperEnabled}"/>
-                        <CheckBox x:Name="AyEnabled" Content="AY enabled" Classes="Center" IsChecked="{Binding IsAyEnabled}"/>
-                        <CheckBox Content="AY in 16/48k mode" Classes="Center" Margin="25 0 0 0" IsChecked="{Binding IsAySupportedStandardSpectrum}" IsEnabled="{Binding #AyEnabled.IsChecked}"/>
+                        <controls:HeaderSeparator Text="Beeper"/>
+                        <CheckBox Content="Beeper audio enabled" Classes="Center" IsChecked="{Binding IsBeeperEnabled}"/>
+
+                        <controls:HeaderSeparator Text="AY-3-8912"/>
+                        <CheckBox x:Name="AyEnabled" Content="AY audio enabled" Classes="Center" IsChecked="{Binding IsAyEnabled}"/>
+                        <CheckBox Content="Available in standard 16/48k mode" Classes="Center" Margin="25 0 0 0" IsChecked="{Binding IsAySupportedStandardSpectrum}" IsEnabled="{Binding #AyEnabled.IsChecked}"/>
+                        <StackPanel Margin="25 0 0 0" Orientation="Horizontal">
+                            <TextBlock Text="Stereo mode:" Padding="0 0 10 0" VerticalAlignment="Center" Classes="Center"/>
+                            <ComboBox Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding StereoModes}" SelectedValue="{Binding StereoMode}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}" IsEnabled="{Binding #AyEnabled.IsChecked}"/>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
             </TabItem>
