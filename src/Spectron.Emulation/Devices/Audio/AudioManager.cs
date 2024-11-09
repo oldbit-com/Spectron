@@ -134,29 +134,23 @@ public sealed class AudioManager
         for (var i = 0; i < samplesCount; i++)
         {
             var sample = _beeperAudio.Samples.Count > i ? _beeperAudio.Samples[i] : 0;
-            var sampleL = sample;
-            var sampleR = sample;
+            var sampleL = 0;
+            var sampleR = 0;
 
             if (Ay.ChannelA.Samples.Count > i)
             {
-                var center = 0;
-
                 switch (StereoMode)
                 {
                     case StereoMode.None:
-                        sample += Ay.ChannelA.Samples[i] + Ay.ChannelB.Samples[i] + Ay.ChannelC.Samples[i];
+                        sample = MonoMix(sample, Ay.ChannelA.Samples[i], Ay.ChannelB.Samples[i], Ay.ChannelC.Samples[i]);
                         break;
 
                     case StereoMode.StereoAbc:
-                        center = (int)(Ay.ChannelB.Samples[i] * 0.7);
-                        sampleL += Ay.ChannelA.Samples[i] + center + (int)(Ay.ChannelC.Samples[i] * 0.3);
-                        sampleR += (int)(Ay.ChannelA.Samples[i] * 0.3) + center + Ay.ChannelC.Samples[i];
+                        (sampleL, sampleR) = StereoMix(sample, Ay.ChannelA.Samples[i], Ay.ChannelB.Samples[i], Ay.ChannelC.Samples[i]);
                         break;
 
                     case StereoMode.StereoAcb:
-                        center = (int)(Ay.ChannelC.Samples[i] * 0.7);
-                        sampleL += Ay.ChannelA.Samples[i] + center + (int)(Ay.ChannelB.Samples[i] * 0.3);
-                        sampleR += (int)(Ay.ChannelA.Samples[i] * 0.3) + center + Ay.ChannelB.Samples[i];
+                        (sampleL, sampleR) = StereoMix(sample, Ay.ChannelA.Samples[i], Ay.ChannelC.Samples[i], Ay.ChannelB.Samples[i]);
                         break;
                 }
             }
@@ -234,4 +228,16 @@ public sealed class AudioManager
         Stop();
         Start();
     }
+
+    private static (int, int) StereoMix(int beeperSample, int leftChannelSample, int centerChannelSample, int rightChannelSample)
+    {
+        var center = (int)(centerChannelSample * 0.7) + beeperSample;
+        var left = leftChannelSample + center + (int)(rightChannelSample * 0.3);
+        var right = (int)(leftChannelSample * 0.3) + center + rightChannelSample;
+
+        return (left, right);
+    }
+
+    private static int MonoMix(int beeperSample, int leftChannelSample, int centerChannelSample, int rightChannelSample) =>
+        leftChannelSample + centerChannelSample + rightChannelSample + beeperSample;
 }
