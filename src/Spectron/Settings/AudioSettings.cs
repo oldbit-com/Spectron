@@ -1,3 +1,5 @@
+using OldBit.Spectron.Emulation.Devices.Audio;
+
 namespace OldBit.Spectron.Settings;
 
 public record AudioSettings
@@ -9,4 +11,6 @@ public record AudioSettings
     public bool IsAyAudioEnabled { get; init; } = true;
 
     public bool IsAySupportedStandardSpectrum { get; init; } = true;
+
+    public StereoMode StereoMode { get; init; } = StereoMode.None;
 }

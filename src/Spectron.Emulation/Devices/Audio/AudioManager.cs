@@ -18,6 +18,7 @@ public sealed class AudioManager
     private readonly BeeperAudio _beeperAudio;
     private readonly AyAudio _ayAudio;
 
+    private StereoMode _stereoMode = StereoMode.None;
     private bool _isMuted;
     private bool _isAyEnabled;
     private bool _isBeeperEnabled;
@@ -26,6 +27,22 @@ public sealed class AudioManager
 
     internal BeeperDevice Beeper { get; }
     internal AyDevice Ay { get; } = new();
+
+    public StereoMode StereoMode
+    {
+        get => _stereoMode;
+        set
+        {
+            if (_stereoMode == value)
+            {
+                return;
+            }
+
+            _stereoMode = value;
+
+            ConfigureStereoMode();
+        }
+    }
 
     public bool IsAySupported => _hasAyChip || IsAySupportedStandardSpectrum;
 
@@ -117,13 +134,42 @@ public sealed class AudioManager
         for (var i = 0; i < samplesCount; i++)
         {
             var sample = _beeperAudio.Samples.Count > i ? _beeperAudio.Samples[i] : 0;
+            var sampleL = sample;
+            var sampleR = sample;
 
             if (Ay.ChannelA.Samples.Count > i)
             {
-                sample += Ay.ChannelA.Samples[i] + Ay.ChannelB.Samples[i] + Ay.ChannelC.Samples[i];
+                var center = 0;
+
+                switch (StereoMode)
+                {
+                    case StereoMode.None:
+                        sample += Ay.ChannelA.Samples[i] + Ay.ChannelB.Samples[i] + Ay.ChannelC.Samples[i];
+                        break;
+
+                    case StereoMode.StereoAbc:
+                        center = (int)(Ay.ChannelB.Samples[i] * 0.7);
+                        sampleL += Ay.ChannelA.Samples[i] + center + (int)(Ay.ChannelC.Samples[i] * 0.3);
+                        sampleR += (int)(Ay.ChannelA.Samples[i] * 0.3) + center + Ay.ChannelC.Samples[i];
+                        break;
+
+                    case StereoMode.StereoAcb:
+                        center = (int)(Ay.ChannelC.Samples[i] * 0.7);
+                        sampleL += Ay.ChannelA.Samples[i] + center + (int)(Ay.ChannelB.Samples[i] * 0.3);
+                        sampleR += (int)(Ay.ChannelA.Samples[i] * 0.3) + center + Ay.ChannelB.Samples[i];
+                        break;
+                }
             }
 
-            audioBuffer.Add((short)sample);
+            if (StereoMode == StereoMode.None)
+            {
+                audioBuffer.Add((short)sample);
+            }
+            else
+            {
+                audioBuffer.Add((short)sampleL);
+                audioBuffer.Add((short)sampleR);
+            }
         }
 
         _audioPlayer?.TryEnqueue(audioBuffer.Buffer);
@@ -139,7 +185,7 @@ public sealed class AudioManager
         _audioPlayer = new AudioPlayer(
             AudioFormat.Signed16BitIntegerLittleEndian,
             PlayerSampleRate,
-            channelCount: 1,
+            channelCount: StereoMode == StereoMode.None ? 1 : 2,
             new PlayerOptions
             {
                 BufferSizeInBytes = 32768,
@@ -181,5 +227,11 @@ public sealed class AudioManager
         {
             Stop();
         }
+    }
+
+    private void ConfigureStereoMode()
+    {
+        Stop();
+        Start();
     }
 }

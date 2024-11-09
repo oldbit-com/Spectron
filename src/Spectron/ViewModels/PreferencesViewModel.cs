@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reactive;
 using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
@@ -29,6 +30,7 @@ public class PreferencesViewModel : ViewModelBase
         IsBeeperEnabled = preferences.AudioSettings.IsBeeperEnabled;
         IsAyEnabled = preferences.AudioSettings.IsAyAudioEnabled;
         IsAySupportedStandardSpectrum = preferences.AudioSettings.IsAySupportedStandardSpectrum;
+        StereoMode = preferences.AudioSettings.StereoMode;
 
         IsTimeMachineEnabled = preferences.TimeMachine.IsEnabled;
         SnapshotInterval = preferences.TimeMachine.SnapshotInterval.TotalSeconds;
@@ -59,7 +61,8 @@ public class PreferencesViewModel : ViewModelBase
             {
                 IsBeeperEnabled = IsBeeperEnabled,
                 IsAyAudioEnabled = IsAyEnabled,
-                IsAySupportedStandardSpectrum = IsAySupportedStandardSpectrum
+                IsAySupportedStandardSpectrum = IsAySupportedStandardSpectrum,
+                StereoMode = StereoMode,
             },
 
             TimeMachine = new TimeMachineSettings
@@ -105,6 +108,13 @@ public class PreferencesViewModel : ViewModelBase
         new("Sinclair 2", JoystickType.Sinclair2),
         new("Cursor", JoystickType.Cursor),
         new("Fuller", JoystickType.Fuller),
+    ];
+
+    public List<NameValuePair<StereoMode>> StereoModes { get; } =
+    [
+        new("None", StereoMode.None),
+        new("Stereo ABC", StereoMode.StereoAbc),
+        new("Stereo ACB", StereoMode.StereoAcb),
     ];
 
     private ComputerType _computerType;
@@ -217,5 +227,12 @@ public class PreferencesViewModel : ViewModelBase
     {
         get => _isAySupportedStandardSpectrum;
         set => this.RaiseAndSetIfChanged(ref _isAySupportedStandardSpectrum, value);
+    }
+
+    private StereoMode _stereoMode;
+    public StereoMode StereoMode
+    {
+        get => _stereoMode;
+        set => this.RaiseAndSetIfChanged(ref _stereoMode, value);
     }
 }

@@ -35,6 +35,7 @@ public static class EmulatorExtensions
         emulator.AudioManager.IsBeeperEnabled = audioSettings.IsBeeperEnabled;
         emulator.AudioManager.IsAyEnabled = audioSettings.IsAyAudioEnabled;
         emulator.AudioManager.IsAySupportedStandardSpectrum = audioSettings.IsAySupportedStandardSpectrum;
+        emulator.AudioManager.StereoMode = audioSettings.StereoMode;
     }
 
     public static void SetUlaPlus(this Emulator? emulator, bool isUlaPlusEnabled)

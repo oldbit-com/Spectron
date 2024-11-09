@@ -297,9 +297,7 @@ public partial class MainWindowViewModel : ViewModelBase
         Emulator.JoystickManager.SetupJoystick(JoystickType);
         Emulator.RenderScreen += EmulatorOnRenderScreen;
 
-        Emulator.AudioManager.IsBeeperEnabled = _preferences.AudioSettings.IsBeeperEnabled;
-        Emulator.AudioManager.IsAyEnabled = _preferences.AudioSettings.IsAyAudioEnabled;
-        Emulator.AudioManager.IsAySupportedStandardSpectrum = _preferences.AudioSettings.IsAySupportedStandardSpectrum;
+        Emulator.SetAudioSettings(_preferences.AudioSettings);
 
         if (IsMuted)
         {
