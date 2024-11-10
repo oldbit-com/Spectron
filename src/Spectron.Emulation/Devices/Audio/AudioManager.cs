@@ -134,10 +134,10 @@ public sealed class AudioManager
         for (var i = 0; i < samplesCount; i++)
         {
             var sample = _beeperAudio.Samples.Count > i ? _beeperAudio.Samples[i] : 0;
-            var sampleL = 0;
-            var sampleR = 0;
+            int? sampleL = null;
+            int? sampleR = null;
 
-            if (Ay.ChannelA.Samples.Count > i)
+            if (IsAySupported && Ay.ChannelA.Samples.Count > i)
             {
                 switch (StereoMode)
                 {
@@ -161,8 +161,8 @@ public sealed class AudioManager
             }
             else
             {
-                audioBuffer.Add((short)sampleL);
-                audioBuffer.Add((short)sampleR);
+                audioBuffer.Add((short)(sampleL ?? sample));
+                audioBuffer.Add((short)(sampleR ?? sample));
             }
         }
 
