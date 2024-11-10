@@ -353,17 +353,12 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
 
     private static void SaveTape(TapeManager tapeManager, SzxFile snapshot, CompressionLevel compressionLevel)
     {
-        var tzx = tapeManager.Cassette.Content;
-
-        if (tzx.Blocks.Count == 0)
+        if (tapeManager.Cassette.IsEmpty)
         {
             return;
         }
 
-        using var stream = new MemoryStream();
-        tzx.Save(stream);
-
-        snapshot.Tape = new TapeBlock(stream.ToArray(), compressionLevel)
+        snapshot.Tape = new TapeBlock(tapeManager.Cassette.ContentBytes, compressionLevel)
         {
             FileExtension = "tzx",
             CurrentBlockNo = (ushort)tapeManager.Cassette.Position

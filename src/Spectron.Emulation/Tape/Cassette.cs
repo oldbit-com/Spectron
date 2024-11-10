@@ -16,8 +16,12 @@ public class BlockSelectedEventArgs(int position) : EventArgs
 /// </summary>
 public sealed class Cassette
 {
+    private byte[]? _contentBytes = null;
+
     public int Position { get; set; }
     public TzxFile Content { get; private set; } = new();
+    public bool IsEmpty => Content.Blocks.Count == 0;
+    internal byte[] ContentBytes => GetContentBytes();
 
     public delegate void BlockSelectedEvent(BlockSelectedEventArgs e);
     public event BlockSelectedEvent? BlockSelected;
@@ -41,12 +45,15 @@ public sealed class Cassette
                 Load(tzxFile);
                 break;
         }
+
+        _contentBytes = null;
     }
 
     internal void Load(TzxFile tzxFile, int blockIndex = 0)
     {
         Position = blockIndex;
         Content = tzxFile;
+        _contentBytes = null;
     }
 
     public TapData? GetNextTapData()
@@ -88,5 +95,20 @@ public sealed class Cassette
         Position += 1;
 
         return block;
+    }
+
+    private byte[] GetContentBytes()
+    {
+        if (_contentBytes != null)
+        {
+            return _contentBytes;
+        }
+
+        using var stream = new MemoryStream();
+        Content.Save(stream);
+
+        _contentBytes = stream.ToArray();
+
+        return _contentBytes;
     }
 }
