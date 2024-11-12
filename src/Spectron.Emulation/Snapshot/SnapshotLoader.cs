@@ -5,16 +5,15 @@ namespace OldBit.Spectron.Emulation.Snapshot;
 
 public sealed class SnapshotLoader(SnaSnapshot snaSnapshot, SzxSnapshot szxSnapshot, Z80Snapshot z80Snapshot)
 {
-    public Emulator Load(string fileName)
+    public Emulator Load(Stream stream, FileType fileType)
     {
-        var fileType = FileTypeHelper.GetFileType(fileName);
-
         return fileType switch
         {
-            FileType.Sna => snaSnapshot.Load(fileName),
-            FileType.Szx => szxSnapshot.Load(fileName),
-            FileType.Z80 => z80Snapshot.Load(fileName),
-            _ => throw new NotSupportedException($"The file extension '{Path.GetExtension(fileName)}' is not supported.")
+            FileType.Sna => snaSnapshot.Load(stream),
+            FileType.Szx => szxSnapshot.Load(stream),
+            FileType.Z80 => z80Snapshot.Load(stream),
+
+            _ => throw new NotSupportedException($"The file type '{fileType}' is not supported.")
         };
     }
 

@@ -1,3 +1,4 @@
+using OldBit.Spectron.Emulation.Storage;
 using OldBit.Z80Cpu;
 using OldBit.ZX.Files.Tzx;
 
@@ -60,17 +61,25 @@ public sealed class TapeManager
         _directAccess?.SaveBytes(Cassette, TapeSaveSpeed);
     }
 
-    public void InsertTape(string fileName, bool autoPlay = false)
+    public void InsertTape(Stream stream, FileType fileType, bool autoPlay = false)
     {
         StopTape();
 
-        Cassette.Load(fileName);
+        Cassette.Load(stream, fileType);
         InsertTape();
 
         if (autoPlay)
         {
             PlayTape();
         }
+    }
+
+    public void InsertTape(string fileName, bool autoPlay = false)
+    {
+        var fileType = FileTypeHelper.GetFileType(fileName);
+        var stream = File.OpenRead(fileName);
+
+        InsertTape(stream, fileType, autoPlay);
     }
 
     public void InsertTape(TzxFile tzxFile, int currentBlockIndex)

@@ -17,4 +17,14 @@ public static class MessageDialogs
 
         await messageBox.ShowWindowDialogAsync(MainWindow);
     }
+
+    public static async Task Warning(string message, string title = "Warning")
+    {
+        var messageBox = MessageBoxManager.GetMessageBoxStandard(
+            title,
+            message,
+            windowStartupLocation: WindowStartupLocation.CenterOwner);
+
+        await messageBox.ShowWindowDialogAsync(MainWindow);
+    }
 }

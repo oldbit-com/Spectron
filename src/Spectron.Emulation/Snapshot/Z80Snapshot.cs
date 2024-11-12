@@ -10,10 +10,24 @@ namespace OldBit.Spectron.Emulation.Snapshot;
 
 public sealed class Z80Snapshot(EmulatorFactory emulatorFactory)
 {
-    internal Emulator Load(string fileName)
+    internal Emulator Load(Stream stream)
     {
-        var snapshot = Z80File.Load(fileName);
+        var snapshot = Z80File.Load(stream);
 
+        return CreateEmulator(snapshot);
+    }
+
+    internal static void Save(string fileName, Emulator emulator)
+    {
+        var snapshot = new Z80File();
+
+        // TODO: Populate snapshot with emulator state
+
+        snapshot.Save(fileName);
+    }
+
+    private Emulator CreateEmulator(Z80File snapshot)
+    {
         var emulator = (snapshot.Header.HardwareMode, snapshot.Header.Flags3?.ModifyHardware) switch
         {
             (HardwareMode.Spectrum48, false) => emulatorFactory.Create(ComputerType.Spectrum48K, RomType.Original),
@@ -57,15 +71,6 @@ public sealed class Z80Snapshot(EmulatorFactory emulatorFactory)
         screenBuffer.UpdateBorder(borderColor);
 
         return emulator;
-    }
-
-    internal static void Save(string fileName, Emulator emulator)
-    {
-        var snapshot = new Z80File();
-
-        // TODO: Populate snapshot with emulator state
-
-        snapshot.Save(fileName);
     }
 
     private static void LoadMemory(ComputerType computerType, Z80File snapshot, IMemory memory)

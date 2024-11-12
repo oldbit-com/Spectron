@@ -18,9 +18,9 @@ namespace OldBit.Spectron.Emulation.Snapshot;
 
 public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
 {
-    internal Emulator Load(string fileName)
+    internal Emulator Load(Stream stream)
     {
-        var snapshot = SzxFile.Load(fileName);
+        var snapshot = SzxFile.Load(stream);
 
         return CreateEmulator(snapshot);
     }

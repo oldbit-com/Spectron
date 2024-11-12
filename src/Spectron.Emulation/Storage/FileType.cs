@@ -12,6 +12,8 @@ public enum FileType
 
     Szx,
 
+    Zip,
+
     Unsupported
 }
 
@@ -19,4 +21,10 @@ public static class FileTypeExtensions
 {
     public static bool IsSnapshot(this FileType fileType) =>
         fileType is FileType.Sna or FileType.Z80 or FileType.Szx;
+
+    public static bool IsTape(this FileType fileType) =>
+        fileType is FileType.Tap or FileType.Tzx;
+
+    public static bool IsArchive(this FileType fileType) =>
+        fileType is FileType.Zip;
 }

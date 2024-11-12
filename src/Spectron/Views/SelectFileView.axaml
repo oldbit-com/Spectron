@@ -1,0 +1,17 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="OldBit.Spectron.Views.SelectFileView"
+        x:DataType="viewModels:SelectFileViewModel"
+        Height="300"
+        Width="250"
+        WindowStartupLocation="CenterOwner"
+        Title="Select File">
+    <Grid RowDefinitions="*, 40" Margin="10 10 10 0">
+        <ListBox x:Name="Files" Grid.Row="0" ItemsSource="{Binding FileNames}" SelectedItem="{Binding SelectedFile}" DisplayMemberBinding="{Binding Name}"/>
+        <Button Grid.Row="1" VerticalAlignment="Center" Content="Select" HorizontalAlignment="Right" IsEnabled="{Binding #Files.SelectedValue, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+    </Grid>
+</Window>

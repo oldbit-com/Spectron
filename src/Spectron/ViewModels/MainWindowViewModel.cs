@@ -13,6 +13,7 @@ using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Snapshot;
+using OldBit.Spectron.Emulation.Storage;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Emulation.Tape.Loader;
 using OldBit.Spectron.Extensions;
@@ -81,6 +82,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public Interaction<PreferencesViewModel, Preferences?> ShowPreferencesView { get; }
     public Interaction<Unit, Unit?> ShowAboutView { get; }
+    public Interaction<SelectFileViewModel, ArchiveEntry?> ShowSelectFileView { get; }
 
     public MainWindowViewModel(
         EmulatorFactory emulatorFactory,
@@ -143,6 +145,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         ShowPreferencesView = new Interaction<PreferencesViewModel, Preferences?>();
         ShowAboutView = new Interaction<Unit, Unit?>();
+        ShowSelectFileView = new Interaction<SelectFileViewModel, ArchiveEntry?>();
 
         TimeMachineViewModel.OnTimeTravel = HandleTimeTravel;
         SpectrumScreen = _frameBufferConverter.Bitmap;
