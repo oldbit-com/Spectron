@@ -59,7 +59,10 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         snapshot.Save(fileName);
     }
 
-    public static SzxFile CreateSnapshot(Emulator emulator, CompressionLevel compressionLevel = CompressionLevel.SmallestSize)
+    public static SzxFile CreateSnapshot(
+        Emulator emulator,
+        CompressionLevel compressionLevel = CompressionLevel.SmallestSize,
+        bool shouldEmbedTape = true)
     {
         var snapshot = new SzxFile
         {
@@ -84,7 +87,12 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         SaveSpectrumRegisters(emulator.ScreenBuffer, snapshot.SpecRegs);
         SaveUlaPlus(emulator.UlaPlus, snapshot);
         SaveJoystick(emulator.JoystickManager, snapshot);
-        SaveTape(emulator.TapeManager, snapshot, compressionLevel);
+
+        if (shouldEmbedTape)
+        {
+            SaveTape(emulator.TapeManager, snapshot, compressionLevel);
+        }
+
         SaveAyRegisters(emulator.AudioManager, snapshot);
 
         if (emulator.RomType.IsCustomRom())

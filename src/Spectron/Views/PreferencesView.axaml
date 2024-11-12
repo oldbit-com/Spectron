@@ -41,7 +41,7 @@
                     <StackPanel>
                         <controls:HeaderSeparator Text="Startup"/>
                         <CheckBox x:Name="SaveState" Content="Save / Load state on exit" ToolTip.Tip="Saves emulator state as a snapshot on exit and loads it when application starts" Classes="Center" Margin="10 0 0 0" IsChecked="{Binding IsResumeEnabled}"/>
-                        <CheckBox Content="Include current tape" ToolTip.Tip="When saving current state, tape contents will be also saved and restored" Classes="Center" Margin="35 0 0 0" IsEnabled="{Binding #SaveState.IsChecked}" IsChecked="{Binding ShouldIncludeTapeInResume}"/>
+                        <CheckBox Content="Embed current tape" ToolTip.Tip="When saving current state, tape contents will be saved and restored" Classes="Center" Margin="35 0 0 0" IsEnabled="{Binding #SaveState.IsChecked}" IsChecked="{Binding ShouldIncludeTapeInResume}"/>
                         <CheckBox Content="Include time machine state" ToolTip.Tip="When saving current state, time machine state will be also saved and restored" Classes="Center" Margin="35 0 0 0" IsEnabled="{Binding #SaveState.IsChecked}" IsChecked="{Binding ShouldIncludeTimeMachineInResume}"/>
 
                         <controls:HeaderSeparator Text="Emulator defaults"/>
@@ -86,7 +86,10 @@
             <TabItem Header="Time Machine">
                 <Border Classes="Tab">
                     <StackPanel>
+                        <controls:HeaderSeparator Text="Time Machine Options"/>
                         <CheckBox x:Name="TimeMachineEnabled" IsChecked="{Binding IsTimeMachineEnabled}" Content="Enable Time Machine" Classes="Center"/>
+                        <CheckBox IsChecked="{Binding ShouldEmbeddedTapeInTimeMachine}" IsEnabled="{Binding #TimeMachineEnabled.IsChecked}" Content="Embed tape content" Classes="Center" Margin="25 0 0 0" ToolTip.Tip="When enabled, tape content will be saved"/>
+
                         <Grid ColumnDefinitions="100,*">
                             <TextBlock Text="Length" VerticalAlignment="Center" Padding="0 0 0 10"/>
                             <StackPanel Grid.Column="1">

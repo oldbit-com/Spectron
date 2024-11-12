@@ -171,8 +171,10 @@ public partial class MainWindowViewModel : ViewModelBase
             IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
 
             _timeMachine.IsEnabled = preferences.TimeMachine.IsEnabled;
+            _timeMachine.ShouldEmbedTape = preferences.TimeMachine.ShouldEmbedTape;
             _timeMachine.SnapshotInterval = preferences.TimeMachine.SnapshotInterval;
             _timeMachine.MaxDuration = preferences.TimeMachine.MaxDuration;
+
 
             Emulator?.SetUlaPlus(IsUlaPlusEnabled);
             Emulator?.SetAudioSettings(preferences.AudioSettings);
@@ -219,6 +221,7 @@ public partial class MainWindowViewModel : ViewModelBase
         IsMuted = _preferences.AudioSettings.IsMuted;
 
         _timeMachine.IsEnabled = _preferences.TimeMachine.IsEnabled;
+        _timeMachine.ShouldEmbedTape = _preferences.TimeMachine.ShouldEmbedTape;
         _timeMachine.SnapshotInterval = _preferences.TimeMachine.SnapshotInterval;
         _timeMachine.MaxDuration = _preferences.TimeMachine.MaxDuration;
 

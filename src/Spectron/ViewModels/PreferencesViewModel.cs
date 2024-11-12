@@ -33,6 +33,7 @@ public class PreferencesViewModel : ViewModelBase
         StereoMode = preferences.AudioSettings.StereoMode;
 
         IsTimeMachineEnabled = preferences.TimeMachine.IsEnabled;
+        ShouldEmbeddedTapeInTimeMachine = preferences.TimeMachine.ShouldEmbedTape;
         SnapshotInterval = preferences.TimeMachine.SnapshotInterval.TotalSeconds;
         MaxDuration = preferences.TimeMachine.MaxDuration.TotalSeconds;
 
@@ -68,6 +69,7 @@ public class PreferencesViewModel : ViewModelBase
             TimeMachine = new TimeMachineSettings
             {
                 IsEnabled = IsTimeMachineEnabled,
+                ShouldEmbedTape = ShouldEmbeddedTapeInTimeMachine,
                 SnapshotInterval = TimeSpan.FromSeconds(SnapshotInterval),
                 MaxDuration = TimeSpan.FromSeconds(MaxDuration)
             },
@@ -150,6 +152,13 @@ public class PreferencesViewModel : ViewModelBase
     {
         get => _isTimeMachineEnabled;
         set => this.RaiseAndSetIfChanged(ref _isTimeMachineEnabled, value);
+    }
+
+    private bool _shouldEmbeddedTapeInTimeMachine;
+    public bool ShouldEmbeddedTapeInTimeMachine
+    {
+        get => _shouldEmbeddedTapeInTimeMachine;
+        set => this.RaiseAndSetIfChanged(ref _shouldEmbeddedTapeInTimeMachine, value);
     }
 
     private double _snapshotInterval;

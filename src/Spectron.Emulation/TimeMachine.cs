@@ -9,6 +9,7 @@ public record TimeMachineEntry(DateTimeOffset Timestamp, SzxFile Snapshot);
 public sealed class TimeMachine
 {
     public bool IsEnabled { get; set; }
+    public bool ShouldEmbedTape { get; set; }
     public TimeSpan SnapshotInterval { get; set; } = TimeSpan.FromSeconds(1);
     public TimeSpan MaxDuration { get; set; } = TimeSpan.FromMinutes(1);
     public List<TimeMachineEntry> Entries { get; } = [];
@@ -27,7 +28,7 @@ public sealed class TimeMachine
             return;
         }
 
-        var snapshot = SzxSnapshot.CreateSnapshot(emulator, CompressionLevel.NoCompression);
+        var snapshot = SzxSnapshot.CreateSnapshot(emulator, CompressionLevel.NoCompression, ShouldEmbedTape);
         Entries.Add(new TimeMachineEntry(now, snapshot));
 
         while (Entries.Count > MaxSnapshots)
