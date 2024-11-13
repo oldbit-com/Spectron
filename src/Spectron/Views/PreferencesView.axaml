@@ -3,7 +3,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
-        xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
         xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.PreferencesView"
@@ -13,10 +12,6 @@
         WindowStartupLocation="CenterOwner"
         CanResize="False"
         Title="Preferences">
-
-    <Window.Resources>
-        <converters:ValueEqualityConverter x:Key="ValueEqualityConverter"/>
-    </Window.Resources>
 
     <Window.Styles>
         <Style Selector="Border.Tab">

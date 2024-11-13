@@ -39,7 +39,7 @@ public class PreferencesViewModel : ViewModelBase
         IsTapeSaveEnabled = preferences.TapeSaving.IsEnabled;
         TapeSaveSpeed = preferences.TapeSaving.Speed;
 
-        UpdatePreferencesCommand = ReactiveCommand.Create(() => new Settings.Preferences
+        UpdatePreferencesCommand = ReactiveCommand.Create(() => new Preferences
         {
             ComputerType = ComputerType,
             IsUlaPlusEnabled = IsUlaPlusEnabled,

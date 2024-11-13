@@ -9,6 +9,7 @@ public static class FileTypeHelper
         ".z80" => FileType.Z80,
         ".tap" => FileType.Tap,
         ".tzx" => FileType.Tzx,
+        ".zip" => FileType.Zip,
         _ => FileType.Unsupported
     };
 }

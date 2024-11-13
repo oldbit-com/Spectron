@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Avalonia.Input;
 using Avalonia.Controls;
@@ -21,6 +23,8 @@ partial class MainWindowViewModel
 
     private async Task HandleLoadFileAsync(string? filePath)
     {
+        Stream? stream = null;
+
         try
         {
             Emulator?.Pause();
@@ -37,19 +41,22 @@ partial class MainWindowViewModel
             }
 
             var fileType = FileTypeHelper.GetFileType(filePath);
-            if (fileType.IsSnapshot())
+            if (fileType == FileType.Unsupported)
             {
-                var emulator = _snapshotLoader.Load(filePath);
-                InitializeEmulator(emulator);
-            }
-            else
-            {
-                var emulator = _loader.EnterLoadCommand(ComputerType);
-                emulator.TapeManager.InsertTape(filePath);
-                InitializeEmulator(emulator);
+                await MessageDialogs.Warning($"Unsupported file type: {fileType}.");
+                return;
             }
 
-            RecentFilesViewModel.Add(filePath);
+            var fileResult = await LoadFileAsync(filePath, fileType);
+            if (fileResult.Stream == null)
+            {
+                return;
+            }
+
+            if (CreateEmulator(fileResult.Stream, fileResult.FileType))
+            {
+                RecentFilesViewModel.Add(filePath);
+            }
         }
         catch (Exception ex)
         {
@@ -58,8 +65,72 @@ partial class MainWindowViewModel
         }
         finally
         {
+            stream?.Close();
             Emulator?.Resume();
         }
+    }
+
+    private async Task<(Stream? Stream, FileType FileType)> LoadFileAsync(string filePath, FileType fileType)
+    {
+        Stream? stream = null;
+
+        if (fileType.IsArchive())
+        {
+            var archive = new CompressedFile(filePath);
+            var files = archive.GetFiles();
+
+            switch (files.Count)
+            {
+                case 0:
+                    await MessageDialogs.Warning("No matching files found in the archive.");
+                    return (null, fileType);
+
+                case 1:
+                    fileType = files[0].FileType;
+                    stream = archive.GetFile(files[0].Name);
+                    break;
+
+                default:
+                {
+                    var selectedFile = await ShowSelectFileView.Handle(new SelectFileViewModel { FileNames = files });
+                    if (selectedFile != null)
+                    {
+                        fileType = selectedFile.FileType;
+                        stream = archive.GetFile(selectedFile.Name);
+                    }
+
+                    break;
+                }
+            }
+        }
+        else
+        {
+            stream = File.OpenRead(filePath);
+        }
+
+        return (stream, fileType);
+    }
+
+    private bool CreateEmulator(Stream stream, FileType fileType)
+    {
+        Emulator? emulator = null;
+
+        if (fileType.IsSnapshot())
+        {
+            emulator = _snapshotLoader.Load(stream, fileType);
+        }
+        else if (fileType.IsTape())
+        {
+            emulator = _loader.EnterLoadCommand(ComputerType);
+            emulator.TapeManager.InsertTape(stream, fileType);
+        }
+
+        if (emulator != null)
+        {
+            InitializeEmulator(emulator);
+        }
+
+        return emulator != null;
     }
 
     private async Task HandleSaveFileAsync()

@@ -22,7 +22,16 @@ public static class FileDialogs
         {
             Title = "Open File",
             AllowMultiple = false,
-            FileTypeFilter = [FileTypes.All, FileTypes.Sna, FileTypes.Szx, FileTypes.Tap, FileTypes.Tzx, FileTypes.Z80]
+            FileTypeFilter =
+            [
+                FileTypes.All,
+                FileTypes.Sna,
+                FileTypes.Szx,
+                FileTypes.Tap,
+                FileTypes.Tzx,
+                FileTypes.Z80,
+                FileTypes.Zip
+            ]
         });
     }
 

@@ -8,55 +8,11 @@ namespace OldBit.Spectron.Emulation.Snapshot;
 
 public sealed class SnaSnapshot(EmulatorFactory emulatorFactory)
 {
-    internal Emulator Load(string fileName)
+    internal Emulator Load(Stream stream)
     {
-        var snapshot = SnaFile.Load(fileName);
+        var snapshot = SnaFile.Load(stream);
 
-        var emulator = emulatorFactory.Create(snapshot.Header128 != null ?
-            ComputerType.Spectrum128K : ComputerType.Spectrum48K, RomType.Original);
-        var (cpu, memory, screenBuffer) = (emulator.Cpu, emulator.Memory, emulator.ScreenBuffer);
-
-        cpu.Registers.AF = snapshot.Header.AF;
-        cpu.Registers.BC = snapshot.Header.BC;
-        cpu.Registers.DE = snapshot.Header.DE;
-        cpu.Registers.HL = snapshot.Header.HL;
-
-        cpu.Registers.Prime.AF = snapshot.Header.AFPrime;
-        cpu.Registers.Prime.BC = snapshot.Header.BCPrime;
-        cpu.Registers.Prime.DE = snapshot.Header.DEPrime;
-        cpu.Registers.Prime.HL = snapshot.Header.HLPrime;
-
-        cpu.Registers.IX = snapshot.Header.IX;
-        cpu.Registers.IY = snapshot.Header.IY;
-        cpu.Registers.SP = snapshot.Header.SP;
-
-        cpu.Registers.I = snapshot.Header.I;
-        cpu.Registers.R = snapshot.Header.R;
-        cpu.IM = (InterruptMode)snapshot.Header.InterruptMode;
-        cpu.IFF1 = (snapshot.Header.Interrupt & 0x04) != 0;
-        cpu.IFF2 = (snapshot.Header.Interrupt & 0x04) != 0;
-
-        if (snapshot.Header128 != null)
-        {
-            LoadMemory(snapshot, (Memory128K)memory);
-
-            cpu.Registers.PC = snapshot.Header128.PC;
-        }
-        else
-        {
-            LoadMemory(snapshot, (Memory48K)memory);
-
-            cpu.Registers.PC = (Word)(memory.Read((Word)(cpu.Registers.SP + 1)) << 8 |
-                                      memory.Read(cpu.Registers.SP));
-            cpu.Registers.SP += 2;
-        }
-
-        var borderColor = SpectrumPalette.GetBorderColor(snapshot.Header.BorderColor);
-
-        screenBuffer.Reset();
-        screenBuffer.UpdateBorder(borderColor);
-
-        return emulator;
+        return CreateEmulator(snapshot);
     }
 
     internal static void Save(string fileName, Emulator emulator)
@@ -102,6 +58,55 @@ public sealed class SnaSnapshot(EmulatorFactory emulatorFactory)
         // TODO: Populate snapshot with emulator state
 
         snapshot.Save(fileName);
+    }
+
+    private Emulator CreateEmulator(SnaFile snapshot)
+    {
+        var emulator = emulatorFactory.Create(snapshot.Header128 != null ?
+            ComputerType.Spectrum128K : ComputerType.Spectrum48K, RomType.Original);
+        var (cpu, memory, screenBuffer) = (emulator.Cpu, emulator.Memory, emulator.ScreenBuffer);
+
+        cpu.Registers.AF = snapshot.Header.AF;
+        cpu.Registers.BC = snapshot.Header.BC;
+        cpu.Registers.DE = snapshot.Header.DE;
+        cpu.Registers.HL = snapshot.Header.HL;
+
+        cpu.Registers.Prime.AF = snapshot.Header.AFPrime;
+        cpu.Registers.Prime.BC = snapshot.Header.BCPrime;
+        cpu.Registers.Prime.DE = snapshot.Header.DEPrime;
+        cpu.Registers.Prime.HL = snapshot.Header.HLPrime;
+
+        cpu.Registers.IX = snapshot.Header.IX;
+        cpu.Registers.IY = snapshot.Header.IY;
+        cpu.Registers.SP = snapshot.Header.SP;
+
+        cpu.Registers.I = snapshot.Header.I;
+        cpu.Registers.R = snapshot.Header.R;
+        cpu.IM = (InterruptMode)snapshot.Header.InterruptMode;
+        cpu.IFF1 = (snapshot.Header.Interrupt & 0x04) != 0;
+        cpu.IFF2 = (snapshot.Header.Interrupt & 0x04) != 0;
+
+        if (snapshot.Header128 != null)
+        {
+            LoadMemory(snapshot, (Memory128K)memory);
+
+            cpu.Registers.PC = snapshot.Header128.PC;
+        }
+        else
+        {
+            LoadMemory(snapshot, (Memory48K)memory);
+
+            cpu.Registers.PC = (Word)(memory.Read((Word)(cpu.Registers.SP + 1)) << 8 |
+                                      memory.Read(cpu.Registers.SP));
+            cpu.Registers.SP += 2;
+        }
+
+        var borderColor = SpectrumPalette.GetBorderColor(snapshot.Header.BorderColor);
+
+        screenBuffer.Reset();
+        screenBuffer.UpdateBorder(borderColor);
+
+        return emulator;
     }
 
     private static void LoadMemory(SnaFile snapshot, Memory48K memory)

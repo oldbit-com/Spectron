@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.ReactiveUI;
 using OldBit.Spectron.Dialogs;
+using OldBit.Spectron.Emulation.Storage;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.ViewModels;
 using ReactiveUI;
@@ -27,6 +28,9 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
         this.WhenActivated(action =>
             action(ViewModel!.ShowAboutView.RegisterHandler(ShowAboutViewAsync)));
+
+        this.WhenActivated(action =>
+            action(ViewModel!.ShowSelectFileView.RegisterHandler(ShowSelectFileViewAsync)));
     }
 
     private async Task ShowPreferencesViewAsync(InteractionContext<PreferencesViewModel, Preferences?> interaction)
@@ -49,6 +53,14 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         var dialog = new AboutView();
         await dialog.ShowDialog<Unit?>(this);
+    }
+
+    private async Task ShowSelectFileViewAsync(InteractionContext<SelectFileViewModel, ArchiveEntry?> interaction)
+    {
+        var dialog = new SelectFileView { DataContext = interaction.Input };
+        var result = await dialog.ShowDialog<ArchiveEntry?>(this);
+
+        interaction.SetOutput(result);
     }
 
     protected override void OnDataContextChanged(EventArgs e)

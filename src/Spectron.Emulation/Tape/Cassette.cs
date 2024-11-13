@@ -28,25 +28,33 @@ public sealed class Cassette
 
     public event EventHandler? EndOfTape;
 
-    public void Load(string filePath)
+    public void Load(Stream stream, FileType fileType)
     {
         Position = 0;
-        var fileType = FileTypeHelper.GetFileType(filePath);
 
         switch (fileType)
         {
             case FileType.Tap:
-                var tapFile = TapFile.Load(filePath);
+                var tapFile = TapFile.Load(stream);
                 Load(tapFile.ToTzx());
                 break;
 
             case FileType.Tzx:
-                var tzxFile = TzxFile.Load(filePath);
+                var tzxFile = TzxFile.Load(stream);
                 Load(tzxFile);
                 break;
         }
 
         _contentBytes = null;
+    }
+
+    public void Load(string filePath)
+    {
+        Position = 0;
+        var fileType = FileTypeHelper.GetFileType(filePath);
+
+        using var stream = File.OpenRead(filePath);
+        Load(stream, fileType);
     }
 
     internal void Load(TzxFile tzxFile, int blockIndex = 0)
