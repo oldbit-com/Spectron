@@ -7,11 +7,11 @@ namespace OldBit.Spectron.ViewModels;
 
 public class SelectFileViewModel : ViewModelBase
 {
-    public ReactiveCommand<Unit, ArchiveEntry?> FileSelectedCommand { get; }
+    public ReactiveCommand<Unit, ArchiveEntry?> SelectFileCommand { get; }
 
     public SelectFileViewModel()
     {
-        FileSelectedCommand = ReactiveCommand.Create(() => SelectedFile);
+        SelectFileCommand = ReactiveCommand.Create(() => SelectedFile);
     }
 
     public List<ArchiveEntry> FileNames { get; set; } = [];

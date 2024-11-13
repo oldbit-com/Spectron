@@ -39,7 +39,7 @@ public static class FileTypes
         Patterns = ["*.z80"]
     };
 
-    public static FilePickerFileType Zip { get; } = new("Zip Compressed File")
+    public static FilePickerFileType Zip { get; } = new("ZIP File")
     {
         Patterns = ["*.zip"]
     };

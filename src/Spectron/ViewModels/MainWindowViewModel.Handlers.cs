@@ -79,26 +79,27 @@ partial class MainWindowViewModel
             var archive = new CompressedFile(filePath);
             var files = archive.GetFiles();
 
-            if (files.Count == 0)
+            switch (files.Count)
             {
-                await MessageDialogs.Warning("No matching files found in the archive.");
-                return (null, fileType);
-            }
-            else if (files.Count == 1)
-            {
-                fileType = files[0].FileType;
-                stream = archive.GetFile(files[0].Name);
-            }
-            else
-            {
-                var fileName = await ShowSelectFileView.Handle(new SelectFileViewModel
-                {
-                    FileNames = files
-                });
+                case 0:
+                    await MessageDialogs.Warning("No matching files found in the archive.");
+                    return (null, fileType);
 
-                if (fileName != null)
-                {
+                case 1:
+                    fileType = files[0].FileType;
+                    stream = archive.GetFile(files[0].Name);
+                    break;
 
+                default:
+                {
+                    var selectedFile = await ShowSelectFileView.Handle(new SelectFileViewModel { FileNames = files });
+                    if (selectedFile != null)
+                    {
+                        fileType = selectedFile.FileType;
+                        stream = archive.GetFile(selectedFile.Name);
+                    }
+
+                    break;
                 }
             }
         }

@@ -17,6 +17,6 @@ public partial class SelectFileView : ReactiveWindow<SelectFileViewModel>
             return;
         }
 
-        this.WhenActivated(action => action(ViewModel!.FileSelectedCommand.Subscribe(Close)));
+        this.WhenActivated(action => action(ViewModel!.SelectFileCommand.Subscribe(Close)));
     }
 }
