@@ -16,6 +16,7 @@ Z80 CPU emulator and audio player are written from scratch as a separate library
 - [x] Time Machine: rewind and replay your games
 - [x] Resume: save and restore emulator state
 - [x] Supports SNA, SZX, Z80, TAP and TZX files
+- [x] Can read ZIP files with the above file types inside
 - [x] Quite accurate timings, including contented memory and IO
 - [x] Multicolor screen effects in games like Uridium
 - [x] ULA+ support (multicolor)
