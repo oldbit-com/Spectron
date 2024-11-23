@@ -41,6 +41,8 @@ public sealed class JoystickManager
         {
             _spectrumBus.AddDevice(_joystick);
         }
+
+        _gamePadManager.Initialize();
     }
 
     public void HandleInput(JoystickInput input, bool isOn) => _joystick?.HandleInput(input, isOn);

@@ -18,6 +18,7 @@ namespace OldBit.Spectron.Emulation;
 public sealed class Emulator
 {
     private readonly HardwareSettings _hardware;
+    private readonly GamePadManager _gamePadManager;
     private readonly TimeMachine _timeMachine;
     private readonly SpectrumBus _spectrumBus;
     private readonly EmulatorTimer _emulationTimer;
@@ -53,6 +54,7 @@ public sealed class Emulator
     {
         TapeManager = tapeManager;
         _hardware = hardware;
+        _gamePadManager = gamePadManager;
         _timeMachine = timeMachine;
         ComputerType = emulatorArgs.ComputerType;
         RomType = emulatorArgs.RomType;
@@ -95,6 +97,7 @@ public sealed class Emulator
     {
         AudioManager.Stop();
         _emulationTimer.Stop();
+        _gamePadManager.Stop();
 
         while (!_emulationTimer.IsStopped)
         {
