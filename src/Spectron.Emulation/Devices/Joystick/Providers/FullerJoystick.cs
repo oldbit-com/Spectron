@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.Devices.Joystick;
+namespace OldBit.Spectron.Emulation.Devices.Joystick.Providers;
 
 internal class FullerJoystick : IJoystick
 {

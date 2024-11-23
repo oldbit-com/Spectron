@@ -38,4 +38,10 @@
       <PackageReference Include="OldBit.ZX.Files" Version="0.9.5-rc.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="OldBit.JoyPad">
+        <HintPath>..\..\..\JoyPad\src\JoyPad\bin\Debug\net8.0\OldBit.JoyPad.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

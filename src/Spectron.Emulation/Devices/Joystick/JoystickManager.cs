@@ -1,3 +1,4 @@
+using OldBit.Spectron.Emulation.Devices.Joystick.Providers;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 
 namespace OldBit.Spectron.Emulation.Devices.Joystick;

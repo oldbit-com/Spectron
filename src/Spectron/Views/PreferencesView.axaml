@@ -40,13 +40,11 @@
                         <CheckBox Content="Include time machine state" ToolTip.Tip="When saving current state, time machine state will be also saved and restored" Classes="Center" Margin="35 0 0 0" IsEnabled="{Binding #SaveState.IsChecked}" IsChecked="{Binding ShouldIncludeTimeMachineInResume}"/>
 
                         <controls:HeaderSeparator Text="Emulator defaults"/>
-                        <Grid ColumnDefinitions="120,*" RowDefinitions="40,40,40">
+                        <Grid ColumnDefinitions="120,*" RowDefinitions="40,40">
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="Machine" VerticalAlignment="Center" Classes="Center"/>
                             <ComboBox  Grid.Row="0" Grid.Column="1" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding ComputerTypes}" SelectedValue="{Binding ComputerType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="ROM" VerticalAlignment="Center" Classes="Center"/>
                             <ComboBox  Grid.Row="1" Grid.Column="1" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding RomTypes}" SelectedValue="{Binding RomType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Joystick" VerticalAlignment="Center" Classes="Center"/>
-                            <ComboBox  Grid.Row="2" Grid.Column="1" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding JoystickTypes}" SelectedValue="{Binding JoystickType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
                         </Grid>
 
                         <controls:HeaderSeparator Text="Screen"/>
@@ -74,7 +72,27 @@
             <TabItem Header="Joystick">
                 <Border Classes="Tab">
                     <StackPanel>
-                        <CheckBox Content="Emulate using cursor keys and Tab (fire)" Classes="Center" IsChecked="{Binding JoystickUseCursorKeys}"/>
+                        <controls:HeaderSeparator Text="Keyboard"/>
+                        <Grid ColumnDefinitions="140,*" RowDefinitions="40">
+                            <TextBlock Text="Emulated Joystick" VerticalAlignment="Center" Classes="Center"/>
+                            <ComboBox Grid.Column="1"  Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding JoystickTypes}" SelectedValue="{Binding JoystickKeyboardType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
+                        </Grid>
+
+                        <controls:HeaderSeparator Text="Joystick 1"/>
+                        <Grid ColumnDefinitions="140,*" RowDefinitions="40,40">
+                            <TextBlock Text="Device" VerticalAlignment="Center" Classes="Center"/>
+                            <ComboBox Grid.Row="1" Grid.Column="1" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding JoystickTypes}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Emulated Joystick" VerticalAlignment="Center" Classes="Center"/>
+                            <ComboBox Grid.Row="1" Grid.Column="1" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding JoystickTypes}" SelectedValue="{Binding Joystick1Type}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
+                        </Grid>
+
+                        <controls:HeaderSeparator Text="Joystick 2"/>
+                        <Grid ColumnDefinitions="140,*" RowDefinitions="40,40">
+                            <TextBlock Text="Device" VerticalAlignment="Center" Classes="Center"/>
+                            <ComboBox Grid.Row="1" Grid.Column="1" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding JoystickTypes}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Emulated Joystick" VerticalAlignment="Center" Classes="Center"/>
+                            <ComboBox Grid.Row="1" Grid.Column="1" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding JoystickTypes}" SelectedValue="{Binding Joystick2Type}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
+                        </Grid>
                     </StackPanel>
                 </Border>
             </TabItem>

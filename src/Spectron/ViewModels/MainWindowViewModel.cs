@@ -169,8 +169,6 @@ public partial class MainWindowViewModel : ViewModelBase
 
             //TapeLoadingSpeed = preferences.TapeLoadingSpeed;
 
-            _useCursorKeysAsJoystick = preferences.Joystick.UseCursorKeys;
-
             IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
 
             _timeMachine.IsEnabled = preferences.TimeMachine.IsEnabled;
@@ -265,7 +263,7 @@ public partial class MainWindowViewModel : ViewModelBase
         var emulator = _emulatorFactory.Create(computerType, romType);
 
         emulator.IsUlaPlusEnabled = _preferences.IsUlaPlusEnabled;
-        emulator.JoystickManager.SetupJoystick(_preferences.Joystick.JoystickType);
+        emulator.JoystickManager.SetupJoystick(_preferences.Joystick.JoystickKeyboardType);
 
         InitializeEmulator(emulator);
     }
@@ -341,8 +339,7 @@ public partial class MainWindowViewModel : ViewModelBase
         },
         Joystick = new JoystickSettings
         {
-            JoystickType = JoystickType,
-            UseCursorKeys = _useCursorKeysAsJoystick
+            JoystickKeyboardType = JoystickType,
         },
         TapeLoadSpeed = TapeLoadSpeed,
 

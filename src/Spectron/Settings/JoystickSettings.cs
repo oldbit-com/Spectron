@@ -4,7 +4,9 @@ namespace OldBit.Spectron.Settings;
 
 public record JoystickSettings
 {
-    public JoystickType JoystickType { get; init; } = JoystickType.None;
+    public JoystickType JoystickKeyboardType { get; init; } = JoystickType.None;
 
-    public bool UseCursorKeys { get; init; } = true;
+    public JoystickType Joystick1Type { get; init; } = JoystickType.None;
+
+    public JoystickType Joystick2Type { get; init; } = JoystickType.None;
 }

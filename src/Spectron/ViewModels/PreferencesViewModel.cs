@@ -20,8 +20,10 @@ public class PreferencesViewModel : ViewModelBase
         ComputerType = preferences.ComputerType;
         IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
         RomType = preferences.RomType;
-        JoystickType = preferences.Joystick.JoystickType;
-        JoystickUseCursorKeys = preferences.Joystick.UseCursorKeys;
+
+        JoystickKeyboardType = preferences.Joystick.JoystickKeyboardType;
+        Joystick1Type = preferences.Joystick.Joystick1Type;
+        Joystick2Type = preferences.Joystick.Joystick2Type;
 
         IsResumeEnabled = preferences.ResumeSettings.IsResumeEnabled;
         ShouldIncludeTapeInResume = preferences.ResumeSettings.ShouldIncludeTape;
@@ -46,8 +48,9 @@ public class PreferencesViewModel : ViewModelBase
             RomType = RomType,
             Joystick = new JoystickSettings
             {
-                JoystickType = JoystickType,
-                UseCursorKeys = JoystickUseCursorKeys,
+                JoystickKeyboardType = JoystickKeyboardType,
+                Joystick1Type = Joystick1Type,
+                Joystick2Type = Joystick2Type
             },
 
             ResumeSettings = new ResumeSettings
@@ -138,11 +141,25 @@ public class PreferencesViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _romType, value);
     }
 
-    private JoystickType _joystickType = JoystickType.None;
-    public JoystickType JoystickType
+    private JoystickType _joystickKeyboardType = JoystickType.None;
+    public JoystickType JoystickKeyboardType
     {
-        get => _joystickType;
-        set => this.RaiseAndSetIfChanged(ref _joystickType, value);
+        get => _joystickKeyboardType;
+        set => this.RaiseAndSetIfChanged(ref _joystickKeyboardType, value);
+    }
+
+    private JoystickType _joystick1Type = JoystickType.None;
+    public JoystickType Joystick1Type
+    {
+        get => _joystick1Type;
+        set => this.RaiseAndSetIfChanged(ref _joystick1Type, value);
+    }
+
+    private JoystickType _joystick2Type = JoystickType.None;
+    public JoystickType Joystick2Type
+    {
+        get => _joystick2Type;
+        set => this.RaiseAndSetIfChanged(ref _joystick2Type, value);
     }
 
     private bool _isTimeMachineEnabled;
@@ -185,13 +202,6 @@ public class PreferencesViewModel : ViewModelBase
     {
         get => _shouldIncludeTimeMachineInResume;
         set => this.RaiseAndSetIfChanged(ref _shouldIncludeTimeMachineInResume, value);
-    }
-
-    private bool _joystickUseCursorKeys;
-    public bool JoystickUseCursorKeys
-    {
-        get => _joystickUseCursorKeys;
-        set => this.RaiseAndSetIfChanged(ref _joystickUseCursorKeys, value);
     }
 
     private bool _isTapeSaveEnabled;
