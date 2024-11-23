@@ -49,7 +49,7 @@ public class KeyboardHandlerTests
     public void GivenKeyIsPressed_WhenReadPort_ThenReturnsState(SpectrumKey key, Word port, byte expectedState)
     {
         var keyboard = new KeyboardHandler();
-        keyboard.HandleKeyDown(new[] { key });
+        keyboard.HandleKeyDown([key]);
 
         var state = keyboard.Read(port);
 

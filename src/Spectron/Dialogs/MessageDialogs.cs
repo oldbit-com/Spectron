@@ -6,7 +6,7 @@ namespace OldBit.Spectron.Dialogs;
 
 public static class MessageDialogs
 {
-    public static Window? MainWindow { get; set; }
+    public static Window MainWindow { get; set; } = null!;
 
     public static async Task Error(string message, string title = "Error")
     {

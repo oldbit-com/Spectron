@@ -13,7 +13,7 @@ using MainWindow = OldBit.Spectron.Views.MainWindow;
 
 namespace OldBit.Spectron;
 
-public partial class App : Application
+public class App : Application
 {
     private ServiceProvider? _serviceProvider;
     private MainWindowViewModel? MainWindowViewModel { get; set; }

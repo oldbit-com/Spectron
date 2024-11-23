@@ -33,7 +33,7 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             action(ViewModel!.ShowSelectFileView.RegisterHandler(ShowSelectFileViewAsync)));
     }
 
-    private async Task ShowPreferencesViewAsync(InteractionContext<PreferencesViewModel, Preferences?> interaction)
+    private async Task ShowPreferencesViewAsync(IInteractionContext<PreferencesViewModel, Preferences?> interaction)
     {
         var dialog = new PreferencesView { DataContext = interaction.Input };
         var result = await dialog.ShowDialog<Preferences?>(this);
@@ -41,7 +41,7 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         interaction.SetOutput(result);
     }
 
-    private async Task ShowTapeViewAsync(InteractionContext<TapeViewModel, Unit?> interaction)
+    private async Task ShowTapeViewAsync(IInteractionContext<TapeViewModel, Unit?> interaction)
     {
         var dialog = new TapeView { DataContext = interaction.Input };
         var result = await dialog.ShowDialog<Unit?>(this);
@@ -49,13 +49,13 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         interaction.SetOutput(result);
     }
 
-    private async Task ShowAboutViewAsync(InteractionContext<Unit, Unit?> interaction)
+    private async Task ShowAboutViewAsync(IInteractionContext<Unit, Unit?> interaction)
     {
         var dialog = new AboutView();
         await dialog.ShowDialog<Unit?>(this);
     }
 
-    private async Task ShowSelectFileViewAsync(InteractionContext<SelectFileViewModel, ArchiveEntry?> interaction)
+    private async Task ShowSelectFileViewAsync(IInteractionContext<SelectFileViewModel, ArchiveEntry?> interaction)
     {
         var dialog = new SelectFileView { DataContext = interaction.Input };
         var result = await dialog.ShowDialog<ArchiveEntry?>(this);
