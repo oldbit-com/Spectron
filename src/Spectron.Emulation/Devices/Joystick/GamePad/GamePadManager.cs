@@ -16,9 +16,31 @@ public sealed class GamePadManager
     {
         _joyPadManager = new JoyPadManager();
 
+        _joyPadManager.ControllerConnected += JoyPadManagerOnControllerConnected;
+        _joyPadManager.ControllerDisconnected += JoyPadManagerOnControllerDisconnected;
+
         GamePadControllers.Add(new GamePadController(Guid.Empty, "None"));
     }
 
+    private void JoyPadManagerOnControllerConnected(object? sender, ControllerEventArgs e)
+    {
+        if (GamePadControllers.Any(x => x.Id == e.Controller.Id))
+        {
+            return;
+        }
+
+        GamePadControllers.Add(new GamePadController(e.Controller.Id, e.Controller.Name));
+    }
+
+    private void JoyPadManagerOnControllerDisconnected(object? sender, ControllerEventArgs e)
+    {
+        var existingController = GamePadControllers.FirstOrDefault(x => x.Id == e.Controller.Id);
+
+        if (existingController != null)
+        {
+            GamePadControllers.Remove(existingController);
+        }
+    }
     public void Initialize()
     {
         if (_initialized)
