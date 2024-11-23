@@ -5,6 +5,7 @@ using System.Reactive;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
+using OldBit.Spectron.Emulation.Devices.Joystick.GamePad;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Settings;
@@ -14,10 +15,14 @@ namespace OldBit.Spectron.ViewModels;
 
 public class PreferencesViewModel : ViewModelBase
 {
+    private readonly GamePadManager _gamePadManager;
+
     public ReactiveCommand<Unit, Preferences> UpdatePreferencesCommand { get; }
 
-    public PreferencesViewModel(Preferences preferences)
+    public PreferencesViewModel(Preferences preferences, GamePadManager gamePadManager)
     {
+        _gamePadManager = gamePadManager;
+
         ComputerType = preferences.ComputerType;
         IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
         RomType = preferences.RomType;
@@ -25,6 +30,8 @@ public class PreferencesViewModel : ViewModelBase
         JoystickKeyboardType = preferences.Joystick.JoystickKeyboardType;
         Joystick1Type = preferences.Joystick.Joystick1Type;
         Joystick2Type = preferences.Joystick.Joystick2Type;
+        Joystick1GamePad = preferences.Joystick.Joystick1GamePad;
+        Joystick2GamePad = preferences.Joystick.Joystick2GamePad;
 
         IsResumeEnabled = preferences.ResumeSettings.IsResumeEnabled;
         ShouldIncludeTapeInResume = preferences.ResumeSettings.ShouldIncludeTape;
@@ -51,7 +58,9 @@ public class PreferencesViewModel : ViewModelBase
             {
                 JoystickKeyboardType = JoystickKeyboardType,
                 Joystick1Type = Joystick1Type,
-                Joystick2Type = Joystick2Type
+                Joystick2Type = Joystick2Type,
+                Joystick1GamePad = Joystick1GamePad,
+                Joystick2GamePad = Joystick2GamePad
             },
 
             ResumeSettings = new ResumeSettings
@@ -121,6 +130,8 @@ public class PreferencesViewModel : ViewModelBase
         new("Stereo ACB", StereoMode.StereoAcb),
     ];
 
+    public ObservableCollection<GamePadController> GamePadControllers => _gamePadManager.GamePadControllers;
+
     private ComputerType _computerType;
     public ComputerType ComputerType
     {
@@ -156,11 +167,26 @@ public class PreferencesViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _joystick1Type, value);
     }
 
+
     private JoystickType _joystick2Type = JoystickType.None;
     public JoystickType Joystick2Type
     {
         get => _joystick2Type;
         set => this.RaiseAndSetIfChanged(ref _joystick2Type, value);
+    }
+
+    private Guid _joystick1GamePad = Guid.Empty;
+    public Guid Joystick1GamePad
+    {
+        get => _joystick1GamePad;
+        set => this.RaiseAndSetIfChanged(ref _joystick1GamePad, value);
+    }
+
+    private Guid _joystick2GamePad = Guid.Empty;
+    public Guid Joystick2GamePad
+    {
+        get => _joystick2GamePad;
+        set => this.RaiseAndSetIfChanged(ref _joystick2GamePad, value);
     }
 
     private bool _isTimeMachineEnabled;
