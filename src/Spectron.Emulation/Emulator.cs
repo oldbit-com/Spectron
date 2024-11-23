@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
+using OldBit.Spectron.Emulation.Devices.Joystick.GamePad;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
@@ -46,6 +47,7 @@ public sealed class Emulator
         EmulatorArgs emulatorArgs,
         HardwareSettings hardware,
         TapeManager tapeManager,
+        GamePadManager gamePadManager,
         TimeMachine timeMachine,
         ILogger logger)
     {
@@ -61,7 +63,7 @@ public sealed class Emulator
         ScreenBuffer = new ScreenBuffer(hardware, emulatorArgs.Memory, UlaPlus);
         Cpu = new Z80(emulatorArgs.Memory, emulatorArgs.ContentionProvider); ;
 
-        JoystickManager = new JoystickManager(_spectrumBus, KeyboardHandler);
+        JoystickManager = new JoystickManager(gamePadManager, _spectrumBus, KeyboardHandler);
         TapeManager.Attach(Cpu, Memory, hardware);
 
         AudioManager = new AudioManager(Cpu.Clock, tapeManager.Player, hardware);

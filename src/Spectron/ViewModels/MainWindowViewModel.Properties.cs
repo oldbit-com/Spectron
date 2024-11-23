@@ -32,11 +32,11 @@ partial class MainWindowViewModel
         set => this.RaiseAndSetIfChanged(ref _computerType, value);
     }
 
-    private JoystickType _joystickType = JoystickType.None;
-    public JoystickType JoystickType
+    private JoystickType _joystickKeyboardType = JoystickType.None;
+    public JoystickType JoystickKeyboardType
     {
-        get => _joystickType;
-        set => this.RaiseAndSetIfChanged(ref _joystickType, value);
+        get => _joystickKeyboardType;
+        set => this.RaiseAndSetIfChanged(ref _joystickKeyboardType, value);
     }
 
     private bool _isUlaPlusEnabled;

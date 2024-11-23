@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using OldBit.Spectron.Emulation.Devices.Joystick.GamePad;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
@@ -12,7 +13,11 @@ internal sealed record EmulatorArgs(
     IEmulatorMemory Memory,
     IContentionProvider ContentionProvider);
 
-public sealed class EmulatorFactory(TimeMachine timeMachine, TapeManager tapeManager, ILogger<EmulatorFactory> logger)
+public sealed class EmulatorFactory(
+    TimeMachine timeMachine,
+    TapeManager tapeManager,
+    GamePadManager gamePadManager,
+    ILogger<EmulatorFactory> logger)
 {
     public Emulator Create(ComputerType computerType, RomType romType, byte[]? customRom = null)
     {
@@ -55,7 +60,7 @@ public sealed class EmulatorFactory(TimeMachine timeMachine, TapeManager tapeMan
             memory,
             contentionProvider);
 
-        return new Emulator(emulatorSettings, Hardware.Spectrum128K, tapeManager, timeMachine, logger);
+        return new Emulator(emulatorSettings, Hardware.Spectrum128K, tapeManager, gamePadManager, timeMachine, logger);
     }
 
     private Emulator CreateSpectrum(ComputerType computerType, RomType romType, IEmulatorMemory memory)
@@ -70,7 +75,7 @@ public sealed class EmulatorFactory(TimeMachine timeMachine, TapeManager tapeMan
             memory,
             contentionProvider);
 
-        return new Emulator(emulatorSettings, Hardware.Spectrum48K, tapeManager, timeMachine, logger);
+        return new Emulator(emulatorSettings, Hardware.Spectrum48K, tapeManager, gamePadManager, timeMachine, logger);
     }
 
     private static byte[] GetSpectrum48KRom(RomType romType) =>

@@ -45,7 +45,6 @@ public partial class MainWindowViewModel : ViewModelBase
     private HelpKeyboardView? _helpKeyboardView;
 
     private Preferences _preferences = new();
-    private bool _useCursorKeysAsJoystick;
     private int _frameCount;
     private readonly Stopwatch _renderStopwatch = new();
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
@@ -290,12 +289,12 @@ public partial class MainWindowViewModel : ViewModelBase
 
         ComputerType = emulator.ComputerType;
         RomType = emulator.RomType;
-        JoystickType = emulator.JoystickManager.JoystickType;
+        JoystickKeyboardType = emulator.JoystickManager.JoystickType;
         IsUlaPlusEnabled = emulator.IsUlaPlusEnabled;
 
         Emulator.IsUlaPlusEnabled = IsUlaPlusEnabled;
         Emulator.TapeLoadSpeed = TapeLoadSpeed;
-        Emulator.JoystickManager.SetupJoystick(JoystickType);
+        Emulator.JoystickManager.SetupJoystick(JoystickKeyboardType);
         Emulator.RenderScreen += EmulatorOnRenderScreen;
 
         Emulator.SetAudioSettings(_preferences.AudioSettings);
@@ -339,7 +338,7 @@ public partial class MainWindowViewModel : ViewModelBase
         },
         Joystick = new JoystickSettings
         {
-            JoystickKeyboardType = JoystickType,
+            JoystickKeyboardType = JoystickKeyboardType,
         },
         TapeLoadSpeed = TapeLoadSpeed,
 
