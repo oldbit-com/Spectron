@@ -3,7 +3,7 @@ using OldBit.JoyPad;
 
 namespace OldBit.Spectron.Emulation.Devices.Joystick.GamePad;
 
-public sealed record GamePadController(Guid Id, string Name);
+public sealed record GamePadController(Guid Id, string Name, IReadOnlyList<GamePadButton> Buttons);
 
 public sealed class GamePadManager
 {
@@ -19,7 +19,7 @@ public sealed class GamePadManager
         _joyPadManager.ControllerConnected += JoyPadManagerOnControllerConnected;
         _joyPadManager.ControllerDisconnected += JoyPadManagerOnControllerDisconnected;
 
-        GamePadControllers.Add(new GamePadController(Guid.Empty, "None"));
+        GamePadControllers.Add(new GamePadController(Guid.Empty, "None", []));
     }
 
     private void JoyPadManagerOnControllerConnected(object? sender, ControllerEventArgs e)
@@ -29,7 +29,13 @@ public sealed class GamePadManager
             return;
         }
 
-        GamePadControllers.Add(new GamePadController(e.Controller.Id, e.Controller.Name));
+        var buttons = e.Controller.Controls.Where(x => x.ControlType == ControlType.Button)
+            .Select(x => new GamePadButton(x.Name));
+
+        GamePadControllers.Add(new GamePadController(
+            e.Controller.Id,
+            e.Controller.Name,
+            buttons.ToList()));
     }
 
     private void JoyPadManagerOnControllerDisconnected(object? sender, ControllerEventArgs e)
@@ -50,12 +56,12 @@ public sealed class GamePadManager
 
         _initialized = true;
 
-        _joyPadManager.StartListener();
+        _joyPadManager.Start();
     }
 
     public void Stop()
     {
-        _joyPadManager.StopListener();
+        _joyPadManager.Stop();
         _joyPadManager.Dispose();
     }
 }

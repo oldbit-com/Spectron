@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
@@ -18,6 +21,9 @@ public class PreferencesViewModel : ViewModelBase
     private readonly GamePadManager _gamePadManager;
 
     public ReactiveCommand<Unit, Preferences> UpdatePreferencesCommand { get; }
+    public ReactiveCommand<string, Task> OpenGamePadMappingCommand { get; }
+
+    public Interaction<GamePadMappingViewModel, GamePadSettings?> ShowGamePadMappingView { get; }
 
     public PreferencesViewModel(Preferences preferences, GamePadManager gamePadManager)
     {
@@ -49,44 +55,69 @@ public class PreferencesViewModel : ViewModelBase
         IsTapeSaveEnabled = preferences.TapeSaving.IsEnabled;
         TapeSaveSpeed = preferences.TapeSaving.Speed;
 
-        UpdatePreferencesCommand = ReactiveCommand.Create(() => new Preferences
+        UpdatePreferencesCommand = ReactiveCommand.Create(UpdatePreferences);
+        OpenGamePadMappingCommand = ReactiveCommand.Create<string, Task>(OpenGamePadMapping);
+
+        ShowGamePadMappingView = new Interaction<GamePadMappingViewModel, GamePadSettings?>();
+    }
+
+    private Preferences UpdatePreferences() => new()
+    {
+        ComputerType = ComputerType,
+        IsUlaPlusEnabled = IsUlaPlusEnabled,
+        RomType = RomType,
+        Joystick = new JoystickSettings
         {
-            ComputerType = ComputerType,
-            IsUlaPlusEnabled = IsUlaPlusEnabled,
-            RomType = RomType,
-            Joystick = new JoystickSettings
-            {
-                JoystickKeyboardType = JoystickKeyboardType,
-                Joystick1Type = Joystick1Type,
-                Joystick2Type = Joystick2Type,
-                Joystick1GamePad = Joystick1GamePad,
-                Joystick2GamePad = Joystick2GamePad
-            },
+            JoystickKeyboardType = JoystickKeyboardType,
+            Joystick1Type = Joystick1Type,
+            Joystick2Type = Joystick2Type,
+            Joystick1GamePad = Joystick1GamePad,
+            Joystick2GamePad = Joystick2GamePad
+        },
 
-            ResumeSettings = new ResumeSettings
-            {
-                IsResumeEnabled = IsResumeEnabled,
-                ShouldIncludeTape = ShouldIncludeTapeInResume,
-                ShouldIncludeTimeMachine = ShouldIncludeTimeMachineInResume
-            },
+        ResumeSettings = new ResumeSettings
+        {
+            IsResumeEnabled = IsResumeEnabled,
+            ShouldIncludeTape = ShouldIncludeTapeInResume,
+            ShouldIncludeTimeMachine = ShouldIncludeTimeMachineInResume
+        },
 
-            AudioSettings = new AudioSettings
-            {
-                IsBeeperEnabled = IsBeeperEnabled,
-                IsAyAudioEnabled = IsAyEnabled,
-                IsAySupportedStandardSpectrum = IsAySupportedStandardSpectrum,
-                StereoMode = StereoMode,
-            },
+        AudioSettings = new AudioSettings
+        {
+            IsBeeperEnabled = IsBeeperEnabled,
+            IsAyAudioEnabled = IsAyEnabled,
+            IsAySupportedStandardSpectrum = IsAySupportedStandardSpectrum,
+            StereoMode = StereoMode,
+        },
 
-            TimeMachine = new TimeMachineSettings
-            {
-                IsEnabled = IsTimeMachineEnabled,
-                SnapshotInterval = TimeSpan.FromSeconds(SnapshotInterval),
-                MaxDuration = TimeSpan.FromSeconds(MaxDuration)
-            },
+        TimeMachine = new TimeMachineSettings
+        {
+            IsEnabled = IsTimeMachineEnabled,
+            SnapshotInterval = TimeSpan.FromSeconds(SnapshotInterval),
+            MaxDuration = TimeSpan.FromSeconds(MaxDuration)
+        },
 
-            TapeSaving = new TapeSavingSettings(IsTapeSaveEnabled, TapeSaveSpeed)
-        });
+        TapeSaving = new TapeSavingSettings(IsTapeSaveEnabled, TapeSaveSpeed)
+    };
+
+    private async Task OpenGamePadMapping(string joystick)
+    {
+        var gamePadControllerId = joystick switch
+        {
+            "Joystick1" => Joystick1GamePad,
+            "Joystick2" => Joystick2GamePad,
+            _ => Guid.Empty
+        };
+
+        var gamePadController = _gamePadManager.GamePadControllers.FirstOrDefault(x => x.Id == gamePadControllerId);
+
+        if (gamePadController == null)
+        {
+            return;
+        }
+
+        var viewModel = new GamePadMappingViewModel(gamePadController, _gamePadManager);
+        var gamePadSettings = await ShowGamePadMappingView.Handle(viewModel);
     }
 
     public List<NameValuePair<TapeSpeed>> TapeSpeeds { get; } =
