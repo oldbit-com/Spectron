@@ -30,7 +30,7 @@ public sealed class GamePadManager
         }
 
         var buttons = e.Controller.Controls.Where(x => x.ControlType == ControlType.Button)
-            .Select(x => new GamePadButton(x.Name));
+            .Select(button => new GamePadButton(button.Id, button.Name));
 
         GamePadControllers.Add(new GamePadController(
             e.Controller.Id,
@@ -47,6 +47,7 @@ public sealed class GamePadManager
             GamePadControllers.Remove(existingController);
         }
     }
+
     public void Initialize()
     {
         if (_initialized)

@@ -10,25 +10,33 @@ namespace OldBit.Spectron.ViewModels;
 
 public class GamePadMappingViewModel : ViewModelBase
 {
-    private readonly GamePadManager _gamePadManager;
+    private readonly GamePadManager _manager;
 
-    public ReactiveCommand<Unit, GamePadSettings> UpdateGamePadMappingCommand { get; }
+    public ReactiveCommand<Unit, GamePadSettings> UpdateMappingCommand { get; }
 
-    public GamePadMappingViewModel(GamePadController controller, GamePadManager gamePadManager)
+    public IReadOnlyList<GamePadButtonMappingViewModel> Mappings { get; private set; }
+
+    public GamePadMappingViewModel(
+        GamePadController controller,
+        GamePadManager manager,
+        GamePadSettings settings)
     {
-        _gamePadManager = gamePadManager;
+        _manager = manager;
+
+        var currentMappings = settings.Mappings.ToDictionary(x => x.ButtonId, y => y.Action);
 
         var actions = GetAllActions().ToList();
 
-        Mappings = controller.Buttons.Select(button => new GamePadControlMappingViewModel(
-            button.Name,
-            actions)).ToList();
+        Mappings = controller.Buttons.Select(button =>
+            new GamePadButtonMappingViewModel(
+                button,
+                actions.FirstOrDefault(
+                    a => a.Action == (currentMappings.GetValueOrDefault(button.Id))) ?? actions.First(),
+                actions))
+            .ToList();
 
-        UpdateGamePadMappingCommand = ReactiveCommand.Create(UpdateGamePadMapping);
-
+        UpdateMappingCommand = ReactiveCommand.Create(UpdateMapping);
     }
-
-    public IReadOnlyList<GamePadControlMappingViewModel> Mappings { get; private set; }
 
     private static IEnumerable<GamePadActionMapping> GetAllActions()
     {
@@ -50,8 +58,11 @@ public class GamePadMappingViewModel : ViewModelBase
         }
     }
 
-    private GamePadSettings UpdateGamePadMapping()
+    private GamePadSettings UpdateMapping() => new()
     {
-        return new GamePadSettings();
-    }
+        Mappings = Mappings
+            .Where(m => m.SelectedAction.Action != GamePadAction.None)
+            .Select(m => new GamePadMapping(m.Button.Id, m.SelectedAction.Action))
+            .ToList()
+    };
 }

@@ -11,6 +11,7 @@ using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Joystick.GamePad;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
+using OldBit.Spectron.Models;
 using OldBit.Spectron.Settings;
 using ReactiveUI;
 
@@ -20,8 +21,11 @@ public class PreferencesViewModel : ViewModelBase
 {
     private readonly GamePadManager _gamePadManager;
 
+    private GamePadSettings _gamePad1Settings;
+    private GamePadSettings _gamePad2Settings;
+
     public ReactiveCommand<Unit, Preferences> UpdatePreferencesCommand { get; }
-    public ReactiveCommand<string, Task> OpenGamePadMappingCommand { get; }
+    public ReactiveCommand<JoystickId, Task> OpenGamePadMappingCommand { get; }
 
     public Interaction<GamePadMappingViewModel, GamePadSettings?> ShowGamePadMappingView { get; }
 
@@ -38,6 +42,8 @@ public class PreferencesViewModel : ViewModelBase
         Joystick2Type = preferences.Joystick.Joystick2Type;
         Joystick1GamePad = preferences.Joystick.Joystick1GamePad;
         Joystick2GamePad = preferences.Joystick.Joystick2GamePad;
+        _gamePad1Settings = preferences.Joystick.GamePad1Settings;
+        _gamePad2Settings = preferences.Joystick.GamePad2Settings;
 
         IsResumeEnabled = preferences.ResumeSettings.IsResumeEnabled;
         ShouldIncludeTapeInResume = preferences.ResumeSettings.ShouldIncludeTape;
@@ -56,7 +62,7 @@ public class PreferencesViewModel : ViewModelBase
         TapeSaveSpeed = preferences.TapeSaving.Speed;
 
         UpdatePreferencesCommand = ReactiveCommand.Create(UpdatePreferences);
-        OpenGamePadMappingCommand = ReactiveCommand.Create<string, Task>(OpenGamePadMapping);
+        OpenGamePadMappingCommand = ReactiveCommand.Create<JoystickId, Task>(OpenGamePadMapping);
 
         ShowGamePadMappingView = new Interaction<GamePadMappingViewModel, GamePadSettings?>();
     }
@@ -72,7 +78,9 @@ public class PreferencesViewModel : ViewModelBase
             Joystick1Type = Joystick1Type,
             Joystick2Type = Joystick2Type,
             Joystick1GamePad = Joystick1GamePad,
-            Joystick2GamePad = Joystick2GamePad
+            Joystick2GamePad = Joystick2GamePad,
+            GamePad1Settings = _gamePad1Settings,
+            GamePad2Settings = _gamePad2Settings,
         },
 
         ResumeSettings = new ResumeSettings
@@ -100,13 +108,13 @@ public class PreferencesViewModel : ViewModelBase
         TapeSaving = new TapeSavingSettings(IsTapeSaveEnabled, TapeSaveSpeed)
     };
 
-    private async Task OpenGamePadMapping(string joystick)
+    private async Task OpenGamePadMapping(JoystickId joystick)
     {
-        var gamePadControllerId = joystick switch
+        var (gamePadControllerId, gamePadSettings) = joystick switch
         {
-            "Joystick1" => Joystick1GamePad,
-            "Joystick2" => Joystick2GamePad,
-            _ => Guid.Empty
+            JoystickId.Joystick1 => (Joystick1GamePad, _gamePad1Settings),
+            JoystickId.Joystick2 => (Joystick2GamePad, _gamePad2Settings),
+            _ => (Guid.Empty, null)
         };
 
         var gamePadController = _gamePadManager.GamePadControllers.FirstOrDefault(x => x.Id == gamePadControllerId);
@@ -116,8 +124,24 @@ public class PreferencesViewModel : ViewModelBase
             return;
         }
 
-        var viewModel = new GamePadMappingViewModel(gamePadController, _gamePadManager);
-        var gamePadSettings = await ShowGamePadMappingView.Handle(viewModel);
+        var viewModel = new GamePadMappingViewModel(gamePadController, _gamePadManager, gamePadSettings!);
+        gamePadSettings = await ShowGamePadMappingView.Handle(viewModel);
+
+        if (gamePadSettings == null)
+        {
+            return;
+        }
+
+        switch (joystick)
+        {
+            case JoystickId.Joystick1:
+                _gamePad1Settings = gamePadSettings;
+                break;
+
+            case JoystickId.Joystick2:
+                _gamePad2Settings = gamePadSettings;
+                break;
+        }
     }
 
     public List<NameValuePair<TapeSpeed>> TapeSpeeds { get; } =

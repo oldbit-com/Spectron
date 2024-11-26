@@ -18,7 +18,7 @@ public partial class GamePadMappingView : ReactiveWindow<GamePadMappingViewModel
             return;
         }
 
-        this.WhenActivated(action => action(ViewModel!.UpdateGamePadMappingCommand.Subscribe(Close)));
+        this.WhenActivated(action => action(ViewModel!.UpdateMappingCommand.Subscribe(Close)));
     }
 
     protected override void OnKeyDown(KeyEventArgs e)

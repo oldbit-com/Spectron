@@ -9,13 +9,16 @@ public record GamePadActionMapping(string Name, GamePadAction Action);
 
 public record GamePadActionHeading(string Name) : GamePadActionMapping(Name, GamePadAction.None) { }
 
-public class GamePadControlMappingViewModel(string name, List<GamePadActionMapping> actions) : ViewModelBase
+public class GamePadButtonMappingViewModel(
+    GamePadButton button,
+    GamePadActionMapping selectedAction,
+    List<GamePadActionMapping> actions) : ViewModelBase
 {
-    public string Name { get; } = name;
-
+    public GamePadButton Button { get; } = button;
+    public string Name { get; } = button.Name;
     public List<GamePadActionMapping> Actions { get; } = actions;
 
-    private GamePadActionMapping _selectedAction = actions.First();
+    private GamePadActionMapping _selectedAction = selectedAction;
     public GamePadActionMapping SelectedAction
     {
         get => _selectedAction;
