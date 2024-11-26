@@ -11,11 +11,11 @@ public record JoystickSettings
 
     public JoystickType Joystick2Type { get; init; } = JoystickType.None;
 
-    public Guid Joystick1GamePad { get; init; } = Guid.Empty;
+    public Guid Joystick1Gamepad { get; init; } = Guid.Empty;
 
-    public Guid Joystick2GamePad { get; init; } = Guid.Empty;
+    public Guid Joystick2Gamepad { get; init; } = Guid.Empty;
 
-    public GamePadSettings GamePad1Settings { get; init; } = new();
+    public GamepadSettings Gamepad1Settings { get; init; } = new();
 
-    public GamePadSettings GamePad2Settings { get; init; } = new();
+    public GamepadSettings Gamepad2Settings { get; init; } = new();
 }

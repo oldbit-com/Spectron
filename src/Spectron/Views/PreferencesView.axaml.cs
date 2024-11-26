@@ -16,15 +16,15 @@ public partial class PreferencesView : ReactiveWindow<PreferencesViewModel>
         InitializeComponent();
 
         this.WhenActivated(action =>
-            action(ViewModel!.ShowGamePadMappingView.RegisterHandler(ShowGamePadMappingViewAsync)));
+            action(ViewModel!.ShowGamepadMappingView.RegisterHandler(ShowGamepadMappingViewAsync)));
 
         this.WhenActivated(action => action(ViewModel!.UpdatePreferencesCommand.Subscribe(Close)));
     }
 
-    private async Task ShowGamePadMappingViewAsync(IInteractionContext<GamePadMappingViewModel, GamePadSettings?> interaction)
+    private async Task ShowGamepadMappingViewAsync(IInteractionContext<GamepadMappingViewModel, GamepadSettings?> interaction)
     {
-        var dialog = new GamePadMappingView() { DataContext = interaction.Input };
-        var result = await dialog.ShowDialog<GamePadSettings?>(this);
+        var dialog = new GamepadMappingView() { DataContext = interaction.Input };
+        var result = await dialog.ShowDialog<GamepadSettings?>(this);
 
         interaction.SetOutput(result);
     }

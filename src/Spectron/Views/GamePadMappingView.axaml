@@ -5,13 +5,13 @@
         xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
         xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="OldBit.Spectron.Views.GamePadMappingView"
-        x:DataType="viewModels:GamePadMappingViewModel"
+        x:Class="OldBit.Spectron.Views.GamepadMappingView"
+        x:DataType="viewModels:GamepadMappingViewModel"
         WindowStartupLocation="CenterOwner"
         Width="600"
         Height="500"
         CanResize="False"
-        Title="GamePad Mapping">
+        Title="Gamepad Mapping">
 
     <Window.Resources>
         <converters:TypeMatchConverter x:Key="TypeMatchConverter"/>
@@ -52,13 +52,13 @@
                                 SelectedItem="{Binding SelectedAction}">
 
                                 <ComboBox.Styles>
-                                    <Style Selector="ComboBoxItem" x:DataType="viewModels:GamePadActionHeading">
-                                        <Setter Property="IsEnabled" Value="{Binding ., Converter={StaticResource TypeMatchConverter}, ConverterParameter={x:Type viewModels:GamePadActionMapping}}"/>
-                                        <Setter Property="IsHitTestVisible" Value="{Binding ., Converter={StaticResource TypeMatchConverter}, ConverterParameter={x:Type viewModels:GamePadActionMapping}}"/>
+                                    <Style Selector="ComboBoxItem" x:DataType="viewModels:GamepadActionHeading">
+                                        <Setter Property="IsEnabled" Value="{Binding ., Converter={StaticResource TypeMatchConverter}, ConverterParameter={x:Type viewModels:GamepadActionMapping}}"/>
+                                        <Setter Property="IsHitTestVisible" Value="{Binding ., Converter={StaticResource TypeMatchConverter}, ConverterParameter={x:Type viewModels:GamepadActionMapping}}"/>
                                     </Style>
                                 </ComboBox.Styles>
                                 <ComboBox.DataTemplates>
-                                    <DataTemplate DataType="viewModels:GamePadActionHeading">
+                                    <DataTemplate DataType="viewModels:GamepadActionHeading">
                                         <TextBlock TextAlignment="Center"
                                                    Text="{Binding Name}"
                                                    FontWeight="Medium"
@@ -67,7 +67,7 @@
                                                    Margin="0 0 -5 0"
                                                    Foreground="{DynamicResource SystemControlForegroundChromeGrayBrush}" />
                                     </DataTemplate>
-                                    <DataTemplate DataType="viewModels:GamePadActionMapping">
+                                    <DataTemplate DataType="viewModels:GamepadActionMapping">
                                         <TextBlock Text="{Binding Name}" />
                                     </DataTemplate>
                                 </ComboBox.DataTemplates>

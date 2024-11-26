@@ -1,5 +1,5 @@
 using System.Collections.ObjectModel;
-using OldBit.Spectron.Emulation.Devices.Joystick.GamePad;
+using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Joystick.Providers;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 
@@ -7,16 +7,16 @@ namespace OldBit.Spectron.Emulation.Devices.Joystick;
 
 public sealed class JoystickManager
 {
-    private readonly GamePadManager _gamePadManager;
+    private readonly GamepadManager _gamepadManager;
     private readonly SpectrumBus _spectrumBus;
     private readonly KeyboardHandler _keyboardHandler;
     private IJoystick? _joystick;
 
     public JoystickType JoystickType { get; private set; } = JoystickType.None;
 
-    internal JoystickManager(GamePadManager gamePadManager, SpectrumBus spectrumBus, KeyboardHandler keyboardHandler)
+    internal JoystickManager(GamepadManager gamepadManager, SpectrumBus spectrumBus, KeyboardHandler keyboardHandler)
     {
-        _gamePadManager = gamePadManager;
+        _gamepadManager = gamepadManager;
         _spectrumBus = spectrumBus;
         _keyboardHandler = keyboardHandler;
     }
@@ -42,7 +42,7 @@ public sealed class JoystickManager
             _spectrumBus.AddDevice(_joystick);
         }
 
-        _gamePadManager.Initialize();
+        _gamepadManager.Initialize();
     }
 
     public void HandleInput(JoystickInput input, bool isOn) => _joystick?.HandleInput(input, isOn);

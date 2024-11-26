@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
-using OldBit.Spectron.Emulation.Devices.Joystick.GamePad;
+using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
@@ -18,7 +18,7 @@ namespace OldBit.Spectron.Emulation;
 public sealed class Emulator
 {
     private readonly HardwareSettings _hardware;
-    private readonly GamePadManager _gamePadManager;
+    private readonly GamepadManager _gamepadManager;
     private readonly TimeMachine _timeMachine;
     private readonly SpectrumBus _spectrumBus;
     private readonly EmulatorTimer _emulationTimer;
@@ -48,13 +48,13 @@ public sealed class Emulator
         EmulatorArgs emulatorArgs,
         HardwareSettings hardware,
         TapeManager tapeManager,
-        GamePadManager gamePadManager,
+        GamepadManager gamepadManager,
         TimeMachine timeMachine,
         ILogger logger)
     {
         TapeManager = tapeManager;
         _hardware = hardware;
-        _gamePadManager = gamePadManager;
+        _gamepadManager = gamepadManager;
         _timeMachine = timeMachine;
         ComputerType = emulatorArgs.ComputerType;
         RomType = emulatorArgs.RomType;
@@ -65,7 +65,7 @@ public sealed class Emulator
         ScreenBuffer = new ScreenBuffer(hardware, emulatorArgs.Memory, UlaPlus);
         Cpu = new Z80(emulatorArgs.Memory, emulatorArgs.ContentionProvider); ;
 
-        JoystickManager = new JoystickManager(gamePadManager, _spectrumBus, KeyboardHandler);
+        JoystickManager = new JoystickManager(gamepadManager, _spectrumBus, KeyboardHandler);
         TapeManager.Attach(Cpu, Memory, hardware);
 
         AudioManager = new AudioManager(Cpu.Clock, tapeManager.Player, hardware);
@@ -97,7 +97,7 @@ public sealed class Emulator
     {
         AudioManager.Stop();
         _emulationTimer.Stop();
-        _gamePadManager.Stop();
+        _gamepadManager.Stop();
 
         while (!_emulationTimer.IsStopped)
         {

@@ -1,8 +1,8 @@
-using static OldBit.Spectron.Emulation.Devices.Joystick.GamePad.GamePadAction;
+using static OldBit.Spectron.Emulation.Devices.Joystick.Gamepad.GamepadAction;
 
-namespace OldBit.Spectron.Emulation.Devices.Joystick.GamePad;
+namespace OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 
-public enum GamePadAction
+public enum GamepadAction
 {
     None,
 
@@ -59,9 +59,9 @@ public enum GamePadAction
     Z
 }
 
-public static class GamePadActionExtensions
+public static class GamepadActionExtensions
 {
-    public static string GetName(this GamePadAction action) => action switch
+    public static string GetName(this GamepadAction action) => action switch
     {
         None => "None",
 

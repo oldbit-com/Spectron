@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
-using OldBit.Spectron.Emulation.Devices.Joystick.GamePad;
+using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Models;
@@ -19,19 +19,19 @@ namespace OldBit.Spectron.ViewModels;
 
 public class PreferencesViewModel : ViewModelBase
 {
-    private readonly GamePadManager _gamePadManager;
+    private readonly GamepadManager _gamepadManager;
 
-    private GamePadSettings _gamePad1Settings;
-    private GamePadSettings _gamePad2Settings;
+    private GamepadSettings _gamepad1Settings;
+    private GamepadSettings _gamepad2Settings;
 
     public ReactiveCommand<Unit, Preferences> UpdatePreferencesCommand { get; }
-    public ReactiveCommand<JoystickId, Task> OpenGamePadMappingCommand { get; }
+    public ReactiveCommand<JoystickId, Task> OpenGamepadMappingCommand { get; }
 
-    public Interaction<GamePadMappingViewModel, GamePadSettings?> ShowGamePadMappingView { get; }
+    public Interaction<GamepadMappingViewModel, GamepadSettings?> ShowGamepadMappingView { get; }
 
-    public PreferencesViewModel(Preferences preferences, GamePadManager gamePadManager)
+    public PreferencesViewModel(Preferences preferences, GamepadManager gamepadManager)
     {
-        _gamePadManager = gamePadManager;
+        _gamepadManager = gamepadManager;
 
         ComputerType = preferences.ComputerType;
         IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
@@ -40,10 +40,10 @@ public class PreferencesViewModel : ViewModelBase
         JoystickKeyboardType = preferences.Joystick.JoystickKeyboardType;
         Joystick1Type = preferences.Joystick.Joystick1Type;
         Joystick2Type = preferences.Joystick.Joystick2Type;
-        Joystick1GamePad = preferences.Joystick.Joystick1GamePad;
-        Joystick2GamePad = preferences.Joystick.Joystick2GamePad;
-        _gamePad1Settings = preferences.Joystick.GamePad1Settings;
-        _gamePad2Settings = preferences.Joystick.GamePad2Settings;
+        Joystick1Gamepad = preferences.Joystick.Joystick1Gamepad;
+        Joystick2Gamepad = preferences.Joystick.Joystick2Gamepad;
+        _gamepad1Settings = preferences.Joystick.Gamepad1Settings;
+        _gamepad2Settings = preferences.Joystick.Gamepad2Settings;
 
         IsResumeEnabled = preferences.ResumeSettings.IsResumeEnabled;
         ShouldIncludeTapeInResume = preferences.ResumeSettings.ShouldIncludeTape;
@@ -62,9 +62,9 @@ public class PreferencesViewModel : ViewModelBase
         TapeSaveSpeed = preferences.TapeSaving.Speed;
 
         UpdatePreferencesCommand = ReactiveCommand.Create(UpdatePreferences);
-        OpenGamePadMappingCommand = ReactiveCommand.Create<JoystickId, Task>(OpenGamePadMapping);
+        OpenGamepadMappingCommand = ReactiveCommand.Create<JoystickId, Task>(OpenGamepadMapping);
 
-        ShowGamePadMappingView = new Interaction<GamePadMappingViewModel, GamePadSettings?>();
+        ShowGamepadMappingView = new Interaction<GamepadMappingViewModel, GamepadSettings?>();
     }
 
     private Preferences UpdatePreferences() => new()
@@ -77,10 +77,10 @@ public class PreferencesViewModel : ViewModelBase
             JoystickKeyboardType = JoystickKeyboardType,
             Joystick1Type = Joystick1Type,
             Joystick2Type = Joystick2Type,
-            Joystick1GamePad = Joystick1GamePad,
-            Joystick2GamePad = Joystick2GamePad,
-            GamePad1Settings = _gamePad1Settings,
-            GamePad2Settings = _gamePad2Settings,
+            Joystick1Gamepad = Joystick1Gamepad,
+            Joystick2Gamepad = Joystick2Gamepad,
+            Gamepad1Settings = _gamepad1Settings,
+            Gamepad2Settings = _gamepad2Settings,
         },
 
         ResumeSettings = new ResumeSettings
@@ -108,26 +108,26 @@ public class PreferencesViewModel : ViewModelBase
         TapeSaving = new TapeSavingSettings(IsTapeSaveEnabled, TapeSaveSpeed)
     };
 
-    private async Task OpenGamePadMapping(JoystickId joystick)
+    private async Task OpenGamepadMapping(JoystickId joystick)
     {
-        var (gamePadControllerId, gamePadSettings) = joystick switch
+        var (gamepadControllerId, gamepadSettings) = joystick switch
         {
-            JoystickId.Joystick1 => (Joystick1GamePad, _gamePad1Settings),
-            JoystickId.Joystick2 => (Joystick2GamePad, _gamePad2Settings),
+            JoystickId.Joystick1 => (Joystick1Gamepad, _gamepad1Settings),
+            JoystickId.Joystick2 => (Joystick2Gamepad, _gamepad2Settings),
             _ => (Guid.Empty, null)
         };
 
-        var gamePadController = _gamePadManager.GamePadControllers.FirstOrDefault(x => x.Id == gamePadControllerId);
+        var gamepadController = _gamepadManager.GamepadControllers.FirstOrDefault(x => x.Id == gamepadControllerId);
 
-        if (gamePadController == null)
+        if (gamepadController == null)
         {
             return;
         }
 
-        var viewModel = new GamePadMappingViewModel(gamePadController, _gamePadManager, gamePadSettings!);
-        gamePadSettings = await ShowGamePadMappingView.Handle(viewModel);
+        var viewModel = new GamepadMappingViewModel(gamepadController, _gamepadManager, gamepadSettings!);
+        gamepadSettings = await ShowGamepadMappingView.Handle(viewModel);
 
-        if (gamePadSettings == null)
+        if (gamepadSettings == null)
         {
             return;
         }
@@ -135,11 +135,11 @@ public class PreferencesViewModel : ViewModelBase
         switch (joystick)
         {
             case JoystickId.Joystick1:
-                _gamePad1Settings = gamePadSettings;
+                _gamepad1Settings = gamepadSettings;
                 break;
 
             case JoystickId.Joystick2:
-                _gamePad2Settings = gamePadSettings;
+                _gamepad2Settings = gamepadSettings;
                 break;
         }
     }
@@ -185,7 +185,7 @@ public class PreferencesViewModel : ViewModelBase
         new("Stereo ACB", StereoMode.StereoAcb),
     ];
 
-    public ObservableCollection<GamePadController> GamePadControllers => _gamePadManager.GamePadControllers;
+    public ObservableCollection<GamepadController> GamepadControllers => _gamepadManager.GamepadControllers;
 
     private ComputerType _computerType;
     public ComputerType ComputerType
@@ -230,18 +230,18 @@ public class PreferencesViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _joystick2Type, value);
     }
 
-    private Guid _joystick1GamePad = Guid.Empty;
-    public Guid Joystick1GamePad
+    private Guid _joystick1Gamepad = Guid.Empty;
+    public Guid Joystick1Gamepad
     {
-        get => _joystick1GamePad;
-        set => this.RaiseAndSetIfChanged(ref _joystick1GamePad, value);
+        get => _joystick1Gamepad;
+        set => this.RaiseAndSetIfChanged(ref _joystick1Gamepad, value);
     }
 
-    private Guid _joystick2GamePad = Guid.Empty;
-    public Guid Joystick2GamePad
+    private Guid _joystick2Gamepad = Guid.Empty;
+    public Guid Joystick2Gamepad
     {
-        get => _joystick2GamePad;
-        set => this.RaiseAndSetIfChanged(ref _joystick2GamePad, value);
+        get => _joystick2Gamepad;
+        set => this.RaiseAndSetIfChanged(ref _joystick2Gamepad, value);
     }
 
     private bool _isTimeMachineEnabled;

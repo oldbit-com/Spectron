@@ -10,7 +10,7 @@ using Avalonia.Input;
 using Avalonia.Threading;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Joystick;
-using OldBit.Spectron.Emulation.Devices.Joystick.GamePad;
+using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Snapshot;
@@ -33,7 +33,7 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly EmulatorFactory _emulatorFactory;
     private readonly TimeMachine _timeMachine;
-    private readonly GamePadManager _gamePadManager;
+    private readonly GamepadManager _gamepadManager;
 
     private readonly SnapshotLoader _snapshotLoader;
     private readonly Loader _loader;
@@ -88,7 +88,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel(
         EmulatorFactory emulatorFactory,
         TimeMachine timeMachine,
-        GamePadManager gamePadManager,
+        GamepadManager gamepadManager,
         SnapshotLoader snapshotLoader,
         Loader loader,
         PreferencesService preferencesService,
@@ -99,7 +99,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         _emulatorFactory = emulatorFactory;
         _timeMachine = timeMachine;
-        _gamePadManager = gamePadManager;
+        _gamepadManager = gamepadManager;
         _snapshotLoader = snapshotLoader;
         _loader = loader;
         _preferencesService = preferencesService;
@@ -163,7 +163,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         Emulator?.Pause();
 
-        var viewModel = new PreferencesViewModel(_preferences, _gamePadManager);
+        var viewModel = new PreferencesViewModel(_preferences, _gamepadManager);
         var preferences = await ShowPreferencesView.Handle(viewModel);
 
         if (preferences != null)

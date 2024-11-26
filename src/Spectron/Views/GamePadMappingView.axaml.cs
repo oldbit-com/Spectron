@@ -7,9 +7,9 @@ using Avalonia.Input;
 
 namespace OldBit.Spectron.Views;
 
-public partial class GamePadMappingView : ReactiveWindow<GamePadMappingViewModel>
+public partial class GamepadMappingView : ReactiveWindow<GamepadMappingViewModel>
 {
-    public GamePadMappingView()
+    public GamepadMappingView()
     {
         InitializeComponent();
 

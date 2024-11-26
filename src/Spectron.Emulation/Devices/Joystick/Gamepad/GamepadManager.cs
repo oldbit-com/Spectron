@@ -1,38 +1,38 @@
 using System.Collections.ObjectModel;
 using OldBit.JoyPad;
 
-namespace OldBit.Spectron.Emulation.Devices.Joystick.GamePad;
+namespace OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 
-public sealed record GamePadController(Guid Id, string Name, IReadOnlyList<GamePadButton> Buttons);
+public sealed record GamepadController(Guid Id, string Name, IReadOnlyList<GamepadButton> Buttons);
 
-public sealed class GamePadManager
+public sealed class GamepadManager
 {
     private readonly JoyPadManager _joyPadManager;
     private bool _initialized;
 
-    public ObservableCollection<GamePadController> GamePadControllers { get; } = [];
+    public ObservableCollection<GamepadController> GamepadControllers { get; } = [];
 
-    public GamePadManager()
+    public GamepadManager()
     {
         _joyPadManager = new JoyPadManager();
 
         _joyPadManager.ControllerConnected += JoyPadManagerOnControllerConnected;
         _joyPadManager.ControllerDisconnected += JoyPadManagerOnControllerDisconnected;
 
-        GamePadControllers.Add(new GamePadController(Guid.Empty, "None", []));
+        GamepadControllers.Add(new GamepadController(Guid.Empty, "None", []));
     }
 
     private void JoyPadManagerOnControllerConnected(object? sender, ControllerEventArgs e)
     {
-        if (GamePadControllers.Any(x => x.Id == e.Controller.Id))
+        if (GamepadControllers.Any(x => x.Id == e.Controller.Id))
         {
             return;
         }
 
         var buttons = e.Controller.Controls.Where(x => x.ControlType == ControlType.Button)
-            .Select(button => new GamePadButton(button.Id, button.Name));
+            .Select(button => new GamepadButton(button.Id, button.Name));
 
-        GamePadControllers.Add(new GamePadController(
+        GamepadControllers.Add(new GamepadController(
             e.Controller.Id,
             e.Controller.Name,
             buttons.ToList()));
@@ -40,11 +40,11 @@ public sealed class GamePadManager
 
     private void JoyPadManagerOnControllerDisconnected(object? sender, ControllerEventArgs e)
     {
-        var existingController = GamePadControllers.FirstOrDefault(x => x.Id == e.Controller.Id);
+        var existingController = GamepadControllers.FirstOrDefault(x => x.Id == e.Controller.Id);
 
         if (existingController != null)
         {
-            GamePadControllers.Remove(existingController);
+            GamepadControllers.Remove(existingController);
         }
     }
 
