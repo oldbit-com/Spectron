@@ -124,7 +124,7 @@ public class PreferencesViewModel : ViewModelBase
             return;
         }
 
-        var viewModel = new GamepadMappingViewModel(gamepadController, _gamepadManager, gamepadSettings!);
+        using var viewModel = new GamepadMappingViewModel(gamepadController, _gamepadManager, gamepadSettings!);
         gamepadSettings = await ShowGamepadMappingView.Handle(viewModel);
 
         if (gamepadSettings == null)

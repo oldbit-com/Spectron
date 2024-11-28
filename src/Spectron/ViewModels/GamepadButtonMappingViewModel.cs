@@ -5,21 +5,23 @@ using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
 
-public record GamepadActionMapping(string Name, GamepadAction Action);
+public record GamepadActionMappingItem(string Name, GamepadAction Action);
 
-public record GamepadActionHeading(string Name) : GamepadActionMapping(Name, GamepadAction.None) { }
+public record GamepadActionMappingSeparatorItem(string Name) : GamepadActionMappingItem(Name, GamepadAction.None) { }
 
 public class GamepadButtonMappingViewModel(
     GamepadButton button,
-    GamepadActionMapping selectedAction,
-    List<GamepadActionMapping> actions) : ViewModelBase
+    GamepadActionMappingItem selectedAction,
+    List<GamepadActionMappingItem> actions) : ViewModelBase
 {
     public GamepadButton Button { get; } = button;
-    public string Name { get; } = button.Name;
-    public List<GamepadActionMapping> Actions { get; } = actions;
 
-    private GamepadActionMapping _selectedAction = selectedAction;
-    public GamepadActionMapping SelectedAction
+    public string Name { get; } = button.Name;
+
+    public List<GamepadActionMappingItem> Actions { get; } = actions;
+
+    private GamepadActionMappingItem _selectedAction = selectedAction;
+    public GamepadActionMappingItem SelectedAction
     {
         get => _selectedAction;
         set => this.RaiseAndSetIfChanged(ref _selectedAction, value);

@@ -1,11 +1,30 @@
 using System.Collections.Generic;
+using OldBit.JoyPad.Controls;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 
 namespace OldBit.Spectron.Settings;
 
-public record GamepadMapping(int ButtonId, GamepadAction Action);
-
 public record GamepadSettings
 {
-    public List<GamepadMapping> Mappings { get; init; } = [];
+    public List<GamepadMapping>? Mappings { get; set; }
+}
+
+public record GamepadMapping
+{
+    public GamepadMapping()
+    {
+    }
+
+    public GamepadMapping(GamepadButton button, GamepadAction action)
+    {
+        ButtonId = button.Id;
+        Direction = button.Direction;
+        Action = action;
+    }
+
+    public int ButtonId { get; init; }
+
+    public GamepadAction Action { get; init; }
+
+    public DirectionalPadDirection Direction { get; init; }
 }

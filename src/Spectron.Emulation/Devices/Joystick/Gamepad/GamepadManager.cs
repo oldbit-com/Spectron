@@ -1,9 +1,8 @@
 using System.Collections.ObjectModel;
 using OldBit.JoyPad;
+using OldBit.JoyPad.Controls;
 
 namespace OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
-
-public sealed record GamepadController(Guid Id, string Name, IReadOnlyList<GamepadButton> Buttons);
 
 public sealed class GamepadManager
 {
@@ -19,26 +18,36 @@ public sealed class GamepadManager
         _joyPadManager.ControllerConnected += JoyPadManagerOnControllerConnected;
         _joyPadManager.ControllerDisconnected += JoyPadManagerOnControllerDisconnected;
 
-        GamepadControllers.Add(new GamepadController(Guid.Empty, "None", []));
+        GamepadControllers.Add(GamepadController.None);
     }
 
-    private void JoyPadManagerOnControllerConnected(object? sender, ControllerEventArgs e)
+    private void JoyPadManagerOnControllerConnected(object? sender, JoyPadControllerEventArgs e)
     {
         if (GamepadControllers.Any(x => x.Id == e.Controller.Id))
         {
             return;
         }
 
-        var buttons = e.Controller.Controls.Where(x => x.ControlType == ControlType.Button)
-            .Select(button => new GamepadButton(button.Id, button.Name));
+        var buttons = e.Controller.Controls
+            .Where(control => control.ControlType is ControlType.Button)
+            .Select(button => new GamepadButton(button.Id, button.Name))
+            .ToList();
 
-        GamepadControllers.Add(new GamepadController(
-            e.Controller.Id,
-            e.Controller.Name,
-            buttons.ToList()));
+        var dpad = e.Controller.Controls
+            .FirstOrDefault(control => control.ControlType is ControlType.DirectionalPad);
+
+        if (dpad != null)
+        {
+            buttons.Insert(0, new GamepadButton(dpad.Id, "D-Pad Left", DirectionalPadDirection.Left));
+            buttons.Insert(1, new GamepadButton(dpad.Id, "D-Pad Up", DirectionalPadDirection.Up));
+            buttons.Insert(2, new GamepadButton(dpad.Id, "D-Pad Right", DirectionalPadDirection.Right));
+            buttons.Insert(3, new GamepadButton(dpad.Id, "D-Pad Down", DirectionalPadDirection.Down));
+        }
+
+        GamepadControllers.Add(new GamepadController(e.Controller, buttons));
     }
 
-    private void JoyPadManagerOnControllerDisconnected(object? sender, ControllerEventArgs e)
+    private void JoyPadManagerOnControllerDisconnected(object? sender, JoyPadControllerEventArgs e)
     {
         var existingController = GamepadControllers.FirstOrDefault(x => x.Id == e.Controller.Id);
 
@@ -56,7 +65,6 @@ public sealed class GamepadManager
         }
 
         _initialized = true;
-
         _joyPadManager.Start();
     }
 
@@ -64,5 +72,10 @@ public sealed class GamepadManager
     {
         _joyPadManager.Stop();
         _joyPadManager.Dispose();
+    }
+
+    public void Update(Guid controllerId)
+    {
+        _joyPadManager.Update(controllerId);
     }
 }
