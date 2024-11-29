@@ -280,9 +280,10 @@ partial class MainWindowViewModel
             return;
         }
 
-        if (JoystickType != JoystickType.None)
+        if (IsKeyboardJoystickEmulationEnabled)
         {
             var input = KeyMappings.ToJoystickAction(e);
+
             if (input != JoystickInput.None)
             {
                 Emulator?.JoystickManager.InputOff(input);
@@ -315,9 +316,10 @@ partial class MainWindowViewModel
                 return;
         }
 
-        if (JoystickType != JoystickType.None)
+        if (IsKeyboardJoystickEmulationEnabled)
         {
             var input = KeyMappings.ToJoystickAction(e);
+
             if (input != JoystickInput.None)
             {
                 Emulator?.JoystickManager.InputOn(input);
@@ -328,6 +330,9 @@ partial class MainWindowViewModel
         var keys = KeyMappings.ToSpectrumKey(e);
         Emulator?.KeyboardHandler.HandleKeyDown(keys);
     }
+
+    private bool IsKeyboardJoystickEmulationEnabled =>
+        JoystickType != JoystickType.None && _preferences.Joystick.EmulateUsingKeyboard;
 
     private void HandleTimeTravel(TimeMachineEntry entry) => CreateEmulator(entry.Snapshot);
 
