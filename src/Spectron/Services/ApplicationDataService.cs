@@ -55,14 +55,14 @@ public class ApplicationDataService(ILogger<ApplicationDataService> logger)
         return new T();
     }
 
-    public static string GetSettingsFilePath(object settings)
+    private static string GetSettingsFilePath(object settings)
     {
         var fileName = GetFileName(settings.GetType());
 
         return GetFilePath(fileName);
     }
 
-    public static bool TryCreateDirectory(string filePath)
+    private static bool TryCreateDirectory(string filePath)
     {
         try
         {

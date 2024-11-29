@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Timers;
+using DynamicData;
 using OldBit.JoyPad.Controls;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Settings;
@@ -16,9 +18,10 @@ public class GamepadMappingViewModel : ViewModelBase, IDisposable
     private readonly GamepadController _controller;
     private readonly GamepadManager _gamepadManager;
 
-    public ReactiveCommand<Unit, GamepadSettings> UpdateMappingCommand { get; }
+    public ReactiveCommand<Unit, List<GamepadMapping>> UpdateMappingCommand { get; }
+    public ReactiveCommand<Unit, Unit> SetDefaultMappingCommand { get; }
 
-    public IReadOnlyList<GamepadButtonMappingViewModel> Mappings { get; }
+    public ObservableCollection<GamepadButtonMappingViewModel> Mappings { get; } = [];
 
     public GamepadMappingViewModel(
         GamepadController controller,
@@ -28,27 +31,38 @@ public class GamepadMappingViewModel : ViewModelBase, IDisposable
         _controller = controller;
         _gamepadManager = gamepadManager;
 
-        settings.Mappings ??= DefaultMappings(controller.Buttons);
+        if (!settings.MappingsByController.TryGetValue(controller.Id, out var mappings))
+        {
+            mappings = DefaultMappings();
+        }
 
-        var actions = GetAllActions().ToList();
+        SetupGridView(mappings);
 
-        Mappings = controller.Buttons
-            .Select(button =>
-                new GamepadButtonMappingViewModel(
-                    button,
-                    actions.FirstOrDefault(
-                        mapping => mapping.Action == settings.Mappings.FirstOrDefault(
-                            g => g.ButtonId == button.Id &&
-                                 g.Direction == button.Direction)?.Action,
-                        actions.First()),
-                    actions))
-            .ToList();
-
-        UpdateMappingCommand = ReactiveCommand.Create(UpdateMapping);
+        UpdateMappingCommand = ReactiveCommand.Create(GetConfiguredMappings);
+        SetDefaultMappingCommand = ReactiveCommand.Create(() => { SetupGridView(DefaultMappings()); });
 
         _timer = new Timer(100) { AutoReset = false };
         _timer.Elapsed += GamepadUpdate;
         _timer.Start();
+    }
+
+    private void SetupGridView(List<GamepadMapping> mappings)
+    {
+        var actions = GetAllActions().ToList();
+
+        var mappedViewModels = _controller.Buttons
+            .Select(button =>
+                new GamepadButtonMappingViewModel(
+                    button,
+                    actions.FirstOrDefault(
+                        mapping => mapping.Action == mappings.FirstOrDefault(
+                            g => g.ButtonId == button.Id &&
+                                 g.Direction == button.Direction)?.Action,
+                        actions.First()),
+                    actions));
+
+        Mappings.Clear();
+        Mappings.AddOrInsertRange(mappedViewModels, 0);
     }
 
     private void GamepadUpdate(object? sender, ElapsedEventArgs e)
@@ -77,27 +91,19 @@ public class GamepadMappingViewModel : ViewModelBase, IDisposable
         }
     }
 
-    private GamepadSettings UpdateMapping() => new()
+    private List<GamepadMapping> GetConfiguredMappings() => Mappings
+        .Where(m => m.SelectedAction.Action != GamepadAction.None)
+        .Select(m => new GamepadMapping(m.Button, m.SelectedAction.Action))
+        .ToList();
+
+    private List<GamepadMapping> DefaultMappings()
     {
-        Mappings = Mappings
-            .Where(m => m.SelectedAction.Action != GamepadAction.None)
-            .Select(m => new GamepadMapping(m.Button, m.SelectedAction.Action))
-            .ToList()
-    };
+        var mappings = _controller.Buttons
+            .Where(x => x.Name is "Button 1" or "Button 2" or "Button 3" or "Button 4" or "A" or "B" or "X" or "Y")
+            .Select(button => new GamepadMapping(button, GamepadAction.JoystickFire))
+            .ToList();
 
-    private static List<GamepadMapping> DefaultMappings(IReadOnlyList<GamepadButton> buttons)
-    {
-        var mappings = new List<GamepadMapping>();
-
-        var button = buttons.FirstOrDefault(x => x.Name == "A") ??
-                     buttons.FirstOrDefault(x => x.Name == "Button 1");
-
-        if (button != null)
-        {
-            mappings.Add(new GamepadMapping(button, GamepadAction.JoystickFire));
-        }
-
-        var dpadButtons = buttons.Where(x => x.Direction != DirectionalPadDirection.None);
+        var dpadButtons = _controller.Buttons.Where(x => x.Direction != DirectionalPadDirection.None);
 
         foreach (var dpadButton in dpadButtons)
         {

@@ -27,7 +27,7 @@ public class PreferencesViewModel : ViewModelBase
     public ReactiveCommand<Unit, Preferences> UpdatePreferencesCommand { get; }
     public ReactiveCommand<JoystickId, Task> OpenGamepadMappingCommand { get; }
 
-    public Interaction<GamepadMappingViewModel, GamepadSettings?> ShowGamepadMappingView { get; }
+    public Interaction<GamepadMappingViewModel, List<GamepadMapping>?> ShowGamepadMappingView { get; }
 
     public PreferencesViewModel(Preferences preferences, GamepadManager gamepadManager)
     {
@@ -40,10 +40,14 @@ public class PreferencesViewModel : ViewModelBase
         JoystickKeyboardType = preferences.Joystick.JoystickKeyboardType;
         Joystick1Type = preferences.Joystick.Joystick1Type;
         Joystick2Type = preferences.Joystick.Joystick2Type;
-        Joystick1Gamepad = preferences.Joystick.Joystick1Gamepad;
-        Joystick2Gamepad = preferences.Joystick.Joystick2Gamepad;
         _gamepad1Settings = preferences.Joystick.Gamepad1Settings;
         _gamepad2Settings = preferences.Joystick.Gamepad2Settings;
+        Joystick1Gamepad = _gamepad1Settings.MappingsByController.ContainsKey(preferences.Joystick.Joystick1Gamepad)
+            ? preferences.Joystick.Joystick1Gamepad
+            : Guid.Empty;
+        Joystick2Gamepad = _gamepad1Settings.MappingsByController.ContainsKey(preferences.Joystick.Joystick2Gamepad)
+            ? preferences.Joystick.Joystick2Gamepad
+            : Guid.Empty;
 
         IsResumeEnabled = preferences.ResumeSettings.IsResumeEnabled;
         ShouldIncludeTapeInResume = preferences.ResumeSettings.ShouldIncludeTape;
@@ -64,7 +68,7 @@ public class PreferencesViewModel : ViewModelBase
         UpdatePreferencesCommand = ReactiveCommand.Create(UpdatePreferences);
         OpenGamepadMappingCommand = ReactiveCommand.Create<JoystickId, Task>(OpenGamepadMapping);
 
-        ShowGamepadMappingView = new Interaction<GamepadMappingViewModel, GamepadSettings?>();
+        ShowGamepadMappingView = new Interaction<GamepadMappingViewModel, List<GamepadMapping>?>();
     }
 
     private Preferences UpdatePreferences() => new()
@@ -125,9 +129,9 @@ public class PreferencesViewModel : ViewModelBase
         }
 
         using var viewModel = new GamepadMappingViewModel(gamepadController, _gamepadManager, gamepadSettings!);
-        gamepadSettings = await ShowGamepadMappingView.Handle(viewModel);
+        var mappings = await ShowGamepadMappingView.Handle(viewModel);
 
-        if (gamepadSettings == null)
+        if (mappings == null)
         {
             return;
         }
@@ -135,11 +139,11 @@ public class PreferencesViewModel : ViewModelBase
         switch (joystick)
         {
             case JoystickId.Joystick1:
-                _gamepad1Settings = gamepadSettings;
+                _gamepad1Settings.MappingsByController[gamepadControllerId] = mappings;
                 break;
 
             case JoystickId.Joystick2:
-                _gamepad2Settings = gamepadSettings;
+                _gamepad2Settings.MappingsByController[gamepadControllerId] = mappings;
                 break;
         }
     }

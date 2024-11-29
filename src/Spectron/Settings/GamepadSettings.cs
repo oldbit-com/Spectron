@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using OldBit.JoyPad.Controls;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
@@ -6,7 +7,7 @@ namespace OldBit.Spectron.Settings;
 
 public record GamepadSettings
 {
-    public List<GamepadMapping>? Mappings { get; set; }
+    public Dictionary<Guid, List<GamepadMapping>> MappingsByController { get; set; } = new();
 }
 
 public record GamepadMapping

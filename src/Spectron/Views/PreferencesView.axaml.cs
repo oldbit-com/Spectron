@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.ReactiveUI;
 using OldBit.Spectron.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Avalonia.Input;
 using OldBit.Spectron.Settings;
@@ -21,10 +22,10 @@ public partial class PreferencesView : ReactiveWindow<PreferencesViewModel>
         this.WhenActivated(action => action(ViewModel!.UpdatePreferencesCommand.Subscribe(Close)));
     }
 
-    private async Task ShowGamepadMappingViewAsync(IInteractionContext<GamepadMappingViewModel, GamepadSettings?> interaction)
+    private async Task ShowGamepadMappingViewAsync(IInteractionContext<GamepadMappingViewModel, List<GamepadMapping>?> interaction)
     {
         var dialog = new GamepadMappingView() { DataContext = interaction.Input };
-        var result = await dialog.ShowDialog<GamepadSettings?>(this);
+        var result = await dialog.ShowDialog<List<GamepadMapping>?>(this);
 
         interaction.SetOutput(result);
     }

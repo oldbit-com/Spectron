@@ -78,6 +78,7 @@
             </DataGrid.Columns>
         </DataGrid>
 
+        <Button Grid.Row="1" HorizontalAlignment="Left" Margin="15 0 0 0" Content="Defaults" Command="{Binding SetDefaultMappingCommand}"/>
         <Button Grid.Row="1" HorizontalAlignment="Right" Margin="0 0 15 0" Content="OK" Command="{Binding UpdateMappingCommand}"/>
     </Grid>
 </Window>
