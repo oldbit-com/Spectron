@@ -72,21 +72,19 @@
             <TabItem Header="Joystick">
                 <Border Classes="Tab">
                     <StackPanel>
-                        <controls:HeaderSeparator Text="Keyboard"/>
-                        <Grid ColumnDefinitions="140,*" RowDefinitions="40">
-                            <TextBlock Text="Emulated Joystick" VerticalAlignment="Center" Classes="Center"/>
-                            <ComboBox Grid.Column="1"  Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding JoystickTypes}" SelectedValue="{Binding JoystickKeyboardType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
-                        </Grid>
-
                         <controls:HeaderSeparator Text="Joystick"/>
-                        <Grid ColumnDefinitions="140,300" RowDefinitions="40,40">
+                        <Grid ColumnDefinitions="140,300" RowDefinitions="40,40,30">
                             <TextBlock Text="Device" VerticalAlignment="Center" Classes="Center"/>
                             <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
                                 <ComboBox Name="Gamepad" Margin="5 0 10 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding GamepadControllers}" SelectedValue="{Binding JoystickGamepad}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Id}"/>
-                                <Button Width="80" Content="Mapping" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Command="{Binding OpenGamepadMappingCommand}"  IsEnabled="{Binding #Gamepad.SelectedIndex}"/>
+                                <Button Width="80" Content="Mapping" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Command="{Binding OpenGamepadMappingCommand}" IsEnabled="{Binding #Gamepad.SelectedIndex}"/>
                             </StackPanel>
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="Emulated Joystick" VerticalAlignment="Center" Classes="Center"/>
-                            <ComboBox Grid.Row="1" Grid.Column="1" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding JoystickTypes}" SelectedValue="{Binding JoystickType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
+                            <ComboBox Grid.Row="1" Grid.Column="1" Name="Joystick" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding JoystickTypes}" SelectedValue="{Binding JoystickType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
+                            <CheckBox Grid.Row="2" Grid.Column="1" Content="Emulate using keyboard" Margin="5 0 0 0" IsChecked="{Binding EmulateUsingKeyboard}" IsEnabled="{Binding #Joystick.SelectedIndex}"/>
+                        </Grid>
+                        <Grid>
+                            <TextBlock>Mapping goes here</TextBlock>
                         </Grid>
                     </StackPanel>
                 </Border>

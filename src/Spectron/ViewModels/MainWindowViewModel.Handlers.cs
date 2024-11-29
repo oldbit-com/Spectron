@@ -179,7 +179,7 @@ partial class MainWindowViewModel
 
     private void HandleChangeJoystickType(JoystickType joystickType)
     {
-        JoystickKeyboardType = joystickType;
+        JoystickType = joystickType;
         Emulator?.JoystickManager.SetupJoystick(joystickType);
     }
 
@@ -280,7 +280,7 @@ partial class MainWindowViewModel
             return;
         }
 
-        if (JoystickKeyboardType != JoystickType.None)
+        if (JoystickType != JoystickType.None)
         {
             var input = KeyMappings.ToJoystickAction(e);
             if (input != JoystickInput.None)
@@ -315,7 +315,7 @@ partial class MainWindowViewModel
                 return;
         }
 
-        if (JoystickKeyboardType != JoystickType.None)
+        if (JoystickType != JoystickType.None)
         {
             var input = KeyMappings.ToJoystickAction(e);
             if (input != JoystickInput.None)

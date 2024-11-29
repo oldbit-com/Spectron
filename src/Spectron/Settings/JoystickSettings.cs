@@ -5,11 +5,11 @@ namespace OldBit.Spectron.Settings;
 
 public record JoystickSettings
 {
-    public JoystickType JoystickKeyboardType { get; init; } = JoystickType.None;
-
     public JoystickType JoystickType { get; init; } = JoystickType.None;
 
-    public Guid JoystickGamepad { get; init; } = Guid.Empty;
+    public Guid GamepadId { get; init; } = Guid.Empty;
 
     public GamepadSettings GamepadSettings { get; init; } = new();
+
+    public bool EmulateUsingKeyboard { get; init; } = true;
 }

@@ -20,8 +20,7 @@ namespace OldBit.Spectron.ViewModels;
 public class PreferencesViewModel : ViewModelBase
 {
     private readonly GamepadManager _gamepadManager;
-
-    private GamepadSettings _gamepadSettings;
+    private readonly GamepadSettings _gamepadSettings;
 
     public ReactiveCommand<Unit, Preferences> UpdatePreferencesCommand { get; }
     public ReactiveCommand<Unit, Task> OpenGamepadMappingCommand { get; }
@@ -36,11 +35,11 @@ public class PreferencesViewModel : ViewModelBase
         IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
         RomType = preferences.RomType;
 
-        JoystickKeyboardType = preferences.Joystick.JoystickKeyboardType;
         JoystickType = preferences.Joystick.JoystickType;
+        EmulateUsingKeyboard = preferences.Joystick.EmulateUsingKeyboard;
         _gamepadSettings = preferences.Joystick.GamepadSettings;
-        JoystickGamepad = _gamepadSettings.MappingsByController.ContainsKey(preferences.Joystick.JoystickGamepad)
-            ? preferences.Joystick.JoystickGamepad
+        JoystickGamepad = _gamepadSettings.MappingsByController.ContainsKey(preferences.Joystick.GamepadId)
+            ? preferences.Joystick.GamepadId
             : Guid.Empty;
 
         IsResumeEnabled = preferences.ResumeSettings.IsResumeEnabled;
@@ -72,9 +71,9 @@ public class PreferencesViewModel : ViewModelBase
         RomType = RomType,
         Joystick = new JoystickSettings
         {
-            JoystickKeyboardType = JoystickKeyboardType,
             JoystickType = JoystickType,
-            JoystickGamepad = JoystickGamepad,
+            EmulateUsingKeyboard = EmulateUsingKeyboard,
+            GamepadId = JoystickGamepad,
             GamepadSettings = _gamepadSettings,
         },
 
@@ -188,18 +187,18 @@ public class PreferencesViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _romType, value);
     }
 
-    private JoystickType _joystickKeyboardType = JoystickType.None;
-    public JoystickType JoystickKeyboardType
-    {
-        get => _joystickKeyboardType;
-        set => this.RaiseAndSetIfChanged(ref _joystickKeyboardType, value);
-    }
-
     private JoystickType _joystickType = JoystickType.None;
     public JoystickType JoystickType
     {
         get => _joystickType;
         set => this.RaiseAndSetIfChanged(ref _joystickType, value);
+    }
+
+    private bool _emulateUsingKeyboard;
+    public bool EmulateUsingKeyboard
+    {
+        get => _emulateUsingKeyboard;
+        set => this.RaiseAndSetIfChanged(ref _emulateUsingKeyboard, value);
     }
 
     private Guid _joystickGamepad = Guid.Empty;

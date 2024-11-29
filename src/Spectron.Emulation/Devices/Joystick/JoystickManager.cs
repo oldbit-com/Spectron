@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Joystick.Joysticks;
 using OldBit.Spectron.Emulation.Devices.Keyboard;

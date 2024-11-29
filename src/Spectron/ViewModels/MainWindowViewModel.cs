@@ -267,7 +267,7 @@ public partial class MainWindowViewModel : ViewModelBase
         var emulator = _emulatorFactory.Create(computerType, romType);
 
         emulator.SetUlaPlus(_preferences.IsUlaPlusEnabled);
-        emulator.JoystickManager.SetupJoystick(_preferences.Joystick.JoystickKeyboardType);
+        emulator.JoystickManager.SetupJoystick(_preferences.Joystick.JoystickType);
 
         InitializeEmulator(emulator);
     }
@@ -294,7 +294,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         ComputerType = Emulator.ComputerType;
         RomType = Emulator.RomType;
-        JoystickKeyboardType = Emulator.JoystickManager.JoystickType;
+        JoystickType = Emulator.JoystickManager.JoystickType;
         IsUlaPlusEnabled = Emulator.IsUlaPlusEnabled;
 
         Emulator.TapeLoadSpeed = TapeLoadSpeed;
@@ -327,37 +327,4 @@ public partial class MainWindowViewModel : ViewModelBase
         Emulator.RenderScreen -= EmulatorOnRenderScreen;
         Emulator = null;
     }
-
-    private Preferences Preferences => new()
-    {
-        BorderSize = BorderSize,
-        ComputerType = ComputerType,
-        IsUlaPlusEnabled = IsUlaPlusEnabled,
-        RomType = RomType,
-        AudioSettings = new AudioSettings
-        {
-            IsBeeperEnabled = Emulator?.AudioManager.IsBeeperEnabled ?? true,
-            IsAyAudioEnabled = Emulator?.AudioManager.IsAyEnabled ?? true,
-            IsAySupportedStandardSpectrum = Emulator?.AudioManager.IsAySupportedStandardSpectrum ?? true
-        },
-        Joystick = new JoystickSettings
-        {
-            JoystickKeyboardType = JoystickKeyboardType,
-        },
-        TapeLoadSpeed = TapeLoadSpeed,
-
-        // TODO: Uncomment this when ResumeSettings is implemented
-       // IsResumeEnabled = _isResumeEnabled,
-
-        TimeMachine = new TimeMachineSettings
-        {
-            IsEnabled = _timeMachine.IsEnabled,
-            SnapshotInterval = _timeMachine.SnapshotInterval,
-            MaxDuration = _timeMachine.MaxDuration
-        },
-
-        TapeSaving = new TapeSavingSettings(
-            Emulator?.TapeManager.IsTapeSaveEnabled ?? true,
-            Emulator?.TapeManager.TapeSaveSpeed ?? TapeSpeed.Instant)
-    };
 }
