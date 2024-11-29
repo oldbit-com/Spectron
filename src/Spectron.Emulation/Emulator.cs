@@ -190,7 +190,7 @@ public sealed class Emulator
 
         _timeMachine.AddEntry(this);
 
-        GamepadManager.Update();
+        JoystickManager.Update();
     }
 
     private void ToggleUlaPlus(bool value)

@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
-using OldBit.Spectron.Emulation.Devices.Joystick.Providers;
+using OldBit.Spectron.Emulation.Devices.Joystick.Joysticks;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 
 namespace OldBit.Spectron.Emulation.Devices.Joystick;
@@ -48,13 +48,14 @@ public sealed class JoystickManager
         _gamepadManager.Initialize();
     }
 
-    public void SetupGamepad()
-    {
-    }
-
     public void Update()
     {
+        if (_joystick == null)
+        {
+            return;
+        }
 
+        _gamepadManager.Update();
     }
 
     public void InputOn(JoystickInput input) => _joystick?.HandleInput(input, true);

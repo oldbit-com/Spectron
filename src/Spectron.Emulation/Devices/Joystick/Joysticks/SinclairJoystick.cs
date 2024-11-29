@@ -1,6 +1,6 @@
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 
-namespace OldBit.Spectron.Emulation.Devices.Joystick.Providers;
+namespace OldBit.Spectron.Emulation.Devices.Joystick.Joysticks;
 
 public class SinclairJoystick(KeyboardHandler keyboardHandler, JoystickType joystickType) : IJoystick
 {

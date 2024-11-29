@@ -9,7 +9,7 @@ public record GamepadPreferences(Guid ControllerId, JoystickType JoystickType, L
 public sealed class GamepadManager
 {
     private readonly JoyPadManager _joyPadManager;
-    private readonly List<Guid> _enabledControllers = [];
+    private readonly List<GamepadPreferences> _enabledGamepads = [];
 
     private bool _initialized;
 
@@ -42,27 +42,26 @@ public sealed class GamepadManager
         _joyPadManager.Dispose();
     }
 
-    public void SetupGamepad(GamepadPreferences player1, GamepadPreferences player2)
+    public void SetupGamepad(GamepadPreferences gamepad)
     {
-        _enabledControllers.Clear();
+        _enabledGamepads.Clear();
 
-        if ((player1.ControllerId == Guid.Empty || player1.JoystickType == JoystickType.None) &&
-            (player2.ControllerId == Guid.Empty || player2.JoystickType == JoystickType.None))
+        if ((gamepad.ControllerId == Guid.Empty || gamepad.JoystickType == JoystickType.None))
         {
             return;
         }
 
-        if (GamepadControllers.Any(x => x.Id == player1.ControllerId))
+        if (GamepadControllers.Any(x => x.Id == gamepad.ControllerId))
         {
-            _enabledControllers.Add(player1.ControllerId);
+            _enabledGamepads.Add(gamepad);
         }
     }
 
     public void Update()
     {
-        foreach (var controllerId in _enabledControllers)
+        foreach (var gamepad in _enabledGamepads)
         {
-            _joyPadManager.Update(controllerId);
+            _joyPadManager.Update(gamepad.ControllerId);
         }
     }
 

@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.Devices.Joystick.Providers;
+namespace OldBit.Spectron.Emulation.Devices.Joystick.Joysticks;
 
 internal class KempstonJoystick : IJoystick
 {

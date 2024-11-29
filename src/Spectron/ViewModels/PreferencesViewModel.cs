@@ -21,11 +21,10 @@ public class PreferencesViewModel : ViewModelBase
 {
     private readonly GamepadManager _gamepadManager;
 
-    private GamepadSettings _gamepad1Settings;
-    private GamepadSettings _gamepad2Settings;
+    private GamepadSettings _gamepadSettings;
 
     public ReactiveCommand<Unit, Preferences> UpdatePreferencesCommand { get; }
-    public ReactiveCommand<JoystickId, Task> OpenGamepadMappingCommand { get; }
+    public ReactiveCommand<Unit, Task> OpenGamepadMappingCommand { get; }
 
     public Interaction<GamepadMappingViewModel, List<GamepadMapping>?> ShowGamepadMappingView { get; }
 
@@ -38,15 +37,10 @@ public class PreferencesViewModel : ViewModelBase
         RomType = preferences.RomType;
 
         JoystickKeyboardType = preferences.Joystick.JoystickKeyboardType;
-        Joystick1Type = preferences.Joystick.Joystick1Type;
-        Joystick2Type = preferences.Joystick.Joystick2Type;
-        _gamepad1Settings = preferences.Joystick.Gamepad1Settings;
-        _gamepad2Settings = preferences.Joystick.Gamepad2Settings;
-        Joystick1Gamepad = _gamepad1Settings.MappingsByController.ContainsKey(preferences.Joystick.Joystick1Gamepad)
-            ? preferences.Joystick.Joystick1Gamepad
-            : Guid.Empty;
-        Joystick2Gamepad = _gamepad1Settings.MappingsByController.ContainsKey(preferences.Joystick.Joystick2Gamepad)
-            ? preferences.Joystick.Joystick2Gamepad
+        JoystickType = preferences.Joystick.JoystickType;
+        _gamepadSettings = preferences.Joystick.GamepadSettings;
+        JoystickGamepad = _gamepadSettings.MappingsByController.ContainsKey(preferences.Joystick.JoystickGamepad)
+            ? preferences.Joystick.JoystickGamepad
             : Guid.Empty;
 
         IsResumeEnabled = preferences.ResumeSettings.IsResumeEnabled;
@@ -66,7 +60,7 @@ public class PreferencesViewModel : ViewModelBase
         TapeSaveSpeed = preferences.TapeSaving.Speed;
 
         UpdatePreferencesCommand = ReactiveCommand.Create(UpdatePreferences);
-        OpenGamepadMappingCommand = ReactiveCommand.Create<JoystickId, Task>(OpenGamepadMapping);
+        OpenGamepadMappingCommand = ReactiveCommand.Create(OpenGamepadMapping);
 
         ShowGamepadMappingView = new Interaction<GamepadMappingViewModel, List<GamepadMapping>?>();
     }
@@ -79,12 +73,9 @@ public class PreferencesViewModel : ViewModelBase
         Joystick = new JoystickSettings
         {
             JoystickKeyboardType = JoystickKeyboardType,
-            Joystick1Type = Joystick1Type,
-            Joystick2Type = Joystick2Type,
-            Joystick1Gamepad = Joystick1Gamepad,
-            Joystick2Gamepad = Joystick2Gamepad,
-            Gamepad1Settings = _gamepad1Settings,
-            Gamepad2Settings = _gamepad2Settings,
+            JoystickType = JoystickType,
+            JoystickGamepad = JoystickGamepad,
+            GamepadSettings = _gamepadSettings,
         },
 
         ResumeSettings = new ResumeSettings
@@ -112,23 +103,16 @@ public class PreferencesViewModel : ViewModelBase
         TapeSaving = new TapeSavingSettings(IsTapeSaveEnabled, TapeSaveSpeed)
     };
 
-    private async Task OpenGamepadMapping(JoystickId joystick)
+    private async Task OpenGamepadMapping()
     {
-        var (gamepadControllerId, gamepadSettings) = joystick switch
-        {
-            JoystickId.Joystick1 => (Joystick1Gamepad, _gamepad1Settings),
-            JoystickId.Joystick2 => (Joystick2Gamepad, _gamepad2Settings),
-            _ => (Guid.Empty, null)
-        };
-
-        var gamepadController = _gamepadManager.GamepadControllers.FirstOrDefault(x => x.Id == gamepadControllerId);
+        var gamepadController = _gamepadManager.GamepadControllers.FirstOrDefault(x => x.Id == JoystickGamepad);
 
         if (gamepadController == null)
         {
             return;
         }
 
-        using var viewModel = new GamepadMappingViewModel(gamepadController, _gamepadManager, gamepadSettings!);
+        using var viewModel = new GamepadMappingViewModel(gamepadController, _gamepadManager, _gamepadSettings!);
         var mappings = await ShowGamepadMappingView.Handle(viewModel);
 
         if (mappings == null)
@@ -136,16 +120,7 @@ public class PreferencesViewModel : ViewModelBase
             return;
         }
 
-        switch (joystick)
-        {
-            case JoystickId.Joystick1:
-                _gamepad1Settings.MappingsByController[gamepadControllerId] = mappings;
-                break;
-
-            case JoystickId.Joystick2:
-                _gamepad2Settings.MappingsByController[gamepadControllerId] = mappings;
-                break;
-        }
+        _gamepadSettings.MappingsByController[JoystickGamepad] = mappings;
     }
 
     public List<NameValuePair<TapeSpeed>> TapeSpeeds { get; } =
@@ -220,33 +195,18 @@ public class PreferencesViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _joystickKeyboardType, value);
     }
 
-    private JoystickType _joystick1Type = JoystickType.None;
-    public JoystickType Joystick1Type
+    private JoystickType _joystickType = JoystickType.None;
+    public JoystickType JoystickType
     {
-        get => _joystick1Type;
-        set => this.RaiseAndSetIfChanged(ref _joystick1Type, value);
+        get => _joystickType;
+        set => this.RaiseAndSetIfChanged(ref _joystickType, value);
     }
 
-
-    private JoystickType _joystick2Type = JoystickType.None;
-    public JoystickType Joystick2Type
+    private Guid _joystickGamepad = Guid.Empty;
+    public Guid JoystickGamepad
     {
-        get => _joystick2Type;
-        set => this.RaiseAndSetIfChanged(ref _joystick2Type, value);
-    }
-
-    private Guid _joystick1Gamepad = Guid.Empty;
-    public Guid Joystick1Gamepad
-    {
-        get => _joystick1Gamepad;
-        set => this.RaiseAndSetIfChanged(ref _joystick1Gamepad, value);
-    }
-
-    private Guid _joystick2Gamepad = Guid.Empty;
-    public Guid Joystick2Gamepad
-    {
-        get => _joystick2Gamepad;
-        set => this.RaiseAndSetIfChanged(ref _joystick2Gamepad, value);
+        get => _joystickGamepad;
+        set => this.RaiseAndSetIfChanged(ref _joystickGamepad, value);
     }
 
     private bool _isTimeMachineEnabled;

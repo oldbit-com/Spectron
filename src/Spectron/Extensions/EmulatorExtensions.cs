@@ -51,12 +51,7 @@ public static class EmulatorExtensions
     public static void SetGamepad(this Emulator? emulator, JoystickSettings joystickSettings) =>
         emulator?.GamepadManager.SetupGamepad(
             new GamepadPreferences(
-                joystickSettings.Joystick1Gamepad,
-                joystickSettings.Joystick1Type,
-                joystickSettings.Gamepad1Settings.MappingsByController.GetValueOrDefault(joystickSettings.Joystick1Gamepad, [])),
-
-            new GamepadPreferences(
-                joystickSettings.Joystick2Gamepad,
-                joystickSettings.Joystick2Type,
-                joystickSettings.Gamepad2Settings.MappingsByController.GetValueOrDefault(joystickSettings.Joystick2Gamepad, [])));
+                joystickSettings.JoystickGamepad,
+                joystickSettings.JoystickType,
+                joystickSettings.GamepadSettings.MappingsByController.GetValueOrDefault(joystickSettings.JoystickGamepad, [])));
 }
