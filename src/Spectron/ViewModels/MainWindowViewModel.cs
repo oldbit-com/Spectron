@@ -181,6 +181,7 @@ public partial class MainWindowViewModel : ViewModelBase
             Emulator?.SetUlaPlus(IsUlaPlusEnabled);
             Emulator?.SetAudioSettings(preferences.AudioSettings);
             Emulator?.SetTapeSavingSettings(preferences.TapeSaving);
+            Emulator?.SetGamepad(preferences.Joystick);
         }
 
         Emulator?.Resume();
@@ -246,7 +247,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         Emulator?.SetTapeSavingSettings(_preferences.TapeSaving);
-        Emulator?.SetAudioSettings(_preferences.AudioSettings);
+        Emulator?.SetGamepad(_preferences.Joystick);
     }
 
     private async Task WindowClosingAsync()
@@ -265,7 +266,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var emulator = _emulatorFactory.Create(computerType, romType);
 
-        emulator.IsUlaPlusEnabled = _preferences.IsUlaPlusEnabled;
+        emulator.SetUlaPlus(_preferences.IsUlaPlusEnabled);
         emulator.JoystickManager.SetupJoystick(_preferences.Joystick.JoystickKeyboardType);
 
         InitializeEmulator(emulator);
@@ -291,17 +292,16 @@ public partial class MainWindowViewModel : ViewModelBase
         Emulator = emulator;
         IsPaused = false;
 
-        ComputerType = emulator.ComputerType;
-        RomType = emulator.RomType;
-        JoystickKeyboardType = emulator.JoystickManager.JoystickType;
-        IsUlaPlusEnabled = emulator.IsUlaPlusEnabled;
+        ComputerType = Emulator.ComputerType;
+        RomType = Emulator.RomType;
+        JoystickKeyboardType = Emulator.JoystickManager.JoystickType;
+        IsUlaPlusEnabled = Emulator.IsUlaPlusEnabled;
 
-        Emulator.IsUlaPlusEnabled = IsUlaPlusEnabled;
         Emulator.TapeLoadSpeed = TapeLoadSpeed;
-        Emulator.JoystickManager.SetupJoystick(JoystickKeyboardType);
         Emulator.RenderScreen += EmulatorOnRenderScreen;
 
         Emulator.SetAudioSettings(_preferences.AudioSettings);
+        Emulator.SetGamepad(_preferences.Joystick);
 
         if (IsMuted)
         {

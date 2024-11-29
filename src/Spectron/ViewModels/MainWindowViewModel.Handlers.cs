@@ -282,10 +282,10 @@ partial class MainWindowViewModel
 
         if (JoystickKeyboardType != JoystickType.None)
         {
-            var joystickKeys = KeyMappings.ToJoystickAction(e);
-            if (joystickKeys != JoystickInput.None)
+            var input = KeyMappings.ToJoystickAction(e);
+            if (input != JoystickInput.None)
             {
-                Emulator?.JoystickManager.HandleInput(joystickKeys, isOn: false);
+                Emulator?.JoystickManager.InputOff(input);
                 return;
             }
         }
@@ -298,7 +298,7 @@ partial class MainWindowViewModel
     {
         switch (e)
         {
-            case{ Key: Key.Escape }:
+            case { Key: Key.Escape }:
                 if (IsPaused)
                 {
                     HandleTogglePause();
@@ -317,10 +317,10 @@ partial class MainWindowViewModel
 
         if (JoystickKeyboardType != JoystickType.None)
         {
-            var joystickKeys = KeyMappings.ToJoystickAction(e);
-            if (joystickKeys != JoystickInput.None)
+            var input = KeyMappings.ToJoystickAction(e);
+            if (input != JoystickInput.None)
             {
-                Emulator?.JoystickManager.HandleInput(joystickKeys, isOn: true);
+                Emulator?.JoystickManager.InputOn(input);
                 return;
             }
         }

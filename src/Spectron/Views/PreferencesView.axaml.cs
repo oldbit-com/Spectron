@@ -1,12 +1,11 @@
 using ReactiveUI;
-using Avalonia.Controls;
 using Avalonia.ReactiveUI;
 using OldBit.Spectron.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Avalonia.Input;
-using OldBit.Spectron.Settings;
+using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 
 namespace OldBit.Spectron.Views;
 

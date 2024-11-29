@@ -18,7 +18,6 @@ namespace OldBit.Spectron.Emulation;
 public sealed class Emulator
 {
     private readonly HardwareSettings _hardware;
-    private readonly GamepadManager _gamepadManager;
     private readonly TimeMachine _timeMachine;
     private readonly SpectrumBus _spectrumBus;
     private readonly EmulatorTimer _emulationTimer;
@@ -35,6 +34,8 @@ public sealed class Emulator
     public TapeManager TapeManager { get; }
     public JoystickManager JoystickManager { get; }
     public AudioManager AudioManager { get; }
+    public GamepadManager GamepadManager { get; }
+
     public ComputerType ComputerType { get; }
     public RomType RomType { get; }
     public TapeSpeed TapeLoadSpeed { get; set; }
@@ -52,10 +53,11 @@ public sealed class Emulator
         TimeMachine timeMachine,
         ILogger logger)
     {
-        TapeManager = tapeManager;
         _hardware = hardware;
-        _gamepadManager = gamepadManager;
         _timeMachine = timeMachine;
+
+        TapeManager = tapeManager;
+        GamepadManager = gamepadManager;
         ComputerType = emulatorArgs.ComputerType;
         RomType = emulatorArgs.RomType;
         Memory = emulatorArgs.Memory;
@@ -97,7 +99,7 @@ public sealed class Emulator
     {
         AudioManager.Stop();
         _emulationTimer.Stop();
-        _gamepadManager.Stop();
+        GamepadManager.Stop();
 
         while (!_emulationTimer.IsStopped)
         {
@@ -187,6 +189,8 @@ public sealed class Emulator
         RenderScreen?.Invoke(ScreenBuffer.FrameBuffer);
 
         _timeMachine.AddEntry(this);
+
+        GamepadManager.Update();
     }
 
     private void ToggleUlaPlus(bool value)

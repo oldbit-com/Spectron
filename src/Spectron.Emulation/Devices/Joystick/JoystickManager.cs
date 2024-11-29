@@ -14,7 +14,10 @@ public sealed class JoystickManager
 
     public JoystickType JoystickType { get; private set; } = JoystickType.None;
 
-    internal JoystickManager(GamepadManager gamepadManager, SpectrumBus spectrumBus, KeyboardHandler keyboardHandler)
+    internal JoystickManager(
+        GamepadManager gamepadManager,
+        SpectrumBus spectrumBus,
+        KeyboardHandler keyboardHandler)
     {
         _gamepadManager = gamepadManager;
         _spectrumBus = spectrumBus;
@@ -45,5 +48,16 @@ public sealed class JoystickManager
         _gamepadManager.Initialize();
     }
 
-    public void HandleInput(JoystickInput input, bool isOn) => _joystick?.HandleInput(input, isOn);
+    public void SetupGamepad()
+    {
+    }
+
+    public void Update()
+    {
+
+    }
+
+    public void InputOn(JoystickInput input) => _joystick?.HandleInput(input, true);
+
+    public void InputOff(JoystickInput input) => _joystick?.HandleInput(input, false);
 }

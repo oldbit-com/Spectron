@@ -189,7 +189,8 @@ public class PreferencesViewModel : ViewModelBase
         new("Stereo ACB", StereoMode.StereoAcb),
     ];
 
-    public ObservableCollection<GamepadController> GamepadControllers => _gamepadManager.GamepadControllers;
+    public ObservableCollection<GamepadController> GamepadControllers =>
+        _gamepadManager.GamepadControllers;
 
     private ComputerType _computerType;
     public ComputerType ComputerType

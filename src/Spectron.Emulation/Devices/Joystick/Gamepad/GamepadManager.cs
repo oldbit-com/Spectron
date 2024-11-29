@@ -4,9 +4,13 @@ using OldBit.JoyPad.Controls;
 
 namespace OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 
+public record GamepadPreferences(Guid ControllerId, JoystickType JoystickType, List<GamepadMapping> Mappings);
+
 public sealed class GamepadManager
 {
     private readonly JoyPadManager _joyPadManager;
+    private readonly List<Guid> _enabledControllers = [];
+
     private bool _initialized;
 
     public ObservableCollection<GamepadController> GamepadControllers { get; } = [];
@@ -20,6 +24,49 @@ public sealed class GamepadManager
 
         GamepadControllers.Add(GamepadController.None);
     }
+
+    public void Initialize()
+    {
+        if (_initialized)
+        {
+            return;
+        }
+
+        _initialized = true;
+        _joyPadManager.Start();
+    }
+
+    public void Stop()
+    {
+        _joyPadManager.Stop();
+        _joyPadManager.Dispose();
+    }
+
+    public void SetupGamepad(GamepadPreferences player1, GamepadPreferences player2)
+    {
+        _enabledControllers.Clear();
+
+        if ((player1.ControllerId == Guid.Empty || player1.JoystickType == JoystickType.None) &&
+            (player2.ControllerId == Guid.Empty || player2.JoystickType == JoystickType.None))
+        {
+            return;
+        }
+
+        if (GamepadControllers.Any(x => x.Id == player1.ControllerId))
+        {
+            _enabledControllers.Add(player1.ControllerId);
+        }
+    }
+
+    public void Update()
+    {
+        foreach (var controllerId in _enabledControllers)
+        {
+            _joyPadManager.Update(controllerId);
+        }
+    }
+
+    public void Update(Guid controllerId) => _joyPadManager.Update(controllerId);
 
     private void JoyPadManagerOnControllerConnected(object? sender, JoyPadControllerEventArgs e)
     {
@@ -55,27 +102,5 @@ public sealed class GamepadManager
         {
             GamepadControllers.Remove(existingController);
         }
-    }
-
-    public void Initialize()
-    {
-        if (_initialized)
-        {
-            return;
-        }
-
-        _initialized = true;
-        _joyPadManager.Start();
-    }
-
-    public void Stop()
-    {
-        _joyPadManager.Stop();
-        _joyPadManager.Dispose();
-    }
-
-    public void Update(Guid controllerId)
-    {
-        _joyPadManager.Update(controllerId);
     }
 }

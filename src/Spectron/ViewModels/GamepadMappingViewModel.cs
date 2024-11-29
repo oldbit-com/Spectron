@@ -56,7 +56,7 @@ public class GamepadMappingViewModel : ViewModelBase, IDisposable
                     button,
                     actions.FirstOrDefault(
                         mapping => mapping.Action == mappings.FirstOrDefault(
-                            g => g.ButtonId == button.Id &&
+                            g => g.ButtonId == button.ButtonId &&
                                  g.Direction == button.Direction)?.Action,
                         actions.First()),
                     actions));
