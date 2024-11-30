@@ -1,25 +1,20 @@
-<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
-        xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="OldBit.Spectron.Views.GamepadMappingView"
-        x:DataType="viewModels:GamepadMappingViewModel"
-        WindowStartupLocation="CenterOwner"
-        Width="600"
-        Height="500"
-        CanResize="False"
-        Title="Gamepad Mapping">
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
+             xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="OldBit.Spectron.Controls.GamepadControlsMapping"
+             x:DataType="viewModels:GamepadMappingViewModel">
 
-    <Window.Resources>
+    <UserControl.Resources>
         <converters:TypeMatchConverter x:Key="TypeMatchConverter"/>
-    </Window.Resources>
+    </UserControl.Resources>
 
     <Grid RowDefinitions="*,50">
         <DataGrid ItemsSource="{Binding Mappings}"
-                  Margin="20"
+                  Margin="10"
                   GridLinesVisibility="All"
                   BorderThickness="2"
                   RowHeight="40"
@@ -37,7 +32,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock
-                                Width="200"
+                                Width="250"
                                 Padding="10 0 0 0"
                                 Text="{Binding SelectedAction.Name}" VerticalAlignment="Center" />
                         </DataTemplate>
@@ -45,7 +40,7 @@
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
                             <ComboBox
-                                Width="200"
+                                Width="250"
                                 VerticalAlignment="Center"
                                 Padding="10 0 0 0"
                                 ItemsSource="{Binding Actions}"
@@ -78,7 +73,6 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <Button Grid.Row="1" HorizontalAlignment="Left" Margin="15 0 0 0" Content="Defaults" Command="{Binding SetDefaultMappingCommand}"/>
-        <Button Grid.Row="1" HorizontalAlignment="Right" Margin="0 0 15 0" Content="OK" Command="{Binding UpdateMappingCommand}"/>
+        <Button Grid.Row="1" HorizontalAlignment="Right" Margin="0 0 10 0" Content="Defaults" Command="{Binding SetDefaultMappingCommand}"/>
     </Grid>
-</Window>
+</UserControl>

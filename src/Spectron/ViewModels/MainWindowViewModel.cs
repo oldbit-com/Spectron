@@ -163,7 +163,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         Emulator?.Pause();
 
-        var viewModel = new PreferencesViewModel(_preferences, _gamepadManager);
+        using var viewModel = new PreferencesViewModel(_preferences, _gamepadManager);
         var preferences = await ShowPreferencesView.Handle(viewModel);
 
         if (preferences != null)

@@ -15,36 +15,46 @@ namespace OldBit.Spectron.ViewModels;
 public class GamepadMappingViewModel : ViewModelBase, IDisposable
 {
     private readonly Timer _timer;
-    private readonly GamepadController _controller;
     private readonly GamepadManager _gamepadManager;
 
-    public ReactiveCommand<Unit, List<GamepadMapping>> UpdateMappingCommand { get; }
+    private GamepadController _controller = GamepadController.None;
+
     public ReactiveCommand<Unit, Unit> SetDefaultMappingCommand { get; }
 
     public ObservableCollection<GamepadButtonMappingViewModel> Mappings { get; } = [];
 
-    public GamepadMappingViewModel(
-        GamepadController controller,
-        GamepadManager gamepadManager,
-        GamepadSettings settings)
+    public GamepadMappingViewModel(GamepadManager gamepadManager)
     {
-        _controller = controller;
         _gamepadManager = gamepadManager;
 
-        if (!settings.MappingsByController.TryGetValue(controller.Id, out var mappings))
+        SetDefaultMappingCommand = ReactiveCommand.Create(() =>
         {
-            mappings = DefaultMappings();
-        }
-
-        SetupGridView(mappings);
-
-        UpdateMappingCommand = ReactiveCommand.Create(GetConfiguredMappings);
-        SetDefaultMappingCommand = ReactiveCommand.Create(() => { SetupGridView(DefaultMappings()); });
+            var defaultMappings = DefaultMappings();
+            SetupGridView(defaultMappings);
+        });
 
         _timer = new Timer(100) { AutoReset = false };
         _timer.Elapsed += GamepadUpdate;
         _timer.Start();
     }
+
+    public void UpdateView(Guid controllerId, GamepadSettings settings)
+    {
+        _controller = _gamepadManager.Controllers
+            .FirstOrDefault(controller => controller.Id == controllerId, GamepadController.None);
+
+        if (!settings.Mappings.TryGetValue(controllerId, out var mappings))
+        {
+            mappings = DefaultMappings();
+        }
+
+        SetupGridView(mappings);
+    }
+
+    public List<GamepadMapping> GetConfiguredMappings() => Mappings
+        .Where(m => m.SelectedAction.Action != GamepadAction.None)
+        .Select(m => new GamepadMapping(m.Button, m.SelectedAction.Action))
+        .ToList();
 
     private void SetupGridView(List<GamepadMapping> mappings)
     {
@@ -67,7 +77,11 @@ public class GamepadMappingViewModel : ViewModelBase, IDisposable
 
     private void GamepadUpdate(object? sender, ElapsedEventArgs e)
     {
-        _gamepadManager.Update(_controller.Id);
+        if (_controller != GamepadController.None)
+        {
+            _gamepadManager.Update(_controller.Id);
+        }
+
         _timer.Start();
     }
 
@@ -90,11 +104,6 @@ public class GamepadMappingViewModel : ViewModelBase, IDisposable
             }
         }
     }
-
-    private List<GamepadMapping> GetConfiguredMappings() => Mappings
-        .Where(m => m.SelectedAction.Action != GamepadAction.None)
-        .Select(m => new GamepadMapping(m.Button, m.SelectedAction.Action))
-        .ToList();
 
     private List<GamepadMapping> DefaultMappings()
     {

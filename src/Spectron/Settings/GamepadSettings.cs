@@ -6,5 +6,5 @@ namespace OldBit.Spectron.Settings;
 
 public record GamepadSettings
 {
-    public Dictionary<Guid, List<GamepadMapping>> MappingsByController { get; set; } = new();
+    public Dictionary<Guid, List<GamepadMapping>> Mappings { get; } = new();
 }

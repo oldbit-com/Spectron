@@ -7,7 +7,7 @@ public record JoystickSettings
 {
     public JoystickType JoystickType { get; init; } = JoystickType.None;
 
-    public Guid GamepadId { get; init; } = Guid.Empty;
+    public Guid GamepadControllerId { get; init; } = Guid.Empty;
 
     public GamepadSettings GamepadSettings { get; init; } = new();
 

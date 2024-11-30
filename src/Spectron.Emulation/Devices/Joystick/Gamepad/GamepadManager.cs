@@ -13,7 +13,7 @@ public sealed class GamepadManager
 
     private bool _initialized;
 
-    public ObservableCollection<GamepadController> GamepadControllers { get; } = [];
+    public ObservableCollection<GamepadController> Controllers { get; } = [];
 
     public GamepadManager()
     {
@@ -22,7 +22,7 @@ public sealed class GamepadManager
         _joyPadManager.ControllerConnected += JoyPadManagerOnControllerConnected;
         _joyPadManager.ControllerDisconnected += JoyPadManagerOnControllerDisconnected;
 
-        GamepadControllers.Add(GamepadController.None);
+        Controllers.Add(GamepadController.None);
     }
 
     public void Initialize()
@@ -67,7 +67,7 @@ public sealed class GamepadManager
 
     private void JoyPadManagerOnControllerConnected(object? sender, JoyPadControllerEventArgs e)
     {
-        if (GamepadControllers.Any(x => x.Id == e.Controller.Id))
+        if (Controllers.Any(controller => controller.Id == e.Controller.Id))
         {
             return;
         }
@@ -88,16 +88,16 @@ public sealed class GamepadManager
             buttons.Insert(3, new GamepadButton(dpad.Id, "D-Pad Down", DirectionalPadDirection.Down));
         }
 
-        GamepadControllers.Add(new GamepadController(e.Controller, buttons));
+        Controllers.Add(new GamepadController(e.Controller, buttons));
     }
 
     private void JoyPadManagerOnControllerDisconnected(object? sender, JoyPadControllerEventArgs e)
     {
-        var existingController = GamepadControllers.FirstOrDefault(x => x.Id == e.Controller.Id);
+        var existingController = Controllers.FirstOrDefault(x => x.Id == e.Controller.Id);
 
         if (existingController != null)
         {
-            GamepadControllers.Remove(existingController);
+            Controllers.Remove(existingController);
         }
     }
 }
