@@ -27,8 +27,8 @@
             </DataGrid.Styles>
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Button" Binding="{Binding Name}" Width="150" />
-                <DataGridTemplateColumn Header="Action">
+                <DataGridTextColumn Header="Button" Binding="{Binding Name}" Width="200"/>
+                <DataGridTemplateColumn Header="Action" >
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock
