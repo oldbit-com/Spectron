@@ -13,9 +13,9 @@ public class CursorJoystick(KeyboardHandler keyboardHandler) : IJoystick
         { JoystickInput.Fire, [SpectrumKey.CapsShift, SpectrumKey.D0] }
     };
 
-    public void HandleInput(JoystickInput input, bool isOn)
+    public void HandleInput(JoystickInput input, InputState state)
     {
-        if (isOn)
+        if (state == InputState.Pressed)
         {
             if (_joyToKeyMapping.TryGetValue(input, out var keys))
             {

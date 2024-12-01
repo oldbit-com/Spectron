@@ -4,12 +4,16 @@ using OldBit.JoyPad.Controls;
 
 namespace OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 
-public record GamepadPreferences(Guid ControllerId, JoystickType JoystickType, List<GamepadMapping> Mappings);
+public record GamepadPreferences(
+    Guid ControllerId,
+    JoystickType JoystickType,
+    List<GamepadMapping> Mappings);
 
 public sealed class GamepadManager
 {
     private readonly JoyPadManager _joyPadManager;
     private GamepadPreferences? _activeGamepad;
+    private Dictionary<JoystickInput, List<GamepadMapping>> _joystickInputMappings = new();
 
     private bool _initialized;
 
@@ -47,10 +51,33 @@ public sealed class GamepadManager
         if (gamepad.ControllerId == Guid.Empty || gamepad.JoystickType == JoystickType.None)
         {
             _activeGamepad = null;
+            _joystickInputMappings = [];
+
             return;
         }
 
         _activeGamepad = gamepad;
+
+        _joystickInputMappings = gamepad.Mappings
+            .Where(mapping =>
+                mapping.Action is
+                    GamepadAction.JoystickLeft or
+                    GamepadAction.JoystickRight or
+                    GamepadAction.JoystickUp or
+                    GamepadAction.JoystickDown or
+                    GamepadAction.JoystickFire)
+            .GroupBy(mapping => mapping.Action)
+            .ToDictionary(
+                group => group.Key switch
+                {
+                    GamepadAction.JoystickLeft => JoystickInput.Left,
+                    GamepadAction.JoystickRight => JoystickInput.Right,
+                    GamepadAction.JoystickUp => JoystickInput.Up,
+                    GamepadAction.JoystickDown => JoystickInput.Down,
+                    GamepadAction.JoystickFire => JoystickInput.Fire,
+                    _ => JoystickInput.None
+                },
+                group => group.ToList());
     }
 
     public void Update()
@@ -64,6 +91,11 @@ public sealed class GamepadManager
     }
 
     public void Update(Guid controllerId) => _joyPadManager.Update(controllerId);
+
+    public InputState GetInputState(JoystickInput input)
+    {
+        return InputState.Released;
+    }
 
     private void JoyPadManagerOnControllerConnected(object? sender, JoyPadControllerEventArgs e)
     {

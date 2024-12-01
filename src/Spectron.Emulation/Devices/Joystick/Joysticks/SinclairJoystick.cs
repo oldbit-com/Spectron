@@ -28,9 +28,9 @@ public class SinclairJoystick(KeyboardHandler keyboardHandler, JoystickType joys
         }
     };
 
-    public void HandleInput(JoystickInput input, bool isOn)
+    public void HandleInput(JoystickInput input, InputState state)
     {
-        if (isOn)
+        if (state == InputState.Pressed)
         {
             if (_joyToKeyMapping[joystickType].TryGetValue(input, out var key))
             {

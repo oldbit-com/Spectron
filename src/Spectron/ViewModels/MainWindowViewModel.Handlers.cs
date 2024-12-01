@@ -286,7 +286,7 @@ partial class MainWindowViewModel
 
             if (input != JoystickInput.None)
             {
-                Emulator?.JoystickManager.InputOff(input);
+                Emulator?.JoystickManager.Released(input);
                 return;
             }
         }
@@ -322,7 +322,7 @@ partial class MainWindowViewModel
 
             if (input != JoystickInput.None)
             {
-                Emulator?.JoystickManager.InputOn(input);
+                Emulator?.JoystickManager.Pressed(input);
                 return;
             }
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
@@ -28,8 +29,22 @@ public class PreferencesViewModel : ViewModelBase, IDisposable
     public PreferencesViewModel(Preferences preferences, GamepadManager gamepadManager)
     {
         _gamepadManager = gamepadManager;
+        _gamepadSettings = preferences.Joystick.GamepadSettings;
 
         GamepadMappingViewModel = new GamepadMappingViewModel(_gamepadManager);
+
+        this.WhenAnyValue(x => x.GamepadControllerId)
+            .Buffer(2, 1)
+            .Select(b => (Previous: b[0], Current: b[1]))
+            .Subscribe(value =>
+            {
+                if (value.Previous != Guid.Empty)
+                {
+                    _gamepadSettings.Mappings[value.Previous] = GamepadMappingViewModel.GetConfiguredMappings();
+                }
+
+                GamepadMappingViewModel.UpdateView(value.Current, _gamepadSettings);
+            });
 
         ComputerType = preferences.ComputerType;
         IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
@@ -37,7 +52,6 @@ public class PreferencesViewModel : ViewModelBase, IDisposable
 
         JoystickType = preferences.Joystick.JoystickType;
         EmulateUsingKeyboard = preferences.Joystick.EmulateUsingKeyboard;
-        _gamepadSettings = preferences.Joystick.GamepadSettings;
         GamepadControllerId = _gamepadManager.Controllers.FirstOrDefault(
             controller => controller.Id == preferences.Joystick.GamepadControllerId)?.Id ?? Guid.Empty;
 
@@ -191,16 +205,7 @@ public class PreferencesViewModel : ViewModelBase, IDisposable
     public Guid GamepadControllerId
     {
         get => _gamepadControllerId;
-        set
-        {
-            if (_gamepadControllerId != Guid.Empty)
-            {
-                _gamepadSettings.Mappings[_gamepadControllerId] = GamepadMappingViewModel.GetConfiguredMappings();
-            }
-
-            this.RaiseAndSetIfChanged(ref _gamepadControllerId, value);
-            GamepadMappingViewModel.UpdateView(GamepadControllerId, _gamepadSettings);
-        }
+        init => this.RaiseAndSetIfChanged(ref _gamepadControllerId, value);
     }
 
     private bool _isTimeMachineEnabled;

@@ -247,7 +247,6 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         Emulator?.SetTapeSavingSettings(_preferences.TapeSaving);
-        Emulator?.SetGamepad(_preferences.Joystick);
     }
 
     private async Task WindowClosingAsync()
@@ -274,8 +273,6 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void CreateEmulator(SzxFile? snapshot = null)
     {
-        ShutdownEmulator();
-
         var emulator = snapshot == null ?
             _emulatorFactory.Create(
                 ComputerType,

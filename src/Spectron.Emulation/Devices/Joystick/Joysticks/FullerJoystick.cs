@@ -14,11 +14,11 @@ internal class FullerJoystick : IJoystick
 
     public byte? ReadPort(Word address) => address != FullerPort ? null : _joystickState;
 
-    public void HandleInput(JoystickInput input, bool isOn)
+    public void HandleInput(JoystickInput input, InputState state)
     {
         var value = GetValue(input);
 
-        if (isOn)
+        if (state == InputState.Released)
         {
             _joystickState &= (byte)~value;
         }
