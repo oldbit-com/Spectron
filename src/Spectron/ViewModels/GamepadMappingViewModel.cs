@@ -40,8 +40,12 @@ public class GamepadMappingViewModel : ViewModelBase, IDisposable
 
     public void UpdateView(Guid controllerId, GamepadSettings settings)
     {
+        _controller.ValueChanged -= ControllerOnValueChanged;
+
         _controller = _gamepadManager.Controllers
-            .FirstOrDefault(controller => controller.Id == controllerId, GamepadController.None);
+            .FirstOrDefault(controller => controller.ControllerId == controllerId, GamepadController.None);
+
+        _controller.ValueChanged += ControllerOnValueChanged;
 
         if (!settings.Mappings.TryGetValue(controllerId, out var mappings))
         {
@@ -49,6 +53,11 @@ public class GamepadMappingViewModel : ViewModelBase, IDisposable
         }
 
         SetupGridView(mappings);
+    }
+
+    private void ControllerOnValueChanged(object? sender, ValueChangedEventArgs e)
+    {
+        Console.WriteLine($"Controller {_controller.Name} value changed: {e.ControlId} = {e.Value}");
     }
 
     public List<GamepadMapping> GetConfiguredMappings() => Mappings
@@ -66,7 +75,7 @@ public class GamepadMappingViewModel : ViewModelBase, IDisposable
                     button,
                     actions.FirstOrDefault(
                         mapping => mapping.Action == mappings.FirstOrDefault(
-                            g => g.ButtonId == button.ButtonId &&
+                            g => g.ControlId == button.ButtonId &&
                                  g.Direction == button.Direction)?.Action,
                         actions.First()),
                     actions));
@@ -79,7 +88,7 @@ public class GamepadMappingViewModel : ViewModelBase, IDisposable
     {
         if (_controller != GamepadController.None)
         {
-            _gamepadManager.Update(_controller.Id);
+            _gamepadManager.Update(_controller.ControllerId);
         }
 
         _timer.Start();
@@ -134,6 +143,8 @@ public class GamepadMappingViewModel : ViewModelBase, IDisposable
     public void Dispose()
     {
         GC.SuppressFinalize(this);
+
+        _controller.ValueChanged -= ControllerOnValueChanged;
 
         _timer.Stop();
         _timer.Dispose();

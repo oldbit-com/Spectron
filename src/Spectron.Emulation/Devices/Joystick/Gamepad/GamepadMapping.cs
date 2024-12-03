@@ -10,12 +10,12 @@ public sealed record GamepadMapping
 
     public GamepadMapping(GamepadButton button, GamepadAction action)
     {
-        ButtonId = button.ButtonId;
+        ControlId = button.ButtonId;
         Direction = button.Direction;
         Action = action;
     }
 
-    public int ButtonId { get; init; }
+    public int ControlId { get; init; }
 
     public GamepadAction Action { get; init; }
 

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using Avalonia.Threading;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
@@ -31,7 +32,10 @@ public class PreferencesViewModel : ViewModelBase, IDisposable
         _gamepadManager = gamepadManager;
         _gamepadSettings = preferences.Joystick.GamepadSettings;
 
+        GamepadControllers = new ObservableCollection<GamepadController>(_gamepadManager.Controllers);
         GamepadMappingViewModel = new GamepadMappingViewModel(_gamepadManager);
+
+        _gamepadManager.ControllerChanged += GamepadManagerOnControllerChanged;
 
         this.WhenAnyValue(x => x.GamepadControllerId)
             .Buffer(2, 1)
@@ -53,7 +57,7 @@ public class PreferencesViewModel : ViewModelBase, IDisposable
         JoystickType = preferences.Joystick.JoystickType;
         EmulateUsingKeyboard = preferences.Joystick.EmulateUsingKeyboard;
         GamepadControllerId = _gamepadManager.Controllers.FirstOrDefault(
-            controller => controller.Id == preferences.Joystick.GamepadControllerId)?.Id ?? Guid.Empty;
+            controller => controller.ControllerId == preferences.Joystick.GamepadControllerId)?.ControllerId ?? GamepadController.None.ControllerId;
 
         IsResumeEnabled = preferences.ResumeSettings.IsResumeEnabled;
         ShouldIncludeTapeInResume = preferences.ResumeSettings.ShouldIncludeTape;
@@ -76,9 +80,33 @@ public class PreferencesViewModel : ViewModelBase, IDisposable
         ShowGamepadMappingView = new Interaction<GamepadMappingViewModel, List<GamepadMapping>?>();
     }
 
+    private void GamepadManagerOnControllerChanged(object? sender, ControllerChangedEventArgs e)
+    {
+        switch (e.Action)
+        {
+            case ControllerChangedAction.Added:
+                Dispatcher.UIThread.Post(() =>
+                {
+                    GamepadControllers.Add(e.Controller);
+                    GamepadControllerId = e.Controller.ControllerId;
+                });
+
+                break;
+
+            case ControllerChangedAction.Removed:
+                Dispatcher.UIThread.Post(() =>
+                {
+                    GamepadControllers.Remove(e.Controller);
+                    GamepadControllerId = GamepadController.None.ControllerId;
+                });
+
+                break;
+        }
+    }
+
     private Preferences UpdatePreferences()
     {
-        if (GamepadControllerId != Guid.Empty)
+        if (GamepadControllerId != GamepadController.None.ControllerId)
         {
             _gamepadSettings.Mappings[GamepadControllerId] = GamepadMappingViewModel.GetConfiguredMappings();
         }
@@ -163,8 +191,7 @@ public class PreferencesViewModel : ViewModelBase, IDisposable
         new("Stereo ACB", StereoMode.StereoAcb),
     ];
 
-    public ObservableCollection<GamepadController> GamepadControllers =>
-        _gamepadManager.Controllers;
+    public ObservableCollection<GamepadController> GamepadControllers { get; }
 
     private ComputerType _computerType;
     public ComputerType ComputerType
@@ -201,11 +228,11 @@ public class PreferencesViewModel : ViewModelBase, IDisposable
         set => this.RaiseAndSetIfChanged(ref _emulateUsingKeyboard, value);
     }
 
-    private Guid _gamepadControllerId = Guid.Empty;
+    private Guid _gamepadControllerId = GamepadController.None.ControllerId;
     public Guid GamepadControllerId
     {
         get => _gamepadControllerId;
-        init => this.RaiseAndSetIfChanged(ref _gamepadControllerId, value);
+        set => this.RaiseAndSetIfChanged(ref _gamepadControllerId, value);
     }
 
     private bool _isTimeMachineEnabled;
@@ -295,6 +322,8 @@ public class PreferencesViewModel : ViewModelBase, IDisposable
     public void Dispose()
     {
         GC.SuppressFinalize(this);
+
+        _gamepadManager.ControllerChanged -= GamepadManagerOnControllerChanged;
         GamepadMappingViewModel.Dispose();
     }
 }

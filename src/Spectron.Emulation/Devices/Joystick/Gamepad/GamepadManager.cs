@@ -7,26 +7,31 @@ namespace OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 public record GamepadPreferences(
     Guid ControllerId,
     JoystickType JoystickType,
-    List<GamepadMapping> Mappings);
+    List<GamepadMapping> InputMappings);
 
 public sealed class GamepadManager
 {
     private readonly JoyPadManager _joyPadManager;
+    private readonly List<GamepadController> _controllers = [];
+
     private GamepadPreferences? _activeGamepad;
     private Dictionary<JoystickInput, List<GamepadMapping>> _joystickInputMappings = new();
 
     private bool _initialized;
 
-    public ObservableCollection<GamepadController> Controllers { get; } = [];
+    public IReadOnlyList<GamepadController> Controllers => _controllers;
+
+    public event EventHandler<ControllerChangedEventArgs>? ControllerChanged;
 
     public GamepadManager()
     {
         _joyPadManager = new JoyPadManager();
 
-        _joyPadManager.ControllerConnected += JoyPadManagerOnControllerConnected;
-        _joyPadManager.ControllerDisconnected += JoyPadManagerOnControllerDisconnected;
+        _joyPadManager.ControllerConnected += OnControllerConnected;
+        _joyPadManager.ControllerDisconnected += OnControllerDisconnected;
 
-        Controllers.Add(GamepadController.None);
+        _controllers.Add(GamepadController.None);
+        OnControllerChanged(GamepadController.None, ControllerChangedAction.Added);
     }
 
     public void Initialize()
@@ -58,7 +63,7 @@ public sealed class GamepadManager
 
         _activeGamepad = gamepad;
 
-        _joystickInputMappings = gamepad.Mappings
+        _joystickInputMappings = gamepad.InputMappings
             .Where(mapping =>
                 mapping.Action is
                     GamepadAction.JoystickLeft or
@@ -94,12 +99,50 @@ public sealed class GamepadManager
 
     public InputState GetInputState(JoystickInput input)
     {
+        if (_activeGamepad == null || !_joystickInputMappings.TryGetValue(input, out var inputMappings))
+        {
+            return InputState.Released;
+        }
+
+        if (!_joyPadManager.TryGetController(_activeGamepad.ControllerId, out var controller))
+        {
+            return InputState.Released;
+        }
+
+        foreach (var inputMapping in inputMappings)
+        {
+            if (!controller.TryGetControl(inputMapping.ControlId, out var control))
+            {
+                return InputState.Released;
+            }
+
+            if (control.Value == null)
+            {
+                continue;
+            }
+
+            if (control.ControlType == ControlType.DirectionalPad)
+            {
+                if ((inputMapping.Direction & (DirectionalPadDirection)control.Value) != DirectionalPadDirection.None)
+                {
+                    return InputState.Pressed;
+                }
+            }
+            else if (control.IsPressed)
+            {
+                return InputState.Pressed;
+            }
+        }
+
         return InputState.Released;
     }
 
-    private void JoyPadManagerOnControllerConnected(object? sender, JoyPadControllerEventArgs e)
+    private void OnControllerChanged(GamepadController controller, ControllerChangedAction action) =>
+        ControllerChanged?.Invoke(this, new ControllerChangedEventArgs(controller, action));
+
+    private void OnControllerConnected(object? sender, JoyPadControllerEventArgs e)
     {
-        if (Controllers.Any(controller => controller.Id == e.Controller.Id))
+        if (_controllers.Any(controller => controller.ControllerId == e.Controller.Id))
         {
             return;
         }
@@ -120,16 +163,20 @@ public sealed class GamepadManager
             buttons.Insert(3, new GamepadButton(dpad.Id, "D-Pad Down", DirectionalPadDirection.Down));
         }
 
-        Controllers.Add(new GamepadController(e.Controller, buttons));
+        var controller = new GamepadController(e.Controller, buttons);
+
+        _controllers.Add(controller);
+        OnControllerChanged(controller, ControllerChangedAction.Added);
     }
 
-    private void JoyPadManagerOnControllerDisconnected(object? sender, JoyPadControllerEventArgs e)
+    private void OnControllerDisconnected(object? sender, JoyPadControllerEventArgs e)
     {
-        var existingController = Controllers.FirstOrDefault(x => x.Id == e.Controller.Id);
+        var existingController = _controllers.FirstOrDefault(x => x.ControllerId == e.Controller.Id);
 
         if (existingController != null)
         {
-            Controllers.Remove(existingController);
+            _controllers.Remove(existingController);
+            OnControllerChanged(existingController, ControllerChangedAction.Removed);
         }
     }
 }

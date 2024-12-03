@@ -67,7 +67,7 @@ public sealed class JoystickManager
         _gamepadManager.Update();
         UpdateAllInputsState();
 
-        _stopwatch.Reset();
+        _stopwatch.Restart();
     }
 
     public void Pressed(JoystickInput input) => _joystick?.HandleInput(input, InputState.Pressed);
@@ -86,6 +86,7 @@ public sealed class JoystickManager
     private void UpdateInputState(JoystickInput input)
     {
         var inputState = _gamepadManager.GetInputState(input);
+
         _joystick?.HandleInput(input, inputState);
     }
 }
