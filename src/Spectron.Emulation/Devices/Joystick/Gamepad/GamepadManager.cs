@@ -1,6 +1,6 @@
-using System.Collections.ObjectModel;
 using OldBit.Joypad;
 using OldBit.Joypad.Controls;
+using OldBit.Spectron.Emulation.Devices.Keyboard;
 
 namespace OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 
@@ -11,11 +11,13 @@ public record GamepadPreferences(
 
 public sealed class GamepadManager
 {
+    private readonly KeyboardState _keyboardState;
     private readonly JoypadManager _joypadManager;
     private readonly List<GamepadController> _controllers = [];
 
     private GamepadPreferences? _activeGamepad;
     private Dictionary<JoystickInput, List<GamepadMapping>> _joystickInputMappings = new();
+    private Dictionary<int, GamepadAction> _keyboardMappings = new();
 
     private bool _initialized;
 
@@ -23,8 +25,9 @@ public sealed class GamepadManager
 
     public event EventHandler<ControllerChangedEventArgs>? ControllerChanged;
 
-    public GamepadManager()
+    public GamepadManager(KeyboardState keyboardState)
     {
+        _keyboardState = keyboardState;
         _joypadManager = new JoypadManager();
 
         _joypadManager.ControllerConnected += OnControllerConnected;
@@ -83,6 +86,10 @@ public sealed class GamepadManager
                     _ => JoystickInput.None
                 },
                 group => group.ToList());
+
+        _keyboardMappings = gamepad.InputMappings
+            .Where(mapping => mapping.Action is >= GamepadAction.D0 and <= GamepadAction.Z)
+            .ToDictionary(mapping => mapping.ControlId, mapping => mapping.Action);
     }
 
     public void Update()
@@ -97,7 +104,7 @@ public sealed class GamepadManager
 
     public void Update(Guid controllerId) => _joypadManager.Update(controllerId);
 
-    public InputState GetInputState(JoystickInput input)
+    public InputState GetJoystickInputState(JoystickInput input)
     {
         if (_activeGamepad == null || !_joystickInputMappings.TryGetValue(input, out var inputMappings))
         {
@@ -137,6 +144,8 @@ public sealed class GamepadManager
         return InputState.Released;
     }
 
+    public InputState GetKeyboardInputState(JoystickInput input) => InputState.Released;
+
     private void OnControllerChanged(GamepadController controller, ControllerChangedAction action) =>
         ControllerChanged?.Invoke(this, new ControllerChangedEventArgs(controller, action));
 
@@ -164,6 +173,7 @@ public sealed class GamepadManager
         }
 
         var controller = new GamepadController(e.Controller, buttons);
+        controller.ValueChanged += ControllerOnValueChanged;
 
         _controllers.Add(controller);
         OnControllerChanged(controller, ControllerChangedAction.Added);
@@ -173,10 +183,37 @@ public sealed class GamepadManager
     {
         var existingController = _controllers.FirstOrDefault(x => x.ControllerId == e.Controller.Id);
 
-        if (existingController != null)
+        if (existingController == null)
         {
-            _controllers.Remove(existingController);
-            OnControllerChanged(existingController, ControllerChangedAction.Removed);
+            return;
+        }
+
+        existingController.ValueChanged -= ControllerOnValueChanged;
+        _controllers.Remove(existingController);
+
+        OnControllerChanged(existingController, ControllerChangedAction.Removed);
+    }
+
+    private void ControllerOnValueChanged(object? sender, ValueChangedEventArgs e)
+    {
+        if (!_keyboardMappings.TryGetValue(e.ControlId, out var action))
+        {
+            return;
+        }
+
+        var key = action.ToSpectrumKey();
+        if (key == null)
+        {
+            return;
+        }
+
+        if (e.IsPressed)
+        {
+            _keyboardState.KeyDown([key.Value]);
+        }
+        else
+        {
+            _keyboardState.KeyUp([key.Value]);;
         }
     }
 }

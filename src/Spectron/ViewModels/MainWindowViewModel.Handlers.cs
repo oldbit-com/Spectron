@@ -292,7 +292,7 @@ partial class MainWindowViewModel
         }
 
         var keys = KeyMappings.ToSpectrumKey(e);
-        Emulator?.KeyboardHandler.HandleKeyUp(keys);
+        Emulator?.KeyboardState.KeyUp(keys);
     }
 
     private void HandleKeyDown(KeyEventArgs e)
@@ -328,7 +328,7 @@ partial class MainWindowViewModel
         }
 
         var keys = KeyMappings.ToSpectrumKey(e);
-        Emulator?.KeyboardHandler.HandleKeyDown(keys);
+        Emulator?.KeyboardState.KeyDown(keys);
     }
 
     private bool IsKeyboardJoystickEmulationEnabled =>

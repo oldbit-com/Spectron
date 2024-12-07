@@ -30,7 +30,8 @@ public sealed class Emulator
 
     public bool IsPaused => _emulationTimer.IsPaused;
     public bool IsUlaPlusEnabled { get => UlaPlus.IsEnabled; set => ToggleUlaPlus(value); }
-    public KeyboardHandler KeyboardHandler { get; } = new();
+
+    public KeyboardState KeyboardState { get; }
     public TapeManager TapeManager { get; }
     public JoystickManager JoystickManager { get; }
     public AudioManager AudioManager { get; }
@@ -50,10 +51,12 @@ public sealed class Emulator
         HardwareSettings hardware,
         TapeManager tapeManager,
         GamepadManager gamepadManager,
+        KeyboardState keyboardState,
         TimeMachine timeMachine,
         ILogger logger)
     {
         _hardware = hardware;
+        KeyboardState = keyboardState;
         _timeMachine = timeMachine;
 
         TapeManager = tapeManager;
@@ -67,7 +70,8 @@ public sealed class Emulator
         ScreenBuffer = new ScreenBuffer(hardware, emulatorArgs.Memory, UlaPlus);
         Cpu = new Z80(emulatorArgs.Memory, emulatorArgs.ContentionProvider); ;
 
-        JoystickManager = new JoystickManager(gamepadManager, _spectrumBus, KeyboardHandler);
+        JoystickManager = new JoystickManager(gamepadManager, _spectrumBus, KeyboardState);
+        KeyboardState.Reset();
         TapeManager.Attach(Cpu, Memory, hardware);
 
         AudioManager = new AudioManager(Cpu.Clock, tapeManager.Player, hardware);
@@ -122,6 +126,7 @@ public sealed class Emulator
         Cpu.Reset();
         ScreenBuffer.Reset();
         UlaPlus.Reset();
+        KeyboardState.Reset();
 
         if (IsPaused)
         {
@@ -144,7 +149,7 @@ public sealed class Emulator
 
     private void SetupUlaAndDevices()
     {
-        var ula = new Ula(KeyboardHandler, ScreenBuffer, Cpu.Clock, TapeManager?.Player);
+        var ula = new Ula(KeyboardState, ScreenBuffer, Cpu.Clock, TapeManager?.Player);
 
         _spectrumBus.AddDevice(ula);
         _spectrumBus.AddDevice(UlaPlus);

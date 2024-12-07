@@ -10,7 +10,7 @@ public sealed class JoystickManager
     private readonly Stopwatch _stopwatch = new();
     private readonly GamepadManager _gamepadManager;
     private readonly SpectrumBus _spectrumBus;
-    private readonly KeyboardHandler _keyboardHandler;
+    private readonly KeyboardState _keyboardState;
     private IJoystick? _joystick;
 
     public JoystickType JoystickType { get; private set; } = JoystickType.None;
@@ -18,11 +18,11 @@ public sealed class JoystickManager
     internal JoystickManager(
         GamepadManager gamepadManager,
         SpectrumBus spectrumBus,
-        KeyboardHandler keyboardHandler)
+        KeyboardState keyboardState)
     {
         _gamepadManager = gamepadManager;
         _spectrumBus = spectrumBus;
-        _keyboardHandler = keyboardHandler;
+        _keyboardState = keyboardState;
 
         _stopwatch.Start();
     }
@@ -37,9 +37,9 @@ public sealed class JoystickManager
         {
             JoystickType.Kempston => new KempstonJoystick(),
             JoystickType.Fuller => new FullerJoystick(),
-            JoystickType.Cursor => new CursorJoystick(_keyboardHandler),
-            JoystickType.Sinclair1 => new SinclairJoystick(_keyboardHandler, JoystickType.Sinclair1),
-            JoystickType.Sinclair2 => new SinclairJoystick(_keyboardHandler, JoystickType.Sinclair2),
+            JoystickType.Cursor => new CursorJoystick(_keyboardState),
+            JoystickType.Sinclair1 => new SinclairJoystick(_keyboardState, JoystickType.Sinclair1),
+            JoystickType.Sinclair2 => new SinclairJoystick(_keyboardState, JoystickType.Sinclair2),
             _ => null
         };
 
@@ -85,7 +85,7 @@ public sealed class JoystickManager
 
     private void UpdateInputState(JoystickInput input)
     {
-        var inputState = _gamepadManager.GetInputState(input);
+        var inputState = _gamepadManager.GetJoystickInputState(input);
 
         _joystick?.HandleInput(input, inputState);
     }

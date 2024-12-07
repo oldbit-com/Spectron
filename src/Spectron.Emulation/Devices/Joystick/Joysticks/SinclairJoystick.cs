@@ -2,7 +2,7 @@ using OldBit.Spectron.Emulation.Devices.Keyboard;
 
 namespace OldBit.Spectron.Emulation.Devices.Joystick.Joysticks;
 
-public class SinclairJoystick(KeyboardHandler keyboardHandler, JoystickType joystickType) : IJoystick
+public class SinclairJoystick(KeyboardState keyboardState, JoystickType joystickType) : IJoystick
 {
     private readonly Dictionary<JoystickType, Dictionary<JoystickInput, SpectrumKey>> _joyToKeyMapping = new()
     {
@@ -34,14 +34,14 @@ public class SinclairJoystick(KeyboardHandler keyboardHandler, JoystickType joys
         {
             if (_joyToKeyMapping[joystickType].TryGetValue(input, out var key))
             {
-                keyboardHandler.HandleKeyDown([key]);
+                keyboardState.KeyDown([key]);
             }
         }
         else
         {
             if (_joyToKeyMapping[joystickType].TryGetValue(input, out var key))
             {
-                keyboardHandler.HandleKeyUp([key]);
+                keyboardState.KeyUp([key]);
             }
         }
     }
