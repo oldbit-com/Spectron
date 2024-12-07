@@ -1,8 +1,12 @@
+using OldBit.Joypad.Controls;
+
 namespace OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 
-public class ValueChangedEventArgs(int controlId, int? value) : EventArgs
+public class ValueChangedEventArgs(int controlId, bool isPressed, DirectionalPadDirection direction) : EventArgs
 {
     public int ControlId { get; } = controlId;
 
-    public int? Value { get; set; } = value;
+    public bool IsPressed { get; } = isPressed;
+
+    public DirectionalPadDirection Direction { get; } = direction;
 }

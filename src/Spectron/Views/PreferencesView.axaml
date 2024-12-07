@@ -83,7 +83,7 @@
                             </Grid>
                         </StackPanel>
                         <Grid Grid.Row="1">
-                            <controls:GamepadControlsMapping DataContext="{Binding GamepadMappingViewModel}"/>
+                            <controls:GamepadControlsMapping DataContext="{Binding GamepadMappingViewModel}" IsVisible="{Binding #Gamepad.SelectedIndex}"/>
                         </Grid>
                     </Grid>
                 </Border>

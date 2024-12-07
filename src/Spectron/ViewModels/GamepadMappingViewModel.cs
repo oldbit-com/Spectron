@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Timers;
+using Avalonia.Threading;
 using DynamicData;
 using OldBit.Joypad.Controls;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
@@ -22,6 +23,15 @@ public class GamepadMappingViewModel : ViewModelBase, IDisposable
     public ReactiveCommand<Unit, Unit> SetDefaultMappingCommand { get; }
 
     public ObservableCollection<GamepadButtonMappingViewModel> Mappings { get; } = [];
+
+    private GamepadButtonMappingViewModel? _selectedMapping;
+    public GamepadButtonMappingViewModel? SelectedMapping
+    {
+        get => _selectedMapping;
+        set => this.RaiseAndSetIfChanged(ref _selectedMapping, value);
+    }
+
+    public Action<GamepadButtonMappingViewModel> ScrollIntoView { get; set; } = _ => { };
 
     public GamepadMappingViewModel(GamepadManager gamepadManager)
     {
@@ -57,7 +67,23 @@ public class GamepadMappingViewModel : ViewModelBase, IDisposable
 
     private void ControllerOnValueChanged(object? sender, ValueChangedEventArgs e)
     {
-        Console.WriteLine($"Controller {_controller.Name} value changed: {e.ControlId} = {e.Value}");
+        if (!e.IsPressed)
+        {
+            return;
+        }
+
+        var mapping = Mappings.FirstOrDefault(m => m.Button.ButtonId == e.ControlId &&
+                                                   m.Button.Direction == e.Direction);
+        if (mapping == null)
+        {
+            return;
+        }
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            SelectedMapping = mapping;
+            ScrollIntoView(mapping);
+        });
     }
 
     public List<GamepadMapping> GetConfiguredMappings() => Mappings

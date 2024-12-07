@@ -35,6 +35,15 @@ public class GamepadController
         _controller.ValueChanged += ControllerOnValueChanged;
     }
 
-    private void ControllerOnValueChanged(object? sender, ControlEventArgs e) =>
-        ValueChanged?.Invoke(this, new ValueChangedEventArgs(e.Control.Id, e.Control.Value));
+    private void ControllerOnValueChanged(object? sender, ControlEventArgs e)
+    {
+        var direction = DirectionalPadDirection.None;
+
+        if (e.Control is { ControlType: ControlType.DirectionalPad, Value: not null })
+        {
+            direction = (DirectionalPadDirection)e.Control.Value;
+        }
+
+        ValueChanged?.Invoke(this, new ValueChangedEventArgs(e.Control.Id, e.Control.IsPressed, direction));
+    }
 }
