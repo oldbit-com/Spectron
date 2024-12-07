@@ -9,6 +9,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
 using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.Commands;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Rom;
@@ -308,9 +309,33 @@ public partial class MainWindowViewModel : ViewModelBase
         _renderStopwatch.Restart();
         _lastScreenRender = TimeSpan.Zero;
 
+        Emulator.CommandManager.CommandReceived += CommandManagerOnCommandReceived;
+
         Emulator.Start();
 
         _statusBarTimer.Start();
+    }
+
+    private void CommandManagerOnCommandReceived(object? sender, CommandEventArgs e)
+    {
+        if (e.Command is GamepadActionCommand gamepadCommand)
+        {
+            if (gamepadCommand.State == InputState.Pressed)
+            {
+                return;
+            }
+
+            switch (gamepadCommand.Action)
+            {
+                case GamepadAction.Pause:
+                    HandleTogglePause();
+                    break;
+
+                case GamepadAction.TimeTravel:
+                    //HandleTimeTravel();
+                    break;
+            }
+        }
     }
 
     private void ShutdownEmulator()
@@ -322,6 +347,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         Emulator.Shutdown();
         Emulator.RenderScreen -= EmulatorOnRenderScreen;
+        Emulator.CommandManager.CommandReceived -= CommandManagerOnCommandReceived;
         Emulator = null;
     }
 }

@@ -126,6 +126,11 @@ public class GamepadMappingViewModel : ViewModelBase, IDisposable
 
         foreach (var action in actions)
         {
+            if (action == GamepadAction.Pause)
+            {
+                yield return new GamepadActionMappingSeparatorItem("Actions");
+            }
+
             if (action == GamepadAction.D0)
             {
                 yield return new GamepadActionMappingSeparatorItem("Keys");

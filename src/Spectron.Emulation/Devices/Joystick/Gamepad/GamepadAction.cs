@@ -14,6 +14,10 @@ public enum GamepadAction
     JoystickDown,
     JoystickFire,
 
+    // Emulator actions
+    Pause,
+    TimeTravel,
+
     // Keyboard (numbers)
     D0,
     D1,
@@ -75,6 +79,9 @@ public static class GamepadActionExtensions
         Space => "Space",
         CapsShift => "Caps Shift",
         SymbolShift => "Symbol Shift",
+
+        Pause => "Pause",
+        TimeTravel => "Time Travel",
 
         >= D0 and <= D9 => action.ToString()[1..],
         >= A and <= Z => action.ToString(),

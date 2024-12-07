@@ -1,5 +1,6 @@
 using OldBit.Joypad;
 using OldBit.Joypad.Controls;
+using OldBit.Spectron.Emulation.Commands;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 
 namespace OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
@@ -12,12 +13,14 @@ public record GamepadPreferences(
 public sealed class GamepadManager
 {
     private readonly KeyboardState _keyboardState;
+    private readonly CommandManager _commandManager;
     private readonly JoypadManager _joypadManager;
     private readonly List<GamepadController> _controllers = [];
 
     private GamepadPreferences? _activeGamepad;
     private Dictionary<JoystickInput, List<GamepadMapping>> _joystickInputMappings = new();
     private Dictionary<int, GamepadAction> _keyboardMappings = new();
+    private Dictionary<int, GamepadAction> _commandMappings = new();
 
     private bool _initialized;
 
@@ -25,16 +28,17 @@ public sealed class GamepadManager
 
     public event EventHandler<ControllerChangedEventArgs>? ControllerChanged;
 
-    public GamepadManager(KeyboardState keyboardState)
+    public GamepadManager(KeyboardState keyboardState, CommandManager commandManager)
     {
         _keyboardState = keyboardState;
+        _commandManager = commandManager;
         _joypadManager = new JoypadManager();
 
-        _joypadManager.ControllerConnected += OnControllerConnected;
-        _joypadManager.ControllerDisconnected += OnControllerDisconnected;
+        _joypadManager.ControllerConnected += HandleControllerConnected;
+        _joypadManager.ControllerDisconnected += HandleControllerDisconnected;
 
         _controllers.Add(GamepadController.None);
-        OnControllerChanged(GamepadController.None, ControllerChangedAction.Added);
+        HandleControllerChanged(GamepadController.None, ControllerChangedAction.Added);
     }
 
     public void Initialize()
@@ -90,6 +94,10 @@ public sealed class GamepadManager
         _keyboardMappings = gamepad.InputMappings
             .Where(mapping => mapping.Action is >= GamepadAction.D0 and <= GamepadAction.Z)
             .ToDictionary(mapping => mapping.ControlId, mapping => mapping.Action);
+
+        _commandMappings = gamepad.InputMappings
+            .Where(mapping => mapping.Action is >= GamepadAction.Pause and <= GamepadAction.TimeTravel)
+            .ToDictionary(mapping => mapping.ControlId, mapping => mapping.Action);
     }
 
     public void Update()
@@ -144,12 +152,10 @@ public sealed class GamepadManager
         return InputState.Released;
     }
 
-    public InputState GetKeyboardInputState(JoystickInput input) => InputState.Released;
-
-    private void OnControllerChanged(GamepadController controller, ControllerChangedAction action) =>
+    private void HandleControllerChanged(GamepadController controller, ControllerChangedAction action) =>
         ControllerChanged?.Invoke(this, new ControllerChangedEventArgs(controller, action));
 
-    private void OnControllerConnected(object? sender, JoypadControllerEventArgs e)
+    private void HandleControllerConnected(object? sender, JoypadControllerEventArgs e)
     {
         if (_controllers.Any(controller => controller.ControllerId == e.Controller.Id))
         {
@@ -173,13 +179,13 @@ public sealed class GamepadManager
         }
 
         var controller = new GamepadController(e.Controller, buttons);
-        controller.ValueChanged += ControllerOnValueChanged;
+        controller.ValueChanged += HandleControllerValueChanged;
 
         _controllers.Add(controller);
-        OnControllerChanged(controller, ControllerChangedAction.Added);
+        HandleControllerChanged(controller, ControllerChangedAction.Added);
     }
 
-    private void OnControllerDisconnected(object? sender, JoypadControllerEventArgs e)
+    private void HandleControllerDisconnected(object? sender, JoypadControllerEventArgs e)
     {
         var existingController = _controllers.FirstOrDefault(x => x.ControllerId == e.Controller.Id);
 
@@ -188,13 +194,19 @@ public sealed class GamepadManager
             return;
         }
 
-        existingController.ValueChanged -= ControllerOnValueChanged;
+        existingController.ValueChanged -= HandleControllerValueChanged;
         _controllers.Remove(existingController);
 
-        OnControllerChanged(existingController, ControllerChangedAction.Removed);
+        HandleControllerChanged(existingController, ControllerChangedAction.Removed);
     }
 
-    private void ControllerOnValueChanged(object? sender, ValueChangedEventArgs e)
+    private void HandleControllerValueChanged(object? sender, ValueChangedEventArgs e)
+    {
+        HandleKeyboardAction(e);
+        HandleCommandAction(e);
+    }
+
+    private void HandleKeyboardAction(ValueChangedEventArgs e)
     {
         if (!_keyboardMappings.TryGetValue(e.ControlId, out var action))
         {
@@ -202,6 +214,7 @@ public sealed class GamepadManager
         }
 
         var key = action.ToSpectrumKey();
+
         if (key == null)
         {
             return;
@@ -214,6 +227,24 @@ public sealed class GamepadManager
         else
         {
             _keyboardState.KeyUp([key.Value]);;
+        }
+    }
+
+    private void HandleCommandAction(ValueChangedEventArgs e)
+    {
+        if (!_commandMappings.TryGetValue(e.ControlId, out var action))
+        {
+            return;
+        }
+
+        switch (action)
+        {
+            case GamepadAction.Pause:
+            case GamepadAction.TimeTravel:
+                var args = new GamepadActionCommand(action, e.IsPressed ? InputState.Pressed : InputState.Released);
+                _commandManager.SendCommand(args);
+
+                break;
         }
     }
 }

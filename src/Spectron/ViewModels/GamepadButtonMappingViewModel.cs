@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using ReactiveUI;
 

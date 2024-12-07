@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using OldBit.Spectron.Emulation.Commands;
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
@@ -36,6 +37,7 @@ public sealed class Emulator
     public JoystickManager JoystickManager { get; }
     public AudioManager AudioManager { get; }
     public GamepadManager GamepadManager { get; }
+    public CommandManager CommandManager { get; }
 
     public ComputerType ComputerType { get; }
     public RomType RomType { get; }
@@ -53,12 +55,14 @@ public sealed class Emulator
         GamepadManager gamepadManager,
         KeyboardState keyboardState,
         TimeMachine timeMachine,
+        CommandManager commandManager,
         ILogger logger)
     {
         _hardware = hardware;
         KeyboardState = keyboardState;
         _timeMachine = timeMachine;
 
+        CommandManager = commandManager;
         TapeManager = tapeManager;
         GamepadManager = gamepadManager;
         ComputerType = emulatorArgs.ComputerType;
