@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reactive;
 using System.Timers;
 using DynamicData;
-using OldBit.JoyPad.Controls;
+using OldBit.Joypad.Controls;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Settings;
 using ReactiveUI;

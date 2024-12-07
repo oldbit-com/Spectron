@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
-using OldBit.JoyPad;
-using OldBit.JoyPad.Controls;
+using OldBit.Joypad;
+using OldBit.Joypad.Controls;
 
 namespace OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 
@@ -11,7 +11,7 @@ public record GamepadPreferences(
 
 public sealed class GamepadManager
 {
-    private readonly JoyPadManager _joyPadManager;
+    private readonly JoypadManager _joypadManager;
     private readonly List<GamepadController> _controllers = [];
 
     private GamepadPreferences? _activeGamepad;
@@ -25,10 +25,10 @@ public sealed class GamepadManager
 
     public GamepadManager()
     {
-        _joyPadManager = new JoyPadManager();
+        _joypadManager = new JoypadManager();
 
-        _joyPadManager.ControllerConnected += OnControllerConnected;
-        _joyPadManager.ControllerDisconnected += OnControllerDisconnected;
+        _joypadManager.ControllerConnected += OnControllerConnected;
+        _joypadManager.ControllerDisconnected += OnControllerDisconnected;
 
         _controllers.Add(GamepadController.None);
         OnControllerChanged(GamepadController.None, ControllerChangedAction.Added);
@@ -42,13 +42,13 @@ public sealed class GamepadManager
         }
 
         _initialized = true;
-        _joyPadManager.Start();
+        _joypadManager.Start();
     }
 
     public void Stop()
     {
-        _joyPadManager.Stop();
-        _joyPadManager.Dispose();
+        _joypadManager.Stop();
+        _joypadManager.Dispose();
     }
 
     public void Setup(GamepadPreferences gamepad)
@@ -92,10 +92,10 @@ public sealed class GamepadManager
             return;
         }
 
-        _joyPadManager.Update(_activeGamepad.ControllerId);
+        _joypadManager.Update(_activeGamepad.ControllerId);
     }
 
-    public void Update(Guid controllerId) => _joyPadManager.Update(controllerId);
+    public void Update(Guid controllerId) => _joypadManager.Update(controllerId);
 
     public InputState GetInputState(JoystickInput input)
     {
@@ -104,7 +104,7 @@ public sealed class GamepadManager
             return InputState.Released;
         }
 
-        if (!_joyPadManager.TryGetController(_activeGamepad.ControllerId, out var controller))
+        if (!_joypadManager.TryGetController(_activeGamepad.ControllerId, out var controller))
         {
             return InputState.Released;
         }
@@ -140,7 +140,7 @@ public sealed class GamepadManager
     private void OnControllerChanged(GamepadController controller, ControllerChangedAction action) =>
         ControllerChanged?.Invoke(this, new ControllerChangedEventArgs(controller, action));
 
-    private void OnControllerConnected(object? sender, JoyPadControllerEventArgs e)
+    private void OnControllerConnected(object? sender, JoypadControllerEventArgs e)
     {
         if (_controllers.Any(controller => controller.ControllerId == e.Controller.Id))
         {
@@ -169,7 +169,7 @@ public sealed class GamepadManager
         OnControllerChanged(controller, ControllerChangedAction.Added);
     }
 
-    private void OnControllerDisconnected(object? sender, JoyPadControllerEventArgs e)
+    private void OnControllerDisconnected(object? sender, JoypadControllerEventArgs e)
     {
         var existingController = _controllers.FirstOrDefault(x => x.ControllerId == e.Controller.Id);
 

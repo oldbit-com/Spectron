@@ -50,8 +50,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="OldBit.JoyPad">
-        <HintPath>..\..\..\JoyPad\src\JoyPad\bin\Debug\net8.0\OldBit.JoyPad.dll</HintPath>
+      <Reference Include="OldBit.Joypad">
+        <HintPath>..\..\..\Joypad\src\Joypad\bin\Debug\net8.0\OldBit.Joypad.dll</HintPath>
       </Reference>
     </ItemGroup>
 </Project>

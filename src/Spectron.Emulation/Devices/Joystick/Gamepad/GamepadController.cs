@@ -1,11 +1,11 @@
-using OldBit.JoyPad;
-using OldBit.JoyPad.Controls;
+using OldBit.Joypad;
+using OldBit.Joypad.Controls;
 
 namespace OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 
 public class GamepadController
 {
-    private readonly JoyPadController? _controller;
+    private readonly JoypadController? _controller;
 
     public Guid ControllerId { get; private set; }
 
@@ -24,7 +24,7 @@ public class GamepadController
         Buttons = [];
     }
 
-    public GamepadController(JoyPadController controller, IEnumerable<GamepadButton> buttons)
+    public GamepadController(JoypadController controller, IEnumerable<GamepadButton> buttons)
     {
         _controller = controller;
 
