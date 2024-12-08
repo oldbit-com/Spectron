@@ -76,7 +76,7 @@ partial class MainWindowViewModel
 
         if (fileType.IsArchive())
         {
-            var archive = new CompressedFile(filePath);
+            var archive = new ZipFileReader(filePath);
             var files = archive.GetFiles();
 
             switch (files.Count)
