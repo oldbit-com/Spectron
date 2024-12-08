@@ -5,6 +5,8 @@ namespace OldBit.Spectron.Emulation;
 
 /// <summary>
 /// Custom timer that supports more accurate timing than the built-in .NET timer.
+/// Standard timer does not have enough accuracy for the emulator. Stopwatch
+/// is most accurate and used to calculate the time between each tick.
 /// </summary>
 internal sealed class EmulatorTimer
 {
