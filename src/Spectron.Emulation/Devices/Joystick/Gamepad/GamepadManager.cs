@@ -100,14 +100,16 @@ public sealed class GamepadManager
             .ToDictionary(mapping => mapping.ControlId, mapping => mapping.Action);
     }
 
-    public void Update()
+    public bool Update()
     {
         if (_activeGamepad == null)
         {
-            return;
+            return false;
         }
 
         _joypadManager.Update(_activeGamepad.ControllerId);
+
+        return true;
     }
 
     public void Update(Guid controllerId) => _joypadManager.Update(controllerId);

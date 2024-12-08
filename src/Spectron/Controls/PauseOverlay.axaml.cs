@@ -10,7 +10,7 @@ using Avalonia.Threading;
 
 namespace OldBit.Spectron.Controls;
 
-public class PausedOverlay : TemplatedControl, IDisposable
+public class PauseOverlay : TemplatedControl, IDisposable
 {
     private readonly Timer _timer = new(750);
 
@@ -18,9 +18,9 @@ public class PausedOverlay : TemplatedControl, IDisposable
     private readonly List<SolidColorBrush> _colors = [];
     private readonly Random _random = new();
 
-    public PausedOverlay()
+    public PauseOverlay()
     {
-        IsVisibleProperty.Changed.AddClassHandler<PausedOverlay>((sender, args) => OnIsVisibleChanged(args));
+        IsVisibleProperty.Changed.AddClassHandler<PauseOverlay>((sender, args) => OnIsVisibleChanged(args));
 
         AddColors();
     }

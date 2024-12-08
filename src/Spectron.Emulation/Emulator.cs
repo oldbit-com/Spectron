@@ -108,6 +108,7 @@ public sealed class Emulator
         AudioManager.Stop();
         _emulationTimer.Stop();
         GamepadManager.Stop();
+        JoystickManager.Stop();
 
         while (!_emulationTimer.IsStopped)
         {
@@ -198,8 +199,6 @@ public sealed class Emulator
         RenderScreen?.Invoke(ScreenBuffer.FrameBuffer);
 
         _timeMachine.AddEntry(this);
-
-        JoystickManager.Update();
     }
 
     private void ToggleUlaPlus(bool value)

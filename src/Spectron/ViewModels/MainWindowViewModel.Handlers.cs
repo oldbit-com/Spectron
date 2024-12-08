@@ -216,11 +216,6 @@ partial class MainWindowViewModel
         }
 
         IsPaused = Emulator?.IsPaused ?? false;
-
-        if (IsPaused)
-        {
-            TimeMachineViewModel.BeforeShow();
-        }
     }
 
     private void HandleSetEmulationSpeed(string emulationSpeed)
@@ -271,6 +266,7 @@ partial class MainWindowViewModel
 
     private void HandleShowTimeMachineCommand()
     {
+        TimeMachineViewModel.BeforeShow();
     }
 
     private void HandleKeyUp(KeyEventArgs e)

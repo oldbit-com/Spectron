@@ -1,16 +1,20 @@
-using System.Diagnostics;
+using System.Timers;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Joystick.Joysticks;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
+using Timer = System.Timers.Timer;
 
 namespace OldBit.Spectron.Emulation.Devices.Joystick;
 
 public sealed class JoystickManager
 {
-    private readonly Stopwatch _stopwatch = new();
+    private readonly TimeSpan _joystickUpdateInterval = TimeSpan.FromMilliseconds(20);
+
     private readonly GamepadManager _gamepadManager;
     private readonly SpectrumBus _spectrumBus;
     private readonly KeyboardState _keyboardState;
+    private readonly Timer _updateTimer;
+
     private IJoystick? _joystick;
 
     public JoystickType JoystickType { get; private set; } = JoystickType.None;
@@ -24,11 +28,14 @@ public sealed class JoystickManager
         _spectrumBus = spectrumBus;
         _keyboardState = keyboardState;
 
-        _stopwatch.Start();
+        _updateTimer = new Timer(_joystickUpdateInterval) { AutoReset = true };
+        _updateTimer.Elapsed += UpdateJoystickState;
     }
 
     public void SetupJoystick(JoystickType joystickType)
     {
+        _updateTimer.Stop();
+
         JoystickType = joystickType;
 
         _spectrumBus.RemoveDevice(_joystick);
@@ -43,39 +50,37 @@ public sealed class JoystickManager
             _ => null
         };
 
+        _gamepadManager.Initialize();
+
         if (_joystick != null)
         {
             _spectrumBus.AddDevice(_joystick);
+            _updateTimer.Start();
         }
-
-        _gamepadManager.Initialize();
-    }
-
-    public void Update()
-    {
-        if (_joystick == null)
-        {
-            return;
-        }
-
-        // If running too fast, skip the update, normally 50Hz / 20ms - may move this to UI code
-        if (_stopwatch.ElapsedMilliseconds < 19)
-        {
-            return;
-        }
-
-        _gamepadManager.Update();
-        UpdateAllInputsState();
-
-        _stopwatch.Restart();
     }
 
     public void Pressed(JoystickInput input) => _joystick?.HandleInput(input, InputState.Pressed);
 
     public void Released(JoystickInput input) => _joystick?.HandleInput(input, InputState.Released);
 
-    private void UpdateAllInputsState()
+    public void Stop()
     {
+        _updateTimer.Dispose();
+        _spectrumBus.RemoveDevice(_joystick);
+    }
+
+    private void UpdateJoystickState(object? sender, ElapsedEventArgs e)
+    {
+        if (_joystick == null)
+        {
+            return;
+        }
+
+        if (!_gamepadManager.Update())
+        {
+            return;
+        }
+
         UpdateInputState(JoystickInput.Up);
         UpdateInputState(JoystickInput.Right);
         UpdateInputState(JoystickInput.Down);
