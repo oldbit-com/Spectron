@@ -48,7 +48,7 @@ internal sealed class EmulatorTimer
     {
         IsStopped = false;
 
-        var stopwatch = Stopwatch.StartNew();
+        var timer = Stopwatch.StartNew();
         var nextTrigger = TimeSpan.Zero;
 
         while (_isRunning)
@@ -57,18 +57,18 @@ internal sealed class EmulatorTimer
             {
                 Thread.Sleep(500);
                 nextTrigger = Interval;
-                stopwatch.Restart();
+                timer.Restart();
 
                 continue;
             }
 
             while (_isRunning)
             {
-                var elapsed = stopwatch.Elapsed;
+                var elapsed = timer.Elapsed;
 
                 if (elapsed >= nextTrigger)
                 {
-                    stopwatch.Restart();
+                    timer.Restart();
                     nextTrigger = Interval;
 
                     Elapsed?.Invoke(EventArgs.Empty);
@@ -76,7 +76,7 @@ internal sealed class EmulatorTimer
                     break;
                 }
 
-                var timeToWait = nextTrigger - stopwatch.Elapsed;
+                var timeToWait = nextTrigger - timer.Elapsed;
 
                 switch (timeToWait.TotalMilliseconds)
                 {
@@ -96,6 +96,6 @@ internal sealed class EmulatorTimer
         }
 
         IsStopped = true;
-        stopwatch.Stop();
+        timer.Stop();
     }
 }
