@@ -6,7 +6,7 @@ using OldBit.Z80Cpu;
 namespace OldBit.Spectron.Emulation.Devices;
 
 internal sealed class Ula(
-    KeyboardHandler keyboardHandler,
+    KeyboardState keyboardState,
     ScreenBuffer screenBuffer,
     Clock clock,
     CassettePlayer? cassettePlayer) : IDevice
@@ -18,7 +18,7 @@ internal sealed class Ula(
             return null;
         }
 
-        var value = keyboardHandler.Read(address);
+        var value = keyboardState.Read(address);
         UpdateEarBit(ref value);
 
         return value;

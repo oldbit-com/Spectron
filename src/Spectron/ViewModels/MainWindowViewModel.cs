@@ -9,7 +9,9 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
 using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.Commands;
 using OldBit.Spectron.Emulation.Devices.Joystick;
+using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Snapshot;
@@ -32,6 +34,7 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly EmulatorFactory _emulatorFactory;
     private readonly TimeMachine _timeMachine;
+    private readonly GamepadManager _gamepadManager;
 
     private readonly SnapshotLoader _snapshotLoader;
     private readonly Loader _loader;
@@ -45,7 +48,6 @@ public partial class MainWindowViewModel : ViewModelBase
     private HelpKeyboardView? _helpKeyboardView;
 
     private Preferences _preferences = new();
-    private bool _useCursorKeysAsJoystick;
     private int _frameCount;
     private readonly Stopwatch _renderStopwatch = new();
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
@@ -87,6 +89,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel(
         EmulatorFactory emulatorFactory,
         TimeMachine timeMachine,
+        GamepadManager gamepadManager,
         SnapshotLoader snapshotLoader,
         Loader loader,
         PreferencesService preferencesService,
@@ -97,6 +100,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         _emulatorFactory = emulatorFactory;
         _timeMachine = timeMachine;
+        _gamepadManager = gamepadManager;
         _snapshotLoader = snapshotLoader;
         _loader = loader;
         _preferencesService = preferencesService;
@@ -160,7 +164,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         Emulator?.Pause();
 
-        var viewModel = new PreferencesViewModel(_preferences);
+        using var viewModel = new PreferencesViewModel(_preferences, _gamepadManager);
         var preferences = await ShowPreferencesView.Handle(viewModel);
 
         if (preferences != null)
@@ -168,8 +172,6 @@ public partial class MainWindowViewModel : ViewModelBase
             _preferences = preferences;
 
             //TapeLoadingSpeed = preferences.TapeLoadingSpeed;
-
-            _useCursorKeysAsJoystick = preferences.Joystick.UseCursorKeys;
 
             IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
 
@@ -180,6 +182,7 @@ public partial class MainWindowViewModel : ViewModelBase
             Emulator?.SetUlaPlus(IsUlaPlusEnabled);
             Emulator?.SetAudioSettings(preferences.AudioSettings);
             Emulator?.SetTapeSavingSettings(preferences.TapeSaving);
+            Emulator?.SetGamepad(preferences.Joystick);
         }
 
         Emulator?.Resume();
@@ -245,7 +248,6 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         Emulator?.SetTapeSavingSettings(_preferences.TapeSaving);
-        Emulator?.SetAudioSettings(_preferences.AudioSettings);
     }
 
     private async Task WindowClosingAsync()
@@ -264,7 +266,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var emulator = _emulatorFactory.Create(computerType, romType);
 
-        emulator.IsUlaPlusEnabled = _preferences.IsUlaPlusEnabled;
+        emulator.SetUlaPlus(_preferences.IsUlaPlusEnabled);
         emulator.JoystickManager.SetupJoystick(_preferences.Joystick.JoystickType);
 
         InitializeEmulator(emulator);
@@ -272,8 +274,6 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void CreateEmulator(SzxFile? snapshot = null)
     {
-        ShutdownEmulator();
-
         var emulator = snapshot == null ?
             _emulatorFactory.Create(
                 ComputerType,
@@ -290,17 +290,16 @@ public partial class MainWindowViewModel : ViewModelBase
         Emulator = emulator;
         IsPaused = false;
 
-        ComputerType = emulator.ComputerType;
-        RomType = emulator.RomType;
-        JoystickType = emulator.JoystickManager.JoystickType;
-        IsUlaPlusEnabled = emulator.IsUlaPlusEnabled;
+        ComputerType = Emulator.ComputerType;
+        RomType = Emulator.RomType;
+        JoystickType = Emulator.JoystickManager.JoystickType;
+        IsUlaPlusEnabled = Emulator.IsUlaPlusEnabled;
 
-        Emulator.IsUlaPlusEnabled = IsUlaPlusEnabled;
         Emulator.TapeLoadSpeed = TapeLoadSpeed;
-        Emulator.JoystickManager.SetupJoystick(JoystickType);
         Emulator.RenderScreen += EmulatorOnRenderScreen;
 
         Emulator.SetAudioSettings(_preferences.AudioSettings);
+        Emulator.SetGamepad(_preferences.Joystick);
 
         if (IsMuted)
         {
@@ -310,9 +309,33 @@ public partial class MainWindowViewModel : ViewModelBase
         _renderStopwatch.Restart();
         _lastScreenRender = TimeSpan.Zero;
 
+        Emulator.CommandManager.CommandReceived += CommandManagerOnCommandReceived;
+
         Emulator.Start();
 
         _statusBarTimer.Start();
+    }
+
+    private void CommandManagerOnCommandReceived(object? sender, CommandEventArgs e)
+    {
+        if (e.Command is GamepadActionCommand gamepadCommand)
+        {
+            if (gamepadCommand.State == InputState.Pressed)
+            {
+                return;
+            }
+
+            switch (gamepadCommand.Action)
+            {
+                case GamepadAction.Pause:
+                    HandleTogglePause();
+                    break;
+
+                case GamepadAction.TimeTravel:
+                    //HandleTimeTravel();
+                    break;
+            }
+        }
     }
 
     private void ShutdownEmulator()
@@ -324,40 +347,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         Emulator.Shutdown();
         Emulator.RenderScreen -= EmulatorOnRenderScreen;
+        Emulator.CommandManager.CommandReceived -= CommandManagerOnCommandReceived;
         Emulator = null;
     }
-
-    private Preferences Preferences => new()
-    {
-        BorderSize = BorderSize,
-        ComputerType = ComputerType,
-        IsUlaPlusEnabled = IsUlaPlusEnabled,
-        RomType = RomType,
-        AudioSettings = new AudioSettings
-        {
-            IsBeeperEnabled = Emulator?.AudioManager.IsBeeperEnabled ?? true,
-            IsAyAudioEnabled = Emulator?.AudioManager.IsAyEnabled ?? true,
-            IsAySupportedStandardSpectrum = Emulator?.AudioManager.IsAySupportedStandardSpectrum ?? true
-        },
-        Joystick = new JoystickSettings
-        {
-            JoystickType = JoystickType,
-            UseCursorKeys = _useCursorKeysAsJoystick
-        },
-        TapeLoadSpeed = TapeLoadSpeed,
-
-        // TODO: Uncomment this when ResumeSettings is implemented
-       // IsResumeEnabled = _isResumeEnabled,
-
-        TimeMachine = new TimeMachineSettings
-        {
-            IsEnabled = _timeMachine.IsEnabled,
-            SnapshotInterval = _timeMachine.SnapshotInterval,
-            MaxDuration = _timeMachine.MaxDuration
-        },
-
-        TapeSaving = new TapeSavingSettings(
-            Emulator?.TapeManager.IsTapeSaveEnabled ?? true,
-            Emulator?.TapeManager.TapeSaveSpeed ?? TapeSpeed.Instant)
-    };
 }

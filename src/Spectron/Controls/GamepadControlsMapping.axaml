@@ -1,0 +1,81 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
+             xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="OldBit.Spectron.Controls.GamepadControlsMapping"
+             x:DataType="viewModels:GamepadMappingViewModel">
+
+    <UserControl.Resources>
+        <converters:TypeMatchConverter x:Key="TypeMatchConverter"/>
+    </UserControl.Resources>
+
+    <Grid RowDefinitions="*,50">
+        <DataGrid Name="DataGrid"
+                  ItemsSource="{Binding Mappings}"
+                  Margin="10"
+                  GridLinesVisibility="All"
+                  BorderThickness="2"
+                  RowHeight="40"
+                  BorderBrush="{DynamicResource DataGridGridLinesBrush}"
+                  SelectedItem="{Binding SelectedMapping}"
+                  CanUserSortColumns="False">
+            <DataGrid.Styles>
+                <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+                    <Setter Property="IsVisible" Value="false" />
+                </Style>
+            </DataGrid.Styles>
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Button" Binding="{Binding Name}" Width="200"/>
+                <DataGridTemplateColumn Header="Action" >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock
+                                Width="250"
+                                Padding="10 0 0 0"
+                                Text="{Binding SelectedAction.Name}" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <ComboBox
+                                Width="250"
+                                VerticalAlignment="Center"
+                                Padding="10 0 0 0"
+                                ItemsSource="{Binding Actions}"
+                                SelectedItem="{Binding SelectedAction}">
+
+                                <ComboBox.Styles>
+                                    <Style Selector="ComboBoxItem" x:DataType="viewModels:GamepadActionMappingSeparatorItem">
+                                        <Setter Property="IsEnabled" Value="{Binding ., Converter={StaticResource TypeMatchConverter}, ConverterParameter={x:Type viewModels:GamepadActionMappingItem}}"/>
+                                        <Setter Property="IsHitTestVisible" Value="{Binding ., Converter={StaticResource TypeMatchConverter}, ConverterParameter={x:Type viewModels:GamepadActionMappingItem}}"/>
+                                    </Style>
+                                </ComboBox.Styles>
+                                <ComboBox.DataTemplates>
+                                    <DataTemplate DataType="viewModels:GamepadActionMappingSeparatorItem">
+                                        <TextBlock TextAlignment="Center"
+                                                   Text="{Binding Name}"
+                                                   FontWeight="Medium"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="15"
+                                                   Margin="0 0 -5 0"
+                                                   Foreground="{DynamicResource SystemControlForegroundChromeGrayBrush}" />
+                                    </DataTemplate>
+                                    <DataTemplate DataType="viewModels:GamepadActionMappingItem">
+                                        <TextBlock Text="{Binding Name}" />
+                                    </DataTemplate>
+                                </ComboBox.DataTemplates>
+                            </ComboBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <TextBlock Grid.Row="1" TextAlignment="Left" Margin="10 0 0 0" Text="Press a button to locate the mapping" FontSize="10" VerticalAlignment="Top"/>
+        <Button Grid.Row="1" HorizontalAlignment="Right" Margin="0 0 10 0" Content="Defaults" Command="{Binding SetDefaultMappingCommand}"/>
+    </Grid>
+</UserControl>

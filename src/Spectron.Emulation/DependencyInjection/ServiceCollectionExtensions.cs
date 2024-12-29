@@ -1,4 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
+using OldBit.Spectron.Emulation.Commands;
+using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
+using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Emulation.Tape.Loader;
@@ -17,5 +20,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<SnapshotLoader>();
         services.AddSingleton<Loader>();
         services.AddSingleton<TapeManager>();
+        services.AddSingleton<GamepadManager>();
+        services.AddSingleton<KeyboardState>();
+        services.AddSingleton<CommandManager>();
     }
 }

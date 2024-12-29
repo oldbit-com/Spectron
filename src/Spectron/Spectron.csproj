@@ -48,4 +48,10 @@
         <DependentUpon>MainWindowViewModel.cs</DependentUpon>
       </Compile>
     </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="OldBit.Joypad">
+        <HintPath>..\..\..\Joypad\src\Joypad\bin\Debug\net8.0\OldBit.Joypad.dll</HintPath>
+      </Reference>
+    </ItemGroup>
 </Project>

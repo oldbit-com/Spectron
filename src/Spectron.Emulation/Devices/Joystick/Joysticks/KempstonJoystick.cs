@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.Devices.Joystick;
+namespace OldBit.Spectron.Emulation.Devices.Joystick.Joysticks;
 
 internal class KempstonJoystick : IJoystick
 {
@@ -14,11 +14,11 @@ internal class KempstonJoystick : IJoystick
 
     public byte? ReadPort(Word address) => (address & 0x1F) != KempstonPort ? null : _joystickState;
 
-    public void HandleInput(JoystickInput input, bool isOn)
+    public void HandleInput(JoystickInput input, InputState state)
     {
         var value = GetValue(input);
 
-        if (isOn)
+        if (state == InputState.Pressed)
         {
             _joystickState |= value;
         }

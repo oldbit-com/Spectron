@@ -1,9 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
+using Avalonia.Threading;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
+using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Settings;
@@ -11,17 +16,48 @@ using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class PreferencesViewModel : ViewModelBase
+public class PreferencesViewModel : ViewModelBase, IDisposable
 {
+    private readonly GamepadManager _gamepadManager;
+    private readonly GamepadSettings _gamepadSettings;
+
     public ReactiveCommand<Unit, Preferences> UpdatePreferencesCommand { get; }
 
-    public PreferencesViewModel(Preferences preferences)
+    public Interaction<GamepadMappingViewModel, List<GamepadMapping>?> ShowGamepadMappingView { get; }
+
+    public GamepadMappingViewModel GamepadMappingViewModel { get; }
+
+    public PreferencesViewModel(Preferences preferences, GamepadManager gamepadManager)
     {
+        _gamepadManager = gamepadManager;
+        _gamepadSettings = preferences.Joystick.GamepadSettings;
+
+        GamepadControllers = new ObservableCollection<GamepadController>(_gamepadManager.Controllers);
+        GamepadMappingViewModel = new GamepadMappingViewModel(_gamepadManager);
+
+        _gamepadManager.ControllerChanged += GamepadManagerOnControllerChanged;
+
+        this.WhenAnyValue(x => x.GamepadControllerId)
+            .Buffer(2, 1)
+            .Select(b => (Previous: b[0], Current: b[1]))
+            .Subscribe(value =>
+            {
+                if (value.Previous != Guid.Empty)
+                {
+                    _gamepadSettings.Mappings[value.Previous] = GamepadMappingViewModel.GetConfiguredMappings();
+                }
+
+                GamepadMappingViewModel.UpdateView(value.Current, _gamepadSettings);
+            });
+
         ComputerType = preferences.ComputerType;
         IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
         RomType = preferences.RomType;
+
         JoystickType = preferences.Joystick.JoystickType;
-        JoystickUseCursorKeys = preferences.Joystick.UseCursorKeys;
+        EmulateUsingKeyboard = preferences.Joystick.EmulateUsingKeyboard;
+        GamepadControllerId = _gamepadManager.Controllers.FirstOrDefault(
+            controller => controller.ControllerId == preferences.Joystick.GamepadControllerId)?.ControllerId ?? GamepadController.None.ControllerId;
 
         IsResumeEnabled = preferences.ResumeSettings.IsResumeEnabled;
         ShouldIncludeTapeInResume = preferences.ResumeSettings.ShouldIncludeTape;
@@ -39,7 +75,43 @@ public class PreferencesViewModel : ViewModelBase
         IsTapeSaveEnabled = preferences.TapeSaving.IsEnabled;
         TapeSaveSpeed = preferences.TapeSaving.Speed;
 
-        UpdatePreferencesCommand = ReactiveCommand.Create(() => new Preferences
+        UpdatePreferencesCommand = ReactiveCommand.Create(UpdatePreferences);
+
+        ShowGamepadMappingView = new Interaction<GamepadMappingViewModel, List<GamepadMapping>?>();
+    }
+
+    private void GamepadManagerOnControllerChanged(object? sender, ControllerChangedEventArgs e)
+    {
+        switch (e.Action)
+        {
+            case ControllerChangedAction.Added:
+                Dispatcher.UIThread.Post(() =>
+                {
+                    GamepadControllers.Add(e.Controller);
+                    GamepadControllerId = e.Controller.ControllerId;
+                });
+
+                break;
+
+            case ControllerChangedAction.Removed:
+                Dispatcher.UIThread.Post(() =>
+                {
+                    GamepadControllers.Remove(e.Controller);
+                    GamepadControllerId = GamepadController.None.ControllerId;
+                });
+
+                break;
+        }
+    }
+
+    private Preferences UpdatePreferences()
+    {
+        if (GamepadControllerId != GamepadController.None.ControllerId)
+        {
+            _gamepadSettings.Mappings[GamepadControllerId] = GamepadMappingViewModel.GetConfiguredMappings();
+        }
+
+        return new Preferences
         {
             ComputerType = ComputerType,
             IsUlaPlusEnabled = IsUlaPlusEnabled,
@@ -47,7 +119,9 @@ public class PreferencesViewModel : ViewModelBase
             Joystick = new JoystickSettings
             {
                 JoystickType = JoystickType,
-                UseCursorKeys = JoystickUseCursorKeys,
+                EmulateUsingKeyboard = EmulateUsingKeyboard,
+                GamepadControllerId = GamepadControllerId,
+                GamepadSettings = _gamepadSettings,
             },
 
             ResumeSettings = new ResumeSettings
@@ -73,7 +147,7 @@ public class PreferencesViewModel : ViewModelBase
             },
 
             TapeSaving = new TapeSavingSettings(IsTapeSaveEnabled, TapeSaveSpeed)
-        });
+        };
     }
 
     public List<NameValuePair<TapeSpeed>> TapeSpeeds { get; } =
@@ -117,6 +191,8 @@ public class PreferencesViewModel : ViewModelBase
         new("Stereo ACB", StereoMode.StereoAcb),
     ];
 
+    public ObservableCollection<GamepadController> GamepadControllers { get; }
+
     private ComputerType _computerType;
     public ComputerType ComputerType
     {
@@ -143,6 +219,20 @@ public class PreferencesViewModel : ViewModelBase
     {
         get => _joystickType;
         set => this.RaiseAndSetIfChanged(ref _joystickType, value);
+    }
+
+    private bool _emulateUsingKeyboard;
+    public bool EmulateUsingKeyboard
+    {
+        get => _emulateUsingKeyboard;
+        set => this.RaiseAndSetIfChanged(ref _emulateUsingKeyboard, value);
+    }
+
+    private Guid _gamepadControllerId = GamepadController.None.ControllerId;
+    public Guid GamepadControllerId
+    {
+        get => _gamepadControllerId;
+        set => this.RaiseAndSetIfChanged(ref _gamepadControllerId, value);
     }
 
     private bool _isTimeMachineEnabled;
@@ -187,13 +277,6 @@ public class PreferencesViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _shouldIncludeTimeMachineInResume, value);
     }
 
-    private bool _joystickUseCursorKeys;
-    public bool JoystickUseCursorKeys
-    {
-        get => _joystickUseCursorKeys;
-        set => this.RaiseAndSetIfChanged(ref _joystickUseCursorKeys, value);
-    }
-
     private bool _isTapeSaveEnabled;
     public bool IsTapeSaveEnabled
     {
@@ -234,5 +317,13 @@ public class PreferencesViewModel : ViewModelBase
     {
         get => _stereoMode;
         set => this.RaiseAndSetIfChanged(ref _stereoMode, value);
+    }
+
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+
+        _gamepadManager.ControllerChanged -= GamepadManagerOnControllerChanged;
+        GamepadMappingViewModel.Dispose();
     }
 }

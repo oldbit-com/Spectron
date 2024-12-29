@@ -40,13 +40,11 @@
                         <CheckBox Content="Include time machine state" ToolTip.Tip="When saving current state, time machine state will be also saved and restored" Classes="Center" Margin="35 0 0 0" IsEnabled="{Binding #SaveState.IsChecked}" IsChecked="{Binding ShouldIncludeTimeMachineInResume}"/>
 
                         <controls:HeaderSeparator Text="Emulator defaults"/>
-                        <Grid ColumnDefinitions="120,*" RowDefinitions="40,40,40">
+                        <Grid ColumnDefinitions="120,*" RowDefinitions="40,40">
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="Machine" VerticalAlignment="Center" Classes="Center"/>
                             <ComboBox  Grid.Row="0" Grid.Column="1" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding ComputerTypes}" SelectedValue="{Binding ComputerType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="ROM" VerticalAlignment="Center" Classes="Center"/>
                             <ComboBox  Grid.Row="1" Grid.Column="1" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding RomTypes}" SelectedValue="{Binding RomType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Joystick" VerticalAlignment="Center" Classes="Center"/>
-                            <ComboBox  Grid.Row="2" Grid.Column="1" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding JoystickTypes}" SelectedValue="{Binding JoystickType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
                         </Grid>
 
                         <controls:HeaderSeparator Text="Screen"/>
@@ -73,9 +71,21 @@
             </TabItem>
             <TabItem Header="Joystick">
                 <Border Classes="Tab">
-                    <StackPanel>
-                        <CheckBox Content="Emulate using cursor keys and Tab (fire)" Classes="Center" IsChecked="{Binding JoystickUseCursorKeys}"/>
-                    </StackPanel>
+                    <Grid RowDefinitions="Auto,*">
+                        <StackPanel>
+                            <controls:HeaderSeparator Text="Joystick"/>
+                            <Grid ColumnDefinitions="140,300" RowDefinitions="40,40,30">
+                                <TextBlock Text="Device" VerticalAlignment="Center" Classes="Center"/>
+                                <ComboBox Grid.Row="0" Grid.Column="1" Name="Gamepad" Margin="5 0 10 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding GamepadControllers}" SelectedValue="{Binding GamepadControllerId}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding ControllerId}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Emulated Joystick" VerticalAlignment="Center" Classes="Center"/>
+                                <ComboBox Grid.Row="1" Grid.Column="1" Name="Joystick" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding JoystickTypes}" SelectedValue="{Binding JoystickType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
+                                <CheckBox Grid.Row="2" Grid.Column="1" Content="Emulate using keyboard" Margin="5 0 0 0" IsChecked="{Binding EmulateUsingKeyboard}" IsEnabled="{Binding #Joystick.SelectedIndex}"/>
+                            </Grid>
+                        </StackPanel>
+                        <Grid Grid.Row="1">
+                            <controls:GamepadControlsMapping DataContext="{Binding GamepadMappingViewModel}" IsVisible="{Binding #Gamepad.SelectedIndex}"/>
+                        </Grid>
+                    </Grid>
                 </Border>
             </TabItem>
             <TabItem Header="Time Machine">

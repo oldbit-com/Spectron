@@ -165,13 +165,18 @@
                             </Image>
                         </Grid>
                     </Border>
-                    <Border Padding="20" CornerRadius="10" BoxShadow="15 15 25 0 DarkGray" IsVisible="{Binding IsPaused}" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Silver" >
+
+                    <Border Background="{DynamicResource ButtonBackground}" Opacity=".25" Padding="20" CornerRadius="10" IsVisible="{Binding IsPaused}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <controls:PauseOverlay FontSize="100" Opacity="4" IsVisible="{Binding IsPaused}" VerticalAlignment="Center"/>
+                    </Border>
+
+                    <Border Padding="20" CornerRadius="10" BoxShadow="15 15 25 0 DarkGray" IsVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Silver" >
                         <controls:TimeMachineView DataContext="{Binding TimeMachineViewModel}"/>
                     </Border>
                 </Grid>
             </Border>
+
             <controls:StatusBar Grid.Row="1" Height="30" DataContext="{Binding StatusBar}" IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}"/>
         </Grid>
     </DockPanel>
-
 </Window>

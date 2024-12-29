@@ -1,17 +1,19 @@
 namespace OldBit.Spectron.Emulation.Devices.Keyboard;
 
-public sealed class KeyboardHandler
+public sealed class KeyboardState
 {
+    private const int NoKey = 0xFF;
+
     private readonly Dictionary<byte, byte> _keyStates = new()
     {
-        { 0xFE, 0xFF },     // Shift, Z, X, C, V
-        { 0xFD, 0xFF },     // A, S, D, F, G
-        { 0xFB, 0xFF },     // Q, W, E, R, T
-        { 0xF7, 0xFF },     // 1, 2, 3, 4, 5
-        { 0xEF, 0xFF },     // 0, 9, 8, 7, 6
-        { 0xDF, 0xFF },     // P, O, I, U, Y
-        { 0xBF, 0xFF },     // Enter, L, K, J, H
-        { 0x7F, 0xFF }      // Space, Sym, M, N, B
+        { 0xFE, NoKey },     // Shift, Z, X, C, V
+        { 0xFD, NoKey },     // A, S, D, F, G
+        { 0xFB, NoKey },     // Q, W, E, R, T
+        { 0xF7, NoKey },     // 1, 2, 3, 4, 5
+        { 0xEF, NoKey },     // 0, 9, 8, 7, 6
+        { 0xDF, NoKey },     // P, O, I, U, Y
+        { 0xBF, NoKey },     // Enter, L, K, J, H
+        { 0x7F, NoKey }      // Space, Sym, M, N, B
     };
 
     private readonly Dictionary<SpectrumKey, (byte Bit, byte Port)> _keyPorts = new()
@@ -67,7 +69,15 @@ public sealed class KeyboardHandler
 
     public byte Read(Word address) => GetKeyState((byte)(address >> 8));
 
-    public void HandleKeyDown(IEnumerable<SpectrumKey> keys)
+    public void Reset()
+    {
+        foreach (var port in _keyStates.Keys.ToArray())
+        {
+            _keyStates[port] = NoKey;
+        }
+    }
+
+    public void KeyDown(IEnumerable<SpectrumKey> keys)
     {
         foreach (var key in keys)
         {
@@ -78,7 +88,7 @@ public sealed class KeyboardHandler
         }
     }
 
-    public void HandleKeyUp(IEnumerable<SpectrumKey> keys)
+    public void KeyUp(IEnumerable<SpectrumKey> keys)
     {
         foreach (var key in keys)
         {
@@ -96,7 +106,7 @@ public sealed class KeyboardHandler
             return state;
         }
 
-        state = 0xFF;
+        state = NoKey;
 
         // Special case, for example if port is 0x02, it means check any key except row A-G (0xFD) etc.
         foreach (var (keyPort, keyState) in _keyStates)

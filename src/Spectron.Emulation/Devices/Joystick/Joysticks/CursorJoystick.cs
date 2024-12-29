@@ -1,8 +1,8 @@
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 
-namespace OldBit.Spectron.Emulation.Devices.Joystick;
+namespace OldBit.Spectron.Emulation.Devices.Joystick.Joysticks;
 
-public class CursorJoystick(KeyboardHandler keyboardHandler) : IJoystick
+public class CursorJoystick(KeyboardState keyboardState) : IJoystick
 {
     private readonly Dictionary<JoystickInput, List<SpectrumKey>> _joyToKeyMapping = new()
     {
@@ -13,20 +13,20 @@ public class CursorJoystick(KeyboardHandler keyboardHandler) : IJoystick
         { JoystickInput.Fire, [SpectrumKey.CapsShift, SpectrumKey.D0] }
     };
 
-    public void HandleInput(JoystickInput input, bool isOn)
+    public void HandleInput(JoystickInput input, InputState state)
     {
-        if (isOn)
+        if (state == InputState.Pressed)
         {
             if (_joyToKeyMapping.TryGetValue(input, out var keys))
             {
-                keyboardHandler.HandleKeyDown(keys);
+                keyboardState.KeyDown(keys);
             }
         }
         else
         {
             if (_joyToKeyMapping.TryGetValue(input, out var keys))
             {
-                keyboardHandler.HandleKeyUp(keys);
+                keyboardState.KeyUp(keys);
             }
         }
     }

@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Settings;
 
@@ -45,4 +47,11 @@ public static class EmulatorExtensions
             emulator.IsUlaPlusEnabled = isUlaPlusEnabled;
         }
     }
+
+    public static void SetGamepad(this Emulator? emulator, JoystickSettings joystickSettings) =>
+        emulator?.GamepadManager.Setup(
+            new GamepadPreferences(
+                joystickSettings.GamepadControllerId,
+                joystickSettings.JoystickType,
+                joystickSettings.GamepadSettings.Mappings.GetValueOrDefault(joystickSettings.GamepadControllerId, [])));
 }

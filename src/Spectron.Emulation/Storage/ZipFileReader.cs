@@ -4,7 +4,7 @@ namespace OldBit.Spectron.Emulation.Storage;
 
 public record ArchiveEntry(string Name, FileType FileType);
 
-public sealed class CompressedFile(string filePath) : IDisposable
+public sealed class ZipFileReader(string filePath) : IDisposable
 {
     private readonly ZipArchive _zip = ZipFile.OpenRead(filePath);
 

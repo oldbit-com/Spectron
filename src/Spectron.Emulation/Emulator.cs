@@ -1,7 +1,9 @@
 using Microsoft.Extensions.Logging;
+using OldBit.Spectron.Emulation.Commands;
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
+using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
@@ -29,10 +31,14 @@ public sealed class Emulator
 
     public bool IsPaused => _emulationTimer.IsPaused;
     public bool IsUlaPlusEnabled { get => UlaPlus.IsEnabled; set => ToggleUlaPlus(value); }
-    public KeyboardHandler KeyboardHandler { get; } = new();
+
+    public KeyboardState KeyboardState { get; }
     public TapeManager TapeManager { get; }
     public JoystickManager JoystickManager { get; }
     public AudioManager AudioManager { get; }
+    public GamepadManager GamepadManager { get; }
+    public CommandManager CommandManager { get; }
+
     public ComputerType ComputerType { get; }
     public RomType RomType { get; }
     public TapeSpeed TapeLoadSpeed { get; set; }
@@ -46,12 +52,19 @@ public sealed class Emulator
         EmulatorArgs emulatorArgs,
         HardwareSettings hardware,
         TapeManager tapeManager,
+        GamepadManager gamepadManager,
+        KeyboardState keyboardState,
         TimeMachine timeMachine,
+        CommandManager commandManager,
         ILogger logger)
     {
-        TapeManager = tapeManager;
         _hardware = hardware;
+        KeyboardState = keyboardState;
         _timeMachine = timeMachine;
+
+        CommandManager = commandManager;
+        TapeManager = tapeManager;
+        GamepadManager = gamepadManager;
         ComputerType = emulatorArgs.ComputerType;
         RomType = emulatorArgs.RomType;
         Memory = emulatorArgs.Memory;
@@ -61,7 +74,8 @@ public sealed class Emulator
         ScreenBuffer = new ScreenBuffer(hardware, emulatorArgs.Memory, UlaPlus);
         Cpu = new Z80(emulatorArgs.Memory, emulatorArgs.ContentionProvider); ;
 
-        JoystickManager = new JoystickManager(_spectrumBus, KeyboardHandler);
+        JoystickManager = new JoystickManager(gamepadManager, _spectrumBus, KeyboardState);
+        KeyboardState.Reset();
         TapeManager.Attach(Cpu, Memory, hardware);
 
         AudioManager = new AudioManager(Cpu.Clock, tapeManager.Player, hardware);
@@ -93,6 +107,8 @@ public sealed class Emulator
     {
         AudioManager.Stop();
         _emulationTimer.Stop();
+        GamepadManager.Stop();
+        JoystickManager.Stop();
 
         while (!_emulationTimer.IsStopped)
         {
@@ -115,6 +131,7 @@ public sealed class Emulator
         Cpu.Reset();
         ScreenBuffer.Reset();
         UlaPlus.Reset();
+        KeyboardState.Reset();
 
         if (IsPaused)
         {
@@ -137,7 +154,7 @@ public sealed class Emulator
 
     private void SetupUlaAndDevices()
     {
-        var ula = new Ula(KeyboardHandler, ScreenBuffer, Cpu.Clock, TapeManager?.Player);
+        var ula = new Ula(KeyboardState, ScreenBuffer, Cpu.Clock, TapeManager?.Player);
 
         _spectrumBus.AddDevice(ula);
         _spectrumBus.AddDevice(UlaPlus);

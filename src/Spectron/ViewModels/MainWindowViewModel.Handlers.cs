@@ -76,7 +76,7 @@ partial class MainWindowViewModel
 
         if (fileType.IsArchive())
         {
-            var archive = new CompressedFile(filePath);
+            var archive = new ZipFileReader(filePath);
             var files = archive.GetFiles();
 
             switch (files.Count)
@@ -216,11 +216,6 @@ partial class MainWindowViewModel
         }
 
         IsPaused = Emulator?.IsPaused ?? false;
-
-        if (IsPaused)
-        {
-            TimeMachineViewModel.BeforeShow();
-        }
     }
 
     private void HandleSetEmulationSpeed(string emulationSpeed)
@@ -271,6 +266,7 @@ partial class MainWindowViewModel
 
     private void HandleShowTimeMachineCommand()
     {
+        TimeMachineViewModel.BeforeShow();
     }
 
     private void HandleKeyUp(KeyEventArgs e)
@@ -280,25 +276,26 @@ partial class MainWindowViewModel
             return;
         }
 
-        if (JoystickType != JoystickType.None)
+        if (IsKeyboardJoystickEmulationEnabled)
         {
-            var joystickKeys = KeyMappings.ToJoystickAction(e);
-            if (joystickKeys != JoystickInput.None)
+            var input = KeyMappings.ToJoystickAction(e);
+
+            if (input != JoystickInput.None)
             {
-                Emulator?.JoystickManager.HandleInput(joystickKeys, isOn: false);
+                Emulator?.JoystickManager.Released(input);
                 return;
             }
         }
 
         var keys = KeyMappings.ToSpectrumKey(e);
-        Emulator?.KeyboardHandler.HandleKeyUp(keys);
+        Emulator?.KeyboardState.KeyUp(keys);
     }
 
     private void HandleKeyDown(KeyEventArgs e)
     {
         switch (e)
         {
-            case{ Key: Key.Escape }:
+            case { Key: Key.Escape }:
                 if (IsPaused)
                 {
                     HandleTogglePause();
@@ -315,19 +312,23 @@ partial class MainWindowViewModel
                 return;
         }
 
-        if (JoystickType != JoystickType.None && _useCursorKeysAsJoystick)
+        if (IsKeyboardJoystickEmulationEnabled)
         {
-            var joystickKeys = KeyMappings.ToJoystickAction(e);
-            if (joystickKeys != JoystickInput.None)
+            var input = KeyMappings.ToJoystickAction(e);
+
+            if (input != JoystickInput.None)
             {
-                Emulator?.JoystickManager.HandleInput(joystickKeys, isOn: true);
+                Emulator?.JoystickManager.Pressed(input);
                 return;
             }
         }
 
         var keys = KeyMappings.ToSpectrumKey(e);
-        Emulator?.KeyboardHandler.HandleKeyDown(keys);
+        Emulator?.KeyboardState.KeyDown(keys);
     }
+
+    private bool IsKeyboardJoystickEmulationEnabled =>
+        JoystickType != JoystickType.None && _preferences.Joystick.EmulateUsingKeyboard;
 
     private void HandleTimeTravel(TimeMachineEntry entry) => CreateEmulator(entry.Snapshot);
 
