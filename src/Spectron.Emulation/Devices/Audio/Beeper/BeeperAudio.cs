@@ -91,6 +91,4 @@ internal sealed class BeeperAudio
         _lastEarMic = 0;
         _previousSample = 0;
     }
-
-    internal void Stop() => _beeperStates.Reset();
 }

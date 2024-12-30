@@ -79,12 +79,13 @@ public partial class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> HelpKeyboardCommand { get; private set; }
     public ReactiveCommand<Unit, Task> ShowPreferencesViewCommand { get; private set; }
     public ReactiveCommand<Unit, Task> ShowAboutViewCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> ShowTimeMachineCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> ShowTimeMachineCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleMuteCommand { get; private set; }
 
     public Interaction<PreferencesViewModel, Preferences?> ShowPreferencesView { get; }
     public Interaction<Unit, Unit?> ShowAboutView { get; }
     public Interaction<SelectFileViewModel, ArchiveEntry?> ShowSelectFileView { get; }
+    public Interaction<TimeMachineViewModel, Unit?> ShowTimeMachineView { get; }
 
     public MainWindowViewModel(
         EmulatorFactory emulatorFactory,
@@ -116,13 +117,16 @@ public partial class MainWindowViewModel : ViewModelBase
 
         var emulatorNotNull = this.WhenAnyValue(x => x.Emulator).Select(emulator => emulator is null);
 
-        var timeMachineEnabled = this.WhenAnyValue(x => x._timeMachine.IsEnabled).Select(x => x);
+        var timeMachineEnabled = this.WhenAnyValue(x => x.IsTimeMachineEnabled);
 
         this.WhenAny(x => x.WindowState, x => x.Value)
             .Subscribe(x => WindowStateCommandName = x == WindowState.FullScreen ? "Exit Full Screen" : "Enter Full Screen");
 
         this.WhenAny(x => x.TapeLoadSpeed, x => x.Value)
             .Subscribe(_ => Emulator?.SetTapeLoadingSpeed(TapeLoadSpeed));
+
+        this.WhenAny(x => x.IsTimeMachineEnabled, x => x.Value)
+            .Subscribe(x => _timeMachine.IsEnabled = x);
 
         WindowOpenedCommand = ReactiveCommand.CreateFromTask(WindowOpenedAsync);
         WindowClosingCommand = ReactiveCommand.CreateFromTask(WindowClosingAsync);
@@ -144,12 +148,13 @@ public partial class MainWindowViewModel : ViewModelBase
         HelpKeyboardCommand = ReactiveCommand.Create(HandleHelpKeyboardCommand);
         ShowPreferencesViewCommand = ReactiveCommand.Create(OpenPreferencesWindow);
         ShowAboutViewCommand = ReactiveCommand.Create(OpenAboutView);
-        ShowTimeMachineCommand = ReactiveCommand.Create(HandleShowTimeMachineCommand, timeMachineEnabled);
+        ShowTimeMachineCommand = ReactiveCommand.Create(OpenTimeMachineWindow, timeMachineEnabled);
         ToggleMuteCommand = ReactiveCommand.Create(HandleToggleMute);
 
         ShowPreferencesView = new Interaction<PreferencesViewModel, Preferences?>();
         ShowAboutView = new Interaction<Unit, Unit?>();
         ShowSelectFileView = new Interaction<SelectFileViewModel, ArchiveEntry?>();
+        ShowTimeMachineView = new Interaction<TimeMachineViewModel, Unit?>();
 
         TimeMachineViewModel.OnTimeTravel = HandleTimeTravel;
         SpectrumScreen = _frameBufferConverter.Bitmap;
@@ -175,7 +180,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
             IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
 
-            _timeMachine.IsEnabled = preferences.TimeMachine.IsEnabled;
+            IsTimeMachineEnabled = preferences.TimeMachine.IsEnabled;
             _timeMachine.SnapshotInterval = preferences.TimeMachine.SnapshotInterval;
             _timeMachine.MaxDuration = preferences.TimeMachine.MaxDuration;
 
@@ -186,6 +191,19 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         Emulator?.Resume();
+    }
+
+    private async Task OpenTimeMachineWindow()
+    {
+        if (!IsPaused)
+        {
+            HandleTogglePause();
+        }
+
+        TimeMachineViewModel.BeforeShow();
+        await ShowTimeMachineView.Handle(TimeMachineViewModel);
+
+        HandleTogglePause();
     }
 
     private void StatusBarTimerOnElapsed(object? sender, ElapsedEventArgs e)
@@ -224,7 +242,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         IsMuted = _preferences.AudioSettings.IsMuted;
 
-        _timeMachine.IsEnabled = _preferences.TimeMachine.IsEnabled;
+        IsTimeMachineEnabled = _preferences.TimeMachine.IsEnabled;
         _timeMachine.SnapshotInterval = _preferences.TimeMachine.SnapshotInterval;
         _timeMachine.MaxDuration = _preferences.TimeMachine.MaxDuration;
 

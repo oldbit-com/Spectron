@@ -264,11 +264,6 @@ partial class MainWindowViewModel
         }
     }
 
-    private void HandleShowTimeMachineCommand()
-    {
-        TimeMachineViewModel.BeforeShow();
-    }
-
     private void HandleKeyUp(KeyEventArgs e)
     {
         if (IsPaused)

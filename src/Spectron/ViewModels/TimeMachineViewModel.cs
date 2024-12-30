@@ -19,14 +19,17 @@ public class TimeMachineViewModel : ViewModelBase
     private const int PreviewHeight = 192;
     private const int PreviewWidth = 256;
 
-    public ReactiveCommand<Unit, Unit> TimeTravelCommand { get; private set; }
-    public Control PreviewControl { get; set; } = null!;
+    public ReactiveCommand<Unit, bool> TimeTravelCommand { get; private set; }
+    public Control? PreviewControl { get; set; }
     public Action<TimeMachineEntry>? OnTimeTravel { get; set; }
 
     public TimeMachineViewModel(TimeMachine timeMachine)
     {
         _timeMachine = timeMachine;
         TimeTravelCommand = ReactiveCommand.Create(HandleTimeTravel);
+
+        this.WhenAny(x => x.CurrentEntryIndex, x => x.Value)
+            .Subscribe(_ => UpdatePreview());
     }
 
     public void BeforeShow()
@@ -35,18 +38,23 @@ public class TimeMachineViewModel : ViewModelBase
         CurrentEntryIndex = EntriesCount;
     }
 
-    private void HandleTimeTravel()
+    private bool HandleTimeTravel()
     {
         if (_currentEntryIndex >= EntriesCount)
         {
-            return;
+            return false;
         }
 
         var timeMachineEntry = GetSelectedEntry();
-        if (timeMachineEntry != null)
+
+        if (timeMachineEntry == null)
         {
-            OnTimeTravel?.Invoke(timeMachineEntry);
+            return false;
         }
+
+        OnTimeTravel?.Invoke(timeMachineEntry);
+
+        return true;
     }
 
     private void UpdatePreview()
@@ -66,7 +74,8 @@ public class TimeMachineViewModel : ViewModelBase
 
         var borderColor = SpectrumPalette.GetBorderColor(timeMachineEntry.Snapshot.SpecRegs.Border);
         ScreenBorderBrush = new SolidColorBrush((uint)borderColor.Argb);
-        PreviewControl.InvalidateVisual();
+
+        PreviewControl?.InvalidateVisual();
     }
 
     private TimeMachineEntry? GetSelectedEntry()
@@ -91,11 +100,7 @@ public class TimeMachineViewModel : ViewModelBase
     public double CurrentEntryIndex
     {
         get => _currentEntryIndex;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _currentEntryIndex, value);
-            UpdatePreview();
-        }
+        set => this.RaiseAndSetIfChanged(ref _currentEntryIndex, value);
     }
 
     private WriteableBitmap _screenPreview = new(
