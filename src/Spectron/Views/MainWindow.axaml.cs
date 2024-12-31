@@ -57,6 +57,8 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         var dialog = new AboutView();
         await dialog.ShowDialog<Unit?>(this);
+
+        interaction.SetOutput(Unit.Default);
     }
 
     private async Task ShowSelectFileViewAsync(IInteractionContext<SelectFileViewModel, ArchiveEntry?> interaction)
@@ -71,6 +73,8 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         var dialog = new TimeMachineView { DataContext = interaction.Input };
         await dialog.ShowDialog<TimeMachineEntry?>(this);
+
+        interaction.SetOutput(Unit.Default);
     }
 
     protected override void OnDataContextChanged(EventArgs e)
