@@ -105,7 +105,7 @@
                 </MenuItem>
                 <MenuItem Header="-"/>
                 <MenuItem Header="Pause" HotKey="F10" InputGesture="F10" Command="{Binding TogglePauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
-                <MenuItem Header="Time Machine" Command="{Binding ShowTimeMachineCommand}"/>
+                <MenuItem Header="Time Machine" HotKey="F9" InputGesture="F9" Command="{Binding ShowTimeMachineCommand}"/>
                 <MenuItem Header="-"/>
                 <MenuItem Header="Mute" ToggleType="CheckBox" Command="{Binding ToggleMuteCommand}" IsChecked="{Binding IsMuted}"/>
                 <MenuItem Header="-"/>
@@ -168,10 +168,6 @@
 
                     <Border Background="{DynamicResource ButtonBackground}" Opacity=".25" Padding="20" CornerRadius="10" IsVisible="{Binding IsPaused}" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <controls:PauseOverlay FontSize="100" Opacity="4" IsVisible="{Binding IsPaused}" VerticalAlignment="Center"/>
-                    </Border>
-
-                    <Border Padding="20" CornerRadius="10" BoxShadow="15 15 25 0 DarkGray" IsVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Silver" >
-                        <controls:TimeMachineView DataContext="{Binding TimeMachineViewModel}"/>
                     </Border>
                 </Grid>
             </Border>

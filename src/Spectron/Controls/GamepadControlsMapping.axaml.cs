@@ -13,9 +13,7 @@ public partial class GamepadControlsMapping : UserControl
 
     protected override void OnDataContextChanged(EventArgs e)
     {
-        var viewModel = DataContext as GamepadMappingViewModel;
-
-        if (viewModel != null)
+        if (DataContext is GamepadMappingViewModel viewModel)
         {
             viewModel.ScrollIntoView = ScrollIntoView;
         }

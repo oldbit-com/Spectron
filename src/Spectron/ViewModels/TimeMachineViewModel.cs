@@ -19,39 +19,37 @@ public class TimeMachineViewModel : ViewModelBase
     private const int PreviewHeight = 192;
     private const int PreviewWidth = 256;
 
-    public ReactiveCommand<Unit, Unit> TimeTravelCommand { get; private set; }
-    public Control PreviewControl { get; set; } = null!;
-    public Action<TimeMachineEntry>? OnTimeTravel { get; set; }
+    public ReactiveCommand<Unit, TimeMachineEntry?> TimeTravelCommand { get; private set; }
+    public Control? PreviewControl { get; set; }
 
     public TimeMachineViewModel(TimeMachine timeMachine)
     {
         _timeMachine = timeMachine;
         TimeTravelCommand = ReactiveCommand.Create(HandleTimeTravel);
-    }
 
-    public void BeforeShow()
-    {
+        this.WhenAny(x => x.CurrentEntryIndex, x => x.Value)
+            .Subscribe(_ => UpdatePreview());
+
         EntriesCount = _timeMachine.Entries.Count - 1;
         CurrentEntryIndex = EntriesCount;
     }
 
-    private void HandleTimeTravel()
+    private TimeMachineEntry? HandleTimeTravel()
     {
-        if (_currentEntryIndex >= EntriesCount)
+        if (CurrentEntryIndex >= EntriesCount)
         {
-            return;
+            return null;
         }
 
         var timeMachineEntry = GetSelectedEntry();
-        if (timeMachineEntry != null)
-        {
-            OnTimeTravel?.Invoke(timeMachineEntry);
-        }
+
+        return timeMachineEntry ?? null;
     }
 
     private void UpdatePreview()
     {
         var timeMachineEntry = GetSelectedEntry();
+
         if (timeMachineEntry == null)
         {
             return;
@@ -66,12 +64,14 @@ public class TimeMachineViewModel : ViewModelBase
 
         var borderColor = SpectrumPalette.GetBorderColor(timeMachineEntry.Snapshot.SpecRegs.Border);
         ScreenBorderBrush = new SolidColorBrush((uint)borderColor.Argb);
-        PreviewControl.InvalidateVisual();
+
+        PreviewControl?.InvalidateVisual();
     }
 
     private TimeMachineEntry? GetSelectedEntry()
     {
-        var index = (int)_currentEntryIndex;
+        var index = (int)CurrentEntryIndex;
+
         if (index >= 0 && index < _timeMachine.Entries.Count)
         {
             return _timeMachine.Entries[index];
@@ -91,11 +91,7 @@ public class TimeMachineViewModel : ViewModelBase
     public double CurrentEntryIndex
     {
         get => _currentEntryIndex;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _currentEntryIndex, value);
-            UpdatePreview();
-        }
+        set => this.RaiseAndSetIfChanged(ref _currentEntryIndex, value);
     }
 
     private WriteableBitmap _screenPreview = new(

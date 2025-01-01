@@ -1,0 +1,39 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="OldBit.Spectron.Views.TimeMachineView"
+        x:DataType="viewModels:TimeMachineViewModel"
+        Title="Time Machine"
+        Height="370"
+        Width="400"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+    <Window.Styles>
+        <Style Selector="TextBlock.ZX">
+            <Setter Property="FontFamily" Value="{StaticResource SpectrumStrictFont}"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid Margin="10">
+        <StackPanel>
+            <Border CornerRadius="10" HorizontalAlignment="Center" ClipToBounds="True">
+                <Border Padding="40 40 40 30" Background="{Binding ScreenBorderBrush}">
+                    <Image Name="PreviewImage" Width="256" Height="192" Source="{Binding ScreenPreview}" Stretch="Uniform"/>
+                </Border>
+            </Border>
+
+            <Slider Name="Slider" TickPlacement="None" FocusAdorner="{x:Null}" Height="35" Padding="20 0 20 0" Minimum="0" Maximum="{Binding EntriesCount}" Value="{Binding CurrentEntryIndex}" TickFrequency="1" IsSnapToTickEnabled="True"/>
+
+            <Grid ColumnDefinitions="*,*" Margin="20 0 20 0">
+                <TextBlock Grid.Column="0" Text="past" Classes="ZX" FontSize="15" Foreground="{StaticResource SpectrumWhite}"/>
+                <TextBlock Grid.Column="1" Text="now" TextAlignment="Right" Classes="ZX" FontSize="15" Foreground="{StaticResource SpectrumWhite}"/>
+            </Grid>
+
+            <Button HotKey="Enter" HorizontalAlignment="Center" Content="Time Travel" Command="{Binding TimeTravelCommand}" FontFamily="{StaticResource SpectrumStrictFont}" FontSize="20" CornerRadius="10"/>
+        </StackPanel>
+    </Grid>
+</Window>

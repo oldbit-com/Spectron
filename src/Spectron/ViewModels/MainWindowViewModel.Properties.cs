@@ -94,4 +94,18 @@ partial class MainWindowViewModel
         get => _isMuted;
         set => this.RaiseAndSetIfChanged(ref _isMuted, value);
     }
+
+    private bool _isTimeMachineEnabled;
+    private bool IsTimeMachineEnabled
+    {
+        get => _isTimeMachineEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isTimeMachineEnabled, value);
+    }
+
+    private bool _isTimeMachineVisible;
+    public bool IsTimeMachineVisible
+    {
+        get => _isTimeMachineVisible;
+        set => this.RaiseAndSetIfChanged(ref _isTimeMachineVisible, value);
+    }
 }
