@@ -1,8 +1,8 @@
-using ReactiveUI;
 using Avalonia.ReactiveUI;
 using OldBit.Spectron.ViewModels;
 using System;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 
 namespace OldBit.Spectron.Views;
 
@@ -11,14 +11,6 @@ public partial class TimeMachineView : ReactiveWindow<TimeMachineViewModel>
     public TimeMachineView()
     {
         InitializeComponent();
-
-        this.WhenActivated(action => action(ViewModel!.TimeTravelCommand.Subscribe(isSuccess =>
-        {
-            if (isSuccess)
-            {
-                Close();
-            }
-        })));
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -34,11 +26,13 @@ public partial class TimeMachineView : ReactiveWindow<TimeMachineViewModel>
 
     protected override void OnDataContextChanged(EventArgs e)
     {
-        if (DataContext is not TimeMachineViewModel viewModel)
+        if (ViewModel != null)
         {
-            return;
+            ViewModel!.PreviewControl = PreviewImage;
         }
 
-        viewModel.PreviewControl = PreviewImage;
+        ViewModel?.TimeTravelCommand.Subscribe(Close);
     }
+
+    protected override void OnLoaded(RoutedEventArgs e) => Slider.Focus();
 }

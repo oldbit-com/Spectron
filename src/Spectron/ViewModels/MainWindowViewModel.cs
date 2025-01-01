@@ -56,7 +56,6 @@ public partial class MainWindowViewModel : ViewModelBase
     public Window? MainWindow { get; set; }
     public StatusBarViewModel StatusBar { get; } = new();
     public TapeMenuViewModel TapeMenuViewModel { get; }
-    public TimeMachineViewModel TimeMachineViewModel { get; }
     public RecentFilesViewModel RecentFilesViewModel { get; }
 
     public ReactiveCommand<Unit, Unit> WindowOpenedCommand { get; private set; }
@@ -85,7 +84,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public Interaction<PreferencesViewModel, Preferences?> ShowPreferencesView { get; }
     public Interaction<Unit, Unit?> ShowAboutView { get; }
     public Interaction<SelectFileViewModel, ArchiveEntry?> ShowSelectFileView { get; }
-    public Interaction<TimeMachineViewModel, Unit?> ShowTimeMachineView { get; }
+    public Interaction<TimeMachineViewModel, TimeMachineEntry?> ShowTimeMachineView { get; }
 
     public MainWindowViewModel(
         EmulatorFactory emulatorFactory,
@@ -96,7 +95,6 @@ public partial class MainWindowViewModel : ViewModelBase
         PreferencesService preferencesService,
         SessionService sessionService,
         RecentFilesViewModel recentFilesViewModel,
-        TimeMachineViewModel timeMachineViewModel,
         TapeMenuViewModel tapeMenuViewModel)
     {
         _emulatorFactory = emulatorFactory;
@@ -107,7 +105,6 @@ public partial class MainWindowViewModel : ViewModelBase
         _preferencesService = preferencesService;
         _sessionService = sessionService;
         RecentFilesViewModel = recentFilesViewModel;
-        TimeMachineViewModel = timeMachineViewModel;
         TapeMenuViewModel = tapeMenuViewModel;
         recentFilesViewModel.OpenRecentFileAsync = async fileName => await HandleLoadFileAsync(fileName);
 
@@ -154,9 +151,8 @@ public partial class MainWindowViewModel : ViewModelBase
         ShowPreferencesView = new Interaction<PreferencesViewModel, Preferences?>();
         ShowAboutView = new Interaction<Unit, Unit?>();
         ShowSelectFileView = new Interaction<SelectFileViewModel, ArchiveEntry?>();
-        ShowTimeMachineView = new Interaction<TimeMachineViewModel, Unit?>();
+        ShowTimeMachineView = new Interaction<TimeMachineViewModel, TimeMachineEntry?>();
 
-        TimeMachineViewModel.OnTimeTravel = HandleTimeTravel;
         SpectrumScreen = _frameBufferConverter.Bitmap;
     }
 
@@ -200,10 +196,18 @@ public partial class MainWindowViewModel : ViewModelBase
             HandleTogglePause();
         }
 
-        TimeMachineViewModel.BeforeShow();
-        await ShowTimeMachineView.Handle(TimeMachineViewModel);
+        var viewModel = new TimeMachineViewModel(_timeMachine);
 
-        HandleTogglePause();
+        var entry = await ShowTimeMachineView.Handle(viewModel);
+
+        if (entry != null)
+        {
+            CreateEmulator(entry.Snapshot);
+        }
+        else
+        {
+            HandleTogglePause();
+        }
     }
 
     private void StatusBarTimerOnElapsed(object? sender, ElapsedEventArgs e)

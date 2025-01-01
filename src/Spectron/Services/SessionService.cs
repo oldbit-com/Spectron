@@ -50,12 +50,12 @@ public class SessionService(
 
         try
         {
-            timeMachine.Entries.Clear();
+            timeMachine.Clear();
 
             foreach (var timeMachineSnapshot in session.TimeMachineSnapshots)
             {
                 var snapshot = SnapshotFromBase64(timeMachineSnapshot.Snapshot);
-                timeMachine.Entries.Add(new TimeMachineEntry(timeMachineSnapshot.Timestamp, snapshot));
+                timeMachine.Add(new TimeMachineEntry(timeMachineSnapshot.Timestamp, snapshot));
             }
 
             if (session.LastSnapshot != null)

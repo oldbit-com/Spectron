@@ -285,7 +285,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
             {
                 for (byte i = 0; i < 8; i++)
                 {
-                    ramPages.Add(new RamPageBlock(memory128K.Banks[i], pageNumber: i, compressionLevel));
+                    ramPages.Add(new RamPageBlock(memory128K.Banks[i][..0x4000], pageNumber: i, compressionLevel));
                 }
 
                 specRegs.Port7FFD = memory128K.LastPagingModeValue;

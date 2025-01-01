@@ -9,10 +9,12 @@ public static class SzxFileExtensions
 {
     private static readonly int[] Buffer = new int[ScreenSize.ContentHeight * ScreenSize.ContentWidth];
 
-    public static int[] GetScreenshot(this SzxFile szxFile, bool isFlashOnFrame = false)
+    public static int[] GetScreenshot(this SzxFile szx, bool isFlashOnFrame = false)
     {
-        var screenMemory = szxFile.RamPages.First(page => page.PageNumber == 5).Data;
-        var palette = szxFile.Palette;
+        const int screenBank = 5;
+
+        var screenMemory = szx.RamPages.First(page => page.PageNumber == screenBank).Data;
+        var palette = szx.Palette;
 
         for (var line = 0; line < ScreenSize.ContentHeight; line++)
         {

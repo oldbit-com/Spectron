@@ -19,9 +19,8 @@ public class TimeMachineViewModel : ViewModelBase
     private const int PreviewHeight = 192;
     private const int PreviewWidth = 256;
 
-    public ReactiveCommand<Unit, bool> TimeTravelCommand { get; private set; }
+    public ReactiveCommand<Unit, TimeMachineEntry?> TimeTravelCommand { get; private set; }
     public Control? PreviewControl { get; set; }
-    public Action<TimeMachineEntry>? OnTimeTravel { get; set; }
 
     public TimeMachineViewModel(TimeMachine timeMachine)
     {
@@ -30,36 +29,27 @@ public class TimeMachineViewModel : ViewModelBase
 
         this.WhenAny(x => x.CurrentEntryIndex, x => x.Value)
             .Subscribe(_ => UpdatePreview());
-    }
 
-    public void BeforeShow()
-    {
         EntriesCount = _timeMachine.Entries.Count - 1;
         CurrentEntryIndex = EntriesCount;
     }
 
-    private bool HandleTimeTravel()
+    private TimeMachineEntry? HandleTimeTravel()
     {
-        if (_currentEntryIndex >= EntriesCount)
+        if (CurrentEntryIndex >= EntriesCount)
         {
-            return false;
+            return null;
         }
 
         var timeMachineEntry = GetSelectedEntry();
 
-        if (timeMachineEntry == null)
-        {
-            return false;
-        }
-
-        OnTimeTravel?.Invoke(timeMachineEntry);
-
-        return true;
+        return timeMachineEntry ?? null;
     }
 
     private void UpdatePreview()
     {
         var timeMachineEntry = GetSelectedEntry();
+
         if (timeMachineEntry == null)
         {
             return;
@@ -80,7 +70,8 @@ public class TimeMachineViewModel : ViewModelBase
 
     private TimeMachineEntry? GetSelectedEntry()
     {
-        var index = (int)_currentEntryIndex;
+        var index = (int)CurrentEntryIndex;
+
         if (index >= 0 && index < _timeMachine.Entries.Count)
         {
             return _timeMachine.Entries[index];

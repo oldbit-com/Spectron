@@ -22,19 +22,13 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         InitializeComponent();
 
         this.WhenActivated(action =>
-            action(ViewModel!.ShowPreferencesView.RegisterHandler(ShowPreferencesViewAsync)));
-
-        this.WhenActivated(action =>
-            action(ViewModel!.TapeMenuViewModel.ShowTapeView.RegisterHandler(ShowTapeViewAsync)));
-
-        this.WhenActivated(action =>
-            action(ViewModel!.ShowAboutView.RegisterHandler(ShowAboutViewAsync)));
-
-        this.WhenActivated(action =>
-            action(ViewModel!.ShowSelectFileView.RegisterHandler(ShowSelectFileViewAsync)));
-
-        this.WhenActivated(action =>
-            action(ViewModel!.ShowTimeMachineView.RegisterHandler(ShowTimeMachineViewAsync)));
+        {
+            action(ViewModel!.ShowPreferencesView.RegisterHandler(ShowPreferencesViewAsync));
+            action(ViewModel!.TapeMenuViewModel.ShowTapeView.RegisterHandler(ShowTapeViewAsync));
+            action(ViewModel!.ShowAboutView.RegisterHandler(ShowAboutViewAsync));
+            action(ViewModel!.ShowSelectFileView.RegisterHandler(ShowSelectFileViewAsync));
+            action(ViewModel!.ShowTimeMachineView.RegisterHandler(ShowTimeMachineViewAsync));
+        });
     }
 
     private async Task ShowPreferencesViewAsync(IInteractionContext<PreferencesViewModel, Preferences?> interaction)
@@ -69,12 +63,12 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         interaction.SetOutput(result);
     }
 
-    private async Task ShowTimeMachineViewAsync(IInteractionContext<TimeMachineViewModel, Unit?> interaction)
+    private async Task ShowTimeMachineViewAsync(IInteractionContext<TimeMachineViewModel, TimeMachineEntry?> interaction)
     {
         var dialog = new TimeMachineView { DataContext = interaction.Input };
-        await dialog.ShowDialog<TimeMachineEntry?>(this);
+        var result = await dialog.ShowDialog<TimeMachineEntry?>(this);
 
-        interaction.SetOutput(Unit.Default);
+        interaction.SetOutput(result);
     }
 
     protected override void OnDataContextChanged(EventArgs e)

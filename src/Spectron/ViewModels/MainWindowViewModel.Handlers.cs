@@ -325,8 +325,6 @@ partial class MainWindowViewModel
     private bool IsKeyboardJoystickEmulationEnabled =>
         JoystickType != JoystickType.None && _preferences.Joystick.EmulateUsingKeyboard;
 
-    private void HandleTimeTravel(TimeMachineEntry entry) => CreateEmulator(entry.Snapshot);
-
     private void HandleToggleMute()
     {
         IsMuted = !IsMuted;
