@@ -20,7 +20,7 @@ public class PauseOverlay : TemplatedControl, IDisposable
 
     public PauseOverlay()
     {
-        IsVisibleProperty.Changed.AddClassHandler<PauseOverlay>((sender, args) => OnIsVisibleChanged(args));
+        IsVisibleProperty.Changed.AddClassHandler<PauseOverlay>((_, args) => OnIsVisibleChanged(args));
 
         AddColors();
     }

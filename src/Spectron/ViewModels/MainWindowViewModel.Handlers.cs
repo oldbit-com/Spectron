@@ -338,4 +338,11 @@ partial class MainWindowViewModel
             Emulator?.AudioManager.UnMute();
         }
     }
+
+    private void HandleTimeMachineResumeEmulator()
+    {
+        IsTimeMachineCountdownVisible = false;
+
+        Emulator?.Resume();
+    }
 }

@@ -169,6 +169,8 @@
                     <Border Background="{DynamicResource ButtonBackground}" Opacity=".25" Padding="20" CornerRadius="10" IsVisible="{Binding IsPaused}" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <controls:PauseOverlay FontSize="100" Opacity="4" IsVisible="{Binding IsPaused}" VerticalAlignment="Center"/>
                     </Border>
+
+                    <controls:TimeMachineTimer IsVisible="{Binding IsTimeMachineCountdownVisible}" ElapsedCommand="{Binding TimeMachineResumeEmulatorCommand}"/>
                 </Grid>
             </Border>
 

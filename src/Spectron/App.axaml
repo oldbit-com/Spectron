@@ -35,7 +35,7 @@
     <Application.Resources>
         <!-- Spectrum fonts -->
         <FontFamily x:Key="SpectrumStrictFont">/Assets/Fonts/zxSpectrumStrict.ttf#zxSpectrumStrict</FontFamily>
-        <FontFamily x:Key="SpectrumExpandedFont">/Assets/Fonts/zxSpectrumExpanded.ttf#zxSpectrumExpanded</FontFamily>
+        <FontFamily x:Key="SpectrumExpandedFont">/Assets/Fonts/zxSpectrumExpanded.ttf#zxSpectrumExpand</FontFamily>
 
         <!-- Spectrum palette -->
         <SolidColorBrush x:Key="SpectrumBlack" Color="#FF000000"/>

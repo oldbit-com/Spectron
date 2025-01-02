@@ -60,6 +60,13 @@ partial class MainWindowViewModel
         set => this.RaiseAndSetIfChanged(ref _isPaused, value);
     }
 
+    private bool _isTimeMachineCountdownVisible;
+    public bool IsTimeMachineCountdownVisible
+    {
+        get => _isTimeMachineCountdownVisible;
+        set => this.RaiseAndSetIfChanged(ref _isTimeMachineCountdownVisible, value);
+    }
+
     private string _emulationSpeed = "100";
     public string EmulationSpeed
     {
@@ -100,12 +107,5 @@ partial class MainWindowViewModel
     {
         get => _isTimeMachineEnabled;
         set => this.RaiseAndSetIfChanged(ref _isTimeMachineEnabled, value);
-    }
-
-    private bool _isTimeMachineVisible;
-    public bool IsTimeMachineVisible
-    {
-        get => _isTimeMachineVisible;
-        set => this.RaiseAndSetIfChanged(ref _isTimeMachineVisible, value);
     }
 }

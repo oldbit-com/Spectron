@@ -80,6 +80,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Task> ShowAboutViewCommand { get; private set; }
     public ReactiveCommand<Unit, Task> ShowTimeMachineCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleMuteCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> TimeMachineResumeEmulatorCommand  { get; private set; }
 
     public Interaction<PreferencesViewModel, Preferences?> ShowPreferencesView { get; }
     public Interaction<Unit, Unit?> ShowAboutView { get; }
@@ -147,6 +148,7 @@ public partial class MainWindowViewModel : ViewModelBase
         ShowAboutViewCommand = ReactiveCommand.Create(OpenAboutView);
         ShowTimeMachineCommand = ReactiveCommand.Create(OpenTimeMachineWindow, timeMachineEnabled);
         ToggleMuteCommand = ReactiveCommand.Create(HandleToggleMute);
+        TimeMachineResumeEmulatorCommand = ReactiveCommand.Create(HandleTimeMachineResumeEmulator);
 
         ShowPreferencesView = new Interaction<PreferencesViewModel, Preferences?>();
         ShowAboutView = new Interaction<Unit, Unit?>();
@@ -191,10 +193,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private async Task OpenTimeMachineWindow()
     {
-        if (!IsPaused)
-        {
-            HandleTogglePause();
-        }
+        Emulator?.Pause();
 
         var viewModel = new TimeMachineViewModel(_timeMachine);
 
@@ -202,11 +201,15 @@ public partial class MainWindowViewModel : ViewModelBase
 
         if (entry != null)
         {
+            IsTimeMachineCountdownVisible = true;
+
             CreateEmulator(entry.Snapshot);
+            Emulator?.Pause();
         }
         else
         {
-            HandleTogglePause();
+            Emulator?.Resume();
+            IsPaused = false;
         }
     }
 
@@ -294,13 +297,9 @@ public partial class MainWindowViewModel : ViewModelBase
         InitializeEmulator(emulator);
     }
 
-    private void CreateEmulator(SzxFile? snapshot = null)
+    private void CreateEmulator(SzxFile snapshot)
     {
-        var emulator = snapshot == null ?
-            _emulatorFactory.Create(
-                ComputerType,
-                RomType == RomType.Custom ? RomType.Original : RomType) :
-            _snapshotLoader.Load(snapshot);
+        var emulator = _snapshotLoader.Load(snapshot);
 
         InitializeEmulator(emulator);
     }
