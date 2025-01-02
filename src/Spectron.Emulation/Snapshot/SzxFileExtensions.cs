@@ -1,7 +1,7 @@
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Screen;
-using OldBit.ZX.Files.Szx;
-using OldBit.ZX.Files.Szx.Blocks;
+using OldBit.Spectron.Files.Szx;
+using OldBit.Spectron.Files.Szx.Blocks;
 
 namespace OldBit.Spectron.Emulation.Snapshot;
 

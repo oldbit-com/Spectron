@@ -1,6 +1,6 @@
 using OldBit.Spectron.Emulation.Storage;
 using OldBit.Z80Cpu;
-using OldBit.ZX.Files.Tzx;
+using OldBit.Spectron.Files.Tzx;
 
 namespace OldBit.Spectron.Emulation.Tape;
 

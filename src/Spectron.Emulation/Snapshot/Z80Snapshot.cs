@@ -3,8 +3,8 @@ using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Z80Cpu;
 using OldBit.Z80Cpu.Registers;
-using OldBit.ZX.Files.Z80;
-using OldBit.ZX.Files.Z80.Types;
+using OldBit.Spectron.Files.Z80;
+using OldBit.Spectron.Files.Z80.Types;
 
 namespace OldBit.Spectron.Emulation.Snapshot;
 
@@ -19,11 +19,23 @@ public sealed class Z80Snapshot(EmulatorFactory emulatorFactory)
 
     internal static void Save(string fileName, Emulator emulator)
     {
-        var snapshot = new Z80File();
+        var header = new Z80Header();
+
+        if (emulator.ComputerType is ComputerType.Spectrum16K or ComputerType.Spectrum48K)
+        {
+
+        }
+        else if (emulator.ComputerType == ComputerType.Spectrum128K)
+        {
+
+        }
+
+
+        //var snapshot = new Z80File(header, );
 
         // TODO: Populate snapshot with emulator state
 
-        snapshot.Save(fileName);
+        //snapshot.Save(fileName);
     }
 
     private Emulator CreateEmulator(Z80File snapshot)

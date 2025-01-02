@@ -2,8 +2,8 @@ using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Z80Cpu;
 using OldBit.Z80Cpu.Registers;
-using OldBit.ZX.Files.Tap;
-using OldBit.ZX.Files.Tzx.Blocks;
+using OldBit.Spectron.Files.Tap;
+using OldBit.Spectron.Files.Tzx.Blocks;
 
 namespace OldBit.Spectron.Emulation.Tape;
 

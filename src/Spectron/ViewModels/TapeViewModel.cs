@@ -4,7 +4,7 @@ using System.Linq;
 using Avalonia.Threading;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Extensions;
-using OldBit.ZX.Files.Tzx.Extensions;
+using OldBit.Spectron.Files.Tzx.Extensions;
 using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;

@@ -1,8 +1,8 @@
 using OldBit.Spectron.Emulation.Storage;
-using OldBit.ZX.Files.Extensions;
-using OldBit.ZX.Files.Tap;
-using OldBit.ZX.Files.Tzx;
-using OldBit.ZX.Files.Tzx.Blocks;
+using OldBit.Spectron.Files.Extensions;
+using OldBit.Spectron.Files.Tap;
+using OldBit.Spectron.Files.Tzx;
+using OldBit.Spectron.Files.Tzx.Blocks;
 
 namespace OldBit.Spectron.Emulation.Tape;
 

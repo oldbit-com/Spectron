@@ -1,6 +1,6 @@
 using System.Reflection;
 using OldBit.Spectron.Emulation.Snapshot;
-using OldBit.ZX.Files.Szx;
+using OldBit.Spectron.Files.Szx;
 
 namespace OldBit.Spectron.Emulation.Tape.Loader;
 

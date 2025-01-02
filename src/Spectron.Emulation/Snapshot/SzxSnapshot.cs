@@ -7,11 +7,11 @@ using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Z80Cpu;
-using OldBit.ZX.Files.Extensions;
-using OldBit.ZX.Files.Szx;
-using OldBit.ZX.Files.Szx.Blocks;
-using OldBit.ZX.Files.Tap;
-using OldBit.ZX.Files.Tzx;
+using OldBit.Spectron.Files.Extensions;
+using OldBit.Spectron.Files.Szx;
+using OldBit.Spectron.Files.Szx.Blocks;
+using OldBit.Spectron.Files.Tap;
+using OldBit.Spectron.Files.Tzx;
 using JoystickType = OldBit.Spectron.Emulation.Devices.Joystick.JoystickType;
 
 namespace OldBit.Spectron.Emulation.Snapshot;
