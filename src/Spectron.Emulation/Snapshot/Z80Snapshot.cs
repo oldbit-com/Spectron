@@ -19,23 +19,75 @@ public sealed class Z80Snapshot(EmulatorFactory emulatorFactory)
 
     internal static void Save(string fileName, Emulator emulator)
     {
-        var header = new Z80Header();
-
-        if (emulator.ComputerType is ComputerType.Spectrum16K or ComputerType.Spectrum48K)
+        var header = new Z80Header
         {
+            A = emulator.Cpu.Registers.A,
+            F = (byte)emulator.Cpu.Registers.F,
+            BC = emulator.Cpu.Registers.BC,
+            DE = emulator.Cpu.Registers.DE,
+            HL = emulator.Cpu.Registers.HL,
+            APrime = emulator.Cpu.Registers.Prime.A,
+            FPrime = (byte)emulator.Cpu.Registers.Prime.F,
+            BCPrime = emulator.Cpu.Registers.Prime.BC,
+            DEPrime = emulator.Cpu.Registers.Prime.DE,
+            HLPrime = emulator.Cpu.Registers.Prime.HL,
+            IX = emulator.Cpu.Registers.IX,
+            IY = emulator.Cpu.Registers.IY,
+            SP = emulator.Cpu.Registers.SP,
+            I = emulator.Cpu.Registers.I,
+            R = emulator.Cpu.Registers.R,
+            PC = emulator.Cpu.Registers.PC,
+            IFF1 = (byte)(emulator.Cpu.IFF1 ? 1 : 0),
+            IFF2 = (byte)(emulator.Cpu.IFF2 ? 1 : 0),
+            Flags1 =
+            {
+                BorderColor = SpectrumPalette.ReverseBorderColors[emulator.ScreenBuffer.LastBorderColor],
+            },
+            Flags2 =
+            {
+                InterruptMode = (byte)emulator.Cpu.IM,
+                JoystickType = emulator.JoystickManager.JoystickType switch
+                {
+                    Devices.Joystick.JoystickType.Kempston => JoystickType.Kempston,
+                    Devices.Joystick.JoystickType.Sinclair1 => JoystickType.Sinclair1,
+                    Devices.Joystick.JoystickType.Sinclair2 => JoystickType.Sinclair2,
+                    _ => JoystickType.Cursor,
+                },
+            },
+            HardwareMode = emulator.ComputerType switch
+            {
+                ComputerType.Spectrum128K => HardwareMode.Spectrum128,
+                _ => HardwareMode.Spectrum48
+            },
 
-        }
-        else if (emulator.ComputerType == ComputerType.Spectrum128K)
+            PortFFFD = emulator.AudioManager.Ay.CurrentRegister,
+            AyRegisters = emulator.AudioManager.Ay.Registers.ToArray(),
+        };
+
+        if (header.Flags3 != null)
         {
-
+            header.Flags3.EmulateRegisterR = true;
+            header.Flags3.ModifyHardware = emulator.ComputerType == ComputerType.Spectrum16K;
+            header.Flags3.UseAySound = emulator.AudioManager.IsAySupported;
         }
 
+        Z80File? snapshot = null;
 
-        //var snapshot = new Z80File(header, );
+        if (emulator.Memory is Memory16K memory16K)
+        {
+            snapshot = new Z80File(header, memory16K.Memory[16384..].ToArray());
+        }
+        else if (emulator.Memory is Memory48K memory48K)
+        {
+            snapshot = new Z80File(header, memory48K.Memory[16384..].ToArray());
+        }
+        else if (emulator.Memory is Memory128K memory128K)
+        {
+            header.Port7FFD = memory128K.LastPagingModeValue;
+            snapshot = new Z80File(header, memory128K.Banks);
+        }
 
-        // TODO: Populate snapshot with emulator state
-
-        //snapshot.Save(fileName);
+        snapshot?.Save(fileName);
     }
 
     private Emulator CreateEmulator(Z80File snapshot)
