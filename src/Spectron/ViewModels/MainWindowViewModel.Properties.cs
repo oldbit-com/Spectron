@@ -108,4 +108,11 @@ partial class MainWindowViewModel
         get => _isTimeMachineEnabled;
         set => this.RaiseAndSetIfChanged(ref _isTimeMachineEnabled, value);
     }
+
+    private string _title = DefaultTitle;
+    public string Title
+    {
+        get => _title;
+        set => this.RaiseAndSetIfChanged(ref _title, value);
+    }
 }

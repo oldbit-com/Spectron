@@ -106,8 +106,5 @@ internal sealed class FrameBufferConverter : IDisposable
             PixelFormats.Rgba8888);
     }
 
-    public void Dispose()
-    {
-        Bitmap.Dispose();
-    }
+    public void Dispose() => Bitmap.Dispose();
 }

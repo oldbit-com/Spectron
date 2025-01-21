@@ -15,7 +15,7 @@
         x:Class="OldBit.Spectron.Views.MainWindow"
         x:DataType="viewModels:MainWindowViewModel"
         Icon="/Assets/spectron.ico"
-        Title="Spectron - ZX Spectrum Emulator"
+        Title="{Binding Title}"
         Width="1024" Height="768"
         WindowStartupLocation="CenterScreen"
         WindowState="{Binding WindowState}"

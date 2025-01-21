@@ -56,6 +56,7 @@ partial class MainWindowViewModel
             if (CreateEmulator(fileResult.Stream, fileResult.FileType))
             {
                 RecentFilesViewModel.Add(filePath);
+                Title = $"S{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
             }
         }
         catch (Exception ex)
@@ -197,10 +198,18 @@ partial class MainWindowViewModel
     {
         Emulator?.Reset();
         IsPaused = Emulator?.IsPaused ?? false;
+
+        RecentFilesViewModel.CurrentFileName = string.Empty;
+        SetTitle();
     }
 
-    private void HandleMachineHardReset() =>
+    private void HandleMachineHardReset()
+    {
         CreateEmulator(_preferences.ComputerType, _preferences.RomType);
+
+        RecentFilesViewModel.CurrentFileName = string.Empty;
+        SetTitle();
+    }
 
     private void HandleTogglePause()
     {

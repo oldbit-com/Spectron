@@ -16,6 +16,12 @@ public class RecentFilesViewModel : ViewModelBase
     private readonly ReactiveCommand<string, Unit> _openRecentFileCommand;
     private RecentFilesSettings _recentFilesSettings = new();
 
+    public string CurrentFileName
+    {
+        get => _recentFilesSettings.CurrentFileName;
+        set => _recentFilesSettings.CurrentFileName = value;
+    }
+
     public Func<string, Task>? OpenRecentFileAsync;
 
     public RecentFilesViewModel(RecentFilesService recentFilesService)
@@ -36,21 +42,6 @@ public class RecentFilesViewModel : ViewModelBase
     public async Task LoadAsync() => _recentFilesSettings = await _recentFilesService.LoadAsync();
 
     public async Task SaveAsync() => await _recentFilesService.SaveAsync(_recentFilesSettings);
-
-    public void Opening(IList<NativeMenuItemBase> items)
-    {
-        items.Clear();
-
-        foreach (var file in _recentFilesSettings.Files)
-        {
-            items.Add(new NativeMenuItem
-            {
-                Header = file,
-                Command = _openRecentFileCommand,
-                CommandParameter = file
-            });
-        }
-    }
 
     public void Opening(ItemCollection items)
     {
@@ -73,6 +64,7 @@ public class RecentFilesViewModel : ViewModelBase
     {
         _recentFilesSettings.Files.Remove(filePath);
         _recentFilesSettings.Files.Insert(0, filePath);
+        _recentFilesSettings.CurrentFileName = Path.GetFileName(filePath);
 
         if (_recentFilesSettings.Files.Count > _recentFilesSettings.MaxRecentFiles)
         {

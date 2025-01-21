@@ -32,6 +32,8 @@ namespace OldBit.Spectron.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
+    private const string DefaultTitle = "Spectron - ZX Spectrum Emulator";
+
     private readonly EmulatorFactory _emulatorFactory;
     private readonly TimeMachine _timeMachine;
     private readonly GamepadManager _gamepadManager;
@@ -264,6 +266,7 @@ public partial class MainWindowViewModel : ViewModelBase
             if (snapshot != null)
             {
                 CreateEmulator(snapshot);
+                SetTitle();
             }
         }
 
@@ -370,5 +373,16 @@ public partial class MainWindowViewModel : ViewModelBase
         Emulator.RenderScreen -= EmulatorOnRenderScreen;
         Emulator.CommandManager.CommandReceived -= CommandManagerOnCommandReceived;
         Emulator = null;
+    }
+
+    private void SetTitle()
+    {
+        if (RecentFilesViewModel.CurrentFileName == string.Empty)
+        {
+            Title = DefaultTitle;
+            return;
+        }
+
+        Title = $"S{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
     }
 }
