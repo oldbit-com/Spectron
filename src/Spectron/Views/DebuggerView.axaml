@@ -11,6 +11,4 @@
     <Design.DataContext>
         <viewModels:DebuggerViewModel/>
     </Design.DataContext>
-
-
 </Window>

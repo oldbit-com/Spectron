@@ -78,6 +78,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> ToggleFullScreenCommand { get; private set; }
     public ReactiveCommand<TapeSpeed, Unit> SetTapeLoadSpeedCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> HelpKeyboardCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> ShowDebuggerViewCommand { get; private set; }
     public ReactiveCommand<Unit, Task> ShowPreferencesViewCommand { get; private set; }
     public ReactiveCommand<Unit, Task> ShowAboutViewCommand { get; private set; }
     public ReactiveCommand<Unit, Task> ShowTimeMachineCommand { get; private set; }
@@ -86,6 +87,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public Interaction<PreferencesViewModel, Preferences?> ShowPreferencesView { get; }
     public Interaction<Unit, Unit?> ShowAboutView { get; }
+    public Interaction<DebuggerViewModel, Unit?> ShowDebuggerView { get; }
     public Interaction<SelectFileViewModel, ArchiveEntry?> ShowSelectFileView { get; }
     public Interaction<TimeMachineViewModel, TimeMachineEntry?> ShowTimeMachineView { get; }
 
@@ -146,23 +148,27 @@ public partial class MainWindowViewModel : ViewModelBase
         ToggleFullScreenCommand = ReactiveCommand.Create(HandleToggleFullScreen);
         SetTapeLoadSpeedCommand = ReactiveCommand.Create<TapeSpeed>(HandleSetTapeLoadingSpeed);
         HelpKeyboardCommand = ReactiveCommand.Create(HandleHelpKeyboardCommand);
+        ShowDebuggerViewCommand = ReactiveCommand.Create(OpenDebuggerWindow);
         ShowPreferencesViewCommand = ReactiveCommand.Create(OpenPreferencesWindow);
-        ShowAboutViewCommand = ReactiveCommand.Create(OpenAboutView);
+        ShowAboutViewCommand = ReactiveCommand.Create(OpenAboutWindow);
         ShowTimeMachineCommand = ReactiveCommand.Create(OpenTimeMachineWindow, timeMachineEnabled);
         ToggleMuteCommand = ReactiveCommand.Create(HandleToggleMute);
         TimeMachineResumeEmulatorCommand = ReactiveCommand.Create(HandleTimeMachineResumeEmulator);
 
         ShowPreferencesView = new Interaction<PreferencesViewModel, Preferences?>();
         ShowAboutView = new Interaction<Unit, Unit?>();
+        ShowDebuggerView = new Interaction<DebuggerViewModel, Unit?>();
         ShowSelectFileView = new Interaction<SelectFileViewModel, ArchiveEntry?>();
         ShowTimeMachineView = new Interaction<TimeMachineViewModel, TimeMachineEntry?>();
 
         SpectrumScreen = _frameBufferConverter.Bitmap;
     }
 
-    private async Task OpenAboutView()
+    private async Task OpenAboutWindow() => await ShowAboutView.Handle(Unit.Default);
+
+    public async Task OpenDebuggerWindow()
     {
-        await ShowAboutView.Handle(Unit.Default);
+        await Task.Yield();
     }
 
     public async Task OpenPreferencesWindow()

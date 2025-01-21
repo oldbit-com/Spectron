@@ -123,6 +123,8 @@
                 </MenuItem>
                 <MenuItem Header="-"/>
                 <MenuItem Header="{Binding WindowStateCommandName}" HotKey="Ctrl+Enter" InputGesture="Ctrl+Enter" Command="{Binding ToggleFullScreenCommand}"/>
+                <MenuItem Header="-"/>
+                <MenuItem Header="Debugger" HotKey="F11" InputGesture="F11" Command="{Binding ShowDebuggerViewCommand}"/>
             </MenuItem>
 
             <MenuItem Header="_Tape" Padding="10 0 10 0" Focusable="False">
