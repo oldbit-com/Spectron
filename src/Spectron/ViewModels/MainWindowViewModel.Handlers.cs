@@ -141,6 +141,7 @@ partial class MainWindowViewModel
             Emulator?.Pause();
 
             var file = await FileDialogs.SaveSnapshotFileAsync();
+
             if (file != null && Emulator != null)
             {
                 SnapshotLoader.Save(file.Path.LocalPath, Emulator);
@@ -167,14 +168,12 @@ partial class MainWindowViewModel
     private void HandleChangeRom(RomType romType)
     {
         RomType = romType;
-
         CreateEmulator(ComputerType, RomType);
     }
 
     private void HandleChangeComputerType(ComputerType computerType)
     {
         ComputerType = computerType;
-
         CreateEmulator(ComputerType, RomType);
     }
 
@@ -251,28 +250,6 @@ partial class MainWindowViewModel
 
     private void HandleSetTapeLoadingSpeed(TapeSpeed tapeSpeed) => TapeLoadSpeed = tapeSpeed;
 
-    private void HandleHelpKeyboardCommand()
-    {
-        if (_helpKeyboardView == null)
-        {
-            _helpKeyboardView = new HelpKeyboardView();
-            _helpKeyboardView.Closed += (_, _) => _helpKeyboardView = null;
-
-            if (MainWindow != null)
-            {
-                _helpKeyboardView.Show(MainWindow);
-            }
-            else
-            {
-                _helpKeyboardView.Show();
-            }
-        }
-        else
-        {
-            _helpKeyboardView.Close();
-        }
-    }
-
     private void HandleKeyUp(KeyEventArgs e)
     {
         if (IsPaused)
@@ -308,7 +285,7 @@ partial class MainWindowViewModel
                 break;
 
             case { Key: Key.F1, KeyModifiers: KeyModifiers.None }:
-                HandleHelpKeyboardCommand();
+                _ = ShowKeyboardHelpWindow();
                 return;
 
             case { Key: Key.F5, KeyModifiers: KeyModifiers.Control }:

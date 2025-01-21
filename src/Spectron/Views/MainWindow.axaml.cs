@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -16,6 +17,7 @@ namespace OldBit.Spectron.Views;
 public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 {
     private MainWindowViewModel? _viewModel;
+    private readonly Dictionary<string, Window> _windows = new();
 
     public MainWindow()
     {
@@ -24,31 +26,60 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         this.WhenActivated(action =>
         {
             action(ViewModel!.ShowAboutView
-                .RegisterHandler(ShowViewAsync<Unit, Unit?, AboutView>));
-
-            action(ViewModel!.ShowPreferencesView
-                .RegisterHandler(ShowViewAsync<PreferencesViewModel, Preferences, PreferencesView>));
-
-            action(ViewModel!.ShowSelectFileView
-                .RegisterHandler(ShowViewAsync<SelectFileViewModel, ArchiveEntry?, SelectFileView>));
-
-            action(ViewModel!.TapeMenuViewModel.ShowTapeView
-                .RegisterHandler(ShowViewAsync<TapeViewModel, Unit?, TapeView>));
-
-            action(ViewModel!.ShowTimeMachineView
-                .RegisterHandler(ShowViewAsync<TimeMachineViewModel, TimeMachineEntry?, TimeMachineView>));
+                .RegisterHandler(ShowDialogAsync<Unit, Unit?, AboutView>));
 
             action(ViewModel!.ShowDebuggerView
-                .RegisterHandler(ShowViewAsync<DebuggerViewModel, Unit?, DebuggerView>));
+                .RegisterHandler(Show<DebuggerViewModel, Unit?, DebuggerView>));
+
+            action(ViewModel!.ShowKeyboardHelpView
+                .RegisterHandler(Show<Unit, Unit?, HelpKeyboardView>));
+
+            action(ViewModel!.ShowPreferencesView
+                .RegisterHandler(ShowDialogAsync<PreferencesViewModel, Preferences, PreferencesView>));
+
+            action(ViewModel!.ShowSelectFileView
+                .RegisterHandler(ShowDialogAsync<SelectFileViewModel, ArchiveEntry?, SelectFileView>));
+
+            action(ViewModel!.TapeMenuViewModel.ShowTapeView
+                .RegisterHandler(ShowDialogAsync<TapeViewModel, Unit?, TapeView>));
+
+            action(ViewModel!.ShowTimeMachineView
+                .RegisterHandler(ShowDialogAsync<TimeMachineViewModel, TimeMachineEntry?, TimeMachineView>));
         });
     }
 
-    private async Task ShowViewAsync<TInput, TOutput, TView>(IInteractionContext<TInput, TOutput?> interaction) where TView : Window, new()
+    private async Task ShowDialogAsync<TInput, TOutput, TView>(IInteractionContext<TInput, TOutput?> context) where TView : Window, new()
     {
-        var dialog = new TView { DataContext = interaction.Input };
-        var result = await dialog.ShowDialog<TOutput?>(this);
+        var view = new TView { DataContext = context.Input };
+        var result = await view.ShowDialog<TOutput?>(this);
 
-        interaction.SetOutput(result);
+        context.SetOutput(result);
+    }
+
+    private void Show<TInput, TOutput, TView>(IInteractionContext<TInput, TOutput?> context) where TView : Window, new()
+    {
+        var viewType = typeof(TView).Name;
+
+        if (_windows.TryGetValue(viewType, out var window))
+        {
+            if (viewType == nameof(HelpKeyboardView))
+            {
+                window.Close();
+            }
+            else
+            {
+                window.Show(this);
+            }
+
+            return;
+        }
+
+        var view = new TView { DataContext = context.Input };
+        view.Closed += (_, _) => _windows.Remove(viewType);
+
+        _windows.Add(viewType, view);
+
+        view.Show(this);
     }
 
     protected override void OnDataContextChanged(EventArgs e)

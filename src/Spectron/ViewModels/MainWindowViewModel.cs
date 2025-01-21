@@ -47,7 +47,6 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly Timer _statusBarTimer;
 
     private Emulator? Emulator { get; set; }
-    private HelpKeyboardView? _helpKeyboardView;
 
     private Preferences _preferences = new();
     private int _frameCount;
@@ -77,17 +76,19 @@ public partial class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<string, Unit> SetEmulationSpeedCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleFullScreenCommand { get; private set; }
     public ReactiveCommand<TapeSpeed, Unit> SetTapeLoadSpeedCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> HelpKeyboardCommand { get; private set; }
-    public ReactiveCommand<Unit, Task> ShowDebuggerViewCommand { get; private set; }
-    public ReactiveCommand<Unit, Task> ShowPreferencesViewCommand { get; private set; }
-    public ReactiveCommand<Unit, Task> ShowAboutViewCommand { get; private set; }
-    public ReactiveCommand<Unit, Task> ShowTimeMachineCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleMuteCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> TimeMachineResumeEmulatorCommand  { get; private set; }
 
-    public Interaction<PreferencesViewModel, Preferences?> ShowPreferencesView { get; }
+    public ReactiveCommand<Unit, Task> ShowAboutViewCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> ShowDebuggerViewCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> ShowKeyboardHelpViewCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> ShowPreferencesViewCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> ShowTimeMachineViewCommand { get; private set; }
+
     public Interaction<Unit, Unit?> ShowAboutView { get; }
     public Interaction<DebuggerViewModel, Unit?> ShowDebuggerView { get; }
+    public Interaction<Unit, Unit?> ShowKeyboardHelpView { get; }
+    public Interaction<PreferencesViewModel, Preferences?> ShowPreferencesView { get; }
     public Interaction<SelectFileViewModel, ArchiveEntry?> ShowSelectFileView { get; }
     public Interaction<TimeMachineViewModel, TimeMachineEntry?> ShowTimeMachineView { get; }
 
@@ -147,17 +148,19 @@ public partial class MainWindowViewModel : ViewModelBase
         SetEmulationSpeedCommand = ReactiveCommand.Create<string>(HandleSetEmulationSpeed);
         ToggleFullScreenCommand = ReactiveCommand.Create(HandleToggleFullScreen);
         SetTapeLoadSpeedCommand = ReactiveCommand.Create<TapeSpeed>(HandleSetTapeLoadingSpeed);
-        HelpKeyboardCommand = ReactiveCommand.Create(HandleHelpKeyboardCommand);
-        ShowDebuggerViewCommand = ReactiveCommand.Create(OpenDebuggerWindow);
-        ShowPreferencesViewCommand = ReactiveCommand.Create(OpenPreferencesWindow);
-        ShowAboutViewCommand = ReactiveCommand.Create(OpenAboutWindow);
-        ShowTimeMachineCommand = ReactiveCommand.Create(OpenTimeMachineWindow, timeMachineEnabled);
         ToggleMuteCommand = ReactiveCommand.Create(HandleToggleMute);
         TimeMachineResumeEmulatorCommand = ReactiveCommand.Create(HandleTimeMachineResumeEmulator);
 
-        ShowPreferencesView = new Interaction<PreferencesViewModel, Preferences?>();
+        ShowAboutViewCommand = ReactiveCommand.Create(OpenAboutWindow);
+        ShowDebuggerViewCommand = ReactiveCommand.Create(OpenDebuggerWindow);
+        ShowKeyboardHelpViewCommand = ReactiveCommand.Create(ShowKeyboardHelpWindow);
+        ShowPreferencesViewCommand = ReactiveCommand.Create(OpenPreferencesWindow);
+        ShowTimeMachineViewCommand = ReactiveCommand.Create(OpenTimeMachineWindow, timeMachineEnabled);
+
         ShowAboutView = new Interaction<Unit, Unit?>();
         ShowDebuggerView = new Interaction<DebuggerViewModel, Unit?>();
+        ShowKeyboardHelpView = new Interaction<Unit, Unit?>();
+        ShowPreferencesView = new Interaction<PreferencesViewModel, Preferences?>();
         ShowSelectFileView = new Interaction<SelectFileViewModel, ArchiveEntry?>();
         ShowTimeMachineView = new Interaction<TimeMachineViewModel, TimeMachineEntry?>();
 
@@ -166,10 +169,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private async Task OpenAboutWindow() => await ShowAboutView.Handle(Unit.Default);
 
-    public async Task OpenDebuggerWindow()
-    {
-        await Task.Yield();
-    }
+    private async Task OpenDebuggerWindow() => await ShowDebuggerView.Handle(new DebuggerViewModel());
+
+    private async Task ShowKeyboardHelpWindow() => await ShowKeyboardHelpView.Handle(Unit.Default);
 
     public async Task OpenPreferencesWindow()
     {

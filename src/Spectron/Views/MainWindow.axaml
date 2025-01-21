@@ -105,7 +105,7 @@
                 </MenuItem>
                 <MenuItem Header="-"/>
                 <MenuItem Header="Pause" HotKey="F10" InputGesture="F10" Command="{Binding TogglePauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
-                <MenuItem Header="Time Machine" HotKey="F9" InputGesture="F9" Command="{Binding ShowTimeMachineCommand}"/>
+                <MenuItem Header="Time Machine" HotKey="F9" InputGesture="F9" Command="{Binding ShowTimeMachineViewCommand}"/>
                 <MenuItem Header="-"/>
                 <MenuItem Header="Mute" ToggleType="CheckBox" Command="{Binding ToggleMuteCommand}" IsChecked="{Binding IsMuted}"/>
                 <MenuItem Header="-"/>
@@ -146,7 +146,7 @@
             </MenuItem>
 
             <MenuItem Header="_Help" Padding="10 0 10 0" Focusable="False">
-                <MenuItem Header="Keyboard" InputGesture="F1" Command="{Binding HelpKeyboardCommand}"/>
+                <MenuItem Header="Keyboard" InputGesture="F1" Command="{Binding ShowKeyboardHelpViewCommand}"/>
                 <MenuItem Header="About" Command="{Binding ShowAboutViewCommand}"/>
             </MenuItem>
         </Menu>
