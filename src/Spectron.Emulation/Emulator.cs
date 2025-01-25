@@ -43,7 +43,7 @@ public sealed class Emulator
     public RomType RomType { get; }
     public TapeSpeed TapeLoadSpeed { get; set; }
 
-    internal Z80 Cpu { get; }
+    public Z80 Cpu { get; }
     internal IEmulatorMemory Memory { get; }
     internal ScreenBuffer ScreenBuffer { get; }
     internal UlaPlus UlaPlus { get; }

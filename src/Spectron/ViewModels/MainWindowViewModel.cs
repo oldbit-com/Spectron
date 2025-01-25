@@ -23,7 +23,6 @@ using OldBit.Spectron.Helpers;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
-using OldBit.Spectron.Views;
 using OldBit.Spectron.Files.Szx;
 using ReactiveUI;
 using Timer = System.Timers.Timer;
@@ -46,13 +45,12 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
     private readonly Timer _statusBarTimer;
 
-    private Emulator? Emulator { get; set; }
-
     private Preferences _preferences = new();
     private int _frameCount;
     private readonly Stopwatch _renderStopwatch = new();
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
 
+    public Emulator? Emulator { get; private set; }
     public Control ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }
     public StatusBarViewModel StatusBar { get; } = new();
@@ -169,7 +167,10 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private async Task OpenAboutWindow() => await ShowAboutView.Handle(Unit.Default);
 
-    private async Task OpenDebuggerWindow() => await ShowDebuggerView.Handle(new DebuggerViewModel());
+    private async Task OpenDebuggerWindow()
+    {
+        await ShowDebuggerView.Handle(new DebuggerViewModel(this));
+    }
 
     private async Task ShowKeyboardHelpWindow() => await ShowKeyboardHelpView.Handle(Unit.Default);
 

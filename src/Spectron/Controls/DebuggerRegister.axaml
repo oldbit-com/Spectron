@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="OldBit.Spectron.Controls.DebuggerRegister">
+
+    <UserControl.Resources>
+        <Animation x:Key="RegisterAnimation" Duration="0:0:.4" x:SetterTargetType="TextBox">
+            <KeyFrame Cue="0%">
+                <Setter Property="Background" Value="Red" />
+            </KeyFrame>
+            <KeyFrame Cue="100%">
+            </KeyFrame>
+        </Animation>
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="TextBox.Register">
+            <Setter Property="FontFamily" Value="{StaticResource SpectrumStrictFont}"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Padding" Value="8 0 8 0"/>
+            <Setter Property="Height" Value="30"/>
+
+        </Style>
+        <Style Selector="TextBlock.Register">
+            <Setter Property="FontFamily" Value="{StaticResource SpectrumStrictFont}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="20"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid ColumnDefinitions="35,80">
+        <TextBlock Grid.Column="0" Grid.Row="0"
+                   Classes="Register"
+                   Text="{Binding $parent[controls:DebuggerRegister].RegisterName}"/>
+        <TextBox Grid.Column="1" Grid.Row="0"
+                 Background="{StaticResource TextBoxBackgroundThemeBrush}"
+                 x:Name="ValueControl"
+                 Classes="Register"
+                 Text="{Binding $parent[controls:DebuggerRegister].Value}"
+                 IsReadOnly="True" />
+    </Grid>
+</UserControl>

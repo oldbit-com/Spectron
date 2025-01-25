@@ -75,7 +75,20 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         }
 
         var view = new TView { DataContext = context.Input };
-        view.Closed += (_, _) => _windows.Remove(viewType);
+        view.Closed += (_, _) =>
+        {
+            if (!_windows.TryGetValue(viewType, out var closedWindow))
+            {
+                return;
+            }
+
+            if (closedWindow.DataContext is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+
+            _windows.Remove(viewType);
+        };
 
         _windows.Add(viewType, view);
 
