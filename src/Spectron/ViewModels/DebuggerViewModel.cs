@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using OldBit.Z80Cpu.Registers;
 using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
@@ -9,11 +10,6 @@ public class DebuggerViewModel : ViewModelBase, IDisposable
     private readonly List<IDisposable> _disposables = [];
 
     public MainWindowViewModel MainWindowViewModel { get; private  set; }
-
-    public DebuggerViewModel()
-    {
-        // TODO: Remove, needed for preview
-    }
 
     public DebuggerViewModel(MainWindowViewModel mainWindowViewModel)
     {
@@ -46,6 +42,7 @@ public class DebuggerViewModel : ViewModelBase, IDisposable
         IX = MainWindowViewModel.Emulator!.Cpu.Registers.IX;
         IY = MainWindowViewModel.Emulator!.Cpu.Registers.IY;
 
+        F = MainWindowViewModel.Emulator!.Cpu.Registers.F;
         I = MainWindowViewModel.Emulator!.Cpu.Registers.I;
         R = MainWindowViewModel.Emulator!.Cpu.Registers.R;
 
@@ -141,6 +138,13 @@ public class DebuggerViewModel : ViewModelBase, IDisposable
     {
         get => _i;
         set => this.RaiseAndSetIfChanged(ref _i, value);
+    }
+
+    private Flags _f;
+    public Flags F
+    {
+        get => _f;
+        set => this.RaiseAndSetIfChanged(ref _f, value);
     }
 
     private byte _r;

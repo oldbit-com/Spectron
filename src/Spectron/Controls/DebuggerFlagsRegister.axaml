@@ -5,23 +5,33 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="OldBit.Spectron.Controls.DebuggerFlagsRegister">
 
-    <Grid ColumnDefinitions="20,20,20,20,20,20,20,20" RowDefinitions="20,20">
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="S" />
-        <TextBlock Grid.Row="0" Grid.Column="1" Text="Z" />
-        <TextBlock Grid.Row="0" Grid.Column="2" Text="5" />
-        <TextBlock Grid.Row="0" Grid.Column="3" Text="H" />
-        <TextBlock Grid.Row="0" Grid.Column="4" Text="3" />
-        <TextBlock Grid.Row="0" Grid.Column="5" Text="P" />
-        <TextBlock Grid.Row="0" Grid.Column="6" Text="N" />
-        <TextBlock Grid.Row="0" Grid.Column="7" Text="C" />
+    <UserControl.Resources>
+        <Animation x:Key="FlagAnimation" Duration="0:0:.6" x:SetterTargetType="TextBlock">
+            <KeyFrame Cue="0%">
+                <Setter Property="Background" Value="Red" />
+            </KeyFrame>
+            <KeyFrame Cue="100%">
+            </KeyFrame>
+        </Animation>
+    </UserControl.Resources>
 
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="×" />
-        <TextBlock Grid.Row="1" Grid.Column="1" Text="●" />
-        <TextBlock Grid.Row="1" Grid.Column="2" Text="×" />
-        <TextBlock Grid.Row="1" Grid.Column="3" Text="●" />
-        <TextBlock Grid.Row="1" Grid.Column="4" Text="×" />
-        <TextBlock Grid.Row="1" Grid.Column="5" Text="●" />
-        <TextBlock Grid.Row="1" Grid.Column="6" Text="×" />
-        <TextBlock Grid.Row="1" Grid.Column="7" Text="●" />
+    <Grid ColumnDefinitions="20,20,20,20,20,20,20,20" RowDefinitions="20,20">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="S" HorizontalAlignment="Center"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="Z" HorizontalAlignment="Center"/>
+        <TextBlock Grid.Row="0" Grid.Column="2" Text="5" HorizontalAlignment="Center"/>
+        <TextBlock Grid.Row="0" Grid.Column="3" Text="H" HorizontalAlignment="Center"/>
+        <TextBlock Grid.Row="0" Grid.Column="4" Text="3" HorizontalAlignment="Center"/>
+        <TextBlock Grid.Row="0" Grid.Column="5" Text="P" HorizontalAlignment="Center"/>
+        <TextBlock Grid.Row="0" Grid.Column="6" Text="N" HorizontalAlignment="Center"/>
+        <TextBlock Grid.Row="0" Grid.Column="7" Text="C" HorizontalAlignment="Center"/>
+
+        <TextBlock x:Name="SignFlag" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center"/>
+        <TextBlock x:Name="ZeroFlag"  Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center"/>
+        <TextBlock x:Name="YFlag" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center"/>
+        <TextBlock x:Name="HalfCarryFlag" Grid.Row="1" Grid.Column="3" HorizontalAlignment="Center"/>
+        <TextBlock x:Name="XFlag" Grid.Row="1" Grid.Column="4" HorizontalAlignment="Center"/>
+        <TextBlock x:Name="ParityFlag" Grid.Row="1" Grid.Column="5" HorizontalAlignment="Center"/>
+        <TextBlock x:Name="AddSubtractFlag" Grid.Row="1" Grid.Column="6" HorizontalAlignment="Center"/>
+        <TextBlock x:Name="CarryFlag" Grid.Row="1" Grid.Column="7" HorizontalAlignment="Center"/>
     </Grid>
 </UserControl>
