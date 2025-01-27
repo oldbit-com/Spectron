@@ -4,15 +4,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
         xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
-        xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
+        xmlns:debugger="clr-namespace:OldBit.Spectron.Controls.Debugger"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.DebuggerView"
         x:DataType="viewModels:DebuggerViewModel"
         WindowStartupLocation="CenterOwner"
         Title="Debugger">
-    <Design.DataContext>
-        <viewModels:DebuggerViewModel/>
-    </Design.DataContext>
 
     <Window.Resources>
         <converters:HexConverter x:Key="HexConverter"/>
@@ -34,54 +31,57 @@
         </Style>
     </Window.Styles>
 
-    <Grid RowDefinitions="30,*">
-        <StackPanel Orientation="Horizontal">
-            <Button Width="90" Height="30" Padding="0 2 0 0" Command="{Binding MainWindowViewModel.TogglePauseCommand}" IsVisible="{Binding !MainWindowViewModel.IsPaused}" ToolTip.Tip="Pause F10">
+    <Grid RowDefinitions="*, 200" ColumnDefinitions="300,120,*,100" Margin="5">
+        <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Vertical">
+            <Button Width="90" Height="30" Padding="0 2 0 0" Command="{Binding MainWindowViewModel.TogglePauseCommand}" IsVisible="{Binding !MainWindowViewModel.IsPaused}" HotKey="F8" ToolTip.Tip="Pause F10">
                 <StackPanel Orientation="Horizontal">
                     <Path Data="m6 19h4V5H6v14zm8-14v14h4V5h-4z" Fill="{StaticResource ButtonForeground}"/>
                     <TextBlock Text="Pause" VerticalAlignment="Center" Padding="5 0 0 0"/>
                 </StackPanel>
             </Button>
-            <Button Width="90" Height="30" Padding="0 2 0 0" Command="{Binding MainWindowViewModel.TogglePauseCommand}" ToolTip.Tip="Resume (F5)" IsVisible="{Binding MainWindowViewModel.IsPaused}">
+            <Button Width="90" Height="30" Padding="0 2 0 0" Command="{Binding MainWindowViewModel.TogglePauseCommand}" HotKey="F5" ToolTip.Tip="Resume (F5)" IsVisible="{Binding MainWindowViewModel.IsPaused}">
                 <StackPanel Orientation="Horizontal">
                     <Path Data="M8 5v14l11-7z" Fill="{StaticResource ButtonForeground}"/>
                     <TextBlock Text="Resume" VerticalAlignment="Center" Padding="5 0 0 0"/>
                 </StackPanel>
             </Button>
-            <Button Width="90" Height="30" Padding="0 2 0 0" ToolTip.Tip="Step F8" IsEnabled="{Binding MainWindowViewModel.IsPaused}">
+            <Button Width="90" Height="30" Padding="0 2 0 0" ToolTip.Tip="Step F10" Command="{Binding DebuggerStepCommand}" HotKey="F10" IsEnabled="{Binding MainWindowViewModel.IsPaused}">
                 <StackPanel Orientation="Horizontal">
                     <Path Data="M8 5v14l11-7z" Fill="{StaticResource ButtonForeground}" />
                     <TextBlock Text="Step" VerticalAlignment="Center" Padding="5 0 0 0"/>
                 </StackPanel>
             </Button>
-
         </StackPanel>
 
-        <Grid Grid.Row="1" Margin="5" ColumnDefinitions="115,10,115" RowDefinitions="35,35,35,35,35,35,35,50">
-            <controls:DebuggerRegister Grid.Column="0" Grid.Row="0" RegisterName="PC" Value="{Binding PC, Converter={StaticResource HexConverter}}"/>
-            <controls:DebuggerRegister Grid.Column="2" Grid.Row="0" RegisterName="SP" Value="{Binding SP, Converter={StaticResource HexConverter}}"/>
+        <Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="115,10,115" RowDefinitions="35,35,35,35,35,35,35,50">
+            <debugger:Register Grid.Column="0" Grid.Row="0" RegisterName="PC" Value="{Binding PC, Converter={StaticResource HexConverter}}"/>
+            <debugger:Register Grid.Column="2" Grid.Row="0" RegisterName="SP" Value="{Binding SP, Converter={StaticResource HexConverter}}"/>
 
-            <controls:DebuggerRegister Grid.Column="0" Grid.Row="1" RegisterName="AF" Value="{Binding AF, Converter={StaticResource HexConverter}}"/>
-            <controls:DebuggerRegister Grid.Column="2" Grid.Row="1" RegisterName="AF'" Value="{Binding AFPrime, Converter={StaticResource HexConverter}}"/>
+            <debugger:Register Grid.Column="0" Grid.Row="1" RegisterName="AF" Value="{Binding AF, Converter={StaticResource HexConverter}}"/>
+            <debugger:Register Grid.Column="2" Grid.Row="1" RegisterName="AF'" Value="{Binding AFPrime, Converter={StaticResource HexConverter}}"/>
 
-            <controls:DebuggerRegister Grid.Column="0" Grid.Row="2" RegisterName="BC" Value="{Binding BC, Converter={StaticResource HexConverter}}"/>
-            <controls:DebuggerRegister Grid.Column="2" Grid.Row="2" RegisterName="BC'" Value="{Binding BCPrime, Converter={StaticResource HexConverter}}"/>
+            <debugger:Register Grid.Column="0" Grid.Row="2" RegisterName="BC" Value="{Binding BC, Converter={StaticResource HexConverter}}"/>
+            <debugger:Register Grid.Column="2" Grid.Row="2" RegisterName="BC'" Value="{Binding BCPrime, Converter={StaticResource HexConverter}}"/>
 
-            <controls:DebuggerRegister Grid.Column="0" Grid.Row="3" RegisterName="DE" Value="{Binding DE, Converter={StaticResource HexConverter}}"/>
-            <controls:DebuggerRegister Grid.Column="2" Grid.Row="3" RegisterName="DE'" Value="{Binding DEPrime, Converter={StaticResource HexConverter}}"/>
+            <debugger:Register Grid.Column="0" Grid.Row="3" RegisterName="DE" Value="{Binding DE, Converter={StaticResource HexConverter}}"/>
+            <debugger:Register Grid.Column="2" Grid.Row="3" RegisterName="DE'" Value="{Binding DEPrime, Converter={StaticResource HexConverter}}"/>
 
-            <controls:DebuggerRegister Grid.Column="0" Grid.Row="4" RegisterName="HL" Value="{Binding HL, Converter={StaticResource HexConverter}}"/>
-            <controls:DebuggerRegister Grid.Column="2" Grid.Row="4" RegisterName="HL'" Value="{Binding HLPrime, Converter={StaticResource HexConverter}}"/>
+            <debugger:Register Grid.Column="0" Grid.Row="4" RegisterName="HL" Value="{Binding HL, Converter={StaticResource HexConverter}}"/>
+            <debugger:Register Grid.Column="2" Grid.Row="4" RegisterName="HL'" Value="{Binding HLPrime, Converter={StaticResource HexConverter}}"/>
 
-            <controls:DebuggerRegister Grid.Column="0" Grid.Row="5" RegisterName="IX" Value="{Binding IX, Converter={StaticResource HexConverter}}"/>
-            <controls:DebuggerRegister Grid.Column="2" Grid.Row="5" RegisterName="IY" Value="{Binding IY, Converter={StaticResource HexConverter}}"/>
+            <debugger:Register Grid.Column="0" Grid.Row="5" RegisterName="IX" Value="{Binding IX, Converter={StaticResource HexConverter}}"/>
+            <debugger:Register Grid.Column="2" Grid.Row="5" RegisterName="IY" Value="{Binding IY, Converter={StaticResource HexConverter}}"/>
 
-            <controls:DebuggerRegister Grid.Column="0" Grid.Row="6" RegisterName="I" Value="{Binding I, Converter={StaticResource HexConverter}}"/>
-            <controls:DebuggerRegister Grid.Column="2" Grid.Row="6" RegisterName="R" Value="{Binding R, Converter={StaticResource HexConverter}}"/>
+            <debugger:Register Grid.Column="0" Grid.Row="6" RegisterName="I" Value="{Binding I, Converter={StaticResource HexConverter}}"/>
+            <debugger:Register Grid.Column="2" Grid.Row="6" RegisterName="R" Value="{Binding R, Converter={StaticResource HexConverter}}"/>
 
             <Grid Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="7" HorizontalAlignment="Center" Margin="0 10 0 0">
-                <controls:DebuggerFlagsRegister Flags="{Binding F}"/>
+                <debugger:FlagsRegister Flags="{Binding F}"/>
             </Grid>
         </Grid>
+
+        <debugger:Stack Grid.Row="0" Grid.Column="1" Height="250" VerticalAlignment="Top" DataContext="{Binding StackViewModel}"/>
+
+        <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" />
     </Grid>
 </Window>

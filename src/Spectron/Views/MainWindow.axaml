@@ -104,7 +104,7 @@
                     <MenuItem Header="Full Throttle" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="Max" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='Max'}"/>
                 </MenuItem>
                 <MenuItem Header="-"/>
-                <MenuItem Header="Pause" HotKey="F10" InputGesture="F10" Command="{Binding TogglePauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
+                <MenuItem Header="Pause" HotKey="F8" InputGesture="F8" Command="{Binding TogglePauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
                 <MenuItem Header="Time Machine" HotKey="F9" InputGesture="F9" Command="{Binding ShowTimeMachineViewCommand}"/>
                 <MenuItem Header="-"/>
                 <MenuItem Header="Mute" ToggleType="CheckBox" Command="{Binding ToggleMuteCommand}" IsChecked="{Binding IsMuted}"/>

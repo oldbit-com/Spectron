@@ -2,15 +2,15 @@ using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
 
-namespace OldBit.Spectron.Controls;
+namespace OldBit.Spectron.Controls.Debugger;
 
-public partial class DebuggerRegister : UserControl
+public partial class Register : UserControl
 {
     public static readonly StyledProperty<string> RegisterNameProperty =
-        AvaloniaProperty.Register<DebuggerRegister, string>(nameof(RegisterName));
+        AvaloniaProperty.Register<Register, string>(nameof(RegisterName));
 
     public static readonly StyledProperty<string> ValueProperty =
-        AvaloniaProperty.Register<DebuggerRegister, string>(nameof(Value), coerce: ValueChanged);
+        AvaloniaProperty.Register<Register, string>(nameof(Value), coerce: ValueChanged);
 
     public string RegisterName
     {
@@ -26,7 +26,7 @@ public partial class DebuggerRegister : UserControl
 
     private static string ValueChanged(AvaloniaObject control, string value)
     {
-        if (control is DebuggerRegister register &&
+        if (control is Register register &&
             register.Resources["RegisterAnimation"] is Animation animation)
         {
             animation.RunAsync(register.ValueControl);
@@ -35,5 +35,5 @@ public partial class DebuggerRegister : UserControl
         return value;
     }
 
-    public DebuggerRegister() => InitializeComponent();
+    public Register() => InitializeComponent();
 }

@@ -22,6 +22,7 @@ public sealed class Emulator
     private readonly TimeMachine _timeMachine;
     private readonly SpectrumBus _spectrumBus;
     private readonly EmulatorTimer _emulationTimer;
+    private readonly IEmulatorMemory _memory;
 
     private bool _invalidateScreen;
     private bool _isAcceleratedTapeSpeed;
@@ -30,7 +31,12 @@ public sealed class Emulator
     public event RenderScreenEvent? RenderScreen;
 
     public bool IsPaused => _emulationTimer.IsPaused;
-    public bool IsUlaPlusEnabled { get => UlaPlus.IsEnabled; set => ToggleUlaPlus(value); }
+
+    public bool IsUlaPlusEnabled
+    {
+        get => UlaPlus.IsEnabled;
+        set => ToggleUlaPlus(value);
+    }
 
     public KeyboardState KeyboardState { get; }
     public TapeManager TapeManager { get; }
@@ -44,7 +50,8 @@ public sealed class Emulator
     public TapeSpeed TapeLoadSpeed { get; set; }
 
     public Z80 Cpu { get; }
-    internal IEmulatorMemory Memory { get; }
+    public IMemory Memory => _memory;
+
     internal ScreenBuffer ScreenBuffer { get; }
     internal UlaPlus UlaPlus { get; }
 
@@ -67,12 +74,12 @@ public sealed class Emulator
         GamepadManager = gamepadManager;
         ComputerType = emulatorArgs.ComputerType;
         RomType = emulatorArgs.RomType;
-        Memory = emulatorArgs.Memory;
+        _memory = emulatorArgs.Memory;
 
         UlaPlus = new UlaPlus();
         _spectrumBus = new SpectrumBus();
         ScreenBuffer = new ScreenBuffer(hardware, emulatorArgs.Memory, UlaPlus);
-        Cpu = new Z80(emulatorArgs.Memory, emulatorArgs.ContentionProvider); ;
+        Cpu = new Z80(emulatorArgs.Memory, emulatorArgs.ContentionProvider);
 
         JoystickManager = new JoystickManager(gamepadManager, _spectrumBus, KeyboardState);
         KeyboardState.Reset();
@@ -127,7 +134,7 @@ public sealed class Emulator
     public void Reset()
     {
         AudioManager.ResetAudio();
-        Memory.Reset();
+        _memory.Reset();
         Cpu.Reset();
         ScreenBuffer.Reset();
         UlaPlus.Reset();
@@ -140,13 +147,11 @@ public sealed class Emulator
     }
 
     public void SetEmulationSpeed(int emulationSpeedPercentage) => _emulationTimer.Interval =
-        emulationSpeedPercentage == int.MaxValue ?
-            TimeSpan.Zero :
-            TimeSpan.FromMilliseconds(20 * (100f / emulationSpeedPercentage));
+        emulationSpeedPercentage == int.MaxValue ? TimeSpan.Zero : TimeSpan.FromMilliseconds(20 * (100f / emulationSpeedPercentage));
 
     private void SetupEventHandlers()
     {
-        Memory.ScreenMemoryUpdated += address => ScreenBuffer.UpdateScreen(address);
+        _memory.ScreenMemoryUpdated += address => ScreenBuffer.UpdateScreen(address);
         Cpu.Clock.TicksAdded += (_, _, currentFrameTicks) => ScreenBuffer.UpdateContent(currentFrameTicks);
         Cpu.BeforeFetch += BeforeInstructionFetch;
         UlaPlus.ActiveChanged += (_) => _invalidateScreen = true;
@@ -158,7 +163,7 @@ public sealed class Emulator
 
         _spectrumBus.AddDevice(ula);
         _spectrumBus.AddDevice(UlaPlus);
-        _spectrumBus.AddDevice(Memory);
+        _spectrumBus.AddDevice(_memory);
         _spectrumBus.AddDevice(AudioManager.Beeper);
         _spectrumBus.AddDevice(AudioManager.Ay);
 
@@ -223,6 +228,7 @@ public sealed class Emulator
                         _isAcceleratedTapeSpeed = true;
                         break;
                 }
+
                 break;
 
             case RomRoutines.SA_BYTES:
@@ -237,6 +243,7 @@ public sealed class Emulator
                         _isAcceleratedTapeSpeed = true;
                         break;
                 }
+
                 break;
 
             case RomRoutines.LD_BYTES_RET:

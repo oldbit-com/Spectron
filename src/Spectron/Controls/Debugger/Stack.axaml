@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="2000"
+             x:Class="OldBit.Spectron.Controls.Debugger.Stack"
+             x:DataType="viewModels:DebuggerStackViewModel">
+
+    <Design.DataContext>
+        <viewModels:DebuggerStackViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="30,*" Width="120">
+        <Border Grid.Row="0" Grid.ColumnSpan="2" BorderBrush="{StaticResource TextControlBorderBrush}" BorderThickness="2">
+            <TextBlock
+                Text="Stack"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontFamily="{StaticResource SpectrumStrictFont}"
+                FontSize="20"/>
+        </Border>
+
+        <ListBox Grid.Row="1" ItemsSource="{Binding Items}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid ColumnDefinitions="*,*" Height="10">
+                        <TextBlock
+                            Grid.Column="0"
+                            FontFamily="{StaticResource SpectrumStrictFont}"
+                            TextAlignment="Left"
+                            FontSize="20"
+                            Margin="0 -4 0 0"
+                            Text="{Binding Address}"/>
+                        <TextBlock
+                            Grid.Column="1"
+                            FontFamily="{StaticResource SpectrumStrictFont}"
+                            TextAlignment="Right"
+                            FontSize="20"
+                            Margin="0 -4 0 0"
+                            Text="{Binding Value}"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>

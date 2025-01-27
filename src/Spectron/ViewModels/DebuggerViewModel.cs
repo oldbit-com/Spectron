@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reactive;
 using OldBit.Z80Cpu.Registers;
 using ReactiveUI;
 
@@ -11,13 +12,20 @@ public class DebuggerViewModel : ViewModelBase, IDisposable
 
     public MainWindowViewModel MainWindowViewModel { get; private  set; }
 
+    public DebuggerStackViewModel StackViewModel { get; private set; } = new();
+
+    public ReactiveCommand<Unit, Unit> DebuggerStepCommand { get; private set; }
+
     public DebuggerViewModel(MainWindowViewModel mainWindowViewModel)
     {
         MainWindowViewModel = mainWindowViewModel;
 
+        DebuggerStepCommand = ReactiveCommand.Create(HandleDebuggerStep);
+
         var disposable = MainWindowViewModel
             .WhenAny(x => x.IsPaused, x => x.Value)
             .Subscribe(y => HandlePause());
+
         _disposables.Add(disposable);
     }
 
@@ -25,8 +33,20 @@ public class DebuggerViewModel : ViewModelBase, IDisposable
     {
         if (MainWindowViewModel.IsPaused)
         {
-            RefreshRegisters();
+            Refresh();
         }
+    }
+
+    private void HandleDebuggerStep()
+    {
+        MainWindowViewModel.Emulator!.Cpu.Step();
+        Refresh();
+    }
+
+    private void Refresh()
+    {
+        RefreshRegisters();
+        RefreshStack();
     }
 
     private void RefreshRegisters()
@@ -48,6 +68,10 @@ public class DebuggerViewModel : ViewModelBase, IDisposable
 
         PC = MainWindowViewModel.Emulator!.Cpu.Registers.PC;
     }
+
+    private void RefreshStack() =>
+        StackViewModel.Update(MainWindowViewModel.Emulator!.Memory,
+        MainWindowViewModel.Emulator!.Cpu.Registers.SP);
 
     private ushort _af;
     public ushort AF

@@ -2,9 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
+             xmlns:debugger="clr-namespace:OldBit.Spectron.Controls.Debugger"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="OldBit.Spectron.Controls.DebuggerRegister">
+             x:Class="OldBit.Spectron.Controls.Debugger.Register">
 
     <UserControl.Resources>
         <Animation x:Key="RegisterAnimation" Duration="0:0:.4" x:SetterTargetType="TextBox">
@@ -35,12 +35,12 @@
     <Grid ColumnDefinitions="35,80">
         <TextBlock Grid.Column="0" Grid.Row="0"
                    Classes="Register"
-                   Text="{Binding $parent[controls:DebuggerRegister].RegisterName}"/>
+                   Text="{Binding $parent[debugger:Register].RegisterName}"/>
         <TextBox Grid.Column="1" Grid.Row="0"
                  Background="{StaticResource TextBoxBackgroundThemeBrush}"
                  x:Name="ValueControl"
                  Classes="Register"
-                 Text="{Binding $parent[controls:DebuggerRegister].Value}"
+                 Text="{Binding $parent[debugger:Register].Value}"
                  IsReadOnly="True" />
     </Grid>
 </UserControl>

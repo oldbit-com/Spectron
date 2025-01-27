@@ -5,9 +5,9 @@ using Avalonia.Controls.Primitives;
 using OldBit.Z80Cpu.Extensions;
 using OldBit.Z80Cpu.Registers;
 
-namespace OldBit.Spectron.Controls;
+namespace OldBit.Spectron.Controls.Debugger;
 
-public partial class DebuggerFlagsRegister : UserControl
+public partial class FlagsRegister : UserControl
 {
     private const string FlagSet = "\u25cf";
     private const string FlagUnset = "\u00d7";
@@ -15,7 +15,7 @@ public partial class DebuggerFlagsRegister : UserControl
     private Animation? _animation;
 
     public static readonly StyledProperty<Flags> FlagsProperty =
-        AvaloniaProperty.Register<DebuggerFlagsRegister, Flags>(nameof(Flags), coerce: ValueChanged);
+        AvaloniaProperty.Register<FlagsRegister, Flags>(nameof(Flags), coerce: ValueChanged);
 
     public Flags Flags
     {
@@ -33,7 +33,7 @@ public partial class DebuggerFlagsRegister : UserControl
 
     private static Flags ValueChanged(AvaloniaObject control, Flags value)
     {
-        if (control is not DebuggerFlagsRegister flagsControl)
+        if (control is not FlagsRegister flagsControl)
         {
             return value;
         }
@@ -50,7 +50,7 @@ public partial class DebuggerFlagsRegister : UserControl
         return value;
     }
 
-    private static void UpdateFlag(DebuggerFlagsRegister control, TextBlock textBlock, Flags value, Flags flag)
+    private static void UpdateFlag(FlagsRegister control, TextBlock textBlock, Flags value, Flags flag)
     {
         var text = value.IsSet(flag) ? FlagSet : FlagUnset;
 
@@ -64,5 +64,5 @@ public partial class DebuggerFlagsRegister : UserControl
         control._animation?.RunAsync(textBlock);
     }
 
-    public DebuggerFlagsRegister() => InitializeComponent();
+    public FlagsRegister() => InitializeComponent();
 }
