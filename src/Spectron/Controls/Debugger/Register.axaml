@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:debugger="clr-namespace:OldBit.Spectron.Controls.Debugger"
+             xmlns:local="clr-namespace:OldBit.Spectron.Controls.Debugger"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="OldBit.Spectron.Controls.Debugger.Register">
 
@@ -23,7 +23,6 @@
             <Setter Property="FontSize" Value="20"/>
             <Setter Property="Padding" Value="8 0 8 0"/>
             <Setter Property="Height" Value="30"/>
-
         </Style>
         <Style Selector="TextBlock.Register">
             <Setter Property="FontFamily" Value="{StaticResource SpectrumStrictFont}"/>
@@ -35,12 +34,12 @@
     <Grid ColumnDefinitions="35,80">
         <TextBlock Grid.Column="0" Grid.Row="0"
                    Classes="Register"
-                   Text="{Binding $parent[debugger:Register].RegisterName}"/>
+                   Text="{Binding $parent[local:Register].RegisterName}"/>
         <TextBox Grid.Column="1" Grid.Row="0"
                  Background="{StaticResource TextBoxBackgroundThemeBrush}"
                  x:Name="ValueControl"
                  Classes="Register"
-                 Text="{Binding $parent[debugger:Register].Value}"
+                 Text="{Binding $parent[local:Register].Value}"
                  IsReadOnly="True" />
     </Grid>
 </UserControl>

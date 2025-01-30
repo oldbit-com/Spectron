@@ -24,6 +24,7 @@ using OldBit.Spectron.Models;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.Files.Szx;
+using OldBit.Spectron.ViewModels.Debugger;
 using ReactiveUI;
 using Timer = System.Timers.Timer;
 

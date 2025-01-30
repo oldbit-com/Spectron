@@ -3,12 +3,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+             xmlns:debugger="clr-namespace:OldBit.Spectron.ViewModels.Debugger"
              mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="2000"
              x:Class="OldBit.Spectron.Controls.Debugger.Stack"
-             x:DataType="viewModels:DebuggerStackViewModel">
+             x:DataType="debugger:DebuggerStackViewModel">
 
     <Design.DataContext>
-        <viewModels:DebuggerStackViewModel/>
+        <debugger:DebuggerStackViewModel/>
     </Design.DataContext>
 
     <Grid RowDefinitions="30,*" Width="120">
@@ -22,6 +23,11 @@
         </Border>
 
         <ListBox Grid.Row="1" ItemsSource="{Binding Items}">
+            <ListBox.Styles>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="Height" Value="20"/>
+                </Style>
+            </ListBox.Styles>
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid ColumnDefinitions="*,*" Height="10">

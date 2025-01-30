@@ -2,7 +2,7 @@ using System.Collections.ObjectModel;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Z80Cpu;
 
-namespace OldBit.Spectron.ViewModels;
+namespace OldBit.Spectron.ViewModels.Debugger;
 
 public record StackItem(string Address, string Value);
 
