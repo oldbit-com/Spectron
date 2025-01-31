@@ -31,7 +31,7 @@
         </Style>
     </UserControl.Styles>
 
-    <Grid ColumnDefinitions="35,80">
+    <Grid ColumnDefinitions="35,50">
         <TextBlock Grid.Column="0" Grid.Row="0"
                    Classes="Register"
                    Text="{Binding $parent[local:Register].RegisterName}"/>

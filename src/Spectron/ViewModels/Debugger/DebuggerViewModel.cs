@@ -1,36 +1,70 @@
 using System;
 using System.Collections.Generic;
 using System.Reactive;
-using OldBit.Z80Cpu.Registers;
+using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.Debugger;
+using OldBit.Z80Cpu.Events;
 using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels.Debugger;
 
 public class DebuggerViewModel : ViewModelBase, IDisposable
 {
+    private readonly DebuggerContext _debuggerContext;
     private readonly List<IDisposable> _disposables = [];
 
-    public MainWindowViewModel MainWindowViewModel { get; private  set; }
+    private Emulator Emulator => MainWindowViewModel.Emulator!;
+    private Word? _skipDebuggerBreakpointAddress = null;
 
-    public DebuggerCodeListViewModel CodeListViewModel { get; private set; } = new();
-
-    public DebuggerStackViewModel StackViewModel { get; private set; } = new();
-
-    public DebuggerCpuViewModel CpuViewModel { get; private set; } = new();
+    public MainWindowViewModel MainWindowViewModel { get; }
+    public DebuggerCodeListViewModel CodeListViewModel { get; }
+    public DebuggerStackViewModel StackViewModel { get; } = new();
+    public DebuggerCpuViewModel CpuViewModel { get; } = new();
 
     public ReactiveCommand<Unit, Unit> DebuggerStepCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> DebuggerResumeCommand { get; private set; }
 
-    public DebuggerViewModel(MainWindowViewModel mainWindowViewModel)
+    public DebuggerViewModel(
+        MainWindowViewModel mainWindowViewModel,
+        DebuggerContext debuggerContext)
     {
+        _debuggerContext = debuggerContext;
         MainWindowViewModel = mainWindowViewModel;
 
-        DebuggerStepCommand = ReactiveCommand.Create(HandleDebuggerStep);
+        CodeListViewModel = new DebuggerCodeListViewModel(debuggerContext);
 
-        var disposable = MainWindowViewModel
+        DebuggerStepCommand = ReactiveCommand.Create(HandleDebuggerStep);
+        DebuggerResumeCommand = ReactiveCommand.Create(HandleDebuggerResume);
+
+        var disposable = mainWindowViewModel
             .WhenAny(x => x.IsPaused, x => x.Value)
             .Subscribe(y => HandlePause());
 
         _disposables.Add(disposable);
+
+        Emulator.Cpu.BeforeInstruction += BeforeInstruction;
+    }
+
+    private void BeforeInstruction(BeforeInstructionEventArgs e)
+    {
+        if (_skipDebuggerBreakpointAddress == e.PC)
+        {
+            _skipDebuggerBreakpointAddress = null;
+
+            return;
+        }
+
+        if (!_debuggerContext.HasBreakpoint(e.PC))
+        {
+            return;
+        }
+
+        e.IsBreakpoint = true;
+
+        Emulator.Pause();
+        MainWindowViewModel.IsPaused = true;
+
+        Refresh();
     }
 
     private void HandlePause()
@@ -43,8 +77,17 @@ public class DebuggerViewModel : ViewModelBase, IDisposable
 
     private void HandleDebuggerStep()
     {
-        MainWindowViewModel.Emulator!.Cpu.Step();
+        Emulator.Cpu.Step();
         Refresh();
+    }
+
+    private void HandleDebuggerResume()
+    {
+        // Prevent the breakpoint from being hit again for current instruction
+        _skipDebuggerBreakpointAddress = Emulator.Cpu.Registers.PC;
+
+        Emulator.Resume();
+        MainWindowViewModel.IsPaused = false;
     }
 
     private void Refresh()
@@ -54,24 +97,23 @@ public class DebuggerViewModel : ViewModelBase, IDisposable
         RefreshCode();
     }
 
-    private void RefreshCpu() =>
-        CpuViewModel.Update(MainWindowViewModel.Emulator!.Cpu);
+    private void RefreshCpu() => CpuViewModel.Update(Emulator.Cpu);
 
-    private void RefreshStack() =>
-        StackViewModel.Update(MainWindowViewModel.Emulator!.Memory,
-        MainWindowViewModel.Emulator!.Cpu.Registers.SP);
+    private void RefreshStack() => StackViewModel.Update(Emulator.Memory, Emulator.Cpu.Registers.SP);
 
-    private void RefreshCode() =>
-        CodeListViewModel.Update(MainWindowViewModel.Emulator!.Memory,
-            MainWindowViewModel.Emulator!.Cpu.Registers.PC);
+    private void RefreshCode() => CodeListViewModel.Update(Emulator.Memory, Emulator.Cpu.Registers.PC);
 
     public void Dispose()
     {
         GC.SuppressFinalize(this);
 
+        Emulator.Cpu.BeforeInstruction -= BeforeInstruction;
+
         foreach (var disposable in _disposables)
         {
             disposable.Dispose();
         }
+
+        _disposables.Clear();
     }
 }

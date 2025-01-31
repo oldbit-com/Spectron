@@ -10,6 +10,7 @@ using Avalonia.Input;
 using Avalonia.Threading;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Commands;
+using OldBit.Spectron.Emulation.Debugger;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Rom;
@@ -43,6 +44,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private readonly PreferencesService _preferencesService;
     private readonly SessionService _sessionService;
+    private readonly DebuggerContext _debuggerContext;
     private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
     private readonly Timer _statusBarTimer;
 
@@ -100,7 +102,8 @@ public partial class MainWindowViewModel : ViewModelBase
         PreferencesService preferencesService,
         SessionService sessionService,
         RecentFilesViewModel recentFilesViewModel,
-        TapeMenuViewModel tapeMenuViewModel)
+        TapeMenuViewModel tapeMenuViewModel,
+        DebuggerContext debuggerContext)
     {
         _emulatorFactory = emulatorFactory;
         _timeMachine = timeMachine;
@@ -109,6 +112,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _loader = loader;
         _preferencesService = preferencesService;
         _sessionService = sessionService;
+        _debuggerContext = debuggerContext;
         RecentFilesViewModel = recentFilesViewModel;
         TapeMenuViewModel = tapeMenuViewModel;
         recentFilesViewModel.OpenRecentFileAsync = async fileName => await HandleLoadFileAsync(fileName);
@@ -170,7 +174,12 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private async Task OpenDebuggerWindow()
     {
-        await ShowDebuggerView.Handle(new DebuggerViewModel(this));
+        if (!IsPaused)
+        {
+            HandleTogglePause();
+        }
+
+        await ShowDebuggerView.Handle(new DebuggerViewModel(this, _debuggerContext));
     }
 
     private async Task ShowKeyboardHelpWindow() => await ShowKeyboardHelpView.Handle(Unit.Default);

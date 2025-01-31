@@ -3,8 +3,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="clr-namespace:OldBit.Spectron.Controls.Debugger"
+             xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="OldBit.Spectron.Controls.Debugger.CodeLine">
+
+    <UserControl.Resources>
+        <converters:HexConverter x:Key="HexConverter"/>
+    </UserControl.Resources>
 
     <UserControl.Styles>
         <Style Selector="local|CodeLine[IsCurrent=false] Grid Path.Current">
@@ -32,7 +37,7 @@
             FontSize="24"
             VerticalAlignment="Center"
             Height="22"
-            Text="{Binding $parent[local:CodeLine].Address}"/>
+            Text="{Binding $parent[local:CodeLine].Address, Converter={StaticResource HexConverter}}"/>
 
         <Path
             Grid.Column="2"

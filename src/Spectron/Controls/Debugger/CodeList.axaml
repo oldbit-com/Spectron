@@ -8,10 +8,6 @@
              x:DataType="viewModels:DebuggerCodeListViewModel"
              x:Class="OldBit.Spectron.Controls.Debugger.CodeList">
 
-    <Design.DataContext>
-        <viewModels:DebuggerCodeListViewModel/>
-    </Design.DataContext>
-
     <Grid RowDefinitions="30,*">
         <Border Grid.Row="0" Grid.ColumnSpan="2" BorderBrush="{StaticResource TextControlBorderBrush}" BorderThickness="2">
             <TextBlock

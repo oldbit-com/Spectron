@@ -10,6 +10,7 @@ using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Z80Cpu;
+using OldBit.Z80Cpu.Events;
 
 namespace OldBit.Spectron.Emulation;
 
@@ -153,7 +154,7 @@ public sealed class Emulator
     {
         _memory.ScreenMemoryUpdated += address => ScreenBuffer.UpdateScreen(address);
         Cpu.Clock.TicksAdded += (_, _, currentFrameTicks) => ScreenBuffer.UpdateContent(currentFrameTicks);
-        Cpu.BeforeFetch += BeforeInstructionFetch;
+        Cpu.BeforeInstruction += BeforeInstruction;
         UlaPlus.ActiveChanged += (_) => _invalidateScreen = true;
     }
 
@@ -212,9 +213,9 @@ public sealed class Emulator
         _invalidateScreen = true;
     }
 
-    private void BeforeInstructionFetch(Word pc)
+    private void BeforeInstruction(BeforeInstructionEventArgs e)
     {
-        switch (pc)
+        switch (e.PC)
         {
             case RomRoutines.LD_BYTES:
                 switch (TapeLoadSpeed)

@@ -1,11 +1,35 @@
+using System;
+using OldBit.Spectron.Emulation.Debugger;
 using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels.Debugger;
 
 public class DebuggerCodeLineViewModel : ViewModelBase
 {
-    private string _address = string.Empty;
-    public string Address
+    private readonly DebuggerContext _debuggerContext;
+
+    public DebuggerCodeLineViewModel(DebuggerContext debuggerContext)
+    {
+        _debuggerContext = debuggerContext;
+
+        this.WhenAny(x => x.IsBreakpoint, x => x.Value)
+            .Subscribe(ToggleBreakpoint);
+    }
+
+    private void ToggleBreakpoint(bool isBreakpoint)
+    {
+        if (isBreakpoint)
+        {
+            _debuggerContext.AddBreakpoint(Address);
+        }
+        else
+        {
+            _debuggerContext.RemoveBreakpoint(Address);
+        }
+    }
+
+    private Word _address;
+    public Word Address
     {
         get => _address;
         set => this.RaiseAndSetIfChanged(ref _address, value);

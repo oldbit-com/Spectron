@@ -4,8 +4,5 @@ namespace OldBit.Spectron.Controls.Debugger;
 
 public partial class Stack : UserControl
 {
-    public Stack()
-    {
-        InitializeComponent();
-    }
+    public Stack() => InitializeComponent();
 }

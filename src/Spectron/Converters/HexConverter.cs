@@ -8,8 +8,8 @@ public class HexConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value switch
     {
-        ushort wordValue => $"0x{wordValue:X4}",
-        byte byteValue => $"0x{byteValue:X2}",
+        Word wordValue => $"{wordValue:X4}",
+        byte byteValue => $"{byteValue:X2}",
         _ => value
     };
 
@@ -17,7 +17,7 @@ public class HexConverter : IValueConverter
     {
         if (value is string address)
         {
-            return ushort.Parse(address.Replace("0x", string.Empty), NumberStyles.HexNumber);
+            return Word.Parse(address.Replace("0x", string.Empty), NumberStyles.HexNumber);
         }
 
         return value;

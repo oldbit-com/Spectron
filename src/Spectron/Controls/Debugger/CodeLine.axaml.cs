@@ -11,8 +11,8 @@ public partial class CodeLine : UserControl
     public static readonly StyledProperty<bool> IsBreakpointProperty =
         AvaloniaProperty.Register<CodeLine, bool>(nameof(IsBreakpoint));
 
-    public static readonly StyledProperty<string> AddressProperty =
-        AvaloniaProperty.Register<CodeLine, string>(nameof(Address));
+    public static readonly StyledProperty<Word> AddressProperty =
+        AvaloniaProperty.Register<CodeLine, Word>(nameof(Address));
 
     public static readonly StyledProperty<string> CodeProperty =
         AvaloniaProperty.Register<CodeLine, string>(nameof(Code));
@@ -29,7 +29,7 @@ public partial class CodeLine : UserControl
         set => SetValue(IsBreakpointProperty, value);
     }
 
-    public string Address
+    public Word Address
     {
         get => GetValue(AddressProperty);
         set => SetValue(AddressProperty, value);

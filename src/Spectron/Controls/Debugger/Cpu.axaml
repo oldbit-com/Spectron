@@ -24,7 +24,7 @@
         </Border>
 
         <Border Grid.Row="1" Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
-            <Grid ColumnDefinitions="115,10,115" RowDefinitions="35,35,35,35,35,35,35,50" HorizontalAlignment="Center">
+            <Grid ColumnDefinitions="100,10,100" RowDefinitions="35,35,35,35,35,35,35,50" HorizontalAlignment="Center">
                 <local:Register Grid.Column="0" Grid.Row="0" RegisterName="PC" Value="{Binding PC, Converter={StaticResource HexConverter}}"/>
                 <local:Register Grid.Column="2" Grid.Row="0" RegisterName="SP" Value="{Binding SP, Converter={StaticResource HexConverter}}"/>
 

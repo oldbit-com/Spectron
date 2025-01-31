@@ -26,86 +26,85 @@ public class DebuggerCpuViewModel : ViewModelBase
         PC = cpu.Registers.PC;
     }
 
-
-    private ushort _af;
-    public ushort AF
+    private Word _af;
+    public Word AF
     {
         get => _af;
         set => this.RaiseAndSetIfChanged(ref _af, value);
     }
 
-    private ushort _afPrime;
-    public ushort AFPrime
+    private Word _afPrime;
+    public Word AFPrime
     {
         get => _afPrime;
         set => this.RaiseAndSetIfChanged(ref _afPrime, value);
     }
 
-    private ushort _bc;
-    public ushort BC
+    private Word _bc;
+    public Word BC
     {
         get => _bc;
         set => this.RaiseAndSetIfChanged(ref _bc, value);
     }
 
-    private ushort _bcPrime;
-    public ushort BCPrime
+    private Word _bcPrime;
+    public Word BCPrime
     {
         get => _bcPrime;
         set => this.RaiseAndSetIfChanged(ref _bcPrime, value);
     }
 
-    private ushort _de;
-    public ushort DE
+    private Word _de;
+    public Word DE
     {
         get => _de;
         set => this.RaiseAndSetIfChanged(ref _de, value);
     }
 
-    private ushort _dePrime;
-    public ushort DEPrime
+    private Word _dePrime;
+    public Word DEPrime
     {
         get => _dePrime;
         set => this.RaiseAndSetIfChanged(ref _dePrime, value);
     }
 
-    private ushort _hl;
-    public ushort HL
+    private Word _hl;
+    public Word HL
     {
         get => _hl;
         set => this.RaiseAndSetIfChanged(ref _hl, value);
     }
 
-    private ushort _hlPrime;
-    public ushort HLPrime
+    private Word _hlPrime;
+    public Word HLPrime
     {
         get => _hlPrime;
         set => this.RaiseAndSetIfChanged(ref _hlPrime, value);
     }
 
-    private ushort _ix;
-    public ushort IX
+    private Word _ix;
+    public Word IX
     {
         get => _ix;
         set => this.RaiseAndSetIfChanged(ref _ix, value);
     }
 
-    private ushort _iy;
-    public ushort IY
+    private Word _iy;
+    public Word IY
     {
         get => _iy;
         set => this.RaiseAndSetIfChanged(ref _iy, value);
     }
 
-    private ushort _pc;
-    public ushort PC
+    private Word _pc;
+    public Word PC
     {
         get => _pc;
         set => this.RaiseAndSetIfChanged(ref _pc, value);
     }
 
-    private ushort _sp;
-    public ushort SP
+    private Word _sp;
+    public Word SP
     {
         get => _sp;
         set => this.RaiseAndSetIfChanged(ref _sp, value);
