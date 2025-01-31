@@ -52,14 +52,14 @@ Tape saving is supported for **TAP** and **TZX** formats. Two saving speeds are 
 
 ## Snapshots
 Emulator supports saving and loading snapshots in **SNA**, **SZX** and **Z80** formats (can be inside zip file).
-It is recommended to use **SZX** format when saving snapshot since it is the most robust and supports all features of the emulator.
+It is recommended to use **SZX** format when saving a snapshot since it is the most robust and supports all features of the emulator.
 
 ## Screen
 Multicolor screen effects are supported, as well as border effects.
 
 ## Audio
-Standard beeper audio is supported, as well as AY audio (mono or stereo ABC or ACB mode).
-Additionally AY can be enabled in 48K mode, not only in 128K mode.
+Standard beeper audio is supported, as well as AY audio (mono / stereo ABC or ACB mode).
+Additionally AY can be enabled in 48K mode.
 
 Audio playback is done using [Beep](https://github.com/oldbit-com/Beep) which I created for this 
 project since I couldn't find any simple cross-platform audio player that would suit my needs.
