@@ -73,12 +73,11 @@
         <TabControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4">
             <TabItem Header="Immediate">
                 <Grid RowDefinitions="*, Auto">
-                    <TextBox Grid.Row="0" Margin="0 0 0 5" IsReadOnly="True"/>
-                    <TextBox Grid.Row="1" HorizontalAlignment="Stretch" Height="30" VerticalAlignment="Bottom"/>
+                    <TextBox Grid.Row="0" FontFamily="{StaticResource HackRegular}" FontSize="15"  Margin="0 0 0 5" IsReadOnly="True"/>
+                    <TextBox Grid.Row="1" FontFamily="{StaticResource HackRegular}" FontSize="15" HorizontalAlignment="Stretch" Height="30" VerticalAlignment="Bottom"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Breakpoints">
-
             </TabItem>
         </TabControl>
     </Grid>

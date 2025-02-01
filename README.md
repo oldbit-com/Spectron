@@ -84,3 +84,7 @@ The interval and the number of time points can be adjusted in the settings.
 Debugger is available in the emulator. It is a simple debugger that allows you to inspect the CPU registers, 
 memory and disassembly. You can step through the code, set breakpoints.
 
+### Acknowledgements
+- ZX Spectrum Font: https://github.com/comptic/zx-spectrum-font
+- Hack Font: https://sourcefoundry.org/hack/
+
