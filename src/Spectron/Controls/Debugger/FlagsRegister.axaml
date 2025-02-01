@@ -16,22 +16,22 @@
     </UserControl.Resources>
 
     <Grid ColumnDefinitions="20,20,20,20,20,20,20,20" RowDefinitions="20,20">
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="S" HorizontalAlignment="Center"/>
-        <TextBlock Grid.Row="0" Grid.Column="1" Text="Z" HorizontalAlignment="Center"/>
-        <TextBlock Grid.Row="0" Grid.Column="2" Text="5" HorizontalAlignment="Center"/>
-        <TextBlock Grid.Row="0" Grid.Column="3" Text="H" HorizontalAlignment="Center"/>
-        <TextBlock Grid.Row="0" Grid.Column="4" Text="3" HorizontalAlignment="Center"/>
-        <TextBlock Grid.Row="0" Grid.Column="5" Text="P" HorizontalAlignment="Center"/>
-        <TextBlock Grid.Row="0" Grid.Column="6" Text="N" HorizontalAlignment="Center"/>
-        <TextBlock Grid.Row="0" Grid.Column="7" Text="C" HorizontalAlignment="Center"/>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="S" HorizontalAlignment="Center" Padding="4 3 2 0"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="Z" HorizontalAlignment="Center" Padding="4 3 2 0"/>
+        <TextBlock Grid.Row="0" Grid.Column="2" Text="5" HorizontalAlignment="Center" Padding="4 3 2 0"/>
+        <TextBlock Grid.Row="0" Grid.Column="3" Text="H" HorizontalAlignment="Center" Padding="4 3 2 0"/>
+        <TextBlock Grid.Row="0" Grid.Column="4" Text="3" HorizontalAlignment="Center" Padding="4 3 2 0"/>
+        <TextBlock Grid.Row="0" Grid.Column="5" Text="P" HorizontalAlignment="Center" Padding="4 3 2 0"/>
+        <TextBlock Grid.Row="0" Grid.Column="6" Text="N" HorizontalAlignment="Center" Padding="4 3 2 0"/>
+        <TextBlock Grid.Row="0" Grid.Column="7" Text="C" HorizontalAlignment="Center" Padding="4 3 2 0"/>
 
-        <TextBlock x:Name="SignFlag" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center"/>
-        <TextBlock x:Name="ZeroFlag"  Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center"/>
-        <TextBlock x:Name="YFlag" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center"/>
-        <TextBlock x:Name="HalfCarryFlag" Grid.Row="1" Grid.Column="3" HorizontalAlignment="Center"/>
-        <TextBlock x:Name="XFlag" Grid.Row="1" Grid.Column="4" HorizontalAlignment="Center"/>
-        <TextBlock x:Name="ParityFlag" Grid.Row="1" Grid.Column="5" HorizontalAlignment="Center"/>
-        <TextBlock x:Name="AddSubtractFlag" Grid.Row="1" Grid.Column="6" HorizontalAlignment="Center"/>
-        <TextBlock x:Name="CarryFlag" Grid.Row="1" Grid.Column="7" HorizontalAlignment="Center"/>
+        <TextBlock x:Name="SignFlag" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" Padding="2 3 2 0"/>
+        <TextBlock x:Name="ZeroFlag" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Padding="2 3 2 0"/>
+        <TextBlock x:Name="YFlag" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" Padding="2 3 2 0"/>
+        <TextBlock x:Name="HalfCarryFlag" Grid.Row="1" Grid.Column="3" HorizontalAlignment="Center" Padding="2 3 2 0"/>
+        <TextBlock x:Name="XFlag" Grid.Row="1" Grid.Column="4" HorizontalAlignment="Center" Padding="2 3 2 0"/>
+        <TextBlock x:Name="ParityFlag" Grid.Row="1" Grid.Column="5" HorizontalAlignment="Center" Padding="2 3 2 0"/>
+        <TextBlock x:Name="AddSubtractFlag" Grid.Row="1" Grid.Column="6" HorizontalAlignment="Center" Padding="2 3 2 0"/>
+        <TextBlock x:Name="CarryFlag" Grid.Row="1" Grid.Column="7" HorizontalAlignment="Center" Padding="2 3 2 0"/>
     </Grid>
 </UserControl>

@@ -9,8 +9,8 @@ namespace OldBit.Spectron.Controls.Debugger;
 
 public partial class FlagsRegister : UserControl
 {
-    private const string FlagSet = "\u25cf";
-    private const string FlagUnset = "\u00d7";
+    private const string FlagSet = "\u25cf";        // ●
+    private const string FlagUnset = "\u00d7";      // ×
 
     private Animation? _animation;
 

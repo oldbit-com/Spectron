@@ -1,3 +1,4 @@
+using System.Threading;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
@@ -11,6 +12,8 @@ public partial class Register : UserControl
 
     public static readonly StyledProperty<string> ValueProperty =
         AvaloniaProperty.Register<Register, string>(nameof(Value), coerce: ValueChanged);
+
+    private CancellationTokenSource _cancellationTokenSource = new();
 
     public string RegisterName
     {
@@ -29,7 +32,12 @@ public partial class Register : UserControl
         if (control is Register register &&
             register.Resources["RegisterAnimation"] is Animation animation)
         {
-            animation.RunAsync(register.ValueControl);
+            // Cancel the current animation and start a new one, this prevents overlapping animations.
+            register._cancellationTokenSource.Cancel();
+            register._cancellationTokenSource.Dispose();
+            register._cancellationTokenSource = new CancellationTokenSource();
+
+            animation.RunAsync(register.ValueControl, register._cancellationTokenSource.Token);
         }
 
         return value;

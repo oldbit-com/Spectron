@@ -67,6 +67,7 @@
 
         <debugger:Memory
             Grid.Row="1" Grid.Column="3"
+            Margin="1"
             />
 
         <TabControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4">

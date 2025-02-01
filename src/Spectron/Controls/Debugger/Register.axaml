@@ -11,8 +11,7 @@
             <KeyFrame Cue="0%">
                 <Setter Property="Background" Value="Red" />
             </KeyFrame>
-            <KeyFrame Cue="100%">
-            </KeyFrame>
+            <KeyFrame Cue="100%"/>
         </Animation>
     </UserControl.Resources>
 
