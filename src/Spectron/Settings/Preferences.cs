@@ -2,6 +2,7 @@ using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Models;
+using OldBit.Spectron.Theming;
 
 namespace OldBit.Spectron.Settings;
 
@@ -9,6 +10,8 @@ public record TapeSavingSettings(bool IsEnabled, TapeSpeed Speed);
 
 public class Preferences
 {
+    public Theme Theme { get; init; } = Theme.Dark;
+
     public ResumeSettings ResumeSettings { get; init; } = new();
 
     public bool IsUlaPlusEnabled { get; init; }

@@ -23,8 +23,8 @@ using OldBit.Spectron.Helpers;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
-using OldBit.Spectron.Views;
 using OldBit.Spectron.Files.Szx;
+using OldBit.Spectron.Theming;
 using ReactiveUI;
 using Timer = System.Timers.Timer;
 
@@ -180,12 +180,13 @@ public partial class MainWindowViewModel : ViewModelBase
         using var viewModel = new PreferencesViewModel(_preferences, _gamepadManager);
         var preferences = await ShowPreferencesView.Handle(viewModel);
 
+        ThemeManager.SelectTheme(preferences?.Theme ?? _preferences.Theme);
+
         if (preferences != null)
         {
             _preferences = preferences;
 
             //TapeLoadingSpeed = preferences.TapeLoadingSpeed;
-
             IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
 
             IsTimeMachineEnabled = preferences.TimeMachine.IsEnabled;
@@ -256,6 +257,8 @@ public partial class MainWindowViewModel : ViewModelBase
     private async Task WindowOpenedAsync()
     {
         _preferences = await _preferencesService.LoadAsync();
+
+        ThemeManager.SelectTheme(_preferences.Theme);
 
         IsMuted = _preferences.AudioSettings.IsMuted;
 

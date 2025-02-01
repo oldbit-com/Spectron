@@ -2,15 +2,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:spectron="clr-namespace:OldBit.Spectron"
              Name="Spectron"
+             RequestedThemeVariant="Dark"
              x:Class="OldBit.Spectron.App">
 
     <Application.DataTemplates>
         <spectron:ViewLocator/>
     </Application.DataTemplates>
-
-    <Application.RequestedThemeVariant>
-        <ThemeVariant>Dark</ThemeVariant>
-    </Application.RequestedThemeVariant>
 
     <NativeMenu.Menu>
         <NativeMenu>
