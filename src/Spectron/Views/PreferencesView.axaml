@@ -4,6 +4,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
         xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
+        xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
+        xmlns:theming="clr-namespace:OldBit.Spectron.Theming"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.PreferencesView"
         x:DataType="viewModels:PreferencesViewModel"
@@ -13,10 +15,14 @@
         CanResize="False"
         Title="Preferences">
 
+    <Window.Resources>
+        <converters:ValueEqualityConverter x:Key="ValueEqualityConverter"/>
+    </Window.Resources>
+
     <Window.Styles>
         <Style Selector="Border.Tab">
             <Setter Property="Padding" Value="10" />
-            <Setter Property="Background" Value="{StaticResource SystemChromeBlackMediumColor}"/>
+            <Setter Property="Background" Value="{DynamicResource SystemChromeMediumLowColor}"/>
         </Style>
         <Style Selector="RadioButton.Center">
             <Setter Property="Padding" Value="8 2 0 0" />
@@ -34,6 +40,11 @@
             <TabItem Header="General">
                 <Border Classes="Tab">
                     <StackPanel>
+                        <controls:HeaderSeparator Text="Theme"/>
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton Content="Dark" IsChecked="{Binding Theme, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static theming:Theme.Dark}}"/>
+                            <RadioButton Content="Light" IsChecked="{Binding Theme, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static theming:Theme.Light}}" Margin="10 0 0 0"/>
+                        </StackPanel>
                         <controls:HeaderSeparator Text="Startup"/>
                         <CheckBox x:Name="SaveState" Content="Save / Load state on exit" ToolTip.Tip="Saves emulator state as a snapshot on exit and loads it when application starts" Classes="Center" Margin="10 0 0 0" IsChecked="{Binding IsResumeEnabled}"/>
                         <CheckBox Content="Include current tape" ToolTip.Tip="When saving current state, tape contents will be also saved and restored" Classes="Center" Margin="35 0 0 0" IsEnabled="{Binding #SaveState.IsChecked}" IsChecked="{Binding ShouldIncludeTapeInResume}"/>

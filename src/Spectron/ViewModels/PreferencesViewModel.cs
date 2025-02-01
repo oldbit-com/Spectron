@@ -12,6 +12,7 @@ using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Settings;
+using OldBit.Spectron.Theming;
 using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
@@ -49,6 +50,10 @@ public class PreferencesViewModel : ViewModelBase, IDisposable
 
                 GamepadMappingViewModel.UpdateView(value.Current, _gamepadSettings);
             });
+
+        this.WhenAnyValue(x => x.Theme).Subscribe(ThemeManager.SelectTheme);
+
+        Theme = preferences.Theme;
 
         ComputerType = preferences.ComputerType;
         IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
@@ -113,6 +118,7 @@ public class PreferencesViewModel : ViewModelBase, IDisposable
 
         return new Preferences
         {
+            Theme = Theme,
             ComputerType = ComputerType,
             IsUlaPlusEnabled = IsUlaPlusEnabled,
             RomType = RomType,
@@ -192,6 +198,13 @@ public class PreferencesViewModel : ViewModelBase, IDisposable
     ];
 
     public ObservableCollection<GamepadController> GamepadControllers { get; }
+
+    private Theme _theme;
+    public Theme Theme
+    {
+        get => _theme;
+        set => this.RaiseAndSetIfChanged(ref _theme, value);
+    }
 
     private ComputerType _computerType;
     public ComputerType ComputerType
