@@ -24,6 +24,7 @@ public class DebuggerCpuViewModel : ViewModelBase
         R = cpu.Registers.R;
 
         PC = cpu.Registers.PC;
+        SP = cpu.Registers.SP;
     }
 
     private Word _af;

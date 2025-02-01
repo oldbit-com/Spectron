@@ -24,45 +24,61 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="FontSize" Value="20"/>
         </Style>
+        <Style Selector="TabItem">
+            <Setter Property="MinHeight" Value="30"/>
+        </Style>
+        <Style Selector="TabItem > AccessText">
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
     </Window.Styles>
 
-    <Grid RowDefinitions="*, 200" ColumnDefinitions="240,120,*,100" Margin="5">
-        <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Vertical">
-            <Button Width="90" Height="30" Padding="0 2 0 0" Command="{Binding MainWindowViewModel.TogglePauseCommand}" IsVisible="{Binding !MainWindowViewModel.IsPaused}" HotKey="F8" ToolTip.Tip="Pause F10">
-                <StackPanel Orientation="Horizontal">
-                    <Path Data="m6 19h4V5H6v14zm8-14v14h4V5h-4z" Fill="{StaticResource ButtonForeground}"/>
-                    <TextBlock Text="Pause" VerticalAlignment="Center" Padding="5 0 0 0"/>
-                </StackPanel>
-            </Button>
-            <Button Width="90" Height="30" Padding="0 2 0 0" Command="{Binding DebuggerResumeCommand}" HotKey="F5" ToolTip.Tip="Resume (F5)" IsVisible="{Binding MainWindowViewModel.IsPaused}">
-                <StackPanel Orientation="Horizontal">
-                    <Path Data="M8 5v14l11-7z" Fill="{StaticResource ButtonForeground}"/>
-                    <TextBlock Text="Resume" VerticalAlignment="Center" Padding="5 0 0 0"/>
-                </StackPanel>
-            </Button>
-            <Button Width="90" Height="30" Padding="0 2 0 0" ToolTip.Tip="Step F10" Command="{Binding DebuggerStepCommand}" HotKey="F10" IsEnabled="{Binding MainWindowViewModel.IsPaused}">
-                <StackPanel Orientation="Horizontal">
-                    <Path Data="M8 5v14l11-7z" Fill="{StaticResource ButtonForeground}" />
-                    <TextBlock Text="Step" VerticalAlignment="Center" Padding="5 0 0 0"/>
-                </StackPanel>
-            </Button>
-        </StackPanel>
+    <Grid RowDefinitions="35,*, 200" ColumnDefinitions="240,120,*,240" Margin="5">
+        <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Width="30" Height="30" Padding="4 0 0 0" Command="{Binding MainWindowViewModel.TogglePauseCommand}" IsVisible="{Binding !MainWindowViewModel.IsPaused}" HotKey="F8" ToolTip.Tip="Pause F8">
+                    <Path Data="m6 19h4V5H6v14zm8-14v14h4V5h-4z" Fill="{StaticResource ButtonForeground}" Height="16" Width="16" Stretch="Uniform"/>
+                </Button>
+                <Button Width="30" Height="30" Padding="4 0 0 0" Command="{Binding DebuggerResumeCommand}" HotKey="F5" ToolTip.Tip="Resume (F5)" IsVisible="{Binding MainWindowViewModel.IsPaused}">
+                    <Path Data="M8 5v14l11-7z" Fill="{StaticResource ButtonForeground}" Height="16" Width="16" Stretch="Uniform"/>
+                </Button>
+                <Button Width="30" Height="30" Padding="3 2 0 0" Command="{Binding DebuggerStepCommand}" HotKey="F10" ToolTip.Tip="Step (F10)" IsEnabled="{Binding MainWindowViewModel.IsPaused}">
+                    <Path Data="m6 16H3c4-8 8-8 12 0h3l-4 5-4-5h3c-1-5-5-5-7 0Z" Fill="{StaticResource ButtonForeground}" Height="16" Width="20" Stretch="Uniform"/>
+                </Button>
+            </StackPanel>
+            <Grid/>
+        </DockPanel>
 
         <debugger:Cpu
-            Grid.Row="0" Grid.Column="0"
+            Grid.Row="1" Grid.Column="0"
             Margin="1"
             DataContext="{Binding CpuViewModel}"/>
 
         <debugger:Stack
-            Grid.Row="0" Grid.Column="1"
+            Grid.Row="1" Grid.Column="1"
             Margin="1"
             Height="250"
             VerticalAlignment="Top"
             DataContext="{Binding StackViewModel}"/>
 
         <debugger:CodeList
-            Grid.Row="0" Grid.Column="2"
+            Grid.Row="1" Grid.Column="2"
             Margin="1"
             DataContext="{Binding CodeListViewModel}"/>
+
+        <debugger:Memory
+            Grid.Row="1" Grid.Column="3"
+            />
+
+        <TabControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4">
+            <TabItem Header="Immediate">
+                <Grid RowDefinitions="*, Auto">
+                    <TextBox Grid.Row="0" Margin="0 0 0 5" IsReadOnly="True"/>
+                    <TextBox Grid.Row="1" HorizontalAlignment="Stretch" Height="30" VerticalAlignment="Bottom"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Breakpoints">
+
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>
