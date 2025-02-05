@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using OldBit.Spectron.Emulation.Debugger;
+using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Z80Cpu;
+using OldBit.Z80Cpu.Dasm;
 
 namespace OldBit.Spectron.ViewModels.Debugger;
 
@@ -12,17 +14,17 @@ public class DebuggerCodeListViewModel(DebuggerContext debuggerContext) : ViewMo
     {
         CodeLines.Clear();
 
-        for (var i = 0; i < 25; i++)
-        {
-            var address = (Word)(pc + i);
-            var code = memory.Read(address);
+        var disassembly = new Disassembler(memory.GetMemory(), pc, 20);
+        var instructions = disassembly.Disassemble();
 
+        for (var i = 0; i < instructions.Count; i++)
+        {
             CodeLines.Add(new DebuggerCodeLineViewModel(debuggerContext)
             {
-                Address = address,
-                Code = code.ToString("X2"),
+                Address = instructions[i].Address,
+                Code = instructions[i].Code,
                 IsCurrent = i == 0,
-                IsBreakpoint = debuggerContext.Breakpoints.Contains(address)
+                IsBreakpoint = debuggerContext.Breakpoints.Contains(instructions[i].Address)
             });
         }
     }

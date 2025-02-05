@@ -20,7 +20,7 @@
         </Style>
     </UserControl.Styles>
 
-    <Grid ColumnDefinitions="20,70, 15, 150" Height="20">
+    <Grid ColumnDefinitions="20,70, 15, 180" Height="20">
         <Path
             Grid.Column="0"
             Classes="Breakpoint"

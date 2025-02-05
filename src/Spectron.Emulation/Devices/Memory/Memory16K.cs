@@ -5,11 +5,15 @@ namespace OldBit.Spectron.Emulation.Devices.Memory;
 /// </summary>
 internal sealed class Memory16K : IEmulatorMemory
 {
-    internal Memory16K(byte[] rom) => Array.Copy(rom, 0, Memory, 0, rom.Length);
+    internal Memory16K(byte[] rom)
+    {
+        Array.Copy(rom, 0, Memory, 0, rom.Length);
+        Array.Fill(Memory, (byte)0xFF, 32768, 32768);
+    }
 
-    internal byte[] Memory { get; } = new byte[32768];
+    internal byte[] Memory { get; } = new byte[65536];
 
-    public byte Read(Word address) => address > 32767 ? (byte)0xFF : Memory[address];
+    public byte Read(Word address) => Memory[address];
 
     public void Write(Word address, byte data)
     {

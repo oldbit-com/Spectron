@@ -4,7 +4,7 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.ViewModels.Debugger;
 
-public record StackItem(string Address, string Value);
+public record StackItem(string Address, string Value, bool IsCurrent);
 
 public class DebuggerStackViewModel : ViewModelBase
 {
@@ -14,14 +14,15 @@ public class DebuggerStackViewModel : ViewModelBase
     {
         Items.Clear();
 
-        for (var i = 0; i < 10; i++)
+        for (var i = 9; i >= 0; i--)
         {
-            var address = (Word)(sp - (2 * i));
+            var address = (Word)(sp + (2 * i));
             var value = memory.ReadWord(address);
 
             Items.Add(new StackItem(
                 address.ToString("X4"),
-                value.ToString("X4")));
+                value.ToString("X4"),
+                i == 0));
         }
     }
 }
