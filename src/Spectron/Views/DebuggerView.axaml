@@ -5,25 +5,13 @@
         xmlns:debugger="clr-namespace:OldBit.Spectron.Controls.Debugger"
         xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels.Debugger"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        Height="700" Width="1000"
         x:Class="OldBit.Spectron.Views.DebuggerView"
         x:DataType="viewModels:DebuggerViewModel"
         WindowStartupLocation="CenterOwner"
         Title="Debugger">
 
     <Window.Styles>
-        <Style Selector="TextBox.Register">
-            <Setter Property="FontFamily" Value="{StaticResource SpectrumStrictFont}"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="FontSize" Value="20"/>
-            <Setter Property="Padding" Value="8 0 8 0"/>
-            <Setter Property="Height" Value="30"/>
-
-        </Style>
-        <Style Selector="TextBlock.Register">
-            <Setter Property="FontFamily" Value="{StaticResource SpectrumStrictFont}"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="FontSize" Value="20"/>
-        </Style>
         <Style Selector="TabItem">
             <Setter Property="MinHeight" Value="30"/>
         </Style>
@@ -56,8 +44,6 @@
         <debugger:Stack
             Grid.Row="1" Grid.Column="1"
             Margin="1"
-            Height="250"
-            VerticalAlignment="Top"
             DataContext="{Binding StackViewModel}"/>
 
         <debugger:CodeList

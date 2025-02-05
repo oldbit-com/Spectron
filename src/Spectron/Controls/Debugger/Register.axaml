@@ -30,15 +30,21 @@
         </Style>
     </UserControl.Styles>
 
-    <Grid ColumnDefinitions="35,50">
-        <TextBlock Grid.Column="0" Grid.Row="0"
-                   Classes="Register"
-                   Text="{Binding $parent[local:Register].RegisterName}"/>
-        <TextBox Grid.Column="1" Grid.Row="0"
-                 Background="{StaticResource TextBoxBackgroundThemeBrush}"
-                 x:Name="ValueControl"
-                 Classes="Register"
-                 Text="{Binding $parent[local:Register].Value}"
-                 IsReadOnly="True" />
+    <Grid ColumnDefinitions="*,*" HorizontalAlignment="Center">
+        <TextBlock
+            Grid.Column="0" Grid.Row="0"
+            Classes="Register"
+            TextAlignment="Right"
+            Margin="0 0 5 0"
+            Width="{Binding $parent[local:Register].LabelWidth}"
+            Text="{Binding $parent[local:Register].RegisterName}"/>
+        <TextBox
+            Grid.Column="1" Grid.Row="0"
+            x:Name="ValueControl"
+            Classes="Register"
+            Width="{Binding $parent[local:Register].ValueWidth}"
+            MinWidth="{Binding $parent[local:Register].ValueWidth}"
+            Text="{Binding $parent[local:Register].Value}"
+            IsReadOnly="True"/>
     </Grid>
 </UserControl>

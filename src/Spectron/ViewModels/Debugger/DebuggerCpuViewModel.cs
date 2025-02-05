@@ -25,6 +25,10 @@ public class DebuggerCpuViewModel : ViewModelBase
 
         PC = cpu.Registers.PC;
         SP = cpu.Registers.SP;
+
+        IFF1 = cpu.IFF1 ? "1" : "0";
+        IFF2 = cpu.IFF2 ? "1" : "0";
+        IM = ((int)cpu.IM).ToString();
     }
 
     private Word _af;
@@ -130,5 +134,26 @@ public class DebuggerCpuViewModel : ViewModelBase
     {
         get => _r;
         set => this.RaiseAndSetIfChanged(ref _r, value);
+    }
+
+    private string _iff1 = string.Empty;
+    public string IFF1
+    {
+        get => _iff1;
+        set => this.RaiseAndSetIfChanged(ref _iff1, value);
+    }
+
+    private string _iff2 = string.Empty;
+    public string IFF2
+    {
+        get => _iff2;
+        set => this.RaiseAndSetIfChanged(ref _iff2, value);
+    }
+
+    private string _im = string.Empty;
+    public string IM
+    {
+        get => _im;
+        set => this.RaiseAndSetIfChanged(ref _im, value);
     }
 }

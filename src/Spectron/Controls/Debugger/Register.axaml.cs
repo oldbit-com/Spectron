@@ -13,6 +13,12 @@ public partial class Register : UserControl
     public static readonly StyledProperty<string> ValueProperty =
         AvaloniaProperty.Register<Register, string>(nameof(Value), coerce: ValueChanged);
 
+    public static readonly StyledProperty<int> ValueWidthProperty =
+        AvaloniaProperty.Register<Register, int>(nameof(ValueWidth), defaultValue: 60);
+
+    public static readonly StyledProperty<int> LabelWidthProperty =
+        AvaloniaProperty.Register<Register, int>(nameof(LabelWidth), defaultValue: 20);
+
     private CancellationTokenSource _cancellationTokenSource = new();
 
     public string RegisterName
@@ -25,6 +31,18 @@ public partial class Register : UserControl
     {
         get => GetValue(ValueProperty);
         set => SetValue(ValueProperty, value);
+    }
+
+    public int ValueWidth
+    {
+        get => GetValue(ValueWidthProperty);
+        set => SetValue(ValueWidthProperty, value);
+    }
+
+    public int LabelWidth
+    {
+        get => GetValue(LabelWidthProperty);
+        set => SetValue(LabelWidthProperty, value);
     }
 
     private static string ValueChanged(AvaloniaObject control, string value)
