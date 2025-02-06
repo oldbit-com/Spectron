@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels.Debugger"
+             x:DataType="viewModels:DebuggerImmediateViewModel"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="OldBit.Spectron.Controls.Debugger.Immediate">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key='VT220Brush'>Black</SolidColorBrush>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key='VT220Brush'>Chartreuse</SolidColorBrush>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <i:Interaction.Behaviors>
+        <EventTriggerBehavior EventName="KeyDown" SourceObject="ImmediateTextBox">
+            <InvokeCommandAction Command="{Binding ImmediateCommand}" PassEventArgsToCommand="True" />
+        </EventTriggerBehavior>
+    </i:Interaction.Behaviors>
+
+    <Grid RowDefinitions="*, Auto">
+        <TextBox Grid.Row="0"
+                 FontFamily="{StaticResource VT220}"
+                 Text="{Binding OutputText}"
+                 Foreground="{DynamicResource VT220Brush}"
+                 FontSize="16"
+                 Margin="0 0 0 5"
+                 IsReadOnly="True"/>
+        <TextBox Grid.Row="1"
+                 Name="ImmediateTextBox"
+                 Text="{Binding CommandText}"
+                 FontFamily="{StaticResource VT220}"
+                 Foreground="{DynamicResource VT220Brush}"
+                 FontSize="15"
+                 HorizontalAlignment="Stretch"
+                 Height="30"
+                 VerticalAlignment="Bottom"/>
+    </Grid>
+</UserControl>

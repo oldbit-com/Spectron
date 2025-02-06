@@ -34,6 +34,8 @@
         <FontFamily x:Key="SpectrumStrictFont">/Assets/Fonts/zxSpectrumStrict.ttf#zxSpectrumStrict</FontFamily>
         <FontFamily x:Key="SpectrumExpandedFont">/Assets/Fonts/zxSpectrumExpanded.ttf#zxSpectrumExpand</FontFamily>
         <FontFamily x:Key="HackRegular">/Assets/Fonts/Hack-Regular.ttf#Hack</FontFamily>
+        <FontFamily x:Key="VT220">/Assets/Fonts/Glass_TTY_VT220.ttf#Glass TTY VT220</FontFamily>
+
 
         <!-- Spectrum palette -->
         <SolidColorBrush x:Key="SpectrumBlack" Color="#FF000000"/>

@@ -20,6 +20,7 @@ public class DebuggerViewModel : ViewModelBase, IDisposable
     public DebuggerCodeListViewModel CodeListViewModel { get; }
     public DebuggerStackViewModel StackViewModel { get; } = new();
     public DebuggerCpuViewModel CpuViewModel { get; } = new();
+    public DebuggerImmediateViewModel ImmediateViewModel { get; }
 
     public ReactiveCommand<Unit, Unit> DebuggerStepCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> DebuggerResumeCommand { get; private set; }
@@ -32,6 +33,7 @@ public class DebuggerViewModel : ViewModelBase, IDisposable
         MainWindowViewModel = mainWindowViewModel;
 
         CodeListViewModel = new DebuggerCodeListViewModel(debuggerContext);
+        ImmediateViewModel = new DebuggerImmediateViewModel(debuggerContext);
 
         DebuggerStepCommand = ReactiveCommand.Create(HandleDebuggerStep);
         DebuggerResumeCommand = ReactiveCommand.Create(HandleDebuggerResume);

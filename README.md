@@ -87,4 +87,5 @@ memory and disassembly. You can step through the code, set breakpoints.
 ### Acknowledgements
 - ZX Spectrum Font: https://github.com/comptic/zx-spectrum-font
 - Hack Font: https://sourcefoundry.org/hack/
+- VT220 Font: https://github.com/svofski/glasstty/blob/master/Glass_TTY_VT220.ttf
 

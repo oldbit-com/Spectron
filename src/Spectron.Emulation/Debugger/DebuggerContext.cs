@@ -6,6 +6,8 @@ public sealed class DebuggerContext
 
     public IReadOnlySet<Word> Breakpoints => _breakpoints;
 
+    public List<string> CommandHistory { get; } = [];
+
     public DebuggerContext()
     {
     }
