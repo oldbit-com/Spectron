@@ -8,7 +8,7 @@ using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class TapeMenuViewModel : ViewModelBase
+public class TapeMenuViewModel : ReactiveObject
 {
     public ReactiveCommand<Unit, Unit> NewCommand { get; private set; }
     public ReactiveCommand<Unit, Task> InsertCommand { get; private set; }

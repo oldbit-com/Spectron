@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.Debugger;
+namespace OldBit.Spectron.Debugger;
 
 public sealed class DebuggerContext
 {

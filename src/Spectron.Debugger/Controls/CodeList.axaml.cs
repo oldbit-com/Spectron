@@ -1,8 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Input;
-using OldBit.Spectron.ViewModels.Debugger;
+using OldBit.Spectron.Debugger.ViewModels;
 
-namespace OldBit.Spectron.Controls.Debugger;
+namespace OldBit.Spectron.Debugger.Controls;
 
 public partial class CodeList : UserControl
 {

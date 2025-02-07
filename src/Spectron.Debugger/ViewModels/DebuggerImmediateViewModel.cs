@@ -1,13 +1,10 @@
-using System;
-using System.Linq;
 using System.Reactive;
 using Avalonia.Input;
-using OldBit.Spectron.Emulation.Debugger;
 using ReactiveUI;
 
-namespace OldBit.Spectron.ViewModels.Debugger;
+namespace OldBit.Spectron.Debugger.ViewModels;
 
-public class DebuggerImmediateViewModel : ViewModelBase
+public class DebuggerImmediateViewModel : ReactiveObject
 {
     private readonly DebuggerContext _context;
     private int _historyIndex = -1;

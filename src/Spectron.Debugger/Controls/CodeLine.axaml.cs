@@ -1,7 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 
-namespace OldBit.Spectron.Controls.Debugger;
+namespace OldBit.Spectron.Debugger.Controls;
 
 public partial class CodeLine : UserControl
 {

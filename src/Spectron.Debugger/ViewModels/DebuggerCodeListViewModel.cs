@@ -1,12 +1,12 @@
 using System.Collections.ObjectModel;
-using OldBit.Spectron.Emulation.Debugger;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Z80Cpu;
 using OldBit.Z80Cpu.Dasm;
+using ReactiveUI;
 
-namespace OldBit.Spectron.ViewModels.Debugger;
+namespace OldBit.Spectron.Debugger.ViewModels;
 
-public class DebuggerCodeListViewModel(DebuggerContext debuggerContext) : ViewModelBase
+public class DebuggerCodeListViewModel(DebuggerContext debuggerContext) : ReactiveObject
 {
     public ObservableCollection<DebuggerCodeLineViewModel> CodeLines { get; } = [];
 

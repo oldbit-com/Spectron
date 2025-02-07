@@ -1,8 +1,7 @@
-using System;
 using System.Globalization;
 using Avalonia.Data.Converters;
 
-namespace OldBit.Spectron.Converters;
+namespace OldBit.Spectron.Debugger.Converters;
 
 public class HexConverter : IValueConverter
 {

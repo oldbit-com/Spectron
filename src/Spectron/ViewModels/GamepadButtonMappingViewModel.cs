@@ -11,7 +11,7 @@ public record GamepadActionMappingSeparatorItem(string Name) : GamepadActionMapp
 public class GamepadButtonMappingViewModel(
     GamepadButton button,
     GamepadActionMappingItem selectedAction,
-    List<GamepadActionMappingItem> actions) : ViewModelBase
+    List<GamepadActionMappingItem> actions) : ReactiveObject
 {
     public GamepadButton Button { get; } = button;
 

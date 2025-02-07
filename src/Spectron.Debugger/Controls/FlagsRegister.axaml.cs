@@ -5,7 +5,7 @@ using Avalonia.Controls.Primitives;
 using OldBit.Z80Cpu.Extensions;
 using OldBit.Z80Cpu.Registers;
 
-namespace OldBit.Spectron.Controls.Debugger;
+namespace OldBit.Spectron.Debugger.Controls;
 
 public partial class FlagsRegister : UserControl
 {

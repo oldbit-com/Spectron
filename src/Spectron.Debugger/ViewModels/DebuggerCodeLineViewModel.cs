@@ -1,10 +1,8 @@
-using System;
-using OldBit.Spectron.Emulation.Debugger;
 using ReactiveUI;
 
-namespace OldBit.Spectron.ViewModels.Debugger;
+namespace OldBit.Spectron.Debugger.ViewModels;
 
-public class DebuggerCodeLineViewModel : ViewModelBase
+public class DebuggerCodeLineViewModel : ReactiveObject
 {
     private readonly DebuggerContext _debuggerContext;
 

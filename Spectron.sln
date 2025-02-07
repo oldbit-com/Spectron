@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spectron.Emulation", "src\S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spectron.Emulator.Tests", "tests\Spectron.Emulator.Tests\Spectron.Emulator.Tests.csproj", "{10F6D919-AF27-4920-A67E-872C03C45405}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spectron.Debugger", "src\Spectron.Debugger\Spectron.Debugger.csproj", "{5FEBB15B-2424-48DC-B329-A4F30B053A00}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,7 @@ Global
 		{C60D08C5-964F-48E6-BA67-BB14AA63AA6D} = {7DE98BF6-DC2A-4B86-91F2-A69B633E45FC}
 		{B8978359-FFBB-4979-A990-DA54963E4724} = {7DE98BF6-DC2A-4B86-91F2-A69B633E45FC}
 		{10F6D919-AF27-4920-A67E-872C03C45405} = {ED4EA606-69A3-4459-8BBF-0F1578E67C40}
+		{5FEBB15B-2424-48DC-B329-A4F30B053A00} = {7DE98BF6-DC2A-4B86-91F2-A69B633E45FC}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{C60D08C5-964F-48E6-BA67-BB14AA63AA6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -33,5 +36,9 @@ Global
 		{10F6D919-AF27-4920-A67E-872C03C45405}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10F6D919-AF27-4920-A67E-872C03C45405}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10F6D919-AF27-4920-A67E-872C03C45405}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FEBB15B-2424-48DC-B329-A4F30B053A00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FEBB15B-2424-48DC-B329-A4F30B053A00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FEBB15B-2424-48DC-B329-A4F30B053A00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FEBB15B-2424-48DC-B329-A4F30B053A00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

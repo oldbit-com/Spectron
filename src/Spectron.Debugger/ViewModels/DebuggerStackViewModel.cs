@@ -1,12 +1,13 @@
 using System.Collections.ObjectModel;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Z80Cpu;
+using ReactiveUI;
 
-namespace OldBit.Spectron.ViewModels.Debugger;
+namespace OldBit.Spectron.Debugger.ViewModels;
 
 public record StackItem(string Address, string Value, bool IsCurrent);
 
-public class DebuggerStackViewModel : ViewModelBase
+public class DebuggerStackViewModel : ReactiveObject
 {
     public ObservableCollection<StackItem> Items { get; } = [];
 

@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Reactive.Concurrency;
 using ReactiveUI;
 
@@ -9,9 +8,9 @@ public class ObservableExceptionHandler : IObserver<Exception>
 {
     public void OnCompleted()
     {
-        if (Debugger.IsAttached)
+        if (System.Diagnostics.Debugger.IsAttached)
         {
-            Debugger.Break();
+            System.Diagnostics.Debugger.Break();
         }
 
         RxApp.MainThreadScheduler.Schedule(() => throw new NotImplementedException());
@@ -19,9 +18,9 @@ public class ObservableExceptionHandler : IObserver<Exception>
 
     public void OnError(Exception error)
     {
-        if (Debugger.IsAttached)
+        if (System.Diagnostics.Debugger.IsAttached)
         {
-            Debugger.Break();
+            System.Diagnostics.Debugger.Break();
         }
 
         Console.WriteLine(error.ToString());
@@ -31,9 +30,9 @@ public class ObservableExceptionHandler : IObserver<Exception>
 
     public void OnNext(Exception error)
     {
-        if (Debugger.IsAttached)
+        if (System.Diagnostics.Debugger.IsAttached)
         {
-            Debugger.Break();
+            System.Diagnostics.Debugger.Break();
         }
 
         Console.WriteLine(error.ToString());

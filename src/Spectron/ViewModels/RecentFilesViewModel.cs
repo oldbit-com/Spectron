@@ -10,7 +10,7 @@ using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class RecentFilesViewModel : ViewModelBase
+public class RecentFilesViewModel : ReactiveObject
 {
     private readonly RecentFilesService _recentFilesService;
     private readonly ReactiveCommand<string, Unit> _openRecentFileCommand;

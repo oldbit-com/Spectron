@@ -1,9 +1,8 @@
-using System.Threading;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
 
-namespace OldBit.Spectron.Controls.Debugger;
+namespace OldBit.Spectron.Debugger.Controls;
 
 public partial class Register : UserControl
 {

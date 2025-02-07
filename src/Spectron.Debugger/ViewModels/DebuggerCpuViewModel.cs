@@ -2,9 +2,9 @@ using OldBit.Z80Cpu;
 using OldBit.Z80Cpu.Registers;
 using ReactiveUI;
 
-namespace OldBit.Spectron.ViewModels.Debugger;
+namespace OldBit.Spectron.Debugger.ViewModels;
 
-public class DebuggerCpuViewModel : ViewModelBase
+public class DebuggerCpuViewModel : ReactiveObject
 {
     public void Update(Z80 cpu)
     {

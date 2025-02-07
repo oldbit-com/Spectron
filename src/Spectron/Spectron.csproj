@@ -39,6 +39,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Spectron.Debugger\Spectron.Debugger.csproj" />
       <ProjectReference Include="..\Spectron.Emulation\Spectron.Emulation.csproj" />
     </ItemGroup>
 
@@ -49,19 +50,5 @@
       <Compile Update="ViewModels\MainWindowViewModel.Properties.cs">
         <DependentUpon>MainWindowViewModel.cs</DependentUpon>
       </Compile>
-      <Compile Update="Controls\Debugger\FlagsRegister.axaml.cs">
-        <DependentUpon>FlagsRegister.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Controls\Debugger\Register.axaml.cs">
-        <DependentUpon>Register.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="OldBit.Z80Cpu.Dasm">
-        <HintPath>..\..\..\Z80\src\Z80Cpu.Dasm\bin\Debug\net8.0\OldBit.Z80Cpu.Dasm.dll</HintPath>
-      </Reference>
     </ItemGroup>
 </Project>

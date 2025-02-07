@@ -2,9 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:local="clr-namespace:OldBit.Spectron.Controls.Debugger"
+             xmlns:local="clr-namespace:OldBit.Spectron.Debugger.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="OldBit.Spectron.Controls.Debugger.Register">
+             x:Class="OldBit.Spectron.Debugger.Controls.Register">
 
     <UserControl.Resources>
         <Animation x:Key="RegisterAnimation" Duration="0:0:.4" x:SetterTargetType="TextBox">

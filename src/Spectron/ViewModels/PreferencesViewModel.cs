@@ -17,7 +17,7 @@ using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class PreferencesViewModel : ViewModelBase, IDisposable
+public class PreferencesViewModel : ReactiveObject, IDisposable
 {
     private readonly GamepadManager _gamepadManager;
     private readonly GamepadSettings _gamepadSettings;

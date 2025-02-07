@@ -8,9 +8,10 @@ using System.Timers;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
+using OldBit.Spectron.Debugger;
+using OldBit.Spectron.Debugger.ViewModels;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Commands;
-using OldBit.Spectron.Emulation.Debugger;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Rom;
@@ -25,14 +26,13 @@ using OldBit.Spectron.Models;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.Files.Szx;
-using OldBit.Spectron.ViewModels.Debugger;
 using OldBit.Spectron.Theming;
 using ReactiveUI;
 using Timer = System.Timers.Timer;
 
 namespace OldBit.Spectron.ViewModels;
 
-public partial class MainWindowViewModel : ViewModelBase
+public partial class MainWindowViewModel : ReactiveObject
 {
     private const string DefaultTitle = "Spectron - ZX Spectrum Emulator";
 
@@ -180,7 +180,12 @@ public partial class MainWindowViewModel : ViewModelBase
             HandleTogglePause();
         }
 
-        await ShowDebuggerView.Handle(new DebuggerViewModel(this, _debuggerContext));
+        var viewModel = new DebuggerViewModel(_debuggerContext, Emulator!);
+
+        this.WhenAny(x => x.IsPaused, x => x.Value)
+            .Subscribe(isPaused => viewModel.HandlePause(isPaused));
+
+        await ShowDebuggerView.Handle(viewModel);
     }
 
     private async Task ShowKeyboardHelpWindow() => await ShowKeyboardHelpView.Handle(Unit.Default);

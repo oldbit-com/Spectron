@@ -2,11 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:local="clr-namespace:OldBit.Spectron.Controls.Debugger"
-             xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels.Debugger"
+             xmlns:viewModels="clr-namespace:OldBit.Spectron.Debugger.ViewModels"
+             xmlns:local="clr-namespace:OldBit.Spectron.Debugger.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:DebuggerCodeListViewModel"
-             x:Class="OldBit.Spectron.Controls.Debugger.CodeList">
+             x:Class="OldBit.Spectron.Debugger.Controls.CodeList">
 
     <Grid RowDefinitions="30,*">
         <Border Grid.Row="0" Grid.ColumnSpan="2" BorderBrush="{StaticResource TextControlBorderBrush}" BorderThickness="2">

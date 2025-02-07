@@ -1,22 +1,17 @@
-using System;
-using System.Collections.Generic;
 using System.Reactive;
 using OldBit.Spectron.Emulation;
-using OldBit.Spectron.Emulation.Debugger;
 using OldBit.Z80Cpu.Events;
 using ReactiveUI;
 
-namespace OldBit.Spectron.ViewModels.Debugger;
+namespace OldBit.Spectron.Debugger.ViewModels;
 
-public class DebuggerViewModel : ViewModelBase, IDisposable
+public class DebuggerViewModel : ReactiveObject, IDisposable
 {
     private readonly DebuggerContext _debuggerContext;
-    private readonly List<IDisposable> _disposables = [];
 
-    private Emulator Emulator => MainWindowViewModel.Emulator!;
+    private Emulator Emulator { get; }
     private Word? _skipDebuggerBreakpointAddress = null;
 
-    public MainWindowViewModel MainWindowViewModel { get; }
     public DebuggerCodeListViewModel CodeListViewModel { get; }
     public DebuggerStackViewModel StackViewModel { get; } = new();
     public DebuggerCpuViewModel CpuViewModel { get; } = new();
@@ -24,25 +19,19 @@ public class DebuggerViewModel : ViewModelBase, IDisposable
 
     public ReactiveCommand<Unit, Unit> DebuggerStepCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> DebuggerResumeCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> TogglePauseCommand { get; private set; }
 
-    public DebuggerViewModel(
-        MainWindowViewModel mainWindowViewModel,
-        DebuggerContext debuggerContext)
+    public DebuggerViewModel(DebuggerContext debuggerContext, Emulator emulator)
     {
         _debuggerContext = debuggerContext;
-        MainWindowViewModel = mainWindowViewModel;
+        Emulator = emulator;
 
         CodeListViewModel = new DebuggerCodeListViewModel(debuggerContext);
         ImmediateViewModel = new DebuggerImmediateViewModel(debuggerContext);
 
         DebuggerStepCommand = ReactiveCommand.Create(HandleDebuggerStep);
         DebuggerResumeCommand = ReactiveCommand.Create(HandleDebuggerResume);
-
-        var disposable = mainWindowViewModel
-            .WhenAny(x => x.IsPaused, x => x.Value)
-            .Subscribe(y => HandlePause());
-
-        _disposables.Add(disposable);
+        TogglePauseCommand = ReactiveCommand.Create(() => HandlePause(!IsPaused));
 
         Emulator.Cpu.BeforeInstruction += BeforeInstruction;
     }
@@ -64,15 +53,18 @@ public class DebuggerViewModel : ViewModelBase, IDisposable
         e.IsBreakpoint = true;
 
         Emulator.Pause();
-        MainWindowViewModel.IsPaused = true;
+        IsPaused = true;
 
         Refresh();
     }
 
-    private void HandlePause()
+    public void HandlePause(bool isPaused)
     {
-        if (MainWindowViewModel.IsPaused)
+        IsPaused = isPaused;
+
+        if (isPaused)
         {
+            Emulator.Pause();
             Refresh();
         }
     }
@@ -89,7 +81,7 @@ public class DebuggerViewModel : ViewModelBase, IDisposable
         _skipDebuggerBreakpointAddress = Emulator.Cpu.Registers.PC;
 
         Emulator.Resume();
-        MainWindowViewModel.IsPaused = false;
+        IsPaused = false;
     }
 
     private void Refresh()
@@ -105,17 +97,17 @@ public class DebuggerViewModel : ViewModelBase, IDisposable
 
     private void RefreshCode() => CodeListViewModel.Update(Emulator.Memory, Emulator.Cpu.Registers.PC);
 
+    private bool _isPaused;
+    public bool IsPaused
+    {
+        get => _isPaused;
+        set => this.RaiseAndSetIfChanged(ref _isPaused, value);
+    }
+
     public void Dispose()
     {
         GC.SuppressFinalize(this);
 
         Emulator.Cpu.BeforeInstruction -= BeforeInstruction;
-
-        foreach (var disposable in _disposables)
-        {
-            disposable.Dispose();
-        }
-
-        _disposables.Clear();
     }
 }
