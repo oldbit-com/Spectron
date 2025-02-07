@@ -16,7 +16,7 @@ public partial class Register : UserControl
         AvaloniaProperty.Register<Register, int>(nameof(ValueWidth), defaultValue: 60);
 
     public static readonly StyledProperty<int> LabelWidthProperty =
-        AvaloniaProperty.Register<Register, int>(nameof(LabelWidth), defaultValue: 20);
+        AvaloniaProperty.Register<Register, int>(nameof(LabelWidth), defaultValue: 25);
 
     private CancellationTokenSource _cancellationTokenSource = new();
 

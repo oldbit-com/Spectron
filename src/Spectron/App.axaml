@@ -36,7 +36,6 @@
         <FontFamily x:Key="HackRegular">/Assets/Fonts/Hack-Regular.ttf#Hack</FontFamily>
         <FontFamily x:Key="VT220">/Assets/Fonts/Glass_TTY_VT220.ttf#Glass TTY VT220</FontFamily>
 
-
         <!-- Spectrum palette -->
         <SolidColorBrush x:Key="SpectrumBlack" Color="#FF000000"/>
         <SolidColorBrush x:Key="SpectrumBlue" Color="#FF0000D8"/>
