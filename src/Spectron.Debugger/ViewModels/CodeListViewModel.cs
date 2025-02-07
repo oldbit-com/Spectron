@@ -6,9 +6,9 @@ using ReactiveUI;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
-public class DebuggerCodeListViewModel(DebuggerContext debuggerContext) : ReactiveObject
+public class CodeListViewModel(DebuggerContext debuggerContext) : ReactiveObject
 {
-    public ObservableCollection<DebuggerCodeLineViewModel> CodeLines { get; } = [];
+    public ObservableCollection<CodeLineViewModel> CodeLines { get; } = [];
 
     public void Update(IMemory memory, Word pc)
     {
@@ -19,7 +19,7 @@ public class DebuggerCodeListViewModel(DebuggerContext debuggerContext) : Reacti
 
         for (var i = 0; i < instructions.Count; i++)
         {
-            CodeLines.Add(new DebuggerCodeLineViewModel(debuggerContext)
+            CodeLines.Add(new CodeLineViewModel(debuggerContext)
             {
                 Address = instructions[i].Address,
                 Code = instructions[i].Code,

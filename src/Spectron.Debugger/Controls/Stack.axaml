@@ -5,10 +5,10 @@
              mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="200"
              x:Class="OldBit.Spectron.Debugger.Controls.Stack"
              xmlns:viewModels="clr-namespace:OldBit.Spectron.Debugger.ViewModels"
-             x:DataType="viewModels:DebuggerStackViewModel">
+             x:DataType="viewModels:StackViewModel">
 
     <Design.DataContext>
-        <viewModels:DebuggerStackViewModel/>
+        <viewModels:StackViewModel/>
     </Design.DataContext>
 
     <Grid RowDefinitions="30,*" Width="140">

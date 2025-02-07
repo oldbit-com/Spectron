@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:viewModels="clr-namespace:OldBit.Spectron.Debugger.ViewModels"
-             x:DataType="viewModels:DebuggerImmediateViewModel"
+             x:DataType="viewModels:ImmediateViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="OldBit.Spectron.Debugger.Controls.Immediate">
 

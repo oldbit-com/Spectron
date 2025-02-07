@@ -2,11 +2,11 @@ using ReactiveUI;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
-public class DebuggerCodeLineViewModel : ReactiveObject
+public class CodeLineViewModel : ReactiveObject
 {
     private readonly DebuggerContext _debuggerContext;
 
-    public DebuggerCodeLineViewModel(DebuggerContext debuggerContext)
+    public CodeLineViewModel(DebuggerContext debuggerContext)
     {
         _debuggerContext = debuggerContext;
 

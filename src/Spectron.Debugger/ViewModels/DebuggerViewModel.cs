@@ -12,10 +12,10 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
     private Emulator Emulator { get; }
     private Word? _skipDebuggerBreakpointAddress = null;
 
-    public DebuggerCodeListViewModel CodeListViewModel { get; }
-    public DebuggerStackViewModel StackViewModel { get; } = new();
-    public DebuggerCpuViewModel CpuViewModel { get; } = new();
-    public DebuggerImmediateViewModel ImmediateViewModel { get; }
+    public CodeListViewModel CodeListViewModel { get; }
+    public StackViewModel StackViewModel { get; } = new();
+    public CpuViewModel CpuViewModel { get; } = new();
+    public ImmediateViewModel ImmediateViewModel { get; }
 
     public ReactiveCommand<Unit, Unit> DebuggerStepCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> DebuggerResumeCommand { get; private set; }
@@ -26,8 +26,8 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
         _debuggerContext = debuggerContext;
         Emulator = emulator;
 
-        CodeListViewModel = new DebuggerCodeListViewModel(debuggerContext);
-        ImmediateViewModel = new DebuggerImmediateViewModel(debuggerContext);
+        CodeListViewModel = new CodeListViewModel(debuggerContext);
+        ImmediateViewModel = new ImmediateViewModel(debuggerContext);
 
         DebuggerStepCommand = ReactiveCommand.Create(HandleDebuggerStep);
         DebuggerResumeCommand = ReactiveCommand.Create(HandleDebuggerResume);

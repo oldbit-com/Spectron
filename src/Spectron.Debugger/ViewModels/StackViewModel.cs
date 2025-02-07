@@ -7,7 +7,7 @@ namespace OldBit.Spectron.Debugger.ViewModels;
 
 public record StackItem(string Address, string Value, bool IsCurrent);
 
-public class DebuggerStackViewModel : ReactiveObject
+public class StackViewModel : ReactiveObject
 {
     public ObservableCollection<StackItem> Items { get; } = [];
 

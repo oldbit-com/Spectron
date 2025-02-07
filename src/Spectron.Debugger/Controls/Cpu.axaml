@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="260" d:DesignHeight="450"
              xmlns:viewModels="clr-namespace:OldBit.Spectron.Debugger.ViewModels"
-             x:DataType="viewModels:DebuggerCpuViewModel"
+             x:DataType="viewModels:CpuViewModel"
              xmlns:converters="clr-namespace:OldBit.Spectron.Debugger.Converters"
              xmlns:local="clr-namespace:OldBit.Spectron.Debugger.Controls"
              x:Class="OldBit.Spectron.Debugger.Controls.Cpu">

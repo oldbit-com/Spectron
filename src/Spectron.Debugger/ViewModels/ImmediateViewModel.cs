@@ -4,7 +4,7 @@ using ReactiveUI;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
-public class DebuggerImmediateViewModel : ReactiveObject
+public class ImmediateViewModel : ReactiveObject
 {
     private readonly DebuggerContext _context;
     private int _historyIndex = -1;
@@ -12,7 +12,7 @@ public class DebuggerImmediateViewModel : ReactiveObject
 
     public ReactiveCommand<KeyEventArgs, Unit> ImmediateCommand { get; private set; }
 
-    public DebuggerImmediateViewModel(DebuggerContext context)
+    public ImmediateViewModel(DebuggerContext context)
     {
         _context = context;
 

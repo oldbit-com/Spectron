@@ -18,7 +18,7 @@ public partial class CodeList : UserControl
             return;
         }
 
-        if (control.DataContext is DebuggerCodeLineViewModel codeLine)
+        if (control.DataContext is CodeLineViewModel codeLine)
         {
             codeLine.IsBreakpoint = !codeLine.IsBreakpoint;
         }

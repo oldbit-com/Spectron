@@ -4,7 +4,7 @@ using ReactiveUI;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
-public class DebuggerCpuViewModel : ReactiveObject
+public class CpuViewModel : ReactiveObject
 {
     public void Update(Z80 cpu)
     {
