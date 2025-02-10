@@ -1,5 +1,6 @@
 using Antlr4.Runtime;
 using OldBit.Debugger.Parser;
+using OldBit.Spectron.Debugger.Parser.Values;
 using OldBit.Z80Cpu;
 using OldBit.Z80Cpu.Dasm.Formatters;
 
@@ -15,7 +16,7 @@ public class Interpreter(
 
     public List<string> Output { get; private set; } = [];
 
-    public void Execute(string input)
+    public Value? Execute(string input)
     {
         _syntaxErrorListener.Errors.Clear();
 
@@ -28,9 +29,11 @@ public class Interpreter(
         var tree = parser.program();
 
         var visitor = new DebuggerVisitor(cpu, memory, output, numberFormat);
-        visitor.Visit(tree);
+        var result = visitor.Visit(tree);
 
         Output = visitor.Output;
+
+        return result;
     }
 
     private DebuggerParser CreateParser(CommonTokenStream tokenStream)

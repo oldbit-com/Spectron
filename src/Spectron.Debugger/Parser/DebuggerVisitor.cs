@@ -80,6 +80,6 @@ public class DebuggerVisitor(
 
         memory.Write(address, value);
 
-        return base.VisitPokestmt(context);
+        return new Success();
     }
 }

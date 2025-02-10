@@ -1,6 +1,7 @@
 using System.Reactive;
 using Avalonia.Input;
 using OldBit.Spectron.Debugger.Parser;
+using OldBit.Spectron.Debugger.Parser.Values;
 using OldBit.Spectron.Emulation;
 using ReactiveUI;
 
@@ -88,11 +89,15 @@ public class ImmediateViewModel : ReactiveObject, IOutput
 
         try
         {
-            interpreter.Execute(CommandText);
+            var result = interpreter.Execute(CommandText);
+            if (result is Success)
+            {
+                Print("OK");
+            }
         }
         catch (Exception ex)
         {
-            OutputText += ex.Message + Environment.NewLine;
+            Print(ex.Message);
         }
 
         _refreshAction();
