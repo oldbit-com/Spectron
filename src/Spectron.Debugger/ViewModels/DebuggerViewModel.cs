@@ -27,7 +27,7 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
         Emulator = emulator;
 
         CodeListViewModel = new CodeListViewModel(debuggerContext);
-        ImmediateViewModel = new ImmediateViewModel(debuggerContext);
+        ImmediateViewModel = new ImmediateViewModel(debuggerContext, emulator, Refresh);
 
         DebuggerStepCommand = ReactiveCommand.Create(HandleDebuggerStep);
         DebuggerResumeCommand = ReactiveCommand.Create(HandleDebuggerResume);

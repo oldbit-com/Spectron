@@ -1,20 +1,29 @@
 using System.Reactive;
 using Avalonia.Input;
+using OldBit.Spectron.Debugger.Parser;
+using OldBit.Spectron.Emulation;
 using ReactiveUI;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
-public class ImmediateViewModel : ReactiveObject
+public class ImmediateViewModel : ReactiveObject, IOutput
 {
     private readonly DebuggerContext _context;
+    private readonly Emulator _emulator;
+    private readonly Action _refreshAction;
     private int _historyIndex = -1;
     private string _currentCommandText = string.Empty;
 
     public ReactiveCommand<KeyEventArgs, Unit> ImmediateCommand { get; private set; }
 
-    public ImmediateViewModel(DebuggerContext context)
+    public ImmediateViewModel(
+        DebuggerContext context,
+        Emulator emulator,
+        Action refreshAction)
     {
         _context = context;
+        _emulator = emulator;
+        _refreshAction = refreshAction;
 
         ImmediateCommand = ReactiveCommand.Create<KeyEventArgs>(HandleImmediateCommand);
     }
@@ -24,7 +33,12 @@ public class ImmediateViewModel : ReactiveObject
         switch (e.Key)
         {
             case Key.Enter:
-                OutputText += CommandText + Environment.NewLine;
+                if (string.IsNullOrWhiteSpace(CommandText))
+                {
+                    break;
+                }
+
+                ExecuteCommand();
 
                 if (_context.CommandHistory.Count == 0 ||
                     _context.CommandHistory.Count > 0 && _context.CommandHistory.Last() != CommandText)
@@ -61,6 +75,27 @@ public class ImmediateViewModel : ReactiveObject
 
                 break;
         }
+    }
+
+    public void Print(string output)
+    {
+        OutputText += output + Environment.NewLine;
+    }
+
+    private void ExecuteCommand()
+    {
+        var interpreter = new Interpreter(_emulator.Cpu, _emulator.Memory, this);
+
+        try
+        {
+            interpreter.Execute(CommandText);
+        }
+        catch (Exception ex)
+        {
+            OutputText += ex.Message + Environment.NewLine;
+        }
+
+        _refreshAction();
     }
 
     private string _commandText = string.Empty;

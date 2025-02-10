@@ -1,5 +1,6 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
+using OldBit.Z80Cpu.Dasm.Formatters;
 
 namespace OldBit.Spectron.Debugger.Converters;
 
@@ -7,8 +8,8 @@ public class HexConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value switch
     {
-        Word wordValue => $"{wordValue:X4}",
-        byte byteValue => $"{byteValue:X2}",
+        Word wordValue => NumberFormatter.Format(wordValue, NumberFormat.Hex),
+        byte byteValue => NumberFormatter.Format(byteValue, NumberFormat.Hex),
         _ => value
     };
 

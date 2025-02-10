@@ -10,6 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
       <PackageReference Include="Avalonia" Version="11.2.3" />
       <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.3" />
       <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.2.0.8" />
@@ -65,6 +66,10 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Spectron.Emulation\Spectron.Emulation.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Parser\Generated\" />
     </ItemGroup>
 
 </Project>
