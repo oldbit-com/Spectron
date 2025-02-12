@@ -13,13 +13,7 @@ public class BreakpointListViewModel : ReactiveObject
 
     public ReactiveCommand<Unit, Unit> AddBreakpointCommand { get; private set; }
     public ReactiveCommand<IList, Unit> RemoveBreakpointCommand { get; private set; }
-
-    public BreakpointListViewModel()
-    {
-        Breakpoints.Add(new BreakpointViewModel { IsEnabled = true, Address =0x1000,  Condition = "PC == 0x1000" });
-        Breakpoints.Add(new BreakpointViewModel { IsEnabled = false, Address = 0x1002, Condition = "PC == 0x1002" });
-        Breakpoints.Add(new BreakpointViewModel { IsEnabled = true, Address = 0x1004, Condition = "PC == 0x1004" });
-    }
+    
 
     public BreakpointListViewModel(DebuggerContext debuggerContext)
     {
@@ -49,6 +43,11 @@ public class BreakpointListViewModel : ReactiveObject
 
             Breakpoints.Remove(breakpoint);
         }
+    }
+
+    public void UpdateBreakpoint(BreakpointViewModel breakpoint)
+    {
+        Console.WriteLine($"Updating breakpoint: {breakpoint.Address}");
     }
 
     private void RemoveBreakpoints(IList breakpoints)

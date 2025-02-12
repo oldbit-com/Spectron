@@ -5,11 +5,7 @@
              xmlns:viewModels="clr-namespace:OldBit.Spectron.Debugger.ViewModels"
              x:DataType="viewModels:BreakpointListViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="OldBit.Spectron.Debugger.Controls.Breakpoints">
-
-    <Design.DataContext>
-        <viewModels:BreakpointListViewModel/>
-    </Design.DataContext>
+             x:Class="OldBit.Spectron.Debugger.Controls.BreakpointList">
 
     <UserControl.Styles>
         <Style Selector="Path.IsDisabled">
@@ -28,10 +24,10 @@
                     Height="12" Width="12"
                     Stretch="UniformToFill"/>
             </Button>
-            <Button Name="RemoveButton" Command="{Binding RemoveBreakpointCommand}" CommandParameter="{Binding ElementName=BreakpointsGrid, Path=SelectedItems}"
+            <Button Name="RemoveButton" Command="{Binding RemoveBreakpointCommand}" CommandParameter="{Binding ElementName=Breakpoints, Path=SelectedItems}"
                     Width="30" Height="30"
                     VerticalContentAlignment="Center"
-                    IsEnabled="{Binding ElementName=BreakpointsGrid, Path=SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
+                    IsEnabled="{Binding ElementName=Breakpoints, Path=SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
                     ToolTip.Tip="Remove Breakpoint">
                 <Path
                     Data="M4 12h16"
@@ -42,8 +38,9 @@
             </Button>
         </StackPanel>
 
-        <DataGrid Name="BreakpointsGrid"
+        <DataGrid Name="Breakpoints"
                   Grid.Column="1"
+                  RowEditEnded="Breakpoints_OnRowEditEnded"
                   ItemsSource="{Binding Breakpoints}"
                   AutoGenerateColumns="False"
                   IsReadOnly="False"

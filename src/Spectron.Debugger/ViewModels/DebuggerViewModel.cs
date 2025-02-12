@@ -10,7 +10,6 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
     private readonly BreakpointHandler _breakpointHandler;
 
     private Emulator Emulator { get; }
-    private bool _;
 
     public CodeListViewModel CodeListViewModel { get; }
     public StackViewModel StackViewModel { get; } = new();
@@ -36,6 +35,9 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
         DebuggerStepCommand = ReactiveCommand.Create(HandleDebuggerStep);
         DebuggerResumeCommand = ReactiveCommand.Create(HandleDebuggerResume);
         TogglePauseCommand = ReactiveCommand.Create(() => HandlePause(!IsPaused));
+
+        BreakpointListViewModel.Breakpoints.CollectionChanged += (_, args) =>
+            CodeListViewModel.UpdateBreakpoints(args);
     }
 
     private void OnBreakpointHit(object? sender, EventArgs e)
