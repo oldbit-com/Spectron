@@ -11,14 +11,9 @@ public class BreakpointViewModel : ReactiveObject
 
     public static ValidationResult? ValidateCondition(string? condition, ValidationContext context)
     {
-        if (condition is null)
+        if (condition?.StartsWith("PC == $") == false)
         {
-            return ValidationResult.Success;
-        }
-
-        if (!condition.StartsWith("PC == $"))
-        {
-            return new ValidationResult("Invalid condition format.", new[] { nameof(Condition) });
+            return new ValidationResult("Invalid condition format.", [nameof(Condition)]);
         }
 
         return ValidationResult.Success;

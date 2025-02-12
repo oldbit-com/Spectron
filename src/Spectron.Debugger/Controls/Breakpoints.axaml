@@ -11,29 +11,63 @@
         <viewModels:BreakpointListViewModel/>
     </Design.DataContext>
 
-    <DataGrid ItemsSource="{Binding Breakpoints}"
-              AutoGenerateColumns="False"
-              IsReadOnly="False"
-              GridLinesVisibility="All"
-              BorderThickness="1"
-              BorderBrush="Gray">
+    <UserControl.Styles>
+        <Style Selector="Path.IsDisabled">
+            <Setter Property="Opacity" Value=".5"/>
+        </Style>
+    </UserControl.Styles>
 
-        <DataGrid.Styles>
-            <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
-                <Setter Property="IsVisible" Value="false" />
-            </Style>
-        </DataGrid.Styles>
+    <Grid ColumnDefinitions="40,*">
+        <StackPanel HorizontalAlignment="Left" Margin="0 5 0 0">
+            <Button Name="AddButton" Command="{Binding AddBreakpointCommand}"
+                    Width="30" Height="30"
+                    ToolTip.Tip="Add Breakpoint">
+                <Path
+                    Data="M12 5v14M5 12h14"
+                    Stroke="{DynamicResource ButtonForeground}" StrokeThickness="4" StrokeLineCap="Round"
+                    Height="12" Width="12"
+                    Stretch="UniformToFill"/>
+            </Button>
+            <Button Name="RemoveButton" Command="{Binding RemoveBreakpointCommand}" CommandParameter="{Binding ElementName=BreakpointsGrid, Path=SelectedItems}"
+                    Width="30" Height="30"
+                    VerticalContentAlignment="Center"
+                    IsEnabled="{Binding ElementName=BreakpointsGrid, Path=SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
+                    ToolTip.Tip="Remove Breakpoint">
+                <Path
+                    Data="M4 12h16"
+                    Stroke="{DynamicResource ButtonForeground}" StrokeThickness="4" StrokeLineCap="Round"
+                    Width="12"
+                    Stretch="UniformToFill"
+                    Classes.IsDisabled="{Binding !$parent.IsEnabled}"/>
+            </Button>
+        </StackPanel>
 
-        <DataGrid.Columns>
-            <DataGridCheckBoxColumn Header="Enabled" Binding="{Binding IsEnabled}" Width="100">
-                <DataGridCheckBoxColumn.HeaderTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="Enabled" HorizontalAlignment="Center" Padding="12 0 0 0"/>
-                    </DataTemplate>
-                </DataGridCheckBoxColumn.HeaderTemplate>
-            </DataGridCheckBoxColumn>
-            <DataGridTextColumn Header="Condition" Binding="{Binding Condition}" Width="*" />
-        </DataGrid.Columns>
-    </DataGrid>
+        <DataGrid Name="BreakpointsGrid"
+                  Grid.Column="1"
+                  ItemsSource="{Binding Breakpoints}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="False"
+                  GridLinesVisibility="All"
+                  BorderThickness="1"
+                  BorderBrush="Gray">
+
+            <DataGrid.Styles>
+                <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+                    <Setter Property="IsVisible" Value="false" />
+                </Style>
+            </DataGrid.Styles>
+
+            <DataGrid.Columns>
+                <DataGridCheckBoxColumn Header="Enabled" Binding="{Binding IsEnabled}" Width="100">
+                    <DataGridCheckBoxColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="Enabled" HorizontalAlignment="Center" Padding="12 0 0 0"/>
+                        </DataTemplate>
+                    </DataGridCheckBoxColumn.HeaderTemplate>
+                </DataGridCheckBoxColumn>
+                <DataGridTextColumn Header="Condition" Binding="{Binding Condition}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
 
 </UserControl>

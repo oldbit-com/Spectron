@@ -48,26 +48,26 @@
         <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="20 0 0 20">
                 <Button Background="Transparent">
-                    <Path Data="M20 2 L8 12 L20 22 Z M4 2 H8 V22 H4 Z" Fill="{StaticResource ButtonBackground}"/>
+                    <Path Data="M20 2 L8 12 L20 22 Z M4 2 H8 V22 H4 Z" Fill="{DynamicResource ButtonBackground}"/>
                 </Button>
                 <Button Background="Transparent">
-                    <Path Data="M2 2 L20 12 L2 22 Z" Fill="{StaticResource ButtonBackground}"/>
+                    <Path Data="M2 2 L20 12 L2 22 Z" Fill="{DynamicResource ButtonBackground}"/>
                 </Button>
                 <Button Background="Transparent">
-                    <Path Data="M2 2 H8 V22 H2 Z M14 2 H20 V22 H14 Z" Fill="{StaticResource ButtonBackground}"/>
+                    <Path Data="M2 2 H8 V22 H2 Z M14 2 H20 V22 H14 Z" Fill="{DynamicResource ButtonBackground}"/>
                 </Button>
                 <Button Background="Transparent">
-                    <Path Data="M2 2 H22 V22 H2 Z" Fill="{StaticResource ButtonBackground}"/>
+                    <Path Data="M2 2 H22 V22 H2 Z" Fill="{DynamicResource ButtonBackground}"/>
                 </Button>
                 <Button Background="Transparent">
-                    <Path Data="M4 2 L16 12 L4 22 Z M16 2 H20 V22 H16 Z" Fill="{StaticResource ButtonBackground}"/>
+                    <Path Data="M4 2 L16 12 L4 22 Z M16 2 H20 V22 H16 Z" Fill="{DynamicResource ButtonBackground}"/>
                 </Button>
                 <Button Background="Transparent">
-                    <Path Data="M4 16 L12 8 L20 16 Z M4 18 H20 V20 H4 Z" Fill="{StaticResource ButtonBackground}"/>
+                    <Path Data="M4 16 L12 8 L20 16 Z M4 18 H20 V20 H4 Z" Fill="{DynamicResource ButtonBackground}"/>
                 </Button>
                 <Button Background="Transparent" HorizontalContentAlignment="Center">
 
-                        <Path Data="M4 16 L12 8 L20 16 Z M4 18 H20 V20 H4 Z" Fill="{StaticResource ButtonBackground}"/>
+                        <Path Data="M4 16 L12 8 L20 16 Z M4 18 H20 V20 H4 Z" Fill="{DynamicResource ButtonBackground}"/>
                 </Button>
             </StackPanel>
             <Button Grid.Column="1" Content="Close" HorizontalAlignment="Right" HorizontalContentAlignment="Center" Margin="0 0 20 20" Width="100" Click="CancelButton_OnClick"/>
