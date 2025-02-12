@@ -20,6 +20,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <AssemblyAttribute Include="System.CLSCompliantAttribute">
+            <_Parameter1>false</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
       <Compile Update="Controls\CodeLine.axaml.cs">
         <DependentUpon>CodeLine.axaml</DependentUpon>
         <SubType>Code</SubType>
@@ -59,6 +65,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Reference Include="Avalonia.Controls.DataGrid">
+          <HintPath>..\..\..\..\..\.nuget\packages\avalonia.controls.datagrid\11.2.3\lib\net8.0\Avalonia.Controls.DataGrid.dll</HintPath>
+        </Reference>
         <Reference Include="OldBit.Z80Cpu.Dasm">
             <HintPath>..\..\..\Z80\src\Z80Cpu.Dasm\bin\Debug\net8.0\OldBit.Z80Cpu.Dasm.dll</HintPath>
         </Reference>

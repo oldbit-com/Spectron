@@ -411,6 +411,6 @@ public partial class MainWindowViewModel : ReactiveObject
             return;
         }
 
-        Title = $"S{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
+        Title = $"{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
     }
 }

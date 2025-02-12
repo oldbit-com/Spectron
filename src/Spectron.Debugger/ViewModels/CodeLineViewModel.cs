@@ -4,11 +4,11 @@ namespace OldBit.Spectron.Debugger.ViewModels;
 
 public class CodeLineViewModel : ReactiveObject
 {
-    private readonly DebuggerContext _debuggerContext;
+    private readonly BreakpointListViewModel _breakpointListViewModel;
 
-    public CodeLineViewModel(DebuggerContext debuggerContext)
+    public CodeLineViewModel(BreakpointListViewModel breakpointListViewModel)
     {
-        _debuggerContext = debuggerContext;
+        _breakpointListViewModel = breakpointListViewModel;
 
         this.WhenAny(x => x.IsBreakpoint, x => x.Value)
             .Subscribe(ToggleBreakpoint);
@@ -18,11 +18,11 @@ public class CodeLineViewModel : ReactiveObject
     {
         if (isBreakpoint)
         {
-            _debuggerContext.AddBreakpoint(Address);
+            _breakpointListViewModel.AddBreakpoint(Address);
         }
         else
         {
-            _debuggerContext.RemoveBreakpoint(Address);
+            _breakpointListViewModel.RemoveBreakpoint(Address);
         }
     }
 

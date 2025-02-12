@@ -62,6 +62,7 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Breakpoints">
+                <controls:Breakpoints DataContext="{Binding BreakpointListViewModel}" />
             </TabItem>
         </TabControl>
     </Grid>

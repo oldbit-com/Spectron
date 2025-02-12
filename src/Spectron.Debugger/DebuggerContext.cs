@@ -8,10 +8,6 @@ public sealed class DebuggerContext
 
     public List<string> CommandHistory { get; } = [];
 
-    public DebuggerContext()
-    {
-    }
-
     public void ClearBreakpoints()
     {
         _breakpoints.Clear();

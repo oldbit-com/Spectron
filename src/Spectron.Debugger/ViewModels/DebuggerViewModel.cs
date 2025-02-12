@@ -1,21 +1,22 @@
 using System.Reactive;
+using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Emulation;
-using OldBit.Z80Cpu.Events;
 using ReactiveUI;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
 public class DebuggerViewModel : ReactiveObject, IDisposable
 {
-    private readonly DebuggerContext _debuggerContext;
+    private readonly BreakpointHandler _breakpointHandler;
 
     private Emulator Emulator { get; }
-    private Word? _skipDebuggerBreakpointAddress = null;
+    private bool _;
 
     public CodeListViewModel CodeListViewModel { get; }
     public StackViewModel StackViewModel { get; } = new();
     public CpuViewModel CpuViewModel { get; } = new();
     public ImmediateViewModel ImmediateViewModel { get; }
+    public BreakpointListViewModel BreakpointListViewModel { get; }
 
     public ReactiveCommand<Unit, Unit> DebuggerStepCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> DebuggerResumeCommand { get; private set; }
@@ -23,35 +24,22 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
 
     public DebuggerViewModel(DebuggerContext debuggerContext, Emulator emulator)
     {
-        _debuggerContext = debuggerContext;
+        _breakpointHandler = new BreakpointHandler(debuggerContext, emulator);
+        _breakpointHandler.BreakpointHit += OnBreakpointHit;
+
         Emulator = emulator;
 
-        CodeListViewModel = new CodeListViewModel(debuggerContext);
+        BreakpointListViewModel = new BreakpointListViewModel(debuggerContext);
+        CodeListViewModel = new CodeListViewModel(debuggerContext, BreakpointListViewModel);
         ImmediateViewModel = new ImmediateViewModel(debuggerContext, emulator, Refresh);
 
         DebuggerStepCommand = ReactiveCommand.Create(HandleDebuggerStep);
         DebuggerResumeCommand = ReactiveCommand.Create(HandleDebuggerResume);
         TogglePauseCommand = ReactiveCommand.Create(() => HandlePause(!IsPaused));
-
-        Emulator.Cpu.BeforeInstruction += BeforeInstruction;
     }
 
-    private void BeforeInstruction(BeforeInstructionEventArgs e)
+    private void OnBreakpointHit(object? sender, EventArgs e)
     {
-        if (_skipDebuggerBreakpointAddress == e.PC)
-        {
-            _skipDebuggerBreakpointAddress = null;
-
-            return;
-        }
-
-        if (!_debuggerContext.HasBreakpoint(e.PC))
-        {
-            return;
-        }
-
-        e.IsBreakpoint = true;
-
         Emulator.Pause();
         IsPaused = true;
 
@@ -77,8 +65,7 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
 
     private void HandleDebuggerResume()
     {
-        // Prevent the breakpoint from being hit again for current instruction
-        _skipDebuggerBreakpointAddress = Emulator.Cpu.Registers.PC;
+        _breakpointHandler.Resume();
 
         Emulator.Resume();
         IsPaused = false;
@@ -107,7 +94,6 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
     public void Dispose()
     {
         GC.SuppressFinalize(this);
-
-        Emulator.Cpu.BeforeInstruction -= BeforeInstruction;
+        _breakpointHandler.Dispose();
     }
 }

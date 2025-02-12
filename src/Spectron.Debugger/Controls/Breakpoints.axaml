@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:OldBit.Spectron.Debugger.ViewModels"
+             x:DataType="viewModels:BreakpointListViewModel"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="OldBit.Spectron.Debugger.Controls.Breakpoints">
+
+    <Design.DataContext>
+        <viewModels:BreakpointListViewModel/>
+    </Design.DataContext>
+
+    <DataGrid ItemsSource="{Binding Breakpoints}"
+              AutoGenerateColumns="False"
+              IsReadOnly="False"
+              GridLinesVisibility="All"
+              BorderThickness="1"
+              BorderBrush="Gray">
+
+        <DataGrid.Styles>
+            <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+                <Setter Property="IsVisible" Value="false" />
+            </Style>
+        </DataGrid.Styles>
+
+        <DataGrid.Columns>
+            <DataGridCheckBoxColumn Header="Enabled" Binding="{Binding IsEnabled}" Width="100">
+                <DataGridCheckBoxColumn.HeaderTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="Enabled" HorizontalAlignment="Center" Padding="12 0 0 0"/>
+                    </DataTemplate>
+                </DataGridCheckBoxColumn.HeaderTemplate>
+            </DataGridCheckBoxColumn>
+            <DataGridTextColumn Header="Condition" Binding="{Binding Condition}" Width="*" />
+        </DataGrid.Columns>
+    </DataGrid>
+
+</UserControl>

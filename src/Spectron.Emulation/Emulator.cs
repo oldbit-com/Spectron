@@ -21,6 +21,7 @@ public sealed class Emulator
 {
     private readonly HardwareSettings _hardware;
     private readonly TimeMachine _timeMachine;
+    private readonly ILogger _logger;
     private readonly SpectrumBus _spectrumBus;
     private readonly EmulatorTimer _emulationTimer;
     private readonly IEmulatorMemory _memory;
@@ -69,6 +70,7 @@ public sealed class Emulator
         _hardware = hardware;
         KeyboardState = keyboardState;
         _timeMachine = timeMachine;
+        _logger = logger;
 
         CommandManager = commandManager;
         TapeManager = tapeManager;
@@ -92,17 +94,7 @@ public sealed class Emulator
         SetupEventHandlers();
 
         _emulationTimer = new EmulatorTimer();
-        _emulationTimer.Elapsed += _ =>
-        {
-            try
-            {
-                RunFrame();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error during frame execution");
-            }
-        };
+        _emulationTimer.Elapsed += OnTimerElapsed;
     }
 
     public void Start()
@@ -127,6 +119,10 @@ public sealed class Emulator
     public void Pause()
     {
         _emulationTimer.Pause();
+
+        // Ensure that the emulator finishes the current frame before pausing
+        Thread.Sleep(75);
+
         _timeMachine.AddEntry(this);
     }
 
@@ -149,6 +145,18 @@ public sealed class Emulator
 
     public void SetEmulationSpeed(int emulationSpeedPercentage) => _emulationTimer.Interval =
         emulationSpeedPercentage == int.MaxValue ? TimeSpan.Zero : TimeSpan.FromMilliseconds(20 * (100f / emulationSpeedPercentage));
+
+    private void OnTimerElapsed(EventArgs e)
+    {
+        try
+        {
+            RunFrame();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during frame execution");
+        }
+    }
 
     private void SetupEventHandlers()
     {

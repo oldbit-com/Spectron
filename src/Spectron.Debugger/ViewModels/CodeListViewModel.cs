@@ -6,7 +6,9 @@ using ReactiveUI;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
-public class CodeListViewModel(DebuggerContext debuggerContext) : ReactiveObject
+public class CodeListViewModel(
+    DebuggerContext debuggerContext,
+    BreakpointListViewModel breakpointListViewModel) : ReactiveObject
 {
     public ObservableCollection<CodeLineViewModel> CodeLines { get; } = [];
 
@@ -19,7 +21,7 @@ public class CodeListViewModel(DebuggerContext debuggerContext) : ReactiveObject
 
         for (var i = 0; i < instructions.Count; i++)
         {
-            CodeLines.Add(new CodeLineViewModel(debuggerContext)
+            CodeLines.Add(new CodeLineViewModel(breakpointListViewModel)
             {
                 Address = instructions[i].Address,
                 Code = instructions[i].Code,

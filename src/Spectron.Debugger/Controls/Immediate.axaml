@@ -27,16 +27,26 @@
         </EventTriggerBehavior>
     </i:Interaction.Behaviors>
 
-    <Grid RowDefinitions="*, Auto">
+    <Grid RowDefinitions="*, Auto" ColumnDefinitions="16,*">
         <TextBox Grid.Row="0"
+                 Grid.Column="0"
+                 Grid.ColumnSpan="2"
                  FontFamily="{StaticResource VT220}"
                  Text="{Binding OutputText}"
                  Foreground="{DynamicResource VT220Brush}"
                  FontSize="16"
                  Margin="0 0 0 5"
                  IsReadOnly="True"/>
+        <TextBlock Grid.Row="1"
+                   Grid.Column="0"
+                   FontFamily="{StaticResource VT220}"
+                   Foreground="{DynamicResource VT220Brush}"
+                   VerticalAlignment="Center"
+                   Text=">"/>
         <TextBox Grid.Row="1"
+                 Grid.Column="1"
                  Name="ImmediateTextBox"
+                 Watermark="Enter command"
                  Text="{Binding CommandText}"
                  FontFamily="{StaticResource VT220}"
                  Foreground="{DynamicResource VT220Brush}"
