@@ -1,4 +1,5 @@
 using System.Reactive;
+using Avalonia.Threading;
 using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Emulation;
 using ReactiveUI;
@@ -23,13 +24,15 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
 
     public DebuggerViewModel(DebuggerContext debuggerContext, Emulator emulator)
     {
-        _breakpointHandler = new BreakpointHandler(debuggerContext, emulator);
+        var breakpointManager = new BreakpointManager(emulator.Cpu);
+
+        _breakpointHandler = new BreakpointHandler(breakpointManager, emulator);
         _breakpointHandler.BreakpointHit += OnBreakpointHit;
 
         Emulator = emulator;
 
-        BreakpointListViewModel = new BreakpointListViewModel(debuggerContext);
-        CodeListViewModel = new CodeListViewModel(debuggerContext, BreakpointListViewModel);
+        BreakpointListViewModel = new BreakpointListViewModel(breakpointManager);
+        CodeListViewModel = new CodeListViewModel(breakpointManager, BreakpointListViewModel);
         ImmediateViewModel = new ImmediateViewModel(debuggerContext, emulator, Refresh);
 
         DebuggerStepCommand = ReactiveCommand.Create(HandleDebuggerStep);
@@ -45,7 +48,7 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
         Emulator.Pause();
         IsPaused = true;
 
-        Refresh();
+        Dispatcher.UIThread.Post(Refresh);
     }
 
     public void HandlePause(bool isPaused)

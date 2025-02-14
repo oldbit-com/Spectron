@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Z80Cpu;
 using OldBit.Z80Cpu.Dasm;
@@ -8,7 +9,7 @@ using ReactiveUI;
 namespace OldBit.Spectron.Debugger.ViewModels;
 
 public class CodeListViewModel(
-    DebuggerContext debuggerContext,
+    BreakpointManager breakpointManager,
     BreakpointListViewModel breakpointListViewModel) : ReactiveObject
 {
     public ObservableCollection<CodeLineViewModel> CodeLines { get; } = [];
@@ -22,12 +23,13 @@ public class CodeListViewModel(
 
         for (var i = 0; i < instructions.Count; i++)
         {
-            CodeLines.Add(new CodeLineViewModel(breakpointListViewModel)
+            var isBreakpoint = breakpointManager.HasBreakpoint(Register.PC, instructions[i].Address);
+
+            CodeLines.Add(new CodeLineViewModel(breakpointListViewModel, isBreakpoint)
             {
                 Address = instructions[i].Address,
                 Code = instructions[i].Code,
-                IsCurrent = i == 0,
-                IsBreakpoint = debuggerContext.Breakpoints.Contains(instructions[i].Address)
+                IsCurrent = i == 0
             });
         }
     }

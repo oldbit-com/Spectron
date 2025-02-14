@@ -6,9 +6,11 @@ public class CodeLineViewModel : ReactiveObject
 {
     private readonly BreakpointListViewModel _breakpointListViewModel;
 
-    public CodeLineViewModel(BreakpointListViewModel breakpointListViewModel)
+    public CodeLineViewModel(BreakpointListViewModel breakpointListViewModel, bool isBreakpoint)
     {
         _breakpointListViewModel = breakpointListViewModel;
+
+        IsBreakpoint = isBreakpoint;
 
         this.WhenAny(x => x.IsBreakpoint, x => x.Value)
             .Subscribe(ToggleBreakpoint);

@@ -5,17 +5,16 @@ namespace OldBit.Spectron.Debugger.Breakpoints;
 
 public class BreakpointHandler : IDisposable
 {
-    private readonly DebuggerContext _debuggerContext;
+    private readonly BreakpointManager _breakpointManager;
     private readonly Emulator _emulator;
-    private Word? _ignoreBreakpointAddress = null;
 
-    private HashSet<Word> _addressBreakpoints = [];
+    private Word? _ignoreBreakpointAddress = null;
 
     public event EventHandler<EventArgs>? BreakpointHit;
 
-    public BreakpointHandler(DebuggerContext debuggerContext, Emulator emulator)
+    public BreakpointHandler(BreakpointManager breakpointManager, Emulator emulator)
     {
-        _debuggerContext = debuggerContext;
+        _breakpointManager = breakpointManager;
         _emulator = emulator;
 
         emulator.Cpu.BeforeInstruction += BeforeInstruction;
@@ -30,7 +29,7 @@ public class BreakpointHandler : IDisposable
             return;
         }
 
-        if (!_debuggerContext.HasBreakpoint(e.PC))
+        if (!_breakpointManager.CheckHit())
         {
             return;
         }
