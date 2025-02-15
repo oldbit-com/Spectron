@@ -94,7 +94,7 @@ public class BreakpointManager
                 }
             }
 
-            breakpoint.ValueAtLastHit = null;
+            breakpoint.ValueAtLastHit = value;
         }
 
         return false;

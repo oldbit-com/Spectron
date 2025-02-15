@@ -10,7 +10,7 @@ public class Breakpoint(Register register, int value)
 
     public Register Register { get; set; } = register;
 
-    public int? ValueAtLastHit { get; set; }
+    public int? ValueAtLastHit { get; set; } = value;
 
     public override string ToString() => $"{Register} == ${Value:X4}";
 }
