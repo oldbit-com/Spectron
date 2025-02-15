@@ -14,6 +14,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spectron.Debugger", "src\Sp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spectron.Debugger.Tests", "tests\Spectron.Debugger.Tests\Spectron.Debugger.Tests.csproj", "{D19D1D6F-AD7D-494C-8A21-5A2774612149}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spectron.Disassembly", "src\Spectron.Disassembly\Spectron.Disassembly.csproj", "{E9B05C94-47EC-4526-9675-5595182FFC13}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spectron.Disassembly.Tests", "tests\Spectron.Disassembly.Tests\Spectron.Disassembly.Tests.csproj", "{D97CF4C1-CACF-46DC-9A59-5229E6E2BC70}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +29,8 @@ Global
 		{10F6D919-AF27-4920-A67E-872C03C45405} = {ED4EA606-69A3-4459-8BBF-0F1578E67C40}
 		{5FEBB15B-2424-48DC-B329-A4F30B053A00} = {7DE98BF6-DC2A-4B86-91F2-A69B633E45FC}
 		{D19D1D6F-AD7D-494C-8A21-5A2774612149} = {ED4EA606-69A3-4459-8BBF-0F1578E67C40}
+		{E9B05C94-47EC-4526-9675-5595182FFC13} = {7DE98BF6-DC2A-4B86-91F2-A69B633E45FC}
+		{D97CF4C1-CACF-46DC-9A59-5229E6E2BC70} = {ED4EA606-69A3-4459-8BBF-0F1578E67C40}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{C60D08C5-964F-48E6-BA67-BB14AA63AA6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -47,5 +53,13 @@ Global
 		{D19D1D6F-AD7D-494C-8A21-5A2774612149}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D19D1D6F-AD7D-494C-8A21-5A2774612149}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D19D1D6F-AD7D-494C-8A21-5A2774612149}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9B05C94-47EC-4526-9675-5595182FFC13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9B05C94-47EC-4526-9675-5595182FFC13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9B05C94-47EC-4526-9675-5595182FFC13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9B05C94-47EC-4526-9675-5595182FFC13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D97CF4C1-CACF-46DC-9A59-5229E6E2BC70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D97CF4C1-CACF-46DC-9A59-5229E6E2BC70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D97CF4C1-CACF-46DC-9A59-5229E6E2BC70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D97CF4C1-CACF-46DC-9A59-5229E6E2BC70}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

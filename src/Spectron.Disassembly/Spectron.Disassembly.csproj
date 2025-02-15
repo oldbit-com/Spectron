@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>OldBit.Spectron.Disassembly</AssemblyName>
+        <RootNamespace>OldBit.Spectron.Disassembly</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>OldBit.Spectron.Disassembly.Tests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+    
+</Project>

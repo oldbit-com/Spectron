@@ -12,6 +12,7 @@
     <ItemGroup>
       <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
       <PackageReference Include="Avalonia" Version="11.2.3" />
+      <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.3" />
       <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.3" />
       <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.2.0.8" />
       <PackageReference Include="Avalonia.Xaml.Interactivity" Version="11.2.0.8" />
@@ -65,15 +66,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Reference Include="Avalonia.Controls.DataGrid">
-          <HintPath>..\..\..\..\..\.nuget\packages\avalonia.controls.datagrid\11.2.3\lib\net8.0\Avalonia.Controls.DataGrid.dll</HintPath>
-        </Reference>
-        <Reference Include="OldBit.Z80Cpu.Dasm">
-            <HintPath>..\..\..\Z80\src\Z80Cpu.Dasm\bin\Debug\net8.0\OldBit.Z80Cpu.Dasm.dll</HintPath>
-        </Reference>
-    </ItemGroup>
-
-    <ItemGroup>
+      <ProjectReference Include="..\Spectron.Disassembly\Spectron.Disassembly.csproj" />
       <ProjectReference Include="..\Spectron.Emulation\Spectron.Emulation.csproj" />
     </ItemGroup>
 

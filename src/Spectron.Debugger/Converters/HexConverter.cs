@@ -1,6 +1,6 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
-using OldBit.Z80Cpu.Dasm.Formatters;
+using OldBit.Spectron.Disassembly.Formatters;
 
 namespace OldBit.Spectron.Debugger.Converters;
 

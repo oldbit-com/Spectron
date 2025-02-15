@@ -1,0 +1,280 @@
+{
+  "IN R,(C)": [
+    {
+      "bytes": ["ED", "40"],
+      "instruction": "IN B,(C)"
+    },
+    {
+      "bytes": ["ED", "48"],
+      "instruction": "IN C,(C)"
+    },
+    {
+      "bytes": ["ED", "50"],
+      "instruction": "IN D,(C)"
+    },
+    {
+      "bytes": ["ED", "58"],
+      "instruction": "IN E,(C)"
+    },
+    {
+      "bytes": ["ED", "60"],
+      "instruction": "IN H,(C)"
+    },
+    {
+      "bytes": ["ED", "68"],
+      "instruction": "IN L,(C)"
+    },
+    {
+      "bytes": ["ED", "70"],
+      "instruction": "IN (C)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["ED", "78"],
+      "instruction": "IN A,(C)"
+    }
+  ],
+  "OUT (C),R": [
+    {
+      "bytes": ["ED", "41"],
+      "instruction": "OUT (C),B"
+    },
+    {
+      "bytes": ["ED", "49"],
+      "instruction": "OUT (C),C"
+    },
+    {
+      "bytes": ["ED", "51"],
+      "instruction": "OUT (C),D"
+    },
+    {
+      "bytes": ["ED", "59"],
+      "instruction": "OUT (C),E"
+    },
+    {
+      "bytes": ["ED", "61"],
+      "instruction": "OUT (C),H"
+    },
+    {
+      "bytes": ["ED", "69"],
+      "instruction": "OUT (C),L"
+    },
+    {
+      "bytes": ["ED", "71"],
+      "instruction": "OUT (C),0",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["ED", "79"],
+      "instruction": "OUT (C),A"
+    }
+  ],
+  "SBC HL,RR": [
+    {
+      "bytes": ["ED", "42"],
+      "instruction": "SBC HL,BC"
+    },
+    {
+      "bytes": ["ED", "52"],
+      "instruction": "SBC HL,DE"
+    },
+    {
+      "bytes": ["ED", "62"],
+      "instruction": "SBC HL,HL"
+    },
+    {
+      "bytes": ["ED", "72"],
+      "instruction": "SBC HL,SP"
+    }
+  ],
+  "ADC HL,RR": [
+    {
+      "bytes": ["ED", "4A"],
+      "instruction": "ADC HL,BC"
+    },
+    {
+      "bytes": ["ED", "5A"],
+      "instruction": "ADC HL,DE"
+    },
+    {
+      "bytes": ["ED", "6A"],
+      "instruction": "ADC HL,HL"
+    },
+    {
+      "bytes": ["ED", "7A"],
+      "instruction": "ADC HL,SP"
+    }
+  ],
+  "LD (NN),RR": [
+    {
+      "bytes": ["ED", "43", "01", "10"],
+      "instruction": "LD ($1001),BC"
+    },
+    {
+      "bytes": ["ED", "53", "02", "10"],
+      "instruction": "LD ($1002),DE"
+    },
+    {
+      "bytes": ["ED", "63", "03", "10"],
+      "instruction": "LD ($1003),HL"
+    },
+    {
+      "bytes": ["ED", "73", "04", "10"],
+      "instruction": "LD ($1004),SP"
+    }
+  ],
+  "LD RR,(NN)": [
+    {
+      "bytes": ["ED", "4B", "05", "10"],
+      "instruction": "LD BC,($1005)"
+    },
+    {
+      "bytes": ["ED", "5B", "06", "10"],
+      "instruction": "LD DE,($1006)"
+    },
+    {
+      "bytes": ["ED", "6B", "07", "10"],
+      "instruction": "LD HL,($1007)"
+    },
+    {
+      "bytes": ["ED", "7B", "08", "10"],
+      "instruction": "LD SP,($1008)"
+    }
+  ],
+  "NEG": [
+    {
+      "bytes": ["ED", "44"],
+      "instruction": "NEG"
+    }
+  ],
+  "RETN": [
+    {
+      "bytes": ["ED", "45"],
+      "instruction": "RETN"
+    }
+  ],
+  "RETI": [
+    {
+      "bytes": ["ED", "4D"],
+      "instruction": "RETI"
+    }
+  ],
+  "IM N": [
+    {
+      "bytes": ["ED", "46"],
+      "instruction": "IM 0"
+    },
+    {
+      "bytes": ["ED", "56"],
+      "instruction": "IM 1"
+    },
+    {
+      "bytes": ["ED", "5E"],
+      "instruction": "IM 2"
+    }
+  ],
+  "LD I": [
+    {
+      "bytes": ["ED", "47"],
+      "instruction": "LD I,A"
+    },
+    {
+      "bytes": ["ED", "57"],
+      "instruction": "LD A,I"
+    }
+  ],
+  "LD R": [
+    {
+      "bytes": ["ED", "4F"],
+      "instruction": "LD R,A"
+    },
+    {
+      "bytes": ["ED", "5F"],
+      "instruction": "LD A,R"
+    }
+  ],
+  "RRD": [
+    {
+      "bytes": ["ED", "67"],
+      "instruction": "RRD"
+    }
+  ],
+  "RLD": [
+    {
+      "bytes": ["ED", "6F"],
+      "instruction": "RLD"
+    }
+  ],
+  "LDI": [
+    {
+      "bytes": ["ED", "A0"],
+      "instruction": "LDI"
+    },
+    {
+      "bytes": ["ED", "B0"],
+      "instruction": "LDIR"
+    },
+    {
+      "bytes": ["ED", "A8"],
+      "instruction": "LDD"
+    },
+    {
+      "bytes": ["ED", "B8"],
+      "instruction": "LDDR"
+    }
+  ],
+  "CPI": [
+    {
+      "bytes": ["ED", "A1"],
+      "instruction": "CPI"
+    },
+    {
+      "bytes": ["ED", "B1"],
+      "instruction": "CPIR"
+    },
+    {
+      "bytes": ["ED", "A9"],
+      "instruction": "CPD"
+    },
+    {
+      "bytes": ["ED", "B9"],
+      "instruction": "CPDR"
+    }
+  ],
+  "INI": [
+    {
+      "bytes": ["ED", "A2"],
+      "instruction": "INI"
+    },
+    {
+      "bytes": ["ED", "B2"],
+      "instruction": "INIR"
+    },
+    {
+      "bytes": ["ED", "AA"],
+      "instruction": "IND"
+    },
+    {
+      "bytes": ["ED", "BA"],
+      "instruction": "INDR"
+    }
+  ],
+  "OUTI": [
+    {
+      "bytes": ["ED", "A3"],
+      "instruction": "OUTI"
+    },
+    {
+      "bytes": ["ED", "B3"],
+      "instruction": "OTIR"
+    },
+    {
+      "bytes": ["ED", "AB"],
+      "instruction": "OUTD"
+    },
+    {
+      "bytes": ["ED", "BB"],
+      "instruction": "OTDR"
+    }
+  ]
+}

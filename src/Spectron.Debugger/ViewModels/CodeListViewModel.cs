@@ -1,9 +1,9 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using OldBit.Spectron.Debugger.Breakpoints;
+using OldBit.Spectron.Disassembly;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Z80Cpu;
-using OldBit.Z80Cpu.Dasm;
 using ReactiveUI;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
