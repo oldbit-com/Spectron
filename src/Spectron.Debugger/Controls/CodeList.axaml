@@ -21,7 +21,8 @@
         <ListBox Grid.Row="1" ItemsSource="{Binding CodeLines}" Name="ListBox" DoubleTapped="ListBox_OnDoubleTapped">
             <ListBox.Styles>
                 <Style Selector="ListBoxItem">
-                    <Setter Property="Height" Value="20"/>
+                    <Setter Property="Height" Value="18"/>
+                    <Setter Property="Padding" Value="0 2 0 -2"/>
                 </Style>
             </ListBox.Styles>
             <ListBox.ItemTemplate>

@@ -20,21 +20,22 @@
         </Style>
     </UserControl.Styles>
 
-    <Grid ColumnDefinitions="20,70, 15, 180" Height="20">
+    <Grid ColumnDefinitions="20,60,15,*" Height="20">
         <Path
             Grid.Column="0"
             Classes="Breakpoint"
             Height="13"
             Width="13"
+            Margin="0 2 0 0"
             Stretch="Uniform"
-            VerticalAlignment="Center"
+            VerticalAlignment="Top"
             Fill="{StaticResource SpectrumRed}"
             Data="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
 
         <TextBlock
             Grid.Column="1"
-            FontFamily="{StaticResource SpectrumExpandedFont}"
-            FontSize="24"
+            FontFamily="{StaticResource HackRegular}"
+            FontSize="15"
             VerticalAlignment="Center"
             Height="22"
             Text="{Binding $parent[local:CodeLine].Address, Converter={StaticResource HexConverter}}"/>
@@ -45,14 +46,14 @@
             Height="13"
             Width="13"
             Stretch="Uniform"
-            VerticalAlignment="Center"
+            VerticalAlignment="Top"
             Fill="{StaticResource SpectrumGreen}"
             Data="M8 5v14l11-7z"/>
 
         <TextBlock
             Grid.Column="3"
-            FontFamily="{StaticResource SpectrumExpandedFont}"
-            FontSize="24"
+            FontFamily="{StaticResource HackRegular}"
+            FontSize="15"
             VerticalAlignment="Center"
             Height="22"
             Text="{Binding $parent[local:CodeLine].Code}"/>

@@ -23,7 +23,7 @@
         </Style>
     </Window.Styles>
 
-    <Grid RowDefinitions="35,*, 200" ColumnDefinitions="240,140,*,240" Margin="5">
+    <Grid RowDefinitions="35,*,4,200" ColumnDefinitions="240,140,300,*" Margin="5">
         <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                 <Button Width="30" Height="30" Padding="4 0 0 0" Command="{Binding TogglePauseCommand}" IsVisible="{Binding !IsPaused}" HotKey="F8" ToolTip.Tip="Pause F8">
@@ -58,7 +58,9 @@
             Grid.Row="1" Grid.Column="3"
             Margin="1"/>
 
-        <TabControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4">
+        <GridSplitter Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Background="{DynamicResource SystemChromeLowColor}" Margin="2" ResizeDirection="Rows"/>
+
+        <TabControl Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4">
             <TabItem Header="Immediate">
                 <Grid RowDefinitions="*, Auto">
                     <controls:Immediate DataContext="{Binding ImmediateViewModel}"/>
