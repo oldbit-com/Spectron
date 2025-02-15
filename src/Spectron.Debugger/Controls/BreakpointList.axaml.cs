@@ -7,7 +7,7 @@ public partial class BreakpointList : UserControl
 {
     public BreakpointList() => InitializeComponent();
 
-    private void Breakpoints_OnRowEditEnded(object? sender, DataGridRowEditEndedEventArgs e)
+    private void Breakpoints_OnCellEditEnded(object? sender, DataGridCellEditEndedEventArgs e)
     {
         if (DataContext is BreakpointListViewModel viewModel && e.Row.DataContext is BreakpointViewModel item)
         {

@@ -12,7 +12,7 @@ public static partial class BreakpointParser
         "AF", "BC", "DE", "HL", "SP", "PC", "IX", "IY"
     ];
 
-    public static bool TryParseCondition(string? condition, [NotNullWhen(true)]out Breakpoint? breakpoint)
+    public static bool TryParseCondition(string? condition, [NotNullWhen(true)]out (Register Register, int Address)? breakpoint)
     {
         breakpoint = null;
 
@@ -55,7 +55,7 @@ public static partial class BreakpointParser
             }
         }
 
-        breakpoint = new Breakpoint(register, address.Value);
+        breakpoint = (Enum.Parse<Register>(register, true), address.Value);
 
         return true;
     }

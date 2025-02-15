@@ -6,14 +6,12 @@ namespace OldBit.Spectron.Debugger.ViewModels;
 
 public class BreakpointViewModel : ReactiveObject
 {
-    private Word _address;
     private string _condition = string.Empty;
     private bool _isEnabled;
 
     public BreakpointViewModel(string condition, Breakpoint breakpoint)
     {
-        Id = breakpoint.Id;
-        Address = (Word)breakpoint.Value;
+        Breakpoint = breakpoint;
         Condition = condition;
         IsEnabled = breakpoint.IsEnabled;
     }
@@ -28,13 +26,9 @@ public class BreakpointViewModel : ReactiveObject
         return ValidationResult.Success;
     }
 
-    public Guid Id { get; }
+    public Guid Id => Breakpoint.Id;
 
-    public Word Address
-    {
-        get => _address;
-        set => this.RaiseAndSetIfChanged(ref _address, value);
-    }
+    public Breakpoint Breakpoint { get; }
 
     [Required(ErrorMessage = "Condition is required.")]
     [CustomValidation(typeof(BreakpointViewModel), nameof(ValidateCondition))]

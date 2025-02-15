@@ -40,7 +40,7 @@
 
         <DataGrid Name="Breakpoints"
                   Grid.Column="1"
-                  RowEditEnded="Breakpoints_OnRowEditEnded"
+                  CellEditEnded="Breakpoints_OnCellEditEnded"
                   ItemsSource="{Binding Breakpoints}"
                   AutoGenerateColumns="False"
                   IsReadOnly="False"

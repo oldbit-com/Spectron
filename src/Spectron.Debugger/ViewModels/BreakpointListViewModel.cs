@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Reactive;
+using DynamicData;
 using OldBit.Spectron.Debugger.Breakpoints;
 using ReactiveUI;
 
@@ -19,38 +20,46 @@ public class BreakpointListViewModel : ReactiveObject
     {
         _breakpointManager = breakpointManager;
 
-        AddBreakpointCommand = ReactiveCommand.Create(() => AddBreakpoint(0x1000));
+        AddBreakpointCommand = ReactiveCommand.Create(() => AddBreakpoint(Register.PC, 0x1000));
         RemoveBreakpointCommand = ReactiveCommand.Create<IList>(RemoveBreakpoints);
     }
 
-    public void AddBreakpoint(Word address)
+    public void AddBreakpoint(Register register, Word value)
     {
-        var breakpoint = new Breakpoint(Register.PC, address);
-        var viewModel = new BreakpointViewModel($"PC == ${address:X4}", breakpoint);
+        var breakpoint = new Breakpoint(register, value);
+        var viewModel = new BreakpointViewModel($"{register} == ${value:X4}", breakpoint);
 
         Breakpoints.Add(viewModel);
         _breakpointManager.AddBreakpoint(breakpoint);
     }
 
-    public void RemoveBreakpoint(Word address)
+    public void RemoveBreakpoint(Register register, Word value)
     {
-        var breakpoint = Breakpoints.FirstOrDefault(x => x.Address == address);
+        var breakpoint = Breakpoints.FirstOrDefault(x =>
+            x.Breakpoint.Value == value &&
+            x.Breakpoint.Register == register);
 
-        if (breakpoint is not null)
+        if (breakpoint != null)
         {
-            _breakpointManager.RemoveBreakpoint(breakpoint.Id);
+            _breakpointManager.RemoveBreakpoint(breakpoint.Breakpoint.Id);
             Breakpoints.Remove(breakpoint);
         }
     }
 
-    public void UpdateBreakpoint(BreakpointViewModel breakpointViewModel)
+    public void UpdateBreakpoint(BreakpointViewModel breakpoint)
     {
-        if (!BreakpointParser.TryParseCondition(breakpointViewModel.Condition, out var breakpoint))
+        if (!BreakpointParser.TryParseCondition(breakpoint.Condition, out var updated))
         {
             return;
         }
 
-        _breakpointManager.UpdateBreakpoint(breakpointViewModel.Id, breakpoint);
+        _breakpointManager.UpdateBreakpoint(
+            breakpoint.Breakpoint.Id,
+            updated.Value.Register,
+            updated.Value.Address,
+            breakpoint.IsEnabled);
+
+        Breakpoints.Replace(breakpoint, breakpoint);
     }
 
     private void RemoveBreakpoints(IList breakpoints)

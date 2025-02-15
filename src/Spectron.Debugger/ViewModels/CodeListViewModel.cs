@@ -25,12 +25,12 @@ public class CodeListViewModel(
         {
             var isBreakpoint = breakpointManager.HasBreakpoint(Register.PC, instructions[i].Address);
 
-            CodeLines.Add(new CodeLineViewModel(breakpointListViewModel, isBreakpoint)
-            {
-                Address = instructions[i].Address,
-                Code = instructions[i].Code,
-                IsCurrent = i == 0
-            });
+            CodeLines.Add(new CodeLineViewModel(
+                breakpointListViewModel,
+                instructions[i].Address,
+                instructions[i].Code,
+                isCurrent: i == 0,
+                isBreakpoint));
         }
     }
 
@@ -40,9 +40,9 @@ public class CodeListViewModel(
         {
             case NotifyCollectionChangedAction.Add:
             {
-                foreach (var breakpoint in e.NewItems?.Cast<BreakpointViewModel>() ?? [])
+                foreach (var viewModel in e.NewItems?.Cast<BreakpointViewModel>() ?? [])
                 {
-                    if (CodeLines.FirstOrDefault(x => x.Address == breakpoint.Address) is { } codeLine)
+                    if (CodeLines.FirstOrDefault(x => x.Address == viewModel.Breakpoint.Value ) is { } codeLine)
                     {
                         codeLine.IsBreakpoint = true;
                     }
@@ -51,11 +51,21 @@ public class CodeListViewModel(
                 break;
             }
 
+            case NotifyCollectionChangedAction.Replace:
+                foreach (var viewModel in e.NewItems?.Cast<BreakpointViewModel>() ?? [])
+                {
+                    if (CodeLines.FirstOrDefault(x => x.Address == viewModel.Breakpoint.Value) is { } codeLine)
+                    {
+                        codeLine.UpdateBreakpoint(true);
+                    }
+                }
+                break;
+
             case NotifyCollectionChangedAction.Remove:
             {
-                foreach (var breakpoint in e.OldItems?.Cast<BreakpointViewModel>() ?? [])
+                foreach (var viewModel in e.OldItems?.Cast<BreakpointViewModel>() ?? [])
                 {
-                    if (CodeLines.FirstOrDefault(x => x.Address == breakpoint.Address) is { } codeLine)
+                    if (CodeLines.FirstOrDefault(x => x.Address == viewModel.Breakpoint.Value) is { } codeLine)
                     {
                         codeLine.IsBreakpoint = false;
                     }

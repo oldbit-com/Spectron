@@ -34,7 +34,7 @@ public class BreakpointManager
         _registerValueIndex[(int)Register.IY] = () => cpu.Registers.IY;
     }
 
-    public void UpdateBreakpoint(Guid id, Breakpoint breakpoint)
+    public void UpdateBreakpoint(Guid id, Register register, int value, bool isEnabled)
     {
         var existing = _breakpoints.FirstOrDefault(x => x.Id == id);
 
@@ -43,9 +43,9 @@ public class BreakpointManager
             return;
         }
 
-        existing.IsEnabled = breakpoint.IsEnabled;
-        existing.Register = breakpoint.Register;
-        existing.Value = breakpoint.Value;
+        existing.IsEnabled = isEnabled;
+        existing.Register = register;
+        existing.Value = value;
     }
 
     public void AddBreakpoint(Breakpoint breakpoint)
