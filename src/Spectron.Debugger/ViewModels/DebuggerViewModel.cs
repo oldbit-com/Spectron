@@ -83,8 +83,6 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
 
     private void HandleDebuggerResume()
     {
-        _breakpointHandler.Resume();
-
         Emulator.Resume();
         IsPaused = false;
     }

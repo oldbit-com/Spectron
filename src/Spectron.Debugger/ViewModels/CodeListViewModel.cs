@@ -29,7 +29,7 @@ public class CodeListViewModel(
                 breakpointListViewModel,
                 instructions[i].Address,
                 instructions[i].Code,
-                isCurrent: i == 0,
+                isCurrent: instructions[i].Address == pc,
                 isBreakpoint));
         }
     }

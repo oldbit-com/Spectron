@@ -8,8 +8,6 @@ public class BreakpointHandler : IDisposable
     private readonly BreakpointManager _breakpointManager;
     private readonly Emulator _emulator;
 
-    private Word? _ignoreBreakpointAddress;
-
     public event EventHandler<EventArgs>? BreakpointHit;
 
     public BreakpointHandler(BreakpointManager breakpointManager, Emulator emulator)
@@ -31,8 +29,6 @@ public class BreakpointHandler : IDisposable
 
         BreakpointHit?.Invoke(this, EventArgs.Empty);
     }
-
-    public void Resume() => _ignoreBreakpointAddress = _emulator.Cpu.Registers.PC;
 
     public void Dispose()
     {
