@@ -16,21 +16,32 @@ public class BreakpointListViewModel : ReactiveObject
     public ReactiveCommand<Unit, Unit> AddBreakpointCommand { get; private set; }
     public ReactiveCommand<IList, Unit> RemoveBreakpointCommand { get; private set; }
 
-    public BreakpointListViewModel(BreakpointManager breakpointManager)
+    public BreakpointListViewModel(DebuggerContext debuggerContext, BreakpointManager breakpointManager)
     {
         _breakpointManager = breakpointManager;
+
+        foreach (var breakpoint in debuggerContext.Breakpoints)
+        {
+            AddBreakpoint(breakpoint);
+        }
 
         AddBreakpointCommand = ReactiveCommand.Create(() => AddBreakpoint(Register.PC, 0x1000));
         RemoveBreakpointCommand = ReactiveCommand.Create<IList>(RemoveBreakpoints);
     }
 
-    public void AddBreakpoint(Register register, Word value)
+    private void AddBreakpoint(Breakpoint breakpoint)
     {
-        var breakpoint = new Breakpoint(register, value);
-        var viewModel = new BreakpointViewModel($"{register} == ${value:X4}", breakpoint);
+        var viewModel = new BreakpointViewModel(breakpoint);
 
         Breakpoints.Add(viewModel);
         _breakpointManager.AddBreakpoint(breakpoint);
+    }
+
+    public void AddBreakpoint(Register register, Word value)
+    {
+        var breakpoint = new Breakpoint(register, value);
+
+        AddBreakpoint(breakpoint);
     }
 
     public void RemoveBreakpoint(Register register, Word value)

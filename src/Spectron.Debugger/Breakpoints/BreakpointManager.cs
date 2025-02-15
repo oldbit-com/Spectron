@@ -7,6 +7,8 @@ public class BreakpointManager
     private readonly List<Breakpoint> _breakpoints = [];
     private readonly Func<Word>[] _registerValueIndex = new Func<Word>[(int)Register.Last];
 
+    public IReadOnlyList<Breakpoint> Breakpoints => _breakpoints;
+
     public BreakpointManager(Z80 cpu)
     {
         _registerValueIndex[(int)Register.A] = () => cpu.Registers.A;

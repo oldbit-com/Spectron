@@ -8,7 +8,9 @@ namespace OldBit.Spectron.Debugger.ViewModels;
 
 public class DebuggerViewModel : ReactiveObject, IDisposable
 {
+    private readonly DebuggerContext _debuggerContext;
     private readonly BreakpointHandler _breakpointHandler;
+    private readonly BreakpointManager _breakpointManager;
 
     private Emulator Emulator { get; }
 
@@ -24,15 +26,16 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
 
     public DebuggerViewModel(DebuggerContext debuggerContext, Emulator emulator)
     {
-        var breakpointManager = new BreakpointManager(emulator.Cpu);
+        _debuggerContext = debuggerContext;
+        _breakpointManager = new BreakpointManager(emulator.Cpu);
 
-        _breakpointHandler = new BreakpointHandler(breakpointManager, emulator);
+        _breakpointHandler = new BreakpointHandler(_breakpointManager, emulator);
         _breakpointHandler.BreakpointHit += OnBreakpointHit;
 
         Emulator = emulator;
 
-        BreakpointListViewModel = new BreakpointListViewModel(breakpointManager);
-        CodeListViewModel = new CodeListViewModel(breakpointManager, BreakpointListViewModel);
+        BreakpointListViewModel = new BreakpointListViewModel(_debuggerContext, _breakpointManager);
+        CodeListViewModel = new CodeListViewModel(_breakpointManager, BreakpointListViewModel);
         ImmediateViewModel = new ImmediateViewModel(debuggerContext, emulator, Refresh);
 
         DebuggerStepCommand = ReactiveCommand.Create(HandleDebuggerStep);
@@ -59,6 +62,16 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
         {
             Emulator.Pause();
             Refresh();
+        }
+    }
+
+    private void Close()
+    {
+        _debuggerContext.Breakpoints.Clear();
+
+        foreach (var breakpoint in _breakpointManager.Breakpoints)
+        {
+            _debuggerContext.Breakpoints.Add(breakpoint);
         }
     }
 
@@ -98,6 +111,8 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
 
     public void Dispose()
     {
+        Close();
+
         GC.SuppressFinalize(this);
         _breakpointHandler.Dispose();
     }

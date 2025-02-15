@@ -9,10 +9,10 @@ public class BreakpointViewModel : ReactiveObject
     private string _condition = string.Empty;
     private bool _isEnabled;
 
-    public BreakpointViewModel(string condition, Breakpoint breakpoint)
+    public BreakpointViewModel(Breakpoint breakpoint)
     {
         Breakpoint = breakpoint;
-        Condition = condition;
+        Condition = breakpoint.ToString();
         IsEnabled = breakpoint.IsEnabled;
     }
 
