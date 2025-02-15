@@ -70,15 +70,7 @@ public static partial class BreakpointParser
             return address;
         }
 
-        var match = HexValuePattern().Match(value);
-
-        if (!match.Success)
-        {
-            return null;
-        }
-
-        var hex = match.Groups[1].Success ? match.Groups[1].Value : match.Groups[2].Value;
-        if (int.TryParse(hex, NumberStyles.HexNumber, null, out address))
+        if (TryParseHex(value, out address))
         {
             return address;
         }
@@ -86,8 +78,36 @@ public static partial class BreakpointParser
         return null;
     }
 
-    private static bool Is16BitRegister(string register) => register.Length == 2;
+    private static bool TryParseHex(string hex, out int value)
+    {
+        if (hex.StartsWith('$'))
+        {
+            if (int.TryParse(hex.AsSpan(1), NumberStyles.HexNumber, null, out value))
+            {
+                return true;
+            }
+        }
 
-    [GeneratedRegex(@"(?i)(?:\$(?=[0-9A-F])|0x)([0-9A-F]+)|([0-9A-F]+)(?=h)")]
-    private static partial Regex HexValuePattern();
+        if (hex.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+        {
+            if (int.TryParse(hex.AsSpan(2), NumberStyles.HexNumber, null, out value))
+            {
+                return true;
+            }
+        }
+
+        if (hex.EndsWith("h", StringComparison.OrdinalIgnoreCase))
+        {
+            if (int.TryParse(hex.AsSpan(0, hex.Length - 1), NumberStyles.HexNumber, null, out value))
+            {
+                return true;
+            }
+        }
+
+        value = 0;
+
+        return false;
+    }
+
+    private static bool Is16BitRegister(string register) => register.Length == 2;
 }
