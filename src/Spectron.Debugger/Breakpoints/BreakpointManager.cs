@@ -82,12 +82,19 @@ public class BreakpointManager
                 continue;
             }
 
-            var registerValue = _registerValueIndex[(int)breakpoint.Register]();
+            var value = _registerValueIndex[(int)breakpoint.Register]();
 
-            if (registerValue == breakpoint.Value)
+            if (value == breakpoint.Value)
             {
-                return true;
+                if (breakpoint.ValueAtLastHit != value)
+                {
+                    breakpoint.ValueAtLastHit = value;
+
+                    return true;
+                }
             }
+
+            breakpoint.ValueAtLastHit = null;
         }
 
         return false;

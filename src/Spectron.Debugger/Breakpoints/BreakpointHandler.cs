@@ -8,7 +8,7 @@ public class BreakpointHandler : IDisposable
     private readonly BreakpointManager _breakpointManager;
     private readonly Emulator _emulator;
 
-    private Word? _ignoreBreakpointAddress = null;
+    private Word? _ignoreBreakpointAddress;
 
     public event EventHandler<EventArgs>? BreakpointHit;
 
@@ -22,13 +22,6 @@ public class BreakpointHandler : IDisposable
 
     private void BeforeInstruction(BeforeInstructionEventArgs e)
     {
-        if (_ignoreBreakpointAddress == e.PC)
-        {
-            _ignoreBreakpointAddress = null;
-
-            return;
-        }
-
         if (!_breakpointManager.CheckHit())
         {
             return;
