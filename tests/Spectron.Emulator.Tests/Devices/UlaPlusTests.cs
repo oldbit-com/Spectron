@@ -1,5 +1,5 @@
-using FluentAssertions;
 using OldBit.Spectron.Emulation.Devices;
+using Shouldly;
 
 namespace OldBit.Spectron.Emulator.Tests.Devices;
 
@@ -12,18 +12,18 @@ public class UlaPlusTests
     public void WhenModeGroup_ShouldBeAbleToActiveOrDeactivateUlaPlus()
     {
         var ulaPlus = new UlaPlus();
-        ulaPlus.IsActive.Should().BeFalse();
+        ulaPlus.IsActive.ShouldBeFalse();
 
         // Set Mode group
         ulaPlus.WritePort(RegisterPort, 0b_01_000000);
 
         // Enable ULA+
         ulaPlus.WritePort(DataPort, 1);
-        ulaPlus.IsActive.Should().BeTrue();
+        ulaPlus.IsActive.ShouldBeTrue();
 
         // Disable ULA+
         ulaPlus.WritePort(DataPort, 0);
-        ulaPlus.IsActive.Should().BeFalse();
+        ulaPlus.IsActive.ShouldBeFalse();
     }
 
     [Theory]
@@ -41,8 +41,8 @@ public class UlaPlusTests
         var inkColor = ulaPlus.GetInkColor(attribute);
         var paperColor = ulaPlus.GetPaperColor(attribute);
 
-        inkColor.Abgr.Should().Be((int)expectedInkArgb);
-        paperColor.Abgr.Should().Be((int)expectedPaperArgb);
+        inkColor.Abgr.ShouldBe((int)expectedInkArgb);
+        paperColor.Abgr.ShouldBe((int)expectedPaperArgb);
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public class UlaPlusTests
 
         var value = ulaPlus.ReadPort(DataPort);
 
-        value.Should().Be(0xAB);
+        value.ShouldBe((byte)0xAB);
     }
 
     // Standard Spectrum Palette for ULA+ (G..R..B.)

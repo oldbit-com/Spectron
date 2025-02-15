@@ -1,6 +1,6 @@
-using FluentAssertions;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Screen;
+using Shouldly;
 
 namespace OldBit.Spectron.Emulator.Tests;
 
@@ -17,9 +17,9 @@ public class ContentTests
     {
         var eventsTable = FastLookup.GetScreenRenderEvents(Hardware.Spectrum48K);
 
-        eventsTable[index].Ticks.Should().Be(expectedTicks);
-        eventsTable[index].BitmapAddress.Should().Be(expectedBitmapAddress);
-        eventsTable[index].AttributeAddress.Should().Be(expectedAttributeAddress);
+        eventsTable[index].Ticks.ShouldBe(expectedTicks);
+        eventsTable[index].BitmapAddress.ShouldBe(expectedBitmapAddress);
+        eventsTable[index].AttributeAddress.ShouldBe(expectedAttributeAddress);
     }
 
     [Theory]
@@ -33,8 +33,8 @@ public class ContentTests
     {
         var eventsTable = FastLookup.GetScreenRenderEvents(Hardware.Spectrum128K);
 
-        eventsTable[index].Ticks.Should().Be(expectedTicks);
-        eventsTable[index].BitmapAddress.Should().Be(expectedBitmapAddress);
-        eventsTable[index].AttributeAddress.Should().Be(expectedAttributeAddress);
+        eventsTable[index].Ticks.ShouldBe(expectedTicks);
+        eventsTable[index].BitmapAddress.ShouldBe(expectedBitmapAddress);
+        eventsTable[index].AttributeAddress.ShouldBe(expectedAttributeAddress);
     }
 }

@@ -1,6 +1,6 @@
-using FluentAssertions;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulator.Tests.Fixtures;
+using Shouldly;
 
 namespace OldBit.Spectron.Emulator.Tests.Devices.Memory;
 
@@ -13,7 +13,7 @@ public class Memory48KTests
         var rom = Enumerable.Repeat(0, 16384).Select(_ => (byte)random.Next(0, 256)).ToArray();
         var memory = new Memory48K(rom);
 
-        memory.ReadRom().Should().BeEquivalentTo(rom);
+        memory.ReadRom().ShouldBeEquivalentTo(rom);
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public class Memory48KTests
             memory.Write((Word)address, 0xFF);
         }
 
-        memory.ReadRom().Should().AllSatisfy(x => x.Should().Be(0));
+        memory.ReadRom().ShouldAllBe(x => x == 0);
     }
 
     [Fact]
@@ -39,6 +39,6 @@ public class Memory48KTests
             memory.Write((Word)address, 0xFF);
         }
 
-        memory.ReadRange(0x4000, 0xC000).Should().AllSatisfy(x => x.Should().Be(0xFF));
+        memory.ReadRange(0x4000, 0xC000).ShouldAllBe(x => x == 0xFF);
     }
 }

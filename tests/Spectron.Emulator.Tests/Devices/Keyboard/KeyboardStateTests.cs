@@ -1,5 +1,5 @@
-using FluentAssertions;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
+using Shouldly;
 
 namespace OldBit.Spectron.Emulator.Tests.Devices.Keyboard;
 
@@ -53,7 +53,7 @@ public class KeyboardStateTests
 
         var state = keyboard.Read(port);
 
-        state.Should().Be(expectedState);
+        state.ShouldBe(expectedState);
     }
 
     [Theory]
@@ -74,6 +74,6 @@ public class KeyboardStateTests
 
         var state = keyboard.Read(port);
 
-        state.Should().Be(expectedState);
+        state.ShouldBe(expectedState);
     }
 }
