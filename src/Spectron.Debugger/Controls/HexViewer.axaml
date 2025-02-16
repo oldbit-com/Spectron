@@ -1,0 +1,38 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:OldBit.Spectron.Debugger.Controls">
+
+    <Design.PreviewWith>
+        <controls:HexViewer />
+    </Design.PreviewWith>
+
+    <Style Selector="controls|HexViewer">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid
+                    Name="DataPresenter"
+                    RowDefinitions="Auto,*"
+                    IsTabStop="True"
+                    IsHitTestVisible="True"
+                    Focusable="True"
+                    Background="{DynamicResource ButtonBackground}">
+
+                    <!-- Rows -->
+                    <ScrollViewer
+                        Name="ScrollViewer"
+                        Grid.Row="1"
+                        VerticalScrollBarVisibility="Auto"
+                        HorizontalScrollBarVisibility="Auto">
+
+                        <ItemsRepeater Name="RowsPresenter">
+                            <ItemsRepeater.ItemTemplate>
+
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
+
+                    </ScrollViewer>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>
