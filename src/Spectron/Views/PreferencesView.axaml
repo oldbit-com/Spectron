@@ -6,6 +6,7 @@
         xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
         xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
         xmlns:theming="clr-namespace:OldBit.Spectron.Theming"
+        xmlns:tape="clr-namespace:OldBit.Spectron.Emulation.Tape;assembly=OldBit.Spectron.Emulation"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.PreferencesView"
         x:DataType="viewModels:PreferencesViewModel"
@@ -133,22 +134,63 @@
                     <StackPanel>
                         <Border Classes="Tab">
                             <StackPanel>
-                                <CheckBox
-                                    Content="Standard tape loading speed"
-                                    ToolTip.Tip="Should be able to load any tape file"
-                                    Classes="Center"/>
-                                <CheckBox
-                                    Content="Tape audio effects"
-                                    ToolTip.Tip="If enabled, usual tape loading/saving audio will be generated"/>
+                                <controls:HeaderSeparator Text="Tape loading"/>
+                                <StackPanel>
+                                    <RadioButton
+                                        Content="Normal tape loading speed"
+                                        ToolTip.Tip="Should be able to load any tape file"
+                                        IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Normal}}"
+                                        Classes="Center"/>
+
+                                    <RadioButton
+                                        Content="Accelerated tape loading"
+                                        ToolTip.Tip="Runs emulator at maximum speed during tape loading"
+                                        IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Accelerated}}"
+                                        Classes="Center"/>
+
+                                    <RadioButton
+                                        Content="Instant tape loading"
+                                        ToolTip.Tip="Loads tape instantly into memory, only compatible with standard tape blocks"
+                                        IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Instant}}"
+                                        Classes="Center"/>
+                                </StackPanel>
+
                                 <CheckBox
                                     Content="Automatically start playing tape files"
                                     ToolTip.Tip="If enabled, tape files will be automatically loaded and played. If disabled, you need to press play button."
+                                    Margin="0 10 0 0"
                                     Classes="Center"
                                     IsChecked="{Binding IsAutoPlayEnabled}"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <CheckBox Content="Enable tape saving (virtual tape). Speed: " Classes="Center" IsChecked="{Binding IsTapeSaveEnabled}" x:Name="IsTapeSaveEnabled"/>
-                                    <ComboBox Margin="5 0 0 0" Width="150" ItemsSource="{Binding TapeSpeeds}" SelectedValue="{Binding TapeSaveSpeed}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}" IsEnabled="{Binding #IsTapeSaveEnabled.IsChecked}" Padding="10 2 0 0"/>
+
+
+
+                                <controls:HeaderSeparator Text="Tape saving"/>
+                                <CheckBox
+                                    Content="Enable tape saving (virtual tape). Speed: "
+                                    Classes="Center"
+                                    IsChecked="{Binding IsTapeSaveEnabled}"
+                                    x:Name="IsTapeSaveEnabled"/>
+
+                                <StackPanel Margin="20 0 0 0">
+                                    <RadioButton
+                                        Content="Normal tape saving speed"
+                                        ToolTip.Tip="Normal tape saving with all border and audio effects"
+                                        IsEnabled="{Binding #IsTapeSaveEnabled.IsChecked}"
+                                        IsChecked="{Binding TapeSaveSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Normal}}"
+                                        Classes="Center"/>
+
+                                    <RadioButton
+                                        Content="Instant tape saving"
+                                        ToolTip.Tip="Saves tape data instantly capturing memory contents"
+                                        IsEnabled="{Binding #IsTapeSaveEnabled.IsChecked}"
+                                        IsChecked="{Binding TapeSaveSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Instant}}"
+                                        Classes="Center"/>
                                 </StackPanel>
+
+                                <controls:HeaderSeparator Text="Other"/>
+                                <CheckBox
+                                    Content="Tape audio effects"
+                                    ToolTip.Tip="If enabled, usual tape loading/saving audio will be generated"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>

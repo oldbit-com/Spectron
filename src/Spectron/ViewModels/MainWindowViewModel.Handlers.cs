@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Input;
 using Avalonia.Controls;
@@ -14,7 +13,6 @@ using OldBit.Spectron.Emulation.Storage;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Helpers;
 using OldBit.Spectron.Models;
-using OldBit.Spectron.Views;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -134,7 +132,8 @@ partial class MainWindowViewModel
         else if (fileType.IsTape())
         {
             emulator = _loader.EnterLoadCommand(ComputerType);
-            emulator.TapeManager.InsertTape(stream, fileType, _preferences.TapeSettings.IsAutoPlayEnabled);
+            emulator.TapeManager.InsertTape(stream, fileType,
+                _preferences.TapeSettings.IsAutoPlayEnabled && TapeLoadSpeed != TapeSpeed.Instant);
         }
 
         if (emulator != null)

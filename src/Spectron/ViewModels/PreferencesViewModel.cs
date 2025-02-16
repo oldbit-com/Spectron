@@ -162,17 +162,9 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
                 IsSaveEnabled = IsTapeSaveEnabled,
                 SaveSpeed = TapeSaveSpeed,
                 LoadSpeed = TapeLoadSpeed
-
             },
         };
     }
-
-    public List<NameValuePair<TapeSpeed>> TapeSpeeds { get; } =
-    [
-        new("Normal", TapeSpeed.Normal),
-        new("Accelerated", TapeSpeed.Accelerated),
-        new("Instant", TapeSpeed.Instant)
-    ];
 
     public List<NameValuePair<ComputerType>> ComputerTypes { get; } =
     [

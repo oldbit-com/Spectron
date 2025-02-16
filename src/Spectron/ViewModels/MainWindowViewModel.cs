@@ -209,8 +209,8 @@ public partial class MainWindowViewModel : ReactiveObject
         {
             _preferences = preferences;
 
-            //TapeLoadingSpeed = preferences.TapeLoadingSpeed;
             IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
+            TapeLoadSpeed = preferences.TapeSettings.LoadSpeed;
 
             IsTimeMachineEnabled = preferences.TimeMachine.IsEnabled;
             _timeMachine.SnapshotInterval = preferences.TimeMachine.SnapshotInterval;
@@ -321,6 +321,7 @@ public partial class MainWindowViewModel : ReactiveObject
             CreateEmulator(_preferences.ComputerType, _preferences.RomType);
         }
 
+        TapeLoadSpeed = _preferences.TapeSettings.LoadSpeed;
         Emulator?.SetTapeSettings(_preferences.TapeSettings);
     }
 
