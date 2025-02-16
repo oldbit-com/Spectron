@@ -217,6 +217,7 @@ public partial class MainWindowViewModel : ReactiveObject
             _timeMachine.MaxDuration = preferences.TimeMachine.MaxDuration;
 
             Emulator?.SetUlaPlus(IsUlaPlusEnabled);
+            Emulator?.SetFloatingBusSupport(preferences.IsFloatingBusEnabled);
             Emulator?.SetAudioSettings(preferences.AudioSettings);
             Emulator?.SetTapeSettings(preferences.TapeSettings);
             Emulator?.SetGamepad(preferences.Joystick);
@@ -367,6 +368,7 @@ public partial class MainWindowViewModel : ReactiveObject
         Emulator.TapeLoadSpeed = TapeLoadSpeed;
         Emulator.RenderScreen += EmulatorOnRenderScreen;
 
+        Emulator.SetFloatingBusSupport(_preferences.IsFloatingBusEnabled);
         Emulator.SetAudioSettings(_preferences.AudioSettings);
         Emulator.SetGamepad(_preferences.Joystick);
 

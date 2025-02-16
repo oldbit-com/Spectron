@@ -57,6 +57,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
 
         ComputerType = preferences.ComputerType;
         IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
+        IsFloatingBusEnabled = preferences.IsFloatingBusEnabled;
         RomType = preferences.RomType;
 
         JoystickType = preferences.Joystick.JoystickType;
@@ -123,6 +124,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
             Theme = Theme,
             ComputerType = ComputerType,
             IsUlaPlusEnabled = IsUlaPlusEnabled,
+            IsFloatingBusEnabled = IsFloatingBusEnabled,
             RomType = RomType,
             Joystick = new JoystickSettings
             {
@@ -325,6 +327,13 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
     {
         get => _tapeLoadSpeed;
         set => this.RaiseAndSetIfChanged(ref _tapeLoadSpeed, value);
+    }
+
+    private bool _isFloatingBusEnabled;
+    public bool IsFloatingBusEnabled
+    {
+        get => _isFloatingBusEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isFloatingBusEnabled, value);
     }
 
     private bool _isBeeperEnabled;

@@ -28,6 +28,7 @@ public sealed class Emulator
 
     private bool _invalidateScreen;
     private bool _isAcceleratedTapeSpeed;
+    private FloatingBus _floatingBus = null!;
 
     public delegate void RenderScreenEvent(FrameBuffer frameBuffer);
     public event RenderScreenEvent? RenderScreen;
@@ -38,6 +39,11 @@ public sealed class Emulator
     {
         get => UlaPlus.IsEnabled;
         set => ToggleUlaPlus(value);
+    }
+
+    public bool IsFloatingBusEnabled
+    {
+        set => _floatingBus.IsEnabled = value;
     }
 
     public KeyboardState KeyboardState { get; }
@@ -182,8 +188,8 @@ public sealed class Emulator
         _spectrumBus.AddDevice(AudioManager.Beeper);
         _spectrumBus.AddDevice(AudioManager.Ay);
 
-        var floatingBus = new FloatingBus(_hardware, Memory, Cpu.Clock);
-        _spectrumBus.AddDevice(floatingBus);
+        _floatingBus = new FloatingBus(_hardware, Memory, Cpu.Clock);
+        _spectrumBus.AddDevice(_floatingBus);
 
         Cpu.AddBus(_spectrumBus);
     }

@@ -14,6 +14,8 @@ public class Preferences
 
     public bool IsUlaPlusEnabled { get; init; }
 
+    public bool IsFloatingBusEnabled { get; init; }
+
     public BorderSize BorderSize { get; init; } = BorderSize.Medium;
 
     public ComputerType ComputerType { get; init; } = ComputerType.Spectrum48K;

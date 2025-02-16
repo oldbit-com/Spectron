@@ -50,6 +50,14 @@ public static class EmulatorExtensions
         }
     }
 
+    public static void SetFloatingBusSupport(this Emulator? emulator, bool isFloatingBusEnabled)
+    {
+        if (emulator != null)
+        {
+            emulator.IsFloatingBusEnabled = isFloatingBusEnabled;
+        }
+    }
+
     public static void SetGamepad(this Emulator? emulator, JoystickSettings joystickSettings) =>
         emulator?.GamepadManager.Setup(
             new GamepadPreferences(

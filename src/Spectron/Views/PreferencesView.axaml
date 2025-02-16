@@ -124,6 +124,7 @@
                 <Border Classes="Tab">
                     <StackPanel>
                         <CheckBox Content="Pause after state restore" Classes="Center"/>
+                        <CheckBox Content="Enable floating bus emulation" Classes="Center" IsChecked="{Binding IsFloatingBusEnabled}"/>
                     </StackPanel>
                 </Border>
             </TabItem>
