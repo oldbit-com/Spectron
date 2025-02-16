@@ -22,7 +22,7 @@
     <Window.Styles>
         <Style Selector="Border.Tab">
             <Setter Property="Padding" Value="10" />
-            <Setter Property="Background" Value="{DynamicResource SystemChromeMediumLowColor}"/>
+            <Setter Property="Background" Value="{DynamicResource SystemChromeMediumColor}"/>
         </Style>
         <Style Selector="RadioButton.Center">
             <Setter Property="Padding" Value="8 2 0 0" />
