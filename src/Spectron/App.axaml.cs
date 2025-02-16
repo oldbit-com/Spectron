@@ -5,6 +5,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using OldBit.Spectron.Debugger.Extensions;
 using OldBit.Spectron.Emulation.DependencyInjection;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.ViewModels;
@@ -28,6 +29,7 @@ public class App : Application
         var services = new ServiceCollection();
         services.AddEmulation();
         services.AddServices();
+        services.AddDebugging();
         services.AddViewModels();
         services.AddLogging(builder => builder.AddConsole());
 

@@ -9,7 +9,7 @@ using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class TapeBlock(string index, string name, string data) : ViewModelBase
+public class TapeBlock(string index, string name, string data) : ReactiveObject
 {
     private bool _isSelected;
     public bool IsSelected
@@ -23,7 +23,7 @@ public class TapeBlock(string index, string name, string data) : ViewModelBase
     public string Data { get; init; } = data;
 }
 
-public class TapeViewModel : ViewModelBase, IDisposable
+public class TapeViewModel : ReactiveObject, IDisposable
 {
     private readonly TapeManager _tapeManager;
     public ObservableCollection<TapeBlock> Blocks { get; } = [];

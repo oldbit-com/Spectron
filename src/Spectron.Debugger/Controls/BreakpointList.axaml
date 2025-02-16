@@ -1,0 +1,70 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:OldBit.Spectron.Debugger.ViewModels"
+             x:DataType="viewModels:BreakpointListViewModel"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="OldBit.Spectron.Debugger.Controls.BreakpointList">
+
+    <UserControl.Styles>
+        <Style Selector="Path.IsDisabled">
+            <Setter Property="Opacity" Value=".5"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid ColumnDefinitions="40,*">
+        <StackPanel HorizontalAlignment="Left" Margin="0 5 0 0">
+            <Button Name="AddButton" Command="{Binding AddBreakpointCommand}"
+                    Width="30" Height="30"
+                    ToolTip.Tip="Add Breakpoint">
+                <Path
+                    Data="M12 5v14M5 12h14"
+                    Stroke="{DynamicResource ButtonForeground}" StrokeThickness="4" StrokeLineCap="Round"
+                    Height="12" Width="12"
+                    Stretch="UniformToFill"/>
+            </Button>
+            <Button Name="RemoveButton" Command="{Binding RemoveBreakpointCommand}" CommandParameter="{Binding ElementName=Breakpoints, Path=SelectedItems}"
+                    Width="30" Height="30"
+                    VerticalContentAlignment="Center"
+                    IsEnabled="{Binding ElementName=Breakpoints, Path=SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
+                    ToolTip.Tip="Remove Breakpoint">
+                <Path
+                    Data="M4 12h16"
+                    Stroke="{DynamicResource ButtonForeground}" StrokeThickness="4" StrokeLineCap="Round"
+                    Width="12"
+                    Stretch="UniformToFill"
+                    Classes.IsDisabled="{Binding !$parent.IsEnabled}"/>
+            </Button>
+        </StackPanel>
+
+        <DataGrid Name="Breakpoints"
+                  Grid.Column="1"
+                  CellEditEnded="Breakpoints_OnCellEditEnded"
+                  ItemsSource="{Binding Breakpoints}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="False"
+                  GridLinesVisibility="All"
+                  BorderThickness="1"
+                  BorderBrush="Gray">
+
+            <DataGrid.Styles>
+                <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+                    <Setter Property="IsVisible" Value="false" />
+                </Style>
+            </DataGrid.Styles>
+
+            <DataGrid.Columns>
+                <DataGridCheckBoxColumn Header="Enabled" Binding="{Binding IsEnabled}" Width="100">
+                    <DataGridCheckBoxColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="Enabled" HorizontalAlignment="Center" Padding="12 0 0 0"/>
+                        </DataTemplate>
+                    </DataGridCheckBoxColumn.HeaderTemplate>
+                </DataGridCheckBoxColumn>
+                <DataGridTextColumn Header="Condition" Binding="{Binding Condition}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+
+</UserControl>

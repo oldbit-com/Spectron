@@ -1,0 +1,70 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="200"
+             x:Class="OldBit.Spectron.Debugger.Controls.Stack"
+             xmlns:viewModels="clr-namespace:OldBit.Spectron.Debugger.ViewModels"
+             x:DataType="viewModels:StackViewModel">
+
+    <Design.DataContext>
+        <viewModels:StackViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="30,*" Width="140">
+        <Border Grid.Row="0" Grid.ColumnSpan="2" BorderBrush="{StaticResource TextControlBorderBrush}" BorderThickness="2">
+            <TextBlock
+                Text="Stack"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontFamily="{StaticResource SpectrumStrictFont}"
+                FontSize="20"/>
+        </Border>
+
+        <ListBox Grid.Row="1" ItemsSource="{Binding Items}">
+            <ListBox.Styles>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="Height" Value="20"/>
+                </Style>
+            </ListBox.Styles>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid ColumnDefinitions="10,*,*" Height="10">
+                        <Interaction.Behaviors>
+                            <DataTriggerBehavior Binding="{Binding IsCurrent}" Value="{x:True}">
+                                <ChangePropertyAction TargetObject="Indicator" PropertyName="IsVisible" Value="{x:True}"/>
+                            </DataTriggerBehavior>
+                        </Interaction.Behaviors>
+
+                        <Path
+                            Grid.Column="0"
+                            Name="Indicator"
+                            IsVisible="False"
+                            Height="8"
+                            Width="8"
+                            HorizontalAlignment="Left"
+                            Stretch="Uniform"
+                            VerticalAlignment="Bottom"
+                            Fill="{StaticResource SpectrumMagenta}"
+                            Data="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+
+                        <TextBlock
+                            Grid.Column="1"
+                            FontFamily="{StaticResource SpectrumStrictFont}"
+                            TextAlignment="Left"
+                            FontSize="20"
+                            Margin="0 -4 0 0"
+                            Text="{Binding Address}"/>
+                        <TextBlock
+                            Grid.Column="2"
+                            FontFamily="{StaticResource SpectrumStrictFont}"
+                            TextAlignment="Right"
+                            FontSize="20"
+                            Margin="0 -4 8 0"
+                            Text="{Binding Value}"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>

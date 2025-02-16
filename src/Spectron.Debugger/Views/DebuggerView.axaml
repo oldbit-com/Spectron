@@ -1,0 +1,74 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:OldBit.Spectron.Debugger.Controls"
+        xmlns:viewModels="clr-namespace:OldBit.Spectron.Debugger.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        Height="700" Width="1000"
+        x:Class="OldBit.Spectron.Debugger.Views.DebuggerView"
+        x:DataType="viewModels:DebuggerViewModel"
+        WindowStartupLocation="CenterOwner"
+        Title="Debugger">
+
+    <Window.Styles>
+        <Style Selector="TabItem">
+            <Setter Property="MinHeight" Value="30"/>
+        </Style>
+        <Style Selector="TabItem > AccessText">
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        <Style Selector="Path.IsDisabled">
+            <Setter Property="Opacity" Value=".5"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="35,*,4,200" ColumnDefinitions="240,140,300,*" Margin="5">
+        <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Width="30" Height="30" Padding="4 0 0 0" Command="{Binding TogglePauseCommand}" IsVisible="{Binding !IsPaused}" HotKey="F8" ToolTip.Tip="Pause F8">
+                    <Path Data="m6 19h4V5H6v14zm8-14v14h4V5h-4z" Fill="{DynamicResource ButtonForeground}" Height="16" Width="16" Stretch="Uniform" Classes.IsDisabled="{Binding !$parent.IsEnabled}"/>
+                </Button>
+                <Button Width="30" Height="30" Padding="4 0 0 0" Command="{Binding DebuggerResumeCommand}" HotKey="F5" ToolTip.Tip="Resume (F5)" IsVisible="{Binding IsPaused}">
+                    <Path Data="M8 5v14l11-7z" Fill="{DynamicResource ButtonForeground}" Height="16" Width="16" Stretch="Uniform" Classes.IsDisabled="{Binding !$parent.IsEnabled}"/>
+                </Button>
+                <Button Width="30" Height="30" Padding="3 2 0 0" Command="{Binding DebuggerStepCommand}" HotKey="F10" ToolTip.Tip="Step (F10)" IsEnabled="{Binding IsPaused}">
+                    <Path Data="m6 16H3c4-8 8-8 12 0h3l-4 5-4-5h3c-1-5-5-5-7 0Z" Fill="{DynamicResource ButtonForeground}" Height="16" Width="20" Stretch="Uniform" Classes.IsDisabled="{Binding !$parent.IsEnabled}"/>
+                </Button>
+            </StackPanel>
+            <Grid/>
+        </DockPanel>
+
+        <controls:Cpu
+            Grid.Row="1" Grid.Column="0"
+            Margin="1"
+            DataContext="{Binding CpuViewModel}"/>
+
+        <controls:Stack
+            Grid.Row="1" Grid.Column="1"
+            Margin="1"
+            DataContext="{Binding StackViewModel}"/>
+
+        <controls:CodeList
+            Grid.Row="1" Grid.Column="2"
+            Margin="1"
+            DataContext="{Binding CodeListViewModel}"/>
+
+        <controls:Memory
+            Grid.Row="1" Grid.Column="3"
+            Margin="1"/>
+
+        <GridSplitter Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Background="{DynamicResource SystemChromeLowColor}" Margin="2" ResizeDirection="Rows"/>
+
+        <TabControl Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4">
+            <TabItem Header="Immediate">
+                <Grid RowDefinitions="*, Auto">
+                    <controls:Immediate DataContext="{Binding ImmediateViewModel}"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Breakpoints">
+                <controls:BreakpointList DataContext="{Binding BreakpointListViewModel}" />
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

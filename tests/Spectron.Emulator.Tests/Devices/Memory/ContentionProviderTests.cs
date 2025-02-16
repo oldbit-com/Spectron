@@ -1,5 +1,5 @@
-using FluentAssertions;
 using OldBit.Spectron.Emulation.Devices.Memory;
+using Shouldly;
 
 namespace OldBit.Spectron.Emulator.Tests.Devices.Memory;
 
@@ -34,7 +34,7 @@ public class ContentionProviderTests
     {
         var contention = _contention.GetMemoryContention(state, address);
 
-        contention.Should().Be(expectedContention);
+        contention.ShouldBe(expectedContention);
     }
 
     [Theory]
@@ -44,6 +44,6 @@ public class ContentionProviderTests
     {
         var contention = _contention.GetMemoryContention(state, address);
 
-        contention.Should().Be(0);
+        contention.ShouldBe(0);
     }
 }

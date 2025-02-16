@@ -5,7 +5,7 @@ using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class SelectFileViewModel : ViewModelBase
+public class SelectFileViewModel : ReactiveObject
 {
     public ReactiveCommand<Unit, ArchiveEntry?> SelectFileCommand { get; }
 

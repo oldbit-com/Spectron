@@ -1,5 +1,5 @@
-using FluentAssertions;
 using OldBit.Spectron.Emulation.Screen;
+using Shouldly;
 
 namespace OldBit.Spectron.Emulator.Tests.Screen;
 
@@ -24,9 +24,9 @@ public class BorderTests
     [InlineData(503, 69640, 69815, 109472)]     // last bottom border line
     public void BorderTicksTable_ShouldHaveCorrectRange(int index, int startTick, int endTick, int startPixel)
     {
-        _borderTicks[index].StartTick.Should().Be(startTick);
-        _borderTicks[index].EndTick.Should().Be(endTick);
-        _borderTicks[index].StartPixel.Should().Be(startPixel);
+        _borderTicks[index].StartTick.ShouldBe(startTick);
+        _borderTicks[index].EndTick.ShouldBe(endTick);
+        _borderTicks[index].StartPixel.ShouldBe(startPixel);
     }
 
     [Fact]
@@ -71,21 +71,23 @@ public class BorderTests
         borderRenderer.Update(SpectrumPalette.Blue, 25013);
         borderRenderer.Update(SpectrumPalette.Blue, 69888);
 
-        screenBuffer.Pixels[..52].Should().AllSatisfy(c => c.Should().Be(SpectrumPalette.White));
-        screenBuffer.Pixels[52..351].Should().AllSatisfy(c => c.Should().Be(SpectrumPalette.Cyan));
-        //screenBuffer[48..351].Should().AllSatisfy(c => c.Should().Be(Colors.Cyan));
+        screenBuffer.Pixels[..52].ShouldAllBe(c => c == SpectrumPalette.White);
+        screenBuffer.Pixels[52..351].ShouldAllBe(c => c == SpectrumPalette.Cyan);
+        //screenBuffer[48..351].ShouldAllBe(c => c == colors.Cyan);
     }
 
     private static void BorderShouldHaveColor(Color color, Color[] screenBuffer)
     {
-        screenBuffer[0..47].Should().AllSatisfy(c => c.Should().Be(SpectrumPalette.White));
-        screenBuffer[48..22576].Should().AllSatisfy(c => c.Should().Be(color));
+        screenBuffer[..47].ShouldAllBe(c => c == SpectrumPalette.White);
+        screenBuffer[48..22576].ShouldAllBe(c => c == color);
+
         for (var i = 0; i < 192; i++)
         {
-            screenBuffer.Skip(22528 + (i * 352)).Take(48).Should().AllSatisfy(c => c.Should().Be(color));
-            screenBuffer.Skip(22576 + (i * 352)).Take(256).Should().AllSatisfy(c => c.Should().Be(SpectrumPalette.White));
-            screenBuffer.Skip(22832 + (i * 352)).Take(48).Should().AllSatisfy(c => c.Should().Be(color));
+            screenBuffer.Skip(22528 + (i * 352)).Take(48).ShouldAllBe(c => c == color);
+            screenBuffer.Skip(22576 + (i * 352)).Take(256).ShouldAllBe(c => c == SpectrumPalette.White);
+            screenBuffer.Skip(22832 + (i * 352)).Take(48).ShouldAllBe(c => c == color);
         }
-        screenBuffer[90112..].Should().AllSatisfy(c => c.Should().Be(color));
+
+        screenBuffer[90112..].ShouldAllBe(c => c == color);
     }
 }

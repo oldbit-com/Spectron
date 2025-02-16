@@ -97,6 +97,8 @@ internal sealed class Memory128K : IEmulatorMemory
 
     public byte ReadScreen(Word address) => _activeScreen[address];
 
+    internal byte[][] ActiveBanks => [_activeRom, Banks[5], Banks[2], _activeRam];
+
     internal void SetPagingMode(byte pagingMode)
     {
         if (_isPagingDisabledUntilReset)

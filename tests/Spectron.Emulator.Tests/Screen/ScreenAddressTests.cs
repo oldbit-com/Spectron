@@ -1,5 +1,5 @@
-using FluentAssertions;
 using OldBit.Spectron.Emulation.Screen;
+using Shouldly;
 
 namespace OldBit.Spectron.Emulator.Tests.Screen;
 
@@ -28,7 +28,7 @@ public class ScreenAddressTests
     {
         var address = ScreenAddress.Calculate(x, y);
 
-        address.Should().Be(expectedAddress);
+        address.ShouldBe(expectedAddress);
     }
 
     [Theory]
@@ -43,6 +43,6 @@ public class ScreenAddressTests
     {
         var address = ScreenAddress.CalculateAttribute(x, y);
 
-        address.Should().Be(expectedAddress);
+        address.ShouldBe(expectedAddress);
     }
 }

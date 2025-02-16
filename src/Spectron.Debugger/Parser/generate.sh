@@ -1,0 +1,1 @@
+antlr Debugger.g4 -Dlanguage=CSharp -o ./Generated -package OldBit.Debugger.Parser -visitor

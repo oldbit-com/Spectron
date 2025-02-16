@@ -1,6 +1,6 @@
-using FluentAssertions;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulator.Tests.Fixtures;
+using Shouldly;
 
 namespace OldBit.Spectron.Emulator.Tests.Devices.Memory;
 
@@ -13,7 +13,7 @@ public class Memory16KTests
         var rom = Enumerable.Repeat(0, 16384).Select(_ => (byte)random.Next(0, 256)).ToArray();
         var memory = new Memory16K(rom);
 
-        memory.ReadRom().Should().BeEquivalentTo(rom);
+        memory.ReadRom().ShouldBeEquivalentTo(rom);
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public class Memory16KTests
             memory.Write((Word)address, 0xFF);
         }
 
-        memory.ReadRom().Should().AllSatisfy(x => x.Should().Be(0));
+        memory.ReadRom().ShouldAllBe(x => x == 0);
     }
 
     [Fact]
@@ -39,7 +39,7 @@ public class Memory16KTests
             memory.Write((Word)address, 0x55);
         }
 
-        memory.ReadRange(0x4000, 0x4000).Should().AllSatisfy(x => x.Should().Be(0x55));
+        memory.ReadRange(0x4000, 0x4000).ShouldAllBe(x => x == 0x55);
     }
 
     [Fact]
@@ -50,12 +50,12 @@ public class Memory16KTests
         for (var address = 0x8000; address <= 0xFFFF; address++)
         {
             var value = memory.Read((Word)address);
-            value.Should().Be(0xFF);
+            value.ShouldBe((byte)0xFF);
 
             memory.Write((Word)address, 0xAA);
 
             value = memory.Read((Word)address);
-            value.Should().Be(0xFF);
+            value.ShouldBe((byte)0xFF);
         }
     }
 }

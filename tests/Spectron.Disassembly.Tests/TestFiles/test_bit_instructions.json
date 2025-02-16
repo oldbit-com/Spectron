@@ -1,0 +1,1837 @@
+{
+  "RLC": [
+    {
+      "bytes": ["CB", "00"],
+      "instruction": "RLC B"
+    },
+    {
+      "bytes": ["CB", "01"],
+      "instruction": "RLC C"
+    },
+    {
+      "bytes": ["CB", "02"],
+      "instruction": "RLC D"
+    },
+    {
+      "bytes": ["CB", "03"],
+      "instruction": "RLC E"
+    },
+    {
+      "bytes": ["CB", "04"],
+      "instruction": "RLC H"
+    },
+    {
+      "bytes": ["CB", "05"],
+      "instruction": "RLC L"
+    },
+    {
+      "bytes": ["CB", "06"],
+      "instruction": "RLC (HL)"
+    },
+    {
+      "bytes": ["CB", "07"],
+      "instruction": "RLC A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "06"],
+      "instruction": "RLC (IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "07"],
+      "instruction": "RLC (IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "06"],
+      "instruction": "RLC (IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "00"],
+      "instruction": "RLC (IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "00"],
+      "instruction": "RLC (IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "RRC": [
+    {
+      "bytes": ["CB", "08"],
+      "instruction": "RRC B"
+    },
+    {
+      "bytes": ["CB", "09"],
+      "instruction": "RRC C"
+    },
+    {
+      "bytes": ["CB", "0A"],
+      "instruction": "RRC D"
+    },
+    {
+      "bytes": ["CB", "0B"],
+      "instruction": "RRC E"
+    },
+    {
+      "bytes": ["CB", "0C"],
+      "instruction": "RRC H"
+    },
+    {
+      "bytes": ["CB", "0D"],
+      "instruction": "RRC L"
+    },
+    {
+      "bytes": ["CB", "0E"],
+      "instruction": "RRC (HL)"
+    },
+    {
+      "bytes": ["CB", "0F"],
+      "instruction": "RRC A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "0E"],
+      "instruction": "RRC (IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "0F"],
+      "instruction": "RRC (IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "0E"],
+      "instruction": "RRC (IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "08"],
+      "instruction": "RRC (IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "08"],
+      "instruction": "RRC (IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "RL": [
+    {
+      "bytes": ["CB", "10"],
+      "instruction": "RL B"
+    },
+    {
+      "bytes": ["CB", "11"],
+      "instruction": "RL C"
+    },
+    {
+      "bytes": ["CB", "12"],
+      "instruction": "RL D"
+    },
+    {
+      "bytes": ["CB", "13"],
+      "instruction": "RL E"
+    },
+    {
+      "bytes": ["CB", "14"],
+      "instruction": "RL H"
+    },
+    {
+      "bytes": ["CB", "15"],
+      "instruction": "RL L"
+    },
+    {
+      "bytes": ["CB", "16"],
+      "instruction": "RL (HL)"
+    },
+    {
+      "bytes": ["CB", "17"],
+      "instruction": "RL A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "16"],
+      "instruction": "RL (IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "17"],
+      "instruction": "RL (IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "16"],
+      "instruction": "RL (IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "10"],
+      "instruction": "RL (IY+$05),B",
+      "isUndocumented": true
+    }
+  ,
+    {
+      "bytes": ["FD", "CB", "00", "10"],
+      "instruction": "RL (IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "RR": [
+    {
+      "bytes": ["CB", "18"],
+      "instruction": "RR B"
+    },
+    {
+      "bytes": ["CB", "19"],
+      "instruction": "RR C"
+    },
+    {
+      "bytes": ["CB", "1A"],
+      "instruction": "RR D"
+    },
+    {
+      "bytes": ["CB", "1B"],
+      "instruction": "RR E"
+    },
+    {
+      "bytes": ["CB", "1C"],
+      "instruction": "RR H"
+    },
+    {
+      "bytes": ["CB", "1D"],
+      "instruction": "RR L"
+    },
+    {
+      "bytes": ["CB", "1E"],
+      "instruction": "RR (HL)"
+    },
+    {
+      "bytes": ["CB", "1F"],
+      "instruction": "RR A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "1E"],
+      "instruction": "RR (IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "1F"],
+      "instruction": "RR (IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "1E"],
+      "instruction": "RR (IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "18"],
+      "instruction": "RR (IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "18"],
+      "instruction": "RR (IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "SLA": [
+    {
+      "bytes": ["CB", "20"],
+      "instruction": "SLA B"
+    },
+    {
+      "bytes": ["CB", "21"],
+      "instruction": "SLA C"
+    },
+    {
+      "bytes": ["CB", "22"],
+      "instruction": "SLA D"
+    },
+    {
+      "bytes": ["CB", "23"],
+      "instruction": "SLA E"
+    },
+    {
+      "bytes": ["CB", "24"],
+      "instruction": "SLA H"
+    },
+    {
+      "bytes": ["CB", "25"],
+      "instruction": "SLA L"
+    },
+    {
+      "bytes": ["CB", "26"],
+      "instruction": "SLA (HL)"
+    },
+    {
+      "bytes": ["CB", "27"],
+      "instruction": "SLA A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "26"],
+      "instruction": "SLA (IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "27"],
+      "instruction": "SLA (IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "26"],
+      "instruction": "SLA (IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "20"],
+      "instruction": "SLA (IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "20"],
+      "instruction": "SLA (IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "SRA": [
+    {
+      "bytes": ["CB", "28"],
+      "instruction": "SRA B"
+    },
+    {
+      "bytes": ["CB", "29"],
+      "instruction": "SRA C"
+    },
+    {
+      "bytes": ["CB", "2A"],
+      "instruction": "SRA D"
+    },
+    {
+      "bytes": ["CB", "2B"],
+      "instruction": "SRA E"
+    },
+    {
+      "bytes": ["CB", "2C"],
+      "instruction": "SRA H"
+    },
+    {
+      "bytes": ["CB", "2D"],
+      "instruction": "SRA L"
+    },
+    {
+      "bytes": ["CB", "2E"],
+      "instruction": "SRA (HL)"
+    },
+    {
+      "bytes": ["CB", "2F"],
+      "instruction": "SRA A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "2E"],
+      "instruction": "SRA (IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "2F"],
+      "instruction": "SRA (IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "2E"],
+      "instruction": "SRA (IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "28"],
+      "instruction": "SRA (IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "28"],
+      "instruction": "SRA (IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "SLL": [
+    {
+      "bytes": ["CB", "30"],
+      "instruction": "SLL B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["CB", "31"],
+      "instruction": "SLL C",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["CB", "32"],
+      "instruction": "SLL D",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["CB", "33"],
+      "instruction": "SLL E",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["CB", "34"],
+      "instruction": "SLL H",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["CB", "35"],
+      "instruction": "SLL L",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["CB", "36"],
+      "instruction": "SLL (HL)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["CB", "37"],
+      "instruction": "SLL A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "36"],
+      "instruction": "SLL (IX-$17)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["DD", "CB", "05", "37"],
+      "instruction": "SLL (IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "36"],
+      "instruction": "SLL (IY-$17)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "05", "30"],
+      "instruction": "SLL (IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "30"],
+      "instruction": "SLL (IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "SRL": [
+    {
+      "bytes": ["CB", "38"],
+      "instruction": "SRL B"
+    },
+    {
+      "bytes": ["CB", "39"],
+      "instruction": "SRL C"
+    },
+    {
+      "bytes": ["CB", "3A"],
+      "instruction": "SRL D"
+    },
+    {
+      "bytes": ["CB", "3B"],
+      "instruction": "SRL E"
+    },
+    {
+      "bytes": ["CB", "3C"],
+      "instruction": "SRL H"
+    },
+    {
+      "bytes": ["CB", "3D"],
+      "instruction": "SRL L"
+    },
+    {
+      "bytes": ["CB", "3E"],
+      "instruction": "SRL (HL)"
+    },
+    {
+      "bytes": ["CB", "3F"],
+      "instruction": "SRL A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "3E"],
+      "instruction": "SRL (IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "3F"],
+      "instruction": "SRL (IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "3E"],
+      "instruction": "SRL (IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "38"],
+      "instruction": "SRL (IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "38"],
+      "instruction": "SRL (IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "BIT 0": [
+    {
+      "bytes": ["CB", "40"],
+      "instruction": "BIT 0,B"
+    },
+    {
+      "bytes": ["CB", "41"],
+      "instruction": "BIT 0,C"
+    },
+    {
+      "bytes": ["CB", "42"],
+      "instruction": "BIT 0,D"
+    },
+    {
+      "bytes": ["CB", "43"],
+      "instruction": "BIT 0,E"
+    },
+    {
+      "bytes": ["CB", "44"],
+      "instruction": "BIT 0,H"
+    },
+    {
+      "bytes": ["CB", "45"],
+      "instruction": "BIT 0,L"
+    },
+    {
+      "bytes": ["CB", "46"],
+      "instruction": "BIT 0,(HL)"
+    },
+    {
+      "bytes": ["CB", "47"],
+      "instruction": "BIT 0,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "46"],
+      "instruction": "BIT 0,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "47"],
+      "instruction": "BIT 0,(IX+$05)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "46"],
+      "instruction": "BIT 0,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "40"],
+      "instruction": "BIT 0,(IY+$05)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "40"],
+      "instruction": "BIT 0,(IY)",
+      "isUndocumented": true
+    }
+  ],
+  "BIT 1": [
+    {
+      "bytes": ["CB", "48"],
+      "instruction": "BIT 1,B"
+    },
+    {
+      "bytes": ["CB", "49"],
+      "instruction": "BIT 1,C"
+    },
+    {
+      "bytes": ["CB", "4A"],
+      "instruction": "BIT 1,D"
+    },
+    {
+      "bytes": ["CB", "4B"],
+      "instruction": "BIT 1,E"
+    },
+    {
+      "bytes": ["CB", "4C"],
+      "instruction": "BIT 1,H"
+    },
+    {
+      "bytes": ["CB", "4D"],
+      "instruction": "BIT 1,L"
+    },
+    {
+      "bytes": ["CB", "4E"],
+      "instruction": "BIT 1,(HL)"
+    },
+    {
+      "bytes": ["CB", "4F"],
+      "instruction": "BIT 1,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "4E"],
+      "instruction": "BIT 1,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "4F"],
+      "instruction": "BIT 1,(IX+$05)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "4E"],
+      "instruction": "BIT 1,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "48"],
+      "instruction": "BIT 1,(IY+$05)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "48"],
+      "instruction": "BIT 1,(IY)",
+      "isUndocumented": true
+    }
+  ],
+  "BIT 2": [
+    {
+      "bytes": ["CB", "50"],
+      "instruction": "BIT 2,B"
+    },
+    {
+      "bytes": ["CB", "51"],
+      "instruction": "BIT 2,C"
+    },
+    {
+      "bytes": ["CB", "52"],
+      "instruction": "BIT 2,D"
+    },
+    {
+      "bytes": ["CB", "53"],
+      "instruction": "BIT 2,E"
+    },
+    {
+      "bytes": ["CB", "54"],
+      "instruction": "BIT 2,H"
+    },
+    {
+      "bytes": ["CB", "55"],
+      "instruction": "BIT 2,L"
+    },
+    {
+      "bytes": ["CB", "56"],
+      "instruction": "BIT 2,(HL)"
+    },
+    {
+      "bytes": ["CB", "57"],
+      "instruction": "BIT 2,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "56"],
+      "instruction": "BIT 2,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "57"],
+      "instruction": "BIT 2,(IX+$05)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "56"],
+      "instruction": "BIT 2,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "50"],
+      "instruction": "BIT 2,(IY+$05)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "50"],
+      "instruction": "BIT 2,(IY)",
+      "isUndocumented": true
+    }
+  ],
+  "BIT 3": [
+    {
+      "bytes": ["CB", "58"],
+      "instruction": "BIT 3,B"
+    },
+    {
+      "bytes": ["CB", "59"],
+      "instruction": "BIT 3,C"
+    },
+    {
+      "bytes": ["CB", "5A"],
+      "instruction": "BIT 3,D"
+    },
+    {
+      "bytes": ["CB", "5B"],
+      "instruction": "BIT 3,E"
+    },
+    {
+      "bytes": ["CB", "5C"],
+      "instruction": "BIT 3,H"
+    },
+    {
+      "bytes": ["CB", "5D"],
+      "instruction": "BIT 3,L"
+    },
+    {
+      "bytes": ["CB", "5E"],
+      "instruction": "BIT 3,(HL)"
+    },
+    {
+      "bytes": ["CB", "5F"],
+      "instruction": "BIT 3,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "5E"],
+      "instruction": "BIT 3,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "5F"],
+      "instruction": "BIT 3,(IX+$05)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "5E"],
+      "instruction": "BIT 3,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "58"],
+      "instruction": "BIT 3,(IY+$05)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "58"],
+      "instruction": "BIT 3,(IY)",
+      "isUndocumented": true
+    }
+  ],
+  "BIT 4": [
+    {
+      "bytes": ["CB", "60"],
+      "instruction": "BIT 4,B"
+    },
+    {
+      "bytes": ["CB", "61"],
+      "instruction": "BIT 4,C"
+    },
+    {
+      "bytes": ["CB", "62"],
+      "instruction": "BIT 4,D"
+    },
+    {
+      "bytes": ["CB", "63"],
+      "instruction": "BIT 4,E"
+    },
+    {
+      "bytes": ["CB", "64"],
+      "instruction": "BIT 4,H"
+    },
+    {
+      "bytes": ["CB", "65"],
+      "instruction": "BIT 4,L"
+    },
+    {
+      "bytes": ["CB", "66"],
+      "instruction": "BIT 4,(HL)"
+    },
+    {
+      "bytes": ["CB", "67"],
+      "instruction": "BIT 4,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "66"],
+      "instruction": "BIT 4,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "67"],
+      "instruction": "BIT 4,(IX+$05)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "66"],
+      "instruction": "BIT 4,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "60"],
+      "instruction": "BIT 4,(IY+$05)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "60"],
+      "instruction": "BIT 4,(IY)",
+      "isUndocumented": true
+    }
+  ],
+  "BIT 5": [
+    {
+      "bytes": ["CB", "68"],
+      "instruction": "BIT 5,B"
+    },
+    {
+      "bytes": ["CB", "69"],
+      "instruction": "BIT 5,C"
+    },
+    {
+      "bytes": ["CB", "6A"],
+      "instruction": "BIT 5,D"
+    },
+    {
+      "bytes": ["CB", "6B"],
+      "instruction": "BIT 5,E"
+    },
+    {
+      "bytes": ["CB", "6C"],
+      "instruction": "BIT 5,H"
+    },
+    {
+      "bytes": ["CB", "6D"],
+      "instruction": "BIT 5,L"
+    },
+    {
+      "bytes": ["CB", "6E"],
+      "instruction": "BIT 5,(HL)"
+    },
+    {
+      "bytes": ["CB", "6F"],
+      "instruction": "BIT 5,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "6E"],
+      "instruction": "BIT 5,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "6F"],
+      "instruction": "BIT 5,(IX+$05)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "6E"],
+      "instruction": "BIT 5,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "68"],
+      "instruction": "BIT 5,(IY+$05)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "68"],
+      "instruction": "BIT 5,(IY)",
+      "isUndocumented": true
+    }
+  ],
+  "BIT 6": [
+    {
+      "bytes": ["CB", "70"],
+      "instruction": "BIT 6,B"
+    },
+    {
+      "bytes": ["CB", "71"],
+      "instruction": "BIT 6,C"
+    },
+    {
+      "bytes": ["CB", "72"],
+      "instruction": "BIT 6,D"
+    },
+    {
+      "bytes": ["CB", "73"],
+      "instruction": "BIT 6,E"
+    },
+    {
+      "bytes": ["CB", "74"],
+      "instruction": "BIT 6,H"
+    },
+    {
+      "bytes": ["CB", "75"],
+      "instruction": "BIT 6,L"
+    },
+    {
+      "bytes": ["CB", "76"],
+      "instruction": "BIT 6,(HL)"
+    },
+    {
+      "bytes": ["CB", "77"],
+      "instruction": "BIT 6,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "76"],
+      "instruction": "BIT 6,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "77"],
+      "instruction": "BIT 6,(IX+$05)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "76"],
+      "instruction": "BIT 6,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "70"],
+      "instruction": "BIT 6,(IY+$05)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "70"],
+      "instruction": "BIT 6,(IY)",
+      "isUndocumented": true
+    }
+  ],
+  "BIT 7": [
+    {
+      "bytes": ["CB", "78"],
+      "instruction": "BIT 7,B"
+    },
+    {
+      "bytes": ["CB", "79"],
+      "instruction": "BIT 7,C"
+    },
+    {
+      "bytes": ["CB", "7A"],
+      "instruction": "BIT 7,D"
+    },
+    {
+      "bytes": ["CB", "7B"],
+      "instruction": "BIT 7,E"
+    },
+    {
+      "bytes": ["CB", "7C"],
+      "instruction": "BIT 7,H"
+    },
+    {
+      "bytes": ["CB", "7D"],
+      "instruction": "BIT 7,L"
+    },
+    {
+      "bytes": ["CB", "7E"],
+      "instruction": "BIT 7,(HL)"
+    },
+    {
+      "bytes": ["CB", "7F"],
+      "instruction": "BIT 7,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "7E"],
+      "instruction": "BIT 7,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "7F"],
+      "instruction": "BIT 7,(IX+$05)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "7E"],
+      "instruction": "BIT 7,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "78"],
+      "instruction": "BIT 7,(IY+$05)",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "78"],
+      "instruction": "BIT 7,(IY)",
+      "isUndocumented": true
+    }
+  ],
+  "RES 0": [
+    {
+      "bytes": ["CB", "80"],
+      "instruction": "RES 0,B"
+    },
+    {
+      "bytes": ["CB", "81"],
+      "instruction": "RES 0,C"
+    },
+    {
+      "bytes": ["CB", "82"],
+      "instruction": "RES 0,D"
+    },
+    {
+      "bytes": ["CB", "83"],
+      "instruction": "RES 0,E"
+    },
+    {
+      "bytes": ["CB", "84"],
+      "instruction": "RES 0,H"
+    },
+    {
+      "bytes": ["CB", "85"],
+      "instruction": "RES 0,L"
+    },
+    {
+      "bytes": ["CB", "86"],
+      "instruction": "RES 0,(HL)"
+    },
+    {
+      "bytes": ["CB", "87"],
+      "instruction": "RES 0,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "86"],
+      "instruction": "RES 0,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "87"],
+      "instruction": "RES 0,(IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "86"],
+      "instruction": "RES 0,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "80"],
+      "instruction": "RES 0,(IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "80"],
+      "instruction": "RES 0,(IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "RES 1": [
+    {
+      "bytes": ["CB", "88"],
+      "instruction": "RES 1,B"
+    },
+    {
+      "bytes": ["CB", "89"],
+      "instruction": "RES 1,C"
+    },
+    {
+      "bytes": ["CB", "8A"],
+      "instruction": "RES 1,D"
+    },
+    {
+      "bytes": ["CB", "8B"],
+      "instruction": "RES 1,E"
+    },
+    {
+      "bytes": ["CB", "8C"],
+      "instruction": "RES 1,H"
+    },
+    {
+      "bytes": ["CB", "8D"],
+      "instruction": "RES 1,L"
+    },
+    {
+      "bytes": ["CB", "8E"],
+      "instruction": "RES 1,(HL)"
+    },
+    {
+      "bytes": ["CB", "8F"],
+      "instruction": "RES 1,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "8E"],
+      "instruction": "RES 1,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "8F"],
+      "instruction": "RES 1,(IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "8E"],
+      "instruction": "RES 1,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "88"],
+      "instruction": "RES 1,(IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "88"],
+      "instruction": "RES 1,(IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "RES 2": [
+    {
+      "bytes": ["CB", "90"],
+      "instruction": "RES 2,B"
+    },
+    {
+      "bytes": ["CB", "91"],
+      "instruction": "RES 2,C"
+    },
+    {
+      "bytes": ["CB", "92"],
+      "instruction": "RES 2,D"
+    },
+    {
+      "bytes": ["CB", "93"],
+      "instruction": "RES 2,E"
+    },
+    {
+      "bytes": ["CB", "94"],
+      "instruction": "RES 2,H"
+    },
+    {
+      "bytes": ["CB", "95"],
+      "instruction": "RES 2,L"
+    },
+    {
+      "bytes": ["CB", "96"],
+      "instruction": "RES 2,(HL)"
+    },
+    {
+      "bytes": ["CB", "97"],
+      "instruction": "RES 2,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "96"],
+      "instruction": "RES 2,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "97"],
+      "instruction": "RES 2,(IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "96"],
+      "instruction": "RES 2,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "90"],
+      "instruction": "RES 2,(IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "90"],
+      "instruction": "RES 2,(IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "RES 3": [
+    {
+      "bytes": ["CB", "98"],
+      "instruction": "RES 3,B"
+    },
+    {
+      "bytes": ["CB", "99"],
+      "instruction": "RES 3,C"
+    },
+    {
+      "bytes": ["CB", "9A"],
+      "instruction": "RES 3,D"
+    },
+    {
+      "bytes": ["CB", "9B"],
+      "instruction": "RES 3,E"
+    },
+    {
+      "bytes": ["CB", "9C"],
+      "instruction": "RES 3,H"
+    },
+    {
+      "bytes": ["CB", "9D"],
+      "instruction": "RES 3,L"
+    },
+    {
+      "bytes": ["CB", "9E"],
+      "instruction": "RES 3,(HL)"
+    },
+    {
+      "bytes": ["CB", "9F"],
+      "instruction": "RES 3,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "9E"],
+      "instruction": "RES 3,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "9F"],
+      "instruction": "RES 3,(IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "9E"],
+      "instruction": "RES 3,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "98"],
+      "instruction": "RES 3,(IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "98"],
+      "instruction": "RES 3,(IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "RES 4": [
+    {
+      "bytes": ["CB", "A0"],
+      "instruction": "RES 4,B"
+    },
+    {
+      "bytes": ["CB", "A1"],
+      "instruction": "RES 4,C"
+    },
+    {
+      "bytes": ["CB", "A2"],
+      "instruction": "RES 4,D"
+    },
+    {
+      "bytes": ["CB", "A3"],
+      "instruction": "RES 4,E"
+    },
+    {
+      "bytes": ["CB", "A4"],
+      "instruction": "RES 4,H"
+    },
+    {
+      "bytes": ["CB", "A5"],
+      "instruction": "RES 4,L"
+    },
+    {
+      "bytes": ["CB", "A6"],
+      "instruction": "RES 4,(HL)"
+    },
+    {
+      "bytes": ["CB", "A7"],
+      "instruction": "RES 4,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "A6"],
+      "instruction": "RES 4,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "A7"],
+      "instruction": "RES 4,(IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "A6"],
+      "instruction": "RES 4,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "A0"],
+      "instruction": "RES 4,(IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "A0"],
+      "instruction": "RES 4,(IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "RES 5": [
+    {
+      "bytes": ["CB", "A8"],
+      "instruction": "RES 5,B"
+    },
+    {
+      "bytes": ["CB", "A9"],
+      "instruction": "RES 5,C"
+    },
+    {
+      "bytes": ["CB", "AA"],
+      "instruction": "RES 5,D"
+    },
+    {
+      "bytes": ["CB", "AB"],
+      "instruction": "RES 5,E"
+    },
+    {
+      "bytes": ["CB", "AC"],
+      "instruction": "RES 5,H"
+    },
+    {
+      "bytes": ["CB", "AD"],
+      "instruction": "RES 5,L"
+    },
+    {
+      "bytes": ["CB", "AE"],
+      "instruction": "RES 5,(HL)"
+    },
+    {
+      "bytes": ["CB", "AF"],
+      "instruction": "RES 5,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "AE"],
+      "instruction": "RES 5,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "AF"],
+      "instruction": "RES 5,(IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "AE"],
+      "instruction": "RES 5,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "A8"],
+      "instruction": "RES 5,(IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "A8"],
+      "instruction": "RES 5,(IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "RES 6": [
+    {
+      "bytes": ["CB", "B0"],
+      "instruction": "RES 6,B"
+    },
+    {
+      "bytes": ["CB", "B1"],
+      "instruction": "RES 6,C"
+    },
+    {
+      "bytes": ["CB", "B2"],
+      "instruction": "RES 6,D"
+    },
+    {
+      "bytes": ["CB", "B3"],
+      "instruction": "RES 6,E"
+    },
+    {
+      "bytes": ["CB", "B4"],
+      "instruction": "RES 6,H"
+    },
+    {
+      "bytes": ["CB", "B5"],
+      "instruction": "RES 6,L"
+    },
+    {
+      "bytes": ["CB", "B6"],
+      "instruction": "RES 6,(HL)"
+    },
+    {
+      "bytes": ["CB", "B7"],
+      "instruction": "RES 6,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "B6"],
+      "instruction": "RES 6,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "B7"],
+      "instruction": "RES 6,(IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "B6"],
+      "instruction": "RES 6,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "B0"],
+      "instruction": "RES 6,(IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "B0"],
+      "instruction": "RES 6,(IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "RES 7": [
+    {
+      "bytes": ["CB", "B8"],
+      "instruction": "RES 7,B"
+    },
+    {
+      "bytes": ["CB", "B9"],
+      "instruction": "RES 7,C"
+    },
+    {
+      "bytes": ["CB", "BA"],
+      "instruction": "RES 7,D"
+    },
+    {
+      "bytes": ["CB", "BB"],
+      "instruction": "RES 7,E"
+    },
+    {
+      "bytes": ["CB", "BC"],
+      "instruction": "RES 7,H"
+    },
+    {
+      "bytes": ["CB", "BD"],
+      "instruction": "RES 7,L"
+    },
+    {
+      "bytes": ["CB", "BE"],
+      "instruction": "RES 7,(HL)"
+    },
+    {
+      "bytes": ["CB", "BF"],
+      "instruction": "RES 7,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "BE"],
+      "instruction": "RES 7,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "BF"],
+      "instruction": "RES 7,(IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "BE"],
+      "instruction": "RES 7,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "B8"],
+      "instruction": "RES 7,(IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "B8"],
+      "instruction": "RES 7,(IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "SET 0": [
+    {
+      "bytes": ["CB", "C0"],
+      "instruction": "SET 0,B"
+    },
+    {
+      "bytes": ["CB", "C1"],
+      "instruction": "SET 0,C"
+    },
+    {
+      "bytes": ["CB", "C2"],
+      "instruction": "SET 0,D"
+    },
+    {
+      "bytes": ["CB", "C3"],
+      "instruction": "SET 0,E"
+    },
+    {
+      "bytes": ["CB", "C4"],
+      "instruction": "SET 0,H"
+    },
+    {
+      "bytes": ["CB", "C5"],
+      "instruction": "SET 0,L"
+    },
+    {
+      "bytes": ["CB", "C6"],
+      "instruction": "SET 0,(HL)"
+    },
+    {
+      "bytes": ["CB", "C7"],
+      "instruction": "SET 0,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "C6"],
+      "instruction": "SET 0,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "C7"],
+      "instruction": "SET 0,(IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "C6"],
+      "instruction": "SET 0,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "C0"],
+      "instruction": "SET 0,(IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "C0"],
+      "instruction": "SET 0,(IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "SET 1": [
+    {
+      "bytes": ["CB", "C8"],
+      "instruction": "SET 1,B"
+    },
+    {
+      "bytes": ["CB", "C9"],
+      "instruction": "SET 1,C"
+    },
+    {
+      "bytes": ["CB", "CA"],
+      "instruction": "SET 1,D"
+    },
+    {
+      "bytes": ["CB", "CB"],
+      "instruction": "SET 1,E"
+    },
+    {
+      "bytes": ["CB", "CC"],
+      "instruction": "SET 1,H"
+    },
+    {
+      "bytes": ["CB", "CD"],
+      "instruction": "SET 1,L"
+    },
+    {
+      "bytes": ["CB", "CE"],
+      "instruction": "SET 1,(HL)"
+    },
+    {
+      "bytes": ["CB", "CF"],
+      "instruction": "SET 1,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "CE"],
+      "instruction": "SET 1,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "CF"],
+      "instruction": "SET 1,(IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "CE"],
+      "instruction": "SET 1,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "C8"],
+      "instruction": "SET 1,(IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "C8"],
+      "instruction": "SET 1,(IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "SET 2": [
+    {
+      "bytes": ["CB", "D0"],
+      "instruction": "SET 2,B"
+    },
+    {
+      "bytes": ["CB", "D1"],
+      "instruction": "SET 2,C"
+    },
+    {
+      "bytes": ["CB", "D2"],
+      "instruction": "SET 2,D"
+    },
+    {
+      "bytes": ["CB", "D3"],
+      "instruction": "SET 2,E"
+    },
+    {
+      "bytes": ["CB", "D4"],
+      "instruction": "SET 2,H"
+    },
+    {
+      "bytes": ["CB", "D5"],
+      "instruction": "SET 2,L"
+    },
+    {
+      "bytes": ["CB", "D6"],
+      "instruction": "SET 2,(HL)"
+    },
+    {
+      "bytes": ["CB", "D7"],
+      "instruction": "SET 2,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "D6"],
+      "instruction": "SET 2,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "D7"],
+      "instruction": "SET 2,(IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "D6"],
+      "instruction": "SET 2,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "D0"],
+      "instruction": "SET 2,(IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "D0"],
+      "instruction": "SET 2,(IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "SET 3": [
+    {
+      "bytes": ["CB", "D8"],
+      "instruction": "SET 3,B"
+    },
+    {
+      "bytes": ["CB", "D9"],
+      "instruction": "SET 3,C"
+    },
+    {
+      "bytes": ["CB", "DA"],
+      "instruction": "SET 3,D"
+    },
+    {
+      "bytes": ["CB", "DB"],
+      "instruction": "SET 3,E"
+    },
+    {
+      "bytes": ["CB", "DC"],
+      "instruction": "SET 3,H"
+    },
+    {
+      "bytes": ["CB", "DD"],
+      "instruction": "SET 3,L"
+    },
+    {
+      "bytes": ["CB", "DE"],
+      "instruction": "SET 3,(HL)"
+    },
+    {
+      "bytes": ["CB", "DF"],
+      "instruction": "SET 3,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "DE"],
+      "instruction": "SET 3,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "DF"],
+      "instruction": "SET 3,(IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "DE"],
+      "instruction": "SET 3,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "D8"],
+      "instruction": "SET 3,(IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "D8"],
+      "instruction": "SET 3,(IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "SET 4": [
+    {
+      "bytes": ["CB", "E0"],
+      "instruction": "SET 4,B"
+    },
+    {
+      "bytes": ["CB", "E1"],
+      "instruction": "SET 4,C"
+    },
+    {
+      "bytes": ["CB", "E2"],
+      "instruction": "SET 4,D"
+    },
+    {
+      "bytes": ["CB", "E3"],
+      "instruction": "SET 4,E"
+    },
+    {
+      "bytes": ["CB", "E4"],
+      "instruction": "SET 4,H"
+    },
+    {
+      "bytes": ["CB", "E5"],
+      "instruction": "SET 4,L"
+    },
+    {
+      "bytes": ["CB", "E6"],
+      "instruction": "SET 4,(HL)"
+    },
+    {
+      "bytes": ["CB", "E7"],
+      "instruction": "SET 4,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "E6"],
+      "instruction": "SET 4,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "E7"],
+      "instruction": "SET 4,(IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "E6"],
+      "instruction": "SET 4,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "E0"],
+      "instruction": "SET 4,(IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "E0"],
+      "instruction": "SET 4,(IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "SET 5": [
+    {
+      "bytes": ["CB", "E8"],
+      "instruction": "SET 5,B"
+    },
+    {
+      "bytes": ["CB", "E9"],
+      "instruction": "SET 5,C"
+    },
+    {
+      "bytes": ["CB", "EA"],
+      "instruction": "SET 5,D"
+    },
+    {
+      "bytes": ["CB", "EB"],
+      "instruction": "SET 5,E"
+    },
+    {
+      "bytes": ["CB", "EC"],
+      "instruction": "SET 5,H"
+    },
+    {
+      "bytes": ["CB", "ED"],
+      "instruction": "SET 5,L"
+    },
+    {
+      "bytes": ["CB", "EE"],
+      "instruction": "SET 5,(HL)"
+    },
+    {
+      "bytes": ["CB", "EF"],
+      "instruction": "SET 5,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "EE"],
+      "instruction": "SET 5,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "EF"],
+      "instruction": "SET 5,(IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "EE"],
+      "instruction": "SET 5,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "E8"],
+      "instruction": "SET 5,(IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "E8"],
+      "instruction": "SET 5,(IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "SET 6": [
+    {
+      "bytes": ["CB", "F0"],
+      "instruction": "SET 6,B"
+    },
+    {
+      "bytes": ["CB", "F1"],
+      "instruction": "SET 6,C"
+    },
+    {
+      "bytes": ["CB", "F2"],
+      "instruction": "SET 6,D"
+    },
+    {
+      "bytes": ["CB", "F3"],
+      "instruction": "SET 6,E"
+    },
+    {
+      "bytes": ["CB", "F4"],
+      "instruction": "SET 6,H"
+    },
+    {
+      "bytes": ["CB", "F5"],
+      "instruction": "SET 6,L"
+    },
+    {
+      "bytes": ["CB", "F6"],
+      "instruction": "SET 6,(HL)"
+    },
+    {
+      "bytes": ["CB", "F7"],
+      "instruction": "SET 6,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "F6"],
+      "instruction": "SET 6,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "F7"],
+      "instruction": "SET 6,(IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "F6"],
+      "instruction": "SET 6,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "F0"],
+      "instruction": "SET 6,(IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "F0"],
+      "instruction": "SET 6,(IY),B",
+      "isUndocumented": true
+    }
+  ],
+  "SET 7": [
+    {
+      "bytes": ["CB", "F8"],
+      "instruction": "SET 7,B"
+    },
+    {
+      "bytes": ["CB", "F9"],
+      "instruction": "SET 7,C"
+    },
+    {
+      "bytes": ["CB", "FA"],
+      "instruction": "SET 7,D"
+    },
+    {
+      "bytes": ["CB", "FB"],
+      "instruction": "SET 7,E"
+    },
+    {
+      "bytes": ["CB", "FC"],
+      "instruction": "SET 7,H"
+    },
+    {
+      "bytes": ["CB", "FD"],
+      "instruction": "SET 7,L"
+    },
+    {
+      "bytes": ["CB", "FE"],
+      "instruction": "SET 7,(HL)"
+    },
+    {
+      "bytes": ["CB", "FF"],
+      "instruction": "SET 7,A"
+    },
+    {
+      "bytes": ["DD", "CB", "E9", "FE"],
+      "instruction": "SET 7,(IX-$17)"
+    },
+    {
+      "bytes": ["DD", "CB", "05", "FF"],
+      "instruction": "SET 7,(IX+$05),A",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "E9", "FE"],
+      "instruction": "SET 7,(IY-$17)"
+    },
+    {
+      "bytes": ["FD", "CB", "05", "F8"],
+      "instruction": "SET 7,(IY+$05),B",
+      "isUndocumented": true
+    },
+    {
+      "bytes": ["FD", "CB", "00", "F8"],
+      "instruction": "SET 7,(IY),B",
+      "isUndocumented": true
+    }
+  ]
+}

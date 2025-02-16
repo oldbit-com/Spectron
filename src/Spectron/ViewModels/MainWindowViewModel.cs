@@ -8,6 +8,8 @@ using System.Timers;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
+using OldBit.Spectron.Debugger;
+using OldBit.Spectron.Debugger.ViewModels;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Commands;
 using OldBit.Spectron.Emulation.Devices.Joystick;
@@ -30,7 +32,7 @@ using Timer = System.Timers.Timer;
 
 namespace OldBit.Spectron.ViewModels;
 
-public partial class MainWindowViewModel : ViewModelBase
+public partial class MainWindowViewModel : ReactiveObject
 {
     private const string DefaultTitle = "Spectron - ZX Spectrum Emulator";
 
@@ -43,16 +45,16 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private readonly PreferencesService _preferencesService;
     private readonly SessionService _sessionService;
+    private readonly DebuggerContext _debuggerContext;
     private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
     private readonly Timer _statusBarTimer;
-
-    private Emulator? Emulator { get; set; }
 
     private Preferences _preferences = new();
     private int _frameCount;
     private readonly Stopwatch _renderStopwatch = new();
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
 
+    public Emulator? Emulator { get; private set; }
     public Control ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }
     public StatusBarViewModel StatusBar { get; } = new();
@@ -101,7 +103,8 @@ public partial class MainWindowViewModel : ViewModelBase
         PreferencesService preferencesService,
         SessionService sessionService,
         RecentFilesViewModel recentFilesViewModel,
-        TapeMenuViewModel tapeMenuViewModel)
+        TapeMenuViewModel tapeMenuViewModel,
+        DebuggerContext debuggerContext)
     {
         _emulatorFactory = emulatorFactory;
         _timeMachine = timeMachine;
@@ -110,6 +113,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _loader = loader;
         _preferencesService = preferencesService;
         _sessionService = sessionService;
+        _debuggerContext = debuggerContext;
         RecentFilesViewModel = recentFilesViewModel;
         TapeMenuViewModel = tapeMenuViewModel;
         recentFilesViewModel.OpenRecentFileAsync = async fileName => await HandleLoadFileAsync(fileName);
@@ -169,13 +173,32 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private async Task OpenAboutWindow() => await ShowAboutView.Handle(Unit.Default);
 
-    private async Task OpenDebuggerWindow() => await ShowDebuggerView.Handle(new DebuggerViewModel());
+    private async Task OpenDebuggerWindow()
+    {
+        if (!IsPaused)
+        {
+            Pause();
+        }
+
+        var viewModel = new DebuggerViewModel(_debuggerContext, Emulator!);
+
+        this.WhenAny(x => x.IsPaused, x => x.Value)
+            .Subscribe(isPaused => viewModel.HandlePause(isPaused));
+
+        await ShowDebuggerView.Handle(viewModel);
+    }
 
     private async Task ShowKeyboardHelpWindow() => await ShowKeyboardHelpView.Handle(Unit.Default);
 
     public async Task OpenPreferencesWindow()
     {
-        Emulator?.Pause();
+        var resumeAfter = false;
+
+        if (!IsPaused)
+        {
+            Pause();
+            resumeAfter = true;
+        }
 
         using var viewModel = new PreferencesViewModel(_preferences, _gamepadManager);
         var preferences = await ShowPreferencesView.Handle(viewModel);
@@ -195,16 +218,25 @@ public partial class MainWindowViewModel : ViewModelBase
 
             Emulator?.SetUlaPlus(IsUlaPlusEnabled);
             Emulator?.SetAudioSettings(preferences.AudioSettings);
-            Emulator?.SetTapeSavingSettings(preferences.TapeSaving);
+            Emulator?.SetTapeSettings(preferences.TapeSettings);
             Emulator?.SetGamepad(preferences.Joystick);
         }
 
-        Emulator?.Resume();
+        if (resumeAfter)
+        {
+            Resume();
+        }
     }
 
     private async Task OpenTimeMachineWindow()
     {
-        Emulator?.Pause();
+        var resumeAfter = false;
+
+        if (!IsPaused)
+        {
+            Pause();
+            resumeAfter = true;
+        }
 
         var viewModel = new TimeMachineViewModel(_timeMachine);
 
@@ -219,8 +251,10 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         else
         {
-            Emulator?.Resume();
-            IsPaused = false;
+            if (resumeAfter)
+            {
+                Resume();
+            }
         }
     }
 
@@ -286,7 +320,7 @@ public partial class MainWindowViewModel : ViewModelBase
             CreateEmulator(_preferences.ComputerType, _preferences.RomType);
         }
 
-        Emulator?.SetTapeSavingSettings(_preferences.TapeSaving);
+        Emulator?.SetTapeSettings(_preferences.TapeSettings);
     }
 
     private async Task WindowClosingAsync()
@@ -394,6 +428,6 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        Title = $"S{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
+        Title = $"{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
     }
 }

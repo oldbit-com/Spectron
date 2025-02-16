@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:OldBit.Spectron.Debugger.ViewModels"
+             xmlns:local="clr-namespace:OldBit.Spectron.Debugger.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:CodeListViewModel"
+             x:Class="OldBit.Spectron.Debugger.Controls.CodeList">
+
+    <Grid RowDefinitions="30,*">
+        <Border Grid.Row="0" Grid.ColumnSpan="2" BorderBrush="{StaticResource TextControlBorderBrush}" BorderThickness="2">
+            <TextBlock
+                Text="Code"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontFamily="{StaticResource SpectrumStrictFont}"
+                FontSize="20"/>
+        </Border>
+
+        <ListBox Grid.Row="1" ItemsSource="{Binding CodeLines}" Name="ListBox" DoubleTapped="ListBox_OnDoubleTapped">
+            <ListBox.Styles>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="Height" Value="18"/>
+                    <Setter Property="Padding" Value="0 2 0 -2"/>
+                </Style>
+            </ListBox.Styles>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Height="20">
+                        <local:CodeLine
+                            Address="{Binding Address}"
+                            Code="{Binding Code}"
+                            IsCurrent="{Binding IsCurrent}"
+                            IsBreakpoint="{Binding IsBreakpoint}"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>

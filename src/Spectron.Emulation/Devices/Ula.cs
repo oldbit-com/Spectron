@@ -32,7 +32,7 @@ internal sealed class Ula(
         }
 
         var color = SpectrumPalette.GetBorderColor(value);
-        screenBuffer.UpdateBorder(color, clock.FrameTicks);
+        screenBuffer.UpdateBorder(color, clock.CurrentFrameTicks);
     }
 
     internal static bool IsUlaPort(Word address) => (address & 0x01) == 0x00;

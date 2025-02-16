@@ -57,7 +57,7 @@ internal sealed class EmulatorTimer
         {
             if (IsPaused)
             {
-                Thread.Sleep(500);
+                Thread.Sleep(250);
                 nextTrigger = Interval;
                 timer.Restart();
 
@@ -78,7 +78,7 @@ internal sealed class EmulatorTimer
                     break;
                 }
 
-                var timeToWait = nextTrigger - timer.Elapsed;
+                var timeToWait = nextTrigger - elapsed;
 
                 switch (timeToWait.TotalMilliseconds)
                 {

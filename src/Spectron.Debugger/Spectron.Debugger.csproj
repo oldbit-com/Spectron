@@ -1,0 +1,77 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>OldBit.Spectron.Debugger</AssemblyName>
+        <RootNamespace>OldBit.Spectron.Debugger</RootNamespace>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
+      <PackageReference Include="Avalonia" Version="11.2.4" />
+      <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.4" />
+      <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.4" />
+      <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.2.0.8" />
+      <PackageReference Include="Avalonia.Xaml.Interactivity" Version="11.2.0.8" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.2" />
+      <PackageReference Include="OldBit.Z80Cpu.Spectron" Version="0.9.3-pre.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.CLSCompliantAttribute">
+            <_Parameter1>false</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Controls\CodeLine.axaml.cs">
+        <DependentUpon>CodeLine.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Controls\CodeList.axaml.cs">
+        <DependentUpon>CodeList.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Controls\Cpu.axaml.cs">
+        <DependentUpon>Cpu.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Controls\FlagsRegister.axaml.cs">
+        <DependentUpon>FlagsRegister.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Controls\Immediate.axaml.cs">
+        <DependentUpon>Immediate.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Controls\Memory.axaml.cs">
+        <DependentUpon>Memory.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Controls\Register.axaml.cs">
+        <DependentUpon>Register.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Controls\Stack.axaml.cs">
+        <DependentUpon>Stack.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\DebuggerView.axaml.cs">
+        <DependentUpon>DebuggerView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Spectron.Disassembly\Spectron.Disassembly.csproj" />
+      <ProjectReference Include="..\Spectron.Emulation\Spectron.Emulation.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Parser\Generated\" />
+    </ItemGroup>
+
+</Project>

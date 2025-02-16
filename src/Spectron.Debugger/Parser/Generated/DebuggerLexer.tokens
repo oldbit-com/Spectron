@@ -1,0 +1,16 @@
+T__0=1
+T__1=2
+INT=3
+HEX=4
+BIN=5
+WS=6
+COMMA=7
+REG=8
+PRINT=9
+POKE=10
+PEEK=11
+';'=1
+'='=2
+','=7
+'POKE'=10
+'PEEK'=11

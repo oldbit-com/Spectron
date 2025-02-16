@@ -13,7 +13,7 @@ using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class TimeMachineViewModel : ViewModelBase
+public class TimeMachineViewModel : ReactiveObject
 {
     private readonly TimeMachine _timeMachine;
     private const int PreviewHeight = 192;

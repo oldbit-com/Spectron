@@ -22,7 +22,7 @@
     <Window.Styles>
         <Style Selector="Border.Tab">
             <Setter Property="Padding" Value="10" />
-            <Setter Property="Background" Value="{DynamicResource SystemChromeMediumLowColor}"/>
+            <Setter Property="Background" Value="{DynamicResource SystemChromeMediumColor}"/>
         </Style>
         <Style Selector="RadioButton.Center">
             <Setter Property="Padding" Value="8 2 0 0" />
@@ -132,9 +132,18 @@
                     <StackPanel>
                         <Border Classes="Tab">
                             <StackPanel>
-                                <CheckBox Content="Standard tape loading speed" Classes="Center" ToolTip.Tip="Should be able to load any tape file"/>
-                                <CheckBox Content="Tape audio effects" ToolTip.Tip="If enabled, usual tape loading/saving audio will be generated"/>
-                                <CheckBox Content="Automatically load and play tape files" Classes="Center"/>
+                                <CheckBox
+                                    Content="Standard tape loading speed"
+                                    ToolTip.Tip="Should be able to load any tape file"
+                                    Classes="Center"/>
+                                <CheckBox
+                                    Content="Tape audio effects"
+                                    ToolTip.Tip="If enabled, usual tape loading/saving audio will be generated"/>
+                                <CheckBox
+                                    Content="Automatically start playing tape files"
+                                    ToolTip.Tip="If enabled, tape files will be automatically loaded and played. If disabled, you need to press play button."
+                                    Classes="Center"
+                                    IsChecked="{Binding IsAutoPlayEnabled}"/>
                                 <StackPanel Orientation="Horizontal">
                                     <CheckBox Content="Enable tape saving (virtual tape). Speed: " Classes="Center" IsChecked="{Binding IsTapeSaveEnabled}" x:Name="IsTapeSaveEnabled"/>
                                     <ComboBox Margin="5 0 0 0" Width="150" ItemsSource="{Binding TapeSpeeds}" SelectedValue="{Binding TapeSaveSpeed}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}" IsEnabled="{Binding #IsTapeSaveEnabled.IsChecked}" Padding="10 2 0 0"/>

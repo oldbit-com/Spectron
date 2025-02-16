@@ -6,8 +6,6 @@ using OldBit.Spectron.Theming;
 
 namespace OldBit.Spectron.Settings;
 
-public record TapeSavingSettings(bool IsEnabled, TapeSpeed Speed);
-
 public class Preferences
 {
     public Theme Theme { get; init; } = Theme.Dark;
@@ -26,11 +24,9 @@ public class Preferences
 
     public int MaxRecentFiles { get; set; } = 10;
 
-    public TapeSpeed TapeLoadSpeed { get; init; } = TapeSpeed.Instant;
-
     public TimeMachineSettings TimeMachine { get; init; } = new();
 
-    public TapeSavingSettings TapeSaving { get; init; } = new(true, TapeSpeed.Instant);
-
     public AudioSettings AudioSettings { get; init; } = new();
+
+    public TapeSettings TapeSettings { get; init; } = new();
 }

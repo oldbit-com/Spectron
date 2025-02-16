@@ -13,7 +13,7 @@ using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class GamepadMappingViewModel : ViewModelBase, IDisposable
+public class GamepadMappingViewModel : ReactiveObject, IDisposable
 {
     private readonly Timer _timer;
     private readonly GamepadManager _gamepadManager;

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Input;
 using Avalonia.Controls;
@@ -24,10 +25,15 @@ partial class MainWindowViewModel
     private async Task HandleLoadFileAsync(string? filePath)
     {
         Stream? stream = null;
+        var shouldResume = false;
 
         try
         {
-            Emulator?.Pause();
+            if (!IsPaused)
+            {
+                Pause();
+                shouldResume = true;
+            }
 
             if (filePath == null)
             {
@@ -44,6 +50,7 @@ partial class MainWindowViewModel
             if (fileType == FileType.Unsupported)
             {
                 await MessageDialogs.Warning($"Unsupported file type: {fileType}.");
+
                 return;
             }
 
@@ -67,7 +74,11 @@ partial class MainWindowViewModel
         finally
         {
             stream?.Close();
-            Emulator?.Resume();
+
+            if (shouldResume)
+            {
+                Resume();
+            }
         }
     }
 
@@ -123,7 +134,7 @@ partial class MainWindowViewModel
         else if (fileType.IsTape())
         {
             emulator = _loader.EnterLoadCommand(ComputerType);
-            emulator.TapeManager.InsertTape(stream, fileType);
+            emulator.TapeManager.InsertTape(stream, fileType, _preferences.TapeSettings.IsAutoPlayEnabled);
         }
 
         if (emulator != null)
@@ -136,9 +147,14 @@ partial class MainWindowViewModel
 
     private async Task HandleSaveFileAsync()
     {
+        var shouldResume = false;
         try
         {
-            Emulator?.Pause();
+            if (!IsPaused)
+            {
+                Pause();
+                shouldResume = true;
+            }
 
             var file = await FileDialogs.SaveSnapshotFileAsync();
 
@@ -153,7 +169,10 @@ partial class MainWindowViewModel
         }
         finally
         {
-            Emulator?.Resume();
+            if (shouldResume)
+            {
+                Resume();
+            }
         }
     }
 
@@ -210,20 +229,30 @@ partial class MainWindowViewModel
         SetTitle();
     }
 
+    private void Pause()
+    {
+        Emulator?.Pause();
+        IsPaused = true;
+    }
+
+    private void Resume()
+    {
+        Emulator?.Resume();
+        IsPaused = false;
+    }
+
     private void HandleTogglePause()
     {
         switch (Emulator?.IsPaused)
         {
             case true:
-                Emulator.Resume();
+                Resume();
                 break;
 
             case false:
-                Emulator.Pause();
+                Pause();
                 break;
         }
-
-        IsPaused = Emulator?.IsPaused ?? false;
     }
 
     private void HandleSetEmulationSpeed(string emulationSpeed)

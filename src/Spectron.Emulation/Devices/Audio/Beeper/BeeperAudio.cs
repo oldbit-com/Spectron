@@ -38,7 +38,7 @@ internal sealed class BeeperAudio
     {
         var runningTicks = 0;
 
-        var ticks = _beeperStates.Count == 0 ? _clock.FrameTicks : _beeperStates[0].Ticks;
+        var ticks = _beeperStates.Count == 0 ? _clock.CurrentFrameTicks : _beeperStates[0].Ticks;
         var duration = ticks * Multiplier;
 
         for (var i = 0; i <= _beeperStates.Count; i++)
@@ -65,7 +65,7 @@ internal sealed class BeeperAudio
                 break;
             }
 
-            ticks = i == _beeperStates.Count - 1 ? _clock.FrameTicks : _beeperStates[i + 1].Ticks;
+            ticks = i == _beeperStates.Count - 1 ? _clock.CurrentFrameTicks : _beeperStates[i + 1].Ticks;
             duration = ticks * Multiplier - runningTicks;
         }
 
@@ -78,7 +78,7 @@ internal sealed class BeeperAudio
 
         if (_lastEarMic != earMic)
         {
-            _beeperStates.Add(_clock.FrameTicks, _lastEarMic);
+            _beeperStates.Add(_clock.CurrentFrameTicks, _lastEarMic);
         }
 
         _lastEarMic = (byte)earMic;

@@ -1,0 +1,37 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="OldBit.Spectron.Debugger.Controls.FlagsRegister">
+
+    <UserControl.Resources>
+        <Animation x:Key="FlagAnimation" Duration="0:0:.6" x:SetterTargetType="TextBlock">
+            <KeyFrame Cue="0%">
+                <Setter Property="Background" Value="Red" />
+            </KeyFrame>
+            <KeyFrame Cue="100%">
+            </KeyFrame>
+        </Animation>
+    </UserControl.Resources>
+
+    <Grid ColumnDefinitions="20,20,20,20,20,20,20,20" RowDefinitions="20,20" HorizontalAlignment="Center">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="S" HorizontalAlignment="Center" Padding="4 3 2 0"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="Z" HorizontalAlignment="Center" Padding="4 3 2 0"/>
+        <TextBlock Grid.Row="0" Grid.Column="2" Text="5" HorizontalAlignment="Center" Padding="4 3 2 0"/>
+        <TextBlock Grid.Row="0" Grid.Column="3" Text="H" HorizontalAlignment="Center" Padding="4 3 2 0"/>
+        <TextBlock Grid.Row="0" Grid.Column="4" Text="3" HorizontalAlignment="Center" Padding="4 3 2 0"/>
+        <TextBlock Grid.Row="0" Grid.Column="5" Text="P" HorizontalAlignment="Center" Padding="4 3 2 0"/>
+        <TextBlock Grid.Row="0" Grid.Column="6" Text="N" HorizontalAlignment="Center" Padding="4 3 2 0"/>
+        <TextBlock Grid.Row="0" Grid.Column="7" Text="C" HorizontalAlignment="Center" Padding="4 3 2 0"/>
+
+        <TextBlock x:Name="SignFlag" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" Padding="2 3 2 0"/>
+        <TextBlock x:Name="ZeroFlag" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Padding="2 3 2 0"/>
+        <TextBlock x:Name="YFlag" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" Padding="2 3 2 0"/>
+        <TextBlock x:Name="HalfCarryFlag" Grid.Row="1" Grid.Column="3" HorizontalAlignment="Center" Padding="2 3 2 0"/>
+        <TextBlock x:Name="XFlag" Grid.Row="1" Grid.Column="4" HorizontalAlignment="Center" Padding="2 3 2 0"/>
+        <TextBlock x:Name="ParityFlag" Grid.Row="1" Grid.Column="5" HorizontalAlignment="Center" Padding="2 3 2 0"/>
+        <TextBlock x:Name="AddSubtractFlag" Grid.Row="1" Grid.Column="6" HorizontalAlignment="Center" Padding="2 3 2 0"/>
+        <TextBlock x:Name="CarryFlag" Grid.Row="1" Grid.Column="7" HorizontalAlignment="Center" Padding="2 3 2 0"/>
+    </Grid>
+</UserControl>

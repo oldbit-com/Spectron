@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+        <AssemblyName>OldBit.Spectron.Debugger.Tests</AssemblyName>
+        <RootNamespace>OldBit.Spectron.Debugger.Tests</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="coverlet.collector" Version="6.0.2"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+        <PackageReference Include="Shouldly" Version="4.3.0" />
+        <PackageReference Include="xunit" Version="2.9.2"/>
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\Spectron.Debugger\Spectron.Debugger.csproj" />
+      <ProjectReference Include="..\..\src\Spectron\Spectron.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="OldBit.Z80Cpu.Dasm">
+        <HintPath>..\..\..\Z80\src\Z80Cpu.Dasm\bin\Debug\net8.0\OldBit.Z80Cpu.Dasm.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>

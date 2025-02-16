@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.ReactiveUI;
+using OldBit.Spectron.Debugger.ViewModels;
+using OldBit.Spectron.Debugger.Views;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Storage;
@@ -75,7 +77,20 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         }
 
         var view = new TView { DataContext = context.Input };
-        view.Closed += (_, _) => _windows.Remove(viewType);
+        view.Closed += (_, _) =>
+        {
+            if (!_windows.TryGetValue(viewType, out var closedWindow))
+            {
+                return;
+            }
+
+            if (closedWindow.DataContext is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+
+            _windows.Remove(viewType);
+        };
 
         _windows.Add(viewType, view);
 

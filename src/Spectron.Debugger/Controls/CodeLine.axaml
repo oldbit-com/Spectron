@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:OldBit.Spectron.Debugger.Controls"
+             xmlns:converters="clr-namespace:OldBit.Spectron.Debugger.Converters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="OldBit.Spectron.Debugger.Controls.CodeLine">
+
+    <UserControl.Resources>
+        <converters:HexConverter x:Key="HexConverter"/>
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="local|CodeLine[IsCurrent=false] Grid Path.Current">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+        <Style Selector="local|CodeLine[IsBreakpoint=false] Grid Path.Breakpoint">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid ColumnDefinitions="20,60,15,*" Height="20">
+        <Path
+            Grid.Column="0"
+            Classes="Breakpoint"
+            Height="13"
+            Width="13"
+            Margin="0 2 0 0"
+            Stretch="Uniform"
+            VerticalAlignment="Top"
+            Fill="{StaticResource SpectrumRed}"
+            Data="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+
+        <TextBlock
+            Grid.Column="1"
+            FontFamily="{StaticResource HackRegular}"
+            FontSize="15"
+            VerticalAlignment="Center"
+            Height="22"
+            Text="{Binding $parent[local:CodeLine].Address, Converter={StaticResource HexConverter}}"/>
+
+        <Path
+            Grid.Column="2"
+            Classes="Current"
+            Height="13"
+            Width="13"
+            Stretch="Uniform"
+            VerticalAlignment="Top"
+            Fill="{StaticResource SpectrumGreen}"
+            Data="M8 5v14l11-7z"/>
+
+        <TextBlock
+            Grid.Column="3"
+            FontFamily="{StaticResource HackRegular}"
+            FontSize="15"
+            VerticalAlignment="Center"
+            Height="22"
+            Text="{Binding $parent[local:CodeLine].Code}"/>
+    </Grid>
+</UserControl>

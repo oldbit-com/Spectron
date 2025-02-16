@@ -10,21 +10,23 @@ public static class EmulatorExtensions
 {
     public static void SetTapeLoadingSpeed(this Emulator? emulator, TapeSpeed tapeSpeed)
     {
-        if (emulator != null)
+        if (emulator == null)
         {
-            emulator.TapeLoadSpeed = tapeSpeed;
+            return;
         }
+
+        emulator.TapeLoadSpeed = tapeSpeed;
     }
 
-    public static void SetTapeSavingSettings(this Emulator? emulator, TapeSavingSettings tapeSavingSettings)
+    public static void SetTapeSettings(this Emulator? emulator, TapeSettings tapeSettings)
     {
         if (emulator == null)
         {
             return;
         }
 
-        emulator.TapeManager.IsTapeSaveEnabled = tapeSavingSettings.IsEnabled;
-        emulator.TapeManager.TapeSaveSpeed = tapeSavingSettings.Speed;
+        emulator.TapeManager.IsTapeSaveEnabled = tapeSettings.IsSaveEnabled;
+        emulator.TapeManager.TapeSaveSpeed = tapeSettings.SaveSpeed;
     }
 
     public static void SetAudioSettings(this Emulator? emulator, AudioSettings audioSettings)
