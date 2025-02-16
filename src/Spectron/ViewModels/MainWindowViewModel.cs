@@ -192,7 +192,13 @@ public partial class MainWindowViewModel : ReactiveObject
 
     public async Task OpenPreferencesWindow()
     {
-        Emulator?.Pause();
+        var resumeAfter = false;
+
+        if (!IsPaused)
+        {
+            Pause();
+            resumeAfter = true;
+        }
 
         using var viewModel = new PreferencesViewModel(_preferences, _gamepadManager);
         var preferences = await ShowPreferencesView.Handle(viewModel);
@@ -216,12 +222,21 @@ public partial class MainWindowViewModel : ReactiveObject
             Emulator?.SetGamepad(preferences.Joystick);
         }
 
-        Emulator?.Resume();
+        if (resumeAfter)
+        {
+            Resume();
+        }
     }
 
     private async Task OpenTimeMachineWindow()
     {
-        Emulator?.Pause();
+        var resumeAfter = false;
+
+        if (!IsPaused)
+        {
+            Pause();
+            resumeAfter = true;
+        }
 
         var viewModel = new TimeMachineViewModel(_timeMachine);
 
@@ -236,8 +251,10 @@ public partial class MainWindowViewModel : ReactiveObject
         }
         else
         {
-            Emulator?.Resume();
-            IsPaused = false;
+            if (resumeAfter)
+            {
+                Resume();
+            }
         }
     }
 
