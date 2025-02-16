@@ -82,7 +82,13 @@ public sealed class Emulator
         UlaPlus = new UlaPlus();
         _spectrumBus = new SpectrumBus();
         ScreenBuffer = new ScreenBuffer(hardware, emulatorArgs.Memory, UlaPlus);
-        Cpu = new Z80(emulatorArgs.Memory, emulatorArgs.ContentionProvider);
+        Cpu = new Z80(emulatorArgs.Memory, emulatorArgs.ContentionProvider)
+        {
+            Clock =
+            {
+                DefaultFrameTicks = hardware.TicksPerFrame
+            }
+        };
 
         JoystickManager = new JoystickManager(gamepadManager, _spectrumBus, KeyboardState);
         KeyboardState.Reset();
@@ -186,7 +192,8 @@ public sealed class Emulator
     {
         StartFrame();
 
-        Cpu.Run(_hardware.TicksPerFrame);
+        Cpu.TriggerInt(0xFF);
+        Cpu.Run();
 
         EndFrame();
 
@@ -208,8 +215,7 @@ public sealed class Emulator
     {
         AudioManager.EndFrame();
 
-        ScreenBuffer.UpdateBorder(Cpu.Clock.FrameTicks);
-        Cpu.TriggerInt(0xFF);
+        ScreenBuffer.UpdateBorder(Cpu.Clock.CurrentFrameTicks);
         RenderScreen?.Invoke(ScreenBuffer.FrameBuffer);
 
         _timeMachine.AddEntry(this);

@@ -77,8 +77,10 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         SnapshotInterval = preferences.TimeMachine.SnapshotInterval.TotalSeconds;
         MaxDuration = preferences.TimeMachine.MaxDuration.TotalSeconds;
 
-        IsTapeSaveEnabled = preferences.TapeSaving.IsEnabled;
-        TapeSaveSpeed = preferences.TapeSaving.Speed;
+        IsAutoPlayEnabled = preferences.TapeSettings.IsAutoPlayEnabled;
+        IsTapeSaveEnabled = preferences.TapeSettings.IsSaveEnabled;
+        TapeSaveSpeed = preferences.TapeSettings.SaveSpeed;
+        TapeLoadSpeed = preferences.TapeSettings.LoadSpeed;
 
         UpdatePreferencesCommand = ReactiveCommand.Create(UpdatePreferences);
 
@@ -152,7 +154,14 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
                 MaxDuration = TimeSpan.FromSeconds(MaxDuration)
             },
 
-            TapeSaving = new TapeSavingSettings(IsTapeSaveEnabled, TapeSaveSpeed)
+            TapeSettings = new TapeSettings
+            {
+                IsAutoPlayEnabled = IsAutoPlayEnabled,
+                IsSaveEnabled = IsTapeSaveEnabled,
+                SaveSpeed = TapeSaveSpeed,
+                LoadSpeed = TapeLoadSpeed
+
+            },
         };
     }
 
@@ -290,6 +299,13 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         set => this.RaiseAndSetIfChanged(ref _shouldIncludeTimeMachineInResume, value);
     }
 
+    private bool _isAutoPlayEnabled;
+    public bool IsAutoPlayEnabled
+    {
+        get => _isAutoPlayEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isAutoPlayEnabled, value);
+    }
+
     private bool _isTapeSaveEnabled;
     public bool IsTapeSaveEnabled
     {
@@ -302,6 +318,13 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
     {
         get => _tapeSaveSpeed;
         set => this.RaiseAndSetIfChanged(ref _tapeSaveSpeed, value);
+    }
+
+    private TapeSpeed _tapeLoadSpeed = TapeSpeed.Normal;
+    public TapeSpeed TapeLoadSpeed
+    {
+        get => _tapeLoadSpeed;
+        set => this.RaiseAndSetIfChanged(ref _tapeLoadSpeed, value);
     }
 
     private bool _isBeeperEnabled;

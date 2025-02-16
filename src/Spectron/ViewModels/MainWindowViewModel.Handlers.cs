@@ -134,7 +134,7 @@ partial class MainWindowViewModel
         else if (fileType.IsTape())
         {
             emulator = _loader.EnterLoadCommand(ComputerType);
-            emulator.TapeManager.InsertTape(stream, fileType);
+            emulator.TapeManager.InsertTape(stream, fileType, _preferences.TapeSettings.IsAutoPlayEnabled);
         }
 
         if (emulator != null)

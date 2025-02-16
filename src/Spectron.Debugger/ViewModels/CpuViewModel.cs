@@ -10,12 +10,16 @@ public class CpuViewModel : ReactiveObject
     {
         AF = cpu.Registers.AF;
         AFPrime = cpu.Registers.Prime.AF;
+
         BC = cpu.Registers.BC;
         BCPrime = cpu.Registers.Prime.BC;
+
         DE = cpu.Registers.DE;
         DEPrime = cpu.Registers.Prime.DE;
+
         HL = cpu.Registers.HL;
         HLPrime = cpu.Registers.Prime.HL;
+
         IX = cpu.Registers.IX;
         IY = cpu.Registers.IY;
 
@@ -29,6 +33,8 @@ public class CpuViewModel : ReactiveObject
         IFF1 = cpu.IFF1 ? "1" : "0";
         IFF2 = cpu.IFF2 ? "1" : "0";
         IM = ((int)cpu.IM).ToString();
+
+        T = cpu.Clock.CurrentFrameTicks;
     }
 
     private Word _af;
@@ -155,5 +161,12 @@ public class CpuViewModel : ReactiveObject
     {
         get => _im;
         set => this.RaiseAndSetIfChanged(ref _im, value);
+    }
+
+    private int _t;
+    public int T
+    {
+        get => _t;
+        set => this.RaiseAndSetIfChanged(ref _t, value);
     }
 }

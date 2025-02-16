@@ -54,8 +54,9 @@
                 <Grid Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="8">
                     <Grid RowDefinitions="32,32,32" ColumnDefinitions="*,*">
                         <local:Register Grid.Row="0" Grid.Column="0" LabelWidth="40" ValueWidth="30" RegisterName="IFF1" Value="{Binding IFF1}"/>
-                        <local:Register Grid.Row="1" Grid.Column="0" LabelWidth="40" ValueWidth="30" RegisterName="IFF2" Value="{Binding IFF2}"/>
-                        <local:Register Grid.Row="2" Grid.Column="0" LabelWidth="40" ValueWidth="30" RegisterName="IM" Value="{Binding IM}"/>
+                        <local:Register Grid.Row="0" Grid.Column="1" LabelWidth="40" ValueWidth="30" RegisterName="IFF2" Value="{Binding IFF2}"/>
+                        <local:Register Grid.Row="1" Grid.Column="0" LabelWidth="40" ValueWidth="30" RegisterName="IM" Value="{Binding IM}"/>
+                        <local:Register Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" LabelWidth="40" ValueWidth="80" RegisterName="T" Value="{Binding T}"/>
                     </Grid>
                 </Grid>
             </Grid>

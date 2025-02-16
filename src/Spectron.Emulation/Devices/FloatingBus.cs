@@ -40,12 +40,12 @@ internal sealed class FloatingBus : IDevice
             return null;
         }
 
-        if (_clock.FrameTicks < _hardware.FirstPixelTicks || _clock.FrameTicks > _hardware.LastPixelTicks)
+        if (_clock.CurrentFrameTicks < _hardware.FirstPixelTicks || _clock.CurrentFrameTicks > _hardware.LastPixelTicks)
         {
             return null;
         }
 
-        return _floatingBusAddressIndex.TryGetValue(_clock.FrameTicks, out var screenAddress)
+        return _floatingBusAddressIndex.TryGetValue(_clock.CurrentFrameTicks, out var screenAddress)
             ? _memory.Read((Word)(0x4000 + screenAddress))
             : null;
     }

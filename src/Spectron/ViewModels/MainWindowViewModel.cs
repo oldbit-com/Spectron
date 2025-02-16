@@ -177,7 +177,7 @@ public partial class MainWindowViewModel : ReactiveObject
     {
         if (!IsPaused)
         {
-            HandleTogglePause();
+            Pause();
         }
 
         var viewModel = new DebuggerViewModel(_debuggerContext, Emulator!);
@@ -218,7 +218,7 @@ public partial class MainWindowViewModel : ReactiveObject
 
             Emulator?.SetUlaPlus(IsUlaPlusEnabled);
             Emulator?.SetAudioSettings(preferences.AudioSettings);
-            Emulator?.SetTapeSavingSettings(preferences.TapeSaving);
+            Emulator?.SetTapeSettings(preferences.TapeSettings);
             Emulator?.SetGamepad(preferences.Joystick);
         }
 
@@ -320,7 +320,7 @@ public partial class MainWindowViewModel : ReactiveObject
             CreateEmulator(_preferences.ComputerType, _preferences.RomType);
         }
 
-        Emulator?.SetTapeSavingSettings(_preferences.TapeSaving);
+        Emulator?.SetTapeSettings(_preferences.TapeSettings);
     }
 
     private async Task WindowClosingAsync()
