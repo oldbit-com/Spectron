@@ -100,7 +100,7 @@ public sealed class Emulator
         KeyboardState.Reset();
         TapeManager.Attach(Cpu, Memory, hardware);
 
-        AudioManager = new AudioManager(Cpu.Clock, tapeManager.Player, hardware);
+        AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware);
 
         SetupUlaAndDevices();
         SetupEventHandlers();
@@ -180,7 +180,7 @@ public sealed class Emulator
 
     private void SetupUlaAndDevices()
     {
-        var ula = new Ula(KeyboardState, ScreenBuffer, Cpu.Clock, TapeManager?.Player);
+        var ula = new Ula(KeyboardState, ScreenBuffer, Cpu.Clock, TapeManager?.CassettePlayer);
 
         _spectrumBus.AddDevice(ula);
         _spectrumBus.AddDevice(UlaPlus);

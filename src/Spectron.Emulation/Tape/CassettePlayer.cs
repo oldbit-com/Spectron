@@ -9,6 +9,7 @@ namespace OldBit.Spectron.Emulation.Tape;
 internal sealed class CassettePlayer(Clock clock, HardwareSettings hardware) : IDisposable
 {
     private PulseStream? _pulseStream;
+    private Cassette? _cassette;
 
     private int _runningPulseDuration;
     private int _runningPulseCount;
@@ -40,14 +41,20 @@ internal sealed class CassettePlayer(Clock clock, HardwareSettings hardware) : I
 
     internal void Rewind()
     {
-        _runningPulseDuration = 0;
-        _runningPulseCount = 0;
+        if (_cassette == null)
+        {
+            return;
+        }
 
-        IsPlaying = false;
+        _cassette.Rewind();
+
+        LoadTape(_cassette);
     }
 
     internal void LoadTape(Cassette cassette)
     {
+        _cassette = cassette;
+
         Close();
 
         _pulseStream = new PulseStream(cassette, hardware);
@@ -101,6 +108,8 @@ internal sealed class CassettePlayer(Clock clock, HardwareSettings hardware) : I
 
     private void Close()
     {
+        IsPlaying = false;
+
         _runningPulseDuration = 0;
         _runningPulseCount = 0;
 

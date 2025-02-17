@@ -18,17 +18,19 @@ public sealed class Cassette
 {
     private byte[]? _contentBytes = null;
 
-    public int Position { get; set; }
+    public int Position { get; private set; }
+
     public TzxFile Content { get; private set; } = new();
+
     public bool IsEmpty => Content.Blocks.Count == 0;
+
     internal byte[] ContentBytes => GetContentBytes();
 
     public delegate void BlockSelectedEvent(BlockSelectedEventArgs e);
     public event BlockSelectedEvent? BlockSelected;
-
     public event EventHandler? EndOfTape;
 
-    public void Load(Stream stream, FileType fileType)
+    internal void Load(Stream stream, FileType fileType)
     {
         Position = 0;
 
@@ -37,34 +39,27 @@ public sealed class Cassette
             case FileType.Tap:
                 var tapFile = TapFile.Load(stream);
                 Load(tapFile.ToTzx());
+
                 break;
 
             case FileType.Tzx:
                 var tzxFile = TzxFile.Load(stream);
                 Load(tzxFile);
+
                 break;
         }
 
         _contentBytes = null;
     }
 
-    public void Load(string filePath)
+    internal void Load(TzxFile tzxFile, int currentPosition = 0)
     {
-        Position = 0;
-        var fileType = FileTypeHelper.GetFileType(filePath);
-
-        using var stream = File.OpenRead(filePath);
-        Load(stream, fileType);
-    }
-
-    internal void Load(TzxFile tzxFile, int blockIndex = 0)
-    {
-        Position = blockIndex;
+        Position = currentPosition;
         Content = tzxFile;
         _contentBytes = null;
     }
 
-    public TapData? GetNextTapData()
+    internal TapData? GetNextTapData()
     {
         while (Position < Content.Blocks.Count)
         {
@@ -88,7 +83,7 @@ public sealed class Cassette
         return null;
     }
 
-    public IBlock? GetNextBlock()
+    internal IBlock? GetNextBlock()
     {
         if (Position >= Content.Blocks.Count)
         {
@@ -103,6 +98,18 @@ public sealed class Cassette
         Position += 1;
 
         return block;
+    }
+
+    internal void Rewind()
+    {
+        Position = 0;
+        BlockSelected?.Invoke(new BlockSelectedEventArgs(Position));
+    }
+
+    public void SetPosition(int position)
+    {
+        Position = position;
+        BlockSelected?.Invoke(new BlockSelectedEventArgs(Position));
     }
 
     private byte[] GetContentBytes()

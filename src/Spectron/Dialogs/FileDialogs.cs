@@ -13,6 +13,7 @@ public static class FileDialogs
     public static async Task<IReadOnlyList<IStorageFile>> OpenAnyFileAsync()
     {
         var topLevel = TopLevel.GetTopLevel(MainWindow);
+
         if (topLevel == null)
         {
             return Array.Empty<IStorageFile>();
@@ -38,6 +39,7 @@ public static class FileDialogs
     public static async Task<IReadOnlyList<IStorageFile>> OpenTapeFileAsync()
     {
         var topLevel = TopLevel.GetTopLevel(MainWindow);
+
         if (topLevel == null)
         {
             return Array.Empty<IStorageFile>();
@@ -51,9 +53,29 @@ public static class FileDialogs
         });
     }
 
+    public static async Task<IStorageFile?> SaveTapeFileAsync(string? suggestedFileName = null)
+    {
+        var topLevel = TopLevel.GetTopLevel(MainWindow);
+
+        if (topLevel == null)
+        {
+            return null;
+        }
+
+        return await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Save Tape File",
+            DefaultExtension = ".tzx",
+            SuggestedFileName = suggestedFileName,
+            ShowOverwritePrompt = true,
+            FileTypeChoices = [FileTypes.Tzx, FileTypes.Tap]
+        });
+    }
+
     public static async Task<IStorageFile?> SaveSnapshotFileAsync(string? suggestedFileName = null)
     {
         var topLevel = TopLevel.GetTopLevel(MainWindow);
+
         if (topLevel == null)
         {
             return null;

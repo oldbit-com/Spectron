@@ -4,44 +4,41 @@ using OldBit.Spectron.Files.Tzx;
 
 namespace OldBit.Spectron.Emulation.Tape;
 
+public class TapeStateEventArgs(TapeAction action) : EventArgs
+{
+    public TapeAction Action { get; } = action;
+}
+
 public sealed class TapeManager
 {
     private DirectAccess? _directAccess;
-    private bool _isTapeLoaded;
 
     public Cassette Cassette { get; private set; } = new();
 
+    public bool IsTapeLoaded { get; private set; }
     public bool IsTapeSaveEnabled { get; set; }
     public TapeSpeed TapeSaveSpeed { get; set; }
 
-    internal CassettePlayer? Player { get; private set; }
+    internal CassettePlayer? CassettePlayer { get; private set; }
 
-    public delegate void TapeInsertedEvent(EventArgs e);
-    public event TapeInsertedEvent? TapeInserted;
-
-    public delegate void TapePlayingEvent(EventArgs e);
-    public event TapePlayingEvent? TapePlaying;
-
-    public delegate void TapeStoppedEvent(EventArgs e);
-    public event TapeStoppedEvent? TapeStopped;
-
-    public delegate void TapeEjectedEvent(EventArgs e);
-    public event TapeEjectedEvent? TapeEjected;
+    public delegate void TapeStateChangedEvent(TapeStateEventArgs e);
+    public event TapeStateChangedEvent? TapeStateChanged;
 
     internal void Attach(Z80 cpu, IMemory memory, HardwareSettings hardware)
     {
-        Player = new CassettePlayer(cpu.Clock, hardware);
+        CassettePlayer = new CassettePlayer(cpu.Clock, hardware);
         _directAccess = new DirectAccess(cpu, memory);
     }
 
-    public bool IsPlaying => Player?.IsPlaying ?? false;
+    public bool IsPlaying => CassettePlayer?.IsPlaying ?? false;
 
     public void NewTape()
     {
         Cassette = new Cassette();
-        TapeInserted?.Invoke(EventArgs.Empty);
 
-        _isTapeLoaded = true;
+        TapeStateChanged?.Invoke(new TapeStateEventArgs(TapeAction.TapeInserted));
+
+        IsTapeLoaded = true;
     }
 
     public void LoadDirect() => _directAccess?.LoadBytes(Cassette);
@@ -53,7 +50,7 @@ public sealed class TapeManager
             return;
         }
 
-        if (!_isTapeLoaded)
+        if (!IsTapeLoaded)
         {
             NewTape();
         }
@@ -90,30 +87,32 @@ public sealed class TapeManager
 
     private void InsertTape()
     {
-        Player?.LoadTape(Cassette);
-        TapeInserted?.Invoke(EventArgs.Empty);
+        CassettePlayer?.LoadTape(Cassette);
+        TapeStateChanged?.Invoke(new TapeStateEventArgs(TapeAction.TapeInserted));
 
-        _isTapeLoaded = true;
+        IsTapeLoaded = true;
     }
 
     public void StopTape()
     {
-        Player?.Stop();
-        TapeStopped?.Invoke(EventArgs.Empty);
+        CassettePlayer?.Stop();
+        TapeStateChanged?.Invoke(new TapeStateEventArgs(TapeAction.TapeStopped));
     }
 
     public void PlayTape()
     {
-        Player?.Play();
-        TapePlaying?.Invoke(EventArgs.Empty);
+        CassettePlayer?.Play();
+        TapeStateChanged?.Invoke(new TapeStateEventArgs(TapeAction.TapeStarted));
    }
 
     public void EjectTape()
     {
         StopTape();
-        TapeEjected?.Invoke(EventArgs.Empty);
-        Cassette = new Cassette();
+        TapeStateChanged?.Invoke(new TapeStateEventArgs(TapeAction.TapeEjected));
 
-        _isTapeLoaded = false;
+        Cassette = new Cassette();
+        IsTapeLoaded = false;
     }
+
+    public void RewindTape() => CassettePlayer?.Rewind();
 }

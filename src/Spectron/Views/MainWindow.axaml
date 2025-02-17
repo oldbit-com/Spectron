@@ -130,7 +130,7 @@
             <MenuItem Header="_Tape" Padding="10 0 10 0" Focusable="False">
                 <MenuItem Header="New Tape" Command="{Binding TapeMenuViewModel.NewCommand}"/>
                 <MenuItem Header="Insert Tape" HotKey="Cmd+T" InputGesture="Cmd+T" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
-                <MenuItem Header="Save Tape"/>
+                <MenuItem Header="Save Tape" Command="{Binding TapeMenuViewModel.SaveCommand}"/>
                 <MenuItem Header="-"/>
                 <MenuItem Header="Play" Command="{Binding TapeMenuViewModel.PlayCommand}"/>
                 <MenuItem Header="Stop" Command="{Binding TapeMenuViewModel.StopCommand}"/>
