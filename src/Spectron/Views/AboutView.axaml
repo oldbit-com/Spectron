@@ -5,18 +5,53 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.AboutView"
         Title="About Spectron"
-        Height="250"
+        Height="280"
         Width="350"
         WindowStartupLocation="CenterOwner"
         Focusable="True"
         CanResize="False">
 
+    <Window.Styles>
+        <Style Selector="TextBlock.Spectron">
+            <Setter Property="Foreground" Value="{StaticResource SpectrumWhite}"/>
+            <Setter Property="RotateTransform.Angle" Value="0"/>
+            <Style.Animations>
+                <Animation Duration="0:0:10" IterationCount="INFINITE" PlaybackDirection="AlternateReverse">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Foreground" Value="{StaticResource SpectrumMagenta}"/>
+                        <Setter Property="RotateTransform.Angle" Value="0"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="20%">
+                        <Setter Property="Foreground" Value="{StaticResource SpectrumBlue}"/>
+                        <Setter Property="RotateTransform.Angle" Value="5"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="40%">
+                        <Setter Property="Foreground" Value="{StaticResource SpectrumRed}"/>
+                        <Setter Property="RotateTransform.Angle" Value="-5"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="60%">
+                        <Setter Property="Foreground" Value="{StaticResource SpectrumCyan}"/>
+                        <Setter Property="RotateTransform.Angle" Value="5"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="80%">
+                        <Setter Property="Foreground" Value="{StaticResource SpectrumGreen}"/>
+                        <Setter Property="RotateTransform.Angle" Value="-5"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Foreground" Value="{StaticResource SpectrumYellow}"/>
+                        <Setter Property="RotateTransform.Angle" Value="5"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+    </Window.Styles>
+
     <Grid RowDefinitions="96,*" Margin="10">
         <Image Grid.Row="0" Source="../Assets/Logo.png" Height="128" Width="96"/>
         <StackPanel Grid.Row="1">
-            <TextBlock Text="Spectron" FontFamily="{StaticResource SpectrumStrictFont}" FontSize="64" HorizontalAlignment="Center" Foreground="{StaticResource SpectrumMagenta}"/>
-            <TextBlock Text="Version 0.0.1" FontFamily="{StaticResource SpectrumStrictFont}" FontSize="24" HorizontalAlignment="Center" Padding="8" Foreground="{StaticResource SpectrumBrightGreen}"/>
-            <TextBlock Text="© 2024 OldBit Ltd" FontFamily="{StaticResource SpectrumStrictFont}" FontSize="20" HorizontalAlignment="Center" Padding="0,20,0,3" Foreground="{StaticResource SpectrumBrightCyan}"/>
+            <TextBlock Text="Spectron" FontFamily="{StaticResource SpectrumStrictFont}" FontSize="64" HorizontalAlignment="Center"  Classes="Spectron"/>
+            <TextBlock Text="Version 0.8.0" FontFamily="{StaticResource SpectrumStrictFont}" FontSize="24" HorizontalAlignment="Center" Padding="8" Foreground="{StaticResource SpectrumBrightGreen}"/>
+            <TextBlock Text="© 2025 OldBit Ltd" FontFamily="{StaticResource SpectrumStrictFont}" FontSize="20" HorizontalAlignment="Center" Padding="0,20,0,3" Foreground="{StaticResource SpectrumBrightCyan}"/>
             <TextBlock Text="Wojciech Sobieszek" FontFamily="{StaticResource SpectrumStrictFont}" FontSize="20" HorizontalAlignment="Center" Foreground="{StaticResource SpectrumBrightCyan}"/>
         </StackPanel>
     </Grid>
