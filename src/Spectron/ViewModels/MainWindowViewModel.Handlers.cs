@@ -61,7 +61,7 @@ partial class MainWindowViewModel
             if (CreateEmulator(fileResult.Stream, fileResult.FileType))
             {
                 RecentFilesViewModel.Add(filePath);
-                Title = $"S{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
+                Title = $"{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
             }
         }
         catch (Exception ex)
