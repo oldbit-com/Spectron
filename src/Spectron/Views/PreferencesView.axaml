@@ -86,12 +86,66 @@
                     <Grid RowDefinitions="Auto,*">
                         <StackPanel>
                             <controls:HeaderSeparator Text="Joystick"/>
-                            <Grid ColumnDefinitions="140,300" RowDefinitions="40,40,30">
-                                <TextBlock Text="Device" VerticalAlignment="Center" Classes="Center"/>
-                                <ComboBox Grid.Row="0" Grid.Column="1" Name="Gamepad" Margin="5 0 10 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding GamepadControllers}" SelectedValue="{Binding GamepadControllerId}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding ControllerId}"/>
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Emulated Joystick" VerticalAlignment="Center" Classes="Center"/>
-                                <ComboBox Grid.Row="1" Grid.Column="1" Name="Joystick" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding JoystickTypes}" SelectedValue="{Binding JoystickType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
-                                <CheckBox Grid.Row="2" Grid.Column="1" Content="Emulate using keyboard" Margin="5 0 0 0" IsChecked="{Binding EmulateUsingKeyboard}" IsEnabled="{Binding #Joystick.SelectedIndex}"/>
+                            <Grid ColumnDefinitions="140,300" RowDefinitions="40,40,40">
+                                <TextBlock
+                                    Text="Device"
+                                    VerticalAlignment="Center"
+                                    Classes="Center"/>
+                                <ComboBox
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Name="Gamepad"
+                                    Margin="5 0 10 0"
+                                    Padding="10 2 0 0"
+                                    Width="250"
+                                    VerticalAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    ItemsSource="{Binding GamepadControllers}"
+                                    SelectedValue="{Binding GamepadControllerId}"
+                                    DisplayMemberBinding="{Binding Name}"
+                                    SelectedValueBinding="{Binding ControllerId}"/>
+                                <TextBlock
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Text="Emulated Joystick"
+                                    VerticalAlignment="Center"
+                                    Classes="Center"/>
+                                <ComboBox
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Name="Joystick"
+                                    Margin="5 0 0 0"
+                                    Padding="10 2 0 0"
+                                    Width="250"
+                                    VerticalAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    ItemsSource="{Binding JoystickTypes}"
+                                    SelectedValue="{Binding JoystickType}"
+                                    DisplayMemberBinding="{Binding Name}"
+                                    SelectedValueBinding="{Binding Value}"/>
+                                <StackPanel
+                                    Grid.Row="2"
+                                    Grid.Column="1"
+                                    Orientation="Horizontal">
+                                    <CheckBox
+                                        Content="Use keyboard (← ↑ ↓ →). Fire key:"
+                                        Margin="5 0 0 0"
+                                        VerticalAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        IsChecked="{Binding EmulateUsingKeyboard}"
+                                        IsEnabled="{Binding #Joystick.SelectedIndex}"/>
+                                    <ComboBox
+                                        Margin="15 0 0 0"
+                                        Padding="10 2 0 0"
+                                        Width="120"
+                                        VerticalAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        ItemsSource="{Binding FireKeys}"
+                                        SelectedValue="{Binding FireKey}"
+                                        DisplayMemberBinding="{Binding Name}"
+                                        SelectedValueBinding="{Binding Value}"
+                                        IsEnabled="{Binding #Joystick.SelectedIndex}"/>
+                                </StackPanel>
                             </Grid>
                         </StackPanel>
                         <Grid Grid.Row="1">

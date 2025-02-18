@@ -7,7 +7,7 @@ namespace OldBit.Spectron.Helpers;
 
 public static class KeyMappings
 {
-    public static List<SpectrumKey> ToSpectrumKey(KeyEventArgs e)
+    public static List<SpectrumKey> ToSpectrumKey(KeyEventArgs e, JoystickInput joystickInput)
     {
         if ((e.KeyModifiers & KeyModifiers.Alt) != 0)
         {
@@ -71,26 +71,22 @@ public static class KeyMappings
                 PhysicalKey.Comma => [SpectrumKey.SymbolShift, SpectrumKey.N],
                 PhysicalKey.Period => [SpectrumKey.SymbolShift, SpectrumKey.M],
                 PhysicalKey.Semicolon => [SpectrumKey.SymbolShift, SpectrumKey.O],
-                PhysicalKey.ArrowLeft => [SpectrumKey.CapsShift, SpectrumKey.D5],
-                PhysicalKey.ArrowDown => [SpectrumKey.CapsShift, SpectrumKey.D6],
-                PhysicalKey.ArrowUp => [SpectrumKey.CapsShift, SpectrumKey.D7],
-                PhysicalKey.ArrowRight => [SpectrumKey.CapsShift, SpectrumKey.D8],
+                PhysicalKey.ArrowLeft => joystickInput == JoystickInput.Left ? [] : [SpectrumKey.CapsShift, SpectrumKey.D5],
+                PhysicalKey.ArrowDown => joystickInput == JoystickInput.Down ? [] : [SpectrumKey.CapsShift, SpectrumKey.D6],
+                PhysicalKey.ArrowUp => joystickInput == JoystickInput.Up ? [] : [SpectrumKey.CapsShift, SpectrumKey.D7],
+                PhysicalKey.ArrowRight => joystickInput == JoystickInput.Right ? [] : [SpectrumKey.CapsShift, SpectrumKey.D8],
                 PhysicalKey.Minus => [SpectrumKey.SymbolShift, SpectrumKey.J],
                 _ => []
             }
         };
     }
 
-    public static JoystickInput ToJoystickAction(KeyEventArgs e)
+    public static JoystickInput ToJoystickAction(PhysicalKey key, PhysicalKey fireKey) => key switch
     {
-        return e.PhysicalKey switch
-        {
-            PhysicalKey.ArrowLeft => JoystickInput.Left,
-            PhysicalKey.ArrowRight => JoystickInput.Right,
-            PhysicalKey.ArrowDown => JoystickInput.Down,
-            PhysicalKey.ArrowUp => JoystickInput.Up,
-            PhysicalKey.Tab => JoystickInput.Fire,
-            _ => JoystickInput.None
-        };
-    }
+        PhysicalKey.ArrowLeft => JoystickInput.Left,
+        PhysicalKey.ArrowRight => JoystickInput.Right,
+        PhysicalKey.ArrowDown => JoystickInput.Down,
+        PhysicalKey.ArrowUp => JoystickInput.Up,
+        _ => key == fireKey ? JoystickInput.Fire : JoystickInput.None
+    };
 }

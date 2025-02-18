@@ -285,18 +285,20 @@ partial class MainWindowViewModel
             return;
         }
 
+        var joystickInput = JoystickInput.None;
+
         if (IsKeyboardJoystickEmulationEnabled)
         {
-            var input = KeyMappings.ToJoystickAction(e);
+            joystickInput = KeyMappings.ToJoystickAction(e.PhysicalKey, _preferences.Joystick.FireKey);
 
-            if (input != JoystickInput.None)
+            if (joystickInput != JoystickInput.None)
             {
-                Emulator?.JoystickManager.Released(input);
-                return;
+                Emulator?.JoystickManager.Released(joystickInput);
             }
         }
 
-        var keys = KeyMappings.ToSpectrumKey(e);
+        var keys = KeyMappings.ToSpectrumKey(e, joystickInput);
+
         Emulator?.KeyboardState.KeyUp(keys);
     }
 
@@ -321,18 +323,20 @@ partial class MainWindowViewModel
                 return;
         }
 
+        var joystickInput = JoystickInput.None;
+
         if (IsKeyboardJoystickEmulationEnabled)
         {
-            var input = KeyMappings.ToJoystickAction(e);
+            joystickInput = KeyMappings.ToJoystickAction(e.PhysicalKey, _preferences.Joystick.FireKey);
 
-            if (input != JoystickInput.None)
+            if (joystickInput != JoystickInput.None)
             {
-                Emulator?.JoystickManager.Pressed(input);
-                return;
+                Emulator?.JoystickManager.Pressed(joystickInput);
             }
         }
 
-        var keys = KeyMappings.ToSpectrumKey(e);
+        var keys = KeyMappings.ToSpectrumKey(e, joystickInput);
+
         Emulator?.KeyboardState.KeyDown(keys);
     }
 

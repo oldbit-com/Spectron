@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using Avalonia.Input;
 using Avalonia.Threading;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
@@ -64,6 +65,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         EmulateUsingKeyboard = preferences.Joystick.EmulateUsingKeyboard;
         GamepadControllerId = _gamepadManager.Controllers.FirstOrDefault(
             controller => controller.ControllerId == preferences.Joystick.GamepadControllerId)?.ControllerId ?? GamepadController.None.ControllerId;
+        FireKey = preferences.Joystick.FireKey;
 
         IsResumeEnabled = preferences.ResumeSettings.IsResumeEnabled;
         ShouldIncludeTapeInResume = preferences.ResumeSettings.ShouldIncludeTape;
@@ -132,6 +134,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
                 EmulateUsingKeyboard = EmulateUsingKeyboard,
                 GamepadControllerId = GamepadControllerId,
                 GamepadSettings = _gamepadSettings,
+                FireKey = FireKey
             },
 
             ResumeSettings = new ResumeSettings
@@ -200,6 +203,49 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         new("Stereo ACB", StereoMode.StereoAcb),
     ];
 
+    public List<NameValuePair<PhysicalKey>> FireKeys { get; } =
+    [
+        new("Space", PhysicalKey.Space),
+        new("Tab", PhysicalKey.Tab),
+        new("Enter", PhysicalKey.Enter),
+        new("A", PhysicalKey.A),
+        new("B", PhysicalKey.B),
+        new("C", PhysicalKey.C),
+        new("D", PhysicalKey.D),
+        new("E", PhysicalKey.E),
+        new("F", PhysicalKey.F),
+        new("G", PhysicalKey.G),
+        new("H", PhysicalKey.H),
+        new("I", PhysicalKey.I),
+        new("J", PhysicalKey.J),
+        new("K", PhysicalKey.K),
+        new("L", PhysicalKey.L),
+        new("M", PhysicalKey.M),
+        new("N", PhysicalKey.N),
+        new("O", PhysicalKey.O),
+        new("P", PhysicalKey.P),
+        new("Q", PhysicalKey.Q),
+        new("R", PhysicalKey.R),
+        new("S", PhysicalKey.S),
+        new("T", PhysicalKey.T),
+        new("U", PhysicalKey.U),
+        new("V", PhysicalKey.V),
+        new("W", PhysicalKey.W),
+        new("X", PhysicalKey.X),
+        new("Y", PhysicalKey.Y),
+        new("Z", PhysicalKey.Z),
+        new("0", PhysicalKey.Digit0),
+        new("1", PhysicalKey.Digit1),
+        new("2", PhysicalKey.Digit2),
+        new("3", PhysicalKey.Digit3),
+        new("4", PhysicalKey.Digit4),
+        new("5", PhysicalKey.Digit5),
+        new("6", PhysicalKey.Digit6),
+        new("7", PhysicalKey.Digit7),
+        new("8", PhysicalKey.Digit8),
+        new("9", PhysicalKey.Digit9),
+    ];
+
     public ObservableCollection<GamepadController> GamepadControllers { get; }
 
     private Theme _theme;
@@ -242,6 +288,13 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
     {
         get => _emulateUsingKeyboard;
         set => this.RaiseAndSetIfChanged(ref _emulateUsingKeyboard, value);
+    }
+
+    private PhysicalKey _fireKey = PhysicalKey.Space;
+    public PhysicalKey FireKey
+    {
+        get => _fireKey;
+        set => this.RaiseAndSetIfChanged(ref _fireKey, value);
     }
 
     private Guid _gamepadControllerId = GamepadController.None.ControllerId;
