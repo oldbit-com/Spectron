@@ -8,6 +8,7 @@ using System.Timers;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
+using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Debugger;
 using OldBit.Spectron.Debugger.ViewModels;
 using OldBit.Spectron.Emulation;
@@ -26,6 +27,7 @@ using OldBit.Spectron.Models;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.Files.Szx;
+using OldBit.Spectron.Recorder;
 using OldBit.Spectron.Theming;
 using ReactiveUI;
 using Timer = System.Timers.Timer;
@@ -46,6 +48,7 @@ public partial class MainWindowViewModel : ReactiveObject
     private readonly PreferencesService _preferencesService;
     private readonly SessionService _sessionService;
     private readonly DebuggerContext _debuggerContext;
+    private readonly ILogger _logger;
     private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
     private readonly Timer _statusBarTimer;
 
@@ -53,6 +56,7 @@ public partial class MainWindowViewModel : ReactiveObject
     private int _frameCount;
     private readonly Stopwatch _renderStopwatch = new();
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
+    private AudioRecorder? _audioRecorder;
 
     public Emulator? Emulator { get; private set; }
     public Control ScreenControl { get; set; } = null!;
@@ -63,10 +67,15 @@ public partial class MainWindowViewModel : ReactiveObject
 
     public ReactiveCommand<Unit, Unit> WindowOpenedCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> WindowClosingCommand { get; private set; }
+
     public ReactiveCommand<KeyEventArgs, Unit> KeyDownCommand { get; private set; }
     public ReactiveCommand<KeyEventArgs, Unit> KeyUpCommand { get; private set; }
+
     public ReactiveCommand<Unit, Task> LoadFileCommand { get; private set; }
     public ReactiveCommand<Unit, Task> SaveFileCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> StartAudioRecordingCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> StopAudioRecordingCommand { get; private set; }
+
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     public ReactiveCommand<RomType, Unit> ChangeRomCommand { get; private set; }
     public ReactiveCommand<ComputerType, Unit> ChangeComputerType { get; private set; }
@@ -80,6 +89,7 @@ public partial class MainWindowViewModel : ReactiveObject
     public ReactiveCommand<TapeSpeed, Unit> SetTapeLoadSpeedCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleMuteCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> TimeMachineResumeEmulatorCommand  { get; private set; }
+
 
     public ReactiveCommand<Unit, Task> ShowAboutViewCommand { get; private set; }
     public ReactiveCommand<Unit, Task> ShowDebuggerViewCommand { get; private set; }
@@ -104,7 +114,8 @@ public partial class MainWindowViewModel : ReactiveObject
         SessionService sessionService,
         RecentFilesViewModel recentFilesViewModel,
         TapeMenuViewModel tapeMenuViewModel,
-        DebuggerContext debuggerContext)
+        DebuggerContext debuggerContext,
+        ILogger<MainWindowViewModel> logger)
     {
         _emulatorFactory = emulatorFactory;
         _timeMachine = timeMachine;
@@ -114,6 +125,8 @@ public partial class MainWindowViewModel : ReactiveObject
         _preferencesService = preferencesService;
         _sessionService = sessionService;
         _debuggerContext = debuggerContext;
+        _logger = logger;
+
         RecentFilesViewModel = recentFilesViewModel;
         TapeMenuViewModel = tapeMenuViewModel;
         recentFilesViewModel.OpenRecentFileAsync = async fileName => await HandleLoadFileAsync(fileName);
@@ -139,8 +152,12 @@ public partial class MainWindowViewModel : ReactiveObject
         WindowClosingCommand = ReactiveCommand.CreateFromTask(WindowClosingAsync);
         KeyDownCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyDown);
         KeyUpCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyUp);
+
         LoadFileCommand = ReactiveCommand.Create(HandleLoadFileAsync);
         SaveFileCommand = ReactiveCommand.Create(HandleSaveFileAsync, emulatorNotNull);
+        StartAudioRecordingCommand = ReactiveCommand.Create(HandleStartAudioRecordingAsync);
+        StopAudioRecordingCommand = ReactiveCommand.Create(HandleStopAudioRecording);
+
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
         ChangeRomCommand = ReactiveCommand.Create<RomType>(HandleChangeRom);
         ChangeComputerType = ReactiveCommand.Create<ComputerType>(HandleChangeComputerType);
@@ -428,6 +445,7 @@ public partial class MainWindowViewModel : ReactiveObject
         if (RecentFilesViewModel.CurrentFileName == string.Empty)
         {
             Title = DefaultTitle;
+
             return;
         }
 

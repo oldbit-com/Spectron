@@ -41,6 +41,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Spectron.Debugger\Spectron.Debugger.csproj" />
       <ProjectReference Include="..\Spectron.Emulation\Spectron.Emulation.csproj" />
+      <ProjectReference Include="..\Spectron.Recorder\Spectron.Recorder.csproj" />
     </ItemGroup>
 
     <ItemGroup>

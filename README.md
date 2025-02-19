@@ -31,6 +31,7 @@ It uses several of my own libraries that I created for this project:
 - [x] Adjustable emulator speed
 - [x] Debugger
 - [x] Keyboard joystick emulation: Kempston, Sinclair, Cursor & Fuller.
+- [x] Audio recording
 - [x] And more features in progress...
 
 # Running the emulator
@@ -83,6 +84,10 @@ AY is by default enabled in 48K mode, but can be disabled in the settings..
 
 Audio playback is done using [Beep](https://github.com/oldbit-com/Beep) which I created for this 
 project since I couldn't find any simple cross-platform audio player that would suit my needs.
+
+### Audio recording
+Audio can be recorded to a file in WAV format. The format used is PCM 16-bit (uncompressed), sample rate 44100 Hz, 
+mono or stereo depending on the current AY mode.
 
 ## Joystick and Gamepad
 Joystick emulation is supported for Kempston, Sinclair, Cursor and Fuller joysticks. External gamepads and joysticks 

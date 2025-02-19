@@ -52,12 +52,15 @@
             <MenuItem Header="_File" Padding="10 0 10 0" IsTabStop="False" Focusable="False">
                 <MenuItem Header="Load..." HotKey="Cmd+O" InputGesture="Cmd+O" Command="{Binding LoadFileCommand}"/>
                 <MenuItem Header="Recent..." SubmenuOpened="RecentFilesSubmenuOpened">
-                    <MenuItem />
+                    <MenuItem/>
                 </MenuItem>
                 <MenuItem Header="Save Snapshot..." HotKey="Cmd+S" InputGesture="Cmd+S" Command="{Binding SaveFileCommand}"/>
-                <MenuItem Header="-" />
+                <MenuItem Header="-"/>
                 <MenuItem Header="Settings" HotKey="Cmd+," InputGesture="Cmd+," Command="{Binding ShowPreferencesViewCommand}"/>
-                <MenuItem Header="-" />
+                <MenuItem Header="-"/>
+                <MenuItem Header="Record Audio..." Command="{Binding StartAudioRecordingCommand}" IsEnabled="{Binding !IsRecordingAudio}"/>
+                <MenuItem Header="Stop Audio Recording" Command="{Binding StopAudioRecordingCommand}" IsEnabled="{Binding IsRecordingAudio}"/>
+                <MenuItem Header="-"/>
                 <MenuItem Header="Exit" HotKey="Cmd+Q" InputGesture="Cmd+Q"/>
             </MenuItem>
 

@@ -8,8 +8,10 @@ namespace OldBit.Spectron.Emulation.Devices.Audio;
 
 public sealed class AudioManager
 {
+    public const int PlayerSampleRate = 44100;
+
+    private const AudioFormat PlayerAudioFormat = AudioFormat.Signed16BitIntegerLittleEndian;
     private const int FramesPerSecond = 50;
-    private const int PlayerSampleRate = 44100;
     private const int SamplesPerFrame = PlayerSampleRate / FramesPerSecond;
     private const int NumberOfBuffers = 4;
 
@@ -28,6 +30,9 @@ public sealed class AudioManager
     internal BeeperDevice Beeper { get; }
     internal AyDevice Ay { get; } = new();
 
+    public delegate void BeforeEnqueueEvent(IEnumerable<byte> audioData);
+    public event BeforeEnqueueEvent? BeforeEnqueue;
+
     public StereoMode StereoMode
     {
         get => _stereoMode;
@@ -40,7 +45,7 @@ public sealed class AudioManager
 
             _stereoMode = value;
 
-            ConfigureStereoMode();
+            Restart();
         }
     }
 
@@ -111,6 +116,7 @@ public sealed class AudioManager
         }
 
         var playAudio = false;
+
         if (IsAySupported && _isAyEnabled)
         {
             _ayAudio.EndFrame();
@@ -166,6 +172,8 @@ public sealed class AudioManager
             }
         }
 
+        BeforeEnqueue?.Invoke(audioBuffer.Buffer);
+
         _audioPlayer?.TryEnqueue(audioBuffer.Buffer);
     }
 
@@ -177,7 +185,7 @@ public sealed class AudioManager
         }
 
         _audioPlayer = new AudioPlayer(
-            AudioFormat.Signed16BitIntegerLittleEndian,
+            PlayerAudioFormat,
             PlayerSampleRate,
             channelCount: StereoMode == StereoMode.None ? 1 : 2,
             new PlayerOptions
@@ -186,7 +194,7 @@ public sealed class AudioManager
                 BufferQueueSize = NumberOfBuffers,
             });
 
-        _audioPlayer.Volume = 80;
+        _audioPlayer.Volume = 100;
         _audioPlayer.Start();
         _isAudioPlayerRunning = true;
     }
@@ -223,7 +231,7 @@ public sealed class AudioManager
         }
     }
 
-    private void ConfigureStereoMode()
+    private void Restart()
     {
         Stop();
         Start();

@@ -23,8 +23,5 @@ internal sealed class AudioBuffer
         _count += 2;
     }
 
-    internal void Clear()
-    {
-        _count = 0;
-    }
+    internal void Clear() => _count = 0;
 }

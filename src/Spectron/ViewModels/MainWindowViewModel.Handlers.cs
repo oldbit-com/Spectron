@@ -13,6 +13,7 @@ using OldBit.Spectron.Emulation.Storage;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Helpers;
 using OldBit.Spectron.Models;
+using OldBit.Spectron.Recorder;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -23,15 +24,11 @@ partial class MainWindowViewModel
     private async Task HandleLoadFileAsync(string? filePath)
     {
         Stream? stream = null;
-        var shouldResume = false;
+        var shouldResume = !IsPaused;
 
         try
         {
-            if (!IsPaused)
-            {
-                Pause();
-                shouldResume = true;
-            }
+            Pause();
 
             if (filePath == null)
             {
@@ -146,14 +143,11 @@ partial class MainWindowViewModel
 
     private async Task HandleSaveFileAsync()
     {
-        var shouldResume = false;
+        var shouldResume = !IsPaused;
+
         try
         {
-            if (!IsPaused)
-            {
-                Pause();
-                shouldResume = true;
-            }
+            Pause();
 
             var file = await FileDialogs.SaveSnapshotFileAsync();
 
@@ -173,6 +167,46 @@ partial class MainWindowViewModel
                 Resume();
             }
         }
+    }
+
+    private async Task HandleStartAudioRecordingAsync()
+    {
+        var shouldResume = !IsPaused;
+
+        try
+        {
+            Pause();
+
+            var file = await FileDialogs.SaveAudioFileAsync();
+
+            if (file != null && Emulator != null)
+            {
+                _audioRecorder?.Dispose();
+                _audioRecorder = new AudioRecorder(Emulator.AudioManager, file.Path.LocalPath, _logger);
+                _audioRecorder.Start();
+
+                IsRecordingAudio = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            await MessageDialogs.Error(ex.Message);
+        }
+        finally
+        {
+            if (shouldResume)
+            {
+                Resume();
+            }
+        }
+    }
+
+    private void HandleStopAudioRecording()
+    {
+        IsRecordingAudio = false;
+
+        _audioRecorder?.Stop();
+        _audioRecorder = null;
     }
 
     private void HandleChangeBorderSize(BorderSize borderSize)
@@ -230,6 +264,11 @@ partial class MainWindowViewModel
 
     private void Pause()
     {
+        if (IsPaused)
+        {
+            return;
+        }
+
         Emulator?.Pause();
         IsPaused = true;
     }
