@@ -31,7 +31,7 @@ It uses several of my own libraries that I created for this project:
 - [x] Adjustable emulator speed
 - [x] Debugger
 - [x] Keyboard joystick emulation: Kempston, Sinclair, Cursor & Fuller.
-- [x] Audio recording
+- [x] Audio and video recording
 - [x] And more features in progress...
 
 # Running the emulator
@@ -85,10 +85,6 @@ AY is by default enabled in 48K mode, but can be disabled in the settings..
 Audio playback is done using [Beep](https://github.com/oldbit-com/Beep) which I created for this 
 project since I couldn't find any simple cross-platform audio player that would suit my needs.
 
-### Audio recording
-Audio can be recorded to a file in WAV format. The format used is PCM 16-bit (uncompressed), sample rate 44100 Hz, 
-mono or stereo depending on the current AY mode.
-
 ## Joystick and Gamepad
 Joystick emulation is supported for Kempston, Sinclair, Cursor and Fuller joysticks. External gamepads and joysticks 
 are supported as well. But this has been only tested with few controllers I have. Controller buttons can be mapped to joystick or 
@@ -102,6 +98,30 @@ ULA+ mode is supported and can be enabled or disabled in the emulator settings.
 ## Time Machine
 Time Machine is a feature that allows you to go back in time and continue from given time point in the past.
 The interval and the number of time points can be adjusted in the settings.
+
+## Video and Audio recording
+
+Audio and video recording is supported in the emulator. This is experimental feature and may not work on all platforms.
+
+### Audio
+Audio can be recorded to a file in **WAV** format. The format used is PCM 16-bit, 44100 Hz, mono or stereo depending on the 
+current AY mode. Since this is not compressed format, the file size can be quite large. The advantage is that it doesn't
+require any additional libraries to record it.
+
+> [!NOTE]
+> Changing audio settings during the recording most likely will cause unexpected results.
+
+### Video
+Video recording requires **FFmpeg** to be installed on the system. It is used to encode the video in MP4 format.
+The process of recording video first saves the raw frames to a temporary compressed file, and then once recording
+is complete, encodes it to MP4 format in a background task. This way it does not affect the emulator performance,
+but you will need to keep the application running until the encoding is complete.
+
+The frame rate is set to 50 FPS to match the ZX Spectrum screen refresh rate.
+TODO: 
+- Record audio together and merge it with the video.
+- Crop the images and resize.
+
 
 ## Debugger
 Debugger is available in the emulator. It is a simple debugger that allows you to inspect the CPU registers, 
