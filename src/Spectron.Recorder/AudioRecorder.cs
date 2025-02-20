@@ -3,21 +3,11 @@ using OldBit.Spectron.Emulation.Devices.Audio;
 
 namespace OldBit.Spectron.Recorder;
 
-public sealed class AudioRecorder(AudioManager audioManager, string filePath, ILogger logger) : IDisposable
+public sealed class AudioRecorder(StereoMode stereoMode, string filePath, ILogger logger) : IDisposable
 {
     private WaveFileWriter? _writer;
 
-    public void Start()
-    {
-        audioManager.BeforeEnqueue += AudioManagerOnBeforeEnqueue;
-
-        _writer = new WaveFileWriter(
-            filePath,
-            AudioManager.PlayerSampleRate,
-            audioManager.StereoMode == StereoMode.None ? 1 : 2);
-    }
-
-    private void AudioManagerOnBeforeEnqueue(IEnumerable<byte> audioData)
+    public void AppendFrame(IEnumerable<byte> audioData)
     {
         try
         {
@@ -31,10 +21,16 @@ public sealed class AudioRecorder(AudioManager audioManager, string filePath, IL
         }
     }
 
+    public void Start()
+    {
+        _writer = new WaveFileWriter(
+            filePath,
+            AudioManager.PlayerSampleRate,
+            stereoMode == StereoMode.None ? 1 : 2);
+    }
+
     public void Stop()
     {
-        audioManager.BeforeEnqueue -= AudioManagerOnBeforeEnqueue;
-
         _writer?.Close();
         _writer = null;
     }

@@ -182,7 +182,7 @@ partial class MainWindowViewModel
 
             if (file != null && Emulator != null)
             {
-                _audioRecorder = new AudioRecorder(Emulator.AudioManager, file.Path.LocalPath, _logger);
+                _audioRecorder = new AudioRecorder(Emulator.AudioManager.StereoMode, file.Path.LocalPath, _logger);
                 _audioRecorder.Start();
 
                 RecordingStatus = RecordingStatus.Recording;

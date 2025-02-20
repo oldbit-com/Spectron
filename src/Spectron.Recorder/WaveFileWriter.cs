@@ -1,6 +1,6 @@
 namespace OldBit.Spectron.Recorder;
 
-public sealed class WaveFileWriter : IDisposable
+internal sealed class WaveFileWriter : IDisposable
 {
     private readonly int _sampleRate;
     private readonly short _channels;
@@ -13,7 +13,7 @@ public sealed class WaveFileWriter : IDisposable
     private const short Pcm = 1;
     private const short BitDepth = 16;
 
-    public WaveFileWriter(string filePath, int sampleRate, int channels)
+    internal WaveFileWriter(string filePath, int sampleRate, int channels)
     {
         _sampleRate = sampleRate;
         _channels = (short)channels;
@@ -22,7 +22,7 @@ public sealed class WaveFileWriter : IDisposable
         _writer = new BinaryWriter(_fileStream);
     }
 
-    public void Write(IEnumerable<byte> data)
+    internal void Write(IEnumerable<byte> data)
     {
         if (!_isHeaderWritten)
         {
@@ -60,7 +60,7 @@ public sealed class WaveFileWriter : IDisposable
         }
     }
 
-    public void Close()
+    internal void Close()
     {
         UpdateHeader();
 

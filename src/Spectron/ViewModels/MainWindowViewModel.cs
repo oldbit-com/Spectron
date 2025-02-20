@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -295,7 +296,7 @@ public partial class MainWindowViewModel : ReactiveObject
         Interlocked.Exchange(ref _frameCount, 0);
     }
 
-    private void EmulatorOnRenderScreen(FrameBuffer frameBuffer)
+    private void EmulatorFrameCompleted(FrameBuffer frameBuffer, IEnumerable<byte> audioBuffer)
     {
         // Keep max 50 FPS
         if (_renderStopwatch.Elapsed - _lastScreenRender < TimeSpan.FromMilliseconds(19))
@@ -313,6 +314,7 @@ public partial class MainWindowViewModel : ReactiveObject
             ScreenControl.InvalidateVisual();
         });
 
+        _audioRecorder?.AppendFrame(audioBuffer);
         _videoRecorder?.AppendFrame(frameBuffer);
     }
 
@@ -394,7 +396,7 @@ public partial class MainWindowViewModel : ReactiveObject
         IsUlaPlusEnabled = Emulator.IsUlaPlusEnabled;
 
         Emulator.TapeLoadSpeed = TapeLoadSpeed;
-        Emulator.RenderScreen += EmulatorOnRenderScreen;
+        Emulator.FrameCompleted += EmulatorFrameCompleted;
 
         Emulator.SetFloatingBusSupport(_preferences.IsFloatingBusEnabled);
         Emulator.SetAudioSettings(_preferences.AudioSettings);
@@ -445,7 +447,7 @@ public partial class MainWindowViewModel : ReactiveObject
         }
 
         Emulator.Shutdown();
-        Emulator.RenderScreen -= EmulatorOnRenderScreen;
+        Emulator.FrameCompleted -= EmulatorFrameCompleted;
         Emulator.CommandManager.CommandReceived -= CommandManagerOnCommandReceived;
         Emulator = null;
     }

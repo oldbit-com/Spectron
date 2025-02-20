@@ -19,6 +19,7 @@ public sealed class AudioManager
     private readonly AudioBufferPool _audioBufferPool;
     private readonly BeeperAudio _beeperAudio;
     private readonly AyAudio _ayAudio;
+    private readonly byte[] _emptyBuffer = [];
 
     private StereoMode _stereoMode = StereoMode.None;
     private bool _isMuted;
@@ -29,9 +30,6 @@ public sealed class AudioManager
 
     internal BeeperDevice Beeper { get; }
     internal AyDevice Ay { get; } = new();
-
-    public delegate void BeforeEnqueueEvent(IEnumerable<byte> audioData);
-    public event BeforeEnqueueEvent? BeforeEnqueue;
 
     public StereoMode StereoMode
     {
@@ -108,11 +106,11 @@ public sealed class AudioManager
         _ayAudio.NewFrame();
     }
 
-    internal void EndFrame()
+    internal IEnumerable<byte> EndFrame()
     {
         if (_isMuted)
         {
-            return;
+            return _emptyBuffer;
         }
 
         var playAudio = false;
@@ -131,7 +129,7 @@ public sealed class AudioManager
 
         if (!playAudio)
         {
-            return;
+            return _emptyBuffer;
         }
 
         var audioBuffer = _audioBufferPool.GetBuffer();
@@ -172,9 +170,9 @@ public sealed class AudioManager
             }
         }
 
-        BeforeEnqueue?.Invoke(audioBuffer.Buffer);
-
         _audioPlayer?.TryEnqueue(audioBuffer.Buffer);
+
+        return audioBuffer.Buffer;
     }
 
     internal void Start()
