@@ -58,8 +58,9 @@
                 <MenuItem Header="-"/>
                 <MenuItem Header="Settings" HotKey="Cmd+," InputGesture="Cmd+," Command="{Binding ShowPreferencesViewCommand}"/>
                 <MenuItem Header="-"/>
-                <MenuItem Header="Record Audio..." Command="{Binding StartAudioRecordingCommand}" IsEnabled="{Binding !IsRecordingAudio}"/>
-                <MenuItem Header="Stop Audio Recording" Command="{Binding StopAudioRecordingCommand}" IsEnabled="{Binding IsRecordingAudio}"/>
+                <MenuItem Header="Record Audio..." Command="{Binding StartAudioRecordingCommand}" IsEnabled="{Binding !IsRecording}"/>
+                <MenuItem Header="Record Video..." Command="{Binding StartVideoRecordingCommand}" IsEnabled="{Binding !IsRecording}"/>
+                <MenuItem Header="Stop Recording" Command="{Binding StopRecordingCommand}" IsEnabled="{Binding IsRecording}"/>
                 <MenuItem Header="-"/>
                 <MenuItem Header="Exit" HotKey="Cmd+Q" InputGesture="Cmd+Q"/>
             </MenuItem>

@@ -11,7 +11,7 @@ using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.Storage;
 using OldBit.Spectron.Emulation.Tape;
-using OldBit.Spectron.Helpers;
+using OldBit.Spectron.Keyboard;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Recorder;
 
@@ -181,11 +181,10 @@ partial class MainWindowViewModel
 
             if (file != null && Emulator != null)
             {
-                _audioRecorder?.Dispose();
                 _audioRecorder = new AudioRecorder(Emulator.AudioManager, file.Path.LocalPath, _logger);
                 _audioRecorder.Start();
 
-                IsRecordingAudio = true;
+                IsRecording = true;
             }
         }
         catch (Exception ex)
@@ -201,12 +200,51 @@ partial class MainWindowViewModel
         }
     }
 
-    private void HandleStopAudioRecording()
+    private async Task HandleStartVideoRecordingAsync()
     {
-        IsRecordingAudio = false;
+        var shouldResume = !IsPaused;
 
-        _audioRecorder?.Stop();
-        _audioRecorder = null;
+        try
+        {
+            Pause();
+
+            var file = await FileDialogs.SaveVideoFileAsync();
+
+            if (file != null && Emulator != null)
+            {
+                _videoRecorder = new VideoRecorder(file.Path.LocalPath, _logger);
+
+                IsRecording = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            await MessageDialogs.Error(ex.Message);
+        }
+        finally
+        {
+            if (shouldResume)
+            {
+                Resume();
+            }
+        }
+    }
+
+    private void HandleStopRecording()
+    {
+        IsRecording = false;
+
+        if (_audioRecorder != null)
+        {
+            _audioRecorder.Stop();
+            _audioRecorder = null;
+        }
+
+        if (_videoRecorder != null)
+        {
+            _videoRecorder.StartProcessing();
+            // TODO: Wait for completed event and dispose recorder
+        }
     }
 
     private void HandleChangeBorderSize(BorderSize borderSize)

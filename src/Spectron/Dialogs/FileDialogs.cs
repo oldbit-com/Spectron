@@ -109,4 +109,23 @@ public static class FileDialogs
             FileTypeChoices = [FileTypes.Wav],
         });
     }
+
+    public static async Task<IStorageFile?> SaveVideoFileAsync(string? suggestedFileName = null)
+    {
+        var topLevel = TopLevel.GetTopLevel(MainWindow);
+
+        if (topLevel == null)
+        {
+            return null;
+        }
+
+        return await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Save Video File",
+            DefaultExtension = ".mp4",
+            SuggestedFileName = suggestedFileName,
+            ShowOverwritePrompt = true,
+            FileTypeChoices = [FileTypes.Mp4],
+        });
+    }
 }

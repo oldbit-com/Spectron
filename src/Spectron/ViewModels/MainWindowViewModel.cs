@@ -22,12 +22,12 @@ using OldBit.Spectron.Emulation.Storage;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Emulation.Tape.Loader;
 using OldBit.Spectron.Extensions;
-using OldBit.Spectron.Helpers;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.Files.Szx;
 using OldBit.Spectron.Recorder;
+using OldBit.Spectron.Screen;
 using OldBit.Spectron.Theming;
 using ReactiveUI;
 using Timer = System.Timers.Timer;
@@ -57,10 +57,12 @@ public partial class MainWindowViewModel : ReactiveObject
     private readonly Stopwatch _renderStopwatch = new();
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
     private AudioRecorder? _audioRecorder;
+    private VideoRecorder? _videoRecorder;
 
     public Emulator? Emulator { get; private set; }
     public Control ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }
+
     public StatusBarViewModel StatusBar { get; } = new();
     public TapeMenuViewModel TapeMenuViewModel { get; }
     public RecentFilesViewModel RecentFilesViewModel { get; }
@@ -74,7 +76,8 @@ public partial class MainWindowViewModel : ReactiveObject
     public ReactiveCommand<Unit, Task> LoadFileCommand { get; private set; }
     public ReactiveCommand<Unit, Task> SaveFileCommand { get; private set; }
     public ReactiveCommand<Unit, Task> StartAudioRecordingCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> StopAudioRecordingCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> StartVideoRecordingCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> StopRecordingCommand { get; private set; }
 
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     public ReactiveCommand<RomType, Unit> ChangeRomCommand { get; private set; }
@@ -156,7 +159,8 @@ public partial class MainWindowViewModel : ReactiveObject
         LoadFileCommand = ReactiveCommand.Create(HandleLoadFileAsync);
         SaveFileCommand = ReactiveCommand.Create(HandleSaveFileAsync, emulatorNotNull);
         StartAudioRecordingCommand = ReactiveCommand.Create(HandleStartAudioRecordingAsync);
-        StopAudioRecordingCommand = ReactiveCommand.Create(HandleStopAudioRecording);
+        StartVideoRecordingCommand = ReactiveCommand.Create(HandleStartVideoRecordingAsync);
+        StopRecordingCommand = ReactiveCommand.Create(HandleStopRecording);
 
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
         ChangeRomCommand = ReactiveCommand.Create<RomType>(HandleChangeRom);
@@ -288,7 +292,7 @@ public partial class MainWindowViewModel : ReactiveObject
         Interlocked.Exchange(ref _frameCount, 0);
     }
 
-    private void EmulatorOnRenderScreen(FrameBuffer framebuffer)
+    private void EmulatorOnRenderScreen(FrameBuffer frameBuffer)
     {
         // Keep max 50 FPS
         if (_renderStopwatch.Elapsed - _lastScreenRender < TimeSpan.FromMilliseconds(19))
@@ -301,9 +305,12 @@ public partial class MainWindowViewModel : ReactiveObject
 
         Dispatcher.UIThread.Post(() =>
         {
-            _frameBufferConverter.UpdateBitmap(framebuffer);
+            _frameBufferConverter.UpdateBitmap(frameBuffer);
+
             ScreenControl.InvalidateVisual();
         });
+
+        _videoRecorder?.AppendFrame(frameBuffer);
     }
 
     private async Task WindowOpenedAsync()

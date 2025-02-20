@@ -3,7 +3,7 @@ using Avalonia.Input;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 
-namespace OldBit.Spectron.Helpers;
+namespace OldBit.Spectron.Keyboard;
 
 public static class KeyMappings
 {

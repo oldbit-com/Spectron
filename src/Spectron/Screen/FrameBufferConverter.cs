@@ -5,7 +5,7 @@ using Avalonia.Platform;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Models;
 
-namespace OldBit.Spectron.Helpers;
+namespace OldBit.Spectron.Screen;
 
 internal record struct Border(int Top, int Left, int Right, int Bottom);
 
@@ -51,14 +51,16 @@ internal sealed class FrameBufferConverter : IDisposable
             for (var frameBufferCol = startFrameBufferCol; frameBufferCol <= endFrameBufferCol; frameBufferCol++)
             {
                 var pixelIndex = rowOffset + frameBufferCol;
-                var color = frameBuffer.Pixels[pixelIndex].Abgr;
 
                 // Duplicate pixels horizontally
                 for (var x = 0; x < _zoomX; x++)
                 {
                     unsafe
                     {
-                        *(int*)targetAddress = color;
+                        fixed (Color* color = &frameBuffer.Pixels[pixelIndex])
+                        {
+                            *(uint*)targetAddress = *(uint*)color;
+                        }
                     }
 
                     targetAddress += 4;
@@ -67,6 +69,7 @@ internal sealed class FrameBufferConverter : IDisposable
 
             // Duplicate previous line vertically based on zoom factor
             var previousLine = targetAddress - lockedBitmap.RowBytes;
+
             for (var y = 0; y < _zoomY - 1; y++)
             {
                 unsafe

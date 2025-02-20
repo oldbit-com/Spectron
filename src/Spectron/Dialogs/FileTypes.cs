@@ -48,4 +48,9 @@ public static class FileTypes
     {
         Patterns = ["*.wav"]
     };
+
+    public static FilePickerFileType Mp4 { get; } = new("MP4 Video")
+    {
+        Patterns = ["*.mp4"]
+    };
 }

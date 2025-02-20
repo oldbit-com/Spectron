@@ -41,8 +41,8 @@ public class UlaPlusTests
         var inkColor = ulaPlus.GetInkColor(attribute);
         var paperColor = ulaPlus.GetPaperColor(attribute);
 
-        inkColor.Abgr.ShouldBe((int)expectedInkArgb);
-        paperColor.Abgr.ShouldBe((int)expectedPaperArgb);
+        inkColor.Abgr.ShouldBe(expectedInkArgb);
+        paperColor.Abgr.ShouldBe(expectedPaperArgb);
     }
 
     [Fact]
