@@ -1,5 +1,6 @@
 using System.IO.Compression;
 using System.Runtime.InteropServices;
+using FFMpegCore;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation.Screen;
 
@@ -45,6 +46,21 @@ public class VideoRecorder : IDisposable
         }
     }
 
+    public static bool VerifyRequiredDependencies()
+    {
+        try
+        {
+            var options = new FFOptions();
+            FFMpegCore.Helpers.FFMpegHelper.VerifyFFMpegExists(options);
+
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     private void StopRecorder()
     {
         _stream?.Flush();
@@ -59,13 +75,17 @@ public class VideoRecorder : IDisposable
         _videoGenerator = null;
     }
 
-    public Task StartProcessing()
+    public void StartProcessing(Action completionCallback)
     {
         StopRecorder();
 
         _videoGenerator = new VideoGenerator(_filePath, _rawRecordingFilePath, _logger);
+        _videoGenerator.Generate(() =>
+        {
+            _videoGenerator.Dispose();
 
-        return _videoGenerator.Generate();
+            completionCallback();
+        });
     }
 
     public void Dispose()

@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Avalonia.Input;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Joystick;
@@ -184,7 +185,7 @@ partial class MainWindowViewModel
                 _audioRecorder = new AudioRecorder(Emulator.AudioManager, file.Path.LocalPath, _logger);
                 _audioRecorder.Start();
 
-                IsRecording = true;
+                RecordingStatus = RecordingStatus.Recording;
             }
         }
         catch (Exception ex)
@@ -204,6 +205,13 @@ partial class MainWindowViewModel
     {
         var shouldResume = !IsPaused;
 
+        if (!VideoRecorder.VerifyRequiredDependencies())
+        {
+            await MessageDialogs.Error("Video recording is not available. It requires FFmpeg to be installed. Please check the documentation for more information.");
+
+            return;
+        }
+
         try
         {
             Pause();
@@ -214,7 +222,7 @@ partial class MainWindowViewModel
             {
                 _videoRecorder = new VideoRecorder(file.Path.LocalPath, _logger);
 
-                IsRecording = true;
+                RecordingStatus = RecordingStatus.Recording;
             }
         }
         catch (Exception ex)
@@ -232,7 +240,7 @@ partial class MainWindowViewModel
 
     private void HandleStopRecording()
     {
-        IsRecording = false;
+        RecordingStatus = RecordingStatus.None;
 
         if (_audioRecorder != null)
         {
@@ -242,8 +250,12 @@ partial class MainWindowViewModel
 
         if (_videoRecorder != null)
         {
-            _videoRecorder.StartProcessing();
-            // TODO: Wait for completed event and dispose recorder
+            RecordingStatus = RecordingStatus.Processing;
+
+            _videoRecorder.StartProcessing(() =>
+            {
+                Dispatcher.UIThread.InvokeAsync(() => RecordingStatus = RecordingStatus.None);
+            });
         }
     }
 

@@ -37,12 +37,10 @@ public sealed class VideoGenerator : IDisposable
             SKAlphaType.Unpremul);
     }
 
-    public Task Generate()
-    {
-        return Task.Factory.StartNew(GenerateFile);
-    }
+    public void Generate(Action completionCallback) => Task.Factory.StartNew(
+        () => GenerateThread(completionCallback));
 
-    private void GenerateFile()
+    private void GenerateThread(Action completionCallback)
     {
         DirectoryInfo? tempWorkingDir = null;
 
@@ -60,12 +58,13 @@ public sealed class VideoGenerator : IDisposable
         finally
         {
             TryDeleteTempFolder(tempWorkingDir);
+            completionCallback();
         }
     }
 
     private void RawFileToImages(string tempWorkingDir)
     {
-        var counter = 1;
+        var index = 1;
 
         var rawRecodingFile = File.OpenRead(_rawRecordingFilePath);
         using var rawFileStream = new BrotliStream(rawRecodingFile, CompressionMode.Decompress);
@@ -87,9 +86,9 @@ public sealed class VideoGenerator : IDisposable
                 }
             }
 
-            SaveImage(tempWorkingDir, counter);
+            SaveImage(tempWorkingDir, index);
 
-            counter += 1;
+            index += 1;
         }
 
         rawFileStream.Close();
@@ -97,13 +96,13 @@ public sealed class VideoGenerator : IDisposable
         TryDeleteRawRecordingFile();
     }
 
-    private void SaveImage(string tempWorkingDir, int counter)
+    private void SaveImage(string tempWorkingDir, int index)
     {
         // TODO: Cropping and scaling
         using var image = SKImage.FromBitmap(_bitmap);
         using var png = image.Encode(SKEncodedImageFormat.Png, 100);
 
-        var fileName = Path.Combine(tempWorkingDir, $"{FileNamePrefix}{counter}.png");
+        var fileName = Path.Combine(tempWorkingDir, $"{FileNamePrefix}{index}.png");
         using var imageStream = File.OpenWrite(fileName);
 
         png.SaveTo(imageStream);

@@ -151,6 +151,9 @@ public partial class MainWindowViewModel : ReactiveObject
         this.WhenAny(x => x.IsTimeMachineEnabled, x => x.Value)
             .Subscribe(x => _timeMachine.IsEnabled = x);
 
+        this.WhenAny(x => x.RecordingStatus, x => x.Value)
+            .Subscribe(status => StatusBar.RecordingStatus = status);
+
         WindowOpenedCommand = ReactiveCommand.CreateFromTask(WindowOpenedAsync);
         WindowClosingCommand = ReactiveCommand.CreateFromTask(WindowClosingAsync);
         KeyDownCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyDown);

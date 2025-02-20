@@ -116,10 +116,10 @@ partial class MainWindowViewModel
         set => this.RaiseAndSetIfChanged(ref _title, value);
     }
 
-    private bool _isRecording;
-    public bool IsRecording
+    private RecordingStatus _recordingStatus = RecordingStatus.None;
+    public RecordingStatus RecordingStatus
     {
-        get => _isRecording;
-        set => this.RaiseAndSetIfChanged(ref _isRecording, value);
+        get => _recordingStatus;
+        set => this.RaiseAndSetIfChanged(ref _recordingStatus, value);
     }
 }

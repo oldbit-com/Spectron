@@ -11,7 +11,47 @@
         <viewModels:StatusBarViewModel/>
     </Design.DataContext>
 
-    <Grid>
-        <TextBlock VerticalAlignment="Center"  Text="{Binding FramesPerSecond}" />
+    <UserControl.Styles>
+        <Style Selector="Path.Animate">
+            <Style.Animations>
+                <Animation Duration="0:0:1" IterationCount="INFINITE" PlaybackDirection="AlternateReverse">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="1"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="0"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid ColumnDefinitions="*,*" Margin="5 0 5 0">
+        <StackPanel
+            Grid.Column="0"
+            Orientation="Horizontal"
+            IsVisible="{Binding !!RecordingStatus}">
+            <Path
+                Classes="Animate"
+                Data="M 50, 10 a 40,40 0 1,0 0,80 a 40,40 0 1,0 0,-80"
+                Fill="Red"
+                Height="12"
+                Width="12"
+                Margin="0 0 5 0"
+                Stretch="UniformToFill"/>
+            <TextBlock
+                Text="{Binding Message}"
+                VerticalAlignment="Center"/>
+            <TextBlock
+                Margin="5 0 0 0"
+                Text="{Binding TimeElapsed}"
+                VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <TextBlock
+            Grid.Column="1"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Right"
+            Text="{Binding FramesPerSecond}"/>
     </Grid>
 </UserControl>

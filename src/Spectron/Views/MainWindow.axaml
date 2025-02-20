@@ -58,9 +58,9 @@
                 <MenuItem Header="-"/>
                 <MenuItem Header="Settings" HotKey="Cmd+," InputGesture="Cmd+," Command="{Binding ShowPreferencesViewCommand}"/>
                 <MenuItem Header="-"/>
-                <MenuItem Header="Record Audio..." Command="{Binding StartAudioRecordingCommand}" IsEnabled="{Binding !IsRecording}"/>
-                <MenuItem Header="Record Video..." Command="{Binding StartVideoRecordingCommand}" IsEnabled="{Binding !IsRecording}"/>
-                <MenuItem Header="Stop Recording" Command="{Binding StopRecordingCommand}" IsEnabled="{Binding IsRecording}"/>
+                <MenuItem Header="Record Audio..." Command="{Binding StartAudioRecordingCommand}" IsEnabled="{Binding !RecordingStatus}"/>
+                <MenuItem Header="Record Video..." Command="{Binding StartVideoRecordingCommand}" IsEnabled="{Binding !RecordingStatus}"/>
+                <MenuItem Header="Stop Recording" Command="{Binding StopRecordingCommand}" IsEnabled="{Binding !!RecordingStatus}"/>
                 <MenuItem Header="-"/>
                 <MenuItem Header="Exit" HotKey="Cmd+Q" InputGesture="Cmd+Q"/>
             </MenuItem>
@@ -180,7 +180,11 @@
                 </Grid>
             </Border>
 
-            <controls:StatusBar Grid.Row="1" Height="30" DataContext="{Binding StatusBar}" IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}"/>
+            <controls:StatusBar
+                Grid.Row="1"
+                Height="30"
+                DataContext="{Binding StatusBar}"
+                IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}"/>
         </Grid>
     </DockPanel>
 </Window>
