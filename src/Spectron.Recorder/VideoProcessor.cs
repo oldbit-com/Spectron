@@ -3,29 +3,28 @@ using System.Runtime.InteropServices;
 using FFMpegCore;
 using FFMpegCore.Arguments;
 using FFMpegCore.Enums;
-using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation.Screen;
 using SkiaSharp;
 
 namespace OldBit.Spectron.Recorder;
 
-public sealed class VideoGenerator : IDisposable
+internal sealed class VideoProcessor : IDisposable
 {
     private const string FileNamePrefix = "frame_";
     private const string TempDirPrefix = "spectron-";
 
     private readonly string _outputFilePath;
     private readonly string _rawRecordingFilePath;
-    private readonly ILogger _logger;
+    private readonly string _audioFilePath;
     private readonly int _frameSizeInBytes;
     private readonly byte[] _frameBuffer;
     private readonly SKBitmap _bitmap;
 
-    public VideoGenerator(string outputFilePath, string rawRecordingFilePath, ILogger logger)
+    public VideoProcessor(string outputFilePath, string rawRecordingFilePath, string audioFilePath)
     {
         _outputFilePath = outputFilePath;
         _rawRecordingFilePath = rawRecordingFilePath;
-        _logger = logger;
+        _audioFilePath = audioFilePath;
         _frameSizeInBytes = Marshal.SizeOf<Color>() * FrameBuffer.Width * FrameBuffer.Height;
 
         _frameBuffer = new byte[_frameSizeInBytes];
@@ -37,10 +36,7 @@ public sealed class VideoGenerator : IDisposable
             SKAlphaType.Unpremul);
     }
 
-    public void Generate(Action completionCallback) => Task.Factory.StartNew(
-        () => GenerateThread(completionCallback));
-
-    private void GenerateThread(Action completionCallback)
+    internal void Process()
     {
         DirectoryInfo? tempWorkingDir = null;
 
@@ -51,14 +47,10 @@ public sealed class VideoGenerator : IDisposable
             RawFileToImages(tempWorkingDir.FullName);
             ConvertImagesToVideo(tempWorkingDir.FullName);
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error generating video");
-        }
         finally
         {
-            TryDeleteTempFolder(tempWorkingDir);
-            completionCallback();
+            FileHelper.TryDeleteFolder(tempWorkingDir);
+            FileHelper.TryDeleteFile(_audioFilePath);
         }
     }
 
@@ -93,7 +85,7 @@ public sealed class VideoGenerator : IDisposable
 
         rawFileStream.Close();
 
-        TryDeleteRawRecordingFile();
+        FileHelper.TryDeleteFile(_rawRecordingFilePath);
     }
 
     private void SaveImage(string tempWorkingDir, int index)
@@ -109,42 +101,15 @@ public sealed class VideoGenerator : IDisposable
         imageStream.Close();
     }
 
-    private void TryDeleteRawRecordingFile()
-    {
-        try
-        {
-            File.Delete(_rawRecordingFilePath);
-        }
-        catch(Exception ex)
-        {
-            _logger.LogError(ex, "Error deleting raw recording file: {File}", _rawRecordingFilePath);
-        }
-    }
-
-    private void TryDeleteTempFolder(DirectoryInfo? directory)
-    {
-        if (directory == null)
-        {
-            return;
-        }
-
-        try
-        {
-            directory.Delete(true);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error deleting temp folder: {Folder}", directory.FullName);;
-        }
-    }
-
     private void ConvertImagesToVideo(string tempWorkingDir)
     {
         FFMpegArguments
             .FromFileInput(Path.Combine(tempWorkingDir, $"{FileNamePrefix}%d.png"), false, options => options
                 .WithArgument(new CustomArgument("-framerate 50")))
+                .AddFileInput(_audioFilePath)
             .OutputToFile(_outputFilePath, true, options => options
                 .WithVideoCodec(VideoCodec.LibX264)
+                .WithAudioCodec(AudioCodec.Aac)
                 .ForcePixelFormat("yuv420p")
                 .WithFramerate(50))
             .ProcessSynchronously();

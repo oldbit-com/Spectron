@@ -6,29 +6,14 @@ using OldBit.Spectron.Emulation.Screen;
 
 namespace OldBit.Spectron.Recorder;
 
-public class VideoRecorder : IDisposable
+internal class VideoRecorder(string filePath) : IDisposable
 {
-    private readonly string _filePath;
-    private readonly ILogger _logger;
-    private readonly int _frameSizeInBytes;
-    private readonly string _rawRecordingFilePath;
+    private readonly int _frameSizeInBytes = Marshal.SizeOf<Color>() * FrameBuffer.Width * FrameBuffer.Height;
 
     private Stream? _stream;
-    private VideoGenerator? _videoGenerator;
+    private VideoProcessor? _videoGenerator;
 
-    public VideoRecorder(string filePath, ILogger logger)
-    {
-        _filePath = filePath;
-        _logger = logger;
-        _frameSizeInBytes = Marshal.SizeOf<Color>() * FrameBuffer.Width * FrameBuffer.Height;
-
-        _rawRecordingFilePath = $"{filePath}.raw";
-
-        var file = File.OpenWrite(_rawRecordingFilePath);
-        _stream = new BrotliStream(file, CompressionLevel.Fastest);
-    }
-
-    public void AppendFrame(FrameBuffer frameBuffer)
+    internal void AppendFrame(FrameBuffer frameBuffer)
     {
         if (_stream == null)
         {
@@ -46,22 +31,13 @@ public class VideoRecorder : IDisposable
         }
     }
 
-    public static bool VerifyRequiredDependencies()
+    internal void Start()
     {
-        try
-        {
-            var options = new FFOptions();
-            FFMpegCore.Helpers.FFMpegHelper.VerifyFFMpegExists(options);
-
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
+        var file = File.OpenWrite(filePath);
+        _stream = new BrotliStream(file, CompressionLevel.Fastest);
     }
 
-    private void StopRecorder()
+    internal void Stop()
     {
         _stream?.Flush();
         _stream?.Close();
@@ -75,24 +51,11 @@ public class VideoRecorder : IDisposable
         _videoGenerator = null;
     }
 
-    public void StartProcessing(Action completionCallback)
-    {
-        StopRecorder();
-
-        _videoGenerator = new VideoGenerator(_filePath, _rawRecordingFilePath, _logger);
-        _videoGenerator.Generate(() =>
-        {
-            _videoGenerator.Dispose();
-
-            completionCallback();
-        });
-    }
-
     public void Dispose()
     {
         GC.SuppressFinalize(this);
 
-        StopRecorder();
+        Stop();
         StopGenerator();
     }
 }

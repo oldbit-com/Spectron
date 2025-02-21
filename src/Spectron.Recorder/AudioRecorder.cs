@@ -1,38 +1,32 @@
-using Microsoft.Extensions.Logging;
-using OldBit.Spectron.Emulation.Devices.Audio;
+using System.IO.Compression;
 
 namespace OldBit.Spectron.Recorder;
 
-public sealed class AudioRecorder(StereoMode stereoMode, string filePath, ILogger logger) : IDisposable
+internal sealed class AudioRecorder(string filePath) : IDisposable
 {
-    private WaveFileWriter? _writer;
+    private Stream? _stream;
 
-    public void AppendFrame(IEnumerable<byte> audioData)
+    internal void AppendFrame(IEnumerable<byte> audioData)
     {
-        try
+        foreach (var data in audioData)
         {
-            _writer?.Write(audioData);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to write audio data to file");
-
-            Stop();
+            _stream?.WriteByte(data);
         }
     }
 
-    public void Start()
+    internal void Start()
     {
-        _writer = new WaveFileWriter(
-            filePath,
-            AudioManager.PlayerSampleRate,
-            stereoMode == StereoMode.None ? 1 : 2);
+        var file = File.OpenWrite(filePath);
+
+        _stream = new GZipStream(file, CompressionLevel.Fastest);
     }
 
-    public void Stop()
+    internal void Stop()
     {
-        _writer?.Close();
-        _writer = null;
+        _stream?.Flush();
+        _stream?.Close();
+
+        _stream = null;
     }
 
     public void Dispose() => Stop();

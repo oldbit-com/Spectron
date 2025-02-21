@@ -182,8 +182,13 @@ partial class MainWindowViewModel
 
             if (file != null && Emulator != null)
             {
-                _audioRecorder = new AudioRecorder(Emulator.AudioManager.StereoMode, file.Path.LocalPath, _logger);
-                _audioRecorder.Start();
+                _audioVideoRecorder = new AudioVideoRecorder(
+                    RecorderMode.Audio,
+                    file.Path.LocalPath,
+                    Emulator.AudioManager.StereoMode,
+                    _logger);
+
+                _audioVideoRecorder.Start();
 
                 RecordingStatus = RecordingStatus.Recording;
             }
@@ -205,7 +210,7 @@ partial class MainWindowViewModel
     {
         var shouldResume = !IsPaused;
 
-        if (!VideoRecorder.VerifyRequiredDependencies())
+        if (!AudioVideoRecorder.VerifyVideoRecordingRequirements())
         {
             await MessageDialogs.Error("Video recording is not available. It requires FFmpeg to be installed. Please check the documentation for more information.");
 
@@ -220,7 +225,13 @@ partial class MainWindowViewModel
 
             if (file != null && Emulator != null)
             {
-                _videoRecorder = new VideoRecorder(file.Path.LocalPath, _logger);
+                _audioVideoRecorder = new AudioVideoRecorder(
+                    RecorderMode.AudioVideo,
+                    file.Path.LocalPath,
+                    Emulator.AudioManager.StereoMode,
+                    _logger);
+
+                _audioVideoRecorder.Start();
 
                 RecordingStatus = RecordingStatus.Recording;
             }
@@ -242,21 +253,20 @@ partial class MainWindowViewModel
     {
         RecordingStatus = RecordingStatus.None;
 
-        if (_audioRecorder != null)
+        if (_audioVideoRecorder == null)
         {
-            _audioRecorder.Stop();
-            _audioRecorder = null;
+            return;
         }
 
-        if (_videoRecorder != null)
-        {
-            RecordingStatus = RecordingStatus.Processing;
+        RecordingStatus = RecordingStatus.Processing;
 
-            _videoRecorder.StartProcessing(() =>
-            {
-                Dispatcher.UIThread.InvokeAsync(() => RecordingStatus = RecordingStatus.None);
-            });
-        }
+        _audioVideoRecorder.StartProcess(isSuccess =>
+        {
+            Dispatcher.UIThread.InvokeAsync(() => RecordingStatus = RecordingStatus.None);
+
+            _audioVideoRecorder.Dispose();
+            _audioVideoRecorder = null;
+        });
     }
 
     private void HandleChangeBorderSize(BorderSize borderSize)

@@ -34,7 +34,7 @@ internal sealed class WaveFileWriter : IDisposable
 
         while (true)
         {
-            short value = 0;
+            short value;
 
             if (iterator.MoveNext())
             {
@@ -56,17 +56,11 @@ internal sealed class WaveFileWriter : IDisposable
 
             _writer.Write(value);
 
-            _dataSize += 1;
+            _dataSize += 2;
         }
     }
 
-    internal void Close()
-    {
-        UpdateHeader();
-
-        _writer.Flush();
-        _writer.Close();
-    }
+    internal void Close() => _writer.Close();
 
     private void WriteHeader()
     {
@@ -93,7 +87,7 @@ internal sealed class WaveFileWriter : IDisposable
         _writer.Write(0);
     }
 
-    private void UpdateHeader()
+    internal void UpdateHeader()
     {
         _fileStream.Seek(4, SeekOrigin.Begin);
         _writer.Write(36 + _dataSize);

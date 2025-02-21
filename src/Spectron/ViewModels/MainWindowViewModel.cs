@@ -57,8 +57,7 @@ public partial class MainWindowViewModel : ReactiveObject
     private int _frameCount;
     private readonly Stopwatch _renderStopwatch = new();
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
-    private AudioRecorder? _audioRecorder;
-    private VideoRecorder? _videoRecorder;
+    private AudioVideoRecorder? _audioVideoRecorder;
 
     public Emulator? Emulator { get; private set; }
     public Control ScreenControl { get; set; } = null!;
@@ -314,8 +313,7 @@ public partial class MainWindowViewModel : ReactiveObject
             ScreenControl.InvalidateVisual();
         });
 
-        _audioRecorder?.AppendFrame(audioBuffer);
-        _videoRecorder?.AppendFrame(frameBuffer);
+        _audioVideoRecorder?.AppendFrame(frameBuffer, audioBuffer);
     }
 
     private async Task WindowOpenedAsync()
