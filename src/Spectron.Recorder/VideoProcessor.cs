@@ -1,5 +1,6 @@
 using System.IO.Compression;
 using System.Runtime.InteropServices;
+using Avalonia.Media.Imaging;
 using FFMpegCore;
 using FFMpegCore.Arguments;
 using FFMpegCore.Enums;
@@ -78,7 +79,13 @@ internal sealed class VideoProcessor : IDisposable
                 }
             }
 
-            SaveImage(tempWorkingDir, index);
+            // var size = new SKImageInfo(4 * FrameBuffer.Width, 4 * FrameBuffer.Height);
+            // var options = new SKSamplingOptions(SKFilterMode.Nearest);
+            // using var resized = _bitmap.Resize(size, options);
+            //
+            // SaveImage(resized, tempWorkingDir, index);
+
+            SaveImage(_bitmap, tempWorkingDir, index);
 
             index += 1;
         }
@@ -88,10 +95,9 @@ internal sealed class VideoProcessor : IDisposable
         FileHelper.TryDeleteFile(_rawRecordingFilePath);
     }
 
-    private void SaveImage(string tempWorkingDir, int index)
+    private static void SaveImage(SKBitmap bitmap, string tempWorkingDir, int index)
     {
-        // TODO: Cropping and scaling
-        using var image = SKImage.FromBitmap(_bitmap);
+        using var image = SKImage.FromBitmap(bitmap);
         using var png = image.Encode(SKEncodedImageFormat.Png, 100);
 
         var fileName = Path.Combine(tempWorkingDir, $"{FileNamePrefix}{index}.png");
@@ -103,11 +109,17 @@ internal sealed class VideoProcessor : IDisposable
 
     private void ConvertImagesToVideo(string tempWorkingDir)
     {
+        var pattern = Path.Combine(tempWorkingDir, $"{FileNamePrefix}%d.png");
+        var width = FrameBuffer.Width - 46;
+        var height = FrameBuffer.Height - 70;
+
         FFMpegArguments
-            .FromFileInput(Path.Combine(tempWorkingDir, $"{FileNamePrefix}%d.png"), false, options => options
+            .FromFileInput(pattern, verifyExists: false, options => options
                 .WithArgument(new CustomArgument("-framerate 50")))
                 .AddFileInput(_audioFilePath)
             .OutputToFile(_outputFilePath, true, options => options
+                .WithArgument(new CustomArgument($"-vf crop={width}:{height}:23:35,scale=1920:-1"))
+                .WithArgument(new CustomArgument($"-sws_flags neighbor"))
                 .WithVideoCodec(VideoCodec.LibX264)
                 .WithAudioCodec(AudioCodec.Aac)
                 .ForcePixelFormat("yuv420p")

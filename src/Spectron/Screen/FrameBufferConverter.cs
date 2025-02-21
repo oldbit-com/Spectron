@@ -34,6 +34,7 @@ internal sealed class FrameBufferConverter : IDisposable
 
         Bitmap = CreateBitmap();
     }
+
     internal void UpdateBitmap(FrameBuffer frameBuffer)
     {
         var startFrameBufferRow = BorderFull.Top - _border.Top;
