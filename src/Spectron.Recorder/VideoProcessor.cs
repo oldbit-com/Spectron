@@ -1,9 +1,9 @@
 using System.IO.Compression;
 using System.Runtime.InteropServices;
-using Avalonia.Media.Imaging;
 using FFMpegCore;
 using FFMpegCore.Arguments;
 using FFMpegCore.Enums;
+using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Screen;
 using SkiaSharp;
 
@@ -14,6 +14,7 @@ internal sealed class VideoProcessor : IDisposable
     private const string FileNamePrefix = "frame_";
     private const string TempDirPrefix = "spectron-";
 
+    private readonly StereoMode _stereoMode;
     private readonly string _outputFilePath;
     private readonly string _rawRecordingFilePath;
     private readonly string _audioFilePath;
@@ -21,8 +22,9 @@ internal sealed class VideoProcessor : IDisposable
     private readonly byte[] _frameBuffer;
     private readonly SKBitmap _bitmap;
 
-    public VideoProcessor(string outputFilePath, string rawRecordingFilePath, string audioFilePath)
+    public VideoProcessor(StereoMode stereoMode, string outputFilePath, string rawRecordingFilePath, string audioFilePath)
     {
+        _stereoMode = stereoMode;
         _outputFilePath = outputFilePath;
         _rawRecordingFilePath = rawRecordingFilePath;
         _audioFilePath = audioFilePath;
@@ -51,7 +53,6 @@ internal sealed class VideoProcessor : IDisposable
         finally
         {
             FileHelper.TryDeleteFolder(tempWorkingDir);
-            FileHelper.TryDeleteFile(_audioFilePath);
         }
     }
 
@@ -79,20 +80,12 @@ internal sealed class VideoProcessor : IDisposable
                 }
             }
 
-            // var size = new SKImageInfo(4 * FrameBuffer.Width, 4 * FrameBuffer.Height);
-            // var options = new SKSamplingOptions(SKFilterMode.Nearest);
-            // using var resized = _bitmap.Resize(size, options);
-            //
-            // SaveImage(resized, tempWorkingDir, index);
-
             SaveImage(_bitmap, tempWorkingDir, index);
 
             index += 1;
         }
 
         rawFileStream.Close();
-
-        FileHelper.TryDeleteFile(_rawRecordingFilePath);
     }
 
     private static void SaveImage(SKBitmap bitmap, string tempWorkingDir, int index)
@@ -112,14 +105,17 @@ internal sealed class VideoProcessor : IDisposable
         var pattern = Path.Combine(tempWorkingDir, $"{FileNamePrefix}%d.png");
         var width = FrameBuffer.Width - 46;
         var height = FrameBuffer.Height - 70;
+        var channels = _stereoMode == StereoMode.None ? 1 : 2;
 
         FFMpegArguments
             .FromFileInput(pattern, verifyExists: false, options => options
                 .WithArgument(new CustomArgument("-framerate 50")))
-                .AddFileInput(_audioFilePath)
+            .AddFileInput(_audioFilePath, verifyExists: false, options => options
+                .WithArgument(new CustomArgument("-c:a pcm_s16le"))
+                .WithArgument(new CustomArgument($"-ac {channels}")))
             .OutputToFile(_outputFilePath, true, options => options
                 .WithArgument(new CustomArgument($"-vf crop={width}:{height}:23:35,scale=1920:-1"))
-                .WithArgument(new CustomArgument($"-sws_flags neighbor"))
+                .WithArgument(new CustomArgument("-sws_flags neighbor")) // experimental is ok too
                 .WithVideoCodec(VideoCodec.LibX264)
                 .WithAudioCodec(AudioCodec.Aac)
                 .ForcePixelFormat("yuv420p")

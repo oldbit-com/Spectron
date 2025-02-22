@@ -32,7 +32,5 @@ internal class AudioProcessor(StereoMode stereoMode, string outputFilePath, stri
         writer.UpdateHeader();
 
         writer.Close();
-
-        FileHelper.TryDeleteFile(rawRecordingFilePath);
     }
 }

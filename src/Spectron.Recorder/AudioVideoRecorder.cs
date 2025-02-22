@@ -7,9 +7,10 @@ namespace OldBit.Spectron.Recorder;
 
 public sealed class AudioVideoRecorder : IDisposable
 {
+    private readonly RecorderMode _recorderMode;
     private readonly string _filePath;
-    private readonly string _audioFilePath;
-    private readonly string _videoFilePath;
+    private readonly string _audioRecordedFilePath;
+    private readonly string _videoRecordedFileath;
 
     private readonly StereoMode _stereoMode;
     private readonly ILogger _logger;
@@ -24,21 +25,22 @@ public sealed class AudioVideoRecorder : IDisposable
         StereoMode stereoMode,
         ILogger logger)
     {
+        _recorderMode = recorderMode;
         _filePath = filePath;
         _stereoMode = stereoMode;
         _logger = logger;
 
-        _audioFilePath = $"{filePath}.audio.rec";
-        _videoFilePath = $"{filePath}.video.rec";
+        _audioRecordedFilePath = $"{filePath}.audio.rec";
+        _videoRecordedFileath = $"{filePath}.video.rec";
 
         if (recorderMode is RecorderMode.Audio or RecorderMode.AudioVideo)
         {
-            _audioRecorder = new AudioRecorder(_audioFilePath);
+            _audioRecorder = new AudioRecorder(_audioRecordedFilePath);
         }
 
         if (recorderMode is RecorderMode.Video or RecorderMode.AudioVideo)
         {
-            _videoRecorder = new VideoRecorder(_videoFilePath);
+            _videoRecorder = new VideoRecorder(_videoRecordedFileath);
         }
     }
 
@@ -123,8 +125,16 @@ public sealed class AudioVideoRecorder : IDisposable
 
         _audioRecorder.Stop();
 
-        var audioProcessor = new AudioProcessor(_stereoMode,  $"{_filePath}.temp.wav", _audioFilePath);
+        var tempAudioFilePath = $"{_filePath}.temp.wav";
+
+        var audioProcessor = new AudioProcessor(_stereoMode, tempAudioFilePath, _audioRecordedFilePath);
         audioProcessor.Process();
+
+        FileHelper.TryDeleteFile(_audioRecordedFilePath);
+        if (_recorderMode == RecorderMode.Audio)
+        {
+            FileHelper.TryMoveFile(tempAudioFilePath, _filePath);
+        }
     }
 
     private void ProcessVideo()
@@ -139,9 +149,12 @@ public sealed class AudioVideoRecorder : IDisposable
         var tempVideoFilePath = $"{_filePath}.temp.mp4";
         var tempAudioFilePath = $"{_filePath}.temp.wav";
 
-        var videoProcessor = new VideoProcessor(tempVideoFilePath, _videoFilePath, tempAudioFilePath);
+        var videoProcessor = new VideoProcessor(_stereoMode, tempVideoFilePath, _videoRecordedFileath, tempAudioFilePath);
         videoProcessor.Process();
 
+        FileHelper.TryDeleteFile(_audioRecordedFilePath);
+        FileHelper.TryDeleteFile(_videoRecordedFileath);
+        FileHelper.TryDeleteFile(tempAudioFilePath);
         FileHelper.TryMoveFile(tempVideoFilePath, _filePath);
     }
 
