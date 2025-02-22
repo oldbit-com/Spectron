@@ -3,11 +3,11 @@ using System.Runtime.InteropServices;
 using FFMpegCore;
 using FFMpegCore.Arguments;
 using FFMpegCore.Enums;
-using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Screen;
+using OldBit.Spectron.Recorder.Helpers;
 using SkiaSharp;
 
-namespace OldBit.Spectron.Recorder;
+namespace OldBit.Spectron.Recorder.Video;
 
 internal sealed class VideoProcessor : IDisposable
 {

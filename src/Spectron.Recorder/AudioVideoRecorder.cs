@@ -2,6 +2,9 @@ using FFMpegCore;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Screen;
+using OldBit.Spectron.Recorder.Audio;
+using OldBit.Spectron.Recorder.Helpers;
+using OldBit.Spectron.Recorder.Video;
 
 namespace OldBit.Spectron.Recorder;
 

@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Recorder;
+namespace OldBit.Spectron.Recorder.Helpers;
 
 internal static class FileHelper
 {

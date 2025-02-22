@@ -1,6 +1,6 @@
 using System.IO.Compression;
 
-namespace OldBit.Spectron.Recorder;
+namespace OldBit.Spectron.Recorder.Audio;
 
 internal sealed class AudioRecorder(string filePath) : IDisposable
 {

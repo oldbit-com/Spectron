@@ -1,7 +1,7 @@
 using System.IO.Compression;
 using OldBit.Spectron.Emulation.Devices.Audio;
 
-namespace OldBit.Spectron.Recorder;
+namespace OldBit.Spectron.Recorder.Audio;
 
 internal class AudioProcessor(RecorderOptions options, string outputFilePath, string rawRecordingFilePath)
 {

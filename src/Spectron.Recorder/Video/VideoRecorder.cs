@@ -1,10 +1,8 @@
 using System.IO.Compression;
 using System.Runtime.InteropServices;
-using FFMpegCore;
-using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation.Screen;
 
-namespace OldBit.Spectron.Recorder;
+namespace OldBit.Spectron.Recorder.Video;
 
 internal class VideoRecorder(string filePath) : IDisposable
 {
