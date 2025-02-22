@@ -185,6 +185,11 @@
                 Height="30"
                 DataContext="{Binding StatusBar}"
                 IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}"/>
+
+            <WindowNotificationManager
+                Grid.Row="0"
+                Name="NotificationManager"
+                Position="BottomRight"/>
         </Grid>
     </DockPanel>
 </Window>

@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using Avalonia.Controls;
+using Avalonia.Controls.Notifications;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
@@ -61,6 +62,7 @@ public partial class MainWindowViewModel : ReactiveObject
     public Emulator? Emulator { get; private set; }
     public Control ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }
+    public WindowNotificationManager NotificationManager { get; set; } = null!;
 
     public StatusBarViewModel StatusBar { get; } = new();
     public TapeMenuViewModel TapeMenuViewModel { get; }

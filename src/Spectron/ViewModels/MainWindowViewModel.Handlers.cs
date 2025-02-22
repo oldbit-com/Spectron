@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Avalonia.Input;
 using Avalonia.Controls;
+using Avalonia.Controls.Notifications;
 using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Dialogs;
@@ -276,7 +277,18 @@ partial class MainWindowViewModel
 
         _mediaRecorder.StartProcess(result =>
         {
-            Dispatcher.UIThread.InvokeAsync(() => RecordingStatus = RecordingStatus.None);
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                RecordingStatus = RecordingStatus.None;
+
+                NotificationManager.Show(new Notification(
+                    result.ISucccess ? "Done!" : "Error!",
+                    result.ISucccess ? "Recording has been successfully completed" : $"Recording has failed: {result.Error?.Message}",
+                    result.ISucccess ? NotificationType.Information : NotificationType.Error)
+                {
+                    Expiration = TimeSpan.FromSeconds(10)
+                });
+            });
 
             _mediaRecorder.Dispose();
             _mediaRecorder = null;

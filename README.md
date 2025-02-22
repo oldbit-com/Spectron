@@ -25,7 +25,7 @@ It uses several of my own libraries that I created for this project:
 - [x] Tape content browser
 - [x] Accurate timings, including contented memory and IO
 - [x] Floating bus support
-- [x] Multicolor screen effects in games like Uridium
+- [x] Multicolor screen effects in games and demos
 - [x] ULA+ support
 - [x] AY-3-8912 sound chip emulation
 - [x] Adjustable emulator speed
@@ -82,13 +82,13 @@ Floating bus is emulated and supported by both 48K and 128K modes. Only a handfu
 Standard beeper audio is supported, as well as AY audio (mono / stereo ABC or ACB mode).
 AY is by default enabled in 48K mode, but can be disabled in the settings..
 
-Audio playback is done using [Beep](https://github.com/oldbit-com/Beep) which I created for this 
-project since I couldn't find any simple cross-platform audio player that would suit my needs.
+Audio playback is done using [Beep](https://github.com/oldbit-com/Beep) which I created for this project since I couldn't find any simple 
+cross-platform audio player that would suit my needs.
 
 ## Joystick and Gamepad
 Joystick emulation is supported for Kempston, Sinclair, Cursor and Fuller joysticks. External gamepads and joysticks 
-are supported as well. But this has been only tested with few controllers I have. Controller buttons can be mapped to joystick or 
-keyboard keys. Standard keyboard can also be used as a joystick, arrow keys for directions and space for fire.
+are supported as well. But this has been only tested with few controllers I have. Controller buttons can be mapped to 
+joystick or keyboard keys. Standard keyboard can also be used as a joystick, arrow keys for directions and space for fire.
 
 > [!NOTE]
 > Not all controllers may work, and compatibility depends on the platform. Experimental feature.
@@ -102,24 +102,25 @@ The interval and the number of time points can be adjusted in the settings.
 ## Video and Audio recording
 
 Audio and video recording is supported in the emulator. This is experimental feature and may not work on all platforms.
+You can pause emulator during the recording, but changing emulator settings during the recording may cause
+unexpected results.
 
 ### Audio
 Audio can be recorded to a file in **WAV** format. The format is PCM 16-bit, 44100 Hz, mono or stereo depending on the 
 current AY mode. No external tools are required for audio recording.
 
-> [!NOTE]
-> Changing audio settings during the recording most likely will cause unexpected results.
-
 ### Video
-Video recording requires **FFmpeg** to be installed on the system. The format is **MP4** with H.264 codec with 50 FPS framerate. 
-All the heavy lifting is done by FFmpeg, e.g. resizing, cropping images and generating audio / video stream.
+Video recording requires **[FFmpeg](https://www.ffmpeg.org)** to be installed on your system.
 
-Video processing can take some time once recording is stopped, depending on the length of the recording. Processing happens 
-after the recording is stopped. Otherwise it would be too slow to record the audio and video in real-time.
+Video is generated as **MP4** using **H.264** codec at **50 FPS**. Some video rendering options like scaling, border size
+can be adjusted in the emulator settings. Raw frame buffer data is used internally during the recording.
+
+Processing of the recorded data starts after the recording is stopped and it can take some time. This is 
+done in a background by converting static frames to a video stream with audio, leveraging FFmpeg.
 
 ## Debugger
 Debugger is available in the emulator. It is a simple debugger that allows you to inspect the CPU registers, 
-memory and disassembly. You can step through the code, set breakpoints.
+memory and disassembly. You can step through the code, set breakpoints. This is still work in progress.
 
 ### Resources
 - ZX Spectrum Font: https://github.com/comptic/zx-spectrum-font
