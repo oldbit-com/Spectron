@@ -196,13 +196,13 @@ partial class MainWindowViewModel
 
             if (file != null && Emulator != null)
             {
-                _audioVideoRecorder = new AudioVideoRecorder(
+                _mediaRecorder = new MediaRecorder(
                     RecorderMode.Audio,
                     file.Path.LocalPath,
                     GetRecorderOptions(),
                     _logger);
 
-                _audioVideoRecorder.Start();
+                _mediaRecorder.Start();
 
                 RecordingStatus = RecordingStatus.Recording;
             }
@@ -224,7 +224,7 @@ partial class MainWindowViewModel
     {
         var shouldResume = !IsPaused;
 
-        if (!AudioVideoRecorder.VerifyVideoRecordingRequirements())
+        if (!MediaRecorder.VerifyVideoRecordingRequirements())
         {
             await MessageDialogs.Error("Video recording is not available. It requires FFmpeg to be installed. Please check the documentation for more information.");
 
@@ -239,13 +239,13 @@ partial class MainWindowViewModel
 
             if (file != null && Emulator != null)
             {
-                _audioVideoRecorder = new AudioVideoRecorder(
+                _mediaRecorder = new MediaRecorder(
                     RecorderMode.AudioVideo,
                     file.Path.LocalPath,
                     GetRecorderOptions(),
                     _logger);
 
-                _audioVideoRecorder.Start();
+                _mediaRecorder.Start();
 
                 RecordingStatus = RecordingStatus.Recording;
             }
@@ -267,19 +267,19 @@ partial class MainWindowViewModel
     {
         RecordingStatus = RecordingStatus.None;
 
-        if (_audioVideoRecorder == null)
+        if (_mediaRecorder == null)
         {
             return;
         }
 
         RecordingStatus = RecordingStatus.Processing;
 
-        _audioVideoRecorder.StartProcess(result =>
+        _mediaRecorder.StartProcess(result =>
         {
             Dispatcher.UIThread.InvokeAsync(() => RecordingStatus = RecordingStatus.None);
 
-            _audioVideoRecorder.Dispose();
-            _audioVideoRecorder = null;
+            _mediaRecorder.Dispose();
+            _mediaRecorder = null;
 
             if (!result.ISucccess)
             {
