@@ -104,24 +104,18 @@ The interval and the number of time points can be adjusted in the settings.
 Audio and video recording is supported in the emulator. This is experimental feature and may not work on all platforms.
 
 ### Audio
-Audio can be recorded to a file in **WAV** format. The format used is PCM 16-bit, 44100 Hz, mono or stereo depending on the 
-current AY mode. Since this is not compressed format, the file size can be quite large. The advantage is that it doesn't
-require any additional libraries to record it.
+Audio can be recorded to a file in **WAV** format. The format is PCM 16-bit, 44100 Hz, mono or stereo depending on the 
+current AY mode. No external tools are required for audio recording.
 
 > [!NOTE]
 > Changing audio settings during the recording most likely will cause unexpected results.
 
 ### Video
-Video recording requires **FFmpeg** to be installed on the system. It is used to encode the video in MP4 format.
-The process of recording video first saves the raw frames to a temporary compressed file, and then once recording
-is complete, encodes it to MP4 format in a background task. This way it does not affect the emulator performance,
-but you will need to keep the application running until the encoding is complete.
+Video recording requires **FFmpeg** to be installed on the system. The format is **MP4** with H.264 codec with 50 FPS framerate. 
+All the heavy lifting is done by FFmpeg, e.g. resizing, cropping images and generating audio / video stream.
 
-The frame rate is set to 50 FPS to match the ZX Spectrum screen refresh rate.
-TODO: 
-- Record audio together and merge it with the video.
-- Crop the images and resize.
-
+Video processing can take some time once recording is stopped, depending on the length of the recording. Processing happens 
+after the recording is stopped. Otherwise it would be too slow to record the audio and video in real-time.
 
 ## Debugger
 Debugger is available in the emulator. It is a simple debugger that allows you to inspect the CPU registers, 
