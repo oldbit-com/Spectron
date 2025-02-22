@@ -46,29 +46,30 @@ dotnet run --project ./src/Spectron
 ```
 
 ## CPU emulation
-I have created my own [Z80 CPU](https://github.com/oldbit-com/Z80/tree/spectron) emulator for this project. 
-CPU emulation is quite accurate and supports many undocumented instructions. Memory and IO contention is also supported.
+I have created my own [Z80 CPU](https://github.com/oldbit-com/Z80/tree/spectron) emulator library for this project. 
+CPU emulation is quite accurate and supports many undocumented instructions. 
+Memory and IO contention is also supported.
+
+## Session
+When emulator is closed, it saves the current state of the emulator. The state will be restored when you start the emulator again.
+This behaviour can be disabled in the settings.
 
 ## Tape loading
 Tape loading is supported for **TAP** and **TZX** files (zip is ok). Three loading speeds are supported:
-- **Normal** - loads the tape at normal speed, with border and audio effects
-- **Accelerated** - loads the tape running emulator at maximum speed
+- **Normal** - loads the tape at normal speed, with border and audio effects,
+- **Accelerated** - loads the tape running emulator at maximum speed,
 - **Instant** - loads the tape instantly into memory. This will skip the tape loading animation and will load the tape instantly.
-
-> [!NOTE]
-> Instant mode is not supported for all tapes, especially for those that use custom loaders. In this case try normal or accelerated mode.
+This mode will only work for files that are using standard ROM loaders.
 
 ## Tape saving
 Tape saving is supported for **TAP** and **TZX** formats. Two saving speeds are supported:
-- **Normal** - tape is saved at normal speed, with border and audio effects.
+- **Normal** - tape is saved at normal speed, with border and audio effects,
 - **Instant** - tape is saved instantly reading the memory.
 
-> [!NOTE]
-> Saved tape contents can be accessed in the tape browser.
-
 ## Tape browser
-Tape browser is a feature that allows you to browse the contents of the tape. 
-You can browse the blocks, their types and lengths. You can select a block and load it using standard LOAD command.
+Tape browser is a feature that allows you to browse the contents of currently loaded or saved tape. 
+You can browse the blocks, their types and some basic block information. 
+You can select a block and load it using standard `LOAD` command.
 
 ## Snapshots
 Emulator supports saving and loading snapshots in **SNA**, **SZX** and **Z80** formats (can be inside zip file).
@@ -104,7 +105,7 @@ The interval and the number of time points can be adjusted in the settings.
 ## Video and Audio recording
 
 Audio and video recording is supported in the emulator. This is experimental feature and may not work on all platforms.
-You can pause emulator during the recording, but changing emulator settings during the recording may cause
+You can pause emulator during the recording, however changing emulator settings during the recording may cause
 unexpected results.
 
 ### Audio
