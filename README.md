@@ -1,3 +1,5 @@
+![Build and Test](https://github.com/oldbit-com/Spectron/actions/workflows/build.yml/badge.svg)
+
 # Spectron (ZX Spectrum emulator)
 My own ZX Spectrum emulator written in C# and Avalonia UI. It emulates ZX Spectrum 16K, 48K and classic 128K computers.
 
