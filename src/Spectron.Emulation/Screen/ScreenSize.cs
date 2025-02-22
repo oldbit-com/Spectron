@@ -1,39 +1,39 @@
 namespace OldBit.Spectron.Emulation.Screen;
 
-internal static class ScreenSize
+public static class ScreenSize
 {
     /// <summary>
     /// Standard top border size is 64 lines.
     /// </summary>
-    internal const int BorderTop = 64;
+    public const int BorderTop = 64;
 
     /// <summary>
     /// Standard left border size is 48 pixels.
     /// </summary>
-    internal const int BorderLeft = 48;
+    public const int BorderLeft = 48;
 
     /// <summary>
     /// Standard right border size is 48 pixels.
     /// </summary>
-    internal const int BorderRight = 48;
+    public const int BorderRight = 48;
 
     /// <summary>
     /// Standard bottom border size is 56 lines.
     /// </summary>
-    internal const int BorderBottom = 56;
+    public const int BorderBottom = 56;
 
     /// <summary>
     /// The width of the screen content is 256 pixels, e.g. 32 columns of 8 pixels.
     /// </summary>
-    internal const int ContentWidth = 256;
+    public const int ContentWidth = 256;
 
     /// <summary>
     /// The height of the screen content is 192 pixels, e.g. 24 rows of 8 pixels.
     /// </summary>
-    internal const int ContentHeight = 192;
+    public const int ContentHeight = 192;
 
     /// <summary>
     /// The total number of screen lines, including top and bottom borders.
     /// </summary>
-    internal const int TotalLines = BorderTop + ContentHeight + BorderBottom;
+    public const int TotalLines = BorderTop + ContentHeight + BorderBottom;
 }

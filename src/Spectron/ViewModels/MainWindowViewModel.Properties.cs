@@ -5,6 +5,7 @@ using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Models;
+using OldBit.Spectron.Screen;
 using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;

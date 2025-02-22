@@ -3,24 +3,20 @@ using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using OldBit.Spectron.Emulation.Screen;
-using OldBit.Spectron.Models;
 
 namespace OldBit.Spectron.Screen;
-
-internal record struct Border(int Top, int Left, int Right, int Bottom);
 
 /// <summary>
 /// Converts and writes the frame buffer to a WriteableBitmap which can be displayed by Avalonia.
 /// </summary>
 internal sealed class FrameBufferConverter : IDisposable
 {
-    private static readonly Border BorderNone = new(Top: 0, Left: 0, Right: 0, Bottom: 0);
-    private static readonly Border BorderSmall = new(Top: 15, Left: 15, Right: 15, Bottom: 15);
-    private static readonly Border BorderMedium = new(Top: 25, Left: 25, Right: 25, Bottom: 25);
-    private static readonly Border BorderLarge = new(Top: 40, Left: 40, Right: 40, Bottom: 40);
-    private static readonly Border BorderFull = new(Top: 64, Left: 48, Right: 48, Bottom: 56);
+    private Border _border = BorderSizes.Full;
 
-    private Border _border = BorderFull;
+    private int _startFrameBufferRow;
+    private int _endFrameBufferRow;
+    private int _startFrameBufferCol;
+    private int _endFrameBufferCol;
 
     private readonly int _zoomX;
     private readonly int _zoomY;
@@ -32,24 +28,20 @@ internal sealed class FrameBufferConverter : IDisposable
         _zoomX = zoomX;
         _zoomY = zoomY;
 
+        SetBorderSize(BorderSize.Full);
         Bitmap = CreateBitmap();
     }
 
     internal void UpdateBitmap(FrameBuffer frameBuffer)
     {
-        var startFrameBufferRow = BorderFull.Top - _border.Top;
-        var endFrameBufferRow = FrameBuffer.Height - (BorderFull.Bottom - _border.Bottom) - 1;
-        var startFrameBufferCol = BorderFull.Left - _border.Left;
-        var endFrameBufferCol = FrameBuffer.Width - (BorderFull.Right - _border.Right) - 1;
-
         using var lockedBitmap = Bitmap.Lock();
         var targetAddress = lockedBitmap.Address;
 
-        for (var frameBufferRow = startFrameBufferRow; frameBufferRow <= endFrameBufferRow; frameBufferRow++)
+        for (var frameBufferRow = _startFrameBufferRow; frameBufferRow <= _endFrameBufferRow; frameBufferRow++)
         {
             var rowOffset = frameBufferRow * FrameBuffer.Width;
 
-            for (var frameBufferCol = startFrameBufferCol; frameBufferCol <= endFrameBufferCol; frameBufferCol++)
+            for (var frameBufferCol = _startFrameBufferCol; frameBufferCol <= _endFrameBufferCol; frameBufferCol++)
             {
                 var pixelIndex = rowOffset + frameBufferCol;
 
@@ -87,20 +79,25 @@ internal sealed class FrameBufferConverter : IDisposable
     {
         _border = borderSize switch
         {
-            BorderSize.None => BorderNone,
-            BorderSize.Small => BorderSmall,
-            BorderSize.Medium => BorderMedium,
-            BorderSize.Large => BorderLarge,
-            _ => BorderFull,
+            BorderSize.None => BorderSizes.None,
+            BorderSize.Small => BorderSizes.Small,
+            BorderSize.Medium => BorderSizes.Medium,
+            BorderSize.Large => BorderSizes.Large,
+            _ => BorderSizes.Full,
         };
+
+        _startFrameBufferRow = BorderSizes.Full.Top - _border.Top;
+        _endFrameBufferRow = FrameBuffer.Height - (BorderSizes.Full.Bottom - _border.Bottom) - 1;
+        _startFrameBufferCol = BorderSizes.Full.Left - _border.Left;
+        _endFrameBufferCol = FrameBuffer.Width - (BorderSizes.Full.Right - _border.Right) - 1;
 
         Bitmap = CreateBitmap();
     }
 
     private WriteableBitmap CreateBitmap()
     {
-        var height = FrameBuffer.Height - (BorderFull.Top - _border.Top) - (BorderFull.Bottom - _border.Bottom);
-        var width = FrameBuffer.Width - (BorderFull.Left - _border.Left) - (BorderFull.Right - _border.Right);
+        var height = FrameBuffer.Height - (BorderSizes.Full.Top - _border.Top) - (BorderSizes.Full.Bottom - _border.Bottom);
+        var width = FrameBuffer.Width - (BorderSizes.Full.Left - _border.Left) - (BorderSizes.Full.Right - _border.Right);
 
         return new WriteableBitmap(
             new PixelSize(

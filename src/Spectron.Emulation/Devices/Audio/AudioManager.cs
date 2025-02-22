@@ -21,7 +21,7 @@ public sealed class AudioManager
     private readonly AyAudio _ayAudio;
     private readonly byte[] _emptyBuffer = [];
 
-    private StereoMode _stereoMode = StereoMode.None;
+    private StereoMode _stereoMode = StereoMode.Mono;
     private bool _isMuted;
     private bool _isAyEnabled;
     private bool _isBeeperEnabled;
@@ -145,7 +145,7 @@ public sealed class AudioManager
             {
                 switch (StereoMode)
                 {
-                    case StereoMode.None:
+                    case StereoMode.Mono:
                         sample = MonoMix(sample, Ay.ChannelA.Samples[i], Ay.ChannelB.Samples[i], Ay.ChannelC.Samples[i]);
                         break;
 
@@ -159,7 +159,7 @@ public sealed class AudioManager
                 }
             }
 
-            if (StereoMode == StereoMode.None)
+            if (StereoMode == StereoMode.Mono)
             {
                 audioBuffer.Add((short)sample);
             }
@@ -185,7 +185,7 @@ public sealed class AudioManager
         _audioPlayer = new AudioPlayer(
             PlayerAudioFormat,
             PlayerSampleRate,
-            channelCount: StereoMode == StereoMode.None ? 1 : 2,
+            channelCount: StereoMode == StereoMode.Mono ? 1 : 2,
             new PlayerOptions
             {
                 BufferSizeInBytes = 32768,

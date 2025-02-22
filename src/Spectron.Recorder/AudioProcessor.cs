@@ -3,7 +3,7 @@ using OldBit.Spectron.Emulation.Devices.Audio;
 
 namespace OldBit.Spectron.Recorder;
 
-internal class AudioProcessor(StereoMode stereoMode, string outputFilePath, string rawRecordingFilePath)
+internal class AudioProcessor(RecorderOptions options, string outputFilePath, string rawRecordingFilePath)
 {
     internal void Process()
     {
@@ -13,7 +13,7 @@ internal class AudioProcessor(StereoMode stereoMode, string outputFilePath, stri
         using var writer = new WaveFileWriter(
             outputFilePath,
             AudioManager.PlayerSampleRate,
-            stereoMode == StereoMode.None ? 1 : 2);
+            options.AudioChannels);
 
         var buffer = new byte[16384];
 

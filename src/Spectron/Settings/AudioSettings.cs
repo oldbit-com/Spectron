@@ -12,5 +12,5 @@ public record AudioSettings
 
     public bool IsAySupportedStandardSpectrum { get; init; } = true;
 
-    public StereoMode StereoMode { get; init; } = StereoMode.None;
+    public StereoMode StereoMode { get; init; } = StereoMode.Mono;
 }

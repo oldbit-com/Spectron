@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using Avalonia.Input;
 using Avalonia.Controls;
 using Avalonia.Threading;
+using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Snapshot;
@@ -15,6 +17,7 @@ using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Keyboard;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Recorder;
+using OldBit.Spectron.Screen;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -170,6 +173,17 @@ partial class MainWindowViewModel
         }
     }
 
+    private RecorderOptions GetRecorderOptions() => new()
+    {
+        AudioChannels = Emulator?.AudioManager.StereoMode == StereoMode.Mono ? 1 : 2,
+        BorderLeft = BorderSizes.GetBorder(_preferences.RecordingSettings.BorderSize).Left,
+        BorderRight = BorderSizes.GetBorder(_preferences.RecordingSettings.BorderSize).Right,
+        BorderTop = BorderSizes.GetBorder(_preferences.RecordingSettings.BorderSize).Top,
+        BorderBottom = BorderSizes.GetBorder(_preferences.RecordingSettings.BorderSize).Bottom,
+        ScalingFactor = _preferences.RecordingSettings.ScalingFactor,
+        ScalingAlgorithm = _preferences.RecordingSettings.ScalingAlgorithm,
+    };
+
     private async Task HandleStartAudioRecordingAsync()
     {
         var shouldResume = !IsPaused;
@@ -185,7 +199,7 @@ partial class MainWindowViewModel
                 _audioVideoRecorder = new AudioVideoRecorder(
                     RecorderMode.Audio,
                     file.Path.LocalPath,
-                    Emulator.AudioManager.StereoMode,
+                    GetRecorderOptions(),
                     _logger);
 
                 _audioVideoRecorder.Start();
@@ -228,7 +242,7 @@ partial class MainWindowViewModel
                 _audioVideoRecorder = new AudioVideoRecorder(
                     RecorderMode.AudioVideo,
                     file.Path.LocalPath,
-                    Emulator.AudioManager.StereoMode,
+                    GetRecorderOptions(),
                     _logger);
 
                 _audioVideoRecorder.Start();
@@ -260,12 +274,17 @@ partial class MainWindowViewModel
 
         RecordingStatus = RecordingStatus.Processing;
 
-        _audioVideoRecorder.StartProcess(isSuccess =>
+        _audioVideoRecorder.StartProcess(result =>
         {
             Dispatcher.UIThread.InvokeAsync(() => RecordingStatus = RecordingStatus.None);
 
             _audioVideoRecorder.Dispose();
             _audioVideoRecorder = null;
+
+            if (!result.ISucccess)
+            {
+                _logger.LogError(result.Error, "Failed to process recording");
+            }
         });
     }
 

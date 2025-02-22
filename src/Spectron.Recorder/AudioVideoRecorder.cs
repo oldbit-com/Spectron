@@ -9,10 +9,10 @@ public sealed class AudioVideoRecorder : IDisposable
 {
     private readonly RecorderMode _recorderMode;
     private readonly string _filePath;
+    private readonly RecorderOptions _options;
     private readonly string _audioRecordedFilePath;
-    private readonly string _videoRecordedFileath;
+    private readonly string _videoRecordedFilePath;
 
-    private readonly StereoMode _stereoMode;
     private readonly ILogger _logger;
     private readonly AudioRecorder? _audioRecorder;
     private readonly VideoRecorder? _videoRecorder;
@@ -22,16 +22,16 @@ public sealed class AudioVideoRecorder : IDisposable
     public AudioVideoRecorder(
         RecorderMode recorderMode,
         string filePath,
-        StereoMode stereoMode,
+        RecorderOptions options,
         ILogger logger)
     {
         _recorderMode = recorderMode;
         _filePath = filePath;
-        _stereoMode = stereoMode;
+        _options = options;
         _logger = logger;
 
         _audioRecordedFilePath = $"{filePath}.audio.rec";
-        _videoRecordedFileath = $"{filePath}.video.rec";
+        _videoRecordedFilePath = $"{filePath}.video.rec";
 
         if (recorderMode is RecorderMode.Audio or RecorderMode.AudioVideo)
         {
@@ -40,7 +40,7 @@ public sealed class AudioVideoRecorder : IDisposable
 
         if (recorderMode is RecorderMode.Video or RecorderMode.AudioVideo)
         {
-            _videoRecorder = new VideoRecorder(_videoRecordedFileath);
+            _videoRecorder = new VideoRecorder(_videoRecordedFilePath);
         }
     }
 
@@ -73,15 +73,13 @@ public sealed class AudioVideoRecorder : IDisposable
         _isRecordingActive = true;
     }
 
-    public void StartProcess(Action<bool> completionCallback)
+    public void StartProcess(Action<(bool ISucccess, Exception? Error)> completionCallback)
     {
         _isRecordingActive = false;
 
         Task.Factory.StartNew(() =>
         {
             Thread.Sleep(100);
-
-            var isSuccess = true;
 
             try
             {
@@ -91,13 +89,13 @@ public sealed class AudioVideoRecorder : IDisposable
             }
             catch (Exception ex)
             {
-                isSuccess = false;
                 _logger.LogError(ex, "Failed to process audio/video");
+
+                completionCallback((false, ex));
+                return;
             }
-            finally
-            {
-                completionCallback(isSuccess);
-            }
+
+            completionCallback((true, null));
         });
     }
 
@@ -127,7 +125,7 @@ public sealed class AudioVideoRecorder : IDisposable
 
         var tempAudioFilePath = $"{_filePath}.temp.wav";
 
-        var audioProcessor = new AudioProcessor(_stereoMode, tempAudioFilePath, _audioRecordedFilePath);
+        var audioProcessor = new AudioProcessor(_options, tempAudioFilePath, _audioRecordedFilePath);
         audioProcessor.Process();
 
         FileHelper.TryDeleteFile(_audioRecordedFilePath);
@@ -149,11 +147,11 @@ public sealed class AudioVideoRecorder : IDisposable
         var tempVideoFilePath = $"{_filePath}.temp.mp4";
         var tempAudioFilePath = $"{_filePath}.temp.wav";
 
-        var videoProcessor = new VideoProcessor(_stereoMode, tempVideoFilePath, _videoRecordedFileath, tempAudioFilePath);
+        var videoProcessor = new VideoProcessor(_options, tempVideoFilePath, _videoRecordedFilePath, tempAudioFilePath);
         videoProcessor.Process();
 
         FileHelper.TryDeleteFile(_audioRecordedFilePath);
-        FileHelper.TryDeleteFile(_videoRecordedFileath);
+        FileHelper.TryDeleteFile(_videoRecordedFilePath);
         FileHelper.TryDeleteFile(tempAudioFilePath);
         FileHelper.TryMoveFile(tempVideoFilePath, _filePath);
     }
