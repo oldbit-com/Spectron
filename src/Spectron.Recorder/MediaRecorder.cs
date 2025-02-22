@@ -101,11 +101,17 @@ public sealed class MediaRecorder : IDisposable
         });
     }
 
-    public static bool VerifyVideoRecordingRequirements()
+    public static bool VerifyDependencies(string? ffmpegPath = null)
     {
         try
         {
             var options = new FFOptions();
+
+            if (!string.IsNullOrWhiteSpace(ffmpegPath))
+            {
+                options.BinaryFolder = ffmpegPath;
+            }
+
             FFMpegCore.Helpers.FFMpegHelper.VerifyFFMpegExists(options);
 
             return true;

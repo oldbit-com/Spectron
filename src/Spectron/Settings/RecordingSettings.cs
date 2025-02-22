@@ -9,4 +9,6 @@ public record RecordingSettings
     public int ScalingFactor { get; init; } = 2;
 
     public string ScalingAlgorithm { get; init; } = "neighbor";
+
+    public string FFmpegPath { get; init; } = string.Empty;
 }

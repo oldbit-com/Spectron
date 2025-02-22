@@ -12,6 +12,7 @@ using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
+using OldBit.Spectron.Recorder;
 using OldBit.Spectron.Screen;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.Theming;
@@ -25,6 +26,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
     private readonly GamepadSettings _gamepadSettings;
 
     public ReactiveCommand<Unit, Preferences> UpdatePreferencesCommand { get; }
+    public ReactiveCommand<Unit, Unit> ProbeFFmpegCommand { get; }
 
     public Interaction<GamepadMappingViewModel, List<GamepadMapping>?> ShowGamepadMappingView { get; }
 
@@ -89,8 +91,10 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         RecordingBorderSize = preferences.RecordingSettings.BorderSize;
         ScalingFactor = preferences.RecordingSettings.ScalingFactor;
         ScalingAlgorithm = preferences.RecordingSettings.ScalingAlgorithm;
+        FFmpegPath = preferences.RecordingSettings.FFmpegPath;
 
         UpdatePreferencesCommand = ReactiveCommand.Create(UpdatePreferences);
+        ProbeFFmpegCommand = ReactiveCommand.Create(ProbeFFmpeg);
 
         ShowGamepadMappingView = new Interaction<GamepadMappingViewModel, List<GamepadMapping>?>();
     }
@@ -177,8 +181,16 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
                 BorderSize = RecordingBorderSize,
                 ScalingFactor = ScalingFactor,
                 ScalingAlgorithm = ScalingAlgorithm,
+                FFmpegPath = FFmpegPath
             }
         };
+    }
+
+    private void ProbeFFmpeg()
+    {
+        FFmpegMessage = MediaRecorder.VerifyDependencies(FFmpegPath) ?
+            "Success. FFmpeg found" :
+            "Failure. FFmpeg not found";
     }
 
     public List<NameValuePair<ComputerType>> ComputerTypes { get; } =
@@ -473,6 +485,20 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
     {
         get => _scalingFactor;
         set => this.RaiseAndSetIfChanged(ref _scalingFactor, value);
+    }
+
+    private string _ffmpegPath = string.Empty;
+    public string FFmpegPath
+    {
+        get => _ffmpegPath;
+        set => this.RaiseAndSetIfChanged(ref _ffmpegPath, value);
+    }
+
+    private string _ffmpegMessage = string.Empty;
+    public string FFmpegMessage
+    {
+        get => _ffmpegMessage;
+        set => this.RaiseAndSetIfChanged(ref _ffmpegMessage, value);
     }
 
     public void Dispose()

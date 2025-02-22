@@ -252,7 +252,7 @@
                 <Border Classes="Tab">
                     <StackPanel>
                         <controls:HeaderSeparator Text="FFmpeg"/>
-                        <Grid ColumnDefinitions="120,*" RowDefinitions="40,40,40">
+                        <Grid ColumnDefinitions="120,*" RowDefinitions="40,40,40,40,40">
                             <TextBlock
                                 Grid.Row="0"
                                 Grid.Column="0"
@@ -309,6 +309,36 @@
                                 SelectedValue="{Binding ScalingAlgorithm}"
                                 DisplayMemberBinding="{Binding Name}"
                                 SelectedValueBinding="{Binding Value}"/>
+
+                            <TextBlock
+                                Grid.Row="3"
+                                Grid.Column="0"
+                                Text="FFmpeg Path"
+                                VerticalAlignment="Center"
+                                Classes="Center"/>
+                            <TextBox
+                                Grid.Row="3"
+                                Grid.Column="1"
+                                Margin="5 0 0 0"
+                                Height="30"
+                                Watermark="Leave empty to use system PATH"
+                                Text="{Binding FFmpegPath}"
+                                VerticalContentAlignment="Center"/>
+
+                            <StackPanel
+                                Grid.Row="4"
+                                Grid.Column="1"
+                                Orientation="Horizontal">
+                                <Button
+                                    Margin="5 0 0 0"
+                                    Content="Probe FFmpeg"
+                                    Command="{Binding ProbeFFmpegCommand}"/>
+
+                                <TextBlock
+                                    Margin="5 0 0 0"
+                                    Text="{Binding FFmpegMessage}"
+                                    VerticalAlignment="Center"/>
+                            </StackPanel>
                         </Grid>
                     </StackPanel>
                 </Border>

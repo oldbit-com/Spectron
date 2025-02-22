@@ -183,6 +183,7 @@ partial class MainWindowViewModel
         BorderBottom = BorderSizes.GetBorder(_preferences.RecordingSettings.BorderSize).Bottom,
         ScalingFactor = _preferences.RecordingSettings.ScalingFactor,
         ScalingAlgorithm = _preferences.RecordingSettings.ScalingAlgorithm,
+        FFmpegPath = _preferences.RecordingSettings.FFmpegPath,
     };
 
     private async Task HandleStartAudioRecordingAsync()
@@ -225,7 +226,7 @@ partial class MainWindowViewModel
     {
         var shouldResume = !IsPaused;
 
-        if (!MediaRecorder.VerifyVideoRecordingRequirements())
+        if (!MediaRecorder.VerifyDependencies())
         {
             await MessageDialogs.Error("Video recording is not available. It requires FFmpeg to be installed. Please check the documentation for more information.");
 

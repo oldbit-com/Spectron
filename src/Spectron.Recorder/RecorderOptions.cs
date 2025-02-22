@@ -9,6 +9,7 @@ public record RecorderOptions
 
     public int AudioChannels { get; init; }
 
+    public string FFmpegPath { get; init; } = string.Empty;
     public int ScalingFactor { get; init; } = 2;
     public string ScalingAlgorithm { get; init; } = "neighbor";
 }
