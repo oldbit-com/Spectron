@@ -306,7 +306,7 @@ partial class MainWindowViewModel
         BorderSize = borderSize;
 
         _frameBufferConverter.SetBorderSize(borderSize);
-        SpectrumScreen = _frameBufferConverter.Bitmap;
+        SpectrumScreen = _frameBufferConverter.ScreenBitmap;
     }
 
     private void HandleChangeRom(RomType romType)
@@ -343,7 +343,7 @@ partial class MainWindowViewModel
         IsPaused = Emulator?.IsPaused ?? false;
 
         RecentFilesViewModel.CurrentFileName = string.Empty;
-        SetTitle();
+        UpdateWindowTitle();
     }
 
     private void HandleMachineHardReset()
@@ -351,7 +351,17 @@ partial class MainWindowViewModel
         CreateEmulator(_preferences.ComputerType, _preferences.RomType);
 
         RecentFilesViewModel.CurrentFileName = string.Empty;
-        SetTitle();
+        UpdateWindowTitle();
+    }
+
+    private void HandleTapeStateChanged(TapeStateEventArgs args)
+    {
+        if (args.Action == TapeAction.TapeEjected)
+        {
+            RecentFilesViewModel.CurrentFileName = string.Empty;
+        }
+
+        UpdateWindowTitle();
     }
 
     private void Pause()

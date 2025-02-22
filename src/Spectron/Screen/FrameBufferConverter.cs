@@ -21,7 +21,7 @@ internal sealed class FrameBufferConverter : IDisposable
     private readonly int _zoomX;
     private readonly int _zoomY;
 
-    internal WriteableBitmap Bitmap { get; private set; }
+    internal WriteableBitmap ScreenBitmap { get; private set; }
 
     internal FrameBufferConverter(int zoomX, int zoomY)
     {
@@ -29,12 +29,12 @@ internal sealed class FrameBufferConverter : IDisposable
         _zoomY = zoomY;
 
         SetBorderSize(BorderSize.Full);
-        Bitmap = CreateBitmap();
+        ScreenBitmap = CreateBitmap();
     }
 
     internal void UpdateBitmap(FrameBuffer frameBuffer)
     {
-        using var lockedBitmap = Bitmap.Lock();
+        using var lockedBitmap = ScreenBitmap.Lock();
         var targetAddress = lockedBitmap.Address;
 
         for (var frameBufferRow = _startFrameBufferRow; frameBufferRow <= _endFrameBufferRow; frameBufferRow++)
@@ -91,7 +91,7 @@ internal sealed class FrameBufferConverter : IDisposable
         _startFrameBufferCol = BorderSizes.Full.Left - _border.Left;
         _endFrameBufferCol = FrameBuffer.Width - (BorderSizes.Full.Right - _border.Right) - 1;
 
-        Bitmap = CreateBitmap();
+        ScreenBitmap = CreateBitmap();
     }
 
     private WriteableBitmap CreateBitmap()
@@ -107,5 +107,5 @@ internal sealed class FrameBufferConverter : IDisposable
             PixelFormats.Rgba8888);
     }
 
-    public void Dispose() => Bitmap.Dispose();
+    public void Dispose() => ScreenBitmap.Dispose();
 }

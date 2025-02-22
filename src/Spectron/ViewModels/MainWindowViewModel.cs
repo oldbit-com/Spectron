@@ -94,7 +94,6 @@ public partial class MainWindowViewModel : ReactiveObject
     public ReactiveCommand<Unit, Unit> ToggleMuteCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> TimeMachineResumeEmulatorCommand  { get; private set; }
 
-
     public ReactiveCommand<Unit, Task> ShowAboutViewCommand { get; private set; }
     public ReactiveCommand<Unit, Task> ShowDebuggerViewCommand { get; private set; }
     public ReactiveCommand<Unit, Task> ShowKeyboardHelpViewCommand { get; private set; }
@@ -119,6 +118,7 @@ public partial class MainWindowViewModel : ReactiveObject
         RecentFilesViewModel recentFilesViewModel,
         TapeMenuViewModel tapeMenuViewModel,
         DebuggerContext debuggerContext,
+        TapeManager tapeManager,
         ILogger<MainWindowViewModel> logger)
     {
         _emulatorFactory = emulatorFactory;
@@ -193,7 +193,9 @@ public partial class MainWindowViewModel : ReactiveObject
         ShowSelectFileView = new Interaction<SelectFileViewModel, ArchiveEntry?>();
         ShowTimeMachineView = new Interaction<TimeMachineViewModel, TimeMachineEntry?>();
 
-        SpectrumScreen = _frameBufferConverter.Bitmap;
+        SpectrumScreen = _frameBufferConverter.ScreenBitmap;
+
+        tapeManager.TapeStateChanged += HandleTapeStateChanged;
     }
 
     private async Task OpenAboutWindow() => await ShowAboutView.Handle(Unit.Default);
@@ -340,7 +342,7 @@ public partial class MainWindowViewModel : ReactiveObject
             if (snapshot != null)
             {
                 CreateEmulator(snapshot);
-                SetTitle();
+                UpdateWindowTitle();
             }
         }
 
@@ -451,7 +453,7 @@ public partial class MainWindowViewModel : ReactiveObject
         Emulator = null;
     }
 
-    private void SetTitle()
+    private void UpdateWindowTitle()
     {
         if (RecentFilesViewModel.CurrentFileName == string.Empty)
         {

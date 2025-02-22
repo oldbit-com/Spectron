@@ -36,6 +36,12 @@ It uses several of my own libraries that I created for this project:
 - [x] Audio and video recording
 - [x] And more features in progress...
 
+
+# Quick demo
+
+[![Spectron](https://youtu.be/Oz70N0VY_2w)](hhttps://youtu.be/Oz70N0VY_2w)
+
+
 # Running the emulator
 Requires .NET 9 in order to build and run the emulator.
 Grab the latest code from the repository, build and run the emulator:
