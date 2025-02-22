@@ -107,7 +107,7 @@ unexpected results.
 
 ### Audio
 Audio can be recorded to a file in **WAV** format. The format is PCM 16-bit, 44100 Hz, mono or stereo depending on the 
-current AY mode. No external tools are required for audio recording.
+current AY mode. No external dependencies are required for audio recording.
 
 ### Video
 Video recording requires **[FFmpeg](https://www.ffmpeg.org)** to be installed on your system.
@@ -123,7 +123,10 @@ Debugger is available in the emulator. It is a simple debugger that allows you t
 memory and disassembly. You can step through the code, set breakpoints. This is still work in progress.
 
 ### Resources
-- ZX Spectrum Font: https://github.com/comptic/zx-spectrum-font
-- Hack Font: https://sourcefoundry.org/hack/
-- VT220 Font: https://github.com/svofski/glasstty/blob/master/Glass_TTY_VT220.ttf
+- [Avalonia UI](https://avaloniaui.net/)
+- [FFmpeg wrapper](https://github.com/rosenbjerg/FFMpegCore)
+- [SkiaSharp](https://github.com/mono/SkiaSharp)
+- [ZX Spectrum Font](https://github.com/comptic/zx-spectrum-font)
+- [Hack Font](https://sourcefoundry.org/hack/)
+- [VT220 Font](https://github.com/svofski/glasstty/blob/master/Glass_TTY_VT220.ttf)
 
