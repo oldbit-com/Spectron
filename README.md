@@ -38,7 +38,7 @@ It uses several of my own libraries that I created for this project:
 
 
 # Quick demo
-[![Spectron](https://img.youtube.com/vi/Oz70N0VY_2w/default.jpg)](hhttps://youtu.be/Oz70N0VY_2w)
+[![Spectron](https://img.youtube.com/vi/Oz70N0VY_2w/default.jpg)](https://youtu.be/Oz70N0VY_2w "Quick demo")
 
 # Running the emulator
 Requires .NET 9 in order to build and run the emulator.
