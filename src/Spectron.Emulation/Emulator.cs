@@ -30,8 +30,8 @@ public sealed class Emulator
     private bool _isAcceleratedTapeSpeed;
     private FloatingBus _floatingBus = null!;
 
-    public delegate void RenderScreenEvent(FrameBuffer frameBuffer);
-    public event RenderScreenEvent? RenderScreen;
+    public delegate void FrameEvent(FrameBuffer frameBuffer, IEnumerable<byte> audioBuffer);
+    public event FrameEvent? FrameCompleted;
 
     public bool IsPaused => _emulationTimer.IsPaused;
 
@@ -219,10 +219,11 @@ public sealed class Emulator
 
     private void EndFrame()
     {
-        AudioManager.EndFrame();
+        var audioBuffer = AudioManager.EndFrame();
 
         ScreenBuffer.UpdateBorder(Cpu.Clock.CurrentFrameTicks);
-        RenderScreen?.Invoke(ScreenBuffer.FrameBuffer);
+
+        FrameCompleted?.Invoke(ScreenBuffer.FrameBuffer, audioBuffer);
 
         _timeMachine.AddEntry(this);
     }

@@ -48,7 +48,7 @@ public static class SzxFileExtensions
                             attributeData.Paper;
                     }
 
-                    Buffer[bufferIndex + bit] = color.Abgr;
+                    Buffer[bufferIndex + bit] = (int)color.Abgr;
                 }
             }
         }

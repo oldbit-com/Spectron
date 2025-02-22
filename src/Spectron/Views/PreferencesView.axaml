@@ -216,8 +216,6 @@
                                     Classes="Center"
                                     IsChecked="{Binding IsAutoPlayEnabled}"/>
 
-
-
                                 <controls:HeaderSeparator Text="Tape saving"/>
                                 <CheckBox
                                     Content="Enable tape saving (virtual tape). Speed: "
@@ -247,6 +245,101 @@
                                     ToolTip.Tip="If enabled, usual tape loading/saving audio will be generated"/>
                             </StackPanel>
                         </Border>
+                    </StackPanel>
+                </Border>
+            </TabItem>
+            <TabItem Header="Recording">
+                <Border Classes="Tab">
+                    <StackPanel>
+                        <controls:HeaderSeparator Text="FFmpeg"/>
+                        <Grid ColumnDefinitions="120,*" RowDefinitions="40,40,40,40,40">
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Text="Border"
+                                VerticalAlignment="Center"
+                                Classes="Center"/>
+                            <ComboBox
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Margin="5 0 0 0"
+                                Padding="10 2 0 0"
+                                Width="250"
+                                VerticalAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                ItemsSource="{Binding BorderSizes}"
+                                SelectedValue="{Binding RecordingBorderSize}"
+                                DisplayMemberBinding="{Binding Name}"
+                                SelectedValueBinding="{Binding Value}"/>
+
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Text="Scaling"
+                                VerticalAlignment="Center"
+                                Classes="Center"/>
+                            <ComboBox
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                Margin="5 0 0 0"
+                                Padding="10 2 0 0"
+                                Width="250"
+                                VerticalAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                ItemsSource="{Binding ScalingFactors}"
+                                SelectedValue="{Binding ScalingFactor}"
+                                DisplayMemberBinding="{Binding Name}"
+                                SelectedValueBinding="{Binding Value}"/>
+
+                            <TextBlock
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Text="Algorithm"
+                                VerticalAlignment="Center"
+                                Classes="Center"/>
+                            <ComboBox
+                                Grid.Row="2"
+                                Grid.Column="1"
+                                Margin="5 0 0 0"
+                                Padding="10 2 0 0"
+                                Width="250"
+                                VerticalAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                ItemsSource="{Binding ScalingAlgorithms}"
+                                SelectedValue="{Binding ScalingAlgorithm}"
+                                DisplayMemberBinding="{Binding Name}"
+                                SelectedValueBinding="{Binding Value}"/>
+
+                            <TextBlock
+                                Grid.Row="3"
+                                Grid.Column="0"
+                                Text="FFmpeg Path"
+                                VerticalAlignment="Center"
+                                Classes="Center"/>
+                            <TextBox
+                                Grid.Row="3"
+                                Grid.Column="1"
+                                Margin="5 0 0 0"
+                                Height="30"
+                                Watermark="Leave empty to use system PATH"
+                                Text="{Binding FFmpegPath}"
+                                VerticalContentAlignment="Center"/>
+
+                            <StackPanel
+                                Grid.Row="4"
+                                Grid.Column="1"
+                                Orientation="Horizontal">
+                                <Button
+                                    Margin="5 0 0 0"
+                                    Content="Probe FFmpeg"
+                                    Command="{Binding ProbeFFmpegCommand}"/>
+
+                                <TextBlock
+                                    Margin="5 0 0 0"
+                                    Text="{Binding FFmpegMessage}"
+                                    VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
                     </StackPanel>
                 </Border>
             </TabItem>

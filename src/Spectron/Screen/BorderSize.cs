@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Models;
+namespace OldBit.Spectron.Screen;
 
 public enum BorderSize
 {

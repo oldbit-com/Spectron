@@ -5,6 +5,7 @@ using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Models;
+using OldBit.Spectron.Screen;
 using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
@@ -116,10 +117,10 @@ partial class MainWindowViewModel
         set => this.RaiseAndSetIfChanged(ref _title, value);
     }
 
-    private bool _isRecordingAudio;
-    public bool IsRecordingAudio
+    private RecordingStatus _recordingStatus = RecordingStatus.None;
+    public RecordingStatus RecordingStatus
     {
-        get => _isRecordingAudio;
-        set => this.RaiseAndSetIfChanged(ref _isRecordingAudio, value);
+        get => _recordingStatus;
+        set => this.RaiseAndSetIfChanged(ref _recordingStatus, value);
     }
 }

@@ -1,12 +1,17 @@
+using System.Runtime.InteropServices;
+
 namespace OldBit.Spectron.Emulation.Screen;
 
+[StructLayout(LayoutKind.Sequential)]
 public readonly record struct Color
 {
-    public int Abgr { get; }
-    public int Argb { get; }
-    public byte Red { get; init; }
-    public byte Green { get; init; }
-    public byte Blue { get; init; }
+    public readonly byte Red;
+    public readonly byte Green;
+    public readonly byte Blue;
+    public readonly byte Alpha = 0xFF;
+
+    public uint Abgr => (uint)(0xFF << 24 | Blue << 16 | Green << 8 | Red);
+    public uint Argb => (uint)(0xFF << 24 | Red << 16 | Green << 8 | Blue);
 
     internal Color(int Red, int Green, int Blue) : this((byte)Red, (byte)Green, (byte)Blue) { }
 
@@ -15,8 +20,5 @@ public readonly record struct Color
         this.Red = Red;
         this.Green = Green;
         this.Blue = Blue;
-
-        Abgr = 0xFF << 24 | Blue << 16 | Green << 8 | Red;
-        Argb = 0xFF << 24 | Red << 16 | Green << 8 | Blue;
     }
 }

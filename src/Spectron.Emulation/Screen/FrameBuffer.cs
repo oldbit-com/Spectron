@@ -9,7 +9,7 @@ public sealed class FrameBuffer(Color fillColor)
 
     public static int Height => ScreenSize.BorderTop + ScreenSize.ContentHeight + ScreenSize.BorderBottom;
 
-    public Color[] Pixels { get; } = Enumerable.Repeat(fillColor, Width * Height).ToArray();
+    public readonly Color[] Pixels = Enumerable.Repeat(fillColor, Width * Height).ToArray();
 
     internal void Fill(int start, int count, Color color) => Array.Fill(Pixels, color, start, count);
 

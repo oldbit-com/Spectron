@@ -4,16 +4,21 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Avalonia.Input;
 using Avalonia.Controls;
+using Avalonia.Controls.Notifications;
+using Avalonia.Threading;
+using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.Storage;
 using OldBit.Spectron.Emulation.Tape;
-using OldBit.Spectron.Helpers;
+using OldBit.Spectron.Keyboard;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Recorder;
+using OldBit.Spectron.Screen;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -169,6 +174,18 @@ partial class MainWindowViewModel
         }
     }
 
+    private RecorderOptions GetRecorderOptions() => new()
+    {
+        AudioChannels = Emulator?.AudioManager.StereoMode == StereoMode.Mono ? 1 : 2,
+        BorderLeft = BorderSizes.GetBorder(_preferences.RecordingSettings.BorderSize).Left,
+        BorderRight = BorderSizes.GetBorder(_preferences.RecordingSettings.BorderSize).Right,
+        BorderTop = BorderSizes.GetBorder(_preferences.RecordingSettings.BorderSize).Top,
+        BorderBottom = BorderSizes.GetBorder(_preferences.RecordingSettings.BorderSize).Bottom,
+        ScalingFactor = _preferences.RecordingSettings.ScalingFactor,
+        ScalingAlgorithm = _preferences.RecordingSettings.ScalingAlgorithm,
+        FFmpegPath = _preferences.RecordingSettings.FFmpegPath,
+    };
+
     private async Task HandleStartAudioRecordingAsync()
     {
         var shouldResume = !IsPaused;
@@ -181,11 +198,15 @@ partial class MainWindowViewModel
 
             if (file != null && Emulator != null)
             {
-                _audioRecorder?.Dispose();
-                _audioRecorder = new AudioRecorder(Emulator.AudioManager, file.Path.LocalPath, _logger);
-                _audioRecorder.Start();
+                _mediaRecorder = new MediaRecorder(
+                    RecorderMode.Audio,
+                    file.Path.LocalPath,
+                    GetRecorderOptions(),
+                    _logger);
 
-                IsRecordingAudio = true;
+                _mediaRecorder.Start();
+
+                RecordingStatus = RecordingStatus.Recording;
             }
         }
         catch (Exception ex)
@@ -201,12 +222,83 @@ partial class MainWindowViewModel
         }
     }
 
-    private void HandleStopAudioRecording()
+    private async Task HandleStartVideoRecordingAsync()
     {
-        IsRecordingAudio = false;
+        var shouldResume = !IsPaused;
 
-        _audioRecorder?.Stop();
-        _audioRecorder = null;
+        if (!MediaRecorder.VerifyDependencies())
+        {
+            await MessageDialogs.Error("Video recording is not available. It requires FFmpeg to be installed. Please check the documentation for more information.");
+
+            return;
+        }
+
+        try
+        {
+            Pause();
+
+            var file = await FileDialogs.SaveVideoFileAsync();
+
+            if (file != null && Emulator != null)
+            {
+                _mediaRecorder = new MediaRecorder(
+                    RecorderMode.AudioVideo,
+                    file.Path.LocalPath,
+                    GetRecorderOptions(),
+                    _logger);
+
+                _mediaRecorder.Start();
+
+                RecordingStatus = RecordingStatus.Recording;
+            }
+        }
+        catch (Exception ex)
+        {
+            await MessageDialogs.Error(ex.Message);
+        }
+        finally
+        {
+            if (shouldResume)
+            {
+                Resume();
+            }
+        }
+    }
+
+    private void HandleStopRecording()
+    {
+        RecordingStatus = RecordingStatus.None;
+
+        if (_mediaRecorder == null)
+        {
+            return;
+        }
+
+        RecordingStatus = RecordingStatus.Processing;
+
+        _mediaRecorder.StartProcess(result =>
+        {
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                RecordingStatus = RecordingStatus.None;
+
+                NotificationManager.Show(new Notification(
+                    result.ISucccess ? "Done!" : "Error!",
+                    result.ISucccess ? "Recording has been successfully completed" : $"Recording has failed: {result.Error?.Message}",
+                    result.ISucccess ? NotificationType.Information : NotificationType.Error)
+                {
+                    Expiration = TimeSpan.FromSeconds(10)
+                });
+            });
+
+            _mediaRecorder.Dispose();
+            _mediaRecorder = null;
+
+            if (!result.ISucccess)
+            {
+                _logger.LogError(result.Error, "Failed to process recording");
+            }
+        });
     }
 
     private void HandleChangeBorderSize(BorderSize borderSize)

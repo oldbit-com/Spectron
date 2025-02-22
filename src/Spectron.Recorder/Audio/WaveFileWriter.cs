@@ -1,6 +1,6 @@
-namespace OldBit.Spectron.Recorder;
+namespace OldBit.Spectron.Recorder.Audio;
 
-public sealed class WaveFileWriter : IDisposable
+internal sealed class WaveFileWriter : IDisposable
 {
     private readonly int _sampleRate;
     private readonly short _channels;
@@ -13,7 +13,7 @@ public sealed class WaveFileWriter : IDisposable
     private const short Pcm = 1;
     private const short BitDepth = 16;
 
-    public WaveFileWriter(string filePath, int sampleRate, int channels)
+    internal WaveFileWriter(string filePath, int sampleRate, int channels)
     {
         _sampleRate = sampleRate;
         _channels = (short)channels;
@@ -22,7 +22,7 @@ public sealed class WaveFileWriter : IDisposable
         _writer = new BinaryWriter(_fileStream);
     }
 
-    public void Write(IEnumerable<byte> data)
+    internal void Write(IEnumerable<byte> data)
     {
         if (!_isHeaderWritten)
         {
@@ -34,7 +34,7 @@ public sealed class WaveFileWriter : IDisposable
 
         while (true)
         {
-            short value = 0;
+            short value;
 
             if (iterator.MoveNext())
             {
@@ -56,17 +56,11 @@ public sealed class WaveFileWriter : IDisposable
 
             _writer.Write(value);
 
-            _dataSize += 1;
+            _dataSize += 2;
         }
     }
 
-    public void Close()
-    {
-        UpdateHeader();
-
-        _writer.Flush();
-        _writer.Close();
-    }
+    internal void Close() => _writer.Close();
 
     private void WriteHeader()
     {
@@ -93,7 +87,7 @@ public sealed class WaveFileWriter : IDisposable
         _writer.Write(0);
     }
 
-    private void UpdateHeader()
+    internal void UpdateHeader()
     {
         _fileStream.Seek(4, SeekOrigin.Begin);
         _writer.Write(36 + _dataSize);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -6,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using Avalonia.Controls;
+using Avalonia.Controls.Notifications;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
@@ -22,12 +24,11 @@ using OldBit.Spectron.Emulation.Storage;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Emulation.Tape.Loader;
 using OldBit.Spectron.Extensions;
-using OldBit.Spectron.Helpers;
-using OldBit.Spectron.Models;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.Files.Szx;
 using OldBit.Spectron.Recorder;
+using OldBit.Spectron.Screen;
 using OldBit.Spectron.Theming;
 using ReactiveUI;
 using Timer = System.Timers.Timer;
@@ -56,11 +57,13 @@ public partial class MainWindowViewModel : ReactiveObject
     private int _frameCount;
     private readonly Stopwatch _renderStopwatch = new();
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
-    private AudioRecorder? _audioRecorder;
+    private MediaRecorder? _mediaRecorder;
 
     public Emulator? Emulator { get; private set; }
     public Control ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }
+    public WindowNotificationManager NotificationManager { get; set; } = null!;
+
     public StatusBarViewModel StatusBar { get; } = new();
     public TapeMenuViewModel TapeMenuViewModel { get; }
     public RecentFilesViewModel RecentFilesViewModel { get; }
@@ -74,7 +77,8 @@ public partial class MainWindowViewModel : ReactiveObject
     public ReactiveCommand<Unit, Task> LoadFileCommand { get; private set; }
     public ReactiveCommand<Unit, Task> SaveFileCommand { get; private set; }
     public ReactiveCommand<Unit, Task> StartAudioRecordingCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> StopAudioRecordingCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> StartVideoRecordingCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> StopRecordingCommand { get; private set; }
 
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     public ReactiveCommand<RomType, Unit> ChangeRomCommand { get; private set; }
@@ -148,6 +152,9 @@ public partial class MainWindowViewModel : ReactiveObject
         this.WhenAny(x => x.IsTimeMachineEnabled, x => x.Value)
             .Subscribe(x => _timeMachine.IsEnabled = x);
 
+        this.WhenAny(x => x.RecordingStatus, x => x.Value)
+            .Subscribe(status => StatusBar.RecordingStatus = status);
+
         WindowOpenedCommand = ReactiveCommand.CreateFromTask(WindowOpenedAsync);
         WindowClosingCommand = ReactiveCommand.CreateFromTask(WindowClosingAsync);
         KeyDownCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyDown);
@@ -156,7 +163,8 @@ public partial class MainWindowViewModel : ReactiveObject
         LoadFileCommand = ReactiveCommand.Create(HandleLoadFileAsync);
         SaveFileCommand = ReactiveCommand.Create(HandleSaveFileAsync, emulatorNotNull);
         StartAudioRecordingCommand = ReactiveCommand.Create(HandleStartAudioRecordingAsync);
-        StopAudioRecordingCommand = ReactiveCommand.Create(HandleStopAudioRecording);
+        StartVideoRecordingCommand = ReactiveCommand.Create(HandleStartVideoRecordingAsync);
+        StopRecordingCommand = ReactiveCommand.Create(HandleStopRecording);
 
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
         ChangeRomCommand = ReactiveCommand.Create<RomType>(HandleChangeRom);
@@ -288,7 +296,7 @@ public partial class MainWindowViewModel : ReactiveObject
         Interlocked.Exchange(ref _frameCount, 0);
     }
 
-    private void EmulatorOnRenderScreen(FrameBuffer framebuffer)
+    private void EmulatorFrameCompleted(FrameBuffer frameBuffer, IEnumerable<byte> audioBuffer)
     {
         // Keep max 50 FPS
         if (_renderStopwatch.Elapsed - _lastScreenRender < TimeSpan.FromMilliseconds(19))
@@ -301,9 +309,12 @@ public partial class MainWindowViewModel : ReactiveObject
 
         Dispatcher.UIThread.Post(() =>
         {
-            _frameBufferConverter.UpdateBitmap(framebuffer);
+            _frameBufferConverter.UpdateBitmap(frameBuffer);
+
             ScreenControl.InvalidateVisual();
         });
+
+        _mediaRecorder?.AppendFrame(frameBuffer, audioBuffer);
     }
 
     private async Task WindowOpenedAsync()
@@ -384,7 +395,7 @@ public partial class MainWindowViewModel : ReactiveObject
         IsUlaPlusEnabled = Emulator.IsUlaPlusEnabled;
 
         Emulator.TapeLoadSpeed = TapeLoadSpeed;
-        Emulator.RenderScreen += EmulatorOnRenderScreen;
+        Emulator.FrameCompleted += EmulatorFrameCompleted;
 
         Emulator.SetFloatingBusSupport(_preferences.IsFloatingBusEnabled);
         Emulator.SetAudioSettings(_preferences.AudioSettings);
@@ -435,7 +446,7 @@ public partial class MainWindowViewModel : ReactiveObject
         }
 
         Emulator.Shutdown();
-        Emulator.RenderScreen -= EmulatorOnRenderScreen;
+        Emulator.FrameCompleted -= EmulatorFrameCompleted;
         Emulator.CommandManager.CommandReceived -= CommandManagerOnCommandReceived;
         Emulator = null;
     }

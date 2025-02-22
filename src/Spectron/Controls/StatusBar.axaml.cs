@@ -4,8 +4,5 @@ namespace OldBit.Spectron.Controls;
 
 public partial class StatusBar : UserControl
 {
-    public StatusBar()
-    {
-        InitializeComponent();
-    }
+    public StatusBar() => InitializeComponent();
 }

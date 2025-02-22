@@ -1,7 +1,6 @@
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Rom;
-using OldBit.Spectron.Emulation.Tape;
-using OldBit.Spectron.Models;
+using OldBit.Spectron.Screen;
 using OldBit.Spectron.Theming;
 
 namespace OldBit.Spectron.Settings;
@@ -31,4 +30,6 @@ public class Preferences
     public AudioSettings AudioSettings { get; init; } = new();
 
     public TapeSettings TapeSettings { get; init; } = new();
+
+    public RecordingSettings RecordingSettings { get; init; } = new();
 }
