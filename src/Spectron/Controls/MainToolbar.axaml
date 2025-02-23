@@ -106,6 +106,13 @@
             <material:MaterialIcon Kind="ClockTimeTenOutline"/>
         </Button>
 
+        <Button
+            ToolTip.Tip="Debugger"
+            HotKey="F11"
+            Command="{Binding ShowDebuggerViewCommand}">
+            <material:MaterialIcon Kind="Bug"/>
+        </Button>
+
         <ToggleButton
             ToolTip.Tip="Toggle Full Screen"
             IsChecked="{Binding $parent[Window].WindowState, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static WindowState.FullScreen}}"
