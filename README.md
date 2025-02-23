@@ -133,6 +133,7 @@ memory and disassembly. You can step through the code, set breakpoints. This is 
 - [Avalonia UI](https://avaloniaui.net/)
 - [FFmpeg wrapper](https://github.com/rosenbjerg/FFMpegCore)
 - [SkiaSharp](https://github.com/mono/SkiaSharp)
+- [Material Icons](https://github.com/SKProCH/Material.Icons)
 - [ZX Spectrum Font](https://github.com/comptic/zx-spectrum-font)
 - [Hack Font](https://sourcefoundry.org/hack/)
 - [VT220 Font](https://github.com/svofski/glasstty/blob/master/Glass_TTY_VT220.ttf)

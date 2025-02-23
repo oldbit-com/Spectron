@@ -118,6 +118,7 @@ public class TapeMenuViewModel : ReactiveObject
                     CanRewind = true;
                     CanPlay = true;
                     CanStop = false;
+                    CanEject = true;
 
                     break;
 
@@ -125,6 +126,7 @@ public class TapeMenuViewModel : ReactiveObject
                     CanRewind = false;
                     CanPlay = false;
                     CanStop = true;
+                    CanEject = true;
 
                     break;
 

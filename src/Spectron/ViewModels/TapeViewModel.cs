@@ -17,6 +17,7 @@ public class TapeViewModel : ReactiveObject, IDisposable
     private bool _canStop;
     private bool _canPlay;
     private bool _canRewind;
+    private bool _canEject;
 
     public ObservableCollection<TapeBlockViewModel> Blocks { get; } = [];
 
@@ -29,7 +30,7 @@ public class TapeViewModel : ReactiveObject, IDisposable
     {
         _tapeManager = tapeManager;
 
-        _tapeManager.Cassette.BlockSelected += CassetteOnCassettePositionChanged;
+        _tapeManager.Cassette.BlockSelected += CassetteOnPositionChanged;
         _tapeManager.Cassette.EndOfTape += CassetteOnEndOfTape;
         _tapeManager.TapeStateChanged += TapeManagerOnTapeStateChanged;
 
@@ -41,6 +42,7 @@ public class TapeViewModel : ReactiveObject, IDisposable
         CanRewind = _tapeManager.IsTapeLoaded;
         CanPlay = _tapeManager is { IsTapeLoaded: true, IsPlaying: false };
         CanStop = _tapeManager is { IsTapeLoaded: true, IsPlaying: true };
+        CanEject = _tapeManager.IsTapeLoaded;
 
         PopulateBlocks();
     }
@@ -55,6 +57,7 @@ public class TapeViewModel : ReactiveObject, IDisposable
                     CanRewind = true;
                     CanPlay = true;
                     CanStop = false;
+                    CanEject = true;
 
                     break;
 
@@ -62,6 +65,7 @@ public class TapeViewModel : ReactiveObject, IDisposable
                     CanRewind = false;
                     CanPlay = false;
                     CanStop = true;
+                    CanEject = true;
 
                     break;
 
@@ -69,13 +73,14 @@ public class TapeViewModel : ReactiveObject, IDisposable
                     CanPlay = false;
                     CanStop = false;
                     CanRewind = false;
+                    CanEject = false;
 
                     break;
             }
         });
     }
 
-    private void CassetteOnCassettePositionChanged(BlockSelectedEventArgs e) =>
+    private void CassetteOnPositionChanged(BlockSelectedEventArgs e) =>
         Dispatcher.UIThread.Post(() => MarkActiveBlock(e.Position));
 
     private void CassetteOnEndOfTape(object? sender, EventArgs e) =>
@@ -97,6 +102,11 @@ public class TapeViewModel : ReactiveObject, IDisposable
 
     private void MarkActiveBlock(int position)
     {
+        if (Blocks.Count == 0)
+        {
+            return;
+        }
+
         Blocks.Where(b => b.IsSelected).ForEach(b => b.IsSelected = false);
 
         if (position >= Blocks.Count)
@@ -141,9 +151,15 @@ public class TapeViewModel : ReactiveObject, IDisposable
         set => this.RaiseAndSetIfChanged(ref _canRewind, value);
     }
 
+    public bool CanEject
+    {
+        get => _canEject;
+        set => this.RaiseAndSetIfChanged(ref _canEject, value);
+    }
+
     public void Dispose()
     {
-        _tapeManager.Cassette.BlockSelected -= CassetteOnCassettePositionChanged;
+        _tapeManager.Cassette.BlockSelected -= CassetteOnPositionChanged;
         _tapeManager.Cassette.EndOfTape -= CassetteOnEndOfTape;
         _tapeManager.TapeStateChanged -= TapeManagerOnTapeStateChanged;
 
