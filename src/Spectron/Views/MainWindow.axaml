@@ -46,14 +46,24 @@
             DockPanel.Dock="Top"
             IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}"/>
 
-        <controls:MainToolbar
-            DockPanel.Dock="Top"
-            DataContext="{Binding}"
-            Height="40"
-            IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}"/>
+        <Grid ColumnDefinitions="40,*,40"
+            RowDefinitions="*,Auto"
+            Focusable="True"
+            FocusAdorner="{x:Null}">
 
-        <Grid RowDefinitions="*,Auto" Focusable="True" FocusAdorner="{x:Null}">
-            <Border>
+            <controls:MainToolbar
+                Grid.Row="0"
+                Grid.Column="0"
+                DockPanel.Dock="Top"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Margin="6 10 0 0"
+                DataContext="{Binding}"
+                Width="30"/>
+
+            <Border
+                Grid.Row="0"
+                Grid.Column="1">
                 <Grid>
                     <Border CornerRadius="15" HorizontalAlignment="Center" ClipToBounds="True">
                         <Grid>
@@ -79,12 +89,16 @@
 
             <controls:StatusBar
                 Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
                 Height="30"
                 DataContext="{Binding StatusBar}"
                 IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}"/>
 
             <WindowNotificationManager
                 Grid.Row="0"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
                 Name="NotificationManager"
                 Position="BottomRight"/>
         </Grid>

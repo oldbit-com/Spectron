@@ -6,7 +6,7 @@
              x:DataType="viewModels:MainWindowViewModel"
              xmlns:material="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:icons="clr-namespace:Material.Icons;assembly=Material.Icons"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="50"
+             mc:Ignorable="d" d:DesignWidth="50" d:DesignHeight="250"
              x:Class="OldBit.Spectron.Controls.MainToolbar">
 
     <UserControl.Styles>
@@ -33,85 +33,80 @@
         </Style>
     </UserControl.Styles>
 
-    <Panel DockPanel.Dock="Top" Height="40">
-        <DockPanel>
-            <Button
-                ToolTip.Tip="Load File"
-                HotKey="Cmd+O"
-                Margin="6,0,0,0"
-                Command="{Binding LoadFileCommand}">
-                <material:MaterialIcon Kind="Import"/>
-            </Button>
+    <StackPanel>
+        <Button
+            ToolTip.Tip="Load File"
+            HotKey="Cmd+O"
+            Command="{Binding LoadFileCommand}">
+            <material:MaterialIcon Kind="Import"/>
+        </Button>
 
-            <Button
-                ToolTip.Tip="Save Snapshot"
-                HotKey="Cmd+S"
-                Command="{Binding SaveFileCommand}">
-                <material:MaterialIcon Kind="Floppy"/>
-            </Button>
+        <Button
+            ToolTip.Tip="Save Snapshot"
+            HotKey="Cmd+S"
+            Command="{Binding SaveFileCommand}">
+            <material:MaterialIcon Kind="Floppy"/>
+        </Button>
 
-            <Button
-                ToolTip.Tip="Record Video"
-                Foreground="Red"
-                Command="{Binding StartVideoRecordingCommand}">
-                <material:MaterialIcon Kind="Record"/>
-            </Button>
+        <Button
+            ToolTip.Tip="Record Video"
+            Foreground="Red"
+            Command="{Binding StartVideoRecordingCommand}">
+            <material:MaterialIcon Kind="Record"/>
+        </Button>
 
-            <ToggleButton
-                ToolTip.Tip="Pause"
-                Name="PauseButton"
-                HotKey="F8"
-                Margin="10 0 0 0"
-                IsChecked="{Binding IsPaused, Mode=OneWay}"
-                Command="{Binding TogglePauseCommand}">
-                <material:MaterialIcon Kind="Pause"/>
+        <ToggleButton
+            ToolTip.Tip="Pause"
+            Name="PauseButton"
+            HotKey="F8"
+            Margin="0 10 0 0"
+            IsChecked="{Binding IsPaused, Mode=OneWay}"
+            Command="{Binding TogglePauseCommand}">
+            <material:MaterialIcon Kind="Pause"/>
 
-                <Interaction.Behaviors>
-                    <DataTriggerBehavior Binding="{Binding $parent[ToggleButton].IsChecked}" Value="{x:True}">
-                        <ChangePropertyAction TargetObject="PauseButton" PropertyName="ToolTip.Tip" Value="Resume"/>
-                    </DataTriggerBehavior>
-                    <DataTriggerBehavior Binding="{Binding $parent[ToggleButton].IsChecked}" Value="{x:False}">
-                        <ChangePropertyAction TargetObject="PauseButton" PropertyName="ToolTip.Tip" Value="Pause"/>
-                    </DataTriggerBehavior>
-                </Interaction.Behaviors>
-            </ToggleButton>
+            <Interaction.Behaviors>
+                <DataTriggerBehavior Binding="{Binding $parent[ToggleButton].IsChecked}" Value="{x:True}">
+                    <ChangePropertyAction TargetObject="PauseButton" PropertyName="ToolTip.Tip" Value="Resume"/>
+                </DataTriggerBehavior>
+                <DataTriggerBehavior Binding="{Binding $parent[ToggleButton].IsChecked}" Value="{x:False}">
+                    <ChangePropertyAction TargetObject="PauseButton" PropertyName="ToolTip.Tip" Value="Pause"/>
+                </DataTriggerBehavior>
+            </Interaction.Behaviors>
+        </ToggleButton>
 
-            <ToggleButton
-                Name="VolumeButton"
-                ToolTip.Tip="Mute"
-                IsChecked="{Binding IsMuted, Mode=OneWay}"
-                Command="{Binding ToggleMuteCommand}">
+        <ToggleButton
+            Name="VolumeButton"
+            ToolTip.Tip="Mute"
+            IsChecked="{Binding IsMuted, Mode=OneWay}"
+            Command="{Binding ToggleMuteCommand}">
 
-                <Interaction.Behaviors>
-                    <DataTriggerBehavior Binding="{Binding $parent[ToggleButton].IsChecked}" Value="{x:True}">
-                        <ChangePropertyAction TargetObject="VolumeIcon" PropertyName="Kind" Value="{x:Static icons:MaterialIconKind.VolumeOff}"/>
-                        <ChangePropertyAction TargetObject="VolumeButton" PropertyName="ToolTip.Tip" Value="Unmute"/>
-                    </DataTriggerBehavior>
-                    <DataTriggerBehavior Binding="{Binding $parent[ToggleButton].IsChecked}" Value="{x:False}">
-                        <ChangePropertyAction TargetObject="VolumeIcon" PropertyName="Kind" Value="{x:Static icons:MaterialIconKind.VolumeHigh}"/>
-                        <ChangePropertyAction TargetObject="VolumeButton" PropertyName="ToolTip.Tip" Value="Mute"/>
-                    </DataTriggerBehavior>
-                </Interaction.Behaviors>
+            <Interaction.Behaviors>
+                <DataTriggerBehavior Binding="{Binding $parent[ToggleButton].IsChecked}" Value="{x:True}">
+                    <ChangePropertyAction TargetObject="VolumeIcon" PropertyName="Kind" Value="{x:Static icons:MaterialIconKind.VolumeOff}"/>
+                    <ChangePropertyAction TargetObject="VolumeButton" PropertyName="ToolTip.Tip" Value="Unmute"/>
+                </DataTriggerBehavior>
+                <DataTriggerBehavior Binding="{Binding $parent[ToggleButton].IsChecked}" Value="{x:False}">
+                    <ChangePropertyAction TargetObject="VolumeIcon" PropertyName="Kind" Value="{x:Static icons:MaterialIconKind.VolumeHigh}"/>
+                    <ChangePropertyAction TargetObject="VolumeButton" PropertyName="ToolTip.Tip" Value="Mute"/>
+                </DataTriggerBehavior>
+            </Interaction.Behaviors>
 
-                <material:MaterialIcon Name="VolumeIcon" Kind="VolumeHigh"/>
-            </ToggleButton>
+            <material:MaterialIcon Name="VolumeIcon" Kind="VolumeHigh"/>
+        </ToggleButton>
 
-            <Button
-                ToolTip.Tip="Time Machine"
-                Command="{Binding ShowTimeMachineViewCommand}">
-                <material:MaterialIcon Kind="ClockTimeTenOutline"/>
-            </Button>
+        <Button
+            ToolTip.Tip="Time Machine"
+            Command="{Binding ShowTimeMachineViewCommand}">
+            <material:MaterialIcon Kind="ClockTimeTenOutline"/>
+        </Button>
 
-            <Panel DockPanel.Dock="Right" HorizontalAlignment="Right">
-                <Button
-                    ToolTip.Tip="Preferences"
-                    HotKey="Cmd+,"
-                    Margin="0,0,6,0"
-                    Command="{Binding ShowPreferencesViewCommand}">
-                    <material:MaterialIcon Kind="Settings"/>
-                </Button>
-            </Panel>
+        <Button
+            ToolTip.Tip="Preferences"
+            HotKey="Cmd+,"
+            Margin="0,10,0,0"
+            Command="{Binding ShowPreferencesViewCommand}">
+            <material:MaterialIcon Kind="Settings"/>
+        </Button>
 
-        </DockPanel>
-    </Panel>
+    </StackPanel>
 </UserControl>
