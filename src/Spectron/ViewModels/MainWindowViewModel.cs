@@ -143,9 +143,6 @@ public partial class MainWindowViewModel : ReactiveObject
 
         var timeMachineEnabled = this.WhenAnyValue(x => x.IsTimeMachineEnabled);
 
-        this.WhenAny(x => x.WindowState, x => x.Value)
-            .Subscribe(x => WindowStateCommandName = x == WindowState.FullScreen ? "Exit Full Screen" : "Enter Full Screen");
-
         this.WhenAny(x => x.TapeLoadSpeed, x => x.Value)
             .Subscribe(_ => Emulator?.SetTapeLoadingSpeed(TapeLoadSpeed));
 

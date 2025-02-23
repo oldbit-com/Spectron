@@ -6,8 +6,13 @@
              x:DataType="viewModels:MainWindowViewModel"
              xmlns:material="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:icons="clr-namespace:Material.Icons;assembly=Material.Icons"
-             mc:Ignorable="d" d:DesignWidth="50" d:DesignHeight="250"
+             xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
+             mc:Ignorable="d" d:DesignWidth="30" d:DesignHeight="400"
              x:Class="OldBit.Spectron.Controls.MainToolbar">
+
+    <UserControl.Resources>
+        <converters:ValueEqualityConverter x:Key="ValueEqualityConverter"/>
+    </UserControl.Resources>
 
     <UserControl.Styles>
         <Style Selector="Button">
@@ -96,9 +101,19 @@
 
         <Button
             ToolTip.Tip="Time Machine"
+            HotKey="F9"
             Command="{Binding ShowTimeMachineViewCommand}">
             <material:MaterialIcon Kind="ClockTimeTenOutline"/>
         </Button>
+
+        <ToggleButton
+            ToolTip.Tip="Toggle Full Screen"
+            IsChecked="{Binding $parent[Window].WindowState, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static WindowState.FullScreen}}"
+            HotKey="Ctrl+Enter"
+            Margin="0,10,0,0"
+            Command="{Binding ToggleFullScreenCommand}">
+            <material:MaterialIcon Kind="Fullscreen"/>
+        </ToggleButton>
 
         <Button
             ToolTip.Tip="Preferences"

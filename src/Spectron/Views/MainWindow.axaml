@@ -32,7 +32,8 @@
     </i:Interaction.Behaviors>
 
     <Window.Resources>
-        <converters:IsFullScreenConverter x:Key="IsFullScreenConverter"/>
+        <converters:ValueEqualityConverter x:Key="ValueEqualityConverter"/>
+        <converters:ValueInequalityConverter x:Key="ValueInequalityConverter"/>
     </Window.Resources>
 
     <Window.Styles>
@@ -44,7 +45,7 @@
     <DockPanel>
         <controls:MainMenu
             DockPanel.Dock="Top"
-            IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}"/>
+            IsVisible="{Binding $parent[Window].WindowState, Converter={StaticResource ValueInequalityConverter}, ConverterParameter={x:Static WindowState.FullScreen}}"/>
 
         <Grid ColumnDefinitions="40,*,40"
             RowDefinitions="*,Auto"
@@ -93,7 +94,7 @@
                 Grid.ColumnSpan="3"
                 Height="30"
                 DataContext="{Binding StatusBar}"
-                IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}"/>
+                IsVisible="{Binding $parent[Window].WindowState, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static WindowState.FullScreen}}"/>
 
             <WindowNotificationManager
                 Grid.Row="0"

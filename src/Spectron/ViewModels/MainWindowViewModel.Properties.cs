@@ -82,13 +82,6 @@ partial class MainWindowViewModel
         set => this.RaiseAndSetIfChanged(ref _windowState, value);
     }
 
-    private string _windowStateCommandName = string.Empty;
-    public string WindowStateCommandName
-    {
-        get => _windowStateCommandName;
-        set => this.RaiseAndSetIfChanged(ref _windowStateCommandName, value);
-    }
-
     private TapeSpeed _tapeLoadSpeed = TapeSpeed.Normal;
     public TapeSpeed TapeLoadSpeed
     {
