@@ -1,5 +1,6 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:spectron="clr-namespace:OldBit.Spectron"
              Name="Spectron"
              RequestedThemeVariant="Dark"
@@ -27,6 +28,11 @@
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
         <StyleInclude Source="avares://Spectron/Controls/PauseOverlay.axaml" />
         <StyleInclude Source="avares://Spectron/Controls/HeaderSeparator.axaml" />
+        <materialIcons:MaterialIconStyles />
+
+        <Style Selector="ToolTip">
+            <Setter Property="Padding" Value="8 5 4 4"></Setter>
+        </Style>
     </Application.Styles>
 
     <Application.Resources>

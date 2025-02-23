@@ -112,14 +112,4 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         viewModel.MainWindow = this;
         viewModel.NotificationManager = NotificationManager;
     }
-
-    private void RecentFilesSubmenuOpened(object? sender, RoutedEventArgs e)
-    {
-        if (sender is not MenuItem menuItem)
-        {
-            return;
-        }
-
-        _viewModel?.RecentFilesViewModel.Opening(menuItem.Items);
-    }
 }

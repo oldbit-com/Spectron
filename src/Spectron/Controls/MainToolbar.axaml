@@ -1,0 +1,75 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+             x:DataType="viewModels:MainWindowViewModel"
+             xmlns:material="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:icons="clr-namespace:Material.Icons;assembly=Material.Icons"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="OldBit.Spectron.Controls.MainToolbar">
+
+    <UserControl.Styles>
+        <Style Selector="Button">
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="30"/>
+            <Setter Property="Background" Value="{DynamicResource SystemAltLowColor}"/>
+        </Style>
+        <Style Selector="ToggleButton">
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="30"/>
+            <Setter Property="Background" Value="{DynamicResource SystemAltLowColor}"/>
+        </Style>
+        <Style Selector="Path">
+            <Setter Property="Fill" Value="{DynamicResource ButtonForeground}"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Panel DockPanel.Dock="Top" Height="40">
+        <DockPanel>
+            <Button
+                ToolTip.Tip="Load File"
+                Margin="6,0,0,0"
+                Command="{Binding LoadFileCommand}">
+                <material:MaterialIcon Kind="OpenInApp" />
+            </Button>
+            <ToggleButton
+                ToolTip.Tip="Pause/Resume"
+                IsChecked="{Binding IsPaused, Mode=OneWay}"
+                Command="{Binding TogglePauseCommand}">
+                <material:MaterialIcon Kind="Pause" />
+            </ToggleButton>
+            <ToggleButton
+                Name="VolumeButton"
+                ToolTip.Tip="Mute"
+                IsChecked="{Binding IsMuted, Mode=OneWay}"
+                Command="{Binding ToggleMuteCommand}">
+
+                <Interaction.Behaviors>
+                    <DataTriggerBehavior Binding="{Binding $parent[ToggleButton].IsChecked}" Value="{x:True}">
+                        <ChangePropertyAction TargetObject="VolumeIcon" PropertyName="Kind" Value="{x:Static icons:MaterialIconKind.VolumeOff}"/>
+                        <ChangePropertyAction TargetObject="VolumeButton" PropertyName="ToolTip.Tip" Value="Unmute"/>
+                    </DataTriggerBehavior>
+                    <DataTriggerBehavior Binding="{Binding $parent[ToggleButton].IsChecked}" Value="{x:False}">
+                        <ChangePropertyAction TargetObject="VolumeIcon" PropertyName="Kind" Value="{x:Static icons:MaterialIconKind.VolumeHigh}"/>
+                        <ChangePropertyAction TargetObject="VolumeButton" PropertyName="ToolTip.Tip" Value="Mute"/>
+                    </DataTriggerBehavior>
+                </Interaction.Behaviors>
+
+                <material:MaterialIcon Name="VolumeIcon" Kind="VolumeHigh"/>
+            </ToggleButton>
+
+            <Panel DockPanel.Dock="Right" HorizontalAlignment="Right">
+                <Button
+                    ToolTip.Tip="Preferences"
+                    Margin="0,0,6,0"
+                    Command="{Binding ShowPreferencesViewCommand}">
+                    <material:MaterialIcon Kind="Settings" />
+                </Button>
+            </Panel>
+
+        </DockPanel>
+    </Panel>
+</UserControl>
