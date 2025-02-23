@@ -32,7 +32,6 @@
     </i:Interaction.Behaviors>
 
     <Window.Resources>
-        <converters:ValueEqualityConverter x:Key="ValueEqualityConverter"/>
         <converters:ValueInequalityConverter x:Key="ValueInequalityConverter"/>
     </Window.Resources>
 
@@ -94,7 +93,7 @@
                 Grid.ColumnSpan="3"
                 Height="30"
                 DataContext="{Binding StatusBar}"
-                IsVisible="{Binding $parent[Window].WindowState, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static WindowState.FullScreen}}"/>
+                IsVisible="{Binding $parent[Window].WindowState, Converter={StaticResource ValueInequalityConverter}, ConverterParameter={x:Static WindowState.FullScreen}}"/>
 
             <WindowNotificationManager
                 Grid.Row="0"
