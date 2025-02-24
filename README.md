@@ -19,6 +19,8 @@ It uses several of my own libraries that I created for this project:
 - [Audio player](https://github.com/oldbit-com/Beep)
 - [Gamepad support](https://github.com/oldbit-com/Joypad)
 
+![Main Window](docs/default.png?raw=true "Main Window")
+
 # Features
 - [x] Emulates classic ZX Spectrum 16K, 48K and 128K
 - [x] Time Machine: go back in time to continue from there
