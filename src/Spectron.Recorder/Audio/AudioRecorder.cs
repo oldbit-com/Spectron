@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using OldBit.Spectron.Emulation.Devices.Audio;
 
 namespace OldBit.Spectron.Recorder.Audio;
 
@@ -6,11 +7,11 @@ internal sealed class AudioRecorder(string filePath) : IDisposable
 {
     private Stream? _stream;
 
-    internal void AppendFrame(IEnumerable<byte> audioData)
+    internal void AppendFrame(AudioBuffer audioBuffer)
     {
-        foreach (var data in audioData)
+        for (var i = 0; i < audioBuffer.Count; i++)
         {
-            _stream?.WriteByte(data);
+            _stream?.WriteByte(audioBuffer.Buffer[i]);
         }
     }
 

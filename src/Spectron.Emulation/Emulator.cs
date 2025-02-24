@@ -30,7 +30,7 @@ public sealed class Emulator
     private bool _isAcceleratedTapeSpeed;
     private FloatingBus _floatingBus = null!;
 
-    public delegate void FrameEvent(FrameBuffer frameBuffer, IEnumerable<byte> audioBuffer);
+    public delegate void FrameEvent(FrameBuffer frameBuffer, AudioBuffer audioBuffer);
     public event FrameEvent? FrameCompleted;
 
     public bool IsPaused => _emulationTimer.IsPaused;

@@ -1,5 +1,6 @@
 using FFMpegCore;
 using Microsoft.Extensions.Logging;
+using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Recorder.Audio;
 using OldBit.Spectron.Recorder.Helpers;
@@ -46,7 +47,7 @@ public sealed class MediaRecorder : IDisposable
         }
     }
 
-    public void AppendFrame(FrameBuffer frameBuffer, IEnumerable<byte> audioData)
+    public void AppendFrame(FrameBuffer frameBuffer, AudioBuffer audioBuffer)
     {
         if (!_isRecordingActive)
         {
@@ -56,7 +57,7 @@ public sealed class MediaRecorder : IDisposable
         try
         {
             _videoRecorder?.AppendFrame(frameBuffer);
-            _audioRecorder?.AppendFrame(audioData);
+            _audioRecorder?.AppendFrame(audioBuffer);
         }
         catch (Exception ex)
         {

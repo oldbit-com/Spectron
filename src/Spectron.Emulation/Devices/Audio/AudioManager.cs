@@ -19,7 +19,6 @@ public sealed class AudioManager
     private readonly AudioBufferPool _audioBufferPool;
     private readonly BeeperAudio _beeperAudio;
     private readonly AyAudio _ayAudio;
-    private readonly byte[] _emptyBuffer = [];
 
     private StereoMode _stereoMode = StereoMode.Mono;
     private bool _isMuted;
@@ -106,11 +105,11 @@ public sealed class AudioManager
         _ayAudio.NewFrame();
     }
 
-    internal IEnumerable<byte> EndFrame()
+    internal AudioBuffer EndFrame()
     {
         if (_isMuted)
         {
-            return _emptyBuffer;
+            return AudioBuffer.Empty;
         }
 
         var playAudio = false;
@@ -129,7 +128,7 @@ public sealed class AudioManager
 
         if (!playAudio)
         {
-            return _emptyBuffer;
+            return AudioBuffer.Empty;
         }
 
         var audioBuffer = _audioBufferPool.GetBuffer();
@@ -170,9 +169,9 @@ public sealed class AudioManager
             }
         }
 
-        _audioPlayer?.TryEnqueue(audioBuffer.Buffer);
+        _audioPlayer?.TryEnqueue(audioBuffer.Buffer, audioBuffer.Count);
 
-        return audioBuffer.Buffer;
+        return audioBuffer;
     }
 
     internal void Start()

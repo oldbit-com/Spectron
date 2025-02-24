@@ -15,6 +15,7 @@ using OldBit.Spectron.Debugger;
 using OldBit.Spectron.Debugger.ViewModels;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Commands;
+using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Rom;
@@ -295,7 +296,7 @@ public partial class MainWindowViewModel : ReactiveObject
         Interlocked.Exchange(ref _frameCount, 0);
     }
 
-    private void EmulatorFrameCompleted(FrameBuffer frameBuffer, IEnumerable<byte> audioBuffer)
+    private void EmulatorFrameCompleted(FrameBuffer frameBuffer, AudioBuffer audioBuffer)
     {
         // Keep max 50 FPS
         if (_renderStopwatch.Elapsed - _lastScreenRender < TimeSpan.FromMilliseconds(19))
