@@ -74,7 +74,7 @@
                 <MenuItem Header="300%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="300" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='300'}"/>
                 <MenuItem Header="400%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="400" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='400'}"/>
                 <MenuItem Header="500%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="500" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='500'}"/>
-                <MenuItem Header="Full Throttle" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="Max" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='Max'}"/>
+                <MenuItem Header="Max" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="Max" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='Max'}"/>
             </MenuItem>
             <MenuItem Header="-"/>
             <MenuItem Header="Pause" HotKey="F8" InputGesture="F8" Command="{Binding TogglePauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>

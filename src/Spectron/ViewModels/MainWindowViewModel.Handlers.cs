@@ -267,9 +267,13 @@ partial class MainWindowViewModel
 
     private void HandleStopRecording()
     {
-        RecordingStatus = RecordingStatus.None;
-
         if (_mediaRecorder == null)
+        {
+            RecordingStatus = RecordingStatus.None;
+            return;
+        }
+
+        if (RecordingStatus != RecordingStatus.Recording)
         {
             return;
         }
@@ -411,6 +415,7 @@ partial class MainWindowViewModel
             }
         }
 
+        StatusBar.Speed = emulationSpeed;
         Emulator?.SetEmulationSpeed(emulationSpeedValue);
     }
 

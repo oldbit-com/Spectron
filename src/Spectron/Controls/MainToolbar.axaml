@@ -35,6 +35,7 @@
         <Style Selector="material|MaterialIcon">
             <Setter Property="Width" Value="20"/>
             <Setter Property="Height" Value="20"/>
+            <Setter Property="Foreground" Value="{DynamicResource SystemBaseMediumLowColor}"/>
         </Style>
     </UserControl.Styles>
 
@@ -54,10 +55,17 @@
         </Button>
 
         <Button
-            ToolTip.Tip="Record Video"
-            Foreground="Red"
+            ToolTip.Tip="Start Video Record"
+            IsVisible="{Binding !RecordingStatus}"
             Command="{Binding StartVideoRecordingCommand}">
-            <material:MaterialIcon Kind="Record"/>
+            <material:MaterialIcon Kind="Record" Foreground="Red"/>
+        </Button>
+
+        <Button
+            ToolTip.Tip="Stop Recording"
+            IsVisible="{Binding RecordingStatus}"
+            Command="{Binding StopRecordingCommand}">
+            <material:MaterialIcon Kind="Stop" Foreground="Red"/>
         </Button>
 
         <ToggleButton

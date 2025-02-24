@@ -140,8 +140,6 @@ public partial class MainWindowViewModel : ReactiveObject
         _statusBarTimer.AutoReset = true;
         _statusBarTimer.Elapsed += StatusBarTimerOnElapsed;
 
-        var emulatorNotNull = this.WhenAnyValue(x => x.Emulator).Select(emulator => emulator is null);
-
         var timeMachineEnabled = this.WhenAnyValue(x => x.IsTimeMachineEnabled);
 
         this.WhenAny(x => x.TapeLoadSpeed, x => x.Value)
@@ -153,13 +151,19 @@ public partial class MainWindowViewModel : ReactiveObject
         this.WhenAny(x => x.RecordingStatus, x => x.Value)
             .Subscribe(status => StatusBar.RecordingStatus = status);
 
+        this.WhenAny(x => x.ComputerType, x => x.Value)
+            .Subscribe(computerType => StatusBar.ComputerType = computerType);
+
+        this.WhenAny(x => x.JoystickType, x => x.Value)
+            .Subscribe(joystickType => StatusBar.JoystickType = joystickType);
+
         WindowOpenedCommand = ReactiveCommand.CreateFromTask(WindowOpenedAsync);
         WindowClosingCommand = ReactiveCommand.CreateFromTask(WindowClosingAsync);
         KeyDownCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyDown);
         KeyUpCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyUp);
 
         LoadFileCommand = ReactiveCommand.Create(HandleLoadFileAsync);
-        SaveFileCommand = ReactiveCommand.Create(HandleSaveFileAsync, emulatorNotNull);
+        SaveFileCommand = ReactiveCommand.Create(HandleSaveFileAsync);
         StartAudioRecordingCommand = ReactiveCommand.Create(HandleStartAudioRecordingAsync);
         StartVideoRecordingCommand = ReactiveCommand.Create(HandleStartVideoRecordingAsync);
         StopRecordingCommand = ReactiveCommand.Create(HandleStopRecording);
@@ -169,9 +173,9 @@ public partial class MainWindowViewModel : ReactiveObject
         ChangeComputerType = ReactiveCommand.Create<ComputerType>(HandleChangeComputerType);
         ChangeJoystickType = ReactiveCommand.Create<JoystickType>(HandleChangeJoystickType);
         ToggleUlaPlus = ReactiveCommand.Create(HandleToggleUlaPlus);
-        TogglePauseCommand = ReactiveCommand.Create(HandleTogglePause, emulatorNotNull);
-        ResetCommand = ReactiveCommand.Create(HandleMachineReset, emulatorNotNull);
-        HardResetCommand = ReactiveCommand.Create(HandleMachineHardReset, emulatorNotNull);
+        TogglePauseCommand = ReactiveCommand.Create(HandleTogglePause);
+        ResetCommand = ReactiveCommand.Create(HandleMachineReset);
+        HardResetCommand = ReactiveCommand.Create(HandleMachineHardReset);
         SetEmulationSpeedCommand = ReactiveCommand.Create<string>(HandleSetEmulationSpeed);
         ToggleFullScreenCommand = ReactiveCommand.Create(HandleToggleFullScreen);
         SetTapeLoadSpeedCommand = ReactiveCommand.Create<TapeSpeed>(HandleSetTapeLoadingSpeed);
@@ -286,12 +290,9 @@ public partial class MainWindowViewModel : ReactiveObject
 
     private void StatusBarTimerOnElapsed(object? sender, ElapsedEventArgs e)
     {
-        var fps = $"FPS: {_frameCount.ToString()}";
+        var fps = _frameCount.ToString();
 
-        Dispatcher.UIThread.Post(() =>
-        {
-            StatusBar.FramesPerSecond = fps;
-        });
+        Dispatcher.UIThread.Post(() => StatusBar.FramesPerSecond = fps);
 
         Interlocked.Exchange(ref _frameCount, 0);
     }
