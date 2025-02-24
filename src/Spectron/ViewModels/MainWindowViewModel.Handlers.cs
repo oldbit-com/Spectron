@@ -228,7 +228,7 @@ partial class MainWindowViewModel
 
         if (!MediaRecorder.VerifyDependencies())
         {
-            await MessageDialogs.Error("Video recording is not available. It requires FFmpeg to be installed. Please check the documentation for more information.");
+            await MessageDialogs.Error("Video recording is not available. It requires FFmpeg to be available.\nPlease check the documentation for more information.");
 
             return;
         }
