@@ -1,10 +1,8 @@
-using System.IO.Compression;
-using OldBit.Spectron.Emulation.Snapshot;
-using OldBit.Spectron.Files.Szx;
+using OldBit.Spectron.Emulation.State;
 
 namespace OldBit.Spectron.Emulation;
 
-public record TimeMachineEntry(DateTimeOffset Timestamp, SzxFile Snapshot);
+public record TimeMachineEntry(DateTimeOffset Timestamp, EmulatorState Snapshot);
 
 public sealed class TimeMachine
 {
@@ -30,7 +28,7 @@ public sealed class TimeMachine
             return;
         }
 
-        var snapshot = SzxSnapshot.CreateSnapshot(emulator, CompressionLevel.NoCompression);
+        var snapshot = StateManager.CreateSnapshot(emulator);
         _entries.Add(new TimeMachineEntry(now, snapshot));
 
         while (Entries.Count > MaxSnapshots)

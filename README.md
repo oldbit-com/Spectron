@@ -79,7 +79,7 @@ You can select a block and load it using standard `LOAD` command.
 
 ## Snapshots
 Emulator supports saving and loading snapshots in **SNA**, **SZX** and **Z80** formats (can be inside zip file).
-It is recommended to use **SZX** format when saving a snapshot since it is the most robust and supports all features of the emulator.
+It is recommended to use **SZX** format when saving a snapshot since it is the most robust and supports nearly all features of the emulator.
 
 ## Screen
 Multicolor screen effects are supported, as well as border effects. Border size can be adjusted.

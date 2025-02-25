@@ -3,6 +3,7 @@ using OldBit.Spectron.Emulation.Commands;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Snapshot;
+using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Emulation.Tape.Loader;
 
@@ -17,7 +18,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<SnaSnapshot>();
         services.AddSingleton<SzxSnapshot>();
         services.AddSingleton<Z80Snapshot>();
-        services.AddSingleton<SnapshotLoader>();
+        services.AddSingleton<SnapshotManager>();
+        services.AddSingleton<StateManager>();
         services.AddSingleton<Loader>();
         services.AddSingleton<TapeManager>();
         services.AddSingleton<GamepadManager>();

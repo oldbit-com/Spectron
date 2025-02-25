@@ -55,8 +55,6 @@ public sealed class SnaSnapshot(EmulatorFactory emulatorFactory)
             };
         }
 
-        // TODO: Populate snapshot with emulator state
-
         snapshot.Save(fileName);
     }
 

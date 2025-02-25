@@ -3,7 +3,7 @@ using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Files.Szx;
 using OldBit.Spectron.Files.Szx.Blocks;
 
-namespace OldBit.Spectron.Emulation.Snapshot;
+namespace OldBit.Spectron.Emulation.Extensions;
 
 public static class SzxFileExtensions
 {

@@ -7,8 +7,7 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using OldBit.Spectron.Emulation;
-using OldBit.Spectron.Emulation.Screen;
-using OldBit.Spectron.Emulation.Snapshot;
+using OldBit.Spectron.Emulation.Extensions;
 using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
@@ -62,8 +61,7 @@ public class TimeMachineViewModel : ReactiveObject
             Marshal.Copy(screenshot, 0, bitmap.Address, screenshot.Length);
         }
 
-        var borderColor = SpectrumPalette.GetBorderColor(timeMachineEntry.Snapshot.SpecRegs.Border);
-        ScreenBorderBrush = new SolidColorBrush((uint)borderColor.Argb);
+        ScreenBorderBrush = new SolidColorBrush(timeMachineEntry.Snapshot.BorderColor.Argb);
 
         PreviewControl?.InvalidateVisual();
     }

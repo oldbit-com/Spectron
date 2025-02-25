@@ -12,12 +12,12 @@ internal sealed class UlaPlus : IDevice
     private const int RegisterPort = 0xBF3B;
     private const int DataPort = 0xFF3B;
 
-    private readonly Color[][] _paletteColors = [new Color[16], new Color[16], new Color[16], new Color[16]];
     private Register _register;
     private bool _isActive;
     private byte _lastWrittenValue;
 
     internal byte PaletteGroup { get; set; }
+    internal Color[][] PaletteColors { get; set; } = [new Color[16], new Color[16], new Color[16], new Color[16]];
     internal bool IsEnabled { get; set; }
     internal bool IsActive
     {
@@ -55,7 +55,7 @@ internal sealed class UlaPlus : IDevice
                         var colorIndex = PaletteGroup & 0x0F;
                         var color = ColorFromValue(value);
 
-                        _paletteColors[paletteIndex][colorIndex] = color;
+                        PaletteColors[paletteIndex][colorIndex] = color;
                         break;
 
                     case Register.ModeGroup:
@@ -79,7 +79,7 @@ internal sealed class UlaPlus : IDevice
     internal Color GetInkColor(byte attribute)
     {
         var paletteIndex = attribute >> 6;
-        var palette = _paletteColors[paletteIndex];
+        var palette = PaletteColors[paletteIndex];
         var colorIndex = attribute & 0x07;
 
         return palette[colorIndex];
@@ -88,7 +88,7 @@ internal sealed class UlaPlus : IDevice
     internal Color GetPaperColor(byte attribute)
     {
         var paletteIndex = attribute >> 6;
-        var palette = _paletteColors[paletteIndex];
+        var palette = PaletteColors[paletteIndex];
         var colorIndex = ((attribute >> 3) & 0x07) | 8;
 
         return palette[colorIndex];
@@ -102,7 +102,7 @@ internal sealed class UlaPlus : IDevice
         _register = Register.PaletteGroup;
         _lastWrittenValue = 0;
 
-        foreach (var palette in _paletteColors)
+        foreach (var palette in PaletteColors)
         {
             Array.Fill(palette, SpectrumPalette.White);
         }
@@ -112,11 +112,11 @@ internal sealed class UlaPlus : IDevice
     {
         var data = new byte[64];
 
-        for (var i = 0; i < _paletteColors.Length; i++)
+        for (var i = 0; i < PaletteColors.Length; i++)
         {
-            for (var j = 0; j < _paletteColors[i].Length; j++)
+            for (var j = 0; j < PaletteColors[i].Length; j++)
             {
-                var color = _paletteColors[i][j];
+                var color = PaletteColors[i][j];
                 var value = ValueFromColor(color);
 
                 data[i * 16 + j] = value;
@@ -128,14 +128,14 @@ internal sealed class UlaPlus : IDevice
 
     internal void SetPaletteData(byte[] data)
     {
-        for (var i = 0; i < _paletteColors.Length; i++)
+        for (var i = 0; i < PaletteColors.Length; i++)
         {
-            for (var j = 0; j < _paletteColors[i].Length; j++)
+            for (var j = 0; j < PaletteColors[i].Length; j++)
             {
                 var value = data[i * 16 + j];
                 var color = ColorFromValue(value);
 
-                _paletteColors[i][j] = color;
+                PaletteColors[i][j] = color;
             }
         }
     }

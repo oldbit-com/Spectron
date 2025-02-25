@@ -4,9 +4,8 @@ using System.IO.Compression;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation;
-using OldBit.Spectron.Emulation.Snapshot;
+using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Settings;
-using OldBit.Spectron.Files.Szx;
 
 namespace OldBit.Spectron.Services;
 
@@ -28,15 +27,16 @@ public class SessionService(
 
         if (resumeSettings.IsResumeEnabled)
         {
-            var snapshot = SzxSnapshot.CreateSnapshot(emulator, CompressionLevel.NoCompression);
-            session.LastSnapshot = SnapshotToBase64(snapshot);;
+            var snapshot = StateManager.CreateSnapshot(emulator);
+
+            session.LastSnapshot = EmulatorStateToBase64(snapshot);
         }
 
         if (timeMachine.IsEnabled && resumeSettings.ShouldIncludeTimeMachine)
         {
             foreach (var entry in timeMachine.Entries)
             {
-                var snapshotBase64 = SnapshotToBase64(entry.Snapshot);
+                var snapshotBase64 = EmulatorStateToBase64(entry.Snapshot);
                 session.TimeMachineSnapshots.Add(new TimeMachineSnapshot(snapshotBase64, entry.Timestamp));
             }
         }
@@ -44,7 +44,7 @@ public class SessionService(
         await applicationDataService.SaveAsync(session);
     }
 
-    public async Task<SzxFile?> LoadAsync()
+    public async Task<EmulatorState?> LoadAsync()
     {
         var session = await applicationDataService.LoadAsync<SessionSettings>();
 
@@ -54,42 +54,47 @@ public class SessionService(
 
             foreach (var timeMachineSnapshot in session.TimeMachineSnapshots)
             {
-                var snapshot = SnapshotFromBase64(timeMachineSnapshot.Snapshot);
-                timeMachine.Add(new TimeMachineEntry(timeMachineSnapshot.Timestamp, snapshot));
+                var snapshot = EmulatorStateFromBase64(timeMachineSnapshot.Snapshot);
+
+                if (snapshot != null)
+                {
+                    timeMachine.Add(new TimeMachineEntry(timeMachineSnapshot.Timestamp, snapshot));
+                }
             }
 
             if (session.LastSnapshot != null)
             {
-                return SnapshotFromBase64(session.LastSnapshot);
+                return EmulatorStateFromBase64(session.LastSnapshot);
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to load session");
+            _logger.LogError(ex, "Failed to load emulator state");
         }
 
         return null;
     }
 
-    private static string SnapshotToBase64(SzxFile szxFile)
+    private static string EmulatorStateToBase64(EmulatorState snapshot)
     {
-        using var memoryStream = new MemoryStream();
+        var serialized = snapshot.Serialize();
 
-        using (var gzipStream = new GZipStream(memoryStream, CompressionLevel.SmallestSize))
+        using var memoryStream = new MemoryStream();
+        using (var gzipStream = new GZipStream(memoryStream, CompressionLevel.Fastest))
         {
-            szxFile.Save(gzipStream);
+            gzipStream.Write(serialized);
         }
 
         return Convert.ToBase64String(memoryStream.ToArray());
     }
 
-    private static SzxFile SnapshotFromBase64(string base64)
+    private static EmulatorState? EmulatorStateFromBase64(string base64)
     {
         var bytes = Convert.FromBase64String(base64);
 
         using var memoryStream = new MemoryStream(bytes);
         using var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
 
-        return SzxFile.Load(gzipStream);
+        return EmulatorState.Load(gzipStream);
     }
 }
