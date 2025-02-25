@@ -24,6 +24,8 @@
                 <MenuItem/>
             </MenuItem>
             <MenuItem Header="Save Snapshot..." HotKey="Cmd+S" InputGesture="Cmd+S" Command="{Binding SaveFileCommand}"/>
+            <MenuItem Header="Quick Save" HotKey="F5" InputGesture="F5" Command="{Binding QuickSaveCommand}"/>
+            <MenuItem Header="Quick Load" HotKey="F6" InputGesture="F6" Command="{Binding QuickLoadCommand}"/>
             <MenuItem Header="-"/>
             <MenuItem Header="Settings" HotKey="Cmd+," InputGesture="Cmd+," Command="{Binding ShowPreferencesViewCommand}"/>
             <MenuItem Header="-"/>
@@ -31,7 +33,7 @@
             <MenuItem Header="Record Video..." Command="{Binding StartVideoRecordingCommand}" IsEnabled="{Binding !RecordingStatus}"/>
             <MenuItem Header="Stop Recording" Command="{Binding StopRecordingCommand}" IsEnabled="{Binding !!RecordingStatus}"/>
             <MenuItem Header="-"/>
-            <MenuItem Header="Exit" HotKey="Cmd+Q" InputGesture="Cmd+Q"/>
+            <MenuItem Header="Exit" Command="{Binding ExitApplicationCommand}" HotKey="Cmd+Q" InputGesture="Cmd+Q"/>
         </MenuItem>
 
         <MenuItem Header="_Emulator" Padding="10 0 10 0" Focusable="False">

@@ -129,7 +129,7 @@ partial class MainWindowViewModel
 
         if (fileType.IsSnapshot())
         {
-            emulator = _snapshotLoader.Load(stream, fileType);
+            emulator = _snapshotManager.Load(stream, fileType);
         }
         else if (fileType.IsTape())
         {
@@ -158,7 +158,7 @@ partial class MainWindowViewModel
 
             if (file != null && Emulator != null)
             {
-                SnapshotLoader.Save(file.Path.LocalPath, Emulator);
+                SnapshotManager.Save(file.Path.LocalPath, Emulator);
             }
         }
         catch (Exception ex)
@@ -172,6 +172,16 @@ partial class MainWindowViewModel
                 Resume();
             }
         }
+    }
+
+    private void HandleQuickSave()
+    {
+        //SnapshotLoader.Save(file.Path.LocalPath, Emulator);
+    }
+
+    private void HandleQuickLoad()
+    {
+
     }
 
     private RecorderOptions GetRecorderOptions() => new()

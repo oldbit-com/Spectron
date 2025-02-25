@@ -21,6 +21,7 @@ using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Snapshot;
+using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Emulation.Storage;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Emulation.Tape.Loader;
@@ -44,7 +45,8 @@ public partial class MainWindowViewModel : ReactiveObject
     private readonly TimeMachine _timeMachine;
     private readonly GamepadManager _gamepadManager;
 
-    private readonly SnapshotLoader _snapshotLoader;
+    private readonly SnapshotManager _snapshotManager;
+    private readonly StateManager _stateManager;
     private readonly Loader _loader;
 
     private readonly PreferencesService _preferencesService;
@@ -59,6 +61,7 @@ public partial class MainWindowViewModel : ReactiveObject
     private readonly Stopwatch _renderStopwatch = new();
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
     private MediaRecorder? _mediaRecorder;
+    private bool canClose;
 
     public Emulator? Emulator { get; private set; }
     public Control ScreenControl { get; set; } = null!;
@@ -70,16 +73,19 @@ public partial class MainWindowViewModel : ReactiveObject
     public RecentFilesViewModel RecentFilesViewModel { get; }
 
     public ReactiveCommand<Unit, Unit> WindowOpenedCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> WindowClosingCommand { get; private set; }
+    public ReactiveCommand<WindowClosingEventArgs, Unit> WindowClosingCommand { get; private set; }
 
     public ReactiveCommand<KeyEventArgs, Unit> KeyDownCommand { get; private set; }
     public ReactiveCommand<KeyEventArgs, Unit> KeyUpCommand { get; private set; }
 
     public ReactiveCommand<Unit, Task> LoadFileCommand { get; private set; }
     public ReactiveCommand<Unit, Task> SaveFileCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> QuickSaveCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> QuickLoadCommand { get; private set; }
     public ReactiveCommand<Unit, Task> StartAudioRecordingCommand { get; private set; }
     public ReactiveCommand<Unit, Task> StartVideoRecordingCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> StopRecordingCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ExitApplicationCommand { get; private set; }
 
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     public ReactiveCommand<RomType, Unit> ChangeRomCommand { get; private set; }
@@ -112,7 +118,8 @@ public partial class MainWindowViewModel : ReactiveObject
         EmulatorFactory emulatorFactory,
         TimeMachine timeMachine,
         GamepadManager gamepadManager,
-        SnapshotLoader snapshotLoader,
+        SnapshotManager snapshotManager,
+        StateManager stateManager,
         Loader loader,
         PreferencesService preferencesService,
         SessionService sessionService,
@@ -125,7 +132,8 @@ public partial class MainWindowViewModel : ReactiveObject
         _emulatorFactory = emulatorFactory;
         _timeMachine = timeMachine;
         _gamepadManager = gamepadManager;
-        _snapshotLoader = snapshotLoader;
+        _snapshotManager = snapshotManager;
+        _stateManager = stateManager;
         _loader = loader;
         _preferencesService = preferencesService;
         _sessionService = sessionService;
@@ -158,15 +166,18 @@ public partial class MainWindowViewModel : ReactiveObject
             .Subscribe(joystickType => StatusBar.JoystickType = joystickType);
 
         WindowOpenedCommand = ReactiveCommand.CreateFromTask(WindowOpenedAsync);
-        WindowClosingCommand = ReactiveCommand.CreateFromTask(WindowClosingAsync);
+        WindowClosingCommand = ReactiveCommand.CreateFromTask<WindowClosingEventArgs>(WindowClosingAsync);
         KeyDownCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyDown);
         KeyUpCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyUp);
 
         LoadFileCommand = ReactiveCommand.Create(HandleLoadFileAsync);
         SaveFileCommand = ReactiveCommand.Create(HandleSaveFileAsync);
+        QuickSaveCommand = ReactiveCommand.Create(HandleQuickSave);
+        QuickLoadCommand = ReactiveCommand.Create(HandleQuickLoad);
         StartAudioRecordingCommand = ReactiveCommand.Create(HandleStartAudioRecordingAsync);
         StartVideoRecordingCommand = ReactiveCommand.Create(HandleStartVideoRecordingAsync);
         StopRecordingCommand = ReactiveCommand.Create(HandleStopRecording);
+        ExitApplicationCommand = ReactiveCommand.Create(() => MainWindow?.Close());
 
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
         ChangeRomCommand = ReactiveCommand.Create<RomType>(HandleChangeRom);
@@ -354,8 +365,15 @@ public partial class MainWindowViewModel : ReactiveObject
         Emulator?.SetTapeSettings(_preferences.TapeSettings);
     }
 
-    private async Task WindowClosingAsync()
+    private async Task WindowClosingAsync(WindowClosingEventArgs args)
     {
+        if (canClose)
+        {
+            return;
+        }
+
+        args.Cancel = true;
+
         Emulator?.Shutdown();
 
         _preferences.AudioSettings.IsMuted = IsMuted;
@@ -364,6 +382,9 @@ public partial class MainWindowViewModel : ReactiveObject
             _preferencesService.SaveAsync(_preferences),
             RecentFilesViewModel.SaveAsync(),
             _sessionService.SaveAsync(Emulator, _preferences.ResumeSettings));
+
+        canClose = true;
+        MainWindow?.Close();
     }
 
     private void CreateEmulator(ComputerType computerType, RomType romType)
@@ -378,7 +399,14 @@ public partial class MainWindowViewModel : ReactiveObject
 
     private void CreateEmulator(SzxFile snapshot)
     {
-        var emulator = _snapshotLoader.Load(snapshot);
+        var emulator = _snapshotManager.Load(snapshot);
+
+        InitializeEmulator(emulator);
+    }
+
+    private void CreateEmulator(EmulatorState emulatorState)
+    {
+        var emulator = _stateManager.CreateEmulator(emulatorState);
 
         InitializeEmulator(emulator);
     }

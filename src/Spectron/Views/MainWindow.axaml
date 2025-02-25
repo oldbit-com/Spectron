@@ -21,7 +21,7 @@
             <InvokeCommandAction Command="{Binding WindowOpenedCommand}" />
         </EventTriggerBehavior>
         <EventTriggerBehavior EventName="Closing" SourceObject="Window">
-            <InvokeCommandAction Command="{Binding WindowClosingCommand}"/>
+            <InvokeCommandAction Command="{Binding WindowClosingCommand}" PassEventArgsToCommand="True"/>
         </EventTriggerBehavior>
         <EventTriggerBehavior EventName="KeyDown" SourceObject="Window">
             <InvokeCommandAction Command="{Binding KeyDownCommand}" PassEventArgsToCommand="True"/>
