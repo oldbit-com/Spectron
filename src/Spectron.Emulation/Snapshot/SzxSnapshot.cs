@@ -132,7 +132,6 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
             switch (memory)
             {
                 case Memory16K or Memory48K:
-                {
                     var address = ramPage.PageNumber switch
                     {
                         5 => 0x4000,
@@ -147,9 +146,10 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
                     }
 
                     break;
-                }
+
                 case Memory128K memory128:
                     var bank = memory128.Banks[ramPage.PageNumber];
+
                     for (var i = 0; i < ramPage.Data.Length; i++)
                     {
                         bank[i] = ramPage.Data[i];

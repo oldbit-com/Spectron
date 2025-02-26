@@ -82,23 +82,24 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         switch (memory)
         {
             case Memory16K memory16K:
-                memoryState.SetBank(memory16K.Memory[0x4000..0x8000], pageNumber: 5);
+                memoryState.SetBank(memory16K.Memory[0x4000..0x8000], pageNumber: 0);
+
                 break;
 
             case Memory48K memory48K:
-                memoryState.SetBank(memory48K.Memory[0x4000..0x8000], pageNumber: 5);
-                memoryState.SetBank(memory48K.Memory[0x8000..0xC000], pageNumber: 2);
-                memoryState.SetBank(memory48K.Memory[0xC000..0x10000], pageNumber: 0);
+                memoryState.SetBank(memory48K.Memory[0x4000..], pageNumber: 0);
+
                 break;
 
             case Memory128K memory128K:
             {
-                for (byte i = 0; i < 8; i++)
+                for (var i = 0; i < 8; i++)
                 {
-                    memoryState.SetBank(memory128K.Banks[i][..0x4000], pageNumber: i);
+                    memoryState.SetBank(memory128K.Banks[i], pageNumber: i);
                 }
 
                 memoryState.PagingMode = memory128K.LastPagingModeValue;
+
                 break;
             }
         }
@@ -205,43 +206,27 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
 
     private static void LoadMemory(IMemory memory, MemoryState memoryState)
     {
-        for (var bankNumber = 0; bankNumber < memoryState.Banks.Length; bankNumber++)
+        switch (memory)
         {
-            var bank = memoryState.Banks[bankNumber];
+            case Memory16K memory16K:
+                Array.Copy(memoryState.Banks[0], 0, memory16K.Memory, 0x4000, memoryState.Banks[0].Length);
 
-            switch (memory)
-            {
-                case Memory16K or Memory48K:
+                break;
+
+            case Memory48K memory48K:
+                Array.Copy(memoryState.Banks[0], 0, memory48K.Memory, 0x4000, memoryState.Banks[0].Length);
+
+                break;
+
+            case Memory128K memory128:
+                for (var bankNumber = 0; bankNumber < memoryState.Banks.Length; bankNumber++)
                 {
-                    var address = bankNumber switch
-                    {
-                        5 => 0x4000,
-                        2 => 0x8000,
-                        0 => 0xC000,
-                        _ => -1,
-                    };
-
-
-                    for (var i = 0; i < bank.Length; i++)
-                    {
-                        memory.Write((Word)(address + i), bank[i]);
-                    }
-
-                    break;
+                    Array.Copy(memoryState.Banks[bankNumber], memory128.Banks[bankNumber], memoryState.Banks[bankNumber].Length);
                 }
-                case Memory128K memory128:
-                    Array.Copy(bank, memory128.Banks[bankNumber], bank.Length);
 
-                    break;
+                memory128.SetPagingMode(memoryState.PagingMode);
 
-                default:
-                    throw new NotSupportedException($"Memory type not supported: {memory.GetType()}");
-            }
-        }
-
-        if (memory is Memory128K mem128)
-        {
-            mem128.SetPagingMode(memoryState.PagingMode);
+                break;
         }
     }
 
