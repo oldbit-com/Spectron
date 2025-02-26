@@ -397,15 +397,10 @@ public partial class MainWindowViewModel : ReactiveObject
         InitializeEmulator(emulator);
     }
 
-    private void CreateEmulator(SzxFile snapshot)
-    {
-        var emulator = _snapshotManager.Load(snapshot);
-
-        InitializeEmulator(emulator);
-    }
-
     private void CreateEmulator(EmulatorState emulatorState)
     {
+        Emulator?.Reset();
+
         var emulator = _stateManager.CreateEmulator(emulatorState);
 
         InitializeEmulator(emulator);

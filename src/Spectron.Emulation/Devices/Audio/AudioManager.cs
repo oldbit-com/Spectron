@@ -198,8 +198,6 @@ public sealed class AudioManager
 
     internal void Stop()
     {
-        ResetAudio();
-
         _isAudioPlayerRunning = false;
         _audioPlayer?.Stop();
 
