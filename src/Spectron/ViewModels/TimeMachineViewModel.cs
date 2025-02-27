@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Extensions;
 using ReactiveUI;
@@ -15,15 +16,18 @@ namespace OldBit.Spectron.ViewModels;
 public class TimeMachineViewModel : ReactiveObject
 {
     private readonly TimeMachine _timeMachine;
+    private readonly ILogger _logger;
     private const int PreviewHeight = 192;
     private const int PreviewWidth = 256;
 
     public ReactiveCommand<Unit, TimeMachineEntry?> TimeTravelCommand { get; private set; }
     public Control? PreviewControl { get; set; }
 
-    public TimeMachineViewModel(TimeMachine timeMachine)
+    public TimeMachineViewModel(TimeMachine timeMachine, ILogger logger)
     {
         _timeMachine = timeMachine;
+        _logger = logger;
+
         TimeTravelCommand = ReactiveCommand.Create(HandleTimeTravel);
 
         this.WhenAny(x => x.CurrentEntryIndex, x => x.Value)
@@ -47,23 +51,30 @@ public class TimeMachineViewModel : ReactiveObject
 
     private void UpdatePreview()
     {
-        var timeMachineEntry = GetSelectedEntry();
-
-        if (timeMachineEntry == null)
+        try
         {
-            return;
+            var timeMachineEntry = GetSelectedEntry();
+
+            if (timeMachineEntry == null)
+            {
+                return;
+            }
+
+            var screenshot = timeMachineEntry.Snapshot.GetScreenshot();
+
+            using (var bitmap = ScreenPreview.Lock())
+            {
+                Marshal.Copy(screenshot, 0, bitmap.Address, screenshot.Length);
+            }
+
+            ScreenBorderBrush = new SolidColorBrush(timeMachineEntry.Snapshot.BorderColor.Argb);
+
+            PreviewControl?.InvalidateVisual();
         }
-
-        var screenshot = timeMachineEntry.Snapshot.GetScreenshot();
-
-        using (var bitmap = ScreenPreview.Lock())
+        catch (Exception ex)
         {
-            Marshal.Copy(screenshot, 0, bitmap.Address, screenshot.Length);
+            _logger.LogError(ex, "Failed to update preview");
         }
-
-        ScreenBorderBrush = new SolidColorBrush(timeMachineEntry.Snapshot.BorderColor.Argb);
-
-        PreviewControl?.InvalidateVisual();
     }
 
     private TimeMachineEntry? GetSelectedEntry()

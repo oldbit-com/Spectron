@@ -178,7 +178,7 @@
             <TabItem Header="Emulator">
                 <Border Classes="Tab">
                     <StackPanel>
-                        <CheckBox Content="Pause after state restore" Classes="Center"/>
+                        <controls:HeaderSeparator Text="Advanced"/>
                         <CheckBox Content="Enable floating bus emulation" Classes="Center" IsChecked="{Binding IsFloatingBusEnabled}"/>
                     </StackPanel>
                 </Border>
@@ -238,11 +238,6 @@
                                         IsChecked="{Binding TapeSaveSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Instant}}"
                                         Classes="Center"/>
                                 </StackPanel>
-
-                                <controls:HeaderSeparator Text="Other"/>
-                                <CheckBox
-                                    Content="Tape audio effects"
-                                    ToolTip.Tip="If enabled, usual tape loading/saving audio will be generated"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>

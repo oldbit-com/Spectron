@@ -10,9 +10,9 @@ public static class EmulatorStateExtensions
 
     public static int[] GetScreenshot(this StateSnapshot snapshot, bool isFlashOnFrame = false)
     {
-        const int screenBank = 5;
-
-        var screenMemory = snapshot.Memory.Banks[screenBank];
+        var screenMemory = snapshot.ComputerType == ComputerType.Spectrum128K ?
+            snapshot.Memory.Banks[5] :
+            snapshot.Memory.Banks[0];
 
         for (var line = 0; line < ScreenSize.ContentHeight; line++)
         {

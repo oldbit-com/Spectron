@@ -282,7 +282,7 @@ public partial class MainWindowViewModel : ReactiveObject
             resumeAfter = true;
         }
 
-        var viewModel = new TimeMachineViewModel(_timeMachine);
+        var viewModel = new TimeMachineViewModel(_timeMachine, _logger);
 
         var entry = await ShowTimeMachineView.Handle(viewModel);
 
