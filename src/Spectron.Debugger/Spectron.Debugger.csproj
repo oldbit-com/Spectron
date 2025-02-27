@@ -15,8 +15,9 @@
       <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.4" />
       <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5" />
       <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.4" />
-      <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.2.0.8" />
-      <PackageReference Include="Avalonia.Xaml.Interactivity" Version="11.2.0.8" />
+      <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.2.0.9" />
+      <PackageReference Include="Avalonia.Xaml.Interactivity" Version="11.2.0.9" />
+      <PackageReference Include="Material.Icons.Avalonia" Version="2.2.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.2" />
       <PackageReference Include="OldBit.Z80Cpu.Spectron" Version="0.9.3-pre.4" />
     </ItemGroup>

@@ -86,6 +86,7 @@ internal sealed class AyDevice : IDevice
     private (AmplitudeMode Mode, int Amplitude) GetAmplitude(int value)
     {
         var mode = (AmplitudeMode)((value >> 4) & 0x01);
+
         var amplitude = mode switch
         {
             AmplitudeMode.FixedLevel => _volumeLevels[value & 0x0F],

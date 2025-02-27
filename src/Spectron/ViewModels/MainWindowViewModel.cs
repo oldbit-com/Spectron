@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -6,26 +7,30 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using Avalonia.Controls;
+using Avalonia.Controls.Notifications;
 using Avalonia.Input;
 using Avalonia.Threading;
+using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Debugger;
 using OldBit.Spectron.Debugger.ViewModels;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Commands;
+using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Snapshot;
+using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Emulation.Storage;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Emulation.Tape.Loader;
 using OldBit.Spectron.Extensions;
-using OldBit.Spectron.Helpers;
-using OldBit.Spectron.Models;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.Files.Szx;
+using OldBit.Spectron.Recorder;
+using OldBit.Spectron.Screen;
 using OldBit.Spectron.Theming;
 using ReactiveUI;
 using Timer = System.Timers.Timer;
@@ -40,33 +45,49 @@ public partial class MainWindowViewModel : ReactiveObject
     private readonly TimeMachine _timeMachine;
     private readonly GamepadManager _gamepadManager;
 
-    private readonly SnapshotLoader _snapshotLoader;
+    private readonly SnapshotManager _snapshotManager;
+    private readonly StateManager _stateManager;
     private readonly Loader _loader;
 
     private readonly PreferencesService _preferencesService;
     private readonly SessionService _sessionService;
     private readonly DebuggerContext _debuggerContext;
+    private readonly QuickSaveService _quickSaveService;
+    private readonly ILogger _logger;
     private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
     private readonly Timer _statusBarTimer;
 
+    private Emulator? Emulator { get; set; }
     private Preferences _preferences = new();
     private int _frameCount;
     private readonly Stopwatch _renderStopwatch = new();
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
+    private MediaRecorder? _mediaRecorder;
+    private bool _canClose;
 
-    public Emulator? Emulator { get; private set; }
     public Control ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }
-    public StatusBarViewModel StatusBar { get; } = new();
+    public WindowNotificationManager NotificationManager { get; set; } = null!;
+
+    public StatusBarViewModel StatusBarViewModel { get; } = new();
     public TapeMenuViewModel TapeMenuViewModel { get; }
     public RecentFilesViewModel RecentFilesViewModel { get; }
 
     public ReactiveCommand<Unit, Unit> WindowOpenedCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> WindowClosingCommand { get; private set; }
+    public ReactiveCommand<WindowClosingEventArgs, Unit> WindowClosingCommand { get; private set; }
+
     public ReactiveCommand<KeyEventArgs, Unit> KeyDownCommand { get; private set; }
     public ReactiveCommand<KeyEventArgs, Unit> KeyUpCommand { get; private set; }
+
     public ReactiveCommand<Unit, Task> LoadFileCommand { get; private set; }
     public ReactiveCommand<Unit, Task> SaveFileCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> QuickSaveCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> QuickLoadCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> StartAudioRecordingCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> StartVideoRecordingCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> StopRecordingCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ExitApplicationCommand { get; private set; }
+
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     public ReactiveCommand<RomType, Unit> ChangeRomCommand { get; private set; }
     public ReactiveCommand<ComputerType, Unit> ChangeComputerType { get; private set; }
@@ -98,22 +119,30 @@ public partial class MainWindowViewModel : ReactiveObject
         EmulatorFactory emulatorFactory,
         TimeMachine timeMachine,
         GamepadManager gamepadManager,
-        SnapshotLoader snapshotLoader,
+        SnapshotManager snapshotManager,
+        StateManager stateManager,
         Loader loader,
         PreferencesService preferencesService,
         SessionService sessionService,
         RecentFilesViewModel recentFilesViewModel,
         TapeMenuViewModel tapeMenuViewModel,
-        DebuggerContext debuggerContext)
+        DebuggerContext debuggerContext,
+        TapeManager tapeManager,
+        QuickSaveService quickSaveService,
+        ILogger<MainWindowViewModel> logger)
     {
         _emulatorFactory = emulatorFactory;
         _timeMachine = timeMachine;
         _gamepadManager = gamepadManager;
-        _snapshotLoader = snapshotLoader;
+        _snapshotManager = snapshotManager;
+        _stateManager = stateManager;
         _loader = loader;
         _preferencesService = preferencesService;
         _sessionService = sessionService;
         _debuggerContext = debuggerContext;
+        _quickSaveService = quickSaveService;
+        _logger = logger;
+
         RecentFilesViewModel = recentFilesViewModel;
         TapeMenuViewModel = tapeMenuViewModel;
         recentFilesViewModel.OpenRecentFileAsync = async fileName => await HandleLoadFileAsync(fileName);
@@ -122,12 +151,7 @@ public partial class MainWindowViewModel : ReactiveObject
         _statusBarTimer.AutoReset = true;
         _statusBarTimer.Elapsed += StatusBarTimerOnElapsed;
 
-        var emulatorNotNull = this.WhenAnyValue(x => x.Emulator).Select(emulator => emulator is null);
-
         var timeMachineEnabled = this.WhenAnyValue(x => x.IsTimeMachineEnabled);
-
-        this.WhenAny(x => x.WindowState, x => x.Value)
-            .Subscribe(x => WindowStateCommandName = x == WindowState.FullScreen ? "Exit Full Screen" : "Enter Full Screen");
 
         this.WhenAny(x => x.TapeLoadSpeed, x => x.Value)
             .Subscribe(_ => Emulator?.SetTapeLoadingSpeed(TapeLoadSpeed));
@@ -135,20 +159,37 @@ public partial class MainWindowViewModel : ReactiveObject
         this.WhenAny(x => x.IsTimeMachineEnabled, x => x.Value)
             .Subscribe(x => _timeMachine.IsEnabled = x);
 
+        this.WhenAny(x => x.RecordingStatus, x => x.Value)
+            .Subscribe(status => StatusBarViewModel.RecordingStatus = status);
+
+        this.WhenAny(x => x.ComputerType, x => x.Value)
+            .Subscribe(computerType => StatusBarViewModel.ComputerType = computerType);
+
+        this.WhenAny(x => x.JoystickType, x => x.Value)
+            .Subscribe(joystickType => StatusBarViewModel.JoystickType = joystickType);
+
         WindowOpenedCommand = ReactiveCommand.CreateFromTask(WindowOpenedAsync);
-        WindowClosingCommand = ReactiveCommand.CreateFromTask(WindowClosingAsync);
+        WindowClosingCommand = ReactiveCommand.CreateFromTask<WindowClosingEventArgs>(WindowClosingAsync);
         KeyDownCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyDown);
         KeyUpCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyUp);
+
         LoadFileCommand = ReactiveCommand.Create(HandleLoadFileAsync);
-        SaveFileCommand = ReactiveCommand.Create(HandleSaveFileAsync, emulatorNotNull);
+        SaveFileCommand = ReactiveCommand.Create(HandleSaveFileAsync);
+        QuickSaveCommand = ReactiveCommand.Create(HandleQuickSave);
+        QuickLoadCommand = ReactiveCommand.Create(HandleQuickLoad);
+        StartAudioRecordingCommand = ReactiveCommand.Create(HandleStartAudioRecordingAsync);
+        StartVideoRecordingCommand = ReactiveCommand.Create(HandleStartVideoRecordingAsync);
+        StopRecordingCommand = ReactiveCommand.Create(HandleStopRecording);
+        ExitApplicationCommand = ReactiveCommand.Create(() => MainWindow?.Close());
+
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
         ChangeRomCommand = ReactiveCommand.Create<RomType>(HandleChangeRom);
         ChangeComputerType = ReactiveCommand.Create<ComputerType>(HandleChangeComputerType);
         ChangeJoystickType = ReactiveCommand.Create<JoystickType>(HandleChangeJoystickType);
         ToggleUlaPlus = ReactiveCommand.Create(HandleToggleUlaPlus);
-        TogglePauseCommand = ReactiveCommand.Create(HandleTogglePause, emulatorNotNull);
-        ResetCommand = ReactiveCommand.Create(HandleMachineReset, emulatorNotNull);
-        HardResetCommand = ReactiveCommand.Create(HandleMachineHardReset, emulatorNotNull);
+        TogglePauseCommand = ReactiveCommand.Create(HandleTogglePause);
+        ResetCommand = ReactiveCommand.Create(HandleMachineReset);
+        HardResetCommand = ReactiveCommand.Create(HandleMachineHardReset);
         SetEmulationSpeedCommand = ReactiveCommand.Create<string>(HandleSetEmulationSpeed);
         ToggleFullScreenCommand = ReactiveCommand.Create(HandleToggleFullScreen);
         SetTapeLoadSpeedCommand = ReactiveCommand.Create<TapeSpeed>(HandleSetTapeLoadingSpeed);
@@ -168,7 +209,9 @@ public partial class MainWindowViewModel : ReactiveObject
         ShowSelectFileView = new Interaction<SelectFileViewModel, ArchiveEntry?>();
         ShowTimeMachineView = new Interaction<TimeMachineViewModel, TimeMachineEntry?>();
 
-        SpectrumScreen = _frameBufferConverter.Bitmap;
+        SpectrumScreen = _frameBufferConverter.ScreenBitmap;
+
+        tapeManager.TapeStateChanged += HandleTapeStateChanged;
     }
 
     private async Task OpenAboutWindow() => await ShowAboutView.Handle(Unit.Default);
@@ -209,14 +252,16 @@ public partial class MainWindowViewModel : ReactiveObject
         {
             _preferences = preferences;
 
-            //TapeLoadingSpeed = preferences.TapeLoadingSpeed;
             IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
+            TapeLoadSpeed = preferences.TapeSettings.LoadSpeed;
 
             IsTimeMachineEnabled = preferences.TimeMachine.IsEnabled;
             _timeMachine.SnapshotInterval = preferences.TimeMachine.SnapshotInterval;
             _timeMachine.MaxDuration = preferences.TimeMachine.MaxDuration;
+            TimeMachineCountdownSeconds = preferences.TimeMachine.CountdownSeconds;
 
             Emulator?.SetUlaPlus(IsUlaPlusEnabled);
+            Emulator?.SetFloatingBusSupport(preferences.IsFloatingBusEnabled);
             Emulator?.SetAudioSettings(preferences.AudioSettings);
             Emulator?.SetTapeSettings(preferences.TapeSettings);
             Emulator?.SetGamepad(preferences.Joystick);
@@ -238,7 +283,7 @@ public partial class MainWindowViewModel : ReactiveObject
             resumeAfter = true;
         }
 
-        var viewModel = new TimeMachineViewModel(_timeMachine);
+        var viewModel = new TimeMachineViewModel(_timeMachine, _logger);
 
         var entry = await ShowTimeMachineView.Handle(viewModel);
 
@@ -260,17 +305,14 @@ public partial class MainWindowViewModel : ReactiveObject
 
     private void StatusBarTimerOnElapsed(object? sender, ElapsedEventArgs e)
     {
-        var fps = $"FPS: {_frameCount.ToString()}";
+        var fps = _frameCount.ToString();
 
-        Dispatcher.UIThread.Post(() =>
-        {
-            StatusBar.FramesPerSecond = fps;
-        });
+        Dispatcher.UIThread.Post(() => StatusBarViewModel.FramesPerSecond = fps);
 
         Interlocked.Exchange(ref _frameCount, 0);
     }
 
-    private void EmulatorOnRenderScreen(FrameBuffer framebuffer)
+    private void EmulatorFrameCompleted(FrameBuffer frameBuffer, AudioBuffer audioBuffer)
     {
         // Keep max 50 FPS
         if (_renderStopwatch.Elapsed - _lastScreenRender < TimeSpan.FromMilliseconds(19))
@@ -283,9 +325,17 @@ public partial class MainWindowViewModel : ReactiveObject
 
         Dispatcher.UIThread.Post(() =>
         {
-            _frameBufferConverter.UpdateBitmap(framebuffer);
+            _frameBufferConverter.UpdateBitmap(frameBuffer);
+
             ScreenControl.InvalidateVisual();
         });
+
+        _mediaRecorder?.AppendFrame(frameBuffer, audioBuffer);
+
+        if (_quickSaveService.QuickSaveIfRequested(Emulator))
+        {
+            StatusBarViewModel.AnimateQuickSave();
+        }
     }
 
     private async Task WindowOpenedAsync()
@@ -299,6 +349,7 @@ public partial class MainWindowViewModel : ReactiveObject
         IsTimeMachineEnabled = _preferences.TimeMachine.IsEnabled;
         _timeMachine.SnapshotInterval = _preferences.TimeMachine.SnapshotInterval;
         _timeMachine.MaxDuration = _preferences.TimeMachine.MaxDuration;
+        TimeMachineCountdownSeconds = _preferences.TimeMachine.CountdownSeconds;
 
         await RecentFilesViewModel.LoadAsync();
 
@@ -311,7 +362,7 @@ public partial class MainWindowViewModel : ReactiveObject
             if (snapshot != null)
             {
                 CreateEmulator(snapshot);
-                SetTitle();
+                UpdateWindowTitle();
             }
         }
 
@@ -320,11 +371,19 @@ public partial class MainWindowViewModel : ReactiveObject
             CreateEmulator(_preferences.ComputerType, _preferences.RomType);
         }
 
+        TapeLoadSpeed = _preferences.TapeSettings.LoadSpeed;
         Emulator?.SetTapeSettings(_preferences.TapeSettings);
     }
 
-    private async Task WindowClosingAsync()
+    private async Task WindowClosingAsync(WindowClosingEventArgs args)
     {
+        if (_canClose)
+        {
+            return;
+        }
+
+        args.Cancel = true;
+
         Emulator?.Shutdown();
 
         _preferences.AudioSettings.IsMuted = IsMuted;
@@ -333,6 +392,9 @@ public partial class MainWindowViewModel : ReactiveObject
             _preferencesService.SaveAsync(_preferences),
             RecentFilesViewModel.SaveAsync(),
             _sessionService.SaveAsync(Emulator, _preferences.ResumeSettings));
+
+        _canClose = true;
+        MainWindow?.Close();
     }
 
     private void CreateEmulator(ComputerType computerType, RomType romType)
@@ -345,9 +407,11 @@ public partial class MainWindowViewModel : ReactiveObject
         InitializeEmulator(emulator);
     }
 
-    private void CreateEmulator(SzxFile snapshot)
+    private void CreateEmulator(StateSnapshot stateSnapshot)
     {
-        var emulator = _snapshotLoader.Load(snapshot);
+        Emulator?.Reset();
+
+        var emulator = _stateManager.CreateEmulator(stateSnapshot);
 
         InitializeEmulator(emulator);
     }
@@ -365,8 +429,9 @@ public partial class MainWindowViewModel : ReactiveObject
         IsUlaPlusEnabled = Emulator.IsUlaPlusEnabled;
 
         Emulator.TapeLoadSpeed = TapeLoadSpeed;
-        Emulator.RenderScreen += EmulatorOnRenderScreen;
+        Emulator.FrameCompleted += EmulatorFrameCompleted;
 
+        Emulator.SetFloatingBusSupport(_preferences.IsFloatingBusEnabled);
         Emulator.SetAudioSettings(_preferences.AudioSettings);
         Emulator.SetGamepad(_preferences.Joystick);
 
@@ -415,16 +480,17 @@ public partial class MainWindowViewModel : ReactiveObject
         }
 
         Emulator.Shutdown();
-        Emulator.RenderScreen -= EmulatorOnRenderScreen;
+        Emulator.FrameCompleted -= EmulatorFrameCompleted;
         Emulator.CommandManager.CommandReceived -= CommandManagerOnCommandReceived;
         Emulator = null;
     }
 
-    private void SetTitle()
+    private void UpdateWindowTitle()
     {
         if (RecentFilesViewModel.CurrentFileName == string.Empty)
         {
             Title = DefaultTitle;
+
             return;
         }
 

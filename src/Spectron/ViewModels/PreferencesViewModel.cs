@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using Avalonia.Input;
 using Avalonia.Threading;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
@@ -11,6 +12,8 @@ using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
+using OldBit.Spectron.Recorder;
+using OldBit.Spectron.Screen;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.Theming;
 using ReactiveUI;
@@ -23,6 +26,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
     private readonly GamepadSettings _gamepadSettings;
 
     public ReactiveCommand<Unit, Preferences> UpdatePreferencesCommand { get; }
+    public ReactiveCommand<Unit, Unit> ProbeFFmpegCommand { get; }
 
     public Interaction<GamepadMappingViewModel, List<GamepadMapping>?> ShowGamepadMappingView { get; }
 
@@ -57,12 +61,14 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
 
         ComputerType = preferences.ComputerType;
         IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
+        IsFloatingBusEnabled = preferences.IsFloatingBusEnabled;
         RomType = preferences.RomType;
 
         JoystickType = preferences.Joystick.JoystickType;
         EmulateUsingKeyboard = preferences.Joystick.EmulateUsingKeyboard;
         GamepadControllerId = _gamepadManager.Controllers.FirstOrDefault(
             controller => controller.ControllerId == preferences.Joystick.GamepadControllerId)?.ControllerId ?? GamepadController.None.ControllerId;
+        FireKey = preferences.Joystick.FireKey;
 
         IsResumeEnabled = preferences.ResumeSettings.IsResumeEnabled;
         ShouldIncludeTapeInResume = preferences.ResumeSettings.ShouldIncludeTape;
@@ -76,13 +82,20 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         IsTimeMachineEnabled = preferences.TimeMachine.IsEnabled;
         SnapshotInterval = preferences.TimeMachine.SnapshotInterval.TotalSeconds;
         MaxDuration = preferences.TimeMachine.MaxDuration.TotalSeconds;
+        TimeMachineCountdownSeconds = preferences.TimeMachine.CountdownSeconds;
 
         IsAutoPlayEnabled = preferences.TapeSettings.IsAutoPlayEnabled;
         IsTapeSaveEnabled = preferences.TapeSettings.IsSaveEnabled;
         TapeSaveSpeed = preferences.TapeSettings.SaveSpeed;
         TapeLoadSpeed = preferences.TapeSettings.LoadSpeed;
 
+        RecordingBorderSize = preferences.RecordingSettings.BorderSize;
+        ScalingFactor = preferences.RecordingSettings.ScalingFactor;
+        ScalingAlgorithm = preferences.RecordingSettings.ScalingAlgorithm;
+        FFmpegPath = preferences.RecordingSettings.FFmpegPath;
+
         UpdatePreferencesCommand = ReactiveCommand.Create(UpdatePreferences);
+        ProbeFFmpegCommand = ReactiveCommand.Create(ProbeFFmpeg);
 
         ShowGamepadMappingView = new Interaction<GamepadMappingViewModel, List<GamepadMapping>?>();
     }
@@ -123,6 +136,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
             Theme = Theme,
             ComputerType = ComputerType,
             IsUlaPlusEnabled = IsUlaPlusEnabled,
+            IsFloatingBusEnabled = IsFloatingBusEnabled,
             RomType = RomType,
             Joystick = new JoystickSettings
             {
@@ -130,6 +144,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
                 EmulateUsingKeyboard = EmulateUsingKeyboard,
                 GamepadControllerId = GamepadControllerId,
                 GamepadSettings = _gamepadSettings,
+                FireKey = FireKey
             },
 
             ResumeSettings = new ResumeSettings
@@ -151,7 +166,8 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
             {
                 IsEnabled = IsTimeMachineEnabled,
                 SnapshotInterval = TimeSpan.FromSeconds(SnapshotInterval),
-                MaxDuration = TimeSpan.FromSeconds(MaxDuration)
+                MaxDuration = TimeSpan.FromSeconds(MaxDuration),
+                CountdownSeconds = TimeMachineCountdownSeconds,
             },
 
             TapeSettings = new TapeSettings
@@ -160,17 +176,24 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
                 IsSaveEnabled = IsTapeSaveEnabled,
                 SaveSpeed = TapeSaveSpeed,
                 LoadSpeed = TapeLoadSpeed
-
             },
+
+            RecordingSettings = new RecordingSettings
+            {
+                BorderSize = RecordingBorderSize,
+                ScalingFactor = ScalingFactor,
+                ScalingAlgorithm = ScalingAlgorithm,
+                FFmpegPath = FFmpegPath
+            }
         };
     }
 
-    public List<NameValuePair<TapeSpeed>> TapeSpeeds { get; } =
-    [
-        new("Normal", TapeSpeed.Normal),
-        new("Accelerated", TapeSpeed.Accelerated),
-        new("Instant", TapeSpeed.Instant)
-    ];
+    private void ProbeFFmpeg()
+    {
+        FFmpegMessage = MediaRecorder.VerifyDependencies(FFmpegPath) ?
+            "Success. FFmpeg found" :
+            "Failure. FFmpeg not found";
+    }
 
     public List<NameValuePair<ComputerType>> ComputerTypes { get; } =
     [
@@ -201,9 +224,95 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
 
     public List<NameValuePair<StereoMode>> StereoModes { get; } =
     [
-        new("None", StereoMode.None),
+        new("Mono", StereoMode.Mono),
         new("Stereo ABC", StereoMode.StereoAbc),
         new("Stereo ACB", StereoMode.StereoAcb),
+    ];
+
+    public List<NameValuePair<PhysicalKey>> FireKeys { get; } =
+    [
+        new("Space", PhysicalKey.Space),
+        new("Tab", PhysicalKey.Tab),
+        new("Enter", PhysicalKey.Enter),
+        new("A", PhysicalKey.A),
+        new("B", PhysicalKey.B),
+        new("C", PhysicalKey.C),
+        new("D", PhysicalKey.D),
+        new("E", PhysicalKey.E),
+        new("F", PhysicalKey.F),
+        new("G", PhysicalKey.G),
+        new("H", PhysicalKey.H),
+        new("I", PhysicalKey.I),
+        new("J", PhysicalKey.J),
+        new("K", PhysicalKey.K),
+        new("L", PhysicalKey.L),
+        new("M", PhysicalKey.M),
+        new("N", PhysicalKey.N),
+        new("O", PhysicalKey.O),
+        new("P", PhysicalKey.P),
+        new("Q", PhysicalKey.Q),
+        new("R", PhysicalKey.R),
+        new("S", PhysicalKey.S),
+        new("T", PhysicalKey.T),
+        new("U", PhysicalKey.U),
+        new("V", PhysicalKey.V),
+        new("W", PhysicalKey.W),
+        new("X", PhysicalKey.X),
+        new("Y", PhysicalKey.Y),
+        new("Z", PhysicalKey.Z),
+        new("0", PhysicalKey.Digit0),
+        new("1", PhysicalKey.Digit1),
+        new("2", PhysicalKey.Digit2),
+        new("3", PhysicalKey.Digit3),
+        new("4", PhysicalKey.Digit4),
+        new("5", PhysicalKey.Digit5),
+        new("6", PhysicalKey.Digit6),
+        new("7", PhysicalKey.Digit7),
+        new("8", PhysicalKey.Digit8),
+        new("9", PhysicalKey.Digit9),
+    ];
+
+    public List<NameValuePair<BorderSize>> BorderSizes { get; } =
+    [
+        new("None", BorderSize.None),
+        new("Small", BorderSize.Small),
+        new("Medium", BorderSize.Medium),
+        new("Large", BorderSize.Large),
+        new("Full", BorderSize.Full),
+    ];
+
+    public List<NameValuePair<int>> ScalingFactors { get; } =
+    [
+        new("1x", 1),
+        new("2x", 2),
+        new("3x", 3),
+        new("4x", 4),
+        new("5x", 5),
+    ];
+
+    public List<NameValuePair<string>> ScalingAlgorithms { get; } =
+    [
+        new("Fast Bilinear","fast_bilinear"),
+        new("Bilinear", "bilinear"),
+        new("Bicubic", "bicubic"),
+        new("Experimental", "experimental"),
+        new("Nearest Neighbor", "neighbor"),
+        new("Area", "area"),
+        new("Bicublin", "bicublin"),
+        new("Gauss", "gauss"),
+        new("Sinc", "sinc"),
+        new("Lanczos", "lanczos"),
+        new("Spline", "spline"),
+    ];
+
+    public List<NameValuePair<int>> TimeMachineCountdownValues { get; } =
+    [
+        new("0 seconds", 0),
+        new("1 second", 1),
+        new("2 seconds", 2),
+        new("3 seconds", 3),
+        new("4 seconds", 4),
+        new("5 seconds", 5),
     ];
 
     public ObservableCollection<GamepadController> GamepadControllers { get; }
@@ -248,6 +357,13 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
     {
         get => _emulateUsingKeyboard;
         set => this.RaiseAndSetIfChanged(ref _emulateUsingKeyboard, value);
+    }
+
+    private PhysicalKey _fireKey = PhysicalKey.Space;
+    public PhysicalKey FireKey
+    {
+        get => _fireKey;
+        set => this.RaiseAndSetIfChanged(ref _fireKey, value);
     }
 
     private Guid _gamepadControllerId = GamepadController.None.ControllerId;
@@ -327,6 +443,13 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         set => this.RaiseAndSetIfChanged(ref _tapeLoadSpeed, value);
     }
 
+    private bool _isFloatingBusEnabled;
+    public bool IsFloatingBusEnabled
+    {
+        get => _isFloatingBusEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isFloatingBusEnabled, value);
+    }
+
     private bool _isBeeperEnabled;
     public bool IsBeeperEnabled
     {
@@ -353,6 +476,48 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
     {
         get => _stereoMode;
         set => this.RaiseAndSetIfChanged(ref _stereoMode, value);
+    }
+
+    private BorderSize _recordingBorderSize = BorderSize.Medium;
+    public BorderSize RecordingBorderSize
+    {
+        get => _recordingBorderSize;
+        set => this.RaiseAndSetIfChanged(ref _recordingBorderSize, value);
+    }
+
+    private string _scalingAlgorithm = "neighbor";
+    public string ScalingAlgorithm
+    {
+        get => _scalingAlgorithm;
+        set => this.RaiseAndSetIfChanged(ref _scalingAlgorithm, value);
+    }
+
+    private int _scalingFactor = 2;
+    public int ScalingFactor
+    {
+        get => _scalingFactor;
+        set => this.RaiseAndSetIfChanged(ref _scalingFactor, value);
+    }
+
+    private string _ffmpegPath = string.Empty;
+    public string FFmpegPath
+    {
+        get => _ffmpegPath;
+        set => this.RaiseAndSetIfChanged(ref _ffmpegPath, value);
+    }
+
+    private string _ffmpegMessage = string.Empty;
+    public string FFmpegMessage
+    {
+        get => _ffmpegMessage;
+        set => this.RaiseAndSetIfChanged(ref _ffmpegMessage, value);
+    }
+
+    private int _timeMachineCountdownSeconds = 3;
+    public int TimeMachineCountdownSeconds
+    {
+        get => _timeMachineCountdownSeconds;
+        set => this.RaiseAndSetIfChanged(ref _timeMachineCountdownSeconds, value);
     }
 
     public void Dispose()

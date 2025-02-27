@@ -1,20 +1,18 @@
-using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Screen;
-using OldBit.Spectron.Files.Szx;
-using OldBit.Spectron.Files.Szx.Blocks;
+using OldBit.Spectron.Emulation.State;
+using OldBit.Spectron.Emulation.State.Components;
 
-namespace OldBit.Spectron.Emulation.Snapshot;
+namespace OldBit.Spectron.Emulation.Extensions;
 
-public static class SzxFileExtensions
+public static class EmulatorStateExtensions
 {
     private static readonly int[] Buffer = new int[ScreenSize.ContentHeight * ScreenSize.ContentWidth];
 
-    public static int[] GetScreenshot(this SzxFile szx, bool isFlashOnFrame = false)
+    public static int[] GetScreenshot(this StateSnapshot snapshot, bool isFlashOnFrame = false)
     {
-        const int screenBank = 5;
-
-        var screenMemory = szx.RamPages.First(page => page.PageNumber == screenBank).Data;
-        var palette = szx.Palette;
+        var screenMemory = snapshot.ComputerType == ComputerType.Spectrum128K ?
+            snapshot.Memory.Banks[5] :
+            snapshot.Memory.Banks[0];
 
         for (var line = 0; line < ScreenSize.ContentHeight; line++)
         {
@@ -35,11 +33,11 @@ public static class SzxFileExtensions
                 {
                     Color color;
 
-                    if (palette?.Flags == PaletteBlock.FlagsPaletteEnabled)
+                    if (snapshot.UlaPlus != null && snapshot.UlaPlus.PaletteGroup != 0)
                     {
                         color = (bitmap & FastLookup.BitMasks[bit]) != 0 ?
-                            palette.GetInkColor(attribute) :
-                            palette.GetPaperColor(attribute);
+                            snapshot.UlaPlus.GetInkColor(attribute) :
+                            snapshot.UlaPlus.GetPaperColor(attribute);
                     }
                     else
                     {
@@ -48,7 +46,7 @@ public static class SzxFileExtensions
                             attributeData.Paper;
                     }
 
-                    Buffer[bufferIndex + bit] = color.Abgr;
+                    Buffer[bufferIndex + bit] = (int)color.Abgr;
                 }
             }
         }
@@ -56,21 +54,19 @@ public static class SzxFileExtensions
         return Buffer;
     }
 
-    private static Color GetInkColor(this PaletteBlock palette, byte attribute)
+    private static Color GetInkColor(this UlaPlusState ulaPlusState, byte attribute)
     {
         var paletteIndex = attribute >> 6;
         var colorIndex = attribute & 0x07;
-        var colorValue = palette.Registers[paletteIndex * 16 + colorIndex];
 
-        return UlaPlus.ColorFromValue(colorValue);
+        return ulaPlusState.PaletteColors[paletteIndex][colorIndex];
     }
 
-    private static Color GetPaperColor(this PaletteBlock palette, byte attribute)
+    private static Color GetPaperColor(this UlaPlusState ulaPlusState, byte attribute)
     {
         var paletteIndex = attribute >> 6;
         var colorIndex = ((attribute >> 3) & 0x07) | 8;
-        var colorValue = palette.Registers[paletteIndex * 16 + colorIndex];
 
-        return UlaPlus.ColorFromValue(colorValue);
+        return ulaPlusState.PaletteColors[paletteIndex][colorIndex];
     }
 }

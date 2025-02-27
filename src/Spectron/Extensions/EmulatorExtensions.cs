@@ -27,6 +27,7 @@ public static class EmulatorExtensions
 
         emulator.TapeManager.IsTapeSaveEnabled = tapeSettings.IsSaveEnabled;
         emulator.TapeManager.TapeSaveSpeed = tapeSettings.SaveSpeed;
+        emulator.TapeLoadSpeed = tapeSettings.LoadSpeed;
     }
 
     public static void SetAudioSettings(this Emulator? emulator, AudioSettings audioSettings)
@@ -47,6 +48,14 @@ public static class EmulatorExtensions
         if (emulator != null)
         {
             emulator.IsUlaPlusEnabled = isUlaPlusEnabled;
+        }
+    }
+
+    public static void SetFloatingBusSupport(this Emulator? emulator, bool isFloatingBusEnabled)
+    {
+        if (emulator != null)
+        {
+            emulator.IsFloatingBusEnabled = isFloatingBusEnabled;
         }
     }
 

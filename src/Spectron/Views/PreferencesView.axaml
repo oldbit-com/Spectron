@@ -6,12 +6,14 @@
         xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
         xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
         xmlns:theming="clr-namespace:OldBit.Spectron.Theming"
+        xmlns:tape="clr-namespace:OldBit.Spectron.Emulation.Tape;assembly=OldBit.Spectron.Emulation"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.PreferencesView"
         x:DataType="viewModels:PreferencesViewModel"
         Width="850"
         Height="600"
         WindowStartupLocation="CenterOwner"
+        Focusable="True"
         CanResize="False"
         Title="Preferences">
 
@@ -33,6 +35,11 @@
         <Style Selector="TextBlock.Center">
             <Setter Property="Padding" Value="8 4 0 0" />
         </Style>
+        <Style Selector="ComboBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="10 2 0 0"/>
+        </Style>
     </Window.Styles>
 
     <Grid RowDefinitions="*,50">
@@ -53,9 +60,9 @@
                         <controls:HeaderSeparator Text="Emulator defaults"/>
                         <Grid ColumnDefinitions="120,*" RowDefinitions="40,40">
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="Machine" VerticalAlignment="Center" Classes="Center"/>
-                            <ComboBox  Grid.Row="0" Grid.Column="1" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding ComputerTypes}" SelectedValue="{Binding ComputerType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
+                            <ComboBox  Grid.Row="0" Grid.Column="1" Margin="5 0 0 0" Width="250" ItemsSource="{Binding ComputerTypes}" SelectedValue="{Binding ComputerType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="ROM" VerticalAlignment="Center" Classes="Center"/>
-                            <ComboBox  Grid.Row="1" Grid.Column="1" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding RomTypes}" SelectedValue="{Binding RomType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
+                            <ComboBox  Grid.Row="1" Grid.Column="1" Margin="5 0 0 0" Width="250" ItemsSource="{Binding RomTypes}" SelectedValue="{Binding RomType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
                         </Grid>
 
                         <controls:HeaderSeparator Text="Screen"/>
@@ -63,7 +70,6 @@
                     </StackPanel>
                 </Border>
             </TabItem>
-
             <TabItem Header="Audio">
                 <Border Classes="Tab">
                     <StackPanel>
@@ -75,7 +81,7 @@
                         <CheckBox Content="Available in standard 16/48k mode" Classes="Center" Margin="25 0 0 0" IsChecked="{Binding IsAySupportedStandardSpectrum}" IsEnabled="{Binding #AyEnabled.IsChecked}"/>
                         <StackPanel Margin="25 0 0 0" Orientation="Horizontal">
                             <TextBlock Text="Stereo mode:" Padding="0 0 10 0" VerticalAlignment="Center" Classes="Center"/>
-                            <ComboBox Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding StereoModes}" SelectedValue="{Binding StereoMode}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}" IsEnabled="{Binding #AyEnabled.IsChecked}"/>
+                            <ComboBox Width="250" ItemsSource="{Binding StereoModes}" SelectedValue="{Binding StereoMode}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}" IsEnabled="{Binding #AyEnabled.IsChecked}"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
@@ -85,12 +91,57 @@
                     <Grid RowDefinitions="Auto,*">
                         <StackPanel>
                             <controls:HeaderSeparator Text="Joystick"/>
-                            <Grid ColumnDefinitions="140,300" RowDefinitions="40,40,30">
-                                <TextBlock Text="Device" VerticalAlignment="Center" Classes="Center"/>
-                                <ComboBox Grid.Row="0" Grid.Column="1" Name="Gamepad" Margin="5 0 10 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding GamepadControllers}" SelectedValue="{Binding GamepadControllerId}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding ControllerId}"/>
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Emulated Joystick" VerticalAlignment="Center" Classes="Center"/>
-                                <ComboBox Grid.Row="1" Grid.Column="1" Name="Joystick" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding JoystickTypes}" SelectedValue="{Binding JoystickType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
-                                <CheckBox Grid.Row="2" Grid.Column="1" Content="Emulate using keyboard" Margin="5 0 0 0" IsChecked="{Binding EmulateUsingKeyboard}" IsEnabled="{Binding #Joystick.SelectedIndex}"/>
+                            <Grid ColumnDefinitions="140,300" RowDefinitions="40,40,40">
+                                <TextBlock
+                                    Text="Device"
+                                    VerticalAlignment="Center"
+                                    Classes="Center"/>
+                                <ComboBox
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Name="Gamepad"
+                                    Margin="5 0 10 0"
+                                    Width="250"
+                                    ItemsSource="{Binding GamepadControllers}"
+                                    SelectedValue="{Binding GamepadControllerId}"
+                                    DisplayMemberBinding="{Binding Name}"
+                                    SelectedValueBinding="{Binding ControllerId}"/>
+                                <TextBlock
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Text="Emulated Joystick"
+                                    VerticalAlignment="Center"
+                                    Classes="Center"/>
+                                <ComboBox
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Name="Joystick"
+                                    Margin="5 0 0 0"
+                                    Width="250"
+                                    ItemsSource="{Binding JoystickTypes}"
+                                    SelectedValue="{Binding JoystickType}"
+                                    DisplayMemberBinding="{Binding Name}"
+                                    SelectedValueBinding="{Binding Value}"/>
+                                <StackPanel
+                                    Grid.Row="2"
+                                    Grid.Column="1"
+                                    Orientation="Horizontal">
+                                    <CheckBox
+                                        Content="Use keyboard (← ↑ ↓ →). Fire key:"
+                                        Margin="5 0 0 0"
+                                        VerticalAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        IsChecked="{Binding EmulateUsingKeyboard}"
+                                        IsEnabled="{Binding #Joystick.SelectedIndex}"/>
+                                    <ComboBox
+                                        Margin="15 0 0 0"
+                                        Width="120"
+                                        ItemsSource="{Binding FireKeys}"
+                                        SelectedValue="{Binding FireKey}"
+                                        DisplayMemberBinding="{Binding Name}"
+                                        SelectedValueBinding="{Binding Value}"
+                                        IsEnabled="{Binding #Joystick.SelectedIndex}"/>
+                                </StackPanel>
                             </Grid>
                         </StackPanel>
                         <Grid Grid.Row="1">
@@ -102,20 +153,60 @@
             <TabItem Header="Time Machine">
                 <Border Classes="Tab">
                     <StackPanel>
-                        <CheckBox x:Name="TimeMachineEnabled" IsChecked="{Binding IsTimeMachineEnabled}" Content="Enable Time Machine" Classes="Center"/>
+                        <CheckBox
+                            x:Name="TimeMachineEnabled"
+                            IsChecked="{Binding IsTimeMachineEnabled}"
+                            Content="Enable Time Machine"
+                            Classes="Center"/>
+
                         <Grid ColumnDefinitions="100,*">
                             <TextBlock Text="Length" VerticalAlignment="Center" Padding="0 0 0 10"/>
                             <StackPanel Grid.Column="1">
-                                <Slider x:Name="TimeMachineDuration" Value="{Binding MaxDuration}" Minimum="30" Maximum="600" TickFrequency="30" IsSnapToTickEnabled="True" TickPlacement="BottomRight" IsEnabled="{Binding #TimeMachineEnabled.IsChecked}"/>
-                                <TextBlock Text="{Binding #TimeMachineDuration.Value, StringFormat='Last {0} seconds'}" HorizontalAlignment="Center"/>
+                                <Slider
+                                    x:Name="TimeMachineDuration"
+                                    Value="{Binding MaxDuration}"
+                                    Minimum="30"
+                                    Maximum="600"
+                                    TickFrequency="30"
+                                    IsSnapToTickEnabled="True"
+                                    TickPlacement="BottomRight"
+                                    IsEnabled="{Binding #TimeMachineEnabled.IsChecked}"/>
+                                <TextBlock
+                                    Text="{Binding #TimeMachineDuration.Value, StringFormat='Last {0} seconds'}"
+                                    HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Grid>
+
                         <Grid ColumnDefinitions="100,*">
                             <TextBlock Text="Frequency" VerticalAlignment="Center" Padding="0 0 0 10"/>
                             <StackPanel Grid.Column="1">
-                                <Slider x:Name="TimeMachineInterval" Value="{Binding SnapshotInterval}" Minimum="0.5" Maximum="10" TickFrequency="0.5" IsSnapToTickEnabled="True" TickPlacement="BottomRight" IsEnabled="{Binding #TimeMachineEnabled.IsChecked}"/>
-                                <TextBlock Text="{Binding #TimeMachineInterval.Value, StringFormat='Snapshot Every {0} s'}" HorizontalAlignment="Center"/>
+                                <Slider
+                                    x:Name="TimeMachineInterval"
+                                    Value="{Binding SnapshotInterval}"
+                                    Minimum="0.5"
+                                    Maximum="10"
+                                    TickFrequency="0.5"
+                                    IsSnapToTickEnabled="True"
+                                    TickPlacement="BottomRight"
+                                    IsEnabled="{Binding #TimeMachineEnabled.IsChecked}"/>
+                                <TextBlock
+                                    Text="{Binding #TimeMachineInterval.Value, StringFormat='Snapshot Every {0} s'}"
+                                    HorizontalAlignment="Center"/>
                             </StackPanel>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="100,*" Margin="0 10 0 0">
+                            <TextBlock
+                                Text="Countdown"
+                                VerticalAlignment="Center"/>
+                            <ComboBox
+                                Grid.Column="1"
+                                Width="130"
+                                ItemsSource="{Binding TimeMachineCountdownValues}"
+                                SelectedValue="{Binding TimeMachineCountdownSeconds}"
+                                DisplayMemberBinding="{Binding Name}"
+                                SelectedValueBinding="{Binding Value}"
+                                IsEnabled="{Binding #TimeMachineEnabled.IsChecked}"/>
                         </Grid>
                     </StackPanel>
                 </Border>
@@ -123,7 +214,8 @@
             <TabItem Header="Emulator">
                 <Border Classes="Tab">
                     <StackPanel>
-                        <CheckBox Content="Pause after state restore" Classes="Center"/>
+                        <controls:HeaderSeparator Text="Advanced"/>
+                        <CheckBox Content="Enable floating bus emulation" Classes="Center" IsChecked="{Binding IsFloatingBusEnabled}"/>
                     </StackPanel>
                 </Border>
             </TabItem>
@@ -132,28 +224,156 @@
                     <StackPanel>
                         <Border Classes="Tab">
                             <StackPanel>
-                                <CheckBox
-                                    Content="Standard tape loading speed"
-                                    ToolTip.Tip="Should be able to load any tape file"
-                                    Classes="Center"/>
-                                <CheckBox
-                                    Content="Tape audio effects"
-                                    ToolTip.Tip="If enabled, usual tape loading/saving audio will be generated"/>
+                                <controls:HeaderSeparator Text="Tape loading"/>
+                                <StackPanel>
+                                    <RadioButton
+                                        Content="Normal tape loading speed"
+                                        ToolTip.Tip="Should be able to load any tape file"
+                                        IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Normal}}"
+                                        Classes="Center"/>
+
+                                    <RadioButton
+                                        Content="Accelerated tape loading"
+                                        ToolTip.Tip="Runs emulator at maximum speed during tape loading"
+                                        IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Accelerated}}"
+                                        Classes="Center"/>
+
+                                    <RadioButton
+                                        Content="Instant tape loading"
+                                        ToolTip.Tip="Loads tape instantly into memory, only compatible with standard tape blocks"
+                                        IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Instant}}"
+                                        Classes="Center"/>
+                                </StackPanel>
+
                                 <CheckBox
                                     Content="Automatically start playing tape files"
                                     ToolTip.Tip="If enabled, tape files will be automatically loaded and played. If disabled, you need to press play button."
+                                    Margin="0 10 0 0"
                                     Classes="Center"
                                     IsChecked="{Binding IsAutoPlayEnabled}"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <CheckBox Content="Enable tape saving (virtual tape). Speed: " Classes="Center" IsChecked="{Binding IsTapeSaveEnabled}" x:Name="IsTapeSaveEnabled"/>
-                                    <ComboBox Margin="5 0 0 0" Width="150" ItemsSource="{Binding TapeSpeeds}" SelectedValue="{Binding TapeSaveSpeed}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}" IsEnabled="{Binding #IsTapeSaveEnabled.IsChecked}" Padding="10 2 0 0"/>
+
+                                <controls:HeaderSeparator Text="Tape saving"/>
+                                <CheckBox
+                                    Content="Enable tape saving (virtual tape). Speed: "
+                                    Classes="Center"
+                                    IsChecked="{Binding IsTapeSaveEnabled}"
+                                    x:Name="IsTapeSaveEnabled"/>
+
+                                <StackPanel Margin="20 0 0 0">
+                                    <RadioButton
+                                        Content="Normal tape saving speed"
+                                        ToolTip.Tip="Normal tape saving with all border and audio effects"
+                                        IsEnabled="{Binding #IsTapeSaveEnabled.IsChecked}"
+                                        IsChecked="{Binding TapeSaveSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Normal}}"
+                                        Classes="Center"/>
+
+                                    <RadioButton
+                                        Content="Instant tape saving"
+                                        ToolTip.Tip="Saves tape data instantly capturing memory contents"
+                                        IsEnabled="{Binding #IsTapeSaveEnabled.IsChecked}"
+                                        IsChecked="{Binding TapeSaveSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Instant}}"
+                                        Classes="Center"/>
                                 </StackPanel>
                             </StackPanel>
                         </Border>
                     </StackPanel>
                 </Border>
             </TabItem>
+            <TabItem Header="Recording">
+                <Border Classes="Tab">
+                    <StackPanel>
+                        <controls:HeaderSeparator Text="FFmpeg"/>
+                        <Grid ColumnDefinitions="120,*" RowDefinitions="40,40,40,40,40">
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Text="Border"
+                                VerticalAlignment="Center"
+                                Classes="Center"/>
+                            <ComboBox
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Margin="5 0 0 0"
+                                Width="250"
+                                ItemsSource="{Binding BorderSizes}"
+                                SelectedValue="{Binding RecordingBorderSize}"
+                                DisplayMemberBinding="{Binding Name}"
+                                SelectedValueBinding="{Binding Value}"/>
+
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Text="Scaling"
+                                VerticalAlignment="Center"
+                                Classes="Center"/>
+                            <ComboBox
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                Margin="5 0 0 0"
+                                Width="250"
+                                ItemsSource="{Binding ScalingFactors}"
+                                SelectedValue="{Binding ScalingFactor}"
+                                DisplayMemberBinding="{Binding Name}"
+                                SelectedValueBinding="{Binding Value}"/>
+
+                            <TextBlock
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Text="Algorithm"
+                                VerticalAlignment="Center"
+                                Classes="Center"/>
+                            <ComboBox
+                                Grid.Row="2"
+                                Grid.Column="1"
+                                Margin="5 0 0 0"
+                                Width="250"
+                                ItemsSource="{Binding ScalingAlgorithms}"
+                                SelectedValue="{Binding ScalingAlgorithm}"
+                                DisplayMemberBinding="{Binding Name}"
+                                SelectedValueBinding="{Binding Value}"/>
+
+                            <TextBlock
+                                Grid.Row="3"
+                                Grid.Column="0"
+                                Text="FFmpeg Path"
+                                VerticalAlignment="Center"
+                                Classes="Center"/>
+                            <TextBox
+                                Grid.Row="3"
+                                Grid.Column="1"
+                                Margin="5 0 0 0"
+                                Height="30"
+                                Watermark="Leave empty to use system PATH"
+                                Text="{Binding FFmpegPath}"
+                                VerticalContentAlignment="Center"/>
+
+                            <StackPanel
+                                Grid.Row="4"
+                                Grid.Column="1"
+                                Orientation="Horizontal">
+                                <Button
+                                    Margin="5 0 0 0"
+                                    Content="Probe FFmpeg"
+                                    Command="{Binding ProbeFFmpegCommand}"/>
+
+                                <TextBlock
+                                    Margin="5 0 0 0"
+                                    Text="{Binding FFmpegMessage}"
+                                    VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </TabItem>
         </TabControl>
-        <Button Grid.Row="1" HorizontalAlignment="Right" Margin="0 0 15 0" Content="OK" Command="{Binding UpdatePreferencesCommand}"/>
+
+        <Button
+            Grid.Row="1"
+            Width="80"
+            HorizontalContentAlignment="Center"
+            HorizontalAlignment="Right"
+            Margin="0 0 15 0"
+            Content="OK"
+            Command="{Binding UpdatePreferencesCommand}"/>
     </Grid>
 </Window>

@@ -29,10 +29,4 @@
       <ProjectReference Include="..\..\src\Spectron\Spectron.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Reference Include="OldBit.Z80Cpu.Dasm">
-        <HintPath>..\..\..\Z80\src\Z80Cpu.Dasm\bin\Debug\net8.0\OldBit.Z80Cpu.Dasm.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
 </Project>

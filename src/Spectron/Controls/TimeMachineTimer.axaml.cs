@@ -13,12 +13,21 @@ public partial class TimeMachineTimer : UserControl
     private int _value;
 
     public static readonly StyledProperty<ICommand?> ElapsedCommandProperty =
-        AvaloniaProperty.Register<Button, ICommand?>(nameof(ElapsedCommand));
+        AvaloniaProperty.Register<TimeMachineTimer, ICommand?>(nameof(ElapsedCommand));
+
+    public static readonly StyledProperty<int> CountdownSecondsProperty =
+        AvaloniaProperty.Register<TimeMachineTimer, int>(nameof(CountdownSeconds));
 
     public ICommand? ElapsedCommand
     {
         get => GetValue(ElapsedCommandProperty);
         set => SetValue(ElapsedCommandProperty, value);
+    }
+
+    public int CountdownSeconds
+    {
+        get => GetValue(CountdownSecondsProperty);
+        set => SetValue(CountdownSecondsProperty, value);
     }
 
     public TimeMachineTimer()
@@ -42,7 +51,13 @@ public partial class TimeMachineTimer : UserControl
 
     private void StartTimer()
     {
-        _value = 3;
+        if (CountdownSeconds == 0)
+        {
+            Dispatcher.UIThread.Post(() => ElapsedCommand?.Execute(null));
+            return;
+        }
+
+        _value = CountdownSeconds;
         Countdown.Text = _value.ToString();
 
         _timer.Elapsed += TimerOnElapsed;

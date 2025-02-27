@@ -43,4 +43,14 @@ public static class FileTypes
     {
         Patterns = ["*.zip"]
     };
+
+    public static FilePickerFileType Wav { get; } = new("Wave Audio")
+    {
+        Patterns = ["*.wav"]
+    };
+
+    public static FilePickerFileType Mp4 { get; } = new("MP4 Video")
+    {
+        Patterns = ["*.mp4"]
+    };
 }

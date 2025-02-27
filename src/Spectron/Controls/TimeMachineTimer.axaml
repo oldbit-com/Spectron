@@ -11,5 +11,5 @@
         Opacity=".8"
         Foreground="{StaticResource SpectrumBrightMagenta}"
         HorizontalAlignment="Center"
-        VerticalAlignment="Center" />
+        VerticalAlignment="Center"/>
 </UserControl>

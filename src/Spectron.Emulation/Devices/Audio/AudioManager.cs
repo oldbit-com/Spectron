@@ -8,8 +8,10 @@ namespace OldBit.Spectron.Emulation.Devices.Audio;
 
 public sealed class AudioManager
 {
+    public const int PlayerSampleRate = 44100;
+
+    private const AudioFormat PlayerAudioFormat = AudioFormat.Signed16BitIntegerLittleEndian;
     private const int FramesPerSecond = 50;
-    private const int PlayerSampleRate = 44100;
     private const int SamplesPerFrame = PlayerSampleRate / FramesPerSecond;
     private const int NumberOfBuffers = 4;
 
@@ -18,7 +20,7 @@ public sealed class AudioManager
     private readonly BeeperAudio _beeperAudio;
     private readonly AyAudio _ayAudio;
 
-    private StereoMode _stereoMode = StereoMode.None;
+    private StereoMode _stereoMode = StereoMode.Mono;
     private bool _isMuted;
     private bool _isAyEnabled;
     private bool _isBeeperEnabled;
@@ -40,7 +42,7 @@ public sealed class AudioManager
 
             _stereoMode = value;
 
-            ConfigureStereoMode();
+            Restart();
         }
     }
 
@@ -103,14 +105,15 @@ public sealed class AudioManager
         _ayAudio.NewFrame();
     }
 
-    internal void EndFrame()
+    internal AudioBuffer EndFrame()
     {
         if (_isMuted)
         {
-            return;
+            return AudioBuffer.Empty;
         }
 
         var playAudio = false;
+
         if (IsAySupported && _isAyEnabled)
         {
             _ayAudio.EndFrame();
@@ -125,7 +128,7 @@ public sealed class AudioManager
 
         if (!playAudio)
         {
-            return;
+            return AudioBuffer.Empty;
         }
 
         var audioBuffer = _audioBufferPool.GetBuffer();
@@ -141,7 +144,7 @@ public sealed class AudioManager
             {
                 switch (StereoMode)
                 {
-                    case StereoMode.None:
+                    case StereoMode.Mono:
                         sample = MonoMix(sample, Ay.ChannelA.Samples[i], Ay.ChannelB.Samples[i], Ay.ChannelC.Samples[i]);
                         break;
 
@@ -155,7 +158,7 @@ public sealed class AudioManager
                 }
             }
 
-            if (StereoMode == StereoMode.None)
+            if (StereoMode == StereoMode.Mono)
             {
                 audioBuffer.Add((short)sample);
             }
@@ -166,7 +169,9 @@ public sealed class AudioManager
             }
         }
 
-        _audioPlayer?.TryEnqueue(audioBuffer.Buffer);
+        _audioPlayer?.TryEnqueue(audioBuffer.Buffer, audioBuffer.Count);
+
+        return audioBuffer;
     }
 
     internal void Start()
@@ -177,24 +182,22 @@ public sealed class AudioManager
         }
 
         _audioPlayer = new AudioPlayer(
-            AudioFormat.Signed16BitIntegerLittleEndian,
+            PlayerAudioFormat,
             PlayerSampleRate,
-            channelCount: StereoMode == StereoMode.None ? 1 : 2,
+            channelCount: StereoMode == StereoMode.Mono ? 1 : 2,
             new PlayerOptions
             {
                 BufferSizeInBytes = 32768,
                 BufferQueueSize = NumberOfBuffers,
             });
 
-        _audioPlayer.Volume = 80;
+        _audioPlayer.Volume = 100;
         _audioPlayer.Start();
         _isAudioPlayerRunning = true;
     }
 
     internal void Stop()
     {
-        ResetAudio();
-
         _isAudioPlayerRunning = false;
         _audioPlayer?.Stop();
 
@@ -223,7 +226,7 @@ public sealed class AudioManager
         }
     }
 
-    private void ConfigureStereoMode()
+    private void Restart()
     {
         Stop();
         Start();

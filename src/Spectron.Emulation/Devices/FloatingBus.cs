@@ -16,6 +16,8 @@ internal sealed class FloatingBus : IDevice
     private readonly Clock _clock;
     private readonly Dictionary<int, Word> _floatingBusAddressIndex = new();
 
+    public bool IsEnabled { get; set; } = true;
+
     internal FloatingBus(HardwareSettings hardware, IMemory memory, Clock clock)
     {
         _hardware = hardware;
@@ -35,7 +37,7 @@ internal sealed class FloatingBus : IDevice
 
     public byte? ReadPort(Word address)
     {
-        if (Ula.IsUlaPort(address))
+        if (!IsEnabled || Ula.IsUlaPort(address))
         {
             return null;
         }

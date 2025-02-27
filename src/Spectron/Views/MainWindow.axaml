@@ -2,14 +2,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:rom="clr-namespace:OldBit.Spectron.Emulation.Rom;assembly=OldBit.Spectron.Emulation"
-        xmlns:tape="clr-namespace:OldBit.Spectron.Emulation.Tape;assembly=OldBit.Spectron.Emulation"
-        xmlns:joy="clr-namespace:OldBit.Spectron.Emulation.Devices.Joystick;assembly=OldBit.Spectron.Emulation"
         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-        xmlns:emu="clr-namespace:OldBit.Spectron.Emulation;assembly=OldBit.Spectron.Emulation"
         xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
         xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
-        xmlns:models="clr-namespace:OldBit.Spectron.Models"
         xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.MainWindow"
@@ -26,7 +21,7 @@
             <InvokeCommandAction Command="{Binding WindowOpenedCommand}" />
         </EventTriggerBehavior>
         <EventTriggerBehavior EventName="Closing" SourceObject="Window">
-            <InvokeCommandAction Command="{Binding WindowClosingCommand}"/>
+            <InvokeCommandAction Command="{Binding WindowClosingCommand}" PassEventArgsToCommand="True"/>
         </EventTriggerBehavior>
         <EventTriggerBehavior EventName="KeyDown" SourceObject="Window">
             <InvokeCommandAction Command="{Binding KeyDownCommand}" PassEventArgsToCommand="True"/>
@@ -37,8 +32,7 @@
     </i:Interaction.Behaviors>
 
     <Window.Resources>
-        <converters:IsFullScreenConverter x:Key="IsFullScreenConverter"/>
-        <converters:ValueEqualityConverter x:Key="ValueEqualityConverter"/>
+        <converters:ValueInequalityConverter x:Key="ValueInequalityConverter"/>
     </Window.Resources>
 
     <Window.Styles>
@@ -48,111 +42,28 @@
     </Window.Styles>
 
     <DockPanel>
-        <Menu DockPanel.Dock="Top" IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}" Focusable="False">
-            <MenuItem Header="_File" Padding="10 0 10 0" IsTabStop="False" Focusable="False">
-                <MenuItem Header="Load..." HotKey="Cmd+O" InputGesture="Cmd+O" Command="{Binding LoadFileCommand}"/>
-                <MenuItem Header="Recent..." SubmenuOpened="RecentFilesSubmenuOpened">
-                    <MenuItem />
-                </MenuItem>
-                <MenuItem Header="Save Snapshot..." HotKey="Cmd+S" InputGesture="Cmd+S" Command="{Binding SaveFileCommand}"/>
-                <MenuItem Header="-" />
-                <MenuItem Header="Settings" HotKey="Cmd+," InputGesture="Cmd+," Command="{Binding ShowPreferencesViewCommand}"/>
-                <MenuItem Header="-" />
-                <MenuItem Header="Exit" HotKey="Cmd+Q" InputGesture="Cmd+Q"/>
-            </MenuItem>
+        <controls:MainMenu
+            DockPanel.Dock="Top"
+            IsVisible="{Binding $parent[Window].WindowState, Converter={StaticResource ValueInequalityConverter}, ConverterParameter={x:Static WindowState.FullScreen}}"/>
 
-            <MenuItem Header="_Emulator" Padding="10 0 10 0" Focusable="False">
-                <MenuItem Header="Machine">
-                    <MenuItem Header="ZX Spectrum 16" ToggleType="Radio" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum16K}" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum16K}}"/>
-                    <MenuItem Header="ZX Spectrum 48" ToggleType="Radio" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum48K}" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum48K}}"/>
-                    <MenuItem Header="ZX Spectrum 128" ToggleType="Radio" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum128K}" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum128K}}"/>
-                </MenuItem>
-                <MenuItem Header="ROM">
-                    <MenuItem Header="Original" ToggleType="Radio" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Original}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.Original}}"/>
-                    <MenuItem Header="Gosh Wonderful" ToggleType="Radio" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.GoshWonderful}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.GoshWonderful}}"/>
-                    <MenuItem Header="Busy Soft v1.40" ToggleType="Radio" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.BusySoft}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.BusySoft}}"/>
-                    <MenuItem Header="J.G. Harston v0.77" ToggleType="Radio" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Harston}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.Harston}}"/>
-                    <MenuItem Header="Diagnostics">
-                        <MenuItem Header="Retroleum v1.71" ToggleType="Radio" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Retroleum}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.Retroleum}}"/>
-                        <MenuItem Header="B. Alford v1.37" ToggleType="Radio" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.BrendanAlford}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.BrendanAlford}}"/>
-                    </MenuItem>
-                </MenuItem>
-                <MenuItem Header="Joystick" Focusable="False">
-                    <MenuItem Header="None" ToggleType="Radio" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.None}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.None}}"/>
-                    <MenuItem Header="Kempston" ToggleType="Radio" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Kempston}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Kempston}}"/>
-                    <MenuItem Header="Sinclair 1" ToggleType="Radio" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Sinclair1}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Sinclair1}}"/>
-                    <MenuItem Header="Sinclair 2" ToggleType="Radio" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Sinclair2}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Sinclair2}}"/>
-                    <MenuItem Header="Cursor" ToggleType="Radio" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Cursor}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Cursor}}"/>
-                    <MenuItem Header="Fuller" ToggleType="Radio" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Fuller}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Fuller}}"/>
-                </MenuItem>
-                <MenuItem Header="Enable ULA+" ToggleType="CheckBox" Command="{Binding ToggleUlaPlus}" IsChecked="{Binding IsUlaPlusEnabled}"/>
-            </MenuItem>
+        <Grid ColumnDefinitions="40,*,40"
+            RowDefinitions="*,Auto"
+            Focusable="True"
+            FocusAdorner="{x:Null}">
 
-            <MenuItem Header="_Control" Padding="10 0 10 0" Focusable="False">
-                <MenuItem Header="Speed">
-                    <MenuItem Header="25%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="25" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='25'}"/>
-                    <MenuItem Header="50%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="50" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='50'}"/>
-                    <MenuItem Header="75%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="75" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='75'}"/>
-                    <MenuItem Header="100%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="100" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='100'}"/>
-                    <MenuItem Header="125%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="125" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='125'}"/>
-                    <MenuItem Header="150%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="150" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='150'}"/>
-                    <MenuItem Header="200%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="200" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='200'}"/>
-                    <MenuItem Header="250%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="250" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='250'}"/>
-                    <MenuItem Header="300%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="300" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='300'}"/>
-                    <MenuItem Header="400%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="400" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='400'}"/>
-                    <MenuItem Header="500%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="500" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='500'}"/>
-                    <MenuItem Header="Full Throttle" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="Max" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='Max'}"/>
-                </MenuItem>
-                <MenuItem Header="-"/>
-                <MenuItem Header="Pause" HotKey="F8" InputGesture="F8" Command="{Binding TogglePauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
-                <MenuItem Header="Time Machine" HotKey="F9" InputGesture="F9" Command="{Binding ShowTimeMachineViewCommand}"/>
-                <MenuItem Header="-"/>
-                <MenuItem Header="Mute" ToggleType="CheckBox" Command="{Binding ToggleMuteCommand}" IsChecked="{Binding IsMuted}"/>
-                <MenuItem Header="-"/>
-                <MenuItem Header="Reset" InputGesture="Ctrl+F5" HotKey="Ctrl+F5" Command="{Binding ResetCommand}"/>
-                <MenuItem Header="Hard Reset" Command="{Binding HardResetCommand}"/>
-            </MenuItem>
+            <controls:MainToolbar
+                Grid.Row="0"
+                Grid.Column="0"
+                DockPanel.Dock="Top"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Margin="6 10 0 0"
+                DataContext="{Binding}"
+                Width="30"/>
 
-            <MenuItem Header="_View" Padding="10 0 10 0" Focusable="False">
-                <MenuItem Header="Border">
-                    <MenuItem Header="None" ToggleType="Radio" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.None}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.None}}"/>
-                    <MenuItem Header="Small" ToggleType="Radio" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Small}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.Small}}"/>
-                    <MenuItem Header="Medium" ToggleType="Radio" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Medium}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.Medium}}"/>
-                    <MenuItem Header="Large" ToggleType="Radio" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Large}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.Large}}"/>
-                    <MenuItem Header="Full" ToggleType="Radio" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static models:BorderSize.Full}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static models:BorderSize.Full}}"/>
-                </MenuItem>
-                <MenuItem Header="-"/>
-                <MenuItem Header="{Binding WindowStateCommandName}" HotKey="Ctrl+Enter" InputGesture="Ctrl+Enter" Command="{Binding ToggleFullScreenCommand}"/>
-                <MenuItem Header="-"/>
-                <MenuItem Header="Debugger" HotKey="F11" InputGesture="F11" Command="{Binding ShowDebuggerViewCommand}"/>
-            </MenuItem>
-
-            <MenuItem Header="_Tape" Padding="10 0 10 0" Focusable="False">
-                <MenuItem Header="New Tape" Command="{Binding TapeMenuViewModel.NewCommand}"/>
-                <MenuItem Header="Insert Tape" HotKey="Cmd+T" InputGesture="Cmd+T" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
-                <MenuItem Header="Save Tape"/>
-                <MenuItem Header="-"/>
-                <MenuItem Header="Play" Command="{Binding TapeMenuViewModel.PlayCommand}"/>
-                <MenuItem Header="Stop" Command="{Binding TapeMenuViewModel.StopCommand}"/>
-                <MenuItem Header="Rewind" Command="{Binding TapeMenuViewModel.RewindCommand}"/>
-                <MenuItem Header="Eject" Command="{Binding TapeMenuViewModel.EjectCommand}"/>
-                <MenuItem Header="View" Command="{Binding TapeMenuViewModel.ViewCommand}"/>
-                <MenuItem Header="-"/>
-                <MenuItem Header="Loading Speed">
-                    <MenuItem Header="Normal" ToggleType="Radio" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeSpeed.Normal}" IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Normal}}"/>
-                    <MenuItem Header="Instant" ToggleType="Radio" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeSpeed.Instant}" IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Instant}}"/>
-                    <MenuItem Header="Accelerated" ToggleType="Radio" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeSpeed.Accelerated}" IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Accelerated}}"/>
-                </MenuItem>
-            </MenuItem>
-
-            <MenuItem Header="_Help" Padding="10 0 10 0" Focusable="False">
-                <MenuItem Header="Keyboard" InputGesture="F1" Command="{Binding ShowKeyboardHelpViewCommand}"/>
-                <MenuItem Header="About" Command="{Binding ShowAboutViewCommand}"/>
-            </MenuItem>
-        </Menu>
-
-        <Grid RowDefinitions="*,Auto" Focusable="True" FocusAdorner="{x:Null}">
-            <Border>
+            <Border
+                Grid.Row="0"
+                Grid.Column="1">
                 <Grid>
                     <Border CornerRadius="15" HorizontalAlignment="Center" ClipToBounds="True">
                         <Grid>
@@ -172,11 +83,27 @@
                         <controls:PauseOverlay FontSize="100" Opacity="4" IsVisible="{Binding IsPaused}" VerticalAlignment="Center"/>
                     </Border>
 
-                    <controls:TimeMachineTimer IsVisible="{Binding IsTimeMachineCountdownVisible}" ElapsedCommand="{Binding TimeMachineResumeEmulatorCommand}"/>
+                    <controls:TimeMachineTimer
+                        IsVisible="{Binding IsTimeMachineCountdownVisible}"
+                        CountdownSeconds="{Binding TimeMachineCountdownSeconds}"
+                        ElapsedCommand="{Binding TimeMachineResumeEmulatorCommand}"/>
                 </Grid>
             </Border>
 
-            <controls:StatusBar Grid.Row="1" Height="30" DataContext="{Binding StatusBar}" IsVisible="{Binding #Window.WindowState, Converter={StaticResource IsFullScreenConverter}, ConverterParameter=invert}"/>
+            <controls:StatusBar
+                Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Height="30"
+                DataContext="{Binding StatusBarViewModel}"
+                IsVisible="{Binding $parent[Window].WindowState, Converter={StaticResource ValueInequalityConverter}, ConverterParameter={x:Static WindowState.FullScreen}}"/>
+
+            <WindowNotificationManager
+                Grid.Row="0"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Name="NotificationManager"
+                Position="BottomRight"/>
         </Grid>
     </DockPanel>
 </Window>

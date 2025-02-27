@@ -5,8 +5,9 @@ using OldBit.Spectron.Files.Szx;
 namespace OldBit.Spectron.Emulation.Tape.Loader;
 
 /// <summary>
-/// The loader is responsible for entering the LOAD "" command into the emulator.
-/// Basically it loads a snapshot that it is the state after the LOAD "" command has been entered.
+/// Responsible for simulating LOAD "" instruction entered by a user.
+/// Basically it loads a snapshot taken when the LOAD "" instruction has been entered,
+/// so it means we don't type the command, but we simulate it.
 /// </summary>
 public sealed class Loader(SzxSnapshot szxSnapshot)
 {
@@ -16,7 +17,7 @@ public sealed class Loader(SzxSnapshot szxSnapshot)
 
     public Emulator EnterLoadCommand(ComputerType computerType)
     {
-        var romResourceName = computerType switch
+        var resourceName = computerType switch
         {
             ComputerType.Spectrum16K => Loader16ResourceName,
             ComputerType.Spectrum48K => Loader48ResourceName,
@@ -24,7 +25,7 @@ public sealed class Loader(SzxSnapshot szxSnapshot)
             _ => throw new NotSupportedException($"The computer type '{computerType}' is not supported.")
         };
 
-        var szx = GetSnapshot(romResourceName);
+        var szx = GetSnapshot(resourceName);
 
         return szxSnapshot.CreateEmulator(szx);
     }

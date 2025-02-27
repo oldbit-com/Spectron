@@ -1,20 +1,24 @@
 using System;
 using System.IO;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Input;
 using Avalonia.Controls;
+using Avalonia.Controls.Notifications;
+using Avalonia.Threading;
+using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.Storage;
 using OldBit.Spectron.Emulation.Tape;
-using OldBit.Spectron.Helpers;
+using OldBit.Spectron.Keyboard;
 using OldBit.Spectron.Models;
-using OldBit.Spectron.Views;
+using OldBit.Spectron.Recorder;
+using OldBit.Spectron.Screen;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -25,15 +29,11 @@ partial class MainWindowViewModel
     private async Task HandleLoadFileAsync(string? filePath)
     {
         Stream? stream = null;
-        var shouldResume = false;
+        var shouldResume = !IsPaused;
 
         try
         {
-            if (!IsPaused)
-            {
-                Pause();
-                shouldResume = true;
-            }
+            Pause();
 
             if (filePath == null)
             {
@@ -63,7 +63,7 @@ partial class MainWindowViewModel
             if (CreateEmulator(fileResult.Stream, fileResult.FileType))
             {
                 RecentFilesViewModel.Add(filePath);
-                Title = $"S{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
+                Title = $"{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
             }
         }
         catch (Exception ex)
@@ -129,12 +129,13 @@ partial class MainWindowViewModel
 
         if (fileType.IsSnapshot())
         {
-            emulator = _snapshotLoader.Load(stream, fileType);
+            emulator = _snapshotManager.Load(stream, fileType);
         }
         else if (fileType.IsTape())
         {
             emulator = _loader.EnterLoadCommand(ComputerType);
-            emulator.TapeManager.InsertTape(stream, fileType, _preferences.TapeSettings.IsAutoPlayEnabled);
+            emulator.TapeManager.InsertTape(stream, fileType,
+                _preferences.TapeSettings.IsAutoPlayEnabled && TapeLoadSpeed != TapeSpeed.Instant);
         }
 
         if (emulator != null)
@@ -147,20 +148,17 @@ partial class MainWindowViewModel
 
     private async Task HandleSaveFileAsync()
     {
-        var shouldResume = false;
+        var shouldResume = !IsPaused;
+
         try
         {
-            if (!IsPaused)
-            {
-                Pause();
-                shouldResume = true;
-            }
+            Pause();
 
             var file = await FileDialogs.SaveSnapshotFileAsync();
 
             if (file != null && Emulator != null)
             {
-                SnapshotLoader.Save(file.Path.LocalPath, Emulator);
+                SnapshotManager.Save(file.Path.LocalPath, Emulator);
             }
         }
         catch (Exception ex)
@@ -176,12 +174,163 @@ partial class MainWindowViewModel
         }
     }
 
+    private void HandleQuickSave()
+    {
+        if (Emulator == null)
+        {
+            return;
+        }
+
+        _quickSaveService.RequestQuickSave();
+    }
+
+    private void HandleQuickLoad()
+    {
+        var snapshot = _quickSaveService.QuickLoad();
+
+        if (snapshot != null)
+        {
+            CreateEmulator(snapshot);
+        }
+    }
+
+    private RecorderOptions GetRecorderOptions() => new()
+    {
+        AudioChannels = Emulator?.AudioManager.StereoMode == StereoMode.Mono ? 1 : 2,
+        BorderLeft = BorderSizes.GetBorder(_preferences.RecordingSettings.BorderSize).Left,
+        BorderRight = BorderSizes.GetBorder(_preferences.RecordingSettings.BorderSize).Right,
+        BorderTop = BorderSizes.GetBorder(_preferences.RecordingSettings.BorderSize).Top,
+        BorderBottom = BorderSizes.GetBorder(_preferences.RecordingSettings.BorderSize).Bottom,
+        ScalingFactor = _preferences.RecordingSettings.ScalingFactor,
+        ScalingAlgorithm = _preferences.RecordingSettings.ScalingAlgorithm,
+        FFmpegPath = _preferences.RecordingSettings.FFmpegPath,
+    };
+
+    private async Task HandleStartAudioRecordingAsync()
+    {
+        var shouldResume = !IsPaused;
+
+        try
+        {
+            Pause();
+
+            var file = await FileDialogs.SaveAudioFileAsync();
+
+            if (file != null && Emulator != null)
+            {
+                _mediaRecorder = new MediaRecorder(
+                    RecorderMode.Audio,
+                    file.Path.LocalPath,
+                    GetRecorderOptions(),
+                    _logger);
+
+                _mediaRecorder.Start();
+
+                RecordingStatus = RecordingStatus.Recording;
+            }
+        }
+        catch (Exception ex)
+        {
+            await MessageDialogs.Error(ex.Message);
+        }
+        finally
+        {
+            if (shouldResume)
+            {
+                Resume();
+            }
+        }
+    }
+
+    private async Task HandleStartVideoRecordingAsync()
+    {
+        var shouldResume = !IsPaused;
+
+        if (!MediaRecorder.VerifyDependencies())
+        {
+            await MessageDialogs.Error("Video recording is not available. It requires FFmpeg to be available.\nPlease check the documentation for more information.");
+
+            return;
+        }
+
+        try
+        {
+            Pause();
+
+            var file = await FileDialogs.SaveVideoFileAsync();
+
+            if (file != null && Emulator != null)
+            {
+                _mediaRecorder = new MediaRecorder(
+                    RecorderMode.AudioVideo,
+                    file.Path.LocalPath,
+                    GetRecorderOptions(),
+                    _logger);
+
+                _mediaRecorder.Start();
+
+                RecordingStatus = RecordingStatus.Recording;
+            }
+        }
+        catch (Exception ex)
+        {
+            await MessageDialogs.Error(ex.Message);
+        }
+        finally
+        {
+            if (shouldResume)
+            {
+                Resume();
+            }
+        }
+    }
+
+    private void HandleStopRecording()
+    {
+        if (_mediaRecorder == null)
+        {
+            RecordingStatus = RecordingStatus.None;
+            return;
+        }
+
+        if (RecordingStatus != RecordingStatus.Recording)
+        {
+            return;
+        }
+
+        RecordingStatus = RecordingStatus.Processing;
+
+        _mediaRecorder.StartProcess(result =>
+        {
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                RecordingStatus = RecordingStatus.None;
+
+                NotificationManager.Show(new Notification(
+                    result.ISucccess ? "Done!" : "Error!",
+                    result.ISucccess ? "Recording has been successfully completed" : $"Recording has failed: {result.Error?.Message}",
+                    result.ISucccess ? NotificationType.Information : NotificationType.Error)
+                {
+                    Expiration = TimeSpan.FromSeconds(10)
+                });
+            });
+
+            _mediaRecorder.Dispose();
+            _mediaRecorder = null;
+
+            if (!result.ISucccess)
+            {
+                _logger.LogError(result.Error, "Failed to process recording");
+            }
+        });
+    }
+
     private void HandleChangeBorderSize(BorderSize borderSize)
     {
         BorderSize = borderSize;
 
         _frameBufferConverter.SetBorderSize(borderSize);
-        SpectrumScreen = _frameBufferConverter.Bitmap;
+        SpectrumScreen = _frameBufferConverter.ScreenBitmap;
     }
 
     private void HandleChangeRom(RomType romType)
@@ -218,7 +367,7 @@ partial class MainWindowViewModel
         IsPaused = Emulator?.IsPaused ?? false;
 
         RecentFilesViewModel.CurrentFileName = string.Empty;
-        SetTitle();
+        UpdateWindowTitle();
     }
 
     private void HandleMachineHardReset()
@@ -226,11 +375,26 @@ partial class MainWindowViewModel
         CreateEmulator(_preferences.ComputerType, _preferences.RomType);
 
         RecentFilesViewModel.CurrentFileName = string.Empty;
-        SetTitle();
+        UpdateWindowTitle();
+    }
+
+    private void HandleTapeStateChanged(TapeStateEventArgs args)
+    {
+        if (args.Action == TapeAction.TapeEjected)
+        {
+            RecentFilesViewModel.CurrentFileName = string.Empty;
+        }
+
+        UpdateWindowTitle();
     }
 
     private void Pause()
     {
+        if (IsPaused)
+        {
+            return;
+        }
+
         Emulator?.Pause();
         IsPaused = true;
     }
@@ -271,6 +435,7 @@ partial class MainWindowViewModel
             }
         }
 
+        StatusBarViewModel.Speed = emulationSpeed;
         Emulator?.SetEmulationSpeed(emulationSpeedValue);
     }
 
@@ -281,28 +446,40 @@ partial class MainWindowViewModel
 
     private void HandleKeyUp(KeyEventArgs e)
     {
+        if (MainWindow?.IsActive != true)
+        {
+            return;
+        }
+
         if (IsPaused)
         {
             return;
         }
 
+        var joystickInput = JoystickInput.None;
+
         if (IsKeyboardJoystickEmulationEnabled)
         {
-            var input = KeyMappings.ToJoystickAction(e);
+            joystickInput = KeyMappings.ToJoystickAction(e.PhysicalKey, _preferences.Joystick.FireKey);
 
-            if (input != JoystickInput.None)
+            if (joystickInput != JoystickInput.None)
             {
-                Emulator?.JoystickManager.Released(input);
-                return;
+                Emulator?.JoystickManager.Released(joystickInput);
             }
         }
 
-        var keys = KeyMappings.ToSpectrumKey(e);
+        var keys = KeyMappings.ToSpectrumKey(e, joystickInput);
+
         Emulator?.KeyboardState.KeyUp(keys);
     }
 
     private void HandleKeyDown(KeyEventArgs e)
     {
+        if (MainWindow?.IsActive != true)
+        {
+            return;
+        }
+
         switch (e)
         {
             case { Key: Key.Escape }:
@@ -322,18 +499,20 @@ partial class MainWindowViewModel
                 return;
         }
 
+        var joystickInput = JoystickInput.None;
+
         if (IsKeyboardJoystickEmulationEnabled)
         {
-            var input = KeyMappings.ToJoystickAction(e);
+            joystickInput = KeyMappings.ToJoystickAction(e.PhysicalKey, _preferences.Joystick.FireKey);
 
-            if (input != JoystickInput.None)
+            if (joystickInput != JoystickInput.None)
             {
-                Emulator?.JoystickManager.Pressed(input);
-                return;
+                Emulator?.JoystickManager.Pressed(joystickInput);
             }
         }
 
-        var keys = KeyMappings.ToSpectrumKey(e);
+        var keys = KeyMappings.ToSpectrumKey(e, joystickInput);
+
         Emulator?.KeyboardState.KeyDown(keys);
     }
 

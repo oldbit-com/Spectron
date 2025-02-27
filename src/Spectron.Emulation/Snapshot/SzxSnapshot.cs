@@ -3,6 +3,7 @@ using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Memory;
+using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Tape;
@@ -131,7 +132,6 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
             switch (memory)
             {
                 case Memory16K or Memory48K:
-                {
                     var address = ramPage.PageNumber switch
                     {
                         5 => 0x4000,
@@ -146,9 +146,10 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
                     }
 
                     break;
-                }
+
                 case Memory128K memory128:
                     var bank = memory128.Banks[ramPage.PageNumber];
+
                     for (var i = 0; i < ramPage.Data.Length; i++)
                     {
                         bank[i] = ramPage.Data[i];
@@ -306,7 +307,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         }
         else if (memory is Memory128K memory128K)
         {
-            snapshot.CustomRom = new CustomRomBlock(ConcatenateArrays(memory128K.RomBank0, memory128K.RomBank1), compressionLevel);
+            snapshot.CustomRom = new CustomRomBlock(memory128K.RomBank0.Concatenate(memory128K.RomBank1), compressionLevel);
         }
     }
 
@@ -361,7 +362,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         snapshot.Tape = new TapeBlock(tapeManager.Cassette.ContentBytes, compressionLevel)
         {
             FileExtension = "tzx",
-            CurrentBlockNo = (ushort)tapeManager.Cassette.Position
+            CurrentBlockNo = (Word)tapeManager.Cassette.Position
         };
     }
 
@@ -376,19 +377,10 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         {
             CurrentRegister = audioManager.Ay.CurrentRegister
         };
+
         for (var i = 0; i <  audioManager.Ay.Registers.Length; i++)
         {
             snapshot.Ay.Registers[i] = audioManager.Ay.Registers[i];
         }
-    }
-
-    private static T[] ConcatenateArrays<T>(T[] first, T[] second)
-    {
-        var result = new T[first.Length + second.Length];
-
-        Array.Copy(first, 0, result, 0, first.Length);
-        Array.Copy(second, 0, result, first.Length, second.Length);
-
-        return result;
     }
 }

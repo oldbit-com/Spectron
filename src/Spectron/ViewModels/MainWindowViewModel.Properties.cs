@@ -5,6 +5,7 @@ using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Models;
+using OldBit.Spectron.Screen;
 using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
@@ -81,13 +82,6 @@ partial class MainWindowViewModel
         set => this.RaiseAndSetIfChanged(ref _windowState, value);
     }
 
-    private string _windowStateCommandName = string.Empty;
-    public string WindowStateCommandName
-    {
-        get => _windowStateCommandName;
-        set => this.RaiseAndSetIfChanged(ref _windowStateCommandName, value);
-    }
-
     private TapeSpeed _tapeLoadSpeed = TapeSpeed.Normal;
     public TapeSpeed TapeLoadSpeed
     {
@@ -114,5 +108,19 @@ partial class MainWindowViewModel
     {
         get => _title;
         set => this.RaiseAndSetIfChanged(ref _title, value);
+    }
+
+    private RecordingStatus _recordingStatus = RecordingStatus.None;
+    public RecordingStatus RecordingStatus
+    {
+        get => _recordingStatus;
+        set => this.RaiseAndSetIfChanged(ref _recordingStatus, value);
+    }
+
+    private int _timeMachineCountdownSeconds;
+    public int TimeMachineCountdownSeconds
+    {
+        get => _timeMachineCountdownSeconds;
+        set => this.RaiseAndSetIfChanged(ref _timeMachineCountdownSeconds, value);
     }
 }

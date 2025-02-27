@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>OldBit.Spectron.Recorder</AssemblyName>
+        <RootNamespace>OldBit.Spectron.Recorder</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Spectron.Emulation\Spectron.Emulation.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Avalonia" Version="11.2.4" />
+      <PackageReference Include="FFMpegCore" Version="5.1.0" />
+      <PackageReference Include="SkiaSharp" Version="3.116.1" />
+      <PackageReference Include="System.Text.Json" Version="9.0.2" />
+    </ItemGroup>
+
+</Project>

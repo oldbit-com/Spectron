@@ -28,9 +28,10 @@ public sealed class Emulator
 
     private bool _invalidateScreen;
     private bool _isAcceleratedTapeSpeed;
+    private FloatingBus _floatingBus = null!;
 
-    public delegate void RenderScreenEvent(FrameBuffer frameBuffer);
-    public event RenderScreenEvent? RenderScreen;
+    public delegate void FrameEvent(FrameBuffer frameBuffer, AudioBuffer audioBuffer);
+    public event FrameEvent? FrameCompleted;
 
     public bool IsPaused => _emulationTimer.IsPaused;
 
@@ -38,6 +39,11 @@ public sealed class Emulator
     {
         get => UlaPlus.IsEnabled;
         set => ToggleUlaPlus(value);
+    }
+
+    public bool IsFloatingBusEnabled
+    {
+        set => _floatingBus.IsEnabled = value;
     }
 
     public KeyboardState KeyboardState { get; }
@@ -94,7 +100,7 @@ public sealed class Emulator
         KeyboardState.Reset();
         TapeManager.Attach(Cpu, Memory, hardware);
 
-        AudioManager = new AudioManager(Cpu.Clock, tapeManager.Player, hardware);
+        AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware);
 
         SetupUlaAndDevices();
         SetupEventHandlers();
@@ -174,7 +180,7 @@ public sealed class Emulator
 
     private void SetupUlaAndDevices()
     {
-        var ula = new Ula(KeyboardState, ScreenBuffer, Cpu.Clock, TapeManager?.Player);
+        var ula = new Ula(KeyboardState, ScreenBuffer, Cpu.Clock, TapeManager?.CassettePlayer);
 
         _spectrumBus.AddDevice(ula);
         _spectrumBus.AddDevice(UlaPlus);
@@ -182,8 +188,8 @@ public sealed class Emulator
         _spectrumBus.AddDevice(AudioManager.Beeper);
         _spectrumBus.AddDevice(AudioManager.Ay);
 
-        var floatingBus = new FloatingBus(_hardware, Memory, Cpu.Clock);
-        _spectrumBus.AddDevice(floatingBus);
+        _floatingBus = new FloatingBus(_hardware, Memory, Cpu.Clock);
+        _spectrumBus.AddDevice(_floatingBus);
 
         Cpu.AddBus(_spectrumBus);
     }
@@ -213,10 +219,11 @@ public sealed class Emulator
 
     private void EndFrame()
     {
-        AudioManager.EndFrame();
+        var audioBuffer = AudioManager.EndFrame();
 
         ScreenBuffer.UpdateBorder(Cpu.Clock.CurrentFrameTicks);
-        RenderScreen?.Invoke(ScreenBuffer.FrameBuffer);
+
+        FrameCompleted?.Invoke(ScreenBuffer.FrameBuffer, audioBuffer);
 
         _timeMachine.AddEntry(this);
     }

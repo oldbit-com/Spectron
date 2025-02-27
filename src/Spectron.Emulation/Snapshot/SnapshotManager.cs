@@ -3,7 +3,7 @@ using OldBit.Spectron.Files.Szx;
 
 namespace OldBit.Spectron.Emulation.Snapshot;
 
-public sealed class SnapshotLoader(SnaSnapshot snaSnapshot, SzxSnapshot szxSnapshot, Z80Snapshot z80Snapshot)
+public sealed class SnapshotManager(SnaSnapshot snaSnapshot, SzxSnapshot szxSnapshot, Z80Snapshot z80Snapshot)
 {
     public Emulator Load(Stream stream, FileType fileType)
     {

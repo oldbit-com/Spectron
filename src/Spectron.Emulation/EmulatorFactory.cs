@@ -99,8 +99,8 @@ public sealed class EmulatorFactory(
     }
 
     private static byte[] GetSpectrum48KRom(RomType romType) =>
-        RomReader.ReadRom(romType == RomType.Original ? RomType.Original48 : romType);
+        RomReader.ReadRom(romType is RomType.Original or RomType.Custom ? RomType.Original48 : romType);
 
     private static byte[] GetSpectrum128KRom(RomType romType) =>
-        RomReader.ReadRom(romType == RomType.Original ? RomType.Original128Bank0 : romType);
+        RomReader.ReadRom(romType is RomType.Original or RomType.Custom ? RomType.Original128Bank0 : romType);
 }
