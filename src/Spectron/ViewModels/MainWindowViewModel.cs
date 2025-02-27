@@ -258,6 +258,7 @@ public partial class MainWindowViewModel : ReactiveObject
             IsTimeMachineEnabled = preferences.TimeMachine.IsEnabled;
             _timeMachine.SnapshotInterval = preferences.TimeMachine.SnapshotInterval;
             _timeMachine.MaxDuration = preferences.TimeMachine.MaxDuration;
+            TimeMachineCountdownSeconds = preferences.TimeMachine.CountdownSeconds;
 
             Emulator?.SetUlaPlus(IsUlaPlusEnabled);
             Emulator?.SetFloatingBusSupport(preferences.IsFloatingBusEnabled);
@@ -348,6 +349,7 @@ public partial class MainWindowViewModel : ReactiveObject
         IsTimeMachineEnabled = _preferences.TimeMachine.IsEnabled;
         _timeMachine.SnapshotInterval = _preferences.TimeMachine.SnapshotInterval;
         _timeMachine.MaxDuration = _preferences.TimeMachine.MaxDuration;
+        TimeMachineCountdownSeconds = _preferences.TimeMachine.CountdownSeconds;
 
         await RecentFilesViewModel.LoadAsync();
 

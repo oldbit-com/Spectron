@@ -83,7 +83,10 @@
                         <controls:PauseOverlay FontSize="100" Opacity="4" IsVisible="{Binding IsPaused}" VerticalAlignment="Center"/>
                     </Border>
 
-                    <controls:TimeMachineTimer IsVisible="{Binding IsTimeMachineCountdownVisible}" ElapsedCommand="{Binding TimeMachineResumeEmulatorCommand}"/>
+                    <controls:TimeMachineTimer
+                        IsVisible="{Binding IsTimeMachineCountdownVisible}"
+                        CountdownSeconds="{Binding TimeMachineCountdownSeconds}"
+                        ElapsedCommand="{Binding TimeMachineResumeEmulatorCommand}"/>
                 </Grid>
             </Border>
 

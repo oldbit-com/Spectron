@@ -116,4 +116,11 @@ partial class MainWindowViewModel
         get => _recordingStatus;
         set => this.RaiseAndSetIfChanged(ref _recordingStatus, value);
     }
+
+    private int _timeMachineCountdownSeconds;
+    public int TimeMachineCountdownSeconds
+    {
+        get => _timeMachineCountdownSeconds;
+        set => this.RaiseAndSetIfChanged(ref _timeMachineCountdownSeconds, value);
+    }
 }

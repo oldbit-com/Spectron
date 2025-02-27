@@ -87,7 +87,7 @@
             ToolTip.Tip="Pause"
             Margin="0 20 0 0"
             Name="PauseButton"
-            HotKey="F8"
+            HotKey="F2"
             IsChecked="{Binding IsPaused, Mode=OneWay}"
             Command="{Binding TogglePauseCommand}">
             <material:MaterialIcon Kind="Pause"/>
@@ -124,7 +124,7 @@
 
         <Button
             ToolTip.Tip="Time Machine"
-            HotKey="F9"
+            HotKey="F3"
             Command="{Binding ShowTimeMachineViewCommand}">
             <material:MaterialIcon Kind="ClockTimeTenOutline"/>
         </Button>

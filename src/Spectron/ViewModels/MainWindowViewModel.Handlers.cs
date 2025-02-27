@@ -446,6 +446,11 @@ partial class MainWindowViewModel
 
     private void HandleKeyUp(KeyEventArgs e)
     {
+        if (MainWindow?.IsActive != true)
+        {
+            return;
+        }
+
         if (IsPaused)
         {
             return;
@@ -470,6 +475,11 @@ partial class MainWindowViewModel
 
     private void HandleKeyDown(KeyEventArgs e)
     {
+        if (MainWindow?.IsActive != true)
+        {
+            return;
+        }
+
         switch (e)
         {
             case { Key: Key.Escape }:

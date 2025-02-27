@@ -82,6 +82,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         IsTimeMachineEnabled = preferences.TimeMachine.IsEnabled;
         SnapshotInterval = preferences.TimeMachine.SnapshotInterval.TotalSeconds;
         MaxDuration = preferences.TimeMachine.MaxDuration.TotalSeconds;
+        TimeMachineCountdownSeconds = preferences.TimeMachine.CountdownSeconds;
 
         IsAutoPlayEnabled = preferences.TapeSettings.IsAutoPlayEnabled;
         IsTapeSaveEnabled = preferences.TapeSettings.IsSaveEnabled;
@@ -165,7 +166,8 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
             {
                 IsEnabled = IsTimeMachineEnabled,
                 SnapshotInterval = TimeSpan.FromSeconds(SnapshotInterval),
-                MaxDuration = TimeSpan.FromSeconds(MaxDuration)
+                MaxDuration = TimeSpan.FromSeconds(MaxDuration),
+                CountdownSeconds = TimeMachineCountdownSeconds,
             },
 
             TapeSettings = new TapeSettings
@@ -301,6 +303,16 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         new("Sinc", "sinc"),
         new("Lanczos", "lanczos"),
         new("Spline", "spline"),
+    ];
+
+    public List<NameValuePair<int>> TimeMachineCountdownValues { get; } =
+    [
+        new("0 seconds", 0),
+        new("1 second", 1),
+        new("2 seconds", 2),
+        new("3 seconds", 3),
+        new("4 seconds", 4),
+        new("5 seconds", 5),
     ];
 
     public ObservableCollection<GamepadController> GamepadControllers { get; }
@@ -499,6 +511,13 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
     {
         get => _ffmpegMessage;
         set => this.RaiseAndSetIfChanged(ref _ffmpegMessage, value);
+    }
+
+    private int _timeMachineCountdownSeconds = 3;
+    public int TimeMachineCountdownSeconds
+    {
+        get => _timeMachineCountdownSeconds;
+        set => this.RaiseAndSetIfChanged(ref _timeMachineCountdownSeconds, value);
     }
 
     public void Dispose()

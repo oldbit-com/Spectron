@@ -36,7 +36,7 @@
     <Grid RowDefinitions="35,*,4,200" ColumnDefinitions="240,140,300,*" Margin="5">
         <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                <Button Padding="4 0 0 0" Classes="Toolbar" Command="{Binding TogglePauseCommand}" IsVisible="{Binding !IsPaused}" HotKey="F8" ToolTip.Tip="Pause F8">
+                <Button Padding="4 0 0 0" Classes="Toolbar" Command="{Binding TogglePauseCommand}" IsVisible="{Binding !IsPaused}" HotKey="F2" ToolTip.Tip="Pause F2">
                     <material:MaterialIcon Kind="Pause" Classes.IsDisabled="{Binding !$parent.IsEnabled}"/>
                 </Button>
                 <Button Padding="4 0 0 0" Classes="Toolbar" Command="{Binding DebuggerResumeCommand}" HotKey="F5" ToolTip.Tip="Resume (F5)" IsVisible="{Binding IsPaused}">

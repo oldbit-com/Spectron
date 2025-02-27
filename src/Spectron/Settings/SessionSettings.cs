@@ -9,5 +9,5 @@ public record SessionSettings
 {
     public string? LastSnapshot { get; set; }
 
-    public List<TimeMachineSnapshot> TimeMachineSnapshots { get; set; } = [];
+    public List<TimeMachineSnapshot> TimeMachineSnapshots { get; } = [];
 }

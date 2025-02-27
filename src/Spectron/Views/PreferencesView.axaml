@@ -13,6 +13,7 @@
         Width="850"
         Height="600"
         WindowStartupLocation="CenterOwner"
+        Focusable="True"
         CanResize="False"
         Title="Preferences">
 
@@ -34,6 +35,11 @@
         <Style Selector="TextBlock.Center">
             <Setter Property="Padding" Value="8 4 0 0" />
         </Style>
+        <Style Selector="ComboBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="10 2 0 0"/>
+        </Style>
     </Window.Styles>
 
     <Grid RowDefinitions="*,50">
@@ -54,9 +60,9 @@
                         <controls:HeaderSeparator Text="Emulator defaults"/>
                         <Grid ColumnDefinitions="120,*" RowDefinitions="40,40">
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="Machine" VerticalAlignment="Center" Classes="Center"/>
-                            <ComboBox  Grid.Row="0" Grid.Column="1" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding ComputerTypes}" SelectedValue="{Binding ComputerType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
+                            <ComboBox  Grid.Row="0" Grid.Column="1" Margin="5 0 0 0" Width="250" ItemsSource="{Binding ComputerTypes}" SelectedValue="{Binding ComputerType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="ROM" VerticalAlignment="Center" Classes="Center"/>
-                            <ComboBox  Grid.Row="1" Grid.Column="1" Margin="5 0 0 0" Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding RomTypes}" SelectedValue="{Binding RomType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
+                            <ComboBox  Grid.Row="1" Grid.Column="1" Margin="5 0 0 0" Width="250" ItemsSource="{Binding RomTypes}" SelectedValue="{Binding RomType}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
                         </Grid>
 
                         <controls:HeaderSeparator Text="Screen"/>
@@ -64,7 +70,6 @@
                     </StackPanel>
                 </Border>
             </TabItem>
-
             <TabItem Header="Audio">
                 <Border Classes="Tab">
                     <StackPanel>
@@ -76,7 +81,7 @@
                         <CheckBox Content="Available in standard 16/48k mode" Classes="Center" Margin="25 0 0 0" IsChecked="{Binding IsAySupportedStandardSpectrum}" IsEnabled="{Binding #AyEnabled.IsChecked}"/>
                         <StackPanel Margin="25 0 0 0" Orientation="Horizontal">
                             <TextBlock Text="Stereo mode:" Padding="0 0 10 0" VerticalAlignment="Center" Classes="Center"/>
-                            <ComboBox Padding="10 2 0 0" Width="250" VerticalAlignment="Center" VerticalContentAlignment="Center" ItemsSource="{Binding StereoModes}" SelectedValue="{Binding StereoMode}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}" IsEnabled="{Binding #AyEnabled.IsChecked}"/>
+                            <ComboBox Width="250" ItemsSource="{Binding StereoModes}" SelectedValue="{Binding StereoMode}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}" IsEnabled="{Binding #AyEnabled.IsChecked}"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
@@ -96,10 +101,7 @@
                                     Grid.Column="1"
                                     Name="Gamepad"
                                     Margin="5 0 10 0"
-                                    Padding="10 2 0 0"
                                     Width="250"
-                                    VerticalAlignment="Center"
-                                    VerticalContentAlignment="Center"
                                     ItemsSource="{Binding GamepadControllers}"
                                     SelectedValue="{Binding GamepadControllerId}"
                                     DisplayMemberBinding="{Binding Name}"
@@ -115,10 +117,7 @@
                                     Grid.Column="1"
                                     Name="Joystick"
                                     Margin="5 0 0 0"
-                                    Padding="10 2 0 0"
                                     Width="250"
-                                    VerticalAlignment="Center"
-                                    VerticalContentAlignment="Center"
                                     ItemsSource="{Binding JoystickTypes}"
                                     SelectedValue="{Binding JoystickType}"
                                     DisplayMemberBinding="{Binding Name}"
@@ -136,10 +135,7 @@
                                         IsEnabled="{Binding #Joystick.SelectedIndex}"/>
                                     <ComboBox
                                         Margin="15 0 0 0"
-                                        Padding="10 2 0 0"
                                         Width="120"
-                                        VerticalAlignment="Center"
-                                        VerticalContentAlignment="Center"
                                         ItemsSource="{Binding FireKeys}"
                                         SelectedValue="{Binding FireKey}"
                                         DisplayMemberBinding="{Binding Name}"
@@ -157,20 +153,59 @@
             <TabItem Header="Time Machine">
                 <Border Classes="Tab">
                     <StackPanel>
-                        <CheckBox x:Name="TimeMachineEnabled" IsChecked="{Binding IsTimeMachineEnabled}" Content="Enable Time Machine" Classes="Center"/>
+                        <CheckBox
+                            x:Name="TimeMachineEnabled"
+                            IsChecked="{Binding IsTimeMachineEnabled}"
+                            Content="Enable Time Machine"
+                            Classes="Center"/>
+
                         <Grid ColumnDefinitions="100,*">
                             <TextBlock Text="Length" VerticalAlignment="Center" Padding="0 0 0 10"/>
                             <StackPanel Grid.Column="1">
-                                <Slider x:Name="TimeMachineDuration" Value="{Binding MaxDuration}" Minimum="30" Maximum="600" TickFrequency="30" IsSnapToTickEnabled="True" TickPlacement="BottomRight" IsEnabled="{Binding #TimeMachineEnabled.IsChecked}"/>
-                                <TextBlock Text="{Binding #TimeMachineDuration.Value, StringFormat='Last {0} seconds'}" HorizontalAlignment="Center"/>
+                                <Slider
+                                    x:Name="TimeMachineDuration"
+                                    Value="{Binding MaxDuration}"
+                                    Minimum="30"
+                                    Maximum="600"
+                                    TickFrequency="30"
+                                    IsSnapToTickEnabled="True"
+                                    TickPlacement="BottomRight"
+                                    IsEnabled="{Binding #TimeMachineEnabled.IsChecked}"/>
+                                <TextBlock
+                                    Text="{Binding #TimeMachineDuration.Value, StringFormat='Last {0} seconds'}"
+                                    HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Grid>
+
                         <Grid ColumnDefinitions="100,*">
                             <TextBlock Text="Frequency" VerticalAlignment="Center" Padding="0 0 0 10"/>
                             <StackPanel Grid.Column="1">
-                                <Slider x:Name="TimeMachineInterval" Value="{Binding SnapshotInterval}" Minimum="0.5" Maximum="10" TickFrequency="0.5" IsSnapToTickEnabled="True" TickPlacement="BottomRight" IsEnabled="{Binding #TimeMachineEnabled.IsChecked}"/>
-                                <TextBlock Text="{Binding #TimeMachineInterval.Value, StringFormat='Snapshot Every {0} s'}" HorizontalAlignment="Center"/>
+                                <Slider
+                                    x:Name="TimeMachineInterval"
+                                    Value="{Binding SnapshotInterval}"
+                                    Minimum="0.5"
+                                    Maximum="10"
+                                    TickFrequency="0.5"
+                                    IsSnapToTickEnabled="True"
+                                    TickPlacement="BottomRight"
+                                    IsEnabled="{Binding #TimeMachineEnabled.IsChecked}"/>
+                                <TextBlock
+                                    Text="{Binding #TimeMachineInterval.Value, StringFormat='Snapshot Every {0} s'}"
+                                    HorizontalAlignment="Center"/>
                             </StackPanel>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="100,*" Margin="0 10 0 0">
+                            <TextBlock
+                                Text="Countdown"
+                                VerticalAlignment="Center"/>
+                            <ComboBox
+                                Grid.Column="1"
+                                Width="130"
+                                ItemsSource="{Binding TimeMachineCountdownValues}"
+                                SelectedValue="{Binding TimeMachineCountdownSeconds}"
+                                DisplayMemberBinding="{Binding Name}"
+                                SelectedValueBinding="{Binding Value}"/>
                         </Grid>
                     </StackPanel>
                 </Border>
@@ -258,10 +293,7 @@
                                 Grid.Row="0"
                                 Grid.Column="1"
                                 Margin="5 0 0 0"
-                                Padding="10 2 0 0"
                                 Width="250"
-                                VerticalAlignment="Center"
-                                VerticalContentAlignment="Center"
                                 ItemsSource="{Binding BorderSizes}"
                                 SelectedValue="{Binding RecordingBorderSize}"
                                 DisplayMemberBinding="{Binding Name}"
@@ -277,10 +309,7 @@
                                 Grid.Row="1"
                                 Grid.Column="1"
                                 Margin="5 0 0 0"
-                                Padding="10 2 0 0"
                                 Width="250"
-                                VerticalAlignment="Center"
-                                VerticalContentAlignment="Center"
                                 ItemsSource="{Binding ScalingFactors}"
                                 SelectedValue="{Binding ScalingFactor}"
                                 DisplayMemberBinding="{Binding Name}"
@@ -296,10 +325,7 @@
                                 Grid.Row="2"
                                 Grid.Column="1"
                                 Margin="5 0 0 0"
-                                Padding="10 2 0 0"
                                 Width="250"
-                                VerticalAlignment="Center"
-                                VerticalContentAlignment="Center"
                                 ItemsSource="{Binding ScalingAlgorithms}"
                                 SelectedValue="{Binding ScalingAlgorithm}"
                                 DisplayMemberBinding="{Binding Name}"
@@ -339,6 +365,14 @@
                 </Border>
             </TabItem>
         </TabControl>
-        <Button Grid.Row="1" HorizontalAlignment="Right" Margin="0 0 15 0" Content="OK" Command="{Binding UpdatePreferencesCommand}"/>
+
+        <Button
+            Grid.Row="1"
+            Width="80"
+            HorizontalContentAlignment="Center"
+            HorizontalAlignment="Right"
+            Margin="0 0 15 0"
+            Content="OK"
+            Command="{Binding UpdatePreferencesCommand}"/>
     </Grid>
 </Window>
