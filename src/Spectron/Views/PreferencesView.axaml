@@ -205,7 +205,8 @@
                                 ItemsSource="{Binding TimeMachineCountdownValues}"
                                 SelectedValue="{Binding TimeMachineCountdownSeconds}"
                                 DisplayMemberBinding="{Binding Name}"
-                                SelectedValueBinding="{Binding Value}"/>
+                                SelectedValueBinding="{Binding Value}"
+                                IsEnabled="{Binding #TimeMachineEnabled.IsChecked}"/>
                         </Grid>
                     </StackPanel>
                 </Border>
