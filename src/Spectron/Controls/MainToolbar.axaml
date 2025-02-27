@@ -55,6 +55,21 @@
         </Button>
 
         <Button
+            ToolTip.Tip="Quick Save"
+            HotKey="F5"
+            Command="{Binding QuickSaveCommand}">
+            <material:MaterialIcon Kind="TransferLeft"/>
+        </Button>
+
+        <Button
+            ToolTip.Tip="Quick Load"
+            Margin="0 0 20 0"
+            HotKey="F6"
+            Command="{Binding QuickLoadCommand}">
+            <material:MaterialIcon Kind="TransferRight"/>
+        </Button>
+
+        <Button
             ToolTip.Tip="Start Video Record"
             IsVisible="{Binding !RecordingStatus}"
             Command="{Binding StartVideoRecordingCommand}">
@@ -70,9 +85,9 @@
 
         <ToggleButton
             ToolTip.Tip="Pause"
+            Margin="0 20 0 0"
             Name="PauseButton"
             HotKey="F8"
-            Margin="0 10 0 0"
             IsChecked="{Binding IsPaused, Mode=OneWay}"
             Command="{Binding TogglePauseCommand}">
             <material:MaterialIcon Kind="Pause"/>

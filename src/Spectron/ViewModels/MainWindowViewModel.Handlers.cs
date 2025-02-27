@@ -176,12 +176,22 @@ partial class MainWindowViewModel
 
     private void HandleQuickSave()
     {
-        //SnapshotLoader.Save(file.Path.LocalPath, Emulator);
+        if (Emulator == null)
+        {
+            return;
+        }
+
+        _quickSaveService.RequestQuickSave();
     }
 
     private void HandleQuickLoad()
     {
+        var snapshot = _quickSaveService.QuickLoad();
 
+        if (snapshot != null)
+        {
+            CreateEmulator(snapshot);
+        }
     }
 
     private RecorderOptions GetRecorderOptions() => new()
@@ -425,7 +435,7 @@ partial class MainWindowViewModel
             }
         }
 
-        StatusBar.Speed = emulationSpeed;
+        StatusBarViewModel.Speed = emulationSpeed;
         Emulator?.SetEmulationSpeed(emulationSpeedValue);
     }
 

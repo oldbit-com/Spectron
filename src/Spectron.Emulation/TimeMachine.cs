@@ -2,7 +2,7 @@ using OldBit.Spectron.Emulation.State;
 
 namespace OldBit.Spectron.Emulation;
 
-public record TimeMachineEntry(DateTimeOffset Timestamp, EmulatorState Snapshot);
+public record TimeMachineEntry(DateTimeOffset Timestamp, StateSnapshot Snapshot);
 
 public sealed class TimeMachine
 {

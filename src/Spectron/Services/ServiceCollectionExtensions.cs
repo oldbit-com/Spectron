@@ -12,5 +12,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<SessionService>();
         services.AddSingleton<RecentFilesService>();
         services.AddSingleton<TimeMachine>();
+        services.AddSingleton<QuickSaveService>();
     }
 }

@@ -12,7 +12,7 @@ namespace OldBit.Spectron.Emulation.State;
 
 public sealed class StateManager(EmulatorFactory emulatorFactory)
 {
-    public Emulator CreateEmulator(EmulatorState snapshot)
+    public Emulator CreateEmulator(StateSnapshot snapshot)
     {
         var romType = snapshot.CustomRom?.RomType ?? RomType.Original;
 
@@ -29,9 +29,9 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         return emulator;
     }
 
-    public static EmulatorState CreateSnapshot(Emulator emulator)
+    public static StateSnapshot CreateSnapshot(Emulator emulator)
     {
-        var snapshot = new EmulatorState
+        var snapshot = new StateSnapshot
         {
             ComputerType = emulator.ComputerType
         };
@@ -105,14 +105,14 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         }
     }
 
-    private static void SaveUlaPlus(UlaPlus ulaPlus, EmulatorState state)
+    private static void SaveUlaPlus(UlaPlus ulaPlus, StateSnapshot stateSnapshot)
     {
         if (!ulaPlus.IsActive)
         {
             return;
         }
 
-        state.UlaPlus = new UlaPlusState
+        stateSnapshot.UlaPlus = new UlaPlusState
         {
             IsActive = ulaPlus.IsActive,
             IsEnabled = ulaPlus.IsEnabled,
@@ -124,7 +124,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
     private static void SaveJoystick(JoystickManager joystickManager, JoystickState joystickState) =>
         joystickState.JoystickType = joystickManager.JoystickType;
 
-    private static void SaveTape(TapeManager tapeManager, EmulatorState snapshot)
+    private static void SaveTape(TapeManager tapeManager, StateSnapshot snapshot)
     {
         if (tapeManager.Cassette.IsEmpty)
         {
@@ -138,26 +138,26 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         };
     }
 
-    private static void SaveAy(AudioManager audioManager, EmulatorState state)
+    private static void SaveAy(AudioManager audioManager, StateSnapshot stateSnapshot)
     {
         if (!audioManager.IsAySupported)
         {
             return;
         }
 
-        state.Ay = new AyState
+        stateSnapshot.Ay = new AyState
         {
             CurrentRegister = audioManager.Ay.CurrentRegister,
             Registers = audioManager.Ay.Registers,
         };
     }
 
-    private static void SaveOther(Emulator emulator, EmulatorState state) =>
-        state.BorderColor = emulator.ScreenBuffer.LastBorderColor;
+    private static void SaveOther(Emulator emulator, StateSnapshot stateSnapshot) =>
+        stateSnapshot.BorderColor = emulator.ScreenBuffer.LastBorderColor;
 
-    private static void SaveCustomRom(Emulator emulator, EmulatorState state)
+    private static void SaveCustomRom(Emulator emulator, StateSnapshot stateSnapshot)
     {
-        state.CustomRom = emulator.Memory switch
+        stateSnapshot.CustomRom = emulator.Memory switch
         {
             Memory16K memory16K => new CustomRomState
             {
@@ -260,10 +260,10 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         tapeManager.InsertTape(tzx, tapeState.CurrentBlockNo);
     }
 
-    private static void LoadOther(Emulator emulator, EmulatorState state)
+    private static void LoadOther(Emulator emulator, StateSnapshot stateSnapshot)
     {
         emulator.ScreenBuffer.Reset();
-        emulator.ScreenBuffer.UpdateBorder(state.BorderColor);
+        emulator.ScreenBuffer.UpdateBorder(stateSnapshot.BorderColor);
     }
 
     private static void LoadAy(AudioManager audioManager, AyState? ayState)

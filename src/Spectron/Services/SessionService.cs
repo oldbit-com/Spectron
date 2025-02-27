@@ -44,7 +44,7 @@ public class SessionService(
         await applicationDataService.SaveAsync(session);
     }
 
-    public async Task<EmulatorState?> LoadAsync()
+    public async Task<StateSnapshot?> LoadAsync()
     {
         var session = await applicationDataService.LoadAsync<SessionSettings>();
 
@@ -75,7 +75,7 @@ public class SessionService(
         return null;
     }
 
-    private static string EmulatorStateToBase64(EmulatorState snapshot)
+    private static string EmulatorStateToBase64(StateSnapshot snapshot)
     {
         var serialized = snapshot.Serialize();
 
@@ -88,13 +88,13 @@ public class SessionService(
         return Convert.ToBase64String(memoryStream.ToArray());
     }
 
-    private static EmulatorState? EmulatorStateFromBase64(string base64)
+    private static StateSnapshot? EmulatorStateFromBase64(string base64)
     {
         var bytes = Convert.FromBase64String(base64);
 
         using var memoryStream = new MemoryStream(bytes);
         using var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
 
-        return EmulatorState.Load(gzipStream);
+        return StateSnapshot.Load(gzipStream);
     }
 }

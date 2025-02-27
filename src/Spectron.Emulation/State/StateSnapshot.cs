@@ -5,7 +5,7 @@ using OldBit.Spectron.Emulation.State.Components;
 namespace OldBit.Spectron.Emulation.State;
 
 [MemoryPackable]
-public sealed partial class EmulatorState
+public sealed partial class StateSnapshot
 {
     public ComputerType ComputerType { get; set; }
 
@@ -27,15 +27,22 @@ public sealed partial class EmulatorState
 
     public byte[] Serialize() => MemoryPackSerializer.Serialize(this);
 
-    public static EmulatorState? Load(Stream stream)
+    public static StateSnapshot? Load(string filePath)
+    {
+        var file = File.ReadAllBytes(filePath);
+
+        return MemoryPackSerializer.Deserialize<StateSnapshot>(file);
+    }
+
+    public static StateSnapshot? Load(Stream stream)
     {
         using var memoryStream = new MemoryStream();
         stream.CopyTo(memoryStream);
 
-        return MemoryPackSerializer.Deserialize<EmulatorState>(memoryStream.ToArray());
+        return MemoryPackSerializer.Deserialize<StateSnapshot>(memoryStream.ToArray());
     }
 
-    internal void Save(string fileName)
+    public void Save(string fileName)
     {
         using var stream = File.Create(fileName);
 

@@ -27,6 +27,8 @@ public class StatusBarViewModel : ReactiveObject
     private readonly Timer _timer;
     private readonly Stopwatch _stopwatch = new();
 
+    public Action AnimateQuickSave { get; set; } = () => { };
+
     public StatusBarViewModel()
     {
         _timer = new Timer(1000);

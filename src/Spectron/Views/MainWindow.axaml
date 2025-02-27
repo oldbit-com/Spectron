@@ -92,7 +92,7 @@
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 Height="30"
-                DataContext="{Binding StatusBar}"
+                DataContext="{Binding StatusBarViewModel}"
                 IsVisible="{Binding $parent[Window].WindowState, Converter={StaticResource ValueInequalityConverter}, ConverterParameter={x:Static WindowState.FullScreen}}"/>
 
             <WindowNotificationManager

@@ -52,23 +52,24 @@ public partial class MainWindowViewModel : ReactiveObject
     private readonly PreferencesService _preferencesService;
     private readonly SessionService _sessionService;
     private readonly DebuggerContext _debuggerContext;
+    private readonly QuickSaveService _quickSaveService;
     private readonly ILogger _logger;
     private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
     private readonly Timer _statusBarTimer;
 
+    private Emulator? Emulator { get; set; }
     private Preferences _preferences = new();
     private int _frameCount;
     private readonly Stopwatch _renderStopwatch = new();
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
     private MediaRecorder? _mediaRecorder;
-    private bool canClose;
+    private bool _canClose;
 
-    public Emulator? Emulator { get; private set; }
     public Control ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }
     public WindowNotificationManager NotificationManager { get; set; } = null!;
 
-    public StatusBarViewModel StatusBar { get; } = new();
+    public StatusBarViewModel StatusBarViewModel { get; } = new();
     public TapeMenuViewModel TapeMenuViewModel { get; }
     public RecentFilesViewModel RecentFilesViewModel { get; }
 
@@ -127,6 +128,7 @@ public partial class MainWindowViewModel : ReactiveObject
         TapeMenuViewModel tapeMenuViewModel,
         DebuggerContext debuggerContext,
         TapeManager tapeManager,
+        QuickSaveService quickSaveService,
         ILogger<MainWindowViewModel> logger)
     {
         _emulatorFactory = emulatorFactory;
@@ -138,6 +140,7 @@ public partial class MainWindowViewModel : ReactiveObject
         _preferencesService = preferencesService;
         _sessionService = sessionService;
         _debuggerContext = debuggerContext;
+        _quickSaveService = quickSaveService;
         _logger = logger;
 
         RecentFilesViewModel = recentFilesViewModel;
@@ -157,13 +160,13 @@ public partial class MainWindowViewModel : ReactiveObject
             .Subscribe(x => _timeMachine.IsEnabled = x);
 
         this.WhenAny(x => x.RecordingStatus, x => x.Value)
-            .Subscribe(status => StatusBar.RecordingStatus = status);
+            .Subscribe(status => StatusBarViewModel.RecordingStatus = status);
 
         this.WhenAny(x => x.ComputerType, x => x.Value)
-            .Subscribe(computerType => StatusBar.ComputerType = computerType);
+            .Subscribe(computerType => StatusBarViewModel.ComputerType = computerType);
 
         this.WhenAny(x => x.JoystickType, x => x.Value)
-            .Subscribe(joystickType => StatusBar.JoystickType = joystickType);
+            .Subscribe(joystickType => StatusBarViewModel.JoystickType = joystickType);
 
         WindowOpenedCommand = ReactiveCommand.CreateFromTask(WindowOpenedAsync);
         WindowClosingCommand = ReactiveCommand.CreateFromTask<WindowClosingEventArgs>(WindowClosingAsync);
@@ -303,7 +306,7 @@ public partial class MainWindowViewModel : ReactiveObject
     {
         var fps = _frameCount.ToString();
 
-        Dispatcher.UIThread.Post(() => StatusBar.FramesPerSecond = fps);
+        Dispatcher.UIThread.Post(() => StatusBarViewModel.FramesPerSecond = fps);
 
         Interlocked.Exchange(ref _frameCount, 0);
     }
@@ -327,6 +330,11 @@ public partial class MainWindowViewModel : ReactiveObject
         });
 
         _mediaRecorder?.AppendFrame(frameBuffer, audioBuffer);
+
+        if (_quickSaveService.QuickSaveIfRequested(Emulator))
+        {
+            StatusBarViewModel.AnimateQuickSave();
+        }
     }
 
     private async Task WindowOpenedAsync()
@@ -367,7 +375,7 @@ public partial class MainWindowViewModel : ReactiveObject
 
     private async Task WindowClosingAsync(WindowClosingEventArgs args)
     {
-        if (canClose)
+        if (_canClose)
         {
             return;
         }
@@ -383,7 +391,7 @@ public partial class MainWindowViewModel : ReactiveObject
             RecentFilesViewModel.SaveAsync(),
             _sessionService.SaveAsync(Emulator, _preferences.ResumeSettings));
 
-        canClose = true;
+        _canClose = true;
         MainWindow?.Close();
     }
 
@@ -397,11 +405,11 @@ public partial class MainWindowViewModel : ReactiveObject
         InitializeEmulator(emulator);
     }
 
-    private void CreateEmulator(EmulatorState emulatorState)
+    private void CreateEmulator(StateSnapshot stateSnapshot)
     {
         Emulator?.Reset();
 
-        var emulator = _stateManager.CreateEmulator(emulatorState);
+        var emulator = _stateManager.CreateEmulator(stateSnapshot);
 
         InitializeEmulator(emulator);
     }

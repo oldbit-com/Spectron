@@ -8,11 +8,11 @@ public static class EmulatorStateExtensions
 {
     private static readonly int[] Buffer = new int[ScreenSize.ContentHeight * ScreenSize.ContentWidth];
 
-    public static int[] GetScreenshot(this EmulatorState state, bool isFlashOnFrame = false)
+    public static int[] GetScreenshot(this StateSnapshot snapshot, bool isFlashOnFrame = false)
     {
         const int screenBank = 5;
 
-        var screenMemory = state.Memory.Banks[screenBank];
+        var screenMemory = snapshot.Memory.Banks[screenBank];
 
         for (var line = 0; line < ScreenSize.ContentHeight; line++)
         {
@@ -33,11 +33,11 @@ public static class EmulatorStateExtensions
                 {
                     Color color;
 
-                    if (state.UlaPlus != null && state.UlaPlus.PaletteGroup != 0)
+                    if (snapshot.UlaPlus != null && snapshot.UlaPlus.PaletteGroup != 0)
                     {
                         color = (bitmap & FastLookup.BitMasks[bit]) != 0 ?
-                            state.UlaPlus.GetInkColor(attribute) :
-                            state.UlaPlus.GetPaperColor(attribute);
+                            snapshot.UlaPlus.GetInkColor(attribute) :
+                            snapshot.UlaPlus.GetPaperColor(attribute);
                     }
                     else
                     {
