@@ -83,7 +83,7 @@
             <StackPanel
                 Orientation="Horizontal"
                 Margin="0 0 20 0"
-                ToolTip.Tip="Computer">
+                ToolTip.Tip="Machine">
 
                 <material:MaterialIcon
                     Margin="0 -2 2 0"
@@ -106,7 +106,7 @@
 
             <StackPanel
                 Orientation="Horizontal"
-                ToolTip.Tip="FPS">
+                ToolTip.Tip="Speed &amp; FPS">
 
                 <material:MaterialIcon
                     Margin="0 -2 0 0"

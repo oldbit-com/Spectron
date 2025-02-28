@@ -5,6 +5,9 @@ namespace OldBit.Spectron.Emulation.Devices.Memory;
 /// </summary>
 internal sealed class Memory128K : IEmulatorMemory
 {
+    internal const int ScreenBank1 = 5;
+    internal const int ScreenBank2 = 7;
+
     private const byte RomSelectBit = 0b00010000;
     private const byte PagingDisableBit = 0b00100000;
     private const byte ScreenSelectBit = 0b00001000;
@@ -17,6 +20,7 @@ internal sealed class Memory128K : IEmulatorMemory
 
     internal delegate void BankPagedEvent(int bankId);
     internal event BankPagedEvent? BankPaged;
+
     internal byte[][] Banks { get; } = new byte[8][];
     internal byte LastPagingModeValue { get; private set; }
     internal byte[] RomBank0 { get; }
@@ -76,8 +80,7 @@ internal sealed class Memory128K : IEmulatorMemory
 
     public void WritePort(Word address, byte data)
     {
-        // Port 0x7FFD is decoded as: A15=0 & A1=0
-        if ((address & 0x8002) != 0)
+        if (!IsPagingPortAddress(address))
         {
             return;
         }
@@ -98,6 +101,9 @@ internal sealed class Memory128K : IEmulatorMemory
     public byte ReadScreen(Word address) => _activeScreen[address];
 
     internal byte[][] ActiveBanks => [_activeRom, Banks[5], Banks[2], _activeRam];
+
+    // Port 0x7FFD is decoded as: A15=0 & A1=0 hence 0x8002
+    internal static bool IsPagingPortAddress(Word address) => (address & 0x8002) == 0;
 
     internal void SetPagingMode(byte pagingMode)
     {
@@ -174,21 +180,25 @@ internal sealed class Memory128K : IEmulatorMemory
 
     private void SelectNormalScreen()
     {
-        if (ReferenceEquals(_activeScreen, Banks[5]))
+        if (ReferenceEquals(_activeScreen, Banks[ScreenBank1]))
         {
             return;
         }
 
-        _activeScreen = Banks[5];
+        _activeScreen = Banks[ScreenBank1];
+
+        BankPaged?.Invoke(ScreenBank1);
     }
 
     private void SelectShadowScreen()
     {
-        if (ReferenceEquals(_activeScreen, Banks[7]))
+        if (ReferenceEquals(_activeScreen, Banks[ScreenBank2]))
         {
             return;
         }
 
-        _activeScreen = Banks[7];
+        _activeScreen = Banks[ScreenBank2];
+
+        BankPaged?.Invoke(ScreenBank2);
     }
 }

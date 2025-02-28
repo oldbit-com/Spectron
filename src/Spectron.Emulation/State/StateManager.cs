@@ -107,7 +107,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
 
     private static void SaveUlaPlus(UlaPlus ulaPlus, StateSnapshot stateSnapshot)
     {
-        if (!ulaPlus.IsActive)
+        if (!ulaPlus.IsEnabled)
         {
             return;
         }

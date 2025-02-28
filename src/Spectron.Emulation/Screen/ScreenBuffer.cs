@@ -17,6 +17,17 @@ internal sealed class ScreenBuffer
     {
         _border = new Border(FrameBuffer);
         _content = new Content(hardware, FrameBuffer, memory, ulaPlus);
+
+        if (memory is Memory128K memory128K)
+        {
+            memory128K.BankPaged += bankId =>
+            {
+                if (bankId is Memory128K.ScreenBank1 or Memory128K.ScreenBank2)
+                {
+                    _content.Invalidate();
+                }
+            };
+        }
     }
 
     internal void NewFrame()

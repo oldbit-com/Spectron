@@ -5,11 +5,11 @@ internal sealed class AudioBufferPool
     private readonly List<AudioBuffer> _pool = [];
     private int _position;
 
-    internal AudioBufferPool(int capacity)
+    internal AudioBufferPool(int capacity, int initialSize)
     {
         for (var i = 0; i < capacity; i++)
         {
-            _pool.Add(new AudioBuffer());
+            _pool.Add(new AudioBuffer(initialSize));
         }
     }
 

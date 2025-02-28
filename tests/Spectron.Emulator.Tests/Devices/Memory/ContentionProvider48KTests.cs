@@ -1,11 +1,14 @@
+using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using Shouldly;
 
 namespace OldBit.Spectron.Emulator.Tests.Devices.Memory;
 
-public class ContentionProviderTests
+public class ContentionProvider48KTests
 {
-    private readonly ContentionProvider _contention = new(14335, 224);
+    private readonly ContentionProvider _contention = new(
+        Hardware.Spectrum48K.FirstPixelTicks,
+        Hardware.Spectrum48K.TicksPerLine);
 
     [Theory]
     [InlineData(16384, 14335, 6)]
@@ -16,6 +19,14 @@ public class ContentionProviderTests
     [InlineData(16384, 14340, 1)]
     [InlineData(16384, 14341, 0)]
     [InlineData(16384, 14342, 0)]
+    [InlineData(16384, 14559, 6)]
+    [InlineData(16384, 14560, 5)]
+    [InlineData(16384, 14561, 4)]
+    [InlineData(16384, 14562, 3)]
+    [InlineData(16384, 14563, 2)]
+    [InlineData(16384, 14564, 1)]
+    [InlineData(16384, 14565, 0)]
+    [InlineData(16384, 14566, 0)]
     [InlineData(32767, 14343, 6)]
     [InlineData(32767, 14344, 5)]
     [InlineData(32767, 14345, 4)]

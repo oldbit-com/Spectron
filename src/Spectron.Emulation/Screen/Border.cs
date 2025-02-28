@@ -62,16 +62,12 @@ internal sealed class Border(FrameBuffer frameBuffer)
         _lastColor = color;
     }
 
-    internal void NewFrame()
-    {
-        _lastRangeIndex = 0;
-        _offset = 0;
-    }
+    internal void NewFrame() => Invalidate();
 
     internal void Reset()
     {
         _lastColor = SpectrumPalette.White;
-        NewFrame();
+        Invalidate();
     }
 
     public void Invalidate()

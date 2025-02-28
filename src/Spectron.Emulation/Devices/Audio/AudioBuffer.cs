@@ -2,19 +2,21 @@ namespace OldBit.Spectron.Emulation.Devices.Audio;
 
 public sealed class AudioBuffer
 {
-    private byte[] _buffer = [];
+    private byte[] _buffer;
 
-    public static readonly AudioBuffer Empty = new();
+    public static readonly AudioBuffer Empty = new(0);
 
     public byte[] Buffer => _buffer;
 
     public int Count { get; private set; }
 
+    internal AudioBuffer(int initialSize) => _buffer = new byte [initialSize];
+
     internal void Add(short sample)
     {
         if (_buffer.Length <= Count)
         {
-            Array.Resize(ref _buffer, _buffer.Length + 16);
+            Array.Resize(ref _buffer, _buffer.Length + 2);
         }
 
         _buffer[Count] = (byte)sample;

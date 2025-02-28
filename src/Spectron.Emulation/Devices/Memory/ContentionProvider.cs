@@ -12,7 +12,7 @@ internal sealed class ContentionProvider(int firstPixelTick, int ticksPerLine) :
 
     public int GetMemoryContention(int ticks, Word address)
     {
-        if (!IsAddressContended(address))
+        if (!IsAddressInContendedArea(address))
         {
             return 0;
         }
@@ -27,7 +27,7 @@ internal sealed class ContentionProvider(int firstPixelTick, int ticksPerLine) :
 
     public int GetPortContention(int ticks, Word port)
     {
-        if (!IsAddressContended(port))
+        if (!IsPortInContendedArea(port))
         {
             return 0;
         }
@@ -35,22 +35,13 @@ internal sealed class ContentionProvider(int firstPixelTick, int ticksPerLine) :
         return ticks < _contentionTable.Length ? _contentionTable[ticks] : 0;
     }
 
-    private bool IsAddressContended(Word address)
-    {
-        if (address < 0x4000)
-        {
-            return false;
-        }
+    private bool IsAddressInContendedArea(Word address) =>
+        address is >= 0x4000 and <= 0x7FFF ||
+        MemoryBankId is 1 or 3 or 5 or 7 && address >= 0xC000;
 
-        switch (MemoryBankId)
-        {
-            case 0 when address > 0x7fff:
-            case 1 or 3 or 5 or 7 when address > 0xBFFF:
-                return false;
-        }
-
-        return true;
-    }
+    private static bool IsPortInContendedArea(Word port) =>
+        Ula.IsUlaPort(port) ||
+        port is >= 0x4000 and <= 0x7FFF && !Memory128K.IsPagingPortAddress(port);
 
     private static int[] BuildContentionTable(int firstPixelTick, int ticksPerLine)
     {

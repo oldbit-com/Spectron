@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
@@ -28,7 +28,6 @@ using OldBit.Spectron.Emulation.Tape.Loader;
 using OldBit.Spectron.Extensions;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
-using OldBit.Spectron.Files.Szx;
 using OldBit.Spectron.Recorder;
 using OldBit.Spectron.Screen;
 using OldBit.Spectron.Theming;
@@ -414,6 +413,30 @@ public partial class MainWindowViewModel : ReactiveObject
         var emulator = _stateManager.CreateEmulator(stateSnapshot);
 
         InitializeEmulator(emulator);
+    }
+
+    private bool CreateEmulator(Stream stream, FileType fileType)
+    {
+        Emulator? emulator = null;
+
+        if (fileType.IsSnapshot())
+        {
+            emulator = _snapshotManager.Load(stream, fileType);
+        }
+        else if (fileType.IsTape())
+        {
+            emulator = _loader.EnterLoadCommand(ComputerType);
+            emulator.TapeManager.InsertTape(stream, fileType,
+                _preferences.TapeSettings.IsAutoPlayEnabled && TapeLoadSpeed != TapeSpeed.Instant);
+            emulator.SetUlaPlus(_preferences.IsUlaPlusEnabled);
+        }
+
+        if (emulator != null)
+        {
+            InitializeEmulator(emulator);
+        }
+
+        return emulator != null;
     }
 
     private void InitializeEmulator(Emulator emulator)

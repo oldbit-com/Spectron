@@ -90,13 +90,14 @@ public sealed class AudioManager
         var statesPerSample = (double)hardware.TicksPerFrame / SamplesPerFrame;
 
         _beeperAudio = new BeeperAudio(clock, statesPerSample);
+
         Beeper = new BeeperDevice(cassettePlayer)
         {
             OnUpdateBeeper = _beeperAudio.Update
         };
 
         _ayAudio = new AyAudio(clock, Ay, statesPerSample);
-        _audioBufferPool = new AudioBufferPool(NumberOfBuffers);
+        _audioBufferPool = new AudioBufferPool(NumberOfBuffers, 4 * SamplesPerFrame + 16);
     }
 
     internal void NewFrame()
