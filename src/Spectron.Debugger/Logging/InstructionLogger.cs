@@ -9,6 +9,7 @@ internal sealed class InstructionLogger : IDisposable
 {
     private readonly string _logFilePath;
     private readonly Emulator _emulator;
+    private readonly Disassembler _disassembler;
 
     private StreamWriter _textWriter;
     private bool _isEnabled;
@@ -18,6 +19,8 @@ internal sealed class InstructionLogger : IDisposable
         _logFilePath = logFilePath;
         _emulator = emulator;
         _emulator.Cpu.BeforeInstruction += CpuOnBeforeInstruction;
+
+        _disassembler = new Disassembler(emulator.Memory, 0, 1);
 
         _textWriter = new StreamWriter(logFilePath);
     }
@@ -41,8 +44,15 @@ internal sealed class InstructionLogger : IDisposable
 
         var address = _emulator.Cpu.Registers.PC;
         var ticks = _emulator.Cpu.Clock.CurrentFrameTicks;
+        var instruction = string.Empty;
 
-        _textWriter.WriteLine($"{address:X4} {ticks}");
+        var instructions = _disassembler.Disassemble(address);
+        if (instructions.Count > 0)
+        {
+            instruction = instructions[0].ToString();
+        }
+
+        _textWriter.WriteLine($"{ticks} {address:X4} {instruction}");
     }
 
     public void Dispose()

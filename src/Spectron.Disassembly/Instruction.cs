@@ -7,40 +7,22 @@ namespace OldBit.Spectron.Disassembly;
 
 internal sealed record InstructionTemplate(string Pattern, bool IsUndocumented = false) { }
 
-/// <summary>
-/// Represents a disassembled instruction.
-/// </summary>
 public partial class Instruction
 {
-    /// <summary>
-    /// Gets the address of the instruction.
-    /// </summary>
     public Word Address { get; }
 
-    /// <summary>
-    /// Gets the disassembled code.
-    /// </summary>
     public string Code { get; private set; } = string.Empty;
 
-    /// <summary>
-    /// Gets the byte codes of the instruction.
-    /// </summary>
     public byte[] ByteCodes { get; internal set; } = [];
 
-    /// <summary>
-    /// Gets a value indicating whether the instruction is undocumented.
-    /// </summary>
     public bool IsUndocumented { get; }
 
-    /// <summary>
-    /// Gets a value indicating whether the instruction is invalid.
-    /// </summary>
     public bool IsInvalid { get; }
 
     internal Instruction(
         int address,
         InstructionTemplate template,
-        ByteDataReader reader,
+        IDataReader reader,
         NumberFormatter formatter,
         IndexContext context)
     {
@@ -59,7 +41,7 @@ public partial class Instruction
 
     private void Parse(
         string instruction,
-        ByteDataReader reader,
+        IDataReader reader,
         NumberFormatter formatter,
         IndexContext context)
     {
