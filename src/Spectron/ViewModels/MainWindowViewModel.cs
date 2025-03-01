@@ -219,7 +219,7 @@ public partial class MainWindowViewModel : ReactiveObject
     {
         if (!IsPaused)
         {
-            Pause();
+            Pause(showOverlay: false);
         }
 
         var viewModel = new DebuggerViewModel(_debuggerContext, Emulator!);

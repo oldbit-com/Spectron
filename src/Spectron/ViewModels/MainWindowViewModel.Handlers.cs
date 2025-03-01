@@ -365,7 +365,7 @@ partial class MainWindowViewModel
         UpdateWindowTitle();
     }
 
-    private void Pause()
+    private void Pause(bool showOverlay = true)
     {
         if (IsPaused)
         {
@@ -374,12 +374,18 @@ partial class MainWindowViewModel
 
         Emulator?.Pause();
         IsPaused = true;
+
+        if (showOverlay)
+        {
+            IsPauseOverlayVisible = true;
+        }
     }
 
     private void Resume()
     {
         Emulator?.Resume();
         IsPaused = false;
+        IsPauseOverlayVisible = false;
     }
 
     private void HandleTogglePause()

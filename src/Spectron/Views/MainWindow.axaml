@@ -67,7 +67,7 @@
                 <Grid>
                     <Border CornerRadius="15" HorizontalAlignment="Center" ClipToBounds="True">
                         <Grid>
-                            <Image x:Name="ScreenImage" Source="{Binding SpectrumScreen}" Stretch="Uniform" Classes.IsPaused="{Binding IsPaused}">
+                            <Image x:Name="ScreenImage" Source="{Binding SpectrumScreen}" Stretch="Uniform" Classes.IsPaused="{Binding IsPauseOverlayVisible}">
                                 <Image.Styles>
                                     <Style Selector="Image.IsPaused">
                                         <Setter Property="Effect">
@@ -79,8 +79,15 @@
                         </Grid>
                     </Border>
 
-                    <Border Background="{DynamicResource ButtonBackground}" Opacity=".25" Padding="20" CornerRadius="10" IsVisible="{Binding IsPaused}" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <controls:PauseOverlay FontSize="100" Opacity="4" IsVisible="{Binding IsPaused}" VerticalAlignment="Center"/>
+                    <Border
+                        Background="{DynamicResource ButtonBackground}"
+                        Opacity=".25" Padding="20"
+                        CornerRadius="10"
+                        IsVisible="{Binding IsPauseOverlayVisible}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+
+                        <controls:PauseOverlay FontSize="100" Opacity="4" VerticalAlignment="Center"/>
                     </Border>
 
                     <controls:TimeMachineTimer

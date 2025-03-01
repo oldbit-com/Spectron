@@ -19,6 +19,7 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
     public CpuViewModel CpuViewModel { get; } = new();
     public ImmediateViewModel ImmediateViewModel { get; }
     public BreakpointListViewModel BreakpointListViewModel { get; }
+    public LoggingViewModel LoggingViewModel { get; }
 
     public ReactiveCommand<Unit, Unit> DebuggerStepCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> DebuggerResumeCommand { get; private set; }
@@ -37,6 +38,7 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
         BreakpointListViewModel = new BreakpointListViewModel(_debuggerContext, _breakpointManager);
         CodeListViewModel = new CodeListViewModel(_breakpointManager, BreakpointListViewModel);
         ImmediateViewModel = new ImmediateViewModel(debuggerContext, emulator, Refresh);
+        LoggingViewModel = new LoggingViewModel(emulator);
 
         DebuggerStepCommand = ReactiveCommand.Create(HandleDebuggerStep);
         DebuggerResumeCommand = ReactiveCommand.Create(HandleDebuggerResume);
@@ -67,6 +69,8 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
 
     private void Close()
     {
+        LoggingViewModel.Dispose();
+
         _debuggerContext.Breakpoints.Clear();
 
         foreach (var breakpoint in _breakpointManager.Breakpoints)
@@ -111,7 +115,7 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
     {
         Close();
 
-        GC.SuppressFinalize(this);
         _breakpointHandler.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

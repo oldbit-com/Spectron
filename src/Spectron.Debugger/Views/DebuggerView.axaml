@@ -79,6 +79,9 @@
             <TabItem Header="Breakpoints">
                 <controls:BreakpointList DataContext="{Binding BreakpointListViewModel}" />
             </TabItem>
+            <TabItem Header="Logging">
+                <controls:Logging DataContext="{Binding LoggingViewModel}"/>
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>

@@ -61,6 +61,13 @@ partial class MainWindowViewModel
         set => this.RaiseAndSetIfChanged(ref _isPaused, value);
     }
 
+    private bool _isPauseOverlayVisible;
+    public bool IsPauseOverlayVisible
+    {
+        get => _isPauseOverlayVisible;
+        set => this.RaiseAndSetIfChanged(ref _isPauseOverlayVisible, value);
+    }
+
     private bool _isTimeMachineCountdownVisible;
     public bool IsTimeMachineCountdownVisible
     {
