@@ -63,6 +63,7 @@ public partial class MainWindowViewModel : ReactiveObject
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
     private MediaRecorder? _mediaRecorder;
     private bool _canClose;
+    private DebuggerViewModel? _debuggerViewModel;
 
     public Control ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }
@@ -213,6 +214,15 @@ public partial class MainWindowViewModel : ReactiveObject
         tapeManager.TapeStateChanged += HandleTapeStateChanged;
     }
 
+    public void OnViewClosed(object? viewModel)
+    {
+        if (viewModel is DebuggerViewModel)
+        {
+            Resume();
+            _debuggerViewModel = null;
+        }
+    }
+
     private async Task OpenAboutWindow() => await ShowAboutView.Handle(Unit.Default);
 
     private async Task OpenDebuggerWindow()
@@ -222,12 +232,12 @@ public partial class MainWindowViewModel : ReactiveObject
             Pause(showOverlay: false);
         }
 
-        var viewModel = new DebuggerViewModel(_debuggerContext, Emulator!);
+        _debuggerViewModel = new DebuggerViewModel(_debuggerContext, Emulator!);
 
         this.WhenAny(x => x.IsPaused, x => x.Value)
-            .Subscribe(isPaused => viewModel.HandlePause(isPaused));
+            .Subscribe(isPaused => _debuggerViewModel?.HandlePause(isPaused));
 
-        await ShowDebuggerView.Handle(viewModel);
+        await ShowDebuggerView.Handle(_debuggerViewModel);
     }
 
     private async Task ShowKeyboardHelpWindow() => await ShowKeyboardHelpView.Handle(Unit.Default);
@@ -468,8 +478,9 @@ public partial class MainWindowViewModel : ReactiveObject
 
         Emulator.CommandManager.CommandReceived += CommandManagerOnCommandReceived;
 
-        Emulator.Start();
+        _debuggerViewModel?.ConfigureEmulator(Emulator);
 
+        Emulator.Start();
         _statusBarTimer.Start();
     }
 

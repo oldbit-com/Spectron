@@ -9,17 +9,43 @@ namespace OldBit.Spectron.Debugger.ViewModels;
 public class DebuggerViewModel : ReactiveObject, IDisposable
 {
     private readonly DebuggerContext _debuggerContext;
-    private readonly BreakpointHandler _breakpointHandler;
-    private readonly BreakpointManager _breakpointManager;
 
-    private Emulator Emulator { get; }
+    private BreakpointHandler _breakpointHandler = null!;
+    private BreakpointManager? _breakpointManager;
 
-    public CodeListViewModel CodeListViewModel { get; }
+    private CodeListViewModel _codeListViewModel= null!;
+    private ImmediateViewModel _immediateViewModel = null!;
+    private BreakpointListViewModel _breakpointListViewModel = null!;
+    private LoggingViewModel _loggingViewModel = null!;
+
+    private Emulator Emulator { get; set; } = null!;
+
     public StackViewModel StackViewModel { get; } = new();
     public CpuViewModel CpuViewModel { get; } = new();
-    public ImmediateViewModel ImmediateViewModel { get; }
-    public BreakpointListViewModel BreakpointListViewModel { get; }
-    public LoggingViewModel LoggingViewModel { get; }
+
+    public CodeListViewModel CodeListViewModel
+    {
+        get => _codeListViewModel;
+        set => this.RaiseAndSetIfChanged(ref _codeListViewModel, value);
+    }
+
+    public ImmediateViewModel ImmediateViewModel
+    {
+        get => _immediateViewModel;
+        set => this.RaiseAndSetIfChanged(ref _immediateViewModel, value);
+    }
+
+    public BreakpointListViewModel BreakpointListViewModel
+    {
+        get => _breakpointListViewModel;
+        set => this.RaiseAndSetIfChanged(ref _breakpointListViewModel, value);
+    }
+
+    public LoggingViewModel LoggingViewModel
+    {
+        get => _loggingViewModel;
+        set => this.RaiseAndSetIfChanged(ref _loggingViewModel, value);
+    }
 
     public ReactiveCommand<Unit, Unit> DebuggerStepCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> DebuggerResumeCommand { get; private set; }
@@ -28,21 +54,29 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
     public DebuggerViewModel(DebuggerContext debuggerContext, Emulator emulator)
     {
         _debuggerContext = debuggerContext;
-        _breakpointManager = new BreakpointManager(emulator.Cpu);
-
-        _breakpointHandler = new BreakpointHandler(_breakpointManager, emulator);
-        _breakpointHandler.BreakpointHit += OnBreakpointHit;
-
-        Emulator = emulator;
-
-        BreakpointListViewModel = new BreakpointListViewModel(_debuggerContext, _breakpointManager);
-        CodeListViewModel = new CodeListViewModel(_breakpointManager, BreakpointListViewModel);
-        ImmediateViewModel = new ImmediateViewModel(debuggerContext, emulator, Refresh);
-        LoggingViewModel = new LoggingViewModel(emulator);
 
         DebuggerStepCommand = ReactiveCommand.Create(HandleDebuggerStep);
         DebuggerResumeCommand = ReactiveCommand.Create(HandleDebuggerResume);
         TogglePauseCommand = ReactiveCommand.Create(() => HandlePause(!IsPaused));
+
+        ConfigureEmulator(emulator);
+    }
+
+    public void ConfigureEmulator(Emulator emulator)
+    {
+        Emulator = emulator;
+
+        UpdateContextBreakpoints();
+
+        _breakpointManager = new BreakpointManager(emulator.Cpu);
+
+        _breakpointHandler = new BreakpointHandler(_breakpointManager, emulator.Cpu);
+        _breakpointHandler.BreakpointHit += OnBreakpointHit;
+
+        BreakpointListViewModel = new BreakpointListViewModel(_debuggerContext, _breakpointManager);
+        CodeListViewModel = new CodeListViewModel(_breakpointManager, BreakpointListViewModel);
+        ImmediateViewModel = new ImmediateViewModel(_debuggerContext, emulator, Refresh);
+        LoggingViewModel = new LoggingViewModel(emulator);
 
         BreakpointListViewModel.Breakpoints.CollectionChanged += (_, args) =>
             CodeListViewModel.UpdateBreakpoints(args);
@@ -71,7 +105,19 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
     {
         LoggingViewModel.Dispose();
 
+        UpdateContextBreakpoints();
+
+        _breakpointHandler.Dispose();
+    }
+
+    private void UpdateContextBreakpoints()
+    {
         _debuggerContext.Breakpoints.Clear();
+
+        if (_breakpointManager == null)
+        {
+            return;
+        }
 
         foreach (var breakpoint in _breakpointManager.Breakpoints)
         {
@@ -115,7 +161,6 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
     {
         Close();
 
-        _breakpointHandler.Dispose();
         GC.SuppressFinalize(this);
     }
 }

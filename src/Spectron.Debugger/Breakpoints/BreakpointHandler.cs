@@ -1,4 +1,4 @@
-using OldBit.Spectron.Emulation;
+using OldBit.Z80Cpu;
 using OldBit.Z80Cpu.Events;
 
 namespace OldBit.Spectron.Debugger.Breakpoints;
@@ -6,16 +6,16 @@ namespace OldBit.Spectron.Debugger.Breakpoints;
 public class BreakpointHandler : IDisposable
 {
     private readonly BreakpointManager _breakpointManager;
-    private readonly Emulator _emulator;
+    private readonly Z80 _cpu;
 
     public event EventHandler<EventArgs>? BreakpointHit;
 
-    public BreakpointHandler(BreakpointManager breakpointManager, Emulator emulator)
+    public BreakpointHandler(BreakpointManager breakpointManager, Z80 cpu)
     {
         _breakpointManager = breakpointManager;
-        _emulator = emulator;
+        _cpu = cpu;
 
-        emulator.Cpu.BeforeInstruction += BeforeInstruction;
+        _cpu.BeforeInstruction += BeforeInstruction;
     }
 
     private void BeforeInstruction(BeforeInstructionEventArgs e)
@@ -33,6 +33,7 @@ public class BreakpointHandler : IDisposable
     public void Dispose()
     {
         GC.SuppressFinalize(this);
-        _emulator.Cpu.BeforeInstruction -= BeforeInstruction;
+
+        _cpu.BeforeInstruction -= BeforeInstruction;
     }
 }

@@ -77,6 +77,7 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         }
 
         var view = new TView { DataContext = context.Input };
+
         view.Closed += (_, _) =>
         {
             if (!_windows.TryGetValue(viewType, out var closedWindow))
@@ -90,6 +91,8 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             }
 
             _windows.Remove(viewType);
+
+            _viewModel?.OnViewClosed(context.Input);
         };
 
         _windows.Add(viewType, view);
