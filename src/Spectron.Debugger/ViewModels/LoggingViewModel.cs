@@ -22,6 +22,7 @@ public class LoggingViewModel : ReactiveObject, IDisposable
     public LoggingViewModel(Emulator emulator)
     {
         _emulator = emulator;
+
         SelectLogFileFileCommand = ReactiveCommand.Create(HandleSelectLogFileFileAsync,
             this.WhenAnyValue(x => x.IsLoggingRunning, x => x == false));
 
