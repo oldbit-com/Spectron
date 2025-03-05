@@ -12,7 +12,8 @@ internal sealed class InstructionLogger : IDisposable
     private readonly Disassembler _disassembler;
 
     private StreamWriter _textWriter;
-    private bool _isEnabled;
+
+    internal bool IsEnabled { get; private set; }
 
     internal InstructionLogger(string logFilePath, Emulator emulator)
     {
@@ -25,9 +26,9 @@ internal sealed class InstructionLogger : IDisposable
         _textWriter = new StreamWriter(logFilePath);
     }
 
-    internal void Enable() => _isEnabled = true;
+    internal void Enable() => IsEnabled = true;
 
-    internal void Disable() => _isEnabled = false;
+    internal void Disable() => IsEnabled = false;
 
     internal void ClearLogFile()
     {
@@ -37,7 +38,7 @@ internal sealed class InstructionLogger : IDisposable
 
     private void CpuOnBeforeInstruction(BeforeInstructionEventArgs e)
     {
-        if (!_isEnabled)
+        if (!IsEnabled)
         {
             return;
         }
@@ -57,7 +58,7 @@ internal sealed class InstructionLogger : IDisposable
 
     public void Dispose()
     {
-        _isEnabled = false;
+        IsEnabled = false;
 
         _emulator.Cpu.BeforeInstruction -= CpuOnBeforeInstruction;
         _textWriter.Dispose();

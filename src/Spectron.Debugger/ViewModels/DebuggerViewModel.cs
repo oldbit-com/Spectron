@@ -16,7 +16,7 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
     private CodeListViewModel _codeListViewModel= null!;
     private ImmediateViewModel _immediateViewModel = null!;
     private BreakpointListViewModel _breakpointListViewModel = null!;
-    private LoggingViewModel _loggingViewModel = null!;
+    private LoggingViewModel _loggingViewModel = new();
 
     private Emulator Emulator { get; set; } = null!;
 
@@ -76,7 +76,8 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
         BreakpointListViewModel = new BreakpointListViewModel(_debuggerContext, _breakpointManager);
         CodeListViewModel = new CodeListViewModel(_breakpointManager, BreakpointListViewModel);
         ImmediateViewModel = new ImmediateViewModel(_debuggerContext, emulator, Refresh);
-        LoggingViewModel = new LoggingViewModel(emulator);
+
+        LoggingViewModel.Configure(emulator);
 
         BreakpointListViewModel.Breakpoints.CollectionChanged += (_, args) =>
             CodeListViewModel.UpdateBreakpoints(args);

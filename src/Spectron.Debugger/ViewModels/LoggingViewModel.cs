@@ -9,7 +9,7 @@ namespace OldBit.Spectron.Debugger.ViewModels;
 
 public class LoggingViewModel : ReactiveObject, IDisposable
 {
-    private readonly Emulator _emulator;
+    private Emulator _emulator = null!;
     private InstructionLogger? _instructionLogger;
 
     public UserControl? Control { get; set; }
@@ -19,10 +19,8 @@ public class LoggingViewModel : ReactiveObject, IDisposable
     public ReactiveCommand<Unit, Unit> StopLoggingCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ClearLogFileCommand { get; private set; }
 
-    public LoggingViewModel(Emulator emulator)
+    public LoggingViewModel()
     {
-        _emulator = emulator;
-
         SelectLogFileFileCommand = ReactiveCommand.Create(HandleSelectLogFileFileAsync,
             this.WhenAnyValue(x => x.IsLoggingRunning, x => x == false));
 
@@ -36,6 +34,25 @@ public class LoggingViewModel : ReactiveObject, IDisposable
             this.WhenAnyValue(x => x.LogFilePath, x => !string.IsNullOrEmpty(x)));
     }
 
+    public void Configure(Emulator emulator)
+    {
+        _emulator = emulator;
+
+        if (string.IsNullOrEmpty(LogFilePath))
+        {
+            return;
+        }
+
+        var instructionLogger = new InstructionLogger(LogFilePath, _emulator);
+
+        if (_instructionLogger?.IsEnabled == true)
+        {
+            instructionLogger.Enable();
+        }
+
+        _instructionLogger = instructionLogger;
+    }
+
     private async Task HandleSelectLogFileFileAsync()
     {
         var file = await SelectLogFileFileAsync();
@@ -43,6 +60,7 @@ public class LoggingViewModel : ReactiveObject, IDisposable
         if (file != null)
         {
             LogFilePath = file.Path.LocalPath;
+
             _instructionLogger = new InstructionLogger(LogFilePath, _emulator);
         }
     }
