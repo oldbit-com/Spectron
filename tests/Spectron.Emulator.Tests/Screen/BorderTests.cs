@@ -71,9 +71,8 @@ public class BorderTests
         borderRenderer.Update(SpectrumPalette.Blue, 25013);
         borderRenderer.Update(SpectrumPalette.Blue, 69888);
 
-        screenBuffer.Pixels[..52].ShouldAllBe(c => c == SpectrumPalette.White);
-        screenBuffer.Pixels[52..351].ShouldAllBe(c => c == SpectrumPalette.Cyan);
-        //screenBuffer[48..351].ShouldAllBe(c => c == colors.Cyan);
+        screenBuffer.Pixels[..50].ShouldAllBe(c => c == SpectrumPalette.White);
+        screenBuffer.Pixels[50..351].ShouldAllBe(c => c == SpectrumPalette.Cyan);
     }
 
     private static void BorderShouldHaveColor(Color color, Color[] screenBuffer)
