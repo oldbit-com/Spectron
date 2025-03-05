@@ -173,7 +173,7 @@ public sealed class Emulator
     private void SetupEventHandlers()
     {
         _memory.ScreenMemoryUpdated += address => ScreenBuffer.UpdateScreen(address);
-        Cpu.Clock.TicksAdded += (_, _, currentFrameTicks) => ScreenBuffer.UpdateContent(currentFrameTicks);
+        Cpu.Clock.TicksAdded += (_, previousFrameTicks, _) => ScreenBuffer.UpdateContent(previousFrameTicks);
         Cpu.BeforeInstruction += BeforeInstruction;
         UlaPlus.ActiveChanged += (_) => _invalidateScreen = true;
     }

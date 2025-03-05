@@ -18,7 +18,7 @@ internal sealed class Border(FrameBuffer frameBuffer)
     internal void Update(Color color) => _lastColor = color;
 
     /// <summary>
-    /// Fill the border with the specified color uo to the current tick.
+    /// Fill the border with the specified color up to the current tick.
     /// </summary>
     /// <param name="color">The new color.</param>
     /// <param name="frameTicks">The current tick when border color is changing.</param>
@@ -37,7 +37,7 @@ internal sealed class Border(FrameBuffer frameBuffer)
 
                     frameBuffer.Fill(startPixel, count, _lastColor);
 
-                    _offset = frameTicks - tickRange.StartTick + 1;
+                    _offset = frameTicks - tickRange.StartTick;
                     _lastRangeIndex = rangeIndex;
 
                     break;
@@ -80,7 +80,7 @@ internal sealed class Border(FrameBuffer frameBuffer)
     /// Builds a lookup table for border ticks so that we can quickly determine the border range and
     /// pixel position for a given tick.
     /// </summary>
-    /// <returns>A list of border ticks.</returns>
+    /// <returns>A list of border tick data..</returns>
     internal static List<BorderTick> BuildBorderTickRanges()
     {
         var ticksTable = new List<BorderTick>();
