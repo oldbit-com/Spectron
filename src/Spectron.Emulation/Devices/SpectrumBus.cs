@@ -27,6 +27,7 @@ internal sealed class SpectrumBus : IBus
         foreach (var device in _devices)
         {
             var result = device.ReadPort(address);
+
             if (result != null)
             {
                 return result.Value;

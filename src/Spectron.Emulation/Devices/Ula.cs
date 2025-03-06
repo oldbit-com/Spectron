@@ -41,6 +41,7 @@ internal sealed class Ula(
     {
         if (cassettePlayer is not { IsPlaying: true })
         {
+            value = (byte)(value & 0xBF);
             return;
         }
 

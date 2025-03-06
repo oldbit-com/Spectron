@@ -279,12 +279,9 @@ public sealed class Emulator
 
                 break;
 
-            case 0x1AF1:
-            case RomRoutines.SAVE_ETC:
-                // var szx = SzxSnapshot.CreateSnapshot(this);
-                // szx.Save("/Users/voytas/Projects/ZX/Spectron/src/Spectron.Emulation/Tape/Loader/Files/128.szx");
-
-                break;
+            // case 0x1AF1:
+            // case RomRoutines.SAVE_ETC:
+            //    break;
         }
     }
 }
