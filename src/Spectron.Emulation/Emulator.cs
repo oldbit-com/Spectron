@@ -88,11 +88,13 @@ public sealed class Emulator
         UlaPlus = new UlaPlus();
         _spectrumBus = new SpectrumBus();
         ScreenBuffer = new ScreenBuffer(hardware, emulatorArgs.Memory, UlaPlus);
-        Cpu = new Z80(emulatorArgs.Memory, emulatorArgs.ContentionProvider)
+        Cpu = new Z80(emulatorArgs.Memory)
         {
             Clock =
             {
-                DefaultFrameTicks = hardware.TicksPerFrame
+                DefaultFrameTicks = hardware.TicksPerFrame,
+                InterruptDuration = hardware.InterruptDuration,
+                ContentionProvider = emulatorArgs.ContentionProvider
             }
         };
 
@@ -198,7 +200,6 @@ public sealed class Emulator
     {
         StartFrame();
 
-        Cpu.TriggerInt(0xFF);
         Cpu.Run();
 
         EndFrame();

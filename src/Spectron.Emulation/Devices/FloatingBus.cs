@@ -24,15 +24,7 @@ internal sealed class FloatingBus : IDevice
         _memory = memory;
         _clock = clock;
 
-        var screenRenderEvents = FastLookup.GetScreenRenderEvents(hardware);
-
-        foreach (var screenEvent in screenRenderEvents)
-        {
-            _floatingBusAddressIndex[screenEvent.Ticks + 0] = screenEvent.BitmapAddress;
-            _floatingBusAddressIndex[screenEvent.Ticks + 1] = screenEvent.AttributeAddress;
-            _floatingBusAddressIndex[screenEvent.Ticks + 2] = (Word)(screenEvent.BitmapAddress + 1);
-            _floatingBusAddressIndex[screenEvent.Ticks + 3] = (Word)(screenEvent.AttributeAddress + 1);
-        }
+        BuildFloatingBusTable();
     }
 
     public byte? ReadPort(Word address)
@@ -42,15 +34,38 @@ internal sealed class FloatingBus : IDevice
             return null;
         }
 
-        if (_clock.CurrentFrameTicks < _hardware.FirstPixelTicks || _clock.CurrentFrameTicks > _hardware.LastPixelTicks)
+        var ticksPostIn = _clock.CurrentFrameTicks + 3;
+
+        if (ticksPostIn < _hardware.FloatingBusStartTicks || ticksPostIn > _hardware.LastPixelTicks)
         {
             return null;
         }
 
-        return _floatingBusAddressIndex.TryGetValue(_clock.CurrentFrameTicks, out var screenAddress)
-            ? _memory.Read((Word)(0x4000 + screenAddress))
+        return _floatingBusAddressIndex.TryGetValue(ticksPostIn, out var screenAddress)
+            ? _memory.Read(screenAddress)
             : null;
     }
 
     public int Priority => int.MaxValue;
+
+    private void BuildFloatingBusTable()
+    {
+        for (var y = 0; y < ScreenSize.ContentHeight; y++)
+        {
+            var startTicks = _hardware.FloatingBusStartTicks + y * _hardware.TicksPerLine;
+
+            for (var x = 0; x < 16; x++)
+            {
+                var bitmapAddress = ScreenAddress.Calculate(2 * x, y);
+                var attributeAddress = ScreenAddress.CalculateAttribute(2 * x, y);
+
+                _floatingBusAddressIndex[startTicks + 0] = bitmapAddress;
+                _floatingBusAddressIndex[startTicks + 1] = attributeAddress;
+                _floatingBusAddressIndex[startTicks + 2] = (Word)(bitmapAddress + 1);
+                _floatingBusAddressIndex[startTicks + 3] = (Word)(attributeAddress + 1);
+
+                startTicks += 8;
+            }
+        }
+    }
 }

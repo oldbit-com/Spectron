@@ -10,38 +10,19 @@ internal sealed class ContentionProvider(int firstPixelTick, int ticksPerLine) :
 
     internal int MemoryBankId { get; set; }
 
-    public int GetMemoryContention(int ticks, Word address)
-    {
-        if (!IsAddressInContendedArea(address))
-        {
-            return 0;
-        }
+    public int GetMemoryContention(int ticks, Word address) =>
+        ticks < _contentionTable.Length ? _contentionTable[ticks] : 0;
 
-        if (ticks < _contentionTable.Length && ticks >= firstPixelTick)
-        {
-            return _contentionTable[ticks];
-        }
+    public int GetPortContention(int ticks, Word port) =>
+        ticks < _contentionTable.Length ? _contentionTable[ticks] : 0;
 
-        return 0;
-    }
-
-    public int GetPortContention(int ticks, Word port)
-    {
-        if (!IsPortInContendedArea(port))
-        {
-            return 0;
-        }
-
-        return ticks < _contentionTable.Length ? _contentionTable[ticks] : 0;
-    }
-
-    private bool IsAddressInContendedArea(Word address) =>
+    public bool IsAddressContended(Word address) =>
         address is >= 0x4000 and <= 0x7FFF ||
-        MemoryBankId is 1 or 3 or 5 or 7 && address >= 0xC000;
+        address >= 0xC000 && MemoryBankId is 1 or 3 or 5 or 7;
 
-    private static bool IsPortInContendedArea(Word port) =>
-        Ula.IsUlaPort(port) ||
-        port is >= 0x4000 and <= 0x7FFF && !Memory128K.IsPagingPortAddress(port);
+    public bool IsPortContended(Word port) =>
+        port is >= 0x4000 and <= 0x7FFF && !Memory128K.IsPagingPortAddress(port) ||
+        port >= 0xC000 && MemoryBankId is 1 or 3 or 5 or 7;
 
     private static int[] BuildContentionTable(int firstPixelTick, int ticksPerLine)
     {

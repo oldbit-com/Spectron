@@ -7,7 +7,7 @@ namespace OldBit.Spectron.Emulator.Tests.Devices.Memory;
 public class ContentionProvider48KTests
 {
     private readonly ContentionProvider _contention = new(
-        Hardware.Spectrum48K.FirstPixelTicks,
+        Hardware.Spectrum48K.ContentionStartTicks,
         Hardware.Spectrum48K.TicksPerLine);
 
     [Theory]
@@ -49,12 +49,12 @@ public class ContentionProvider48KTests
     }
 
     [Theory]
-    [InlineData(16383, 14335)]
-    [InlineData(32768, 14348)]
-    public void WhenNotContendedAddress_ShouldReturnZeroContention(Word address, int state)
+    [InlineData(16383)]
+    [InlineData(32768)]
+    public void WhenNotContendedAddress_ShouldReturnZeroContention(Word address)
     {
-        var contention = _contention.GetMemoryContention(state, address);
+        var isContended = _contention.IsAddressContended(address);
 
-        contention.ShouldBe(0);
+        isContended.ShouldBeFalse();
     }
 }

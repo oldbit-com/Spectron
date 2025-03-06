@@ -9,6 +9,7 @@ internal sealed record HardwareSettings(
     int InterruptFrequency,
     int InterruptDuration,
     int RetraceTicks,
+    int ContentionStartTicks,
     int FloatingBusStartTicks,
     int FirstPixelTicks,        // Number of T-states passed since the interrupt generation to the first display byte is being sent to screen (early timing).
     int LastPixelTicks,         // Number of T-states passed since the interrupt generation to the last display byte is being sent to screen.
@@ -25,6 +26,7 @@ internal static class Hardware
         TicksPerFrame: 69888,
         InterruptFrequency: 50,
         RetraceTicks: 48,
+        ContentionStartTicks: 14335,
         FloatingBusStartTicks: 14338,
         InterruptDuration: 32,
         FirstPixelTicks: 14336,
@@ -37,6 +39,7 @@ internal static class Hardware
         TicksPerFrame: 70908,
         InterruptFrequency: 50,
         RetraceTicks: 52,
+        ContentionStartTicks: 14361,
         FloatingBusStartTicks: 14364,
         InterruptDuration: 36,
         FirstPixelTicks: 14362,
@@ -50,6 +53,7 @@ internal static class Hardware
         TicksPerFrame: 69888,
         InterruptFrequency: 50,
         RetraceTicks: 48,
+        ContentionStartTicks: 14361,
         FloatingBusStartTicks: 14338,
         InterruptDuration: 32,
         FirstPixelTicks: 14336,
