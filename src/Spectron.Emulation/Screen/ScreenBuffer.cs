@@ -15,7 +15,7 @@ internal sealed class ScreenBuffer
 
     internal ScreenBuffer(HardwareSettings hardware, IEmulatorMemory memory, UlaPlus ulaPlus)
     {
-        _border = new Border(FrameBuffer);
+        _border = new Border(hardware, FrameBuffer);
         _content = new Content(hardware, FrameBuffer, memory, ulaPlus);
 
         if (memory is Memory128K memory128K)
@@ -66,9 +66,22 @@ internal sealed class ScreenBuffer
         _content.Invalidate();
     }
 
+    /// <summary>
+    /// Called every time new border color is set to update the frame buffer.
+    /// </summary>
+    /// <param name="frameTicks">The number of ticks for the current frame.</param>
     internal void UpdateBorder(int frameTicks) => _border.Update(LastBorderColor, frameTicks);
 
+    /// <summary>
+    /// Called every time when ticks are added to update the frame buffer..
+    /// </summary>
+    /// <param name="frameTicks">The number of ticks for the current frame.</param>
     internal void UpdateContent(int frameTicks) => _content.Update(frameTicks);
 
+    /// <summary>
+    /// Called when screen memory is updated to mark the specified address as dirty, flagging the frame buffer
+    /// needs to be updated.
+    /// </summary>
+    /// <param name="address">The address of the screen memory that has been written to.</param>
     internal void UpdateScreen(Word address) => _content.UpdateScreen(address);
 }

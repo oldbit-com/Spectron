@@ -2,14 +2,13 @@ namespace OldBit.Spectron.Emulation.Screen;
 
 public record struct BorderTick(int StartTick, int EndTick, int StartPixel);
 
-internal sealed class Border(FrameBuffer frameBuffer)
+internal sealed class Border(HardwareSettings hardwareSettings, FrameBuffer frameBuffer)
 {
-    private const int RetraceTicks = 48;        // Number of ticks for the horizontal retrace (48T)
     private const int LeftBorderTicks = 24;     // Number of ticks for the left border (24T)
     private const int RightBorderTicks = 24;    // Number of ticks for the right border (24T)
     private const int ContentLineTicks = 128;   // Number of ticks for the screen line content (128T).
 
-    private readonly List<BorderTick> _borderTickRanges = BuildBorderTickRanges();
+    private readonly List<BorderTick> _borderTickRanges = BuildBorderTickRanges(hardwareSettings.RetraceTicks);
 
     private int _lastRangeIndex;
     private int _offset;
@@ -18,7 +17,8 @@ internal sealed class Border(FrameBuffer frameBuffer)
     internal void Update(Color color) => _lastColor = color;
 
     /// <summary>
-    /// Fill the border with the specified color up to the current tick.
+    /// Fill the border with the specified color up to the current tick. This fills frame buffer with the
+    /// current border color up to the current tick.
     /// </summary>
     /// <param name="color">The new color.</param>
     /// <param name="frameTicks">The current tick when border color is changing.</param>
@@ -80,8 +80,8 @@ internal sealed class Border(FrameBuffer frameBuffer)
     /// Builds a lookup table for border ticks so that we can quickly determine the border range and
     /// pixel position for a given tick.
     /// </summary>
-    /// <returns>A list of border tick data..</returns>
-    internal static List<BorderTick> BuildBorderTickRanges()
+    /// <returns>A list of border tick data.</returns>
+    internal static List<BorderTick> BuildBorderTickRanges(int retraceTicks)
     {
         var ticksTable = new List<BorderTick>();
 
@@ -96,7 +96,7 @@ internal sealed class Border(FrameBuffer frameBuffer)
                 case < ScreenSize.BorderTop:
                     ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
 
-                    startTick = endTick + RetraceTicks;
+                    startTick = endTick + retraceTicks;
                     endTick = startTick + LeftBorderTicks + ContentLineTicks + RightBorderTicks;
                     startPixel += line == 0 ?
                         ScreenSize.ContentWidth + ScreenSize.BorderRight :
@@ -109,7 +109,7 @@ internal sealed class Border(FrameBuffer frameBuffer)
 
                     ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
 
-                    startTick = endTick + RetraceTicks;
+                    startTick = endTick + retraceTicks;
                     startPixel += ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight;
 
                     break;
@@ -126,7 +126,7 @@ internal sealed class Border(FrameBuffer frameBuffer)
 
                     // Right border
                     ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
-                    startTick = endTick + RetraceTicks;
+                    startTick = endTick + retraceTicks;
                     startPixel += ScreenSize.BorderRight;
 
                     break;

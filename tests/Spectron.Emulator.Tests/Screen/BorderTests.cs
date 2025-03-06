@@ -1,3 +1,4 @@
+using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Screen;
 using Shouldly;
 
@@ -5,7 +6,7 @@ namespace OldBit.Spectron.Emulator.Tests.Screen;
 
 public class BorderTests
 {
-    private readonly List<BorderTick> _borderTicks = Border.BuildBorderTickRanges();
+    private readonly List<BorderTick> _borderTicks = Border.BuildBorderTickRanges(48);
 
     [Theory]
     [InlineData(0, 0, 151, 48)]                 // first top border line
@@ -33,7 +34,7 @@ public class BorderTests
     public void BorderRenderer_ShouldSetBorderBlue()
     {
         var screenBuffer = new FrameBuffer(SpectrumPalette.White);
-        var borderRenderer = new Border(screenBuffer);
+        var borderRenderer = new Border(Hardware.Spectrum48K, screenBuffer);
         borderRenderer.Update(SpectrumPalette.Blue);
 
         borderRenderer.Update(SpectrumPalette.Blue, 69888);
@@ -47,7 +48,7 @@ public class BorderTests
         var random = new Random(69888);
 
         var screenBuffer = new FrameBuffer(SpectrumPalette.White);
-        var borderRenderer = new Border(screenBuffer);
+        var borderRenderer = new Border(Hardware.Spectrum48K, screenBuffer);
         borderRenderer.Update(SpectrumPalette.Red);
 
         var ticks = 0;
@@ -64,7 +65,7 @@ public class BorderTests
     public void BorderRenderer_ShouldMatchAquaplane()
     {
         var screenBuffer = new FrameBuffer(SpectrumPalette.White);
-        var borderRenderer = new Border(screenBuffer);
+        var borderRenderer = new Border(Hardware.Spectrum48K, screenBuffer);
 
         borderRenderer.Update(SpectrumPalette.Cyan, 1);
         borderRenderer.Update(SpectrumPalette.Cyan, 145);
