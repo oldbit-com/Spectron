@@ -21,7 +21,7 @@ internal sealed class ContentionProvider(int firstPixelTick, int ticksPerLine) :
         address >= 0xC000 && MemoryBankId is 1 or 3 or 5 or 7;
 
     public bool IsPortContended(Word port) =>
-        port is >= 0x4000 and <= 0x7FFF && !Memory128K.IsPagingPortAddress(port) ||
+        port is >= 0x4000 and <= 0x7FFF ||
         port >= 0xC000 && MemoryBankId is 1 or 3 or 5 or 7;
 
     private static int[] BuildContentionTable(int firstPixelTick, int ticksPerLine)

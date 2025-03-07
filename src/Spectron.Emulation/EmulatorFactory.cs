@@ -53,10 +53,10 @@ public sealed class EmulatorFactory(
     private Emulator CreateSpectrum128K(RomType romType, Memory128K memory)
     {
         var contentionProvider = new ContentionProvider(
-            Hardware.Spectrum128K.FirstPixelTicks,
+            Hardware.Spectrum128K.ContentionStartTicks,
             Hardware.Spectrum128K.TicksPerLine);
 
-        memory.BankPaged += bankId => contentionProvider.MemoryBankId = bankId;
+        memory.RamBankPaged += bankId => contentionProvider.MemoryBankId = bankId;
 
         var emulatorSettings = new EmulatorArgs(
             ComputerType.Spectrum128K,
@@ -78,7 +78,7 @@ public sealed class EmulatorFactory(
     private Emulator CreateSpectrum(ComputerType computerType, RomType romType, IEmulatorMemory memory)
     {
         var contentionProvider = new ContentionProvider(
-            Hardware.Spectrum48K.FirstPixelTicks,
+            Hardware.Spectrum48K.ContentionStartTicks,
             Hardware.Spectrum48K.TicksPerLine);
 
         var emulatorSettings = new EmulatorArgs(

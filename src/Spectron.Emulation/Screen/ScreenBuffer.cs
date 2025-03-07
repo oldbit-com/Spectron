@@ -20,13 +20,7 @@ internal sealed class ScreenBuffer
 
         if (memory is Memory128K memory128K)
         {
-            memory128K.BankPaged += bankId =>
-            {
-                if (bankId is Memory128K.ScreenBank1 or Memory128K.ScreenBank2)
-                {
-                    _content.Invalidate();
-                }
-            };
+            memory128K.ScreenBankPaged += _ => { _content.Invalidate(); };
         }
     }
 
