@@ -82,7 +82,7 @@ internal static class FastLookup
         for (var y = 0; y < ScreenSize.ContentHeight; y++)
         {
             var rowTime = hardware.FirstPixelTicks + hardware.TicksPerLine * y;
-            var bufferLineIndex = FrameBuffer.GetLineIndex(y);
+            var bufferLineIndex = FrameBuffer.GetLineIndex(y, hardware.BorderTop);
 
             for (var x = 0; x < 16; x++)
             {

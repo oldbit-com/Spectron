@@ -19,7 +19,8 @@ internal sealed class Memory128K : IEmulatorMemory
     private bool _isPagingDisabledUntilReset;
 
     internal delegate void BankPagedEvent(int bankId);
-    internal event BankPagedEvent? BankPaged;
+    internal event BankPagedEvent? RamBankPaged;
+    internal event BankPagedEvent? ScreenBankPaged;
 
     internal byte[][] Banks { get; } = new byte[8][];
     internal byte LastPagingModeValue { get; private set; }
@@ -155,7 +156,7 @@ internal sealed class Memory128K : IEmulatorMemory
 
         _activeRam = bank;
 
-        BankPaged?.Invoke(bankId);
+        RamBankPaged?.Invoke(bankId);
     }
 
     private void SelectRomBank1()
@@ -187,7 +188,7 @@ internal sealed class Memory128K : IEmulatorMemory
 
         _activeScreen = Banks[ScreenBank1];
 
-        BankPaged?.Invoke(ScreenBank1);
+        ScreenBankPaged?.Invoke(ScreenBank1);
     }
 
     private void SelectShadowScreen()
@@ -199,6 +200,6 @@ internal sealed class Memory128K : IEmulatorMemory
 
         _activeScreen = Banks[ScreenBank2];
 
-        BankPaged?.Invoke(ScreenBank2);
+        ScreenBankPaged?.Invoke(ScreenBank2);
     }
 }

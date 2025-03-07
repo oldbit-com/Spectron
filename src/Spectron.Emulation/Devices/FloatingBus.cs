@@ -34,14 +34,14 @@ internal sealed class FloatingBus : IDevice
             return null;
         }
 
-        var ticksPostIn = _clock.CurrentFrameTicks + 3;
+        var finalStateTicks = _clock.CurrentFrameTicks + 2; // adjust for the final T-state of the instruction
 
-        if (ticksPostIn < _hardware.FloatingBusStartTicks || ticksPostIn > _hardware.LastPixelTicks)
+        if (finalStateTicks < _hardware.FloatingBusStartTicks || finalStateTicks > _hardware.LastPixelTicks)
         {
             return null;
         }
 
-        return _floatingBusAddressIndex.TryGetValue(ticksPostIn, out var screenAddress)
+        return _floatingBusAddressIndex.TryGetValue(finalStateTicks, out var screenAddress)
             ? _memory.Read(screenAddress)
             : null;
     }
