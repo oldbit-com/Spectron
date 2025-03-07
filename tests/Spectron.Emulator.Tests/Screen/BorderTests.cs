@@ -6,7 +6,8 @@ namespace OldBit.Spectron.Emulator.Tests.Screen;
 
 public class BorderTests
 {
-    private readonly List<BorderTick> _borderTicks = Border.BuildBorderTickRanges(48);
+    private readonly List<BorderTick> _borderTicks =
+        Border.BuildBorderTickRanges(Hardware.Spectrum48K.RetraceTicks, Hardware.Spectrum48K.BorderTop);
 
     [Theory]
     [InlineData(0, 0, 151, 48)]                 // first top border line

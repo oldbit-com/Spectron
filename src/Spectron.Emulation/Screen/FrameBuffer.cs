@@ -13,5 +13,5 @@ public sealed class FrameBuffer(Color fillColor)
 
     internal void Fill(int start, int count, Color color) => Array.Fill(Pixels, color, start, count);
 
-    internal static int GetLineIndex(int line) => Width * ScreenSize.BorderTop + ScreenSize.BorderLeft + Width * line;
+    internal static int GetLineIndex(int line, int borderTop) => Width * borderTop + ScreenSize.BorderLeft + Width * line;
 }

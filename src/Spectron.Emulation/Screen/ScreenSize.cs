@@ -31,9 +31,4 @@ public static class ScreenSize
     /// The height of the screen content is 192 pixels, e.g. 24 rows of 8 pixels.
     /// </summary>
     public const int ContentHeight = 192;
-
-    /// <summary>
-    /// The total number of screen lines, including top and bottom borders.
-    /// </summary>
-    public const int TotalLines = BorderTop + ContentHeight + BorderBottom;
 }

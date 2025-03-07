@@ -8,7 +8,8 @@ internal sealed class Border(HardwareSettings hardwareSettings, FrameBuffer fram
     private const int RightBorderTicks = 24;    // Number of ticks for the right border (24T)
     private const int ContentLineTicks = 128;   // Number of ticks for the screen line content (128T).
 
-    private readonly List<BorderTick> _borderTickRanges = BuildBorderTickRanges(hardwareSettings.RetraceTicks);
+    private readonly List<BorderTick> _borderTickRanges = BuildBorderTickRanges(
+        hardwareSettings.RetraceTicks, hardwareSettings.BorderTop);
 
     private int _lastRangeIndex;
     private int _offset;
@@ -81,55 +82,51 @@ internal sealed class Border(HardwareSettings hardwareSettings, FrameBuffer fram
     /// pixel position for a given tick.
     /// </summary>
     /// <returns>A list of border tick data.</returns>
-    internal static List<BorderTick> BuildBorderTickRanges(int retraceTicks)
+    internal static List<BorderTick> BuildBorderTickRanges(int retraceTicks, int borderTop)
     {
         var ticksTable = new List<BorderTick>();
 
         var startTick = 0;
         var endTick = ContentLineTicks + LeftBorderTicks;
         var startPixel = ScreenSize.BorderLeft;
+        var totalLines = borderTop + ScreenSize.ContentHeight + ScreenSize.BorderBottom;
 
-        for (var line = 0; line < ScreenSize.TotalLines; line++)
+        for (var line = 0; line < totalLines; line++)
         {
-            switch (line)
+            if (line < borderTop)
             {
-                case < ScreenSize.BorderTop:
-                    ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
+                ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
 
-                    startTick = endTick + retraceTicks;
-                    endTick = startTick + LeftBorderTicks + ContentLineTicks + RightBorderTicks;
-                    startPixel += line == 0 ?
-                        ScreenSize.ContentWidth + ScreenSize.BorderRight :
-                        ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight;
+                startTick = endTick + retraceTicks;
+                endTick = startTick + LeftBorderTicks + ContentLineTicks + RightBorderTicks;
+                startPixel += line == 0
+                    ? ScreenSize.ContentWidth + ScreenSize.BorderRight
+                    : ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight;
+            }
+            else if (line >= borderTop + ScreenSize.ContentHeight)
+            {
+                endTick = startTick + LeftBorderTicks + ContentLineTicks + RightBorderTicks;
 
-                    break;
+                ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
 
-                case >= ScreenSize.BorderTop + ScreenSize.ContentHeight:
-                    endTick = startTick + LeftBorderTicks + ContentLineTicks + RightBorderTicks;
+                startTick = endTick + retraceTicks;
+                startPixel += ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight;
+            }
+            else
+            {
+                // Left border
+                endTick = startTick + LeftBorderTicks;
+                ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
 
-                    ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
+                // Skip content area
+                startTick = endTick + ContentLineTicks;
+                endTick = startTick + RightBorderTicks;
+                startPixel += ScreenSize.BorderLeft + ScreenSize.ContentWidth;
 
-                    startTick = endTick + retraceTicks;
-                    startPixel += ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight;
-
-                    break;
-
-                default:
-                    // Left border
-                    endTick = startTick + LeftBorderTicks;
-                    ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
-
-                    // Skip content area
-                    startTick = endTick + ContentLineTicks;
-                    endTick = startTick + RightBorderTicks;
-                    startPixel += ScreenSize.BorderLeft + ScreenSize.ContentWidth;
-
-                    // Right border
-                    ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
-                    startTick = endTick + retraceTicks;
-                    startPixel += ScreenSize.BorderRight;
-
-                    break;
+                // Right border
+                ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
+                startTick = endTick + retraceTicks;
+                startPixel += ScreenSize.BorderRight;
             }
         }
 
