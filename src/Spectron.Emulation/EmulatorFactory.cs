@@ -56,7 +56,7 @@ public sealed class EmulatorFactory(
             Hardware.Spectrum128K.ContentionStartTicks,
             Hardware.Spectrum128K.TicksPerLine);
 
-        memory.RamBankPaged += bankId => contentionProvider.MemoryBankId = bankId;
+        memory.RamBankPaged += bankId => contentionProvider.ActiveRamBankId = bankId;
 
         var emulatorSettings = new EmulatorArgs(
             ComputerType.Spectrum128K,
