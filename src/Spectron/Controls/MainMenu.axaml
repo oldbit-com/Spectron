@@ -104,7 +104,7 @@
                 <MenuItem Header="Full" ToggleType="Radio" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static screen:BorderSize.Full}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static screen:BorderSize.Full}}"/>
             </MenuItem>
             <MenuItem Header="-"/>
-            <MenuItem Header="Enter Full Screen" InputGesture="Ctrl+Enter" Command="{Binding ToggleFullScreenCommand}"/>
+            <MenuItem Header="Enter Full Screen" InputGesture="Cmd+Enter" Command="{Binding ToggleFullScreenCommand}"/>
         </MenuItem>
 
         <MenuItem Header="Tape" Padding="10 0 10 0" Focusable="False">
