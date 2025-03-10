@@ -54,7 +54,7 @@ public class FloatingBusTests128
     [InlineData(58033, 0x00FF, 0x5AFF, 0x48)]
     public void WhenReadingUnattachedPort_AndMatchingCycle_ShouldReturnFloatingBusValue(int ticks, Word port, Word address, byte expectedValue)
     {
-        _clock.Add(ticks);
+        _clock.AddTicks(ticks);
         _memory.Write(address, expectedValue);
 
         var value = _floatingBus.ReadPort(port);
@@ -73,7 +73,7 @@ public class FloatingBusTests128
     [InlineData(14597, 0x00FF, 0x5801, 0x44)]
     public void WhenReadingUnattachedPort_AndNotMatchingCycle_ShouldReturnNull(int ticks, Word port, Word address, byte expectedValue)
     {
-        _clock.Add(ticks);
+        _clock.AddTicks(ticks);
         _memory.Write(address, expectedValue);
 
         var value = _floatingBus.ReadPort(port);
