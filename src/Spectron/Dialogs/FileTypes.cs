@@ -53,4 +53,9 @@ public static class FileTypes
     {
         Patterns = ["*.mp4"]
     };
+
+    public static FilePickerFileType Png { get; } = new("PNG Bitmap")
+    {
+        Patterns = ["*.png"]
+    };
 }

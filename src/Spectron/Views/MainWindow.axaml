@@ -41,6 +41,23 @@
         </Style>
     </Window.Styles>
 
+    <Window.KeyBindings>
+        <KeyBinding Gesture="{OnPlatform Ctrl+O, macOS=Cmd+O}" Command="{Binding LoadFileCommand}"/>
+        <KeyBinding Gesture="{OnPlatform Ctrl+S, macOS=Cmd+S}" Command="{Binding SaveFileCommand}"/>
+        <KeyBinding Gesture="F2" Command="{Binding TogglePauseCommand}"/>
+        <KeyBinding Gesture="F3" Command="{Binding ShowTimeMachineViewCommand}"/>
+        <KeyBinding Gesture="F5" Command="{Binding QuickSaveCommand}"/>
+        <KeyBinding Gesture="F6" Command="{Binding QuickLoadCommand}"/>
+        <KeyBinding Gesture="F11" Command="{Binding ShowDebuggerViewCommand}"/>
+        <KeyBinding Gesture="Ctrl+Enter" Command="{Binding ToggleFullScreenCommand}"/>
+        <KeyBinding Gesture="Ctrl+F5" Command="{Binding ResetCommand}"/>
+        <KeyBinding Gesture="{OnPlatform Ctrl+F4, macOS=Cmd+Q}" Command="{Binding ExitApplicationCommand}"/>
+        <KeyBinding Gesture="{OnPlatform Ctrl+T, macOS=Cmd+T}" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
+        <KeyBinding Gesture="{OnPlatform Ctrl+P, macOS=Cmd+OemComma}" Command="{Binding ShowPreferencesViewCommand}"/>
+        <KeyBinding Gesture="{OnPlatform Ctrl+Shift+S, macOS=Cmd+Shift+S}" Command="{Binding CopyScreenshotCommand}"/>
+        <KeyBinding Gesture="{OnPlatform Ctrl+C, macOS=Cmd+C}" Command="{Binding CopyScreenshotCommand}"/>
+    </Window.KeyBindings>
+
     <DockPanel>
         <controls:MainMenu
             DockPanel.Dock="Top"

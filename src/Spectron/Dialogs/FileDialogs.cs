@@ -128,4 +128,23 @@ public static class FileDialogs
             FileTypeChoices = [FileTypes.Mp4],
         });
     }
+
+    public static async Task<IStorageFile?> SaveScreenshotFileAsync(string? suggestedFileName = null)
+    {
+        var topLevel = TopLevel.GetTopLevel(MainWindow);
+
+        if (topLevel == null)
+        {
+            return null;
+        }
+
+        return await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Save Screenshot File",
+            DefaultExtension = ".png",
+            SuggestedFileName = suggestedFileName,
+            ShowOverwritePrompt = true,
+            FileTypeChoices = [FileTypes.Png],
+        });
+    }
 }

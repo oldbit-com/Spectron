@@ -18,25 +18,21 @@
     </UserControl.Resources>
 
     <Menu Focusable="False">
-        <MenuItem Header="_File" Padding="10 0 10 0" IsTabStop="False" Focusable="False">
-            <MenuItem Header="Load..." HotKey="Cmd+O" InputGesture="Cmd+O" Command="{Binding LoadFileCommand}"/>
+        <MenuItem Header="File" Padding="10 0 10 0" IsTabStop="False" Focusable="False">
+            <MenuItem Header="Load..." InputGesture="{OnPlatform Ctrl+O, macOS=Cmd+O}" Command="{Binding LoadFileCommand}"/>
             <MenuItem Header="Recent..." SubmenuOpened="RecentFilesSubmenuOpened">
                 <MenuItem/>
             </MenuItem>
-            <MenuItem Header="Save Snapshot..." HotKey="Cmd+S" InputGesture="Cmd+S" Command="{Binding SaveFileCommand}"/>
-            <MenuItem Header="Quick Save" HotKey="F5" InputGesture="F5" Command="{Binding QuickSaveCommand}"/>
-            <MenuItem Header="Quick Load" HotKey="F6" InputGesture="F6" Command="{Binding QuickLoadCommand}"/>
+            <MenuItem Header="Save Snapshot..." InputGesture="{OnPlatform Ctrl+S, macOS=Cmd+S}" Command="{Binding SaveFileCommand}"/>
+            <MenuItem Header="Quick Save" InputGesture="F5" Command="{Binding QuickSaveCommand}"/>
+            <MenuItem Header="Quick Load" InputGesture="F6" Command="{Binding QuickLoadCommand}"/>
             <MenuItem Header="-"/>
-            <MenuItem Header="Settings" HotKey="Cmd+," InputGesture="Cmd+," Command="{Binding ShowPreferencesViewCommand}"/>
+            <MenuItem Header="Settings" InputGesture="{OnPlatform Ctrl+S, macOS=Cmd+OemComma}" Command="{Binding ShowPreferencesViewCommand}"/>
             <MenuItem Header="-"/>
-            <MenuItem Header="Record Audio..." Command="{Binding StartAudioRecordingCommand}" IsEnabled="{Binding !RecordingStatus}"/>
-            <MenuItem Header="Record Video..." Command="{Binding StartVideoRecordingCommand}" IsEnabled="{Binding !RecordingStatus}"/>
-            <MenuItem Header="Stop Recording" Command="{Binding StopRecordingCommand}" IsEnabled="{Binding !!RecordingStatus}"/>
-            <MenuItem Header="-"/>
-            <MenuItem Header="Exit" Command="{Binding ExitApplicationCommand}" HotKey="Cmd+Q" InputGesture="Cmd+Q"/>
+            <MenuItem Header="Exit" Command="{Binding ExitApplicationCommand}" InputGesture="{OnPlatform Ctrl+F4, macOS=Cmd+Q}"/>
         </MenuItem>
 
-        <MenuItem Header="_Emulator" Padding="10 0 10 0" Focusable="False">
+        <MenuItem Header="Emulator" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="Machine">
                 <MenuItem Header="ZX Spectrum 16" ToggleType="Radio" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum16K}" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum16K}}"/>
                 <MenuItem Header="ZX Spectrum 48" ToggleType="Radio" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum48K}" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum48K}}"/>
@@ -63,7 +59,7 @@
             <MenuItem Header="Enable ULA+" ToggleType="CheckBox" Command="{Binding ToggleUlaPlus}" IsChecked="{Binding IsUlaPlusEnabled}"/>
         </MenuItem>
 
-        <MenuItem Header="_Control" Padding="10 0 10 0" Focusable="False">
+        <MenuItem Header="Control" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="Speed">
                 <MenuItem Header="25%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="25" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='25'}"/>
                 <MenuItem Header="50%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="50" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='50'}"/>
@@ -79,16 +75,27 @@
                 <MenuItem Header="Max" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="Max" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='Max'}"/>
             </MenuItem>
             <MenuItem Header="-"/>
-            <MenuItem Header="Pause" HotKey="F2" InputGesture="F2" Command="{Binding TogglePauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
-            <MenuItem Header="Time Machine" HotKey="F3" InputGesture="F3" Command="{Binding ShowTimeMachineViewCommand}"/>
+            <MenuItem Header="Pause" InputGesture="F2" Command="{Binding TogglePauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
+            <MenuItem Header="Time Machine" InputGesture="F3" Command="{Binding ShowTimeMachineViewCommand}"/>
             <MenuItem Header="-"/>
             <MenuItem Header="Mute" ToggleType="CheckBox" Command="{Binding ToggleMuteCommand}" IsChecked="{Binding IsMuted}"/>
             <MenuItem Header="-"/>
-            <MenuItem Header="Reset" InputGesture="Ctrl+F5" HotKey="Ctrl+F5" Command="{Binding ResetCommand}"/>
+            <MenuItem Header="Reset" InputGesture="Ctrl+F5" Command="{Binding ResetCommand}"/>
             <MenuItem Header="Hard Reset" Command="{Binding HardResetCommand}"/>
         </MenuItem>
 
-        <MenuItem Header="_View" Padding="10 0 10 0" Focusable="False">
+        <MenuItem Header="Tools" Padding="10 0 10 0" Focusable="False">
+            <MenuItem Header="Debugger" InputGesture="F11" Command="{Binding ShowDebuggerViewCommand}"/>
+            <MenuItem Header="-"/>
+            <MenuItem Header="Record Audio..." Command="{Binding StartAudioRecordingCommand}" IsEnabled="{Binding !RecordingStatus}"/>
+            <MenuItem Header="Record Video..." Command="{Binding StartVideoRecordingCommand}" IsEnabled="{Binding !RecordingStatus}"/>
+            <MenuItem Header="Stop Recording" Command="{Binding StopRecordingCommand}" IsEnabled="{Binding !!RecordingStatus}"/>
+            <MenuItem Header="-"/>
+            <MenuItem Header="Save Screenshot" Command="{Binding SaveScreenshotCommand}" InputGesture="{OnPlatform Ctrl+Shift+S, macOS=Cmd+Shift+S}"/>
+            <MenuItem Header="Copy Screenshot" Command="{Binding CopyScreenshotCommand}" InputGesture="{OnPlatform Ctrl+C, macOS=Cmd+C}"/>
+        </MenuItem>
+
+        <MenuItem Header="View" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="Border">
                 <MenuItem Header="None" ToggleType="Radio" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static screen:BorderSize.None}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static screen:BorderSize.None}}"/>
                 <MenuItem Header="Small" ToggleType="Radio" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static screen:BorderSize.Small}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static screen:BorderSize.Small}}"/>
@@ -97,14 +104,12 @@
                 <MenuItem Header="Full" ToggleType="Radio" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static screen:BorderSize.Full}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static screen:BorderSize.Full}}"/>
             </MenuItem>
             <MenuItem Header="-"/>
-            <MenuItem Header="Enter Full Screen" HotKey="Ctrl+Enter" InputGesture="Ctrl+Enter" Command="{Binding ToggleFullScreenCommand}"/>
-            <MenuItem Header="-"/>
-            <MenuItem Header="Debugger" HotKey="F11" InputGesture="F11" Command="{Binding ShowDebuggerViewCommand}"/>
+            <MenuItem Header="Enter Full Screen" InputGesture="Ctrl+Enter" Command="{Binding ToggleFullScreenCommand}"/>
         </MenuItem>
 
-        <MenuItem Header="_Tape" Padding="10 0 10 0" Focusable="False">
+        <MenuItem Header="Tape" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="New Tape" Command="{Binding TapeMenuViewModel.NewCommand}"/>
-            <MenuItem Header="Insert Tape" HotKey="Cmd+T" InputGesture="Cmd+T" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
+            <MenuItem Header="Insert Tape" InputGesture="Cmd+T" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
             <MenuItem Header="Save Tape" Command="{Binding TapeMenuViewModel.SaveCommand}"/>
             <MenuItem Header="-"/>
             <MenuItem Header="Play" Command="{Binding TapeMenuViewModel.PlayCommand}"/>
@@ -120,7 +125,7 @@
             </MenuItem>
         </MenuItem>
 
-        <MenuItem Header="_Help" Padding="10 0 10 0" Focusable="False">
+        <MenuItem Header="Help" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="Keyboard" InputGesture="F1" Command="{Binding ShowKeyboardHelpViewCommand}"/>
             <MenuItem Header="About" Command="{Binding ShowAboutViewCommand}"/>
         </MenuItem>

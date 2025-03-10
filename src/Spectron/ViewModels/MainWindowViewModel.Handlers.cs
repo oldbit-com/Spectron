@@ -522,4 +522,45 @@ partial class MainWindowViewModel
 
         Emulator?.Resume();
     }
+
+    private async Task HandleSaveScreenshotAsync()
+    {
+        if (SpectrumScreen == null)
+        {
+            return;
+        }
+
+        try
+        {
+            var file = await FileDialogs.SaveScreenshotFileAsync("screen.png");
+
+            if (file != null && Emulator != null)
+            {
+                SpectrumScreen.Save(file.Path.LocalPath, 100);
+            }
+        }
+        catch (Exception ex)
+        {
+            await MessageDialogs.Error(ex.Message);
+        }
+    }
+
+    private async Task HandleCopyScreenshotAsync()
+    {
+        Console.WriteLine("HandleCopyScreenshotAsync");
+        var clipboard = MainWindow?.Clipboard;
+
+        if (clipboard == null)
+        {
+            return;
+        }
+
+        using var stream = new MemoryStream();
+        SpectrumScreen?.Save(stream, 100);
+
+        var dataObject = new DataObject();
+       // dataObject.Set(DataFormats.Text, stream.);
+
+        //await clipboard.SetDataObjectAsync()
+    }
 }

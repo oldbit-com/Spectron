@@ -42,21 +42,18 @@
     <StackPanel>
         <Button
             ToolTip.Tip="Load File"
-            HotKey="Cmd+O"
             Command="{Binding LoadFileCommand}">
             <material:MaterialIcon Kind="Import"/>
         </Button>
 
         <Button
             ToolTip.Tip="Save Snapshot"
-            HotKey="Cmd+S"
             Command="{Binding SaveFileCommand}">
             <material:MaterialIcon Kind="Floppy"/>
         </Button>
 
         <Button
             ToolTip.Tip="Quick Save"
-            HotKey="F5"
             Command="{Binding QuickSaveCommand}">
             <material:MaterialIcon Kind="TransferLeft"/>
         </Button>
@@ -64,7 +61,6 @@
         <Button
             ToolTip.Tip="Quick Load"
             Margin="0 0 20 0"
-            HotKey="F6"
             Command="{Binding QuickLoadCommand}">
             <material:MaterialIcon Kind="TransferRight"/>
         </Button>
@@ -87,7 +83,6 @@
             ToolTip.Tip="Pause"
             Margin="0 20 0 0"
             Name="PauseButton"
-            HotKey="F2"
             IsChecked="{Binding IsPaused, Mode=OneWay}"
             Command="{Binding TogglePauseCommand}">
             <material:MaterialIcon Kind="Pause"/>
@@ -124,14 +119,12 @@
 
         <Button
             ToolTip.Tip="Time Machine"
-            HotKey="F3"
             Command="{Binding ShowTimeMachineViewCommand}">
             <material:MaterialIcon Kind="ClockTimeTenOutline"/>
         </Button>
 
         <Button
             ToolTip.Tip="Debugger"
-            HotKey="F11"
             Command="{Binding ShowDebuggerViewCommand}">
             <material:MaterialIcon Kind="Bug"/>
         </Button>
@@ -139,7 +132,6 @@
         <ToggleButton
             ToolTip.Tip="Toggle Full Screen"
             IsChecked="{Binding $parent[Window].WindowState, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static WindowState.FullScreen}}"
-            HotKey="Ctrl+Enter"
             Margin="0,10,0,0"
             Command="{Binding ToggleFullScreenCommand}">
             <material:MaterialIcon Kind="Fullscreen"/>
@@ -147,7 +139,6 @@
 
         <Button
             ToolTip.Tip="Preferences"
-            HotKey="Cmd+,"
             Margin="0,10,0,0"
             Command="{Binding ShowPreferencesViewCommand}">
             <material:MaterialIcon Kind="Settings"/>
