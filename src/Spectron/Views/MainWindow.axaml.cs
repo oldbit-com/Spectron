@@ -39,6 +39,9 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             action(ViewModel!.ShowPreferencesView
                 .RegisterHandler(ShowDialogAsync<PreferencesViewModel, Preferences, PreferencesView>));
 
+            action(ViewModel!.ShowScreenshotView
+                .RegisterHandler(Show<ScreenshotViewModel, Unit?, ScreenshotView>));
+
             action(ViewModel!.ShowSelectFileView
                 .RegisterHandler(ShowDialogAsync<SelectFileViewModel, ArchiveEntry?, SelectFileView>));
 

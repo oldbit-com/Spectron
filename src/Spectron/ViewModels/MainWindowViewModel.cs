@@ -64,6 +64,7 @@ public partial class MainWindowViewModel : ReactiveObject
     private MediaRecorder? _mediaRecorder;
     private bool _canClose;
     private DebuggerViewModel? _debuggerViewModel;
+    private readonly ScreenshotViewModel _screenshotViewModel = new();
 
     public Control ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }
@@ -108,8 +109,8 @@ public partial class MainWindowViewModel : ReactiveObject
     public ReactiveCommand<Unit, Task> StartAudioRecordingCommand { get; private set; }
     public ReactiveCommand<Unit, Task> StartVideoRecordingCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> StopRecordingCommand { get; private set; }
-    public ReactiveCommand<Unit, Task> SaveScreenshotCommand { get; private set; }
-    public ReactiveCommand<Unit, Task> CopyScreenshotCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> ShowScreenshotViewerCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> TakeScreenshotCommand { get; private set; }
 
     // View
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
@@ -129,6 +130,7 @@ public partial class MainWindowViewModel : ReactiveObject
     public Interaction<PreferencesViewModel, Preferences?> ShowPreferencesView { get; }
     public Interaction<SelectFileViewModel, ArchiveEntry?> ShowSelectFileView { get; }
     public Interaction<TimeMachineViewModel, TimeMachineEntry?> ShowTimeMachineView { get; }
+    public Interaction<ScreenshotViewModel, Unit?> ShowScreenshotView { get; }
 
     public MainWindowViewModel(
         EmulatorFactory emulatorFactory,
@@ -216,8 +218,8 @@ public partial class MainWindowViewModel : ReactiveObject
         StartAudioRecordingCommand = ReactiveCommand.Create(HandleStartAudioRecordingAsync);
         StartVideoRecordingCommand = ReactiveCommand.Create(HandleStartVideoRecordingAsync);
         StopRecordingCommand = ReactiveCommand.Create(HandleStopRecording);
-        SaveScreenshotCommand = ReactiveCommand.Create(HandleSaveScreenshotAsync);
-        CopyScreenshotCommand = ReactiveCommand.Create(HandleCopyScreenshotAsync);
+        ShowScreenshotViewerCommand = ReactiveCommand.Create(OpenScreenshotViewer);
+        TakeScreenshotCommand = ReactiveCommand.Create(HandleTakeScreenshot);
 
         // View
         ToggleFullScreenCommand = ReactiveCommand.Create(HandleToggleFullScreen);
@@ -237,6 +239,7 @@ public partial class MainWindowViewModel : ReactiveObject
         ShowPreferencesView = new Interaction<PreferencesViewModel, Preferences?>();
         ShowSelectFileView = new Interaction<SelectFileViewModel, ArchiveEntry?>();
         ShowTimeMachineView = new Interaction<TimeMachineViewModel, TimeMachineEntry?>();
+        ShowScreenshotView = new Interaction<ScreenshotViewModel, Unit?>();
 
         SpectrumScreen = _frameBufferConverter.ScreenBitmap;
 
@@ -340,6 +343,9 @@ public partial class MainWindowViewModel : ReactiveObject
             }
         }
     }
+
+    private async Task OpenScreenshotViewer() =>
+        await ShowScreenshotView.Handle(_screenshotViewModel);
 
     private void StatusBarTimerOnElapsed(object? sender, ElapsedEventArgs e)
     {

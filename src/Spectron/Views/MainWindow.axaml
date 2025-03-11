@@ -54,8 +54,8 @@
         <KeyBinding Gesture="{OnPlatform Ctrl+F4, macOS=Cmd+Q}" Command="{Binding ExitApplicationCommand}"/>
         <KeyBinding Gesture="{OnPlatform Ctrl+T, macOS=Cmd+T}" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
         <KeyBinding Gesture="{OnPlatform Ctrl+P, macOS=Cmd+OemComma}" Command="{Binding ShowPreferencesViewCommand}"/>
-        <KeyBinding Gesture="{OnPlatform Ctrl+Shift+S, macOS=Cmd+Shift+S}" Command="{Binding CopyScreenshotCommand}"/>
-        <KeyBinding Gesture="{OnPlatform Ctrl+C, macOS=Cmd+C}" Command="{Binding CopyScreenshotCommand}"/>
+        <KeyBinding Gesture="{OnPlatform Ctrl+Shift+S, macOS=Cmd+Shift+S}" Command="{Binding ShowScreenshotViewerCommand}"/>
+        <KeyBinding Gesture="{OnPlatform Ctrl+C, macOS=Cmd+C}" Command="{Binding TakeScreenshotCommand}"/>
     </Window.KeyBindings>
 
     <DockPanel>

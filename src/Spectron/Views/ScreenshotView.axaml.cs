@@ -3,9 +3,9 @@ using Avalonia.Input;
 
 namespace OldBit.Spectron.Views;
 
-public partial class AboutView : Window
+public partial class ScreenshotView : Window
 {
-    public AboutView() => InitializeComponent();
+    public ScreenshotView() => InitializeComponent();
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
