@@ -1,0 +1,68 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+        xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
+        xmlns:material="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        x:DataType="viewModels:ScreenshotViewModel"
+        x:Class="OldBit.Spectron.Views.ScreenshotView"
+        Title="Screenshots"
+        Width="640" Height="600"
+        WindowStartupLocation="CenterOwner"
+        Focusable="True">
+
+    <Window.Resources>
+        <converters:ScreenshotBytesToImageConverter x:Key="ScreenshotBytesToImageConverter"/>
+    </Window.Resources>
+
+    <Window.Styles>
+        <Style Selector="Border:pointerover.current">
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"/>
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer>
+        <ItemsControl ItemsSource="{Binding Screenshots}" HorizontalAlignment="Center">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border
+                        Classes="current"
+                        BorderBrush="{DynamicResource SystemAccentColorDark3}"
+                        BorderThickness="5"
+                        CornerRadius="4"
+                        Margin="4">
+                        <Grid>
+                            <Image
+                                Width="300"
+                                Stretch="Uniform"
+                                Source="{Binding Data, Converter={StaticResource ScreenshotBytesToImageConverter}}"/>
+                            <StackPanel
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Bottom"
+                                Margin="2">
+                                <Button Padding="2" Margin="0" ToolTip.Tip="Save"
+                                        Command="{Binding $parent[ItemsControl].((viewModels:ScreenshotViewModel)DataContext).SaveCommand, FallbackValue={x:Null}}"
+                                        CommandParameter="{Binding}">
+                                    <material:MaterialIcon Kind="ContentSave"/>
+                                </Button>
+                                <Button Padding="2" Margin="0" ToolTip.Tip="Remove"
+                                        Command="{Binding $parent[ItemsControl].((viewModels:ScreenshotViewModel)DataContext).RemoveCommand, FallbackValue={x:Null}}"
+                                        CommandParameter="{Binding}">
+                                    <material:MaterialIcon Kind="Remove" Foreground="Red"/>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </ScrollViewer>
+</Window>

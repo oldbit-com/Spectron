@@ -8,49 +8,23 @@ internal sealed class ContentionProvider(int firstPixelTick, int ticksPerLine) :
     private static readonly int[] ContentionPattern = [6, 5, 4, 3, 2, 1, 0, 0];
     private readonly int[] _contentionTable = BuildContentionTable(firstPixelTick, ticksPerLine);
 
-    internal int MemoryBankId { get; set; }
+    internal int ActiveRamBankId { get; set; }
 
-    public int GetMemoryContention(int ticks, Word address)
-    {
-        if (!IsAddressContended(address))
-        {
-            return 0;
-        }
+    public int GetMemoryContention(int ticks, Word address) =>
+        ticks < _contentionTable.Length ? _contentionTable[ticks] : 0;
 
-        if (ticks < _contentionTable.Length && ticks >= firstPixelTick)
-        {
-            return _contentionTable[ticks];
-        }
+    public int GetPortContention(int ticks, Word port) =>
+        ticks < _contentionTable.Length ? _contentionTable[ticks] : 0;
 
-        return 0;
-    }
+    public bool IsAddressContended(Word address) =>
+        address is >= 0x4000 and <= 0x7FFF ||
+        address >= 0xC000 && IsRamBankContended;
 
-    public int GetPortContention(int ticks, Word port)
-    {
-        if (!IsAddressContended(port))
-        {
-            return 0;
-        }
+    public bool IsPortContended(Word port) =>
+        port is >= 0x4000 and <= 0x7FFF ||
+        port >= 0xC000 && IsRamBankContended;
 
-        return ticks < _contentionTable.Length ? _contentionTable[ticks] : 0;
-    }
-
-    private bool IsAddressContended(Word address)
-    {
-        if (address < 0x4000)
-        {
-            return false;
-        }
-
-        switch (MemoryBankId)
-        {
-            case 0 when address > 0x7fff:
-            case 1 or 3 or 5 or 7 when address > 0xBFFF:
-                return false;
-        }
-
-        return true;
-    }
+    private bool IsRamBankContended => (ActiveRamBankId & 0x01) == 0x01;  // Bank 1, 3, 5 or 7
 
     private static int[] BuildContentionTable(int firstPixelTick, int ticksPerLine)
     {

@@ -123,29 +123,6 @@ partial class MainWindowViewModel
         return (stream, fileType);
     }
 
-    private bool CreateEmulator(Stream stream, FileType fileType)
-    {
-        Emulator? emulator = null;
-
-        if (fileType.IsSnapshot())
-        {
-            emulator = _snapshotManager.Load(stream, fileType);
-        }
-        else if (fileType.IsTape())
-        {
-            emulator = _loader.EnterLoadCommand(ComputerType);
-            emulator.TapeManager.InsertTape(stream, fileType,
-                _preferences.TapeSettings.IsAutoPlayEnabled && TapeLoadSpeed != TapeSpeed.Instant);
-        }
-
-        if (emulator != null)
-        {
-            InitializeEmulator(emulator);
-        }
-
-        return emulator != null;
-    }
-
     private async Task HandleSaveFileAsync()
     {
         var shouldResume = !IsPaused;
@@ -388,7 +365,7 @@ partial class MainWindowViewModel
         UpdateWindowTitle();
     }
 
-    private void Pause()
+    private void Pause(bool showOverlay = true)
     {
         if (IsPaused)
         {
@@ -397,12 +374,18 @@ partial class MainWindowViewModel
 
         Emulator?.Pause();
         IsPaused = true;
+
+        if (showOverlay)
+        {
+            IsPauseOverlayVisible = true;
+        }
     }
 
     private void Resume()
     {
         Emulator?.Resume();
         IsPaused = false;
+        IsPauseOverlayVisible = false;
     }
 
     private void HandleTogglePause()
@@ -539,4 +522,6 @@ partial class MainWindowViewModel
 
         Emulator?.Resume();
     }
+
+    private void HandleTakeScreenshot() => _screenshotViewModel.AddScreenshot(SpectrumScreen);
 }

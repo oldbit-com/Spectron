@@ -88,11 +88,13 @@ public sealed class Emulator
         UlaPlus = new UlaPlus();
         _spectrumBus = new SpectrumBus();
         ScreenBuffer = new ScreenBuffer(hardware, emulatorArgs.Memory, UlaPlus);
-        Cpu = new Z80(emulatorArgs.Memory, emulatorArgs.ContentionProvider)
+        Cpu = new Z80(emulatorArgs.Memory)
         {
             Clock =
             {
-                DefaultFrameTicks = hardware.TicksPerFrame
+                DefaultFrameTicks = hardware.TicksPerFrame,
+                InterruptDuration = hardware.InterruptDuration,
+                ContentionProvider = emulatorArgs.ContentionProvider
             }
         };
 
@@ -173,7 +175,7 @@ public sealed class Emulator
     private void SetupEventHandlers()
     {
         _memory.ScreenMemoryUpdated += address => ScreenBuffer.UpdateScreen(address);
-        Cpu.Clock.TicksAdded += (_, _, currentFrameTicks) => ScreenBuffer.UpdateContent(currentFrameTicks);
+        Cpu.Clock.TicksAdded += (_, previousFrameTicks, _) => ScreenBuffer.UpdateContent(previousFrameTicks);
         Cpu.BeforeInstruction += BeforeInstruction;
         UlaPlus.ActiveChanged += (_) => _invalidateScreen = true;
     }
@@ -198,7 +200,6 @@ public sealed class Emulator
     {
         StartFrame();
 
-        Cpu.TriggerInt(0xFF);
         Cpu.Run();
 
         EndFrame();
@@ -279,12 +280,9 @@ public sealed class Emulator
 
                 break;
 
-            case 0x1AF1:
-            case RomRoutines.SAVE_ETC:
-                // var szx = SzxSnapshot.CreateSnapshot(this);
-                // szx.Save("/Users/voytas/Projects/ZX/Spectron/src/Spectron.Emulation/Tape/Loader/Files/128.szx");
-
-                break;
+            // case 0x1AF1:
+            // case RomRoutines.SAVE_ETC:
+            //    break;
         }
     }
 }

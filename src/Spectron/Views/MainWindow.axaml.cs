@@ -39,6 +39,9 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             action(ViewModel!.ShowPreferencesView
                 .RegisterHandler(ShowDialogAsync<PreferencesViewModel, Preferences, PreferencesView>));
 
+            action(ViewModel!.ShowScreenshotView
+                .RegisterHandler(Show<ScreenshotViewModel, Unit?, ScreenshotView>));
+
             action(ViewModel!.ShowSelectFileView
                 .RegisterHandler(ShowDialogAsync<SelectFileViewModel, ArchiveEntry?, SelectFileView>));
 
@@ -77,6 +80,7 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         }
 
         var view = new TView { DataContext = context.Input };
+
         view.Closed += (_, _) =>
         {
             if (!_windows.TryGetValue(viewType, out var closedWindow))
@@ -90,6 +94,8 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             }
 
             _windows.Remove(viewType);
+
+            _viewModel?.OnViewClosed(context.Input);
         };
 
         _windows.Add(viewType, view);

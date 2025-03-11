@@ -13,5 +13,9 @@
             <_Parameter1>OldBit.Spectron.Disassembly.Tests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="OldBit.Z80Cpu.Spectron" Version="0.9.3-pre.7" />
+    </ItemGroup>
     
 </Project>

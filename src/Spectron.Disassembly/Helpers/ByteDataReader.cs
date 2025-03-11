@@ -1,10 +1,10 @@
 namespace OldBit.Spectron.Disassembly.Helpers;
 
-internal sealed class ByteDataReader(byte[] data, int address)
+internal sealed class ByteDataReader(byte[] data, int address) : IDataReader
 {
-    internal int Address { get; private set; } = address;
+    public int Address { get; set; } = address;
 
-    internal byte ReadeByte()
+    public byte ReadeByte()
     {
         var value = data[Address];
 
@@ -18,17 +18,9 @@ internal sealed class ByteDataReader(byte[] data, int address)
         return value;
     }
 
-    internal byte PeekByte(int address) => data[address % 65536];
+    public byte PeekByte(int address) => data[address % 65536];
 
-    internal Word ReadWord()
-    {
-        var lowByte = ReadeByte();
-        var highByte = ReadeByte();
-
-        return (Word)(lowByte | (highByte << 8));
-    }
-
-    internal IEnumerable<byte> GetRange(int start, int count)
+    public IEnumerable<byte> GetRange(int start, int count)
     {
         for (var i = start; i < start + count; i++)
         {

@@ -86,18 +86,18 @@ internal sealed class FrameBufferConverter : IDisposable
             _ => BorderSizes.Full,
         };
 
-        _startFrameBufferRow = BorderSizes.Full.Top - _border.Top;
-        _endFrameBufferRow = FrameBuffer.Height - (BorderSizes.Full.Bottom - _border.Bottom) - 1;
-        _startFrameBufferCol = BorderSizes.Full.Left - _border.Left;
-        _endFrameBufferCol = FrameBuffer.Width - (BorderSizes.Full.Right - _border.Right) - 1;
+        _startFrameBufferRow = BorderSizes.Max.Top - _border.Top;
+        _endFrameBufferRow = FrameBuffer.Height - (BorderSizes.Max.Bottom - _border.Bottom) - 1;
+        _startFrameBufferCol = BorderSizes.Max.Left - _border.Left;
+        _endFrameBufferCol = FrameBuffer.Width - (BorderSizes.Max.Right - _border.Right) - 1;
 
         ScreenBitmap = CreateBitmap();
     }
 
     private WriteableBitmap CreateBitmap()
     {
-        var height = FrameBuffer.Height - (BorderSizes.Full.Top - _border.Top) - (BorderSizes.Full.Bottom - _border.Bottom);
-        var width = FrameBuffer.Width - (BorderSizes.Full.Left - _border.Left) - (BorderSizes.Full.Right - _border.Right);
+        var height = FrameBuffer.Height - (BorderSizes.Max.Top - _border.Top) - (BorderSizes.Max.Bottom - _border.Bottom);
+        var width = FrameBuffer.Width - (BorderSizes.Max.Left - _border.Left) - (BorderSizes.Max.Right - _border.Right);
 
         return new WriteableBitmap(
             new PixelSize(

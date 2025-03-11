@@ -1,53 +1,52 @@
 using OldBit.Spectron.Disassembly.Formatters;
 using OldBit.Spectron.Disassembly.Helpers;
 using OldBit.Spectron.Disassembly.Instructions;
+using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Disassembly;
 
-/// <summary>
-/// Represents a disassembler that can be used to disassemble Z80 machine code.
-/// </summary>
 public sealed class Disassembler
 {
-    private readonly ByteDataReader _byteDataReader;
+    private readonly IDataReader _dataReader;
     private readonly NumberFormatter _numberFormatter;
     private readonly int _maxCount;
 
     private IndexContext _indexContext = IndexContext.None;
     private int _address;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Disassembler"/> class.
-    /// </summary>
-    /// <param name="data">The byte data to disassemble.</param>
-    /// <param name="startAddress">The start address for disassembly.</param>
-    /// <param name="maxCount">The maximum number of instructions to disassemble.</param>
-    /// <param name="options">The options to configure the disassembler.</param>
-    public Disassembler(byte[] data,
-        int startAddress,
-        int maxCount,
-        DisassemblerOptions? options = null)
+    private Disassembler(IDataReader dataReader, int maxCount, DisassemblerOptions? options = null)
     {
-        _byteDataReader = new ByteDataReader(data, startAddress);
+        _dataReader = dataReader;
         _numberFormatter = new NumberFormatter(options?.NumberFormat ?? NumberFormat.HexDollarPrefix);
 
         _maxCount = maxCount;
-        _address = _byteDataReader.Address;
+        _address = _dataReader.Address;
     }
 
-    /// <summary>
-    /// Disassembles the memory and returns a list of instructions.
-    /// </summary>
-    /// <returns>A list of disassembled instructions.</returns>
-    public List<Instruction> Disassemble()
+    public Disassembler(byte[] data, int startAddress, int maxCount, DisassemblerOptions? options = null) :
+        this(new ByteDataReader(data, startAddress), maxCount, options)
     {
+    }
+
+    public Disassembler(IMemory memory, int startAddress, int maxCount, DisassemblerOptions? options = null) :
+        this(new MemoryDataReader(memory, startAddress), maxCount, options)
+    {
+    }
+
+    public List<Instruction> Disassemble(Word? startAddress = null)
+    {
+        if (startAddress.HasValue)
+        {
+            _dataReader.Address = startAddress.Value;
+        }
+
         var instructions = new List<Instruction>();
 
         while (instructions.Count < _maxCount)
         {
-            var byteCode = _byteDataReader.ReadeByte();
+            var byteCode = _dataReader.ReadeByte();
 
-            Instruction? instruction = null;
+            Instruction? instruction;
 
             switch (byteCode)
             {
@@ -89,7 +88,7 @@ public sealed class Disassembler
 
             instructions.Add(instruction);
 
-            _address = _byteDataReader.Address;
+            _address = _dataReader.Address;
             _indexContext = IndexContext.None;
         }
 
@@ -105,14 +104,14 @@ public sealed class Disassembler
 
         var instruction = new Instruction(_address, "NOP?", true)
         {
-            ByteCodes = _byteDataReader
-                .GetRange(_address, _byteDataReader.Address - _address - 1)
+            ByteCodes = _dataReader
+                .GetRange(_address, _dataReader.Address - _address - 1)
                 .ToArray()
         };
 
         instructions.Add(instruction);
 
-        _address = _byteDataReader.Address - 1;
+        _address = _dataReader.Address - 1;
     }
 
     private Instruction ProcessMainInstruction(int byteCode)
@@ -144,15 +143,15 @@ public sealed class Disassembler
 
         if (_indexContext is IndexContext.IX or IndexContext.IY)
         {
-            var byteCode = _byteDataReader.PeekByte(_byteDataReader.Address + 1);
+            var byteCode = _dataReader.PeekByte(_dataReader.Address + 1);
             var template = IndexBitShiftRotateInstructions.Index[byteCode];
 
             instruction = CreateInstruction(template);
-            _byteDataReader.ReadeByte(); // instruction code was peeked above, skip it
+            _dataReader.ReadeByte(); // instruction code was peeked above, skip it
         }
         else
         {
-            var byteCode = _byteDataReader.ReadeByte();
+            var byteCode = _dataReader.ReadeByte();
             var template = BitShiftRotateInstructions.Index[byteCode];
 
             instruction = CreateInstruction(template);
@@ -165,7 +164,7 @@ public sealed class Disassembler
 
     private Instruction? ProcessExtendedInstruction()
     {
-        var byteCode = _byteDataReader.ReadeByte();
+        var byteCode = _dataReader.ReadeByte();
 
         if (!ExtendedInstructions.Index.TryGetValue(byteCode, out var template))
         {
@@ -178,14 +177,14 @@ public sealed class Disassembler
         return instruction;
     }
 
-    private byte[] GetByteCodes => _byteDataReader
-        .GetRange(_address, _byteDataReader.Address - _address)
+    private byte[] GetByteCodes => _dataReader
+        .GetRange(_address, _dataReader.Address - _address)
         .ToArray();
 
     private Instruction CreateInstruction(InstructionTemplate template) => new(
         _address,
         template,
-        _byteDataReader,
+        _dataReader,
         _numberFormatter,
         _indexContext);
 }

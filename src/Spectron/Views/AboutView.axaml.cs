@@ -5,10 +5,7 @@ namespace OldBit.Spectron.Views;
 
 public partial class AboutView : Window
 {
-    public AboutView()
-    {
-        InitializeComponent();
-    }
+    public AboutView() => InitializeComponent();
 
     protected override void OnKeyDown(KeyEventArgs e)
     {

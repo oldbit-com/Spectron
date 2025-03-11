@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
@@ -28,7 +28,6 @@ using OldBit.Spectron.Emulation.Tape.Loader;
 using OldBit.Spectron.Extensions;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
-using OldBit.Spectron.Files.Szx;
 using OldBit.Spectron.Recorder;
 using OldBit.Spectron.Screen;
 using OldBit.Spectron.Theming;
@@ -64,6 +63,8 @@ public partial class MainWindowViewModel : ReactiveObject
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
     private MediaRecorder? _mediaRecorder;
     private bool _canClose;
+    private DebuggerViewModel? _debuggerViewModel;
+    private readonly ScreenshotViewModel _screenshotViewModel = new();
 
     public Control ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }
@@ -79,41 +80,57 @@ public partial class MainWindowViewModel : ReactiveObject
     public ReactiveCommand<KeyEventArgs, Unit> KeyDownCommand { get; private set; }
     public ReactiveCommand<KeyEventArgs, Unit> KeyUpCommand { get; private set; }
 
+    public ReactiveCommand<Unit, Unit> TimeMachineResumeEmulatorCommand  { get; private set; }
+
+    // File
     public ReactiveCommand<Unit, Task> LoadFileCommand { get; private set; }
     public ReactiveCommand<Unit, Task> SaveFileCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> QuickSaveCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> QuickLoadCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> ShowPreferencesViewCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ExitApplicationCommand { get; private set; }
+
+    // Emulator
+    public ReactiveCommand<ComputerType, Unit> ChangeComputerType { get; private set; }
+    public ReactiveCommand<RomType, Unit> ChangeRomCommand { get; private set; }
+    public ReactiveCommand<JoystickType, Unit> ChangeJoystickType { get; private set; }
+    public ReactiveCommand<Unit, Unit> ToggleUlaPlus { get; private set; }
+
+    // Control
+    public ReactiveCommand<string, Unit> SetEmulationSpeedCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> TogglePauseCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> ShowTimeMachineViewCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ToggleMuteCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ResetCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> HardResetCommand { get; private set; }
+
+    // Tools
+    public ReactiveCommand<Unit, Task> ShowDebuggerViewCommand { get; private set; }
     public ReactiveCommand<Unit, Task> StartAudioRecordingCommand { get; private set; }
     public ReactiveCommand<Unit, Task> StartVideoRecordingCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> StopRecordingCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> ExitApplicationCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> ShowScreenshotViewerCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> TakeScreenshotCommand { get; private set; }
 
+    // View
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
-    public ReactiveCommand<RomType, Unit> ChangeRomCommand { get; private set; }
-    public ReactiveCommand<ComputerType, Unit> ChangeComputerType { get; private set; }
-    public ReactiveCommand<JoystickType, Unit> ChangeJoystickType { get; private set; }
-    public ReactiveCommand<Unit, Unit> ToggleUlaPlus { get; private set; }
-    public ReactiveCommand<Unit, Unit> ResetCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> HardResetCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> TogglePauseCommand { get; private set; }
-    public ReactiveCommand<string, Unit> SetEmulationSpeedCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleFullScreenCommand { get; private set; }
+
+    // Tape
     public ReactiveCommand<TapeSpeed, Unit> SetTapeLoadSpeedCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> ToggleMuteCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> TimeMachineResumeEmulatorCommand  { get; private set; }
 
+    // Help
     public ReactiveCommand<Unit, Task> ShowAboutViewCommand { get; private set; }
-    public ReactiveCommand<Unit, Task> ShowDebuggerViewCommand { get; private set; }
     public ReactiveCommand<Unit, Task> ShowKeyboardHelpViewCommand { get; private set; }
-    public ReactiveCommand<Unit, Task> ShowPreferencesViewCommand { get; private set; }
-    public ReactiveCommand<Unit, Task> ShowTimeMachineViewCommand { get; private set; }
 
+    // Interactions
     public Interaction<Unit, Unit?> ShowAboutView { get; }
     public Interaction<DebuggerViewModel, Unit?> ShowDebuggerView { get; }
     public Interaction<Unit, Unit?> ShowKeyboardHelpView { get; }
     public Interaction<PreferencesViewModel, Preferences?> ShowPreferencesView { get; }
     public Interaction<SelectFileViewModel, ArchiveEntry?> ShowSelectFileView { get; }
     public Interaction<TimeMachineViewModel, TimeMachineEntry?> ShowTimeMachineView { get; }
+    public Interaction<ScreenshotViewModel, Unit?> ShowScreenshotView { get; }
 
     public MainWindowViewModel(
         EmulatorFactory emulatorFactory,
@@ -172,46 +189,70 @@ public partial class MainWindowViewModel : ReactiveObject
         WindowClosingCommand = ReactiveCommand.CreateFromTask<WindowClosingEventArgs>(WindowClosingAsync);
         KeyDownCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyDown);
         KeyUpCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyUp);
+        TimeMachineResumeEmulatorCommand = ReactiveCommand.Create(HandleTimeMachineResumeEmulator);
 
+        // File
         LoadFileCommand = ReactiveCommand.Create(HandleLoadFileAsync);
         SaveFileCommand = ReactiveCommand.Create(HandleSaveFileAsync);
         QuickSaveCommand = ReactiveCommand.Create(HandleQuickSave);
         QuickLoadCommand = ReactiveCommand.Create(HandleQuickLoad);
+        ShowPreferencesViewCommand = ReactiveCommand.Create(OpenPreferencesWindow);
+        ExitApplicationCommand = ReactiveCommand.Create(() => MainWindow?.Close());
+
+        // Machine
+        ChangeComputerType = ReactiveCommand.Create<ComputerType>(HandleChangeComputerType);
+        ChangeRomCommand = ReactiveCommand.Create<RomType>(HandleChangeRom);
+        ChangeJoystickType = ReactiveCommand.Create<JoystickType>(HandleChangeJoystickType);
+        ToggleUlaPlus = ReactiveCommand.Create(HandleToggleUlaPlus);
+
+        // Control
+        SetEmulationSpeedCommand = ReactiveCommand.Create<string>(HandleSetEmulationSpeed);
+        TogglePauseCommand = ReactiveCommand.Create(HandleTogglePause);
+        ShowTimeMachineViewCommand = ReactiveCommand.Create(OpenTimeMachineWindow, timeMachineEnabled);
+        ToggleMuteCommand = ReactiveCommand.Create(HandleToggleMute);
+        ResetCommand = ReactiveCommand.Create(HandleMachineReset);
+        HardResetCommand = ReactiveCommand.Create(HandleMachineHardReset);
+
+        // Tools
+        ShowDebuggerViewCommand = ReactiveCommand.Create(OpenDebuggerWindow);
         StartAudioRecordingCommand = ReactiveCommand.Create(HandleStartAudioRecordingAsync);
         StartVideoRecordingCommand = ReactiveCommand.Create(HandleStartVideoRecordingAsync);
         StopRecordingCommand = ReactiveCommand.Create(HandleStopRecording);
-        ExitApplicationCommand = ReactiveCommand.Create(() => MainWindow?.Close());
+        ShowScreenshotViewerCommand = ReactiveCommand.Create(OpenScreenshotViewer);
+        TakeScreenshotCommand = ReactiveCommand.Create(HandleTakeScreenshot);
 
-        ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
-        ChangeRomCommand = ReactiveCommand.Create<RomType>(HandleChangeRom);
-        ChangeComputerType = ReactiveCommand.Create<ComputerType>(HandleChangeComputerType);
-        ChangeJoystickType = ReactiveCommand.Create<JoystickType>(HandleChangeJoystickType);
-        ToggleUlaPlus = ReactiveCommand.Create(HandleToggleUlaPlus);
-        TogglePauseCommand = ReactiveCommand.Create(HandleTogglePause);
-        ResetCommand = ReactiveCommand.Create(HandleMachineReset);
-        HardResetCommand = ReactiveCommand.Create(HandleMachineHardReset);
-        SetEmulationSpeedCommand = ReactiveCommand.Create<string>(HandleSetEmulationSpeed);
+        // View
         ToggleFullScreenCommand = ReactiveCommand.Create(HandleToggleFullScreen);
+        ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
+
+        // Tape
         SetTapeLoadSpeedCommand = ReactiveCommand.Create<TapeSpeed>(HandleSetTapeLoadingSpeed);
-        ToggleMuteCommand = ReactiveCommand.Create(HandleToggleMute);
-        TimeMachineResumeEmulatorCommand = ReactiveCommand.Create(HandleTimeMachineResumeEmulator);
 
+        // Help
         ShowAboutViewCommand = ReactiveCommand.Create(OpenAboutWindow);
-        ShowDebuggerViewCommand = ReactiveCommand.Create(OpenDebuggerWindow);
         ShowKeyboardHelpViewCommand = ReactiveCommand.Create(ShowKeyboardHelpWindow);
-        ShowPreferencesViewCommand = ReactiveCommand.Create(OpenPreferencesWindow);
-        ShowTimeMachineViewCommand = ReactiveCommand.Create(OpenTimeMachineWindow, timeMachineEnabled);
 
+        // Interactions
         ShowAboutView = new Interaction<Unit, Unit?>();
         ShowDebuggerView = new Interaction<DebuggerViewModel, Unit?>();
         ShowKeyboardHelpView = new Interaction<Unit, Unit?>();
         ShowPreferencesView = new Interaction<PreferencesViewModel, Preferences?>();
         ShowSelectFileView = new Interaction<SelectFileViewModel, ArchiveEntry?>();
         ShowTimeMachineView = new Interaction<TimeMachineViewModel, TimeMachineEntry?>();
+        ShowScreenshotView = new Interaction<ScreenshotViewModel, Unit?>();
 
         SpectrumScreen = _frameBufferConverter.ScreenBitmap;
 
         tapeManager.TapeStateChanged += HandleTapeStateChanged;
+    }
+
+    public void OnViewClosed(object? viewModel)
+    {
+        if (viewModel is DebuggerViewModel)
+        {
+            Resume();
+            _debuggerViewModel = null;
+        }
     }
 
     private async Task OpenAboutWindow() => await ShowAboutView.Handle(Unit.Default);
@@ -220,15 +261,15 @@ public partial class MainWindowViewModel : ReactiveObject
     {
         if (!IsPaused)
         {
-            Pause();
+            Pause(showOverlay: false);
         }
 
-        var viewModel = new DebuggerViewModel(_debuggerContext, Emulator!);
+        _debuggerViewModel = new DebuggerViewModel(_debuggerContext, Emulator!);
 
         this.WhenAny(x => x.IsPaused, x => x.Value)
-            .Subscribe(isPaused => viewModel.HandlePause(isPaused));
+            .Subscribe(isPaused => _debuggerViewModel?.HandlePause(isPaused));
 
-        await ShowDebuggerView.Handle(viewModel);
+        await ShowDebuggerView.Handle(_debuggerViewModel);
     }
 
     private async Task ShowKeyboardHelpWindow() => await ShowKeyboardHelpView.Handle(Unit.Default);
@@ -302,6 +343,9 @@ public partial class MainWindowViewModel : ReactiveObject
             }
         }
     }
+
+    private async Task OpenScreenshotViewer() =>
+        await ShowScreenshotView.Handle(_screenshotViewModel);
 
     private void StatusBarTimerOnElapsed(object? sender, ElapsedEventArgs e)
     {
@@ -416,6 +460,30 @@ public partial class MainWindowViewModel : ReactiveObject
         InitializeEmulator(emulator);
     }
 
+    private bool CreateEmulator(Stream stream, FileType fileType)
+    {
+        Emulator? emulator = null;
+
+        if (fileType.IsSnapshot())
+        {
+            emulator = _snapshotManager.Load(stream, fileType);
+        }
+        else if (fileType.IsTape())
+        {
+            emulator = _loader.EnterLoadCommand(ComputerType);
+            emulator.TapeManager.InsertTape(stream, fileType,
+                _preferences.TapeSettings.IsAutoPlayEnabled && TapeLoadSpeed != TapeSpeed.Instant);
+            emulator.SetUlaPlus(_preferences.IsUlaPlusEnabled);
+        }
+
+        if (emulator != null)
+        {
+            InitializeEmulator(emulator);
+        }
+
+        return emulator != null;
+    }
+
     private void InitializeEmulator(Emulator emulator)
     {
         ShutdownEmulator();
@@ -445,8 +513,9 @@ public partial class MainWindowViewModel : ReactiveObject
 
         Emulator.CommandManager.CommandReceived += CommandManagerOnCommandReceived;
 
-        Emulator.Start();
+        _debuggerViewModel?.ConfigureEmulator(Emulator);
 
+        Emulator.Start();
         _statusBarTimer.Start();
     }
 

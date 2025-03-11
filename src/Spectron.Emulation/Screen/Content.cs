@@ -12,6 +12,12 @@ internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer
     private bool _isFlashOnFrame;
     private int _fetchCycleIndex;
 
+    /// <summary>
+    /// Updates the frame buffer with the content of the screen at the specified frame ticks. This allows
+    /// proper rendering of the special multicolor effects.
+    /// Uses a lookup table to determine the screen byte and attribute address for the current frame tick.
+    /// </summary>
+    /// <param name="frameTicks">Current ticks at which update is occurring.</param>
     internal void Update(int frameTicks)
     {
         if (frameTicks < hardware.FirstPixelTicks || _fetchCycleIndex >= _screenRenderEvents.Length)
