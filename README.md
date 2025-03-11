@@ -38,7 +38,6 @@ It uses several of my own libraries that I created for this project:
 - [x] Audio and video recording
 - [x] And more features in progress...
 
-
 # Quick demo
 [![Spectron](https://img.youtube.com/vi/Oz70N0VY_2w/default.jpg)](https://youtu.be/Oz70N0VY_2w "Quick demo")
 
@@ -50,6 +49,16 @@ Grab the latest code from the repository, build and run the emulator:
 dotnet build -c Release
 dotnet run --project ./src/Spectron   
 ```
+
+## Testing and compatibility
+- [x] Passes floatspy v0.33 (RAMSOFT) floating bus test in both 48k and 128k mode
+- [x] Passes HALT2INT v3 (Mark Woodmass) test in both 48k and 128k mode
+- [x] Passes EIHALT (Mark Woodmass) test in both 48k and 128k mode
+- [x] Passes Super HALT Invaders (Mark Woodmass) test
+- [x] Passes btime (Jan Bobrowski) test
+
+Test results can be found in the [Results](tests/Results) directory.
+Test files can be found in the [Tests](tests/Files) directory.
 
 ## CPU emulation
 I have created my own [Z80 CPU](https://github.com/oldbit-com/Z80/tree/spectron) emulator library for this project. 
