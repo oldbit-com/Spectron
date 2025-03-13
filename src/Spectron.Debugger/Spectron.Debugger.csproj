@@ -13,6 +13,7 @@
       <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
       <PackageReference Include="Avalonia" Version="11.2.4" />
       <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.4" />
+      <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5" />
       <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.4" />
       <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.2.0.9" />
       <PackageReference Include="Avalonia.Xaml.Interactivity" Version="11.2.0.9" />

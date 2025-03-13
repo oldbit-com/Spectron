@@ -2,11 +2,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:OldBit.Spectron.Debugger.Controls"
+             xmlns:viewModels="clr-namespace:OldBit.Spectron.Debugger.ViewModels"
+             x:DataType="viewModels:MemoryViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="OldBit.Spectron.Debugger.Controls.Memory">
 
     <Grid RowDefinitions="30,*">
-        <Border Grid.Row="0" Grid.ColumnSpan="2" BorderBrush="{StaticResource TextControlBorderBrush}" BorderThickness="2">
+        <Border Grid.Row="0" BorderBrush="{StaticResource TextControlBorderBrush}" BorderThickness="2">
             <TextBlock
                 Text="Memory"
                 HorizontalAlignment="Center"
@@ -14,5 +17,13 @@
                 FontFamily="{StaticResource SpectrumStrictFont}"
                 FontSize="20"/>
         </Border>
+
+        <Border Grid.Row="1" Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+            <controls:HexViewer
+                Data="{Binding Memory}"
+                HorizontalAlignment="Center"
+                BytesPerRow="8"/>
+        </Border>
+
     </Grid>
 </UserControl>

@@ -1,0 +1,113 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:OldBit.Spectron.Debugger.Controls"
+        xmlns:converters="clr-namespace:OldBit.Spectron.Debugger.Converters">
+
+    <Design.PreviewWith>
+        <controls:HexViewer BytesPerRow="8"/>
+    </Design.PreviewWith>
+
+    <Styles.Resources>
+        <converters:HexViewerDataConverter x:Key="HexViewerDataConverter"/>
+        <converters:ZxAsciiConverter x:Key="AsciiConverter"/>
+    </Styles.Resources>
+
+    <Style Selector="controls|HexViewer">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid
+                    Name="DataPresenter"
+                    RowDefinitions="Auto,*"
+                    IsTabStop="True"
+                    IsHitTestVisible="True"
+                    Focusable="True"
+                    Background="{DynamicResource ButtonBackground}">
+
+                    <!-- Rows -->
+                    <ScrollViewer
+                        Name="ScrollViewer"
+                        Grid.Row="1"
+                        Padding="0 0 10 0"
+                        VerticalScrollBarVisibility="Auto"
+                        HorizontalScrollBarVisibility="Auto">
+
+                        <ItemsRepeater Name="RowsPresenter">
+                            <ItemsRepeater.ItemsSource>
+                                <MultiBinding Converter="{StaticResource HexViewerDataConverter}">
+                                    <Binding Path="Data" RelativeSource="{RelativeSource AncestorType={x:Type controls:HexViewer}}" />
+                                    <Binding Path="BytesPerRow" RelativeSource="{RelativeSource AncestorType={x:Type controls:HexViewer}}" />
+                                </MultiBinding>
+                            </ItemsRepeater.ItemsSource>
+
+                            <ItemsRepeater.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="Auto,Auto,Auto" Height="{TemplateBinding CellHeight}">
+                                        <!-- Address -->
+                                        <TextBlock x:DataType="controls:HexViewerDataRow"
+                                                   Text="{Binding Address, StringFormat=X4}"
+                                                   Margin="0 0 4 0"
+                                                   FontFamily="{StaticResource VT220}"
+                                                   FontWeight="Bold"
+                                                   VerticalAlignment="Center"/>
+
+                                        <!-- Cells -->
+                                        <ItemsRepeater Grid.Column="1"
+                                                       x:DataType="controls:HexViewerDataRow"
+                                                       ItemsSource="{Binding Cells}">
+
+                                            <ItemsRepeater.Layout>
+                                                <StackLayout Orientation="Horizontal" />
+                                            </ItemsRepeater.Layout>
+
+                                            <ItemsRepeater.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Width="{TemplateBinding CellWidth}"
+                                                          x:DataType="controls:HexViewerCell"
+                                                          Margin="2">
+                                                        <TextBlock Name="HexCell"
+                                                                   FontFamily="{StaticResource VT220}"
+                                                                   Text="{Binding Value, StringFormat=X2}"
+                                                                   VerticalAlignment="Center"
+                                                                   HorizontalAlignment="Center" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsRepeater.ItemTemplate>
+
+                                        </ItemsRepeater>
+
+                                        <!-- ASCII -->
+                                        <ItemsRepeater Grid.Column="2"
+                                                       Margin="8 0 0 0"
+                                                       x:DataType="controls:HexViewerDataRow"
+                                                       ItemsSource="{Binding Cells}">
+
+                                            <ItemsRepeater.Layout>
+                                                <StackLayout Orientation="Horizontal" />
+                                            </ItemsRepeater.Layout>
+
+                                            <ItemsRepeater.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid x:DataType="controls:HexViewerCell" Height="{TemplateBinding CellHeight}">
+                                                        <TextBlock Name="AsciiCell"
+                                                            Text="{Binding Value, Converter={StaticResource AsciiConverter}}"
+                                                            FontFamily="{StaticResource SpectrumStrictFont}"
+                                                            FontSize="15"
+                                                            VerticalAlignment="Center"
+                                                            TextAlignment="Center"
+                                                            Width="14"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsRepeater.ItemTemplate>
+
+                                        </ItemsRepeater>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
+
+                    </ScrollViewer>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>
