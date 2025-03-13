@@ -22,6 +22,7 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
 
     public StackViewModel StackViewModel { get; } = new();
     public CpuViewModel CpuViewModel { get; } = new();
+    public MemoryViewModel MemoryViewModel { get; } = new();
 
     public CodeListViewModel CodeListViewModel
     {
@@ -75,7 +76,7 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
 
         BreakpointListViewModel = new BreakpointListViewModel(_debuggerContext, _breakpointManager);
         CodeListViewModel = new CodeListViewModel(_breakpointManager, BreakpointListViewModel);
-        ImmediateViewModel = new ImmediateViewModel(_debuggerContext, emulator, Refresh);
+        ImmediateViewModel = new ImmediateViewModel(_debuggerContext, emulator, () => Refresh());
 
         LoggingViewModel.Configure(emulator);
 
@@ -88,7 +89,7 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
         Emulator.Pause();
         IsPaused = true;
 
-        Dispatcher.UIThread.Post(Refresh);
+        Dispatcher.UIThread.Post(() => Refresh());
     }
 
     public void HandlePause(bool isPaused)
@@ -129,7 +130,7 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
     private void HandleDebuggerStep()
     {
         Emulator.Cpu.Step();
-        Refresh();
+        Refresh(refreshMemory: false);
     }
 
     private void HandleDebuggerResume()
@@ -138,11 +139,16 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
         IsPaused = false;
     }
 
-    private void Refresh()
+    private void Refresh(bool refreshMemory = true)
     {
         RefreshCpu();
         RefreshStack();
         RefreshCode();
+
+        if (refreshMemory)
+        {
+            RefreshMemory();
+        }
     }
 
     private void RefreshCpu() => CpuViewModel.Update(Emulator.Cpu);
@@ -150,6 +156,8 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
     private void RefreshStack() => StackViewModel.Update(Emulator.Memory, Emulator.Cpu.Registers.SP);
 
     private void RefreshCode() => CodeListViewModel.Update(Emulator.Memory, Emulator.Cpu.Registers.PC);
+
+    private void RefreshMemory() => MemoryViewModel.Update(Emulator.Memory);
 
     private bool _isPaused;
     public bool IsPaused

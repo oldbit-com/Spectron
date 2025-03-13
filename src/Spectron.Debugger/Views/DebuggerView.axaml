@@ -5,8 +5,8 @@
         xmlns:controls="clr-namespace:OldBit.Spectron.Debugger.Controls"
         xmlns:viewModels="clr-namespace:OldBit.Spectron.Debugger.ViewModels"
         xmlns:material="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        Height="700" Width="1000"
+        mc:Ignorable="d" d:DesignWidth="1040" d:DesignHeight="450"
+        Height="700" Width="1040"
         x:Class="OldBit.Spectron.Debugger.Views.DebuggerView"
         x:DataType="viewModels:DebuggerViewModel"
         WindowStartupLocation="CenterOwner"
@@ -66,7 +66,8 @@
 
         <controls:Memory
             Grid.Row="1" Grid.Column="3"
-            Margin="1"/>
+            Margin="1"
+            DataContext="{Binding MemoryViewModel}"/>
 
         <GridSplitter Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Background="{DynamicResource SystemChromeLowColor}" Margin="2" ResizeDirection="Rows"/>
 

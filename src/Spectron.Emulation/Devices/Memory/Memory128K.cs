@@ -5,8 +5,8 @@ namespace OldBit.Spectron.Emulation.Devices.Memory;
 /// </summary>
 internal sealed class Memory128K : IEmulatorMemory
 {
-    internal const int ScreenBank1 = 5;
-    internal const int ScreenBank2 = 7;
+    private const int ScreenBank1 = 5;
+    private const int ScreenBank2 = 7;
 
     private const byte RomSelectBit = 0b00010000;
     private const byte PagingDisableBit = 0b00100000;
@@ -104,7 +104,7 @@ internal sealed class Memory128K : IEmulatorMemory
     internal byte[][] ActiveBanks => [_activeRom, Banks[5], Banks[2], _activeRam];
 
     // Port 0x7FFD is decoded as: A15=0 & A1=0 hence 0x8002
-    internal static bool IsPagingPortAddress(Word address) => (address & 0x8002) == 0;
+    private static bool IsPagingPortAddress(Word address) => (address & 0x8002) == 0;
 
     internal void SetPagingMode(byte pagingMode)
     {
