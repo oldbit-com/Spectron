@@ -44,7 +44,8 @@
                                     <Grid ColumnDefinitions="Auto,Auto,Auto" Height="{TemplateBinding CellHeight}">
                                         <!-- Address -->
                                         <TextBlock x:DataType="controls:HexViewerDataRow"
-                                                   Text="{Binding Address}"
+                                                   Text="{Binding Address, StringFormat=X4}"
+                                                   Margin="0 0 4 0"
                                                    FontFamily="{StaticResource VT220}"
                                                    FontWeight="Bold"
                                                    VerticalAlignment="Center"/>

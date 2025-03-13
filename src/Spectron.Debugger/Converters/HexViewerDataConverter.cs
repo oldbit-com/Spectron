@@ -19,7 +19,7 @@ public class HexViewerDataConverter : IMultiValueConverter
         var chunks = byteArray.ToChunks(bytesPerRow);
         hexRows.AddRange(
             chunks.Select((chunk, i) => new HexViewerDataRow(
-                Address: FormatAddress(bytesPerRow * i, byteArray.Length),
+                Address: bytesPerRow * i,
                 Cells: chunk.Select((byteValue, index) => new HexViewerCell
                 {
                     ColumnIndex = index,
@@ -29,11 +29,4 @@ public class HexViewerDataConverter : IMultiValueConverter
 
         return hexRows;
     }
-
-    private static string FormatAddress(int number, int size) => size switch
-    {
-        <= 0xFFFF => $"{number:X4}",
-        < 0xFFFFFF => $"{number:X6}",
-        _ => $"{number:X8}"
-    };
 }

@@ -3,7 +3,7 @@ using Avalonia.Controls.Primitives;
 
 namespace OldBit.Spectron.Debugger.Controls;
 
-public record HexViewerDataRow(string Address, HexViewerCell[] Cells);
+public record HexViewerDataRow(int Address, HexViewerCell[] Cells);
 
 public class HexViewer : TemplatedControl
 {
