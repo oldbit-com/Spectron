@@ -1,4 +1,3 @@
-using Antlr4.Runtime;
 using OldBit.Debugger.Parser;
 using OldBit.Spectron.Debugger.Extensions;
 using OldBit.Spectron.Debugger.Parser.Values;
@@ -10,6 +9,7 @@ namespace OldBit.Spectron.Debugger.Parser;
 public class DebuggerVisitor(
     Z80 cpu,
     IMemory memory,
+    IBus bus,
     IOutput output,
     NumberFormat numberFormat) : DebuggerBaseVisitor<Value?>
 {
@@ -31,7 +31,6 @@ public class DebuggerVisitor(
     public override Value? VisitBin(DebuggerParser.BinContext context)
     {
         var bin = context.BIN().GetText()
-            .Replace("0b", string.Empty, StringComparison.OrdinalIgnoreCase)
             .Replace("b", string.Empty, StringComparison.OrdinalIgnoreCase);
 
         return new Integer(Convert.ToInt32(bin, 2));
@@ -43,8 +42,13 @@ public class DebuggerVisitor(
     public override Value? VisitAssign(DebuggerParser.AssignContext context)
     {
         var register = context.REG();
+        var expression = context.expression();
+        var expressionValue = base.Visit(expression);
 
-        return base.VisitAssign(context);
+        var value = GetValue(expressionValue);
+        cpu.SetRegisterValue(register.GetText(), value);
+
+        return new Success();
     }
 
     public override Value? VisitPrintstmt(DebuggerParser.PrintstmtContext context)
@@ -82,4 +86,78 @@ public class DebuggerVisitor(
 
         return new Success();
     }
+
+    public override Value? VisitPeekfunc(DebuggerParser.PeekfuncContext context)
+    {
+        var address = GetAddressValue(base.Visit(context.address));
+
+        var value = memory.Read(address);
+
+        return new Integer(value, value.GetType());
+    }
+
+    public override Value? VisitOutfunc(DebuggerParser.OutfuncContext context)
+    {
+        var address = Validators.GetValidWordOrThrow(base.Visit(context.address));
+        var value = Validators.GetValidByteOrThrow(base.Visit(context.value));
+
+        bus.Write(address, value);
+
+        return new Success();
+    }
+
+    public override Value? VisitInfunc(DebuggerParser.InfuncContext context)
+    {
+        var address = GetAddressValue(base.Visit(context.address));
+
+        var value = bus.Read(address);
+
+        return new Integer(value, value.GetType());
+    }
+
+    public override Value? VisitHelpstmt(DebuggerParser.HelpstmtContext context)
+    {
+        output.Print("Available commands:");
+        output.Print("  CLEAR - Clear this output window");
+        output.Print("  PRINT or ? <expression> - Print the value of an expression, for example: PRINT HL'");
+        output.Print("  POKE <address>,<value> - Write a value to a memory address, for example: POKE 16384,255");
+        output.Print("  PEEK <address> - Read a value from a memory address, for example: PEEK 16384");
+        output.Print("  OUT <port>,<value> - Write a value to an I/O port, for example: OUT 254,255");
+        output.Print("  IN <port> - Read a value from an I/O port, for example: IN 254");
+        output.Print("  R = <value> - Set register value (A, B, C, D, E, H, L, I, R, IXH, IXL, IYH, IYL, AF, AF', BC, BC', DE, DE', HL, HL', IX, IY, PC, SP)");
+        output.Print("  Accepted value formats: decimal, hexadecimal or binary (e.g. 255, 0xFF, $FF, FFh, 0b11111111, 11111111b)");
+        output.Print(string.Empty);
+
+        return base.VisitHelpstmt(context);
+    }
+
+    public override Value? VisitClearstmt(DebuggerParser.ClearstmtContext context)
+    {
+        output.Clear();
+
+        return base.VisitClearstmt(context);
+    }
+
+    private Word GetAddressValue(Value? arg)
+    {
+        Word address;
+
+        if (arg is Register register)
+        {
+            address = (Word)cpu.GetRegisterValue(register.Name);
+        }
+        else
+        {
+            address = Validators.GetValidWordOrThrow(arg);
+        }
+
+        return address;
+    }
+
+    private int GetValue(Value? arg) => arg switch
+    {
+        Register register => cpu.GetRegisterValue(register.Name),
+        Integer integer => integer.Value,
+        _ => throw new ArgumentException("Invalid value")
+    };
 }

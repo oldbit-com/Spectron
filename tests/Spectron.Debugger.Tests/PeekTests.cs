@@ -1,4 +1,4 @@
-﻿using NSubstitute;
+using NSubstitute;
 using OldBit.Spectron.Debugger.Parser;
 using OldBit.Spectron.Debugger.Parser.Values;
 using OldBit.Spectron.Debugger.Tests.Fixtures;
@@ -7,26 +7,27 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Debugger.Tests;
 
-public class PokeTests
+public class PeekTests
 {
     [Theory]
-    [InlineData("POKE 16384,255")]
-    [InlineData("POKE 0x4000,FFh")]
-    [InlineData("POKE 4000H,$FF")]
-    [InlineData("POKE $4000,0XFF")]
-    [InlineData("POKE 0b0100000000000000,11111111b")]
-    public void Poke_ShouldUpdateMemory(string statement)
+    [InlineData("PEEK 16384", 0xA6)]
+    [InlineData("PEEK HL", 0x6A)]
+    public void Peek_ShouldReturnMemoryValue(string statement, byte expected)
     {
         var rom = new byte[16384];
         var memory = new Memory48K(rom);
         var cpu = new Z80(memory);
 
+        memory.Write(16384, 0xA6);
+        memory.Write(16385, 0x6A);
+        cpu.Registers.HL = 16385;
+
         var interpreter = new Interpreter(cpu, memory, Substitute.For<IBus>(), new TestPrintOutput());
-        var pokeResult = interpreter.Execute(statement);
+        var peekResult = interpreter.Execute(statement);
 
-        pokeResult.ShouldBeOfType<Success>();
+        peekResult.ShouldBeOfType<Integer>();
+        var value = (Integer)peekResult;
 
-        var result = memory.Read(16384);
-        result.ShouldBe((byte)0xFF);
+        value.Value.ShouldBe(expected);
     }
 }

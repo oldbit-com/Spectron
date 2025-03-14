@@ -73,6 +73,18 @@ public partial class DebuggerBaseListener : IDebuggerListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitAssign([NotNull] DebuggerParser.AssignContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="DebuggerParser.helpstmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterHelpstmt([NotNull] DebuggerParser.HelpstmtContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DebuggerParser.helpstmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitHelpstmt([NotNull] DebuggerParser.HelpstmtContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="DebuggerParser.printstmt"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
@@ -108,6 +120,42 @@ public partial class DebuggerBaseListener : IDebuggerListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitPeekfunc([NotNull] DebuggerParser.PeekfuncContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DebuggerParser.outfunc"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterOutfunc([NotNull] DebuggerParser.OutfuncContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DebuggerParser.outfunc"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitOutfunc([NotNull] DebuggerParser.OutfuncContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DebuggerParser.infunc"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterInfunc([NotNull] DebuggerParser.InfuncContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DebuggerParser.infunc"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitInfunc([NotNull] DebuggerParser.InfuncContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DebuggerParser.clearstmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterClearstmt([NotNull] DebuggerParser.ClearstmtContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DebuggerParser.clearstmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitClearstmt([NotNull] DebuggerParser.ClearstmtContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>Int</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.

@@ -1,5 +1,4 @@
 using OldBit.Spectron.Debugger.Breakpoints;
-using Shouldly;
 
 namespace OldBit.Spectron.Debugger.Tests;
 

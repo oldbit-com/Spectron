@@ -2,6 +2,7 @@ using System.Reactive;
 using Avalonia.Input;
 using OldBit.Spectron.Debugger.Parser;
 using OldBit.Spectron.Debugger.Parser.Values;
+using OldBit.Spectron.Disassembly.Formatters;
 using OldBit.Spectron.Emulation;
 using ReactiveUI;
 
@@ -12,8 +13,11 @@ public class ImmediateViewModel : ReactiveObject, IOutput
     private readonly DebuggerContext _context;
     private readonly Emulator _emulator;
     private readonly Action _refreshAction;
+    private readonly NumberFormat _numberFormat = NumberFormat.HexDollarPrefix;
     private int _historyIndex = -1;
     private string _currentCommandText = string.Empty;
+
+    public Action ScrollToEnd { get; set; } = () => { };
 
     public ReactiveCommand<KeyEventArgs, Unit> ImmediateCommand { get; private set; }
 
@@ -81,18 +85,31 @@ public class ImmediateViewModel : ReactiveObject, IOutput
     public void Print(string output)
     {
         OutputText += output + Environment.NewLine;
+        ScrollToEnd();
     }
+
+    public void Clear() => OutputText = string.Empty;
 
     private void ExecuteCommand()
     {
-        var interpreter = new Interpreter(_emulator.Cpu, _emulator.Memory, this);
+        var interpreter = new Interpreter(_emulator.Cpu, _emulator.Memory, _emulator.Bus, this, _numberFormat);
 
         try
         {
             var result = interpreter.Execute(CommandText);
-            if (result is Success)
+
+            switch (result)
             {
-                Print("OK");
+                case Success:
+                    Print("OK");
+                    break;
+
+                case Integer intValue:
+                    Print(NumberFormatter.Format(intValue.Value, intValue.Type, _numberFormat));
+                    break;
+
+                case Register register:
+                    break;
             }
         }
         catch (Exception ex)

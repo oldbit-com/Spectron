@@ -9,6 +9,7 @@ namespace OldBit.Spectron.Debugger.Parser;
 public class Interpreter(
     Z80 cpu,
     IMemory memory,
+    IBus bus,
     IOutput output,
     NumberFormat numberFormat = NumberFormat.HexDollarPrefix)
 {
@@ -28,7 +29,7 @@ public class Interpreter(
         var parser = CreateParser(tokenStream);
         var tree = parser.program();
 
-        var visitor = new DebuggerVisitor(cpu, memory, output, numberFormat);
+        var visitor = new DebuggerVisitor(cpu, memory, bus, output, numberFormat);
         var result = visitor.Visit(tree);
 
         Output = visitor.Output;

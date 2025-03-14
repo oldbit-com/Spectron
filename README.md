@@ -140,6 +140,20 @@ done in a background by converting static frames to a video stream with audio, l
 Debugger is available in the emulator. It is a simple debugger that allows you to inspect the CPU registers, 
 memory and disassembly. You can step through the code, set breakpoints. This is still work in progress.
 
+#### Available commands, case insensitive:
+- **HELP** - print help information
+- **PRINT** or ? - prints a value, for example: `PRINT HL`
+- **POKE** address, value - writes a value to the memory, for example: `POKE 16384,0x3E`
+- **PEEK** address - reads a value from the memory, for example: `PEEK 16384`
+- **OUT** port, value - writes a value to the IO port, for example: `OUT 0xFE,$3E`
+- **IN** port - reads a value from the IO port, for example: `IN 254`
+- **R=value** - sets a register value, for example: `A=10h` or `A=B`, `HL'=DE`, etc.
+
+#### Accepted number formats:
+- Decimal: `16384`
+- Hexadecimal: `0x4000` or `$4000` or `4000h`
+- Binary: `0b1010` or `1010b`
+
 ### Resources
 - [Avalonia UI](https://avaloniaui.net/)
 - [FFmpeg wrapper](https://github.com/rosenbjerg/FFMpegCore)

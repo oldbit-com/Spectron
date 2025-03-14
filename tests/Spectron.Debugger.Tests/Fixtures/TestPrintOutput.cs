@@ -6,8 +6,7 @@ public class TestPrintOutput : IOutput
 {
     public List<string> Lines { get; } = [];
 
-    public void Print(string output)
-    {
-        Lines.Add(output);
-    }
+    public void Print(string output) => Lines.Add(output);
+
+    public void Clear() => Lines.Clear();
 }
