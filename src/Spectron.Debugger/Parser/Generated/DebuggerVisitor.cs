@@ -51,6 +51,12 @@ public interface IDebuggerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitAssign([NotNull] DebuggerParser.AssignContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="DebuggerParser.helpstmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitHelpstmt([NotNull] DebuggerParser.HelpstmtContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="DebuggerParser.printstmt"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -68,6 +74,24 @@ public interface IDebuggerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitPeekfunc([NotNull] DebuggerParser.PeekfuncContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DebuggerParser.outfunc"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitOutfunc([NotNull] DebuggerParser.OutfuncContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DebuggerParser.infunc"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitInfunc([NotNull] DebuggerParser.InfuncContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DebuggerParser.clearstmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitClearstmt([NotNull] DebuggerParser.ClearstmtContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>Int</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.

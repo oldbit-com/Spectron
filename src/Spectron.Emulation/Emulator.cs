@@ -59,6 +59,7 @@ public sealed class Emulator
 
     public Z80 Cpu { get; }
     public IMemory Memory => _memory;
+    public IBus Bus => _spectrumBus;
 
     internal ScreenBuffer ScreenBuffer { get; }
     internal UlaPlus UlaPlus { get; }

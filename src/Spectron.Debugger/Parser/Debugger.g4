@@ -23,13 +23,17 @@ COMMA
         ;
 
 REG
-        : 'A' | 'B' | 'C' | 'D' | 'E' | 'H' | 'L'
+        : 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'H' | 'L'
         | 'A\'' | 'B\'' | 'C\'' | 'D\'' | 'E\'' | 'H\'' | 'L\''
         | 'IXH' | 'IXL' | 'IYH' | 'IYL'
         | 'AF' | 'BC' | 'DE' | 'HL'
         | 'AF\'' | 'BC\'' | 'DE\'' | 'HL\''
         | 'SP' | 'PC' | 'IX' | 'IY'
         | 'I' | 'R'
+        ;
+
+HELP
+        : 'HELP'
         ;
 
 PRINT
@@ -45,20 +49,39 @@ PEEK
         : 'PEEK'
         ;
 
+OUT
+        : 'OUT'
+        ;
+
+IN
+        : 'IN'
+        ;
+
+CLEAR
+        : 'CLEAR'
+        ;
+
 program
         : statement (';' statement)* ';'?
         ;
 
 statement
-        : expression
+        : helpstmt
+        | clearstmt
         | printstmt
         | pokestmt
         | peekfunc
+        | outfunc
+        | infunc
         | assign
         ;
 
-assign:
-        REG '=' expression
+assign
+        : REG '=' expression
+        ;
+
+helpstmt
+        : HELP (functionName=PRINT | POKE | PEEK | IN | OUT)?
         ;
 
 printstmt
@@ -71,6 +94,18 @@ pokestmt
 
 peekfunc
         : PEEK address=expression
+        ;
+
+outfunc
+        : OUT address=expression COMMA value=expression
+        ;
+
+infunc
+        : IN address=expression
+        ;
+
+clearstmt
+        : CLEAR
         ;
 
 expression

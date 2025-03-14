@@ -62,6 +62,16 @@ public interface IDebuggerListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitAssign([NotNull] DebuggerParser.AssignContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="DebuggerParser.helpstmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterHelpstmt([NotNull] DebuggerParser.HelpstmtContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DebuggerParser.helpstmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitHelpstmt([NotNull] DebuggerParser.HelpstmtContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="DebuggerParser.printstmt"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -91,6 +101,36 @@ public interface IDebuggerListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitPeekfunc([NotNull] DebuggerParser.PeekfuncContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DebuggerParser.outfunc"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterOutfunc([NotNull] DebuggerParser.OutfuncContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DebuggerParser.outfunc"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitOutfunc([NotNull] DebuggerParser.OutfuncContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DebuggerParser.infunc"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterInfunc([NotNull] DebuggerParser.InfuncContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DebuggerParser.infunc"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitInfunc([NotNull] DebuggerParser.InfuncContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DebuggerParser.clearstmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterClearstmt([NotNull] DebuggerParser.ClearstmtContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DebuggerParser.clearstmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitClearstmt([NotNull] DebuggerParser.ClearstmtContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>Int</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.

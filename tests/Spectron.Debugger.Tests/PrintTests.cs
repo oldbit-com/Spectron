@@ -1,8 +1,8 @@
+using NSubstitute;
 using OldBit.Spectron.Debugger.Parser;
 using OldBit.Spectron.Debugger.Tests.Fixtures;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Z80Cpu;
-using Shouldly;
 
 namespace OldBit.Spectron.Debugger.Tests;
 
@@ -29,7 +29,7 @@ public class PrintTests
         };
         var output = new TestPrintOutput();
 
-        var interpreter = new Interpreter(cpu, memory, output);
+        var interpreter = new Interpreter(cpu, memory, Substitute.For<IBus>(), output);
         interpreter.Execute("PRINT AF,BC,DE,HL,SP,PC,IX,IY,A,B,C,D,E,H,L,IXH,IXL,IYH,IYL");
 
         output.Lines.Count.ShouldBe(19);
