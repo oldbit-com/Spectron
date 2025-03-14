@@ -119,11 +119,11 @@ public class DebuggerVisitor(
     {
         output.Print("Available commands:");
         output.Print("  CLEAR - Clear this output window");
-        output.Print("  PRINT or ? <expression> - Print the value of an expression, register");
-        output.Print("  POKE <address>,<value> - Write a value to a memory address");
-        output.Print("  PEEK <address> - Read a value from a memory address");
-        output.Print("  OUT <port>,<value> - Write a value to an I/O port");
-        output.Print("  IN <port> - Read a value from an I/O port");
+        output.Print("  PRINT or ? <expression> - Print the value of an expression, for example: PRINT HL'");
+        output.Print("  POKE <address>,<value> - Write a value to a memory address, for example: POKE 16384,255");
+        output.Print("  PEEK <address> - Read a value from a memory address, for example: PEEK 16384");
+        output.Print("  OUT <port>,<value> - Write a value to an I/O port, for example: OUT 254,255");
+        output.Print("  IN <port> - Read a value from an I/O port, for example: IN 254");
         output.Print("  R = <value> - Set register value (A, B, C, D, E, H, L, I, R, IXH, IXL, IYH, IYL, AF, AF', BC, BC', DE, DE', HL, HL', IX, IY, PC, SP)");
         output.Print("  Accepted value formats: decimal, hexadecimal or binary (e.g. 255, 0xFF, $FF, FFh, 0b11111111, 11111111b)");
         output.Print(string.Empty);
