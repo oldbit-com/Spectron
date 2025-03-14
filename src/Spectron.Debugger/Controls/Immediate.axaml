@@ -47,7 +47,7 @@
         <TextBox Grid.Row="1"
                  Grid.Column="1"
                  Name="ImmediateTextBox"
-                 Watermark="Enter command"
+                 Watermark="Enter command or type HELP to see available commands"
                  Text="{Binding CommandText}"
                  FontFamily="{StaticResource VT220}"
                  Foreground="{DynamicResource VT220Brush}"
