@@ -518,6 +518,7 @@ partial class MainWindowViewModel
 
     private void HandleTimeMachineResumeEmulator()
     {
+        IsPauseOverlayVisible = false;
         IsTimeMachineCountdownVisible = false;
 
         Emulator?.Resume();
