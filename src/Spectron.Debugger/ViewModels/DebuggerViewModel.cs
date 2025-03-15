@@ -2,6 +2,7 @@ using System.Reactive;
 using Avalonia.Threading;
 using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.Extensions;
 using ReactiveUI;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
@@ -48,7 +49,9 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
         set => this.RaiseAndSetIfChanged(ref _loggingViewModel, value);
     }
 
-    public ReactiveCommand<Unit, Unit> DebuggerStepCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> DebuggerStepOverCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> DebuggerStepIntoCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> DebuggerStepOutCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> DebuggerResumeCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> TogglePauseCommand { get; private set; }
 
@@ -56,7 +59,9 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
     {
         _debuggerContext = debuggerContext;
 
-        DebuggerStepCommand = ReactiveCommand.Create(HandleDebuggerStep);
+        DebuggerStepOverCommand = ReactiveCommand.Create(HandleDebuggerStepOver);
+        DebuggerStepIntoCommand = ReactiveCommand.Create(HandleDebuggerStepInto);
+        DebuggerStepOutCommand = ReactiveCommand.Create(HandleStepOutCommand);
         DebuggerResumeCommand = ReactiveCommand.Create(HandleDebuggerResume);
         TogglePauseCommand = ReactiveCommand.Create(() => HandlePause(!IsPaused));
 
@@ -76,7 +81,9 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
 
         BreakpointListViewModel = new BreakpointListViewModel(_debuggerContext, _breakpointManager);
         CodeListViewModel = new CodeListViewModel(_breakpointManager, BreakpointListViewModel);
-        ImmediateViewModel = new ImmediateViewModel(_debuggerContext, emulator, () => Refresh());
+        ImmediateViewModel = new ImmediateViewModel(_debuggerContext, emulator,
+            () => Refresh(),
+            address => CodeListViewModel.Update(Emulator.Memory, address));
 
         LoggingViewModel.Configure(emulator);
 
@@ -127,15 +134,58 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
         }
     }
 
-    private void HandleDebuggerStep()
+    private void HandleDebuggerStepOver()
+    {
+        var opCode = Emulator.Memory.Read(Emulator.Cpu.Registers.PC);
+        var nextOpCode = Emulator.Memory.Read((Word)(Emulator.Cpu.Registers.PC + 1));
+
+        int? returnAddress = null;
+
+        if (IsCallInstruction(opCode) || IsJumpConditionInstruction(opCode))
+        {
+            returnAddress = Emulator.Cpu.Registers.PC + 3;
+        }
+        else if (IsDjnzInstruction(opCode) || IsShortJumpConditionInstruction(opCode) ||
+                 opCode == 0xED && IsBlockTransferInstruction(nextOpCode))
+        {
+            returnAddress = Emulator.Cpu.Registers.PC + 2;
+        }
+
+        if (returnAddress != null)
+        {
+            _breakpointManager?.AddBreakpoint(new Breakpoint(Register.PC, returnAddress.Value) { ShouldRemoveOnHit = true });
+            HandleDebuggerResume();
+        }
+        else
+        {
+            HandleDebuggerStepInto();
+        }
+    }
+
+    private void HandleDebuggerStepInto()
     {
         Emulator.Cpu.Step();
+
+        if (Emulator.Cpu.Clock.IsFrameComplete)
+        {
+            Emulator.Cpu.Clock.NewFrame(Emulator.TicksPerFrame);
+        }
+
         Refresh(refreshMemory: false);
+    }
+
+    private void HandleStepOutCommand()
+    {
+        var sp = Emulator.Cpu.Registers.SP;
+        var returnAddress = Emulator.Memory.ReadWord(sp);
+
+        _breakpointManager?.AddBreakpoint(new Breakpoint(Register.PC, returnAddress) { ShouldRemoveOnHit = true });
+        HandleDebuggerResume();
     }
 
     private void HandleDebuggerResume()
     {
-        Emulator.Resume();
+        Emulator.Resume(isDebuggerResume: true);
         IsPaused = false;
     }
 
@@ -158,6 +208,16 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
     private void RefreshCode() => CodeListViewModel.Update(Emulator.Memory, Emulator.Cpu.Registers.PC);
 
     private void RefreshMemory() => MemoryViewModel.Update(Emulator.Memory);
+
+    private static bool IsCallInstruction(byte opCode) => opCode == 0xCD || (opCode & 0b1100_0111) == 0b1100_0100;
+
+    private static bool IsDjnzInstruction(byte opCode) => opCode == 0x10;
+
+    private static bool IsJumpConditionInstruction(byte opCode) => (opCode & 0b1100_0111) == 0b1100_0010;
+
+    private static bool IsShortJumpConditionInstruction(byte opCode) => opCode is 0x20 or 0x28 or 0x30 or 0x38;
+
+    private static bool IsBlockTransferInstruction(byte opCode) => opCode is 0xB0 or 0xB8;
 
     private bool _isPaused;
     public bool IsPaused

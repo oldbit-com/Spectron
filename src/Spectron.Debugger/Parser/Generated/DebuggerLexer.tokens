@@ -13,6 +13,8 @@ PEEK=12
 OUT=13
 IN=14
 CLEAR=15
+GOTO=16
+LIST=17
 ';'=1
 '='=2
 ','=7
@@ -22,3 +24,5 @@ CLEAR=15
 'OUT'=13
 'IN'=14
 'CLEAR'=15
+'GOTO'=16
+'LIST'=17

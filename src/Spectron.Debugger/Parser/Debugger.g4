@@ -61,6 +61,14 @@ CLEAR
         : 'CLEAR'
         ;
 
+GOTO
+        : 'GOTO'
+        ;
+
+LIST
+        : 'LIST'
+        ;
+
 program
         : statement (';' statement)* ';'?
         ;
@@ -74,6 +82,8 @@ statement
         | outfunc
         | infunc
         | assign
+        | gotostmt
+        | liststmt
         ;
 
 assign
@@ -106,6 +116,14 @@ infunc
 
 clearstmt
         : CLEAR
+        ;
+
+gotostmt
+        : GOTO address=expression
+        ;
+
+liststmt
+        : LIST address=expression?
         ;
 
 expression

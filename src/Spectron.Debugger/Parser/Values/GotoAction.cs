@@ -1,3 +1,3 @@
 namespace OldBit.Spectron.Debugger.Parser.Values;
 
-public abstract record Value;
+public record GotoAction(Word Address) : Value;

@@ -77,6 +77,22 @@ public class DebuggerVisitor(
         return base.VisitPrintstmt(context);
     }
 
+    public override Value? VisitGotostmt(DebuggerParser.GotostmtContext context)
+    {
+        var address = GetAddressValue(base.Visit(context.address));
+
+        cpu.Registers.PC = address;
+
+        return new GotoAction(address);
+    }
+
+    public override Value? VisitListstmt(DebuggerParser.ListstmtContext context)
+    {
+        var address = context.address == null ? cpu.Registers.PC : GetAddressValue(base.Visit(context.address));
+
+        return new ListAction(address);
+    }
+
     public override Value? VisitPokestmt(DebuggerParser.PokestmtContext context)
     {
         var address = Validators.GetValidWordOrThrow(base.Visit(context.address));
@@ -119,7 +135,9 @@ public class DebuggerVisitor(
     {
         output.Print("Available commands:");
         output.Print("  CLEAR - Clear this output window");
-        output.Print("  PRINT or ? <expression> - Print the value of an expression, for example: PRINT HL'");
+        output.Print("  PRINT or ? <expression> - Prints a value of the expression, for example: PRINT HL'");
+        output.Print("  GOTO <address> - Jump to a memory address, for example: GOTO 16384, equivalent to PC=16384");
+        output.Print("  LIST [<address>] - Disassemble instructions starting at a memory address, for example: LIST 0xC000");
         output.Print("  POKE <address>,<value> - Write a value to a memory address, for example: POKE 16384,255");
         output.Print("  PEEK <address> - Read a value from a memory address, for example: PEEK 16384");
         output.Print("  OUT <port>,<value> - Write a value to an I/O port, for example: OUT 254,255");

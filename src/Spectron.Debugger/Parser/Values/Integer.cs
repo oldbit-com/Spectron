@@ -1,14 +1,14 @@
 namespace OldBit.Spectron.Debugger.Parser.Values;
 
-public class Integer(int value, Type type) : Value
+public record Integer(int Value, Type Type) : Value
 {
     public Integer(int value) : this(value, typeof(int))
     {
     }
 
-    public int Value { get; } = value;
+    public int Value { get; } = Value;
 
-    public Type Type { get; } = type;
+    public Type Type { get; } = Type;
 
     public override string ToString() => Value.ToString();
 }

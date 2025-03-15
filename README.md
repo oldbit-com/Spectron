@@ -140,19 +140,46 @@ done in a background by converting static frames to a video stream with audio, l
 Debugger is available in the emulator. It is a simple debugger that allows you to inspect the CPU registers, 
 memory and disassembly. You can step through the code, set breakpoints. This is still work in progress.
 
-#### Available commands, case insensitive:
-- **HELP** - print help information
-- **PRINT** or ? - prints a value, for example: `PRINT HL`
-- **POKE** address, value - writes a value to the memory, for example: `POKE 16384,0x3E`
-- **PEEK** address - reads a value from the memory, for example: `PEEK 16384`
-- **OUT** port, value - writes a value to the IO port, for example: `OUT 0xFE,$3E`
-- **IN** port - reads a value from the IO port, for example: `IN 254`
-- **R=value** - sets a register value, for example: `A=10h` or `A=B`, `HL'=DE`, etc.
+### Commands
+- **Step Over** - `F10` \
+  For `CALL`, `JR cc`, `JP cc`, `DJNZ`, `LDIR` or `LDDR` instructions, debugger will try to step over the subroutine.
+- **Step Into** - `F11` \
+  Debugger will step into the subroutine call or conditional jump.
+- **Step Out** - `Shift + F11` \
+  Debugger will step out of the subroutine using the current return address on the stack. 
+  So this will only work if the value on the stack contains return address.
 
-#### Accepted number formats:
+### Immediate window instructions, case insensitive:
+- `HELP` - print help information
+- `PRINT [expression]` or `? [expression]` - prints a value of the expression
+- `GOTO address` - sets the program counter to the address, equivalent of `PC=address`
+- `LIST [address]` - disassembles the code, if no address is provided, it will disassemble the current PC
+- `POKE address,value` - writes a value to the memory
+- `PEEK address` - reads a value from the memory
+- `OUT `port,value` - writes a value to the IO port
+- `IN port` - reads a value from the IO port
+- `R=value` - sets a register value
+
+#### Register arguments:
+`A B C D E H L F IXH IXL IYH IYL AF BC DE HL IX IY SP PC I R AF' BC' DE' HL'`
+
+#### Number arguments:
 - Decimal: `16384`
 - Hexadecimal: `0x4000` or `$4000` or `4000h`
 - Binary: `0b1010` or `1010b`
+
+#### Examples:
+- `PRINT HL`
+- `GOTO PC`, `GOTO 32768`
+- `LIST`, `LIST 32768`
+- `POKE 16384,0x3E`
+- `PEEK 16384`
+- `OUT 0xFE,$3E`
+- `IN 254`
+- `A=10h`, `IXH=A` `HL'=DE`, `IX=0x4000`, `SP=0x8000`, etc.
+
+> [!NOTE]  
+> All instructions and operands are case insensitive.
 
 ### Resources
 - [Avalonia UI](https://avaloniaui.net/)

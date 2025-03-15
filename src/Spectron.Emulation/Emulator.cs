@@ -26,6 +26,7 @@ public sealed class Emulator
     private readonly EmulatorTimer _emulationTimer;
     private readonly IEmulatorMemory _memory;
 
+    private bool _isDebuggerResume;
     private bool _invalidateScreen;
     private bool _isAcceleratedTapeSpeed;
     private FloatingBus _floatingBus = null!;
@@ -60,6 +61,7 @@ public sealed class Emulator
     public Z80 Cpu { get; }
     public IMemory Memory => _memory;
     public IBus Bus => _spectrumBus;
+    public int TicksPerFrame => _hardware.TicksPerFrame;
 
     internal ScreenBuffer ScreenBuffer { get; }
     internal UlaPlus UlaPlus { get; }
@@ -93,7 +95,6 @@ public sealed class Emulator
         {
             Clock =
             {
-                DefaultFrameTicks = hardware.TicksPerFrame,
                 InterruptDuration = hardware.InterruptDuration,
                 ContentionProvider = emulatorArgs.ContentionProvider
             }
@@ -141,7 +142,11 @@ public sealed class Emulator
         _timeMachine.AddEntry(this);
     }
 
-    public void Resume() => _emulationTimer.Resume();
+    public void Resume(bool isDebuggerResume = false)
+    {
+        _isDebuggerResume = isDebuggerResume;
+        _emulationTimer.Resume();
+    }
 
     public void Reset()
     {
@@ -158,8 +163,10 @@ public sealed class Emulator
         }
     }
 
-    public void SetEmulationSpeed(int emulationSpeedPercentage) => _emulationTimer.Interval =
-        emulationSpeedPercentage == int.MaxValue ? TimeSpan.Zero : TimeSpan.FromMilliseconds(20 * (100f / emulationSpeedPercentage));
+    public void SetEmulationSpeed(int emulationSpeedPercentage) =>
+        _emulationTimer.Interval = emulationSpeedPercentage == int.MaxValue ?
+            TimeSpan.Zero :
+            TimeSpan.FromMilliseconds(20 * (100f / emulationSpeedPercentage));
 
     private void OnTimerElapsed(EventArgs e)
     {
@@ -214,7 +221,13 @@ public sealed class Emulator
 
     private void StartFrame()
     {
-        Cpu.Clock.NewFrame();
+        if (_isDebuggerResume)
+        {
+            _isDebuggerResume = false;
+            return;
+        }
+
+        Cpu.Clock.NewFrame(_hardware.TicksPerFrame);
         ScreenBuffer.NewFrame();
         AudioManager.NewFrame();
     }

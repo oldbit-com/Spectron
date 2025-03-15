@@ -90,6 +90,11 @@ public class BreakpointManager
                 {
                     breakpoint.ValueAtLastHit = value;
 
+                    if (breakpoint.ShouldRemoveOnHit)
+                    {
+                        RemoveBreakpoint(breakpoint.Id);
+                    }
+
                     return true;
                 }
             }

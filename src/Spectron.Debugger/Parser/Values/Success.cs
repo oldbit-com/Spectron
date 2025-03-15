@@ -1,3 +1,3 @@
 namespace OldBit.Spectron.Debugger.Parser.Values;
 
-public class Success : Value;
+public record Success : Value;

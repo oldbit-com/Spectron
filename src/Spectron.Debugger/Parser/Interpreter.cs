@@ -29,6 +29,11 @@ public class Interpreter(
         var parser = CreateParser(tokenStream);
         var tree = parser.program();
 
+        if (_syntaxErrorListener.Errors.Count > 0)
+        {
+            throw new SyntaxErrorException(_syntaxErrorListener.Errors[0]);
+        }
+
         var visitor = new DebuggerVisitor(cpu, memory, bus, output, numberFormat);
         var result = visitor.Visit(tree);
 

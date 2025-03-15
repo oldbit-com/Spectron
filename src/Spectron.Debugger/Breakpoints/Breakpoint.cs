@@ -12,5 +12,7 @@ public class Breakpoint(Register register, int value)
 
     public int? ValueAtLastHit { get; set; } = value;
 
+    public bool ShouldRemoveOnHit { get; set; } = false;
+
     public override string ToString() => $"{Register} == ${Value:X4}";
 }

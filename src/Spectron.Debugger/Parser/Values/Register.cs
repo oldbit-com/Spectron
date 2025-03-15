@@ -1,6 +1,6 @@
 namespace OldBit.Spectron.Debugger.Parser.Values;
 
-public class Register : Value
+public record Register : Value
 {
     public string Name { get; }
 

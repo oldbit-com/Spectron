@@ -132,6 +132,26 @@ public interface IDebuggerListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitClearstmt([NotNull] DebuggerParser.ClearstmtContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="DebuggerParser.gotostmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterGotostmt([NotNull] DebuggerParser.GotostmtContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DebuggerParser.gotostmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitGotostmt([NotNull] DebuggerParser.GotostmtContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DebuggerParser.liststmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterListstmt([NotNull] DebuggerParser.ListstmtContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DebuggerParser.liststmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitListstmt([NotNull] DebuggerParser.ListstmtContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>Int</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// </summary>

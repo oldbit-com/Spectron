@@ -93,6 +93,18 @@ public interface IDebuggerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitClearstmt([NotNull] DebuggerParser.ClearstmtContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="DebuggerParser.gotostmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitGotostmt([NotNull] DebuggerParser.GotostmtContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="DebuggerParser.liststmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitListstmt([NotNull] DebuggerParser.ListstmtContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>Int</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// </summary>

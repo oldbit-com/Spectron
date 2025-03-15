@@ -13,6 +13,7 @@ public class ImmediateViewModel : ReactiveObject, IOutput
     private readonly DebuggerContext _context;
     private readonly Emulator _emulator;
     private readonly Action _refreshAction;
+    private readonly Action<Word> _listAction;
     private readonly NumberFormat _numberFormat = NumberFormat.HexDollarPrefix;
     private int _historyIndex = -1;
     private string _currentCommandText = string.Empty;
@@ -24,11 +25,13 @@ public class ImmediateViewModel : ReactiveObject, IOutput
     public ImmediateViewModel(
         DebuggerContext context,
         Emulator emulator,
-        Action refreshAction)
+        Action refreshAction,
+        Action<Word> listAction)
     {
         _context = context;
         _emulator = emulator;
         _refreshAction = refreshAction;
+        _listAction = listAction;
 
         ImmediateCommand = ReactiveCommand.Create<KeyEventArgs>(HandleImmediateCommand);
     }
@@ -108,9 +111,20 @@ public class ImmediateViewModel : ReactiveObject, IOutput
                     Print(NumberFormatter.Format(intValue.Value, intValue.Type, _numberFormat));
                     break;
 
-                case Register register:
+                case GotoAction gotoAction:
+                    Print($"Next instruction address set to ${gotoAction.Address:X4}");
                     break;
+
+                case ListAction listAction:
+                    _listAction(listAction.Address);
+                    Print($"Listing at ${listAction.Address:X4}");
+
+                    return;
             }
+        }
+        catch (SyntaxErrorException)
+        {
+            Print($"Syntax Error: `{CommandText}`");
         }
         catch (Exception ex)
         {

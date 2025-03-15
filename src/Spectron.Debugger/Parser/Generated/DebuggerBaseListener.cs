@@ -157,6 +157,30 @@ public partial class DebuggerBaseListener : IDebuggerListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitClearstmt([NotNull] DebuggerParser.ClearstmtContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="DebuggerParser.gotostmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterGotostmt([NotNull] DebuggerParser.GotostmtContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DebuggerParser.gotostmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitGotostmt([NotNull] DebuggerParser.GotostmtContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="DebuggerParser.liststmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterListstmt([NotNull] DebuggerParser.ListstmtContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DebuggerParser.liststmt"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitListstmt([NotNull] DebuggerParser.ListstmtContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>Int</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>

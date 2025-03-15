@@ -1,5 +1,4 @@
-﻿using NSubstitute;
-using OldBit.Spectron.Debugger.Parser;
+﻿using OldBit.Spectron.Debugger.Parser;
 using OldBit.Spectron.Debugger.Parser.Values;
 using OldBit.Spectron.Debugger.Tests.Fixtures;
 using OldBit.Spectron.Emulation.Devices.Memory;
