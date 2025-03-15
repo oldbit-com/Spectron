@@ -2,7 +2,14 @@ using OldBit.Spectron.Emulation.State;
 
 namespace OldBit.Spectron.Emulation;
 
-public record TimeMachineEntry(DateTimeOffset Timestamp, StateSnapshot Snapshot);
+public class TimeMachineEntry(DateTimeOffset timestamp, StateSnapshot snapshot)
+{
+    public DateTimeOffset Timestamp { get; } = timestamp;
+
+    public byte[] SerializedSnapshot { get; } = snapshot.Serialize();
+
+    public StateSnapshot? GetSnapshot() => StateSnapshot.Deserialize(SerializedSnapshot);
+}
 
 public sealed class TimeMachine
 {

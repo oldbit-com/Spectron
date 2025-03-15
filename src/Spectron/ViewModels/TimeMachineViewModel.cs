@@ -60,14 +60,21 @@ public class TimeMachineViewModel : ReactiveObject
                 return;
             }
 
-            var screenshot = timeMachineEntry.Snapshot.GetScreenshot();
+            var snapshot = timeMachineEntry.GetSnapshot();
+
+            if (snapshot == null)
+            {
+                return;
+            }
+
+            var screenshot = snapshot.GetScreenshot();
 
             using (var bitmap = ScreenPreview.Lock())
             {
                 Marshal.Copy(screenshot, 0, bitmap.Address, screenshot.Length);
             }
 
-            ScreenBorderBrush = new SolidColorBrush(timeMachineEntry.Snapshot.BorderColor.Argb);
+            ScreenBorderBrush = new SolidColorBrush(snapshot.BorderColor.Argb);
 
             PreviewControl?.InvalidateVisual();
         }

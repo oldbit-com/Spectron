@@ -34,6 +34,9 @@ public sealed partial class StateSnapshot
         return MemoryPackSerializer.Deserialize<StateSnapshot>(file);
     }
 
+    public static StateSnapshot? Deserialize(byte[] data) =>
+        MemoryPackSerializer.Deserialize<StateSnapshot>(data);
+
     public static StateSnapshot? Load(Stream stream)
     {
         using var memoryStream = new MemoryStream();

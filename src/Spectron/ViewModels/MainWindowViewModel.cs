@@ -330,9 +330,16 @@ public partial class MainWindowViewModel : ReactiveObject
 
         if (entry != null)
         {
+            var snapshot = entry.GetSnapshot();
+
+            if (snapshot == null)
+            {
+                return;
+            }
+
             IsTimeMachineCountdownVisible = true;
 
-            CreateEmulator(entry.Snapshot);
+            CreateEmulator(snapshot);
             Emulator?.Pause();
         }
         else

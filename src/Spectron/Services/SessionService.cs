@@ -36,7 +36,7 @@ public class SessionService(
         {
             foreach (var entry in timeMachine.Entries)
             {
-                var snapshotBase64 = EmulatorStateToBase64(entry.Snapshot);
+                var snapshotBase64 = EmulatorStateToBase64(entry.SerializedSnapshot);
                 session.TimeMachineSnapshots.Add(new TimeMachineSnapshot(snapshotBase64, entry.Timestamp));
             }
         }
@@ -75,17 +75,22 @@ public class SessionService(
         return null;
     }
 
-    private static string EmulatorStateToBase64(StateSnapshot snapshot)
+    private static string EmulatorStateToBase64(byte[] serializedState)
     {
-        var serialized = snapshot.Serialize();
-
         using var memoryStream = new MemoryStream();
         using (var gzipStream = new GZipStream(memoryStream, CompressionLevel.Fastest))
         {
-            gzipStream.Write(serialized);
+            gzipStream.Write(serializedState);
         }
 
         return Convert.ToBase64String(memoryStream.ToArray());
+    }
+
+    private static string EmulatorStateToBase64(StateSnapshot snapshot)
+    {
+        var serializedState = snapshot.Serialize();
+
+        return EmulatorStateToBase64(serializedState);
     }
 
     private static StateSnapshot? EmulatorStateFromBase64(string base64)
