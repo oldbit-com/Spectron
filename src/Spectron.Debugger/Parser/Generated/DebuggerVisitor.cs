@@ -105,19 +105,26 @@ public interface IDebuggerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitListstmt([NotNull] DebuggerParser.ListstmtContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>Int</c>
+	/// Visit a parse tree produced by the <c>Reg</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitInt([NotNull] DebuggerParser.IntContext context);
+	Result VisitReg([NotNull] DebuggerParser.RegContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>Hex</c>
+	/// Visit a parse tree produced by the <c>MulDiv</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitHex([NotNull] DebuggerParser.HexContext context);
+	Result VisitMulDiv([NotNull] DebuggerParser.MulDivContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>AddSub</c>
+	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitAddSub([NotNull] DebuggerParser.AddSubContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>Bin</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
@@ -126,11 +133,25 @@ public interface IDebuggerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitBin([NotNull] DebuggerParser.BinContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>Reg</c>
+	/// Visit a parse tree produced by the <c>Parens</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitReg([NotNull] DebuggerParser.RegContext context);
+	Result VisitParens([NotNull] DebuggerParser.ParensContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>Hex</c>
+	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitHex([NotNull] DebuggerParser.HexContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>Int</c>
+	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitInt([NotNull] DebuggerParser.IntContext context);
 }
 } // namespace OldBit.Debugger.Parser

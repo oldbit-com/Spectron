@@ -134,6 +134,37 @@ public class DebuggerVisitor(Z80 cpu, IMemory memory, IBus bus, IOutput output) 
         return base.VisitClearstmt(context);
     }
 
+    public override Value? VisitParens(DebuggerParser.ParensContext context)
+    {
+        return base.Visit(context.expression());
+    }
+
+    public override Value? VisitAddSub(DebuggerParser.AddSubContext context)
+    {
+        var left = GetValue(Visit(context.expression(0)));
+        var right = GetValue(Visit(context.expression(1)));
+
+        return context.operation.Text switch
+        {
+            "+" => new Integer(left + right),
+            "-" => new Integer(left - right),
+            _ => base.VisitAddSub(context)
+        };
+    }
+
+    public override Value? VisitMulDiv(DebuggerParser.MulDivContext context)
+    {
+        var left = GetValue(Visit(context.expression(0)));
+        var right = GetValue(Visit(context.expression(1)));
+
+        return context.operation.Text switch
+        {
+            "*" => new Integer(left * right),
+            "/" => new Integer(left / right),
+            _ => base.VisitMulDiv(context)
+        };
+    }
+
     private Word GetAddressValue(Value? arg)
     {
         Word address;

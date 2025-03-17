@@ -181,33 +181,47 @@ public partial class DebuggerBaseListener : IDebuggerListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitListstmt([NotNull] DebuggerParser.ListstmtContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>Int</c>
+	/// Enter a parse tree produced by the <c>Reg</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterInt([NotNull] DebuggerParser.IntContext context) { }
+	public virtual void EnterReg([NotNull] DebuggerParser.RegContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by the <c>Int</c>
+	/// Exit a parse tree produced by the <c>Reg</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitInt([NotNull] DebuggerParser.IntContext context) { }
+	public virtual void ExitReg([NotNull] DebuggerParser.RegContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>Hex</c>
+	/// Enter a parse tree produced by the <c>MulDiv</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterHex([NotNull] DebuggerParser.HexContext context) { }
+	public virtual void EnterMulDiv([NotNull] DebuggerParser.MulDivContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by the <c>Hex</c>
+	/// Exit a parse tree produced by the <c>MulDiv</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitHex([NotNull] DebuggerParser.HexContext context) { }
+	public virtual void ExitMulDiv([NotNull] DebuggerParser.MulDivContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>AddSub</c>
+	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterAddSub([NotNull] DebuggerParser.AddSubContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>AddSub</c>
+	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitAddSub([NotNull] DebuggerParser.AddSubContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by the <c>Bin</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
@@ -223,19 +237,47 @@ public partial class DebuggerBaseListener : IDebuggerListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitBin([NotNull] DebuggerParser.BinContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by the <c>Reg</c>
+	/// Enter a parse tree produced by the <c>Parens</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterReg([NotNull] DebuggerParser.RegContext context) { }
+	public virtual void EnterParens([NotNull] DebuggerParser.ParensContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by the <c>Reg</c>
+	/// Exit a parse tree produced by the <c>Parens</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitReg([NotNull] DebuggerParser.RegContext context) { }
+	public virtual void ExitParens([NotNull] DebuggerParser.ParensContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>Hex</c>
+	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterHex([NotNull] DebuggerParser.HexContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>Hex</c>
+	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitHex([NotNull] DebuggerParser.HexContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by the <c>Int</c>
+	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterInt([NotNull] DebuggerParser.IntContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>Int</c>
+	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitInt([NotNull] DebuggerParser.IntContext context) { }
 
 	/// <inheritdoc/>
 	/// <remarks>The default implementation does nothing.</remarks>

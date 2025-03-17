@@ -152,29 +152,41 @@ public interface IDebuggerListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitListstmt([NotNull] DebuggerParser.ListstmtContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>Int</c>
+	/// Enter a parse tree produced by the <c>Reg</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterInt([NotNull] DebuggerParser.IntContext context);
+	void EnterReg([NotNull] DebuggerParser.RegContext context);
 	/// <summary>
-	/// Exit a parse tree produced by the <c>Int</c>
+	/// Exit a parse tree produced by the <c>Reg</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitInt([NotNull] DebuggerParser.IntContext context);
+	void ExitReg([NotNull] DebuggerParser.RegContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>Hex</c>
+	/// Enter a parse tree produced by the <c>MulDiv</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterHex([NotNull] DebuggerParser.HexContext context);
+	void EnterMulDiv([NotNull] DebuggerParser.MulDivContext context);
 	/// <summary>
-	/// Exit a parse tree produced by the <c>Hex</c>
+	/// Exit a parse tree produced by the <c>MulDiv</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitHex([NotNull] DebuggerParser.HexContext context);
+	void ExitMulDiv([NotNull] DebuggerParser.MulDivContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>AddSub</c>
+	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterAddSub([NotNull] DebuggerParser.AddSubContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>AddSub</c>
+	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitAddSub([NotNull] DebuggerParser.AddSubContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>Bin</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
@@ -188,16 +200,40 @@ public interface IDebuggerListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitBin([NotNull] DebuggerParser.BinContext context);
 	/// <summary>
-	/// Enter a parse tree produced by the <c>Reg</c>
+	/// Enter a parse tree produced by the <c>Parens</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterReg([NotNull] DebuggerParser.RegContext context);
+	void EnterParens([NotNull] DebuggerParser.ParensContext context);
 	/// <summary>
-	/// Exit a parse tree produced by the <c>Reg</c>
+	/// Exit a parse tree produced by the <c>Parens</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitReg([NotNull] DebuggerParser.RegContext context);
+	void ExitParens([NotNull] DebuggerParser.ParensContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>Hex</c>
+	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterHex([NotNull] DebuggerParser.HexContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>Hex</c>
+	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitHex([NotNull] DebuggerParser.HexContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>Int</c>
+	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterInt([NotNull] DebuggerParser.IntContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>Int</c>
+	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitInt([NotNull] DebuggerParser.IntContext context);
 }
 } // namespace OldBit.Debugger.Parser

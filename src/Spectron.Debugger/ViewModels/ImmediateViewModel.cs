@@ -100,13 +100,15 @@ public class ImmediateViewModel : ReactiveObject, IOutput
     {
         foreach (var value in printValue.Values)
         {
+            string? hexValue;
+
             switch (value)
             {
                 case Register register:
                 {
                     var decimalValue = _emulator.Cpu.GetRegisterValue(register.Name);
 
-                    var hexValue = register.Is8Bit
+                    hexValue = register.Is8Bit
                         ? NumberFormatter.Format((byte)decimalValue, _numberFormat)
                         : NumberFormatter.Format((Word)decimalValue, _numberFormat);
 
@@ -114,12 +116,13 @@ public class ImmediateViewModel : ReactiveObject, IOutput
                         ? Convert.ToString(decimalValue, 2).PadLeft(8, '0')
                         : Convert.ToString(decimalValue, 2).PadLeft(16, '0');
 
-                    Print($"{register.Name}={hexValue}   {decimalValue}   {binaryValue}");
+                    Print($"{register.Name}={hexValue}   Decimal={decimalValue}   Binary={binaryValue}");
                     break;
                 }
 
                 case Integer integer:
-                    Print($"{integer.Value}");
+                    hexValue = NumberFormatter.Format(integer.Value, 4, _numberFormat);
+                    Print($"Hex={hexValue}   Decimal={integer.Value}");
                     break;
 
                 default:

@@ -156,7 +156,7 @@ public partial class DebuggerBaseVisitor<Result> : AbstractParseTreeVisitor<Resu
 	/// <return>The visitor result.</return>
 	public virtual Result VisitListstmt([NotNull] DebuggerParser.ListstmtContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by the <c>Int</c>
+	/// Visit a parse tree produced by the <c>Reg</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
@@ -165,9 +165,9 @@ public partial class DebuggerBaseVisitor<Result> : AbstractParseTreeVisitor<Resu
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitInt([NotNull] DebuggerParser.IntContext context) { return VisitChildren(context); }
+	public virtual Result VisitReg([NotNull] DebuggerParser.RegContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by the <c>Hex</c>
+	/// Visit a parse tree produced by the <c>MulDiv</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
@@ -176,7 +176,18 @@ public partial class DebuggerBaseVisitor<Result> : AbstractParseTreeVisitor<Resu
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitHex([NotNull] DebuggerParser.HexContext context) { return VisitChildren(context); }
+	public virtual Result VisitMulDiv([NotNull] DebuggerParser.MulDivContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by the <c>AddSub</c>
+	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitAddSub([NotNull] DebuggerParser.AddSubContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by the <c>Bin</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
@@ -189,7 +200,7 @@ public partial class DebuggerBaseVisitor<Result> : AbstractParseTreeVisitor<Resu
 	/// <return>The visitor result.</return>
 	public virtual Result VisitBin([NotNull] DebuggerParser.BinContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by the <c>Reg</c>
+	/// Visit a parse tree produced by the <c>Parens</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
@@ -198,6 +209,28 @@ public partial class DebuggerBaseVisitor<Result> : AbstractParseTreeVisitor<Resu
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitReg([NotNull] DebuggerParser.RegContext context) { return VisitChildren(context); }
+	public virtual Result VisitParens([NotNull] DebuggerParser.ParensContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by the <c>Hex</c>
+	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitHex([NotNull] DebuggerParser.HexContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by the <c>Int</c>
+	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitInt([NotNull] DebuggerParser.IntContext context) { return VisitChildren(context); }
 }
 } // namespace OldBit.Debugger.Parser

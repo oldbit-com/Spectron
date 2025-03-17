@@ -69,6 +69,22 @@ LIST
         : 'LIST'
         ;
 
+ADD
+        : '+'
+        ;
+
+SUB
+        : '-'
+        ;
+
+MUL
+        : '*'
+        ;
+
+DIV
+        : '/'
+        ;
+
 program
         : statement (';' statement)* ';'?
         ;
@@ -127,12 +143,12 @@ liststmt
         ;
 
 expression
-        :
-        //expression ('+' | '-') expression   # AddSub
-          INT                                 # Int
-        | HEX                                 # Hex
-        | BIN                                 # Bin
-        | REG                                 # Reg
-       // | '(' expression ')'                  # Parens
+        : expression operation=(MUL | DIV) expression   # MulDiv
+        | expression operation=(ADD | SUB) expression   # AddSub
+        | INT                                           # Int
+        | HEX                                           # Hex
+        | BIN                                           # Bin
+        | REG                                           # Reg
+        | '(' expression ')'                            # Parens
         ;
 
