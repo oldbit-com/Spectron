@@ -11,22 +11,27 @@ public enum NumberFormat
     Decimal,
 
     /// <summary>
-    /// Use hexadecimal format without a prefix or suffix, for example FF.
+    /// Format without a prefix or suffix, for example FF.
     /// </summary>
     Hex,
 
     /// <summary>
-    /// Use hexadecimal format with a dollar sign prefix, for example $FF.
+    /// Format with a dollar sign prefix, for example $FF.
     /// </summary>
-    HexDollarPrefix,
+    HexPrefixDollar,
 
     /// <summary>
-    /// Use hexadecimal format with a 'h' suffix, for example FFh.
+    /// Format with a 'h' suffix, for example FFh.
     /// </summary>
-    HexHSuffix,
+    HexSuffixH,
 
     /// <summary>
-    /// Use hexadecimal format with a '0x' suffix, for example 0xFF.
+    /// Format with a '0x' suffix, for example 0xFF.
     /// </summary>
-    HexXPrefix,
+    HexPrefix0X,
+
+    /// <summary>
+    /// Format with a hash sign prefix, for example #FF.
+    /// </summary>
+    HexPrefixHash,
 }

@@ -222,60 +222,56 @@
             <TabItem Header="Tape">
                 <Border Classes="Tab">
                     <StackPanel>
-                        <Border Classes="Tab">
-                            <StackPanel>
-                                <controls:HeaderSeparator Text="Tape loading"/>
-                                <StackPanel>
-                                    <RadioButton
-                                        Content="Normal tape loading speed"
-                                        ToolTip.Tip="Should be able to load any tape file"
-                                        IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Normal}}"
-                                        Classes="Center"/>
+                        <controls:HeaderSeparator Text="Tape loading"/>
+                        <StackPanel>
+                            <RadioButton
+                                Content="Normal tape loading speed"
+                                ToolTip.Tip="Should be able to load any tape file"
+                                IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Normal}}"
+                                Classes="Center"/>
 
-                                    <RadioButton
-                                        Content="Accelerated tape loading"
-                                        ToolTip.Tip="Runs emulator at maximum speed during tape loading"
-                                        IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Accelerated}}"
-                                        Classes="Center"/>
+                            <RadioButton
+                                Content="Accelerated tape loading"
+                                ToolTip.Tip="Runs emulator at maximum speed during tape loading"
+                                IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Accelerated}}"
+                                Classes="Center"/>
 
-                                    <RadioButton
-                                        Content="Instant tape loading"
-                                        ToolTip.Tip="Loads tape instantly into memory, only compatible with standard tape blocks"
-                                        IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Instant}}"
-                                        Classes="Center"/>
-                                </StackPanel>
+                            <RadioButton
+                                Content="Instant tape loading"
+                                ToolTip.Tip="Loads tape instantly into memory, only compatible with standard tape blocks"
+                                IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Instant}}"
+                                Classes="Center"/>
+                        </StackPanel>
 
-                                <CheckBox
-                                    Content="Automatically start playing tape files"
-                                    ToolTip.Tip="If enabled, tape files will be automatically loaded and played. If disabled, you need to press play button."
-                                    Margin="0 10 0 0"
-                                    Classes="Center"
-                                    IsChecked="{Binding IsAutoPlayEnabled}"/>
+                        <CheckBox
+                            Content="Automatically start playing tape files"
+                            ToolTip.Tip="If enabled, tape files will be automatically loaded and played. If disabled, you need to press play button."
+                            Margin="0 10 0 0"
+                            Classes="Center"
+                            IsChecked="{Binding IsAutoPlayEnabled}"/>
 
-                                <controls:HeaderSeparator Text="Tape saving"/>
-                                <CheckBox
-                                    Content="Enable tape saving (virtual tape). Speed: "
-                                    Classes="Center"
-                                    IsChecked="{Binding IsTapeSaveEnabled}"
-                                    x:Name="IsTapeSaveEnabled"/>
+                        <controls:HeaderSeparator Text="Tape saving"/>
+                        <CheckBox
+                            Content="Enable tape saving (virtual tape). Speed: "
+                            Classes="Center"
+                            IsChecked="{Binding IsTapeSaveEnabled}"
+                            x:Name="IsTapeSaveEnabled"/>
 
-                                <StackPanel Margin="20 0 0 0">
-                                    <RadioButton
-                                        Content="Normal tape saving speed"
-                                        ToolTip.Tip="Normal tape saving with all border and audio effects"
-                                        IsEnabled="{Binding #IsTapeSaveEnabled.IsChecked}"
-                                        IsChecked="{Binding TapeSaveSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Normal}}"
-                                        Classes="Center"/>
+                        <StackPanel Margin="20 0 0 0">
+                            <RadioButton
+                                Content="Normal tape saving speed"
+                                ToolTip.Tip="Normal tape saving with all border and audio effects"
+                                IsEnabled="{Binding #IsTapeSaveEnabled.IsChecked}"
+                                IsChecked="{Binding TapeSaveSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Normal}}"
+                                Classes="Center"/>
 
-                                    <RadioButton
-                                        Content="Instant tape saving"
-                                        ToolTip.Tip="Saves tape data instantly capturing memory contents"
-                                        IsEnabled="{Binding #IsTapeSaveEnabled.IsChecked}"
-                                        IsChecked="{Binding TapeSaveSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Instant}}"
-                                        Classes="Center"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </Border>
+                            <RadioButton
+                                Content="Instant tape saving"
+                                ToolTip.Tip="Saves tape data instantly capturing memory contents"
+                                IsEnabled="{Binding #IsTapeSaveEnabled.IsChecked}"
+                                IsChecked="{Binding TapeSaveSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Instant}}"
+                                Classes="Center"/>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
             </TabItem>
@@ -361,6 +357,27 @@
                                     Text="{Binding FFmpegMessage}"
                                     VerticalAlignment="Center"/>
                             </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </TabItem>
+            <TabItem Header="Debugger">
+                <Border Classes="Tab">
+                    <StackPanel>
+                        <controls:HeaderSeparator Text="Defaults"/>
+                        <Grid ColumnDefinitions="150,*" Margin="0 10 0 0">
+                            <TextBlock
+                                Text="Preferred hex format"
+                                VerticalAlignment="Center"/>
+                            <ComboBox
+                                Grid.Column="1"
+                                FontFamily="{StaticResource SpectrumStrictFont}"
+                                FontSize="22"
+                                Width="130"
+                                ItemsSource="{Binding HexNumberFormats}"
+                                SelectedValue="{Binding DebuggerPreferredNumberFormat}"
+                                DisplayMemberBinding="{Binding Name}"
+                                SelectedValueBinding="{Binding Value}"/>
                         </Grid>
                     </StackPanel>
                 </Border>

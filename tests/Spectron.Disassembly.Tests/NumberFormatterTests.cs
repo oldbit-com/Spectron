@@ -6,9 +6,10 @@ public class NumberFormatterTests
 {
     [Theory]
     [InlineData(171, NumberFormat.Decimal, "171")]
-    [InlineData(171, NumberFormat.HexDollarPrefix, "$AB")]
-    [InlineData(171, NumberFormat.HexHSuffix, "ABh")]
-    [InlineData(171, NumberFormat.HexXPrefix, "0xAB")]
+    [InlineData(171, NumberFormat.HexPrefixDollar, "$AB")]
+    [InlineData(171, NumberFormat.HexSuffixH, "ABh")]
+    [InlineData(171, NumberFormat.HexPrefix0X, "0xAB")]
+    [InlineData(171, NumberFormat.HexPrefixHash, "#AB")]
     public void ShouldFormatByteValue(byte value, NumberFormat format, string expected)
     {
         var formatter = new NumberFormatter(format);
@@ -21,11 +22,15 @@ public class NumberFormatterTests
     [Theory]
     [InlineData(23, NumberFormat.Decimal, "+23")]
     [InlineData(-23, NumberFormat.Decimal, "-23")]
-    [InlineData(23, NumberFormat.HexDollarPrefix, "+$17")]
-    [InlineData(-23, NumberFormat.HexDollarPrefix, "-$17")]
-    [InlineData(23, NumberFormat.HexHSuffix, "+17h")]
-    [InlineData(-23, NumberFormat.HexXPrefix, "-0x17")]
-    [InlineData(0, NumberFormat.HexXPrefix, "")]
+    [InlineData(23, NumberFormat.HexPrefixDollar, "+$17")]
+    [InlineData(-23, NumberFormat.HexPrefixDollar, "-$17")]
+    [InlineData(23, NumberFormat.HexSuffixH, "+17h")]
+    [InlineData(-23, NumberFormat.HexSuffixH, "-17h")]
+    [InlineData(23, NumberFormat.HexPrefix0X, "+0x17")]
+    [InlineData(-23, NumberFormat.HexPrefix0X, "-0x17")]
+    [InlineData(23, NumberFormat.HexPrefixHash, "+#17")]
+    [InlineData(-23, NumberFormat.HexPrefixHash, "-#17")]
+    [InlineData(0, NumberFormat.HexPrefix0X, "")]
     public void ShouldFormatOffsetValue(sbyte value, NumberFormat format, string expected)
     {
         var formatter = new NumberFormatter(format);

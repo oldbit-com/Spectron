@@ -1,6 +1,7 @@
 using System.Reactive;
 using Avalonia.Threading;
 using OldBit.Spectron.Debugger.Breakpoints;
+using OldBit.Spectron.Debugger.Settings;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Extensions;
 using ReactiveUI;
@@ -10,6 +11,7 @@ namespace OldBit.Spectron.Debugger.ViewModels;
 public class DebuggerViewModel : ReactiveObject, IDisposable
 {
     private readonly DebuggerContext _debuggerContext;
+    private readonly DebuggerSettings _debuggerSettings;
 
     private BreakpointHandler _breakpointHandler = null!;
     private BreakpointManager? _breakpointManager;
@@ -55,9 +57,10 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
     public ReactiveCommand<Unit, Unit> DebuggerResumeCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> TogglePauseCommand { get; private set; }
 
-    public DebuggerViewModel(DebuggerContext debuggerContext, Emulator emulator)
+    public DebuggerViewModel(DebuggerContext debuggerContext, Emulator emulator, DebuggerSettings debuggerSettings)
     {
         _debuggerContext = debuggerContext;
+        _debuggerSettings = debuggerSettings;
 
         DebuggerStepOverCommand = ReactiveCommand.Create(HandleDebuggerStepOver);
         DebuggerStepIntoCommand = ReactiveCommand.Create(HandleDebuggerStepInto);
@@ -81,9 +84,9 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
 
         BreakpointListViewModel = new BreakpointListViewModel(_debuggerContext, _breakpointManager);
         CodeListViewModel = new CodeListViewModel(_breakpointManager, BreakpointListViewModel);
-        ImmediateViewModel = new ImmediateViewModel(_debuggerContext, emulator,
+        ImmediateViewModel = new ImmediateViewModel(_debuggerContext, _debuggerSettings.PreferredNumberFormat, emulator,
             () => Refresh(),
-            address => CodeListViewModel.Update(Emulator.Memory, address));
+            address => CodeListViewModel.Update(Emulator.Memory, address, emulator.Cpu.Registers.PC, _debuggerSettings));
 
         LoggingViewModel.Configure(emulator);
 
@@ -205,7 +208,7 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
 
     private void RefreshStack() => StackViewModel.Update(Emulator.Memory, Emulator.Cpu.Registers.SP);
 
-    private void RefreshCode() => CodeListViewModel.Update(Emulator.Memory, Emulator.Cpu.Registers.PC);
+    private void RefreshCode() => CodeListViewModel.Update(Emulator.Memory, Emulator.Cpu.Registers.PC, Emulator.Cpu.Registers.PC, _debuggerSettings);
 
     private void RefreshMemory() => MemoryViewModel.Update(Emulator.Memory);
 

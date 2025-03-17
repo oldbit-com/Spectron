@@ -1,3 +1,4 @@
+using OldBit.Spectron.Debugger.Settings;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Screen;
@@ -32,4 +33,6 @@ public class Preferences
     public TapeSettings TapeSettings { get; init; } = new();
 
     public RecordingSettings RecordingSettings { get; init; } = new();
+
+    public DebuggerSettings DebuggerSettings { get; init; } = new();
 }

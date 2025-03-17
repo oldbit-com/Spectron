@@ -9,9 +9,10 @@ public sealed class NumberFormatter(NumberFormat numberFormat)
         return numberFormat switch
         {
             NumberFormat.Hex => $"{value:X2}",
-            NumberFormat.HexDollarPrefix => $"${value:X2}",
-            NumberFormat.HexHSuffix => $"{value:X2}h",
-            NumberFormat.HexXPrefix => $"0x{value:X2}",
+            NumberFormat.HexPrefixDollar => $"${value:X2}",
+            NumberFormat.HexSuffixH => $"{value:X2}h",
+            NumberFormat.HexPrefix0X => $"0x{value:X2}",
+            NumberFormat.HexPrefixHash => $"#{value:X2}",
             _  => value.ToString(),
         };
     }
@@ -28,22 +29,15 @@ public sealed class NumberFormatter(NumberFormat numberFormat)
         return Format((Word)value, numberFormat);
     }
 
-    public static string FormatAutoHex(int value) => value switch
-    {
-        >= 0 and <= 0xFF => $"{value:X2}",
-        <= 0xFFFF => $"{value:X4}",
-        <= 0xFFFFFF => $"{value:X6}",
-        _ => $"{value:X8}"
-    };
-
     public static string Format(Word value, NumberFormat numberFormat)
     {
         return numberFormat switch
         {
             NumberFormat.Hex => $"{value:X4}",
-            NumberFormat.HexDollarPrefix => $"${value:X4}",
-            NumberFormat.HexHSuffix => $"{value:X4}h",
-            NumberFormat.HexXPrefix => $"0x{value:X4}",
+            NumberFormat.HexPrefixDollar => $"${value:X4}",
+            NumberFormat.HexSuffixH => $"{value:X4}h",
+            NumberFormat.HexPrefix0X => $"0x{value:X4}",
+            NumberFormat.HexPrefixHash => $"#{value:X4}",
             _  => value.ToString(),
         };
     }
@@ -53,9 +47,10 @@ public sealed class NumberFormatter(NumberFormat numberFormat)
         return numberFormat switch
         {
             NumberFormat.Hex => value,
-            NumberFormat.HexDollarPrefix => $"${value}",
-            NumberFormat.HexHSuffix => $"{value}h",
-            NumberFormat.HexXPrefix => $"0x{value}",
+            NumberFormat.HexPrefixDollar => $"${value}",
+            NumberFormat.HexSuffixH => $"{value}h",
+            NumberFormat.HexPrefix0X => $"0x{value}",
+            NumberFormat.HexPrefixHash => $"#{value}",
             _  => value
         };
     }
@@ -74,9 +69,10 @@ public sealed class NumberFormatter(NumberFormat numberFormat)
         {
             NumberFormat.Hex => $"{sign}{Math.Abs(value):X2}",
             NumberFormat.Decimal => $"{sign}{Math.Abs(value)}",
-            NumberFormat.HexDollarPrefix => $"{sign}${Math.Abs(value):X2}",
-            NumberFormat.HexHSuffix => $"{sign}{Math.Abs(value):X2}h",
-            NumberFormat.HexXPrefix => $"{sign}0x{Math.Abs(value):X2}",
+            NumberFormat.HexPrefixDollar => $"{sign}${Math.Abs(value):X2}",
+            NumberFormat.HexSuffixH => $"{sign}{Math.Abs(value):X2}h",
+            NumberFormat.HexPrefix0X => $"{sign}0x{Math.Abs(value):X2}",
+            NumberFormat.HexPrefixHash => $"{sign}#{Math.Abs(value):X2}",
             _  => value.ToString(),
         };
     }

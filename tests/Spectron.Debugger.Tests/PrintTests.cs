@@ -1,4 +1,5 @@
 using OldBit.Spectron.Debugger.Parser;
+using OldBit.Spectron.Debugger.Parser.Values;
 using OldBit.Spectron.Debugger.Tests.Fixtures;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Z80Cpu;
@@ -29,30 +30,12 @@ public class PrintTests
         var output = new TestPrintOutput();
 
         var interpreter = new Interpreter(cpu, memory, Substitute.For<IBus>(), output);
-        interpreter.Execute("PRINT AF,BC,DE,HL,SP,PC,IX,IY,A,B,C,D,E,H,L,IXH,IXL,IYH,IYL");
+        var result = interpreter.Execute("PRINT AF,BC,DE,HL,SP,PC,IX,IY,A,B,C,D,E,H,L,IXH,IXL,IYH,IYL");
 
-        output.Lines.Count.ShouldBe(19);
-        output.Lines.ShouldBeEquivalentTo(new List<string>
-        {
-            "AF=$0102  (258)",
-            "BC=$0304  (772)",
-            "DE=$0506  (1286)",
-            "HL=$0708  (1800)",
-            "SP=$0D0E  (3342)",
-            "PC=$0F10  (3856)",
-            "IX=$090A  (2314)",
-            "IY=$0B0C  (2828)",
-            "A=$01  (1)",
-            "B=$03  (3)",
-            "C=$04  (4)",
-            "D=$05  (5)",
-            "E=$06  (6)",
-            "H=$07  (7)",
-            "L=$08  (8)",
-            "IXH=$09  (9)",
-            "IXL=$0A  (10)",
-            "IYH=$0B  (11)",
-            "IYL=$0C  (12)"
-        });
+        result.ShouldBeOfType<Print>();
+        var printResult = (Print)result;
+
+        printResult.Values.Count.ShouldBe(19);
+        printResult.Values.ShouldAllBe(x => x is Register);
     }
 }

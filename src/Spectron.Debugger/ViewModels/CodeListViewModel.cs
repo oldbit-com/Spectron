@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using OldBit.Spectron.Debugger.Breakpoints;
+using OldBit.Spectron.Debugger.Settings;
 using OldBit.Spectron.Disassembly;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Z80Cpu;
@@ -14,22 +15,28 @@ public class CodeListViewModel(
 {
     public ObservableCollection<CodeLineViewModel> CodeLines { get; } = [];
 
-    public void Update(IMemory memory, Word pc)
+    public void Update(IMemory memory, Word address, Word pc, DebuggerSettings debuggerSettings)
     {
         CodeLines.Clear();
 
-        var disassembly = new Disassembler(memory.GetMemory(), pc, 20);
+        var disassembly = new Disassembler(
+            memory.GetMemory(),
+            address,
+            maxCount: 25,
+            new DisassemblerOptions { NumberFormat = debuggerSettings.PreferredNumberFormat });
+
         var instructions = disassembly.Disassemble();
 
         for (var i = 0; i < instructions.Count; i++)
         {
             var isBreakpoint = breakpointManager.HasBreakpoint(Register.PC, instructions[i].Address);
+            var isCurrent = instructions[i].Address == pc;
 
             CodeLines.Add(new CodeLineViewModel(
                 breakpointListViewModel,
                 instructions[i].Address,
                 instructions[i].Code,
-                isCurrent: instructions[i].Address == pc,
+                isCurrent,
                 isBreakpoint));
         }
     }
@@ -39,7 +46,7 @@ public class CodeListViewModel(
         switch (e.Action)
         {
             case NotifyCollectionChangedAction.Add:
-            {
+
                 foreach (var viewModel in e.NewItems?.Cast<BreakpointViewModel>() ?? [])
                 {
                     if (CodeLines.FirstOrDefault(x => x.Address == viewModel.Breakpoint.Value ) is { } codeLine)
@@ -47,11 +54,10 @@ public class CodeListViewModel(
                         codeLine.IsBreakpoint = true;
                     }
                 }
-
                 break;
-            }
 
             case NotifyCollectionChangedAction.Replace:
+
                 foreach (var viewModel in e.NewItems?.Cast<BreakpointViewModel>() ?? [])
                 {
                     if (CodeLines.FirstOrDefault(x => x.Address == viewModel.Breakpoint.Value) is { } codeLine)
@@ -62,7 +68,7 @@ public class CodeListViewModel(
                 break;
 
             case NotifyCollectionChangedAction.Remove:
-            {
+
                 foreach (var viewModel in e.OldItems?.Cast<BreakpointViewModel>() ?? [])
                 {
                     if (CodeLines.FirstOrDefault(x => x.Address == viewModel.Breakpoint.Value) is { } codeLine)
@@ -70,9 +76,7 @@ public class CodeListViewModel(
                         codeLine.IsBreakpoint = false;
                     }
                 }
-
                 break;
-            }
         }
     }
 }

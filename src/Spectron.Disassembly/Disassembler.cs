@@ -17,7 +17,7 @@ public sealed class Disassembler
     private Disassembler(IDataReader dataReader, int maxCount, DisassemblerOptions? options = null)
     {
         _dataReader = dataReader;
-        _numberFormatter = new NumberFormatter(options?.NumberFormat ?? NumberFormat.HexDollarPrefix);
+        _numberFormatter = new NumberFormatter(options?.NumberFormat ?? NumberFormat.HexPrefixDollar);
 
         _maxCount = maxCount;
         _address = _dataReader.Address;

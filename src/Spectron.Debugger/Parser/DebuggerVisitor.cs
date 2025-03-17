@@ -1,17 +1,11 @@
 using OldBit.Debugger.Parser;
 using OldBit.Spectron.Debugger.Extensions;
 using OldBit.Spectron.Debugger.Parser.Values;
-using OldBit.Spectron.Disassembly.Formatters;
 using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Debugger.Parser;
 
-public class DebuggerVisitor(
-    Z80 cpu,
-    IMemory memory,
-    IBus bus,
-    IOutput output,
-    NumberFormat numberFormat) : DebuggerBaseVisitor<Value?>
+public class DebuggerVisitor(Z80 cpu, IMemory memory, IBus bus, IOutput output) : DebuggerBaseVisitor<Value?>
 {
     public List<string> Output { get; } = [];
 
@@ -23,7 +17,8 @@ public class DebuggerVisitor(
         var hex = context.HEX().GetText()
             .Replace("0x", string.Empty, StringComparison.OrdinalIgnoreCase)
             .Replace("h", string.Empty, StringComparison.OrdinalIgnoreCase)
-            .Replace("$", string.Empty);
+            .Replace("$", string.Empty)
+            .Replace("#", string.Empty);
 
         return new Integer(Convert.ToInt32(hex, 16));
     }
@@ -55,26 +50,9 @@ public class DebuggerVisitor(
     {
         var expressions = context.expression();
 
-        foreach (var expression in expressions)
-        {
-            var expressionValue = base.Visit(expression);
+        var values = expressions.Select(expression => base.Visit(expression)).ToList();
 
-            if (expressionValue is Register register)
-            {
-                var registerValue = cpu.GetRegisterValue(register.Name);
-                var formattedValue = register.Is8Bit ?
-                    NumberFormatter.Format((byte)registerValue, numberFormat) :
-                    NumberFormatter.Format((Word)registerValue, numberFormat);
-
-                output.Print($"{register.Name}={formattedValue}  ({registerValue})");
-            }
-            else
-            {
-                output.Print(expressionValue?.ToString() ?? string.Empty);
-            }
-        }
-
-        return base.VisitPrintstmt(context);
+        return new Print(values);
     }
 
     public override Value? VisitGotostmt(DebuggerParser.GotostmtContext context)
@@ -143,7 +121,7 @@ public class DebuggerVisitor(
         output.Print("  OUT <port>,<value> - Write a value to an I/O port, for example: OUT 254,255");
         output.Print("  IN <port> - Read a value from an I/O port, for example: IN 254");
         output.Print("  R = <value> - Set register value (A, B, C, D, E, H, L, I, R, IXH, IXL, IYH, IYL, AF, AF', BC, BC', DE, DE', HL, HL', IX, IY, PC, SP)");
-        output.Print("  Accepted value formats: decimal, hexadecimal or binary (e.g. 255, 0xFF, $FF, FFh, 0b11111111, 11111111b)");
+        output.Print("  Accepted value formats: decimal, hexadecimal or binary (e.g. 255, 0xFF, $FF, #FF, FFh, 0b11111111, 11111111b)");
         output.Print(string.Empty);
 
         return base.VisitHelpstmt(context);

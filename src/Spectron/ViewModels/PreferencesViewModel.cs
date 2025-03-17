@@ -6,6 +6,8 @@ using System.Reactive;
 using System.Reactive.Linq;
 using Avalonia.Input;
 using Avalonia.Threading;
+using OldBit.Spectron.Debugger.Settings;
+using OldBit.Spectron.Disassembly.Formatters;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
@@ -97,6 +99,8 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         UpdatePreferencesCommand = ReactiveCommand.Create(UpdatePreferences);
         ProbeFFmpegCommand = ReactiveCommand.Create(ProbeFFmpeg);
 
+        DebuggerPreferredNumberFormat = preferences.DebuggerSettings.PreferredNumberFormat;
+
         ShowGamepadMappingView = new Interaction<GamepadMappingViewModel, List<GamepadMapping>?>();
     }
 
@@ -184,6 +188,11 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
                 ScalingFactor = ScalingFactor,
                 ScalingAlgorithm = ScalingAlgorithm,
                 FFmpegPath = FFmpegPath
+            },
+
+            DebuggerSettings = new DebuggerSettings
+            {
+                PreferredNumberFormat = DebuggerPreferredNumberFormat,
             }
         };
     }
@@ -313,6 +322,15 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         new("3 seconds", 3),
         new("4 seconds", 4),
         new("5 seconds", 5),
+    ];
+
+    public List<NameValuePair<NumberFormat>> HexNumberFormats { get; } =
+    [
+        new("0A2F", NumberFormat.Hex),
+        new("$0A2F", NumberFormat.HexPrefixDollar),
+        new("0A2Fh", NumberFormat.HexSuffixH),
+        new("0x0A2F", NumberFormat.HexPrefix0X),
+        new("#0A2F", NumberFormat.HexPrefixHash),
     ];
 
     public ObservableCollection<GamepadController> GamepadControllers { get; }
@@ -518,6 +536,13 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
     {
         get => _timeMachineCountdownSeconds;
         set => this.RaiseAndSetIfChanged(ref _timeMachineCountdownSeconds, value);
+    }
+
+    private NumberFormat _debuggerPreferredNumberFormat = NumberFormat.HexPrefixDollar;
+    public NumberFormat DebuggerPreferredNumberFormat
+    {
+        get => _debuggerPreferredNumberFormat;
+        set => this.RaiseAndSetIfChanged(ref _debuggerPreferredNumberFormat, value);
     }
 
     public void Dispose()

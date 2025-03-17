@@ -264,7 +264,7 @@ public partial class MainWindowViewModel : ReactiveObject
             Pause(showOverlay: false);
         }
 
-        _debuggerViewModel = new DebuggerViewModel(_debuggerContext, Emulator!);
+        _debuggerViewModel = new DebuggerViewModel(_debuggerContext, Emulator!, _preferences.DebuggerSettings);
 
         this.WhenAny(x => x.IsPaused, x => x.Value)
             .Subscribe(isPaused => _debuggerViewModel?.HandlePause(isPaused));

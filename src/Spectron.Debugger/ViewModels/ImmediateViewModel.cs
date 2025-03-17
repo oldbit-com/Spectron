@@ -1,5 +1,6 @@
 using System.Reactive;
 using Avalonia.Input;
+using OldBit.Spectron.Debugger.Extensions;
 using OldBit.Spectron.Debugger.Parser;
 using OldBit.Spectron.Debugger.Parser.Values;
 using OldBit.Spectron.Disassembly.Formatters;
@@ -14,7 +15,7 @@ public class ImmediateViewModel : ReactiveObject, IOutput
     private readonly Emulator _emulator;
     private readonly Action _refreshAction;
     private readonly Action<Word> _listAction;
-    private readonly NumberFormat _numberFormat = NumberFormat.HexDollarPrefix;
+    private readonly NumberFormat _numberFormat;
     private int _historyIndex = -1;
     private string _currentCommandText = string.Empty;
 
@@ -24,11 +25,13 @@ public class ImmediateViewModel : ReactiveObject, IOutput
 
     public ImmediateViewModel(
         DebuggerContext context,
+        NumberFormat numberFormat,
         Emulator emulator,
         Action refreshAction,
         Action<Word> listAction)
     {
         _context = context;
+        _numberFormat = numberFormat;
         _emulator = emulator;
         _refreshAction = refreshAction;
         _listAction = listAction;
@@ -93,9 +96,42 @@ public class ImmediateViewModel : ReactiveObject, IOutput
 
     public void Clear() => OutputText = string.Empty;
 
+    private void Print(Print printValue)
+    {
+        foreach (var value in printValue.Values)
+        {
+            switch (value)
+            {
+                case Register register:
+                {
+                    var decimalValue = _emulator.Cpu.GetRegisterValue(register.Name);
+
+                    var hexValue = register.Is8Bit
+                        ? NumberFormatter.Format((byte)decimalValue, _numberFormat)
+                        : NumberFormatter.Format((Word)decimalValue, _numberFormat);
+
+                    var binaryValue = register.Is8Bit
+                        ? Convert.ToString(decimalValue, 2).PadLeft(8, '0')
+                        : Convert.ToString(decimalValue, 2).PadLeft(16, '0');
+
+                    Print($"{register.Name}={hexValue}   {decimalValue}   {binaryValue}");
+                    break;
+                }
+
+                case Integer integer:
+                    Print($"{integer.Value}");
+                    break;
+
+                default:
+                    Print(value?.ToString() ?? string.Empty);
+                    break;
+            }
+        }
+    }
+
     private void ExecuteCommand()
     {
-        var interpreter = new Interpreter(_emulator.Cpu, _emulator.Memory, _emulator.Bus, this, _numberFormat);
+        var interpreter = new Interpreter(_emulator.Cpu, _emulator.Memory, _emulator.Bus, this);
 
         try
         {
@@ -105,6 +141,10 @@ public class ImmediateViewModel : ReactiveObject, IOutput
             {
                 case Success:
                     Print("OK");
+                    break;
+
+                case Print printValue:
+                    Print(printValue);
                     break;
 
                 case Integer intValue:

@@ -1,17 +1,11 @@
 using Antlr4.Runtime;
 using OldBit.Debugger.Parser;
 using OldBit.Spectron.Debugger.Parser.Values;
-using OldBit.Spectron.Disassembly.Formatters;
 using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Debugger.Parser;
 
-public class Interpreter(
-    Z80 cpu,
-    IMemory memory,
-    IBus bus,
-    IOutput output,
-    NumberFormat numberFormat = NumberFormat.HexDollarPrefix)
+public class Interpreter(Z80 cpu, IMemory memory, IBus bus, IOutput output)
 {
     private readonly SyntaxErrorListener _syntaxErrorListener = new();
 
@@ -34,7 +28,7 @@ public class Interpreter(
             throw new SyntaxErrorException(_syntaxErrorListener.Errors[0]);
         }
 
-        var visitor = new DebuggerVisitor(cpu, memory, bus, output, numberFormat);
+        var visitor = new DebuggerVisitor(cpu, memory, bus, output);
         var result = visitor.Visit(tree);
 
         Output = visitor.Output;
