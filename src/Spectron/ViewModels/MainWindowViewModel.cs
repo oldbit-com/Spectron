@@ -92,7 +92,7 @@ public partial class MainWindowViewModel : ReactiveObject
 
     // Emulator
     public ReactiveCommand<ComputerType, Unit> ChangeComputerType { get; private set; }
-    public ReactiveCommand<RomType, Unit> ChangeRomCommand { get; private set; }
+    public ReactiveCommand<RomType, Task> ChangeRomCommand { get; private set; }
     public ReactiveCommand<JoystickType, Unit> ChangeJoystickType { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleUlaPlus { get; private set; }
 
@@ -201,7 +201,7 @@ public partial class MainWindowViewModel : ReactiveObject
 
         // Machine
         ChangeComputerType = ReactiveCommand.Create<ComputerType>(HandleChangeComputerType);
-        ChangeRomCommand = ReactiveCommand.Create<RomType>(HandleChangeRom);
+        ChangeRomCommand = ReactiveCommand.Create<RomType, Task>(HandleChangeRomAsync);
         ChangeJoystickType = ReactiveCommand.Create<JoystickType>(HandleChangeJoystickType);
         ToggleUlaPlus = ReactiveCommand.Create(HandleToggleUlaPlus);
 
@@ -448,9 +448,9 @@ public partial class MainWindowViewModel : ReactiveObject
         MainWindow?.Close();
     }
 
-    private void CreateEmulator(ComputerType computerType, RomType romType)
+    private void CreateEmulator(ComputerType computerType, RomType romType, byte[]? customRom = null)
     {
-        var emulator = _emulatorFactory.Create(computerType, romType);
+        var emulator = _emulatorFactory.Create(computerType, romType, customRom);
 
         emulator.SetUlaPlus(_preferences.IsUlaPlusEnabled);
         emulator.JoystickManager.SetupJoystick(_preferences.Joystick.JoystickType);
