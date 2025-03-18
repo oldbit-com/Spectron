@@ -47,6 +47,7 @@
                     <MenuItem Header="Retroleum v1.71" ToggleType="Radio" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Retroleum}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.Retroleum}}"/>
                     <MenuItem Header="B. Alford v1.37" ToggleType="Radio" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.BrendanAlford}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.BrendanAlford}}"/>
                 </MenuItem>
+                <MenuItem Header="Custom" ToggleType="Radio" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Custom}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.Custom}}"/>
             </MenuItem>
             <MenuItem Header="Joystick" Focusable="False">
                 <MenuItem Header="None" ToggleType="Radio" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.None}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.None}}"/>

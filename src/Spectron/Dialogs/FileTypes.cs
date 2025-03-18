@@ -58,4 +58,19 @@ public static class FileTypes
     {
         Patterns = ["*.png"]
     };
+
+    public static FilePickerFileType Bin { get; } = new("BIN File")
+    {
+        Patterns = ["*.bin"]
+    };
+
+    public static FilePickerFileType Rom { get; } = new("ROM File")
+    {
+        Patterns = ["*.rom"]
+    };
+
+    public static FilePickerFileType Any { get; } = new("All Files")
+    {
+        Patterns = ["*.*"]
+    };
 }

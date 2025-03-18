@@ -310,15 +310,45 @@ partial class MainWindowViewModel
         SpectrumScreen = _frameBufferConverter.ScreenBitmap;
     }
 
-    private void HandleChangeRom(RomType romType)
+    private async Task HandleChangeRomAsync(RomType romType)
     {
+        var oldRomType = RomType;
         RomType = romType;
-        CreateEmulator(ComputerType, RomType);
+
+        byte[]? customRom = null;
+
+        try
+        {
+            if (romType == RomType.Custom)
+            {
+                var files = await FileDialogs.LoadCustomRomFileAsync();
+
+                if (files.Count <= 0)
+                {
+                    RomType = oldRomType;
+                    return;
+                }
+
+                customRom = await File.ReadAllBytesAsync(files[0].Path.LocalPath);
+            }
+        }
+        catch (Exception ex)
+        {
+            await MessageDialogs.Error(ex.Message);
+        }
+
+        CreateEmulator(ComputerType, RomType, customRom);
     }
 
     private void HandleChangeComputerType(ComputerType computerType)
     {
         ComputerType = computerType;
+
+        if (RomType == RomType.Custom)
+        {
+            RomType = RomType.Original;
+        }
+
         CreateEmulator(ComputerType, RomType);
     }
 

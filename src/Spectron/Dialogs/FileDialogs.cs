@@ -147,4 +147,26 @@ public static class FileDialogs
             FileTypeChoices = [FileTypes.Png],
         });
     }
+
+    public static async Task<IReadOnlyList<IStorageFile>> LoadCustomRomFileAsync()
+    {
+        var topLevel = TopLevel.GetTopLevel(MainWindow);
+
+        if (topLevel == null)
+        {
+            return Array.Empty<IStorageFile>();
+        }
+
+        return await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Open File",
+            AllowMultiple = false,
+            FileTypeFilter =
+            [
+                FileTypes.Rom,
+                FileTypes.Bin,
+                FileTypes.Any,
+            ]
+        });
+    }
 }

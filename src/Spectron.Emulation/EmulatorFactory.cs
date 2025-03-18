@@ -39,7 +39,7 @@ public sealed class EmulatorFactory(
 
             case ComputerType.Spectrum128K:
                 rom = customRom != null ? customRom[..0x4000] : GetSpectrum128KRom(romType);
-                var bank1Rom = customRom != null ? customRom[0x4000..] : RomReader.ReadRom(RomType.Original128Bank1);
+                var bank1Rom = customRom?.Length == 0x8000 ? customRom[0x4000..] : RomReader.ReadRom(RomType.Original128Bank1);
                 return CreateSpectrum128K(romType, new Memory128K(rom, bank1Rom));
 
             case ComputerType.Timex2048:
