@@ -307,7 +307,8 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         }
         else if (memory is Memory128K memory128K)
         {
-            snapshot.CustomRom = new CustomRomBlock(memory128K.RomBank0.Concatenate(memory128K.RomBank1), compressionLevel);
+            snapshot.CustomRom = new CustomRomBlock(
+                memory128K.RomBank0.Memory.Concatenate(memory128K.RomBank1.Memory), compressionLevel);
         }
     }
 

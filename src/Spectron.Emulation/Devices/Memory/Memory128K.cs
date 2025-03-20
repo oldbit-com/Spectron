@@ -14,7 +14,7 @@ internal sealed class Memory128K : IEmulatorMemory
     private const byte RamBankMask = 0b00000111;
 
     private byte[] _activeScreen;
-    private byte[] _activeRom;
+    private IRomMemory _activeRom;
     private byte[] _activeRam;
     private bool _isPagingDisabledUntilReset;
 
@@ -24,27 +24,27 @@ internal sealed class Memory128K : IEmulatorMemory
 
     internal byte[][] Banks { get; } = new byte[8][];
     internal byte LastPagingModeValue { get; private set; }
-    internal byte[] RomBank0 { get; }
-    internal byte[] RomBank1 { get; }
+    internal IRomMemory RomBank0 { get; }
+    internal IRomMemory RomBank1 { get; }
 
     internal Memory128K(byte[] romBank0, byte[] romBank1)
     {
-        RomBank1 = romBank1;
-        RomBank0 = romBank0;
+        RomBank1 = new RomMemory(romBank1);
+        RomBank0 = new RomMemory(romBank0);
 
         for (var bank = 0; bank < Banks.Length; bank++)
         {
             Banks[bank] = new byte[0x4000];
         }
 
-        _activeRom = romBank0;
+        _activeRom = RomBank0;
         _activeScreen = Banks[5];
         _activeRam = Banks[0];
     }
 
     public byte Read(Word address) => address switch
     {
-        < 0x4000 => _activeRom[address],
+        < 0x4000 => _activeRom.Read(address),
         < 0x8000 => Banks[5][address - 0x4000],
         < 0xC000 => Banks[2][address - 0x8000],
         _ => _activeRam[address - 0xC000]
@@ -77,6 +77,18 @@ internal sealed class Memory128K : IEmulatorMemory
         }
     }
 
+    public void ShadowRom(IRomMemory? shadowRom)
+    {
+        if (shadowRom != null)
+        {
+            _activeRom = shadowRom;
+        }
+        else
+        {
+            SelectActiveRomBank(LastPagingModeValue);
+        }
+    }
+
     public event ScreenMemoryUpdatedEvent? ScreenMemoryUpdated;
 
     public void WritePort(Word address, byte data)
@@ -101,7 +113,7 @@ internal sealed class Memory128K : IEmulatorMemory
 
     public byte ReadScreen(Word address) => _activeScreen[address];
 
-    internal byte[][] ActiveBanks => [_activeRom, Banks[5], Banks[2], _activeRam];
+    internal byte[][] ActiveBanks => [_activeRom.Memory, Banks[5], Banks[2], _activeRam];
 
     // Port 0x7FFD is decoded as: A15=0 & A1=0 hence 0x8002
     private static bool IsPagingPortAddress(Word address) => (address & 0x8002) == 0;

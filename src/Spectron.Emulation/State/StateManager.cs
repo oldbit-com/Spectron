@@ -171,8 +171,8 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
             },
             Memory128K memory128K => new CustomRomState
             {
-                Bank0 = memory128K.RomBank0,
-                Bank1 = memory128K.RomBank1,
+                Bank0 = memory128K.RomBank0.Memory,
+                Bank1 = memory128K.RomBank1.Memory,
                 RomType = emulator.RomType,
             },
             _ => null
