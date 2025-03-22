@@ -306,6 +306,7 @@ public partial class MainWindowViewModel : ReactiveObject
             Emulator?.SetAudioSettings(preferences.AudioSettings);
             Emulator?.SetTapeSettings(preferences.TapeSettings);
             Emulator?.SetGamepad(preferences.Joystick);
+            Emulator?.SetDivMMc(preferences.DivMmcSettings);
         }
 
         if (resumeAfter)
@@ -509,6 +510,7 @@ public partial class MainWindowViewModel : ReactiveObject
         Emulator.SetFloatingBusSupport(_preferences.IsFloatingBusEnabled);
         Emulator.SetAudioSettings(_preferences.AudioSettings);
         Emulator.SetGamepad(_preferences.Joystick);
+        Emulator.SetDivMMc(_preferences.DivMmcSettings);
 
         if (IsMuted)
         {

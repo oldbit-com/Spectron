@@ -4,8 +4,9 @@ using OldBit.Z80Cpu.Events;
 
 namespace OldBit.Spectron.Emulation.Devices.Storage;
 
-internal class DivMmc : IDevice
+public class DivMmc : IDevice
 {
+    private readonly Z80 _cpu;
     private const int ControlRegister = 0xE3;
     private const int CardSelectRegister = 0xE7;
     private const int DataRegister = 0xEB;
@@ -13,10 +14,10 @@ internal class DivMmc : IDevice
     private const byte MMC0 = 0b10;
     private const byte MMC1 = 0b01;
 
+    private bool _isEnabled;
     private MmcCard? ActiveCard { get; set; }
     private MmcCard? InsertedCard { get; set; }
 
-    public bool IsEnabled { get; set; }
     public DivMmcMemory Memory { get; }
 
     // E7 EB
@@ -32,33 +33,33 @@ internal class DivMmc : IDevice
 
     internal DivMmc(Z80 cpu, IEmulatorMemory emulatorMemory)
     {
-        Memory = new DivMmcMemory(emulatorMemory, new byte[0x2000]);
+        _cpu = cpu;
 
-        cpu.BeforeInstruction += CpuOnBeforeInstruction;
+        Memory = new DivMmcMemory(emulatorMemory, new byte[0x2000]);
     }
 
-    private void CpuOnBeforeInstruction(BeforeInstructionEventArgs e)
+    public void Enable()
     {
-        if (e.PC is 0x0000 or 0x0008 or 0x0038 or 0x0066 or 0x04C6 or 0x0562 || (e.PC & 0xFF00) == 0x3D00)
-        {
-            Memory.AutoPage(isEnabled: true);
-        }
-        else if ((e.PC & 0xFFFF8) == 0x1FF8)
-        {
-            Memory.AutoPage(isEnabled: false);
-        }
+        _isEnabled = true;
+        _cpu.BeforeInstruction += CpuOnBeforeInstruction;
+    }
+
+    public void Disable()
+    {
+        _isEnabled = false;
+        _cpu.BeforeInstruction -= CpuOnBeforeInstruction;
     }
 
     public void WritePort(Word address, byte value)
     {
-        if (!IsEnabled)
+        if (!_isEnabled)
         {
             return;
         }
 
         if ((address & 0xFF) == ControlRegister)
         {
-            Memory.PageMemory(value);
+            Memory.Control(value);
         }
 
         if ((address & 0xFF) == CardSelectRegister)
@@ -74,7 +75,24 @@ internal class DivMmc : IDevice
 
     public byte? ReadPort(Word address)
     {
+        if (!_isEnabled)
+        {
+            return null;
+        }
+
         return null;
+    }
+
+    private void CpuOnBeforeInstruction(BeforeInstructionEventArgs e)
+    {
+        if (e.PC is 0x0000 or 0x0008 or 0x0038 or 0x0066 or 0x04C6 or 0x0562 || (e.PC & 0xFF00) == 0x3D00)
+        {
+            Memory.AutoPage(isEnabled: true);
+        }
+        else if ((e.PC & 0xFFFF8) == 0x1FF8)
+        {
+            Memory.AutoPage(isEnabled: false);
+        }
     }
 
     private void SelectActiveCard(byte value)

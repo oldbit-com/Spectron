@@ -3,11 +3,10 @@ using OldBit.Spectron.Emulation.Extensions;
 
 namespace OldBit.Spectron.Emulation.Devices.Storage;
 
-internal class DivMmcMemory : IRomMemory
+public class DivMmcMemory : IRomMemory
 {
     private readonly IEmulatorMemory _emulatorMemory;
 
-    // Emulate DivMMC with 128kB of memory
     private const int BankCount = 16;
     private const int BankSize = 0x2000;
 
@@ -21,8 +20,7 @@ internal class DivMmcMemory : IRomMemory
     private byte[] _bank0;      // 0000h-1FFFh
     private byte[] _bank1;      // 2000h-3FFFh
 
-    internal bool IsWriteEnabled { get; set; }
-    internal bool IsAutoPaging { get; set; }
+    public bool IsWriteEnabled { get; set; }
 
     internal DivMmcMemory(IEmulatorMemory emulatorMemory, byte[] eeprom)
     {
@@ -44,21 +42,13 @@ internal class DivMmcMemory : IRomMemory
     {
         if (IsWriteEnabled)
         {
-            // Flashing mode is on, do not page automatically
             return;
         }
 
-        if (isEnabled)
-        {
-            PageMemory(_control);
-        }
-        else
-        {
-            _emulatorMemory.ShadowRom(null);
-        }
+        _emulatorMemory.ShadowRom(isEnabled ? this : null);
     }
 
-    internal void PageMemory(byte control)
+    internal void Control(byte control)
     {
         // Preserve MAPRAM bit once set, only hard reset can clear it
         var mapram = _control & MAPRAM;
@@ -89,7 +79,10 @@ internal class DivMmcMemory : IRomMemory
 
         _bank1 = _banks[selectedBank];
 
-        _emulatorMemory.ShadowRom(this);
+        if ((_control & CONMEM) == CONMEM)
+        {
+            _emulatorMemory.ShadowRom(this);
+        }
     }
 
     public byte Read(Word address) => address switch

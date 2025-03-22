@@ -26,6 +26,7 @@ internal sealed class Memory128K : IEmulatorMemory
     internal byte LastPagingModeValue { get; private set; }
     internal IRomMemory RomBank0 { get; }
     internal IRomMemory RomBank1 { get; }
+    internal ReadOnlySpan<byte> Rom => _activeRom.Memory;
 
     internal Memory128K(byte[] romBank0, byte[] romBank1)
     {

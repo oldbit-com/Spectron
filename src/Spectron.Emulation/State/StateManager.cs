@@ -82,12 +82,12 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         switch (memory)
         {
             case Memory16K memory16K:
-                memoryState.SetBank(memory16K.Memory[0x4000..0x8000], pageNumber: 0);
+                memoryState.SetBank(memory16K.Ram.ToArray(), pageNumber: 0);
 
                 break;
 
             case Memory48K memory48K:
-                memoryState.SetBank(memory48K.Memory[0x4000..], pageNumber: 0);
+                memoryState.SetBank(memory48K.Ram.ToArray(), pageNumber: 0);
 
                 break;
 
@@ -161,12 +161,12 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         {
             Memory16K memory16K => new CustomRomState
             {
-                Bank0 = memory16K.Memory[..0x4000],
+                Bank0 = memory16K.Rom.ToArray(),
                 RomType = emulator.RomType,
             },
             Memory48K memory48K => new CustomRomState
             {
-                Bank0 = memory48K.Memory[..0x4000],
+                Bank0 = memory48K.Rom.ToArray(),
                 RomType = emulator.RomType,
             },
             Memory128K memory128K => new CustomRomState
@@ -209,12 +209,12 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         switch (memory)
         {
             case Memory16K memory16K:
-                Array.Copy(memoryState.Banks[0], 0, memory16K.Memory, 0x4000, memoryState.Banks[0].Length);
+                memoryState.Banks[0].CopyTo(memory16K.Ram);
 
                 break;
 
             case Memory48K memory48K:
-                Array.Copy(memoryState.Banks[0], 0, memory48K.Memory, 0x4000, memoryState.Banks[0].Length);
+                memoryState.Banks[0].CopyTo(memory48K.Ram);
 
                 break;
 

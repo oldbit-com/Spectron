@@ -22,7 +22,7 @@ public class Memory128KTests
     {
         var memory = new Memory128K(_rom128, _rom48);
 
-        memory.ReadRom().ShouldBeEquivalentTo(_rom128);
+        memory.Rom.ToArray().ShouldBeEquivalentTo(_rom128);
     }
 
     [Fact]
@@ -31,10 +31,10 @@ public class Memory128KTests
         var memory = new Memory128K(_rom128, _rom48);
 
         memory.SetPagingMode(0b00010000);
-        memory.ReadRom().ShouldBeEquivalentTo(_rom48);
+        memory.Rom.ToArray().ShouldBeEquivalentTo(_rom48);
 
         memory.SetPagingMode(0b00000000);
-        memory.ReadRom().ShouldBeEquivalentTo(_rom128);
+        memory.Rom.ToArray().ShouldBeEquivalentTo(_rom128);
     }
 
     [Fact]

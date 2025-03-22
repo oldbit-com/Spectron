@@ -101,6 +101,9 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
 
         DebuggerPreferredNumberFormat = preferences.DebuggerSettings.PreferredNumberFormat;
 
+        IsDivMmcEnabled = preferences.DivMmcSettings.IsEnabled;
+        IsDivMmcWriteEnabled = preferences.DivMmcSettings.IsWriteEnabled;
+
         ShowGamepadMappingView = new Interaction<GamepadMappingViewModel, List<GamepadMapping>?>();
     }
 
@@ -193,6 +196,12 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
             DebuggerSettings = new DebuggerSettings
             {
                 PreferredNumberFormat = DebuggerPreferredNumberFormat,
+            },
+
+            DivMmcSettings = new DivMmcSettings
+            {
+                IsEnabled = IsDivMmcEnabled,
+                IsWriteEnabled = IsDivMmcWriteEnabled,
             }
         };
     }
@@ -543,6 +552,20 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
     {
         get => _debuggerPreferredNumberFormat;
         set => this.RaiseAndSetIfChanged(ref _debuggerPreferredNumberFormat, value);
+    }
+
+    private bool _isDivMmcEnabled;
+    public bool IsDivMmcEnabled
+    {
+        get => _isDivMmcEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isDivMmcEnabled, value);
+    }
+
+    private bool _isDivMmcWriteEnabled;
+    public bool IsDivMmcWriteEnabled
+    {
+        get => _isDivMmcWriteEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isDivMmcWriteEnabled, value);
     }
 
     public void Dispose()

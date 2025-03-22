@@ -75,11 +75,11 @@ public sealed class Z80Snapshot(EmulatorFactory emulatorFactory)
 
         if (emulator.Memory is Memory16K memory16K)
         {
-            snapshot = new Z80File(header, memory16K.Memory[16384..].ToArray());
+            snapshot = new Z80File(header, memory16K.Ram.ToArray());
         }
         else if (emulator.Memory is Memory48K memory48K)
         {
-            snapshot = new Z80File(header, memory48K.Memory[16384..].ToArray());
+            snapshot = new Z80File(header, memory48K.Ram.ToArray());
         }
         else if (emulator.Memory is Memory128K memory128K)
         {

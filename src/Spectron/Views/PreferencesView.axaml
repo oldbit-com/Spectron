@@ -214,8 +214,11 @@
             <TabItem Header="Emulator">
                 <Border Classes="Tab">
                     <StackPanel>
-                        <controls:HeaderSeparator Text="Advanced"/>
+                        <controls:HeaderSeparator Text="Floating bus"/>
                         <CheckBox Content="Enable floating bus emulation" Classes="Center" IsChecked="{Binding IsFloatingBusEnabled}"/>
+                        <controls:HeaderSeparator Text="DivMMC"/>
+                        <CheckBox Content="Enable DivMMC emulation" Classes="Center" IsChecked="{Binding IsDivMmcEnabled}"/>
+                        <CheckBox Content="EEPROM write enabled" Classes="Center" IsChecked="{Binding IsDivMmcWriteEnabled}"/>
                     </StackPanel>
                 </Border>
             </TabItem>
