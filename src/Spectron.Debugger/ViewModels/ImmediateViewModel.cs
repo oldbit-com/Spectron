@@ -5,6 +5,7 @@ using OldBit.Spectron.Debugger.Parser;
 using OldBit.Spectron.Debugger.Parser.Values;
 using OldBit.Spectron.Disassembly.Formatters;
 using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.Extensions;
 using ReactiveUI;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
@@ -14,7 +15,7 @@ public class ImmediateViewModel : ReactiveObject, IOutput
     private readonly DebuggerContext _context;
     private readonly Emulator _emulator;
     private readonly Action _refreshAction;
-    private readonly Action<Word> _listAction;
+    private readonly Action<ListAction> _listAction;
     private readonly NumberFormat _numberFormat;
     private int _historyIndex = -1;
     private string _currentCommandText = string.Empty;
@@ -28,7 +29,7 @@ public class ImmediateViewModel : ReactiveObject, IOutput
         NumberFormat numberFormat,
         Emulator emulator,
         Action refreshAction,
-        Action<Word> listAction)
+        Action<ListAction> listAction)
     {
         _context = context;
         _numberFormat = numberFormat;
@@ -159,10 +160,13 @@ public class ImmediateViewModel : ReactiveObject, IOutput
                     break;
 
                 case ListAction listAction:
-                    _listAction(listAction.Address);
+                    _listAction(listAction);
                     Print($"Listing at ${listAction.Address:X4}");
-
                     return;
+
+                case SaveAction saveAction:
+                    Save(saveAction);
+                    break;
             }
         }
         catch (SyntaxErrorException)
@@ -175,6 +179,29 @@ public class ImmediateViewModel : ReactiveObject, IOutput
         }
 
         _refreshAction();
+    }
+
+    private void Save(SaveAction save)
+    {
+        var memory = _emulator.Memory.GetBytes();
+        var length = save.Length ?? memory.Length - save.Address;
+
+        if (length > memory.Length)
+        {
+            length = memory.Length;
+        }
+
+        try
+        {
+            using var file = new FileStream(save.FilePath, FileMode.Create);
+            file.Write(memory[save.Address..], 0, length);
+
+            Print($"Memory dumped to '{save.FilePath}' {save.Address}:{length}");
+        }
+        catch (Exception ex)
+        {
+            Print(ex.Message);
+        }
     }
 
     private string _commandText = string.Empty;

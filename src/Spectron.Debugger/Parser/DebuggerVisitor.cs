@@ -109,6 +109,15 @@ public class DebuggerVisitor(Z80 cpu, IMemory memory, IBus bus, IOutput output) 
         return new Integer(value, value.GetType());
     }
 
+    public override Value? VisitSavestmt(DebuggerParser.SavestmtContext context)
+    {
+        var filename = context.filepath.Text.Substring(1, context.filepath.Text.Length - 2);
+        var address = context.address == null ? (Word)0 : GetAddressValue(base.Visit(context.address));
+        var length = context.length == null ? null : base.Visit(context.length);
+
+        return new SaveAction(filename, address, length == null ? null : GetValue(length));
+    }
+
     public override Value? VisitHelpstmt(DebuggerParser.HelpstmtContext context)
     {
         output.Print("Available commands:");
@@ -120,6 +129,7 @@ public class DebuggerVisitor(Z80 cpu, IMemory memory, IBus bus, IOutput output) 
         output.Print("  PEEK <address> - Read a value from a memory address, for example: PEEK 16384");
         output.Print("  OUT <port>,<value> - Write a value to an I/O port, for example: OUT 254,255");
         output.Print("  IN <port> - Read a value from an I/O port, for example: IN 254");
+        output.Print("  SAVE \"<filename>\" [<address> [,<length>]] - Save the current memory to a file, for example: SAVE \"rom.bin\" 0,16384");
         output.Print("  R = <value> - Set register value (A, B, C, D, E, H, L, I, R, IXH, IXL, IYH, IYL, AF, AF', BC, BC', DE, DE', HL, HL', IX, IY, PC, SP)");
         output.Print("  Accepted value formats: decimal, hexadecimal or binary (e.g. 255, 0xFF, $FF, #FF, FFh, 0b11111111, 11111111b)");
         output.Print(string.Empty);

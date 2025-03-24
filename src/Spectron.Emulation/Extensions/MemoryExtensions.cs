@@ -17,7 +17,7 @@ public static class MemoryExtensions
         return bytes;
     }
 
-    public static byte[] GetMemory(this IMemory memory)
+    public static byte[] GetBytes(this IMemory memory)
     {
         var memory64 = new byte[65536];
 
