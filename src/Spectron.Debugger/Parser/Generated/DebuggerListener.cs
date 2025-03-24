@@ -152,6 +152,16 @@ public interface IDebuggerListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitListstmt([NotNull] DebuggerParser.ListstmtContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="DebuggerParser.savestmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterSavestmt([NotNull] DebuggerParser.SavestmtContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="DebuggerParser.savestmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitSavestmt([NotNull] DebuggerParser.SavestmtContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>Reg</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// </summary>

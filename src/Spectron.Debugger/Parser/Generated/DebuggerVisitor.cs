@@ -105,6 +105,12 @@ public interface IDebuggerVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitListstmt([NotNull] DebuggerParser.ListstmtContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="DebuggerParser.savestmt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSavestmt([NotNull] DebuggerParser.SavestmtContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>Reg</c>
 	/// labeled alternative in <see cref="DebuggerParser.expression"/>.
 	/// </summary>

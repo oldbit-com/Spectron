@@ -20,7 +20,7 @@ public class CodeListViewModel(
         CodeLines.Clear();
 
         var disassembly = new Disassembler(
-            memory.GetMemory(),
+            memory.GetBytes(),
             address,
             maxCount: 25,
             new DisassemblerOptions { NumberFormat = debuggerSettings.PreferredNumberFormat });

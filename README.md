@@ -158,6 +158,7 @@ memory and disassembly. You can step through the code, set breakpoints. This is 
 - `PEEK address` - reads a value from the memory
 - `OUT `port,value` - writes a value to the IO port
 - `IN port` - reads a value from the IO port
+- `SAVE "filename" [address [,length]]` - saves a memory to a file in binary format starting from the optional address optional length
 - `R=value` - sets a register value
 
 #### Register arguments:
@@ -176,6 +177,7 @@ memory and disassembly. You can step through the code, set breakpoints. This is 
 - `PEEK 16384`
 - `OUT 0xFE,$3E`
 - `IN 254`
+- `SAVE "screen.bin" 16384,6912`
 - `A=10h`, `IXH=A` `HL'=DE`, `IX=0x4000`, `SP=0x8000`, etc.
 
 > [!NOTE]  

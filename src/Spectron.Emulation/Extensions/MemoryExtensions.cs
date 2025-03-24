@@ -28,7 +28,7 @@ public static class MemoryExtensions
         return bytes;
     }
 
-    public static byte[] GetMemory(this IMemory memory)
+    public static byte[] GetBytes(this IMemory memory)
     {
         switch (memory)
         {

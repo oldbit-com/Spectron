@@ -69,6 +69,10 @@ LIST
         : 'LIST'
         ;
 
+SAVE
+        : 'SAVE'
+        ;
+
 ADD
         : '+'
         ;
@@ -83,6 +87,10 @@ MUL
 
 DIV
         : '/'
+        ;
+STRING
+        : '"' ('\\' . | ~['\\])* '"'
+        | '\'' ('\\' . | ~['\\])* '\''
         ;
 
 program
@@ -100,6 +108,7 @@ statement
         | assign
         | gotostmt
         | liststmt
+        | savestmt
         ;
 
 assign
@@ -140,6 +149,10 @@ gotostmt
 
 liststmt
         : LIST address=expression?
+        ;
+
+savestmt
+        : SAVE filepath=STRING (address=expression)? (COMMA length=expression)?
         ;
 
 expression

@@ -15,6 +15,6 @@ public class MemoryViewModel : ReactiveObject
 
     public void Update(IMemory memory)
     {
-        Memory = memory.GetMemory();
+        Memory = memory.GetBytes();
     }
 }

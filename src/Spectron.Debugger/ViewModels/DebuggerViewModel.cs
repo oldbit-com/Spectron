@@ -86,7 +86,7 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
         CodeListViewModel = new CodeListViewModel(_breakpointManager, BreakpointListViewModel);
         ImmediateViewModel = new ImmediateViewModel(_debuggerContext, _debuggerSettings.PreferredNumberFormat, emulator,
             () => Refresh(),
-            address => CodeListViewModel.Update(Emulator.Memory, address, emulator.Cpu.Registers.PC, _debuggerSettings));
+            list => CodeListViewModel.Update(Emulator.Memory, list.Address, emulator.Cpu.Registers.PC, _debuggerSettings));
 
         LoggingViewModel.Configure(emulator);
 
