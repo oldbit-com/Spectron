@@ -38,14 +38,23 @@ public class DivMmcMemory : IRomMemory
         _bank1 = _banks[0];
     }
 
-    internal void AutoPage(bool isEnabled)
+    internal void Paging(PagingMode mode)
     {
         if (IsWriteEnabled)
         {
             return;
         }
 
-        _emulatorMemory.ShadowRom(isEnabled ? this : null);
+        switch (mode)
+        {
+            case PagingMode.On:
+                _emulatorMemory.ShadowRom(this);
+                break;
+
+            case PagingMode.Off:
+                _emulatorMemory.ShadowRom(null);
+                break;
+        }
     }
 
     internal void Control(byte control)
