@@ -34,7 +34,7 @@ internal sealed class FloatingBus : IDevice
             return null;
         }
 
-        var finalStateTicks = _clock.CurrentFrameTicks + 2; // adjust for the final T-state of the instruction
+        var finalStateTicks = _clock.FrameTicks + 2; // adjust for the final T-state of the instruction
 
         if (finalStateTicks < _hardware.FloatingBusStartTicks || finalStateTicks > _hardware.LastPixelTicks)
         {

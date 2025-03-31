@@ -1,4 +1,6 @@
 using OldBit.Spectron.Emulation.Devices.Memory;
+using OldBit.Spectron.Emulation.Devices.Storage.SD;
+using OldBit.Spectron.Emulation.Rom;
 using OldBit.Z80Cpu;
 using OldBit.Z80Cpu.Events;
 
@@ -7,6 +9,8 @@ namespace OldBit.Spectron.Emulation.Devices.Storage;
 public class DivMmc : IDevice
 {
     private readonly Z80 _cpu;
+    private readonly CardDevice _cardDevice = new CardDevice();
+
     private const int ControlRegister = 0xE3;
     private const int CardSelectRegister = 0xE7;
     private const int DataRegister = 0xEB;
@@ -35,19 +39,25 @@ public class DivMmc : IDevice
     {
         _cpu = cpu;
 
-        Memory = new DivMmcMemory(emulatorMemory, new byte[0x2000]);
+        var rom = RomReader.ReadRom(RomType.DivMmc);
+
+        Memory = new DivMmcMemory(emulatorMemory, rom);
     }
 
     public void Enable()
     {
         _isEnabled = true;
-        _cpu.BeforeInstruction += CpuOnBeforeInstruction;
+        //_cpu.BeforeInstruction += CpuOnBeforeInstruction;
+        _cpu.BeforeFetch += CpuOnBeforeOpCodeFetch;
+        _cpu.AfterFetch += CpuOnAfterOpCodeFetch;
     }
 
     public void Disable()
     {
         _isEnabled = false;
-        _cpu.BeforeInstruction -= CpuOnBeforeInstruction;
+        //_cpu.BeforeInstruction -= CpuOnBeforeInstruction;
+        _cpu.BeforeFetch -= CpuOnBeforeOpCodeFetch;
+        _cpu.AfterFetch -= CpuOnAfterOpCodeFetch;
     }
 
     public void WritePort(Word address, byte value)
@@ -64,12 +74,14 @@ public class DivMmc : IDevice
 
         if ((address & 0xFF) == CardSelectRegister)
         {
-
+            _cardDevice.ChipSelect(value);
+            //Console.WriteLine($"Selecting active card: {value}");
         }
 
         if ((address & 0xFF) == DataRegister)
         {
-
+            //Console.WriteLine($"Write DivMMC data register: {value}");
+            _cardDevice.Write(value);
         }
     }
 
@@ -80,16 +92,52 @@ public class DivMmc : IDevice
             return null;
         }
 
+        if ((address & 0xFF) == DataRegister)
+        {
+            //Console.WriteLine("Read DivMMC data register");
+            return _cardDevice.Read();
+        }
+
         return null;
     }
 
-    private void CpuOnBeforeInstruction(BeforeInstructionEventArgs e)
+    private enum AutoPaging
     {
-        if (e.PC is 0x0000 or 0x0008 or 0x0038 or 0x0066 or 0x04C6 or 0x0562 || (e.PC & 0xFF00) == 0x3D00)
+        None,
+        Enable,
+        Disable
+    }
+
+    private AutoPaging _autoPaging = AutoPaging.None;
+
+    private void CpuOnBeforeOpCodeFetch(Word pc)
+    {
+        if (pc is 0x0000 or 0x0008 or 0x0038 or 0x0066 or 0x04C6 or 0x0562)
+        {
+            _autoPaging = AutoPaging.Enable;
+        }
+        else if ((pc & 0xFF00) == 0x3D00)
         {
             Memory.AutoPage(isEnabled: true);
         }
-        else if ((e.PC & 0xFFFF8) == 0x1FF8)
+        else if ((pc & 0xFFFF8) == 0x1FF8)
+        {
+            _autoPaging = AutoPaging.Disable;
+        }
+        else
+        {
+            _autoPaging = AutoPaging.None;
+        }
+    }
+
+    private void CpuOnAfterOpCodeFetch(Word pc)
+    {
+        if (_autoPaging == AutoPaging.Enable)
+        {
+            Memory.AutoPage(isEnabled: true);
+        }
+
+        if (_autoPaging == AutoPaging.Disable)
         {
             Memory.AutoPage(isEnabled: false);
         }

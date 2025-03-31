@@ -242,7 +242,7 @@ public sealed class Emulator
     {
         var audioBuffer = AudioManager.EndFrame();
 
-        ScreenBuffer.UpdateBorder(Cpu.Clock.CurrentFrameTicks);
+        ScreenBuffer.UpdateBorder(Cpu.Clock.FrameTicks);
 
         FrameCompleted?.Invoke(ScreenBuffer.FrameBuffer, audioBuffer);
 

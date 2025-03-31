@@ -22,6 +22,7 @@
       <EmbeddedResource Include="Tape\Loader\Files\48.szx" />
       <EmbeddedResource Include="Tape\Loader\Files\16.szx" />
       <EmbeddedResource Include="Tape\Loader\Files\128.szx" />
+      <EmbeddedResource Include="Rom\Files\ESXMMC.0.8.9.BIN" />
     </ItemGroup>
 
     <ItemGroup>
@@ -43,7 +44,7 @@
       <PackageReference Include="OldBit.Beep" Version="0.9.3-pre.111" />
       <PackageReference Include="OldBit.Joypad" Version="0.0.2-rc.3" />
       <PackageReference Include="OldBit.Spectron.Files" Version="0.9.3-pre.94" />
-      <PackageReference Include="OldBit.Z80Cpu.Spectron" Version="0.9.3-pre.8" />
+      <PackageReference Include="OldBit.Z80Cpu.Spectron" Version="0.9.3-pre.9" />
     </ItemGroup>
 
 </Project>

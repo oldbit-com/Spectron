@@ -28,7 +28,7 @@ internal sealed class AyAudio
         _statesPerSample = (long)(Multiplier * statesPerSample);
         _sampleRate = statesPerSample / AyCycles;
 
-        _ay.OnUpdateAudio = () => Update(clock.CurrentFrameTicks);
+        _ay.OnUpdateAudio = () => Update(clock.FrameTicks);
     }
 
     internal void NewFrame()
@@ -40,8 +40,8 @@ internal sealed class AyAudio
 
     internal void EndFrame()
     {
-        Update(_clock.CurrentFrameTicks);
-        _ayTicks -= _clock.CurrentFrameTicks;
+        Update(_clock.FrameTicks);
+        _ayTicks -= _clock.FrameTicks;
     }
 
     internal void Reset() => _ay.Reset();
