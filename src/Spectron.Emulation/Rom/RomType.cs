@@ -23,6 +23,8 @@ public enum RomType
     Harston,
 
     BrendanAlford,
+
+    DivMmc,
 }
 
 internal static class RomTypeExtensions
