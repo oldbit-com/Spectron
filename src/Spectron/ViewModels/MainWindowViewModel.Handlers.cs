@@ -368,6 +368,8 @@ partial class MainWindowViewModel
         }
     }
 
+    private void HandleTriggerNmi() => Emulator?.Cpu.TriggerNmi();
+
     private void HandleMachineReset()
     {
         Emulator?.Reset();

@@ -101,6 +101,7 @@ public partial class MainWindowViewModel : ReactiveObject
     public ReactiveCommand<Unit, Unit> TogglePauseCommand { get; private set; }
     public ReactiveCommand<Unit, Task> ShowTimeMachineViewCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleMuteCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> TriggerNmiCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ResetCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> HardResetCommand { get; private set; }
 
@@ -210,6 +211,7 @@ public partial class MainWindowViewModel : ReactiveObject
         TogglePauseCommand = ReactiveCommand.Create(HandleTogglePause);
         ShowTimeMachineViewCommand = ReactiveCommand.Create(OpenTimeMachineWindow, timeMachineEnabled);
         ToggleMuteCommand = ReactiveCommand.Create(HandleToggleMute);
+        TriggerNmiCommand = ReactiveCommand.Create(HandleTriggerNmi);
         ResetCommand = ReactiveCommand.Create(HandleMachineReset);
         HardResetCommand = ReactiveCommand.Create(HandleMachineHardReset);
 
