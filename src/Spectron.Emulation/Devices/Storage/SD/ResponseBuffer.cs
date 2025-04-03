@@ -1,12 +1,12 @@
 namespace OldBit.Spectron.Emulation.Devices.Storage.SD;
 
-internal class ResponseBuffer
+internal sealed class ResponseBuffer
 {
-    private readonly byte[] _buffer = new byte[20];
+    private readonly byte[] _buffer = new byte[516];
     private int _endPosition;
     private int _currentPosition;
 
-    internal void R1(Status status)
+    internal void Put(Status status)
     {
         _buffer[0] = (byte)(status);
 
@@ -14,21 +14,33 @@ internal class ResponseBuffer
         _currentPosition = 0;
     }
 
-    internal void R1(Status status, byte token, byte[] data, byte crc1, byte crc2)
+    internal void Put(Status status, byte token, byte[] data, byte crc1, byte crc2)
     {
         _buffer[0] = (byte)(status);
         _buffer[1] = token;
 
         Array.Copy(data, 0, _buffer, 2, data.Length);
 
-        _buffer[18] = crc1;
-        _buffer[19] = crc2;
+        _buffer[2 + data.Length] = crc1;
+        _buffer[2 + data.Length] = crc2;
 
-        _endPosition = 20;
+        _endPosition = 4 + data.Length;
         _currentPosition = 0;
     }
 
-    internal void R7(Status status, byte voltage, byte checkPattern)
+    internal void Put(Status status, ulong value)
+    {
+        _buffer[0] = (byte)(status);
+        _buffer[1] = (byte)(value >> 24);
+        _buffer[2] = (byte)(value >> 16);
+        _buffer[3] = (byte)(value >> 8);
+        _buffer[4] = (byte)(value);
+
+        _endPosition = 5;
+        _currentPosition = 0;
+    }
+
+    internal void Put(Status status, byte voltage, byte checkPattern)
     {
         _buffer[0] = (byte)(status);
         _buffer[1] = 0;

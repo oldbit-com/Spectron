@@ -5,18 +5,19 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.Devices.Storage;
 
-public class DivMmc : IDevice
+public sealed class DivMmc : IDevice
 {
     private const int ControlRegister = 0xE3;
     private const int CardSelectRegister = 0xE7;
     private const int DataRegister = 0xEB;
 
-    private const byte MMC0 = 0b10;
-    private const byte MMC1 = 0b01;
+    private const byte Sd0 = 0b10;  // negated, bit 0 == 0, selected card 0
+    private const byte Sd1 = 0b01;  // negated, bit 1 == 0, selected card 1
 
     private readonly Z80 _cpu;
     private readonly CardDevice _cardDevice = new();
 
+    private SdCard? _sdCard;
     private bool _isEnabled;
     private PagingMode _delayedPagingMode = PagingMode.None;
 
@@ -47,6 +48,16 @@ public class DivMmc : IDevice
         _cpu.AfterFetch -= AfterFetch;
     }
 
+    public void InsertCard(string filename)
+    {
+        _sdCard?.Dispose();
+
+        if (!string.IsNullOrWhiteSpace(filename))
+        {
+            _sdCard = new SdCard(filename);
+        }
+    }
+
     public void WritePort(Word address, byte value)
     {
         if (!_isEnabled)
@@ -61,13 +72,27 @@ public class DivMmc : IDevice
 
         if ((address & 0xFF) == CardSelectRegister)
         {
-            _cardDevice.ChipSelect(value);
-            Console.WriteLine($"Selecting active card: {value:X2}");
+            if ((value & 0x03) == 0x03)
+            {
+                _cardDevice.RemoveCard();
+            }
+            else if ((value & Sd0) == Sd0)
+            {
+                if (_sdCard != null)
+                {
+                    _cardDevice.InsertCard(_sdCard);
+                }
+            }
+            else if ((value & Sd1) == Sd1)
+            {
+                // TODO: Support multiple cards
+                _cardDevice.RemoveCard();
+                //_cardDevice.InsertCard(_sdCard);
+            }
         }
 
         if ((address & 0xFF) == DataRegister)
         {
-            Console.WriteLine($"Write DivMMC data register: {value:X2}");
             _cardDevice.Write(value);
         }
     }
@@ -81,7 +106,6 @@ public class DivMmc : IDevice
 
         if ((address & 0xFF) == DataRegister)
         {
-            Console.WriteLine("Read DivMMC data register");
             return _cardDevice.Read();
         }
 
@@ -107,17 +131,4 @@ public class DivMmc : IDevice
     }
 
     private void AfterFetch(Word pc) => Memory.Paging(_delayedPagingMode);
-
-    private void SelectActiveCard(byte value)
-    {
-        // WR Only = 2 bit chip select register (D0 = MMC0; D1 = MMC1), active LOW
-        switch (value & 0x03)
-        {
-            case MMC0:
-                break;
-
-            case MMC1:
-                break;
-        }
-    }
 }

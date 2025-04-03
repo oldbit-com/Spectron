@@ -2,10 +2,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace OldBit.Spectron.Emulation.Devices.Storage.SD;
 
+/// <summary>
+/// Represents a command sent to the DivMMC SD device.
+/// </summary>
 internal sealed class Command
 {
-    private byte _crc;
-
     internal int Id { get; }
 
     internal int Length { get; private set; }
@@ -36,7 +37,7 @@ internal sealed class Command
     {
         if (Length == 5)
         {
-            _crc = value;
+            // Ignore CRC
         }
         else
         {
