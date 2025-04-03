@@ -109,7 +109,7 @@ public sealed class Emulator
 
         AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware);
 
-        DivMmc = new DivMmc(Cpu, _memory);
+        DivMmc = new DivMmc(Cpu, _memory, logger);
 
         SetupUlaAndDevices();
         SetupEventHandlers();

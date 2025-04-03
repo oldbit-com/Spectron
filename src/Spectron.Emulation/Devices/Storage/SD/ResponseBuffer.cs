@@ -22,13 +22,22 @@ internal sealed class ResponseBuffer
         Array.Copy(data, 0, _buffer, 2, data.Length);
 
         _buffer[2 + data.Length] = crc1;
-        _buffer[2 + data.Length] = crc2;
+        _buffer[3 + data.Length] = crc2;
 
         _endPosition = 4 + data.Length;
         _currentPosition = 0;
     }
 
-    internal void Put(Status status, ulong value)
+    internal void Put(Status status, byte token)
+    {
+        _buffer[0] = (byte)(status);
+        _buffer[1] = token;
+
+        _endPosition = 2;
+        _currentPosition = 0;
+    }
+
+    internal void Put(Status status, uint value)
     {
         _buffer[0] = (byte)(status);
         _buffer[1] = (byte)(value >> 24);

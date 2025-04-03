@@ -15,6 +15,9 @@ internal class CardDevice
     private const byte SendOpCond = 41;      // ACMD41 - SEND_OP_COND
     private const byte ReadOcr = 58;         // CMD58  - READ_OCR
 
+    private const byte DataErrorToken = 0x01;
+    private const byte StartBlockToken = 0xFE;
+
     private SdCard? _sdCard;
     private Status _status;
     private bool _isAppCmd;
@@ -118,7 +121,7 @@ internal class CardDevice
                 data.Set(25, 22, 9);                    // WRITE_BL_LEN
                 data.Set(0, 0, 1);                      // Not used (always 1)
 
-                _responseBuffer.Put(_status, 0xFE, data.ToArray(), 0x00, 0x00);
+                _responseBuffer.Put(_status, StartBlockToken, data.ToArray(), 0x00, 0x00);
 
                 break;
 
@@ -132,7 +135,7 @@ internal class CardDevice
                 data.Set(19, 8, 0x31707);               // Manufacturing date (Year/Month)
                 data.Set(0, 0, 1);                      // Always set to 1
 
-                _responseBuffer.Put(_status, 0xFE, data.ToArray(), 0x00, 0x00);
+                _responseBuffer.Put(_status, StartBlockToken, data.ToArray(), 0x00, 0x00);
 
                 break;
 
@@ -151,8 +154,16 @@ internal class CardDevice
                     return;
                 }
 
-                var buffer = _sdCard.ReadSector(sector);
-                _responseBuffer.Put(_status, 0xFE, buffer, 0x00, 0x00);
+                try
+                {
+                    var buffer = _sdCard.ReadSector(sector);
+
+                    _responseBuffer.Put(_status, StartBlockToken, buffer, 0x00, 0x00);
+                }
+                catch
+                {
+                    _responseBuffer.Put(_status, DataErrorToken);
+                }
 
                 break;
 

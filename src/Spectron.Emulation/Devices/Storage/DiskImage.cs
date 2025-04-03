@@ -7,7 +7,7 @@ internal sealed class DiskImage : IDisposable
     private readonly BinaryReader _reader;
     private readonly string _filename;
 
-    internal uint FirstSectorOffset { get; private set; }
+    private uint _firstSectorOffset;
 
     internal uint TotalSectors { get; private set; }
 
@@ -25,7 +25,7 @@ internal sealed class DiskImage : IDisposable
 
     internal byte[] ReadSector(int sector)
     {
-        _reader.BaseStream.Seek(FirstSectorOffset + SectorSize * sector, SeekOrigin.Begin);
+        _reader.BaseStream.Seek(_firstSectorOffset + SectorSize * sector, SeekOrigin.Begin);
 
         return _reader.ReadBytes(512);
     }
@@ -46,7 +46,7 @@ internal sealed class DiskImage : IDisposable
         var startLba = (uint)(mbr[0x1C6] | (mbr[0x1C7] << 8) | (mbr[0x1C8] << 16) | (mbr[0x1C9] << 24));
         TotalSectors = (uint)(mbr[0x1CA] | (mbr[0x1CB] << 8) | (mbr[0x1CC] << 16) | (mbr[0x1CD] << 24));
 
-        FirstSectorOffset = startLba * SectorSize;
+        _firstSectorOffset = startLba * SectorSize;
     }
 
     public void Dispose() => _reader.Dispose();

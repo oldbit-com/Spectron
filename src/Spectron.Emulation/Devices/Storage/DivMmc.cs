@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Devices.Storage.SD;
 using OldBit.Spectron.Emulation.Rom;
@@ -15,6 +16,7 @@ public sealed class DivMmc : IDevice
     private const byte Sd1 = 0b01;  // negated, bit 1 == 0, selected card 1
 
     private readonly Z80 _cpu;
+    private readonly ILogger _logger;
     private readonly CardDevice _cardDevice = new();
 
     private SdCard? _sdCard;
@@ -23,9 +25,10 @@ public sealed class DivMmc : IDevice
 
     public DivMmcMemory Memory { get; }
 
-    internal DivMmc(Z80 cpu, IEmulatorMemory emulatorMemory)
+    internal DivMmc(Z80 cpu, IEmulatorMemory emulatorMemory, ILogger logger)
     {
         _cpu = cpu;
+        _logger = logger;
 
         var rom = RomReader.ReadRom(RomType.DivMmc);
 
@@ -51,10 +54,20 @@ public sealed class DivMmc : IDevice
     public void InsertCard(string filename)
     {
         _sdCard?.Dispose();
+        _sdCard = null;
 
-        if (!string.IsNullOrWhiteSpace(filename))
+        if (string.IsNullOrWhiteSpace(filename))
+        {
+            return;
+        }
+
+        try
         {
             _sdCard = new SdCard(filename);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load sd card: {Filename}",  filename);
         }
     }
 

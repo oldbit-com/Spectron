@@ -30,7 +30,7 @@ public class DivMmcTests
 
         cpu.Step();
 
-        var divMmc = new DivMmc(cpu, emulatorMemory);
+        //var divMmc = new DivMmc(cpu, emulatorMemory);
         //divMmc.Memory.PageMemory();
 
         // TODO: Complete the test
