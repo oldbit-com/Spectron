@@ -32,6 +32,7 @@ It uses several of my own libraries that I created for this project:
 - [x] Multicolor screen effects in games and demos
 - [x] ULA+ support
 - [x] AY-3-8912 sound chip emulation
+- [x] DivMMC emulation
 - [x] Adjustable emulator speed
 - [x] Debugger
 - [x] Keyboard joystick emulation: Kempston, Sinclair, Cursor & Fuller.
@@ -112,6 +113,11 @@ joystick or keyboard keys. Standard keyboard can also be used as a joystick, arr
 > Not all controllers may work, and compatibility depends on the platform. Experimental feature.
 ## ULA+ support
 ULA+ mode is supported and can be enabled or disabled in the emulator settings.
+
+## DivMMC
+DivMMC emulation is supported and can be enabled or disabled in the emulator settings.
+It is based on [esxDOS 0.8.9](https://esxdos.org/). You will need to create a disk image with esxDOS files. 
+This needs to be a raw disk image, not HDF format. This feature is still experimental and might need some improvements.
 
 ## Time Machine
 Time Machine is a feature that allows you to go back in time and continue from given time point in the past.
