@@ -12,7 +12,7 @@ public class CommandTests
 
         result.ShouldBeTrue();
         command.ShouldNotBeNull();
-        command.Length.ShouldBe(1);
+        command.IsReady.ShouldBeFalse();
     }
 
     [Fact]
@@ -27,6 +27,6 @@ public class CommandTests
         command.ProcessNextByte(0x00);
         command.ProcessNextByte(0x00);
         command.ProcessNextByte(0x95);
-        command.Length.ShouldBe(6);
+        command.IsReady.ShouldBeTrue();
     }
 }

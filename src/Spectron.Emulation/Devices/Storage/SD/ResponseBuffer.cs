@@ -6,11 +6,13 @@ internal sealed class ResponseBuffer
     private int _endPosition;
     private int _currentPosition;
 
-    internal void Put(Status status)
-    {
-        _buffer[0] = (byte)(status);
+    internal void Put(Status status) => Put([(byte)status]);
 
-        _endPosition = 1;
+    internal void Put(byte[] data)
+    {
+        Array.Copy(data, 0, _buffer, 0, data.Length);
+
+        _endPosition = data.Length;
         _currentPosition = 0;
     }
 

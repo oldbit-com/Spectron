@@ -6,6 +6,7 @@ internal sealed class DiskImage : IDisposable
 
     private readonly BinaryReader _reader;
     private readonly string _filename;
+    private readonly Dictionary<int, byte[]> _writeSectors = new();
 
     private uint _firstSectorOffset;
 
@@ -25,9 +26,21 @@ internal sealed class DiskImage : IDisposable
 
     internal byte[] ReadSector(int sector)
     {
+        if (_writeSectors.TryGetValue(sector, out var data))
+        {
+            return data;
+        }
+
         _reader.BaseStream.Seek(_firstSectorOffset + SectorSize * sector, SeekOrigin.Begin);
 
-        return _reader.ReadBytes(512);
+        data = _reader.ReadBytes(SectorSize);
+
+        return data;
+    }
+
+    internal void WriteSector(int sector, byte[] data)
+    {
+        _writeSectors[sector] = data;
     }
 
     private void ParseMbr()
@@ -36,7 +49,7 @@ internal sealed class DiskImage : IDisposable
         using var reader = new BinaryReader(file);
 
         _reader.BaseStream.Seek(0, SeekOrigin.Begin);
-        var mbr = _reader.ReadBytes(512);
+        var mbr = _reader.ReadBytes(SectorSize);
 
         if (mbr[0x1FE] != 0x55 || mbr[0x1FF] != 0xAA)
         {

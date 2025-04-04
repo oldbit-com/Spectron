@@ -12,6 +12,8 @@ public enum RomType
 
     Timex2048,
 
+    DivMmc,
+
     Custom,
 
     Retroleum,
@@ -23,11 +25,9 @@ public enum RomType
     Harston,
 
     BrendanAlford,
-
-    DivMmc,
 }
 
 internal static class RomTypeExtensions
 {
-    internal static bool IsCustomRom(this RomType romType) => romType > RomType.Timex2048;
+    internal static bool IsCustomRom(this RomType romType) => romType >= RomType.Custom;
 }

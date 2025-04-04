@@ -3,20 +3,23 @@ using System.Diagnostics.CodeAnalysis;
 namespace OldBit.Spectron.Emulation.Devices.Storage.SD;
 
 /// <summary>
-/// Represents a command sent to the DivMMC SD device.
+/// Represents a command sent to the DivMMC SD device. It is 6 bytes long.
 /// </summary>
 internal sealed class Command
 {
+    private int _count;
+
     internal int Id { get; }
 
-    internal int Length { get; private set; }
-
     internal byte[] Arguments { get; } = new byte[4];
+
+    internal bool IsReady => _count == 6;
 
     private Command(byte id)
     {
         Id = (id & 0x3F);
-        Length = 1;
+
+        _count = 1;
     }
 
     internal static bool TryCreateCommand(byte value, [NotNullWhen(true)]out Command? command)
@@ -35,15 +38,15 @@ internal sealed class Command
 
     internal void ProcessNextByte(byte value)
     {
-        if (Length == 5)
+        if (_count == 5)
         {
             // Ignore CRC
         }
         else
         {
-            Arguments[Length - 1] = value;
+            Arguments[_count - 1] = value;
         }
 
-        Length += 1;
+        _count += 1;
     }
 }

@@ -1,16 +1,15 @@
-using System.Collections;
-using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Spectron.Emulation.Utilities;
 
 namespace OldBit.Spectron.Emulation.Devices.Storage.SD;
 
-internal class CardDevice
+internal sealed class CardDevice
 {
     private const byte GoIdleState = 0;      // CMD0   - GO_IDLE_STATE
     private const byte SendIfCond = 8;       // CMD8   - SEND_IF_COND
     private const byte SendCsd = 9;          // CMD9   - SEND_CSD
     private const byte SendCid = 10;         // CMD10  - SEND_CID
     private const byte ReadSingleBlock = 17; // CMD17  - READ_SINGLE_BLOCK
+    private const byte WriteBlock = 24;      // CMD24  - WRITE_BLOCK
     private const byte AppCmd = 55;          // CMD55  - APP_CMD
     private const byte SendOpCond = 41;      // ACMD41 - SEND_OP_COND
     private const byte ReadOcr = 58;         // CMD58  - READ_OCR
@@ -24,6 +23,7 @@ internal class CardDevice
 
     private readonly ResponseBuffer _responseBuffer = new();
     private Command? _command;
+    private DataBlock? _dataBlock;
 
     internal void InsertCard(SdCard sdCard) => _sdCard = sdCard;
 
@@ -36,24 +36,38 @@ internal class CardDevice
             return;
         }
 
-        if (_command == null || _command.Length is 0 or 6)
+        // For write we need to receive the command and then the data
+        if (_command is { Id: WriteBlock, IsReady: true } && _dataBlock?.IsReady == false)
         {
+            _dataBlock.ProcessNextByte(value);
+
+            if (_dataBlock.IsReady)
+            {
+                ExecuteCommand();
+            }
+
+            return;
+        }
+
+        if (_command == null || _command.IsReady)
+        {
+            // Time for a new command
             if (Command.TryCreateCommand(value, out var command))
             {
                 _command = command;
+                _dataBlock = _command.Id == WriteBlock ? new DataBlock() : null;
             }
         }
         else
         {
+            // We are still receiving the command
             _command.ProcessNextByte(value);
         }
 
-        if (_command?.Length != 6)
+        if (_command?.IsReady != true)
         {
             return;
         }
-
-        Console.WriteLine($"Executing command: {_command.Id}");
 
         if (_isAppCmd)
         {
@@ -85,6 +99,7 @@ internal class CardDevice
         }
 
         BitVector? data;
+        int sector;
 
         switch (_command?.Id)
         {
@@ -130,7 +145,7 @@ internal class CardDevice
 
                 data.Set(127, 120, 0x03);               // Manufacturer ID
                 data.Set(119, 104, 0x2020);             // OEM/Application ID (ASCII chars)
-                data.Set(103, 64, 0x535054524E);        // Product name (ASCII chars)
+                data.Set(103, 64, 0x535043524E);        // Product name (ASCII chars)
                 data.Set(63, 56, 0x0100);               // Product revision
                 data.Set(19, 8, 0x31707);               // Manufacturing date (Year/Month)
                 data.Set(0, 0, 1);                      // Always set to 1
@@ -145,7 +160,7 @@ internal class CardDevice
                 break;
 
             case ReadSingleBlock:
-                var sector = _command.Arguments[0] << 24 | _command.Arguments[1] << 16 |
+                sector = _command.Arguments[0] << 24 | _command.Arguments[1] << 16 |
                              _command.Arguments[2] << 8 | _command.Arguments[3];
 
                 if (sector >= _sdCard.TotalSectors)
@@ -163,6 +178,32 @@ internal class CardDevice
                 catch
                 {
                     _responseBuffer.Put(_status, DataErrorToken);
+                }
+
+                break;
+
+            case WriteBlock:
+                if (_dataBlock?.IsReady == true)
+                {
+                    // We have received a complete block
+                    sector = _command.Arguments[0] << 24 | _command.Arguments[1] << 16 |
+                             _command.Arguments[2] << 8 | _command.Arguments[3];
+
+                    if (sector >= _sdCard.TotalSectors)
+                    {
+                        _responseBuffer.Put(_status | Status.IllegalCommand);
+                    }
+                    else
+                    {
+                        _sdCard.WriteSector(sector, _dataBlock.Data);
+                        _responseBuffer.Put([0x05, 0x01]); // Data accepted + busy flag
+                    }
+
+                    _dataBlock = null;
+                }
+                else
+                {
+                    _responseBuffer.Put(_status);
                 }
 
                 break;

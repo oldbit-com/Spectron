@@ -10,7 +10,9 @@ internal sealed class SdCard : IDisposable
 
     internal SdCard(string filename) => _diskImage = new DiskImage(filename);
 
-    internal byte[] ReadSector(int sector) => _diskImage.ReadSector(sector);
+    internal byte[] ReadSector(int sector) =>  _diskImage.ReadSector(sector);
+
+    internal void WriteSector(int sector, byte[] data) => _diskImage.WriteSector(sector, data);
 
     public void Dispose() => _diskImage.Dispose();
 }

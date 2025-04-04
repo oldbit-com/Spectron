@@ -2,6 +2,7 @@ using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Memory;
+using OldBit.Spectron.Emulation.Devices.Storage;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.State.Components;
 using OldBit.Spectron.Emulation.Tape;
@@ -42,6 +43,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         SaveJoystick(emulator.JoystickManager, snapshot.Joystick);
         SaveTape(emulator.TapeManager, snapshot);
         SaveAy(emulator.AudioManager, snapshot);
+        SaveMmc(emulator.DivMmc);
         SaveOther(emulator, snapshot);
 
         if (emulator.RomType.IsCustomRom())
@@ -150,6 +152,11 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
             CurrentRegister = audioManager.Ay.CurrentRegister,
             Registers = audioManager.Ay.Registers,
         };
+    }
+
+    private static void SaveMmc(DivMmc emulatorDivMmc)
+    {
+
     }
 
     private static void SaveOther(Emulator emulator, StateSnapshot stateSnapshot) =>
