@@ -54,6 +54,20 @@ public sealed class SnaSnapshot(EmulatorFactory emulatorFactory)
                 PC = emulator.Cpu.Registers.PC,
             };
         }
+        else
+        {
+            switch (emulator.Memory)
+            {
+                case Memory16K memory16K:
+                    snapshot.Ram48 = new byte[49152];
+                    Array.Copy(memory16K.Ram.ToArray(), snapshot.Ram48, memory16K.Ram.Length);
+                    break;
+
+                case Memory48K memory48K:
+                    snapshot.Ram48 = memory48K.Ram.ToArray();
+                    break;
+            }
+        }
 
         snapshot.Save(fileName);
     }
