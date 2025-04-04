@@ -214,8 +214,29 @@
             <TabItem Header="Emulator">
                 <Border Classes="Tab">
                     <StackPanel>
-                        <controls:HeaderSeparator Text="Advanced"/>
+                        <controls:HeaderSeparator Text="Floating bus"/>
                         <CheckBox Content="Enable floating bus emulation" Classes="Center" IsChecked="{Binding IsFloatingBusEnabled}"/>
+                        <controls:HeaderSeparator Text="DivMMC"/>
+                        <CheckBox Content="Enable DivMMC emulation" Classes="Center" IsChecked="{Binding IsDivMmcEnabled}"/>
+                        <CheckBox Content="EEPROM write enabled" Classes="Center" IsChecked="{Binding IsDivMmcWriteEnabled}"/>
+
+                        <Grid ColumnDefinitions="120,*" RowDefinitions="40">
+                            <TextBlock
+                                Grid.Column="0"
+                                Grid.Row="0"
+                                Text="SD card image:"
+                                VerticalAlignment="Center"
+                                Classes="Center"/>
+
+                            <TextBox
+                                Grid.Column="1"
+                                Grid.Row="0"
+                                Text="{Binding DivMmcCard0FileName}"
+                                Margin="5 0 0 0"
+                                Height="30"
+                                Watermark="Image file containing SD card contents"
+                                VerticalContentAlignment="Center"/>
+                        </Grid>
                     </StackPanel>
                 </Border>
             </TabItem>

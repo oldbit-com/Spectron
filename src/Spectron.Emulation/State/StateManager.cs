@@ -2,6 +2,7 @@ using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Memory;
+using OldBit.Spectron.Emulation.Devices.Storage;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.State.Components;
 using OldBit.Spectron.Emulation.Tape;
@@ -24,6 +25,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         LoadJoystick(emulator.JoystickManager, snapshot.Joystick);
         LoadTape(emulator.TapeManager, snapshot.Tape);
         LoadAy(emulator.AudioManager, snapshot.Ay);
+        LoadDivMmc(emulator.DivMmc, snapshot.DivMmc);
         LoadOther(emulator, snapshot);
 
         return emulator;
@@ -42,6 +44,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         SaveJoystick(emulator.JoystickManager, snapshot.Joystick);
         SaveTape(emulator.TapeManager, snapshot);
         SaveAy(emulator.AudioManager, snapshot);
+        SaveDivMmc(emulator.DivMmc, snapshot);
         SaveOther(emulator, snapshot);
 
         if (emulator.RomType.IsCustomRom())
@@ -82,12 +85,12 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         switch (memory)
         {
             case Memory16K memory16K:
-                memoryState.SetBank(memory16K.Memory[0x4000..0x8000], pageNumber: 0);
+                memoryState.SetBank(memory16K.Ram.ToArray(), pageNumber: 0);
 
                 break;
 
             case Memory48K memory48K:
-                memoryState.SetBank(memory48K.Memory[0x4000..], pageNumber: 0);
+                memoryState.SetBank(memory48K.Ram.ToArray(), pageNumber: 0);
 
                 break;
 
@@ -152,6 +155,20 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         };
     }
 
+    private static void SaveDivMmc(DivMmc divMmc, StateSnapshot stateSnapshot)
+    {
+        if (!divMmc.IsEnabled)
+        {
+            return;
+        }
+
+        stateSnapshot.DivMmc = new DivMmcState
+        {
+            ControlRegister = divMmc.Memory.ControlRegister,
+            Banks = divMmc.Memory.Banks,
+        };
+    }
+
     private static void SaveOther(Emulator emulator, StateSnapshot stateSnapshot) =>
         stateSnapshot.BorderColor = emulator.ScreenBuffer.LastBorderColor;
 
@@ -161,18 +178,18 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         {
             Memory16K memory16K => new CustomRomState
             {
-                Bank0 = memory16K.Memory[..0x4000],
+                Bank0 = memory16K.Rom.ToArray(),
                 RomType = emulator.RomType,
             },
             Memory48K memory48K => new CustomRomState
             {
-                Bank0 = memory48K.Memory[..0x4000],
+                Bank0 = memory48K.Rom.ToArray(),
                 RomType = emulator.RomType,
             },
             Memory128K memory128K => new CustomRomState
             {
-                Bank0 = memory128K.RomBank0,
-                Bank1 = memory128K.RomBank1,
+                Bank0 = memory128K.RomBank0.Memory,
+                Bank1 = memory128K.RomBank1.Memory,
                 RomType = emulator.RomType,
             },
             _ => null
@@ -209,12 +226,12 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         switch (memory)
         {
             case Memory16K memory16K:
-                Array.Copy(memoryState.Banks[0], 0, memory16K.Memory, 0x4000, memoryState.Banks[0].Length);
+                memoryState.Banks[0].CopyTo(memory16K.Ram);
 
                 break;
 
             case Memory48K memory48K:
-                Array.Copy(memoryState.Banks[0], 0, memory48K.Memory, 0x4000, memoryState.Banks[0].Length);
+                memoryState.Banks[0].CopyTo(memory48K.Ram);
 
                 break;
 
@@ -277,5 +294,16 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         audioManager.IsBeeperEnabled = true;
 
         audioManager.Ay.LoadRegisters(ayState.CurrentRegister, ayState.Registers);
+    }
+
+    private static void LoadDivMmc(DivMmc divMmc, DivMmcState? divMmcState)
+    {
+        if (divMmcState == null)
+        {
+            return;
+        }
+
+        divMmc.Memory.Banks = divMmcState.Banks;
+        divMmc.Memory.PagingControl(divMmcState.ControlRegister);
     }
 }

@@ -34,7 +34,7 @@ public class CpuViewModel : ReactiveObject
         IFF2 = cpu.IFF2 ? "1" : "0";
         IM = ((int)cpu.IM).ToString();
 
-        T = cpu.Clock.CurrentFrameTicks;
+        T = cpu.Clock.FrameTicks;
     }
 
     private Word _af;

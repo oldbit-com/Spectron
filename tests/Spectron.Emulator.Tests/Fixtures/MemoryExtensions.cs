@@ -16,18 +16,6 @@ internal static class MemoryExtensions
         return result;
     }
 
-    internal static byte[] ReadRom(this IEmulatorMemory memory)
-    {
-        var result = new byte[16384];
-
-        for (var address = 0; address < 16384; address++)
-        {
-            result[address] = memory.Read((Word)address);
-        }
-
-        return result;
-    }
-
     internal static byte[] ReadRange(this IEmulatorMemory memory, int startAddress, int count)
     {
         var result = new byte[count];

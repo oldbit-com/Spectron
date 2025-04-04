@@ -44,7 +44,7 @@ internal sealed class InstructionLogger : IDisposable
         }
 
         var address = _emulator.Cpu.Registers.PC;
-        var ticks = _emulator.Cpu.Clock.CurrentFrameTicks;
+        var ticks = _emulator.Cpu.Clock.FrameTicks;
         var instruction = string.Empty;
 
         var instructions = _disassembler.Disassemble(address);

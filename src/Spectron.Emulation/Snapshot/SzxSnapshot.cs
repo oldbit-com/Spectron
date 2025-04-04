@@ -273,13 +273,13 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         switch (memory)
         {
             case Memory16K memory16K:
-                ramPages.Add(new RamPageBlock(memory16K.Memory[0x4000..0x8000], pageNumber: 5, compressionLevel));
+                ramPages.Add(new RamPageBlock(memory16K.Ram.ToArray(), pageNumber: 5, compressionLevel));
                 break;
 
             case Memory48K memory48K:
-                ramPages.Add(new RamPageBlock(memory48K.Memory[0x4000..0x8000], pageNumber: 5, compressionLevel));
-                ramPages.Add(new RamPageBlock(memory48K.Memory[0x8000..0xC000], pageNumber: 2, compressionLevel));
-                ramPages.Add(new RamPageBlock(memory48K.Memory[0xC000..0x10000], pageNumber: 0, compressionLevel));
+                ramPages.Add(new RamPageBlock(memory48K.Ram[..0x4000].ToArray(), pageNumber: 5, compressionLevel));
+                ramPages.Add(new RamPageBlock(memory48K.Ram[0x4000..0x8000].ToArray(), pageNumber: 2, compressionLevel));
+                ramPages.Add(new RamPageBlock(memory48K.Ram[0x8000..0xC000].ToArray(), pageNumber: 0, compressionLevel));
                 break;
 
             case Memory128K memory128K:
@@ -299,15 +299,16 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
     {
         if (memory is Memory16K memory16K)
         {
-            snapshot.CustomRom = new CustomRomBlock(memory16K.Memory[..0x4000], compressionLevel);
+            snapshot.CustomRom = new CustomRomBlock(memory16K.Rom.ToArray(), compressionLevel);
         }
         else if (memory is Memory48K memory48K)
         {
-            snapshot.CustomRom = new CustomRomBlock(memory48K.Memory[..0x4000], compressionLevel);
+            snapshot.CustomRom = new CustomRomBlock(memory48K.Rom.ToArray(), compressionLevel);
         }
         else if (memory is Memory128K memory128K)
         {
-            snapshot.CustomRom = new CustomRomBlock(memory128K.RomBank0.Concatenate(memory128K.RomBank1), compressionLevel);
+            snapshot.CustomRom = new CustomRomBlock(
+                memory128K.RomBank0.Memory.Concatenate(memory128K.RomBank1.Memory), compressionLevel);
         }
     }
 

@@ -65,4 +65,24 @@ public static class EmulatorExtensions
                 joystickSettings.GamepadControllerId,
                 joystickSettings.JoystickType,
                 joystickSettings.GamepadSettings.Mappings.GetValueOrDefault(joystickSettings.GamepadControllerId, [])));
+
+    public static void SetDivMMc(this Emulator? emulator, DivMmcSettings divMmcSettings)
+    {
+        if (emulator == null)
+        {
+            return;
+        }
+
+        if (divMmcSettings.IsEnabled)
+        {
+            emulator.DivMmc.InsertCard(divMmcSettings.Card0FileName);
+            emulator.DivMmc.Enable();
+        }
+        else
+        {
+            emulator.DivMmc.Disable();
+        }
+
+        emulator.DivMmc.Memory.IsWriteEnabled = divMmcSettings.IsWriteEnabled;
+    }
 }

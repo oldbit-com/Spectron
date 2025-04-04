@@ -6,6 +6,7 @@ using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Devices.Memory;
+using OldBit.Spectron.Emulation.Devices.Storage;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Tape;
@@ -61,6 +62,8 @@ public sealed class Emulator
     public Z80 Cpu { get; }
     public IMemory Memory => _memory;
     public IBus Bus => _spectrumBus;
+    public DivMmc DivMmc { get; }
+
     public int TicksPerFrame => _hardware.TicksPerFrame;
 
     internal ScreenBuffer ScreenBuffer { get; }
@@ -105,6 +108,8 @@ public sealed class Emulator
         TapeManager.Attach(Cpu, Memory, hardware);
 
         AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware);
+
+        DivMmc = new DivMmc(Cpu, _memory, logger);
 
         SetupUlaAndDevices();
         SetupEventHandlers();
@@ -197,6 +202,7 @@ public sealed class Emulator
         _spectrumBus.AddDevice(_memory);
         _spectrumBus.AddDevice(AudioManager.Beeper);
         _spectrumBus.AddDevice(AudioManager.Ay);
+        _spectrumBus.AddDevice(DivMmc);
 
         _floatingBus = new FloatingBus(_hardware, Memory, Cpu.Clock);
         _spectrumBus.AddDevice(_floatingBus);
@@ -236,7 +242,7 @@ public sealed class Emulator
     {
         var audioBuffer = AudioManager.EndFrame();
 
-        ScreenBuffer.UpdateBorder(Cpu.Clock.CurrentFrameTicks);
+        ScreenBuffer.UpdateBorder(Cpu.Clock.FrameTicks);
 
         FrameCompleted?.Invoke(ScreenBuffer.FrameBuffer, audioBuffer);
 

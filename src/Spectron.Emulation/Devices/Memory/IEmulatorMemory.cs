@@ -10,5 +10,7 @@ internal interface IEmulatorMemory : IMemory, IDevice
 
     byte ReadScreen(Word address) => Read((Word)(address + 0x4000));
 
+    void ShadowRom(IRomMemory? shadowRom);
+
     event ScreenMemoryUpdatedEvent? ScreenMemoryUpdated;
 }

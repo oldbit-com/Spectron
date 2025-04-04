@@ -19,6 +19,9 @@ internal static class RomReader
     private const string RetroleumRomResourceName = "OldBit.Spectron.Emulation.Rom.Files.DiagROMv.171";
     private const string BrendanAlfordRomResourceName = "OldBit.Spectron.Emulation.Rom.Files.testrom1.37.bin";
 
+    // DivMMC ROM
+    private const string DivMmcRomResourceName = "OldBit.Spectron.Emulation.Rom.Files.ESXMMC.0.8.9.BIN";
+
     internal static byte[] ReadRom(RomType romType)
     {
         var resourceName = romType switch
@@ -32,6 +35,7 @@ internal static class RomReader
             RomType.BusySoft => BusySoftRomResourceName,
             RomType.Harston => HarstonRomResourceName,
             RomType.BrendanAlford => BrendanAlfordRomResourceName,
+            RomType.DivMmc => DivMmcRomResourceName,
             _ => throw new ArgumentOutOfRangeException(nameof(romType), romType, null)
         };
 

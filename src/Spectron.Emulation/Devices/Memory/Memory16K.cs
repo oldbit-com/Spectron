@@ -5,35 +5,51 @@ namespace OldBit.Spectron.Emulation.Devices.Memory;
 /// </summary>
 internal sealed class Memory16K : IEmulatorMemory
 {
+    private readonly IRomMemory _normalRom;
+    private readonly byte[] _memory = new byte[65536];
+    private IRomMemory _activeRom;
+
     internal Memory16K(byte[] rom)
     {
-        Array.Copy(rom, 0, Memory, 0, rom.Length);
-        Array.Fill(Memory, (byte)0xFF, 32768, 32768);
+        _normalRom = new RomMemory(rom);
+        _activeRom = _normalRom;
+
+        Array.Fill(_memory, (byte)0xFF, 32768, 32768);
     }
 
-    internal byte[] Memory { get; } = new byte[65536];
+    internal Span<byte> Ram => _memory.AsSpan()[0x4000..0x8000];
 
-    public byte Read(Word address) => Memory[address];
+    internal ReadOnlySpan<byte> Rom => _activeRom.Memory;
+
+    public byte Read(Word address) =>
+        address < 0x4000 ? _activeRom.Read(address) : _memory[address];
 
     public void Write(Word address, byte data)
     {
-        if (address is < 0x4000 or > 32767)
+        switch (address)
+        {
+            case < 0x4000:
+                _activeRom.Write(address, data);
+                return;
+
+            case > 32767:
+                return;
+        }
+
+        if (_memory[address] == data)
         {
             return;
         }
 
-        if (Memory[address] == data)
-        {
-            return;
-        }
-
-        Memory[address] = data;
+        _memory[address] = data;
 
         if (address < 0x5B00)
         {
             ScreenMemoryUpdated?.Invoke(address);
         }
     }
+
+    public void ShadowRom(IRomMemory? shadowRom) => _activeRom = shadowRom ?? _normalRom;
 
     public event ScreenMemoryUpdatedEvent? ScreenMemoryUpdated;
 }

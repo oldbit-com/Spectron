@@ -35,4 +35,6 @@ public class Preferences
     public RecordingSettings RecordingSettings { get; init; } = new();
 
     public DebuggerSettings DebuggerSettings { get; init; } = new();
+
+    public DivMmcSettings DivMmcSettings { get; init; } = new();
 }
