@@ -28,7 +28,7 @@ public class DivMmcMemoryTests
         // Fill all memory banks with a value
         for (byte bank = 0; bank < 16; bank++)
         {
-            _divMmcMemory.Control((byte)(CONMEM | bank));
+            _divMmcMemory.PagingControl((byte)(CONMEM | bank));
 
             for (Word address = 0x2000; address < 0x4000; address++)
             {
@@ -39,7 +39,7 @@ public class DivMmcMemoryTests
         // Read all memory banks and check the value
         for (byte bank = 0; bank < 16; bank++)
         {
-            _divMmcMemory.Control((byte)(CONMEM | bank));
+            _divMmcMemory.PagingControl((byte)(CONMEM | bank));
 
             _divMmcMemory.Memory[..0x2000].ShouldAllBe(x => x == DefaultEepromValue);
             _divMmcMemory.Memory[0x2000..0x4000].ShouldAllBe(x => x == (byte)(0xF0 | bank));
@@ -49,7 +49,7 @@ public class DivMmcMemoryTests
     [Fact]
     public void EepromMemory_ShouldBeReadOnly()
     {
-        _divMmcMemory.Control(CONMEM);
+        _divMmcMemory.PagingControl(CONMEM);
 
         for (Word address = 0; address < 0x2000; address++)
         {
@@ -66,7 +66,7 @@ public class DivMmcMemoryTests
     public void WhenWriteEnabled_EepromMemory_ShouldBeWritable()
     {
         _divMmcMemory.IsWriteEnabled = true;
-        _divMmcMemory.Control(CONMEM);
+        _divMmcMemory.PagingControl(CONMEM);
 
         for (Word address = 0; address < 0x2000; address++)
         {
@@ -86,7 +86,7 @@ public class DivMmcMemoryTests
         // Fill all memory banks with a value
         for (byte bank = 0; bank < 16; bank++)
         {
-            _divMmcMemory.Control((byte)(CONMEM | bank));
+            _divMmcMemory.PagingControl((byte)(CONMEM | bank));
 
             for (Word address = 0x2000; address < 0x4000; address++)
             {
@@ -97,7 +97,7 @@ public class DivMmcMemoryTests
         // Read all memory banks and check the value
         for (byte bank = 0; bank < 16; bank++)
         {
-            _divMmcMemory.Control((byte)(CONMEM | bank));
+            _divMmcMemory.PagingControl((byte)(CONMEM | bank));
 
             for (Word address = 0x2000; address < 0x4000; address++)
             {
@@ -112,7 +112,7 @@ public class DivMmcMemoryTests
     public void WhenMapRamIsRequested_Bank3ShouldBeReadonlyInBothBanks()
     {
         // Immediately page bank 3 and fill it with 0x33 value
-        _divMmcMemory.Control(CONMEM | 3);
+        _divMmcMemory.PagingControl(CONMEM | 3);
 
         for (Word address = 0x2000; address < 0x4000; address++)
         {
@@ -120,7 +120,7 @@ public class DivMmcMemoryTests
         }
 
         // Map bank 3 as RON and also as  bank 1
-        _divMmcMemory.Control(MAPRAM | 3);
+        _divMmcMemory.PagingControl(MAPRAM | 3);
 
         for (Word address = 0; address < 0x4000; address++)
         {
@@ -136,7 +136,7 @@ public class DivMmcMemoryTests
     public void WhenMapRamIsEnabled_ItCannotBeDisabled()
     {
         // Immediately page bank 3 and fill it with 0x33 value
-        _divMmcMemory.Control(CONMEM | 3);
+        _divMmcMemory.PagingControl(CONMEM | 3);
 
         for (Word address = 0x2000; address < 0x4000; address++)
         {
@@ -144,10 +144,10 @@ public class DivMmcMemoryTests
         }
 
         // Map bank 3 as RON
-        _divMmcMemory.Control(MAPRAM);
+        _divMmcMemory.PagingControl(MAPRAM);
 
         // Map bank 0
-        _divMmcMemory.Control(CONMEM | 0);
+        _divMmcMemory.PagingControl(CONMEM | 0);
 
         // Bank 3 is still mapped as ROM
         for (Word address = 0; address < 0x2000; address++)

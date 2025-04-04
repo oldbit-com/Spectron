@@ -25,6 +25,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         LoadJoystick(emulator.JoystickManager, snapshot.Joystick);
         LoadTape(emulator.TapeManager, snapshot.Tape);
         LoadAy(emulator.AudioManager, snapshot.Ay);
+        LoadDivMmc(emulator.DivMmc, snapshot.DivMmc);
         LoadOther(emulator, snapshot);
 
         return emulator;
@@ -43,7 +44,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         SaveJoystick(emulator.JoystickManager, snapshot.Joystick);
         SaveTape(emulator.TapeManager, snapshot);
         SaveAy(emulator.AudioManager, snapshot);
-        SaveMmc(emulator.DivMmc);
+        SaveDivMmc(emulator.DivMmc, snapshot);
         SaveOther(emulator, snapshot);
 
         if (emulator.RomType.IsCustomRom())
@@ -154,9 +155,18 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         };
     }
 
-    private static void SaveMmc(DivMmc emulatorDivMmc)
+    private static void SaveDivMmc(DivMmc divMmc, StateSnapshot stateSnapshot)
     {
+        if (!divMmc.IsEnabled)
+        {
+            return;
+        }
 
+        stateSnapshot.DivMmc = new DivMmcState
+        {
+            ControlRegister = divMmc.Memory.ControlRegister,
+            Banks = divMmc.Memory.Banks,
+        };
     }
 
     private static void SaveOther(Emulator emulator, StateSnapshot stateSnapshot) =>
@@ -284,5 +294,16 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         audioManager.IsBeeperEnabled = true;
 
         audioManager.Ay.LoadRegisters(ayState.CurrentRegister, ayState.Registers);
+    }
+
+    private static void LoadDivMmc(DivMmc divMmc, DivMmcState? divMmcState)
+    {
+        if (divMmcState == null)
+        {
+            return;
+        }
+
+        divMmc.Memory.Banks = divMmcState.Banks;
+        divMmc.Memory.PagingControl(divMmcState.ControlRegister);
     }
 }

@@ -14,28 +14,24 @@ public class DivMmcMemory : IRomMemory
     private const byte MAPRAM = 0x40;
 
     private readonly byte[] _eeprom;
-    private readonly byte[][] _banks;
 
-    private byte _control;
     private byte[] _bank0;      // 0000h-1FFFh
     private byte[] _bank1;      // 2000h-3FFFh
-
-    public bool IsWriteEnabled { get; set; }
 
     internal DivMmcMemory(IEmulatorMemory emulatorMemory, byte[] eeprom)
     {
         _emulatorMemory = emulatorMemory;
         _eeprom = eeprom;
 
-        _banks = new byte[BankCount][];
+        Banks = new byte[BankCount][];
 
         for (var i = 0; i < BankCount; i++)
         {
-            _banks[i] = new byte[BankSize];
+            Banks[i] = new byte[BankSize];
         }
 
         _bank0 = _eeprom;
-        _bank1 = _banks[0];
+        _bank1 = Banks[0];
     }
 
     internal void Paging(PagingMode mode)
@@ -57,24 +53,24 @@ public class DivMmcMemory : IRomMemory
         }
     }
 
-    internal void Control(byte control)
+    internal void PagingControl(byte control)
     {
         // Preserve MAPRAM bit once set, only hard reset can clear it
-        var mapram = _control & MAPRAM;
-        _control = (byte)(control | mapram);
+        var mapram = ControlRegister & MAPRAM;
+        ControlRegister = (byte)(control | mapram);
 
-        var selectedBank = _control & 0x0F;
+        var selectedBank = ControlRegister & 0x0F;
 
-        switch (_control & (CONMEM | MAPRAM))
+        switch (ControlRegister & (CONMEM | MAPRAM))
         {
             case 0:
-                _bank0 = (_control & MAPRAM) == MAPRAM ? _banks[3] : _eeprom;
+                _bank0 = (ControlRegister & MAPRAM) == MAPRAM ? Banks[3] : _eeprom;
                 IsBank1Writable = true;
 
                 break;
 
             case MAPRAM:
-                _bank0 = _banks[3];
+                _bank0 = Banks[3];
                 IsBank1Writable = selectedBank != 3;
 
                 break;
@@ -86,9 +82,9 @@ public class DivMmcMemory : IRomMemory
                 break;
         }
 
-        _bank1 = _banks[selectedBank];
+        _bank1 = Banks[selectedBank];
 
-        if ((_control & CONMEM) == CONMEM)
+        if ((ControlRegister & CONMEM) == CONMEM)
         {
             _emulatorMemory.ShadowRom(this);
         }
@@ -125,6 +121,12 @@ public class DivMmcMemory : IRomMemory
             }
         }
     }
+
+    internal byte ControlRegister { get; private set; }
+
+    internal byte[][] Banks { get; set; }
+
+    public bool IsWriteEnabled { get; set; }
 
     public byte[] Memory => _bank0.Concatenate(_bank1);
 

@@ -25,6 +25,8 @@ public sealed partial class StateSnapshot
 
     public TapeState? Tape { get; set; }
 
+    public DivMmcState? DivMmc { get; set; }
+
     public byte[] Serialize() => MemoryPackSerializer.Serialize(this);
 
     public static StateSnapshot? Load(string filePath)

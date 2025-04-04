@@ -19,9 +19,11 @@ public sealed class DivMmc : IDevice
     private readonly ILogger _logger;
     private readonly CardDevice _cardDevice = new();
 
-    private SdCard? _sdCard;
-    private bool _isEnabled;
     private PagingMode _delayedPagingMode = PagingMode.None;
+
+    private SdCard? _sdCard;
+
+    internal bool IsEnabled { get; private set; }
 
     public DivMmcMemory Memory { get; }
 
@@ -37,7 +39,7 @@ public sealed class DivMmc : IDevice
 
     public void Enable()
     {
-        _isEnabled = true;
+        IsEnabled = true;
 
         _cpu.BeforeFetch += BeforeFetch;
         _cpu.AfterFetch += AfterFetch;
@@ -45,7 +47,7 @@ public sealed class DivMmc : IDevice
 
     public void Disable()
     {
-        _isEnabled = false;
+        IsEnabled = false;
 
         _cpu.BeforeFetch -= BeforeFetch;
         _cpu.AfterFetch -= AfterFetch;
@@ -73,14 +75,14 @@ public sealed class DivMmc : IDevice
 
     public void WritePort(Word address, byte value)
     {
-        if (!_isEnabled)
+        if (!IsEnabled)
         {
             return;
         }
 
         if ((address & 0xFF) == ControlRegister)
         {
-            Memory.Control(value);
+            Memory.PagingControl(value);
         }
 
         if ((address & 0xFF) == CardSelectRegister)
@@ -112,7 +114,7 @@ public sealed class DivMmc : IDevice
 
     public byte? ReadPort(Word address)
     {
-        if (!_isEnabled)
+        if (!IsEnabled)
         {
             return null;
         }
