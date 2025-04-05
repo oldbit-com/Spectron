@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.Storage;
+namespace OldBit.Spectron.Emulation.Files;
 
 public static class FileTypeHelper
 {

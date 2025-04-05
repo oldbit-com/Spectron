@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Reactive;
-using OldBit.Spectron.Emulation.Storage;
+using OldBit.Spectron.Emulation.Files;
 using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;

@@ -1,6 +1,6 @@
 using System.IO.Compression;
 
-namespace OldBit.Spectron.Emulation.Storage;
+namespace OldBit.Spectron.Emulation.Files;
 
 public record ArchiveEntry(string Name, FileType FileType);
 

@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using OldBit.Spectron.Dialogs;
-using OldBit.Spectron.Emulation.Storage;
+using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Files.Extensions;
 using ReactiveUI;

@@ -9,7 +9,7 @@ using OldBit.Spectron.Debugger.ViewModels;
 using OldBit.Spectron.Debugger.Views;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
-using OldBit.Spectron.Emulation.Storage;
+using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.ViewModels;
 using ReactiveUI;
