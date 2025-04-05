@@ -116,8 +116,8 @@ ULA+ mode is supported and can be enabled or disabled in the emulator settings.
 
 ## DivMMC
 DivMMC emulation is supported and can be enabled or disabled in the emulator settings.
-It is based on [esxDOS 0.8.9](https://esxdos.org/). You will need to create a disk image with esxDOS files. 
-This needs to be a raw disk image, not HDF format. This feature is still experimental and might need some improvements.
+It is based on [esxDOS 0.8.9](https://esxdos.org/). You will need to use a disk image with esxDOS files. This can be an
+image of SD card or compatible disk image: 512 bytes pe sector, MBR partition with FAT16 or FAT32 file system.
 
 ## Time Machine
 Time Machine is a feature that allows you to go back in time and continue from given time point in the past.
