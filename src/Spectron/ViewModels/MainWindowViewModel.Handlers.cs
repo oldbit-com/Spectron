@@ -368,7 +368,7 @@ partial class MainWindowViewModel
         }
     }
 
-    private void HandleTriggerNmi() => Emulator?.Cpu.TriggerNmi();
+    private void HandleTriggerNmi() => Emulator?.RequestNmi();
 
     private void HandleMachineReset()
     {
@@ -461,12 +461,7 @@ partial class MainWindowViewModel
 
     private void HandleKeyUp(KeyEventArgs e)
     {
-        if (MainWindow?.IsActive != true)
-        {
-            return;
-        }
-
-        if (IsPaused)
+        if (MainWindow?.IsActive != true || IsPaused)
         {
             return;
         }
@@ -512,6 +507,11 @@ partial class MainWindowViewModel
             case { Key: Key.F5, KeyModifiers: KeyModifiers.Control }:
                 HandleMachineHardReset();
                 return;
+        }
+
+        if (IsPaused)
+        {
+            return;
         }
 
         var joystickInput = JoystickInput.None;

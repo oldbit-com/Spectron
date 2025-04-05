@@ -250,11 +250,13 @@ public partial class MainWindowViewModel : ReactiveObject
 
     public void OnViewClosed(object? viewModel)
     {
-        if (viewModel is DebuggerViewModel)
+        if (viewModel is not DebuggerViewModel)
         {
-            Resume();
-            _debuggerViewModel = null;
+            return;
         }
+
+        Resume();
+        _debuggerViewModel = null;
     }
 
     private async Task OpenAboutWindow() => await ShowAboutView.Handle(Unit.Default);
@@ -270,6 +272,12 @@ public partial class MainWindowViewModel : ReactiveObject
 
         this.WhenAny(x => x.IsPaused, x => x.Value)
             .Subscribe(isPaused => _debuggerViewModel?.HandlePause(isPaused));
+
+        this.WhenAnyValue(x => x._debuggerViewModel)
+            .Where(dvm => dvm != null)
+            .Select(dvm => dvm!.WhenAnyValue(vm => vm.IsPaused))
+            .Switch()
+            .Subscribe(isPaused => IsPaused = isPaused);
 
         await ShowDebuggerView.Handle(_debuggerViewModel);
     }

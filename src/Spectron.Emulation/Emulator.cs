@@ -30,6 +30,7 @@ public sealed class Emulator
     private bool _isDebuggerResume;
     private bool _invalidateScreen;
     private bool _isAcceleratedTapeSpeed;
+    private bool _isNmiRequested;
     private FloatingBus _floatingBus = null!;
 
     public delegate void FrameEvent(FrameBuffer frameBuffer, AudioBuffer audioBuffer);
@@ -168,6 +169,8 @@ public sealed class Emulator
         }
     }
 
+    public void RequestNmi() => _isNmiRequested = true;
+
     public void SetEmulationSpeed(int emulationSpeedPercentage) =>
         _emulationTimer.Interval = emulationSpeedPercentage == int.MaxValue ?
             TimeSpan.Zero :
@@ -214,6 +217,13 @@ public sealed class Emulator
     {
         StartFrame();
 
+        if (_isNmiRequested)
+        {
+            _isNmiRequested = false;
+
+            Cpu.TriggerNmi();
+        }
+
         Cpu.Run();
 
         EndFrame();
@@ -230,6 +240,7 @@ public sealed class Emulator
         if (_isDebuggerResume)
         {
             _isDebuggerResume = false;
+
             return;
         }
 

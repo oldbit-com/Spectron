@@ -7,13 +7,17 @@
              mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="200"
              x:Class="OldBit.Spectron.Debugger.Controls.Logging">
 
-    <Grid RowDefinitions="40,40" VerticalAlignment="Center">
+    <Grid RowDefinitions="40,40,40" VerticalAlignment="Center">
         <Grid VerticalAlignment="Top" ColumnDefinitions="105,*">
            <Button Content="Select Log File" Command="{Binding SelectLogFileFileCommand}"/>
            <TextBox Grid.Column="1" Text="{Binding LogFilePath}" Margin="10 0 0 0" IsReadOnly="True"/>
         </Grid>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left">
+            <CheckBox Content="T-states" IsChecked="{Binding ShouldLockTicks}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Content="Start Logging" Command="{Binding StartLoggingCommand}" Margin="0 0 10 0" IsEnabled="{Binding LogFilePath.Length}"/>
             <Button Content="Stop Logging" Command="{Binding StopLoggingCommand}" Margin="0 0 10 0" IsEnabled="{Binding LogFilePath.Length}"/>
             <Button Content="Clear Log File" Command="{Binding ClearLogFileCommand}" Margin="0 0 10 0" IsEnabled="{Binding LogFilePath.Length}"/>

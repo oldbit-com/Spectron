@@ -32,6 +32,14 @@ public class LoggingViewModel : ReactiveObject, IDisposable
 
         ClearLogFileCommand= ReactiveCommand.Create(ClearLogFile,
             this.WhenAnyValue(x => x.LogFilePath, x => !string.IsNullOrEmpty(x)));
+
+        this.WhenAnyValue(x => x.ShouldLockTicks).Subscribe(shouldLockTicks =>
+        {
+            if (_instructionLogger != null)
+            {
+                _instructionLogger.ShouldLockTicks = shouldLockTicks;
+            }
+        });
     }
 
     public void Configure(Emulator emulator)
@@ -110,6 +118,13 @@ public class LoggingViewModel : ReactiveObject, IDisposable
     {
         get => _isLoggingRunning;
         set => this.RaiseAndSetIfChanged(ref _isLoggingRunning, value);
+    }
+
+    private bool _shouldLockTicks = true;
+    public bool ShouldLockTicks
+    {
+        get => _shouldLockTicks;
+        set => this.RaiseAndSetIfChanged(ref _shouldLockTicks, value);
     }
 
     public void Dispose()

@@ -145,5 +145,13 @@ public sealed class DivMmc : IDevice
         }
     }
 
-    private void AfterFetch(Word pc) => Memory.Paging(_delayedPagingMode);
+    private void AfterFetch(Word pc)
+    {
+        if (_delayedPagingMode == PagingMode.None)
+        {
+            return;
+        }
+
+        Memory.Paging(_delayedPagingMode);
+    }
 }
