@@ -1,5 +1,10 @@
 namespace OldBit.Spectron.Emulation.Devices.Storage;
 
+/// <summary>
+/// Represents a SD card disk image file. It should be a raw image of a disk,
+/// with MBR (Master Boot Record) at the beginning and 512-byte sectors, formatted
+/// as FAT16 or FAT32. E.g. compatible with esxDOS.
+/// </summary>
 internal sealed class DiskImage : IDisposable
 {
     private const int SectorSize = 512;

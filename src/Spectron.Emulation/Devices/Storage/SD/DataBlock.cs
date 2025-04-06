@@ -1,27 +1,30 @@
 namespace OldBit.Spectron.Emulation.Devices.Storage.SD;
 
+/// <summary>
+/// Represents a data block received from the SD device. It starts with a 0xFE token
+/// and contains 512 bytes of data. The block is terminated with a CRC16 checksum.
+/// </summary>
 internal class DataBlock
 {
-    private int _count;
+    private int _receivedBytesCount;
 
-    internal bool IsReady => _count == 515; // 512 + start token + CRC
+    internal bool IsReady => _receivedBytesCount == 515; // 512 + start token + CRC
 
     internal readonly byte[] Data = new byte[512];
 
-    internal void ProcessNextByte(byte value)
+    internal void NextByte(byte value)
     {
-        if (_count == 0 && value != 0xFE)
+        switch (_receivedBytesCount)
         {
-            // Skip block start token
-        }
-        else
-        {
-            if (_count > 0 && _count <= Data.Length)
-            {
-                Data[_count - 1] = value;
-            }
+            case 0 when value != Token.StartBlock:
+                // Skip block start token
+                break;
+
+            case > 0 when _receivedBytesCount <= Data.Length:
+                Data[_receivedBytesCount - 1] = value;
+                break;
         }
 
-        _count += 1;
+        _receivedBytesCount += 1;
     }
 }

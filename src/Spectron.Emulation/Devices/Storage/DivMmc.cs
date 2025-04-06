@@ -19,7 +19,7 @@ public sealed class DivMmc : IDevice
     private readonly ILogger _logger;
     private readonly CardDevice _cardDevice = new();
 
-    private PagingMode _delayedPagingMode = PagingMode.None;
+    private PagingMode _afterFetchPagingMode = PagingMode.None;
 
     private SdCard? _sdCard;
 
@@ -89,7 +89,7 @@ public sealed class DivMmc : IDevice
         {
             if ((value & 0x03) == 0x03)
             {
-                _cardDevice.RemoveCard();
+                _cardDevice.EjectCard();
             }
             else if ((value & Sd0) == Sd0)
             {
@@ -101,7 +101,7 @@ public sealed class DivMmc : IDevice
             else if ((value & Sd1) == Sd1)
             {
                 // TODO: Support multiple cards
-                _cardDevice.RemoveCard();
+                _cardDevice.EjectCard();
                 //_cardDevice.InsertCard(_sdCard);
             }
         }
@@ -129,11 +129,11 @@ public sealed class DivMmc : IDevice
 
     private void BeforeFetch(Word pc)
     {
-        _delayedPagingMode = PagingMode.None;
+        _afterFetchPagingMode = PagingMode.None;
 
         if (pc is 0x0000 or 0x0008 or 0x0038 or 0x0066 or 0x04C6 or 0x0562)
         {
-            _delayedPagingMode = PagingMode.On;
+            _afterFetchPagingMode = PagingMode.On;
         }
         else if ((pc & 0xFF00) == 0x3D00)
         {
@@ -141,17 +141,17 @@ public sealed class DivMmc : IDevice
         }
         else if ((pc & 0xFFFF8) == 0x1FF8)
         {
-            _delayedPagingMode = PagingMode.Off;
+            _afterFetchPagingMode = PagingMode.Off;
         }
     }
 
     private void AfterFetch(Word pc)
     {
-        if (_delayedPagingMode == PagingMode.None)
+        if (_afterFetchPagingMode == PagingMode.None)
         {
             return;
         }
 
-        Memory.Paging(_delayedPagingMode);
+        Memory.Paging(_afterFetchPagingMode);
     }
 }

@@ -22,11 +22,11 @@ public class CommandTests
 
         command.ShouldNotBeNull();
 
-        command.ProcessNextByte(0x00);
-        command.ProcessNextByte(0x00);
-        command.ProcessNextByte(0x00);
-        command.ProcessNextByte(0x00);
-        command.ProcessNextByte(0x95);
+        command.NextByte(0x00);
+        command.NextByte(0x00);
+        command.NextByte(0x00);
+        command.NextByte(0x00);
+        command.NextByte(0x95);
         command.IsReady.ShouldBeTrue();
     }
 }

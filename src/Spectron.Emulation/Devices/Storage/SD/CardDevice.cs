@@ -4,19 +4,6 @@ namespace OldBit.Spectron.Emulation.Devices.Storage.SD;
 
 internal sealed class CardDevice
 {
-    private const byte GoIdleState = 0;      // CMD0   - GO_IDLE_STATE
-    private const byte SendIfCond = 8;       // CMD8   - SEND_IF_COND
-    private const byte SendCsd = 9;          // CMD9   - SEND_CSD
-    private const byte SendCid = 10;         // CMD10  - SEND_CID
-    private const byte ReadSingleBlock = 17; // CMD17  - READ_SINGLE_BLOCK
-    private const byte WriteBlock = 24;      // CMD24  - WRITE_BLOCK
-    private const byte AppCmd = 55;          // CMD55  - APP_CMD
-    private const byte SendOpCond = 41;      // ACMD41 - SEND_OP_COND
-    private const byte ReadOcr = 58;         // CMD58  - READ_OCR
-
-    private const byte DataErrorToken = 0x01;
-    private const byte StartBlockToken = 0xFE;
-
     private SdCard? _sdCard;
     private Status _status;
     private bool _isAppCmd;
@@ -27,7 +14,7 @@ internal sealed class CardDevice
 
     internal void InsertCard(SdCard sdCard) => _sdCard = sdCard;
 
-    internal void RemoveCard() => _sdCard = null;
+    internal void EjectCard() => _sdCard = null;
 
     internal void Write(byte value)
     {
@@ -37,9 +24,9 @@ internal sealed class CardDevice
         }
 
         // For write we need to receive the command and then the data
-        if (_command is { Id: WriteBlock, IsReady: true } && _dataBlock?.IsReady == false)
+        if (_command is { Id: Command.WriteBlock, IsReady: true } && _dataBlock?.IsReady == false)
         {
-            _dataBlock.ProcessNextByte(value);
+            _dataBlock.NextByte(value);
 
             if (_dataBlock.IsReady)
             {
@@ -55,13 +42,13 @@ internal sealed class CardDevice
             if (Command.TryCreateCommand(value, out var command))
             {
                 _command = command;
-                _dataBlock = _command.Id == WriteBlock ? new DataBlock() : null;
+                _dataBlock = _command.Id == Command.WriteBlock ? new DataBlock() : null;
             }
         }
         else
         {
             // We are still receiving the command
-            _command.ProcessNextByte(value);
+            _command.NextByte(value);
         }
 
         if (_command?.IsReady != true)
@@ -103,24 +90,24 @@ internal sealed class CardDevice
 
         switch (_command?.Id)
         {
-            case GoIdleState:
+            case Command.GoIdleState:
                 _status |= Status.Idle;
                 _responseBuffer.Put(_status);
 
                 break;
 
-            case SendIfCond:
+            case Command.SendIfCond:
                 _responseBuffer.Put(_status, _command.Arguments[1], _command.Arguments[2]);
 
                 break;
 
-            case AppCmd:
+            case Command.AppCmd:
                 _responseBuffer.Put(_status);
                 _isAppCmd = true;
 
                 break;
 
-            case SendCsd:
+            case Command.SendCsd:
                 var capacity = _sdCard.DiskSizeInBytes / 1024 / 512 - 1;
 
                 data = new BitVector(8 * 16);
@@ -136,11 +123,11 @@ internal sealed class CardDevice
                 data.Set(25, 22, 9);                    // WRITE_BL_LEN
                 data.Set(0, 0, 1);                      // Not used (always 1)
 
-                _responseBuffer.Put(_status, StartBlockToken, data.ToArray(), 0x00, 0x00);
+                _responseBuffer.Put(_status, Token.StartBlock, data.ToArray(), 0x00, 0x00);
 
                 break;
 
-            case SendCid:
+            case Command.SendCid:
                 data = new BitVector(8 * 16);
 
                 data.Set(127, 120, 0x03);               // Manufacturer ID
@@ -150,18 +137,18 @@ internal sealed class CardDevice
                 data.Set(19, 8, 0x31707);               // Manufacturing date (Year/Month)
                 data.Set(0, 0, 1);                      // Always set to 1
 
-                _responseBuffer.Put(_status, StartBlockToken, data.ToArray(), 0x00, 0x00);
+                _responseBuffer.Put(_status, Token.StartBlock, data.ToArray(), 0x00, 0x00);
 
                 break;
 
-            case ReadOcr:
+            case Command.ReadOcr:
                 _responseBuffer.Put(_status, 0xC0000000);
 
                 break;
 
-            case ReadSingleBlock:
+            case Command.ReadSingleBlock:
                 sector = _command.Arguments[0] << 24 | _command.Arguments[1] << 16 |
-                             _command.Arguments[2] << 8 | _command.Arguments[3];
+                         _command.Arguments[2] << 8 | _command.Arguments[3];
 
                 if (sector >= _sdCard.TotalSectors)
                 {
@@ -173,16 +160,16 @@ internal sealed class CardDevice
                 {
                     var buffer = _sdCard.ReadSector(sector);
 
-                    _responseBuffer.Put(_status, StartBlockToken, buffer, 0x00, 0x00);
+                    _responseBuffer.Put(_status, Token.StartBlock, buffer, 0x00, 0x00);
                 }
                 catch
                 {
-                    _responseBuffer.Put(_status, DataErrorToken);
+                    _responseBuffer.Put(_status, Token.DataError);
                 }
 
                 break;
 
-            case WriteBlock:
+            case Command.WriteBlock:
                 if (_dataBlock?.IsReady == true)
                 {
                     // We have received a complete block
@@ -195,8 +182,9 @@ internal sealed class CardDevice
                     }
                     else
                     {
+                        Console.WriteLine($"Writing sector {sector}");
                         _sdCard.WriteSector(sector, _dataBlock.Data);
-                        _responseBuffer.Put([0x05, 0x01]); // Data accepted + busy flag
+                        _responseBuffer.Put([Token.DataAccepted, 0x01]); // Data accepted + busy flag
                     }
 
                     _dataBlock = null;
@@ -220,7 +208,7 @@ internal sealed class CardDevice
     {
         switch (_command?.Id)
         {
-            case SendOpCond:
+            case Command.SendOpCond:
                 if (IsHcs(_command.Arguments[0]))
                 {
                     _status &= ~Status.Idle;

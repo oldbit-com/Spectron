@@ -1,5 +1,8 @@
 namespace OldBit.Spectron.Emulation.Devices.Storage.SD;
 
+/// <summary>
+/// Response buffer for SD card commands.
+/// </summary>
 internal sealed class ResponseBuffer
 {
     private readonly byte[] _buffer = new byte[516];

@@ -1,5 +1,8 @@
 namespace OldBit.Spectron.Emulation.Devices.Storage.SD;
 
+/// <summary>
+/// Wrapper for SD card disk image.
+/// </summary>
 internal sealed class SdCard : IDisposable
 {
     private readonly DiskImage _diskImage;
