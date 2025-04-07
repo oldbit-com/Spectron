@@ -1,7 +1,6 @@
+using OldBit.Spectron.Emulation.Devices.DivMmc;
 using OldBit.Spectron.Emulation.Devices.Memory;
-using OldBit.Spectron.Emulation.Devices.Storage;
 using OldBit.Spectron.Emulation.Rom;
-using Shouldly;
 
 namespace OldBit.Spectron.Emulator.Tests.Devices.Storage;
 
@@ -65,7 +64,7 @@ public class DivMmcMemoryTests
     [Fact]
     public void WhenWriteEnabled_EepromMemory_ShouldBeWritable()
     {
-        _divMmcMemory.IsWriteEnabled = true;
+        _divMmcMemory.IsEepromWriteEnabled = true;
         _divMmcMemory.PagingControl(CONMEM);
 
         for (Word address = 0; address < 0x2000; address++)

@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.Devices.Storage;
+namespace OldBit.Spectron.Emulation.Devices.DivMmc;
 
 internal enum PagingMode
 {

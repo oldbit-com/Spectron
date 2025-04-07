@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.Devices.Storage.SD;
+namespace OldBit.Spectron.Emulation.Devices.DivMmc.SD;
 
 /// <summary>
 /// Response buffer for SD card commands.

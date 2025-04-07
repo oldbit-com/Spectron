@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.Devices.Storage.SD;
+namespace OldBit.Spectron.Emulation.Devices.DivMmc.SD;
 
 /// <summary>
 /// Represents a data block received from the SD device. It starts with a 0xFE token

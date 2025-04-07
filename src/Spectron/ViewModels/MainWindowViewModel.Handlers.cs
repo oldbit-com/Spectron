@@ -37,7 +37,7 @@ partial class MainWindowViewModel
 
             if (filePath == null)
             {
-                var files = await FileDialogs.OpenAnyFileAsync();
+                var files = await FileDialogs.OpenEmulatorFileAsync();
                 if (files.Count <= 0)
                 {
                     return;
@@ -321,7 +321,7 @@ partial class MainWindowViewModel
         {
             if (romType == RomType.Custom)
             {
-                var files = await FileDialogs.LoadCustomRomFileAsync();
+                var files = await FileDialogs.OpenCustomRomFileAsync();
 
                 if (files.Count <= 0)
                 {

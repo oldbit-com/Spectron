@@ -1,4 +1,4 @@
-using OldBit.Spectron.Emulation.Devices.Storage.SD;
+using OldBit.Spectron.Emulation.Devices.DivMmc.SD;
 
 namespace OldBit.Spectron.Emulator.Tests.Devices.Storage.SD;
 

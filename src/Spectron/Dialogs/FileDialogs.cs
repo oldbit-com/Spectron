@@ -10,48 +10,40 @@ public static class FileDialogs
 {
     public static Window MainWindow { get; set; } = null!;
 
-    public static async Task<IReadOnlyList<IStorageFile>> OpenAnyFileAsync()
-    {
-        var topLevel = TopLevel.GetTopLevel(MainWindow);
+    public static async Task<IReadOnlyList<IStorageFile>> OpenEmulatorFileAsync() =>
+        await OpenFileAsync("Select File",
+        [
+            FileTypes.All,
+            FileTypes.Sna,
+            FileTypes.Szx,
+            FileTypes.Tap,
+            FileTypes.Tzx,
+            FileTypes.Z80,
+            FileTypes.Zip
+        ]);
 
-        if (topLevel == null)
-        {
-            return Array.Empty<IStorageFile>();
-        }
+    public static async Task<IReadOnlyList<IStorageFile>> OpenTapeFileAsync() =>
+        await OpenFileAsync("Select Tape File",
+        [
+            FileTypes.TapeFiles,
+            FileTypes.Tap,
+            FileTypes.Tzx
+        ]);
 
-        return await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
-        {
-            Title = "Open File",
-            AllowMultiple = false,
-            FileTypeFilter =
-            [
-                FileTypes.All,
-                FileTypes.Sna,
-                FileTypes.Szx,
-                FileTypes.Tap,
-                FileTypes.Tzx,
-                FileTypes.Z80,
-                FileTypes.Zip
-            ]
-        });
-    }
+    public static async Task<IReadOnlyList<IStorageFile>> OpenCustomRomFileAsync() =>
+        await OpenFileAsync("Select Custom ROM File",
+        [
+            FileTypes.Rom,
+            FileTypes.Bin,
+            FileTypes.Any,
+        ]);
 
-    public static async Task<IReadOnlyList<IStorageFile>> OpenTapeFileAsync()
-    {
-        var topLevel = TopLevel.GetTopLevel(MainWindow);
-
-        if (topLevel == null)
-        {
-            return Array.Empty<IStorageFile>();
-        }
-
-        return await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
-        {
-            Title = "Open Tape File",
-            AllowMultiple = false,
-            FileTypeFilter = [FileTypes.TapeFiles, FileTypes.Tap, FileTypes.Tzx]
-        });
-    }
+    public static async Task<IReadOnlyList<IStorageFile>> OpenDiskImageFileAsync() =>
+        await OpenFileAsync("Select Disk Image",
+        [
+            FileTypes.Img,
+            FileTypes.Any,
+        ]);
 
     public static async Task<IStorageFile?> SaveTapeFileAsync(string? suggestedFileName = null)
     {
@@ -148,7 +140,7 @@ public static class FileDialogs
         });
     }
 
-    public static async Task<IReadOnlyList<IStorageFile>> LoadCustomRomFileAsync()
+    private static async Task<IReadOnlyList<IStorageFile>> OpenFileAsync(string title, IReadOnlyList<FilePickerFileType> fileTypes)
     {
         var topLevel = TopLevel.GetTopLevel(MainWindow);
 
@@ -159,14 +151,9 @@ public static class FileDialogs
 
         return await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = "Open File",
+            Title = title,
             AllowMultiple = false,
-            FileTypeFilter =
-            [
-                FileTypes.Rom,
-                FileTypes.Bin,
-                FileTypes.Any,
-            ]
+            FileTypeFilter = fileTypes
         });
     }
 }

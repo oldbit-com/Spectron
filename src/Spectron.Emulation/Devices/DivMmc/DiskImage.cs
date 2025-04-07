@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.Devices.Storage;
+namespace OldBit.Spectron.Emulation.Devices.DivMmc;
 
 /// <summary>
 /// Represents a SD card disk image file. It should be a raw image of a disk,

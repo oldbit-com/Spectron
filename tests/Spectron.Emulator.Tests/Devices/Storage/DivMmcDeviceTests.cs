@@ -1,12 +1,10 @@
 using OldBit.Spectron.Emulation.Devices.Memory;
-using OldBit.Spectron.Emulation.Devices.Storage;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Z80Cpu;
-using Shouldly;
 
 namespace OldBit.Spectron.Emulator.Tests.Devices.Storage;
 
-public class DivMmcTests
+public class DivMmcDeviceTests
 {
     [Theory]
     [InlineData(0x0000)]

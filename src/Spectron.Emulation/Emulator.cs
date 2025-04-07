@@ -2,11 +2,12 @@ using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation.Commands;
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Audio;
+using OldBit.Spectron.Emulation.Devices.DivMmc;
+using OldBit.Spectron.Emulation.Devices.DivMmc.RTC;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Devices.Memory;
-using OldBit.Spectron.Emulation.Devices.Storage;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Tape;
@@ -63,7 +64,7 @@ public sealed class Emulator
     public Z80 Cpu { get; }
     public IMemory Memory => _memory;
     public IBus Bus => _spectrumBus;
-    public DivMmc DivMmc { get; }
+    public DivMmcDevice DivMmc { get; }
 
     public int TicksPerFrame => _hardware.TicksPerFrame;
 
@@ -110,7 +111,7 @@ public sealed class Emulator
 
         AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware);
 
-        DivMmc = new DivMmc(Cpu, _memory, logger);
+        DivMmc = new DivMmcDevice(Cpu, _memory, logger);
 
         SetupUlaAndDevices();
         SetupEventHandlers();
@@ -206,6 +207,7 @@ public sealed class Emulator
         _spectrumBus.AddDevice(AudioManager.Beeper);
         _spectrumBus.AddDevice(AudioManager.Ay);
         _spectrumBus.AddDevice(DivMmc);
+        _spectrumBus.AddDevice(new RtcDevice(DivMmc));
 
         _floatingBus = new FloatingBus(_hardware, Memory, Cpu.Clock);
         _spectrumBus.AddDevice(_floatingBus);

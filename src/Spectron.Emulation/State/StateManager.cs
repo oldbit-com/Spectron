@@ -1,8 +1,8 @@
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Audio;
+using OldBit.Spectron.Emulation.Devices.DivMmc;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Memory;
-using OldBit.Spectron.Emulation.Devices.Storage;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.State.Components;
 using OldBit.Spectron.Emulation.Tape;
@@ -155,7 +155,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         };
     }
 
-    private static void SaveDivMmc(DivMmc divMmc, StateSnapshot stateSnapshot)
+    private static void SaveDivMmc(DivMmcDevice divMmc, StateSnapshot stateSnapshot)
     {
         if (!divMmc.IsEnabled)
         {
@@ -296,7 +296,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         audioManager.Ay.LoadRegisters(ayState.CurrentRegister, ayState.Registers);
     }
 
-    private static void LoadDivMmc(DivMmc divMmc, DivMmcState? divMmcState)
+    private static void LoadDivMmc(DivMmcDevice divMmc, DivMmcState? divMmcState)
     {
         if (divMmcState == null)
         {

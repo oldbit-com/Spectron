@@ -1,6 +1,6 @@
 using OldBit.Spectron.Emulation.Utilities;
 
-namespace OldBit.Spectron.Emulation.Devices.Storage.SD;
+namespace OldBit.Spectron.Emulation.Devices.DivMmc.SD;
 
 internal sealed class CardDevice
 {
@@ -182,7 +182,6 @@ internal sealed class CardDevice
                     }
                     else
                     {
-                        Console.WriteLine($"Writing sector {sector}");
                         _sdCard.WriteSector(sector, _dataBlock.Data);
                         _responseBuffer.Put([Token.DataAccepted, 0x01]); // Data accepted + busy flag
                     }

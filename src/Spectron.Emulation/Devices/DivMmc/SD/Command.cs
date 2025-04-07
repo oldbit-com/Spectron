@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace OldBit.Spectron.Emulation.Devices.Storage.SD;
+namespace OldBit.Spectron.Emulation.Devices.DivMmc.SD;
 
 /// <summary>
 /// Represents a command sent to the SD device. Commands are 48 buts (6 bytes).

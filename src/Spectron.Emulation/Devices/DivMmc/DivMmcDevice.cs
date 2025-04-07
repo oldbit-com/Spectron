@@ -1,12 +1,12 @@
 using Microsoft.Extensions.Logging;
+using OldBit.Spectron.Emulation.Devices.DivMmc.SD;
 using OldBit.Spectron.Emulation.Devices.Memory;
-using OldBit.Spectron.Emulation.Devices.Storage.SD;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Z80Cpu;
 
-namespace OldBit.Spectron.Emulation.Devices.Storage;
+namespace OldBit.Spectron.Emulation.Devices.DivMmc;
 
-public sealed class DivMmc : IDevice
+public sealed class DivMmcDevice : IDevice
 {
     private const int ControlRegister = 0xE3;
     private const int CardSelectRegister = 0xE7;
@@ -27,7 +27,7 @@ public sealed class DivMmc : IDevice
 
     public DivMmcMemory Memory { get; }
 
-    internal DivMmc(Z80 cpu, IEmulatorMemory emulatorMemory, ILogger logger)
+    internal DivMmcDevice(Z80 cpu, IEmulatorMemory emulatorMemory, ILogger logger)
     {
         _cpu = cpu;
         _logger = logger;

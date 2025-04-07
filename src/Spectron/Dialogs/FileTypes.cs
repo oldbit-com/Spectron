@@ -69,6 +69,11 @@ public static class FileTypes
         Patterns = ["*.rom"]
     };
 
+    public static FilePickerFileType Img { get; } = new("Disk Image")
+    {
+        Patterns = ["*.img"]
+    };
+
     public static FilePickerFileType Any { get; } = new("All Files")
     {
         Patterns = ["*.*"]

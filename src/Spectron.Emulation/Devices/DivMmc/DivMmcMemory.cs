@@ -1,7 +1,7 @@
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Extensions;
 
-namespace OldBit.Spectron.Emulation.Devices.Storage;
+namespace OldBit.Spectron.Emulation.Devices.DivMmc;
 
 public class DivMmcMemory : IRomMemory
 {
@@ -36,7 +36,7 @@ public class DivMmcMemory : IRomMemory
 
     internal void Paging(PagingMode mode)
     {
-        if (IsWriteEnabled)
+        if (IsEepromWriteEnabled)
         {
             return;
         }
@@ -126,11 +126,11 @@ public class DivMmcMemory : IRomMemory
 
     internal byte[][] Banks { get; set; }
 
-    public bool IsWriteEnabled { get; set; }
+    public bool IsEepromWriteEnabled { get; set; }
 
     public byte[] Memory => _bank0.Concatenate(_bank1);
 
-    private bool IsBank0Writable => ReferenceEquals(_bank0, _eeprom) && IsWriteEnabled;
+    private bool IsBank0Writable => ReferenceEquals(_bank0, _eeprom) && IsEepromWriteEnabled;
 
     private bool IsBank1Writable { get; set; } = true;
 }

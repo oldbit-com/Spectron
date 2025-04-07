@@ -4,9 +4,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Avalonia.Input;
 using Avalonia.Threading;
 using OldBit.Spectron.Debugger.Settings;
+using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Disassembly.Formatters;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
@@ -29,6 +31,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
 
     public ReactiveCommand<Unit, Preferences> UpdatePreferencesCommand { get; }
     public ReactiveCommand<Unit, Unit> ProbeFFmpegCommand { get; }
+    public ReactiveCommand<string, Task> SelectSdCardImageFile { get; }
 
     public Interaction<GamepadMappingViewModel, List<GamepadMapping>?> ShowGamepadMappingView { get; }
 
@@ -98,12 +101,15 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
 
         UpdatePreferencesCommand = ReactiveCommand.Create(UpdatePreferences);
         ProbeFFmpegCommand = ReactiveCommand.Create(ProbeFFmpeg);
+        SelectSdCardImageFile = ReactiveCommand.Create<string, Task>(HandleOpenSdCardImageFile);
 
         DebuggerPreferredNumberFormat = preferences.DebuggerSettings.PreferredNumberFormat;
 
         IsDivMmcEnabled = preferences.DivMmcSettings.IsEnabled;
-        IsDivMmcWriteEnabled = preferences.DivMmcSettings.IsWriteEnabled;
+        IsDivMmcWriteEnabled = preferences.DivMmcSettings.IsEepromWriteEnabled;
         DivMmcCard0FileName = preferences.DivMmcSettings.Card0FileName;
+        DivMmcCard1FileName = preferences.DivMmcSettings.Card1FileName;
+        IsDivMmcDriveWriteEnabled = preferences.DivMmcSettings.IsDriveWriteEnabled;
 
         ShowGamepadMappingView = new Interaction<GamepadMappingViewModel, List<GamepadMapping>?>();
     }
@@ -202,10 +208,33 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
             DivMmcSettings = new DivMmcSettings
             {
                 IsEnabled = IsDivMmcEnabled,
-                IsWriteEnabled = IsDivMmcWriteEnabled,
+                IsEepromWriteEnabled = IsDivMmcWriteEnabled,
                 Card0FileName = DivMmcCard0FileName,
+                Card1FileName = DivMmcCard1FileName,
+                IsDriveWriteEnabled = IsDivMmcDriveWriteEnabled,
             }
         };
+    }
+
+    private async Task HandleOpenSdCardImageFile(string cardId)
+    {
+        var file = await FileDialogs.OpenDiskImageFileAsync();
+
+        if (file.Count == 0)
+        {
+            return;
+        }
+
+        switch (cardId)
+        {
+            case "0":
+                DivMmcCard0FileName = file[0].Path.LocalPath;
+                break;
+
+            case "1":
+                DivMmcCard1FileName = file[0].Path.LocalPath;
+                break;
+        }
     }
 
     private void ProbeFFmpeg()
@@ -575,6 +604,20 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
     {
         get => _divMmcCard0FileName;
         set => this.RaiseAndSetIfChanged(ref _divMmcCard0FileName, value);
+    }
+
+    private string _divMmcCard1FileName = string.Empty;
+    public string DivMmcCard1FileName
+    {
+        get => _divMmcCard1FileName;
+        set => this.RaiseAndSetIfChanged(ref _divMmcCard1FileName, value);
+    }
+
+    private bool _isDivMmcDriveWriteEnabled;
+    public bool IsDivMmcDriveWriteEnabled
+    {
+        get => _isDivMmcDriveWriteEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isDivMmcDriveWriteEnabled, value);
     }
 
     public void Dispose()

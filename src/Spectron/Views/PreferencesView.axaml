@@ -7,6 +7,7 @@
         xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
         xmlns:theming="clr-namespace:OldBit.Spectron.Theming"
         xmlns:tape="clr-namespace:OldBit.Spectron.Emulation.Tape;assembly=OldBit.Spectron.Emulation"
+        xmlns:material="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.PreferencesView"
         x:DataType="viewModels:PreferencesViewModel"
@@ -214,17 +215,18 @@
             <TabItem Header="Emulator">
                 <Border Classes="Tab">
                     <StackPanel>
-                        <controls:HeaderSeparator Text="Floating bus"/>
-                        <CheckBox Content="Enable floating bus emulation" Classes="Center" IsChecked="{Binding IsFloatingBusEnabled}"/>
-                        <controls:HeaderSeparator Text="DivMMC"/>
-                        <CheckBox Content="Enable DivMMC emulation" Classes="Center" IsChecked="{Binding IsDivMmcEnabled}"/>
-                        <CheckBox Content="EEPROM write enabled" Classes="Center" IsChecked="{Binding IsDivMmcWriteEnabled}"/>
+                        <controls:HeaderSeparator Text="Floating bus emulation"/>
+                        <CheckBox Content="Floating bus enabled" Classes="Center" IsChecked="{Binding IsFloatingBusEnabled}"/>
+                        <controls:HeaderSeparator Text="DivMMC emulation"/>
+                        <CheckBox x:Name="DivMmcEnabled" Content="DivMMC enabled" Classes="Center" IsChecked="{Binding IsDivMmcEnabled}"/>
+                        <CheckBox Content="EEPROM write enabled" Classes="Center" IsChecked="{Binding IsDivMmcWriteEnabled}" IsEnabled="{Binding #DivMmcEnabled.IsChecked}"/>
+                        <CheckBox Content="SD card image write enabled" Classes="Center" IsChecked="{Binding IsDivMmcDriveWriteEnabled}" IsEnabled="{Binding #DivMmcEnabled.IsChecked}"/>
 
-                        <Grid ColumnDefinitions="120,*" RowDefinitions="40">
+                        <Grid ColumnDefinitions="210,*, 30" RowDefinitions="40,40" IsEnabled="{Binding #DivMmcEnabled.IsChecked}">
                             <TextBlock
                                 Grid.Column="0"
                                 Grid.Row="0"
-                                Text="SD card image:"
+                                Text="Primary SD card disk image:"
                                 VerticalAlignment="Center"
                                 Classes="Center"/>
 
@@ -234,8 +236,42 @@
                                 Text="{Binding DivMmcCard0FileName}"
                                 Margin="5 0 0 0"
                                 Height="30"
-                                Watermark="Image file containing SD card contents"
+                                Watermark="Image file containing primary SD card contents"
                                 VerticalContentAlignment="Center"/>
+
+                            <Button
+                                Grid.Column="2"
+                                Grid.Row="0"
+                                Margin="4 0 0 0"
+                                ToolTip.Tip="Select Disk Image"
+                                Command="{Binding SelectSdCardImageFile}" CommandParameter="0">
+                                <material:MaterialIcon Kind="Harddisk"/>
+                            </Button>
+
+                            <TextBlock
+                                Grid.Column="0"
+                                Grid.Row="1"
+                                Text="Secondary SD card disk image:"
+                                VerticalAlignment="Center"
+                                Classes="Center"/>
+
+                            <TextBox
+                                Grid.Column="1"
+                                Grid.Row="1"
+                                Text="{Binding DivMmcCard1FileName}"
+                                Margin="5 0 0 0"
+                                Height="30"
+                                Watermark="Image file containing secondary SD card contents"
+                                VerticalContentAlignment="Center"/>
+
+                            <Button
+                                Grid.Column="2"
+                                Grid.Row="1"
+                                Margin="4 0 0 0"
+                                ToolTip.Tip="Select Disk Image"
+                                Command="{Binding SelectSdCardImageFile}" CommandParameter="1">
+                                <material:MaterialIcon Kind="Harddisk"/>
+                            </Button>
                         </Grid>
                     </StackPanel>
                 </Border>

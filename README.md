@@ -119,6 +119,11 @@ DivMMC emulation is supported and can be enabled or disabled in the emulator set
 It is based on [esxDOS 0.8.9](https://esxdos.org/). You will need to use a disk image with esxDOS files. This can be an
 image of SD card or compatible disk image: 512 bytes pe sector, MBR partition with FAT16 or FAT32 file system.
 
+You can use [RTC.SYS](src/Spectron.Emulation/Devices/DivMmc/RTC) file to enable RTC support. This is not required, 
+but it will enable DivMMC to use RTC clock.
+
+Sample disk images can be found [here](TODO).
+
 ## Time Machine
 Time Machine is a feature that allows you to go back in time and continue from given time point in the past.
 The interval and the number of time points can be adjusted in the settings.

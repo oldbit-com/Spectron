@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.Devices.Storage.SD;
+namespace OldBit.Spectron.Emulation.Devices.DivMmc.SD;
 
 /// <summary>
 /// Wrapper for SD card disk image.
