@@ -132,6 +132,7 @@ public sealed class Emulator
         _emulationTimer.Stop();
         GamepadManager.Stop();
         JoystickManager.Stop();
+        DivMmc.Stop();
 
         while (!_emulationTimer.IsStopped)
         {

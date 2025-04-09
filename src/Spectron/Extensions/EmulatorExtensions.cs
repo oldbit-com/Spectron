@@ -84,5 +84,6 @@ public static class EmulatorExtensions
         }
 
         emulator.DivMmc.Memory.IsEepromWriteEnabled = divMmcSettings.IsEepromWriteEnabled;
+        emulator.DivMmc.IsDriveWriteEnabled = divMmcSettings.IsDriveWriteEnabled;
     }
 }

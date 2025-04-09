@@ -6,7 +6,7 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.Devices.DivMmc;
 
-public sealed class DivMmcDevice : IDevice
+public sealed class DivMmcDevice : IDevice, IDisposable
 {
     private const int ControlRegister = 0xE3;
     private const int CardSelectRegister = 0xE7;
@@ -21,11 +21,22 @@ public sealed class DivMmcDevice : IDevice
 
     private PagingMode _afterFetchPagingMode = PagingMode.None;
 
-    private SdCard? _sdCard;
+    private DiskImage? _diskImage;
 
     internal bool IsEnabled { get; private set; }
 
     public DivMmcMemory Memory { get; }
+
+    public bool IsDriveWriteEnabled
+    {
+        set
+        {
+            if (_diskImage != null)
+            {
+                _diskImage.IsWriteEnabled = value;
+            }
+        }
+    }
 
     internal DivMmcDevice(Z80 cpu, IEmulatorMemory emulatorMemory, ILogger logger)
     {
@@ -55,8 +66,8 @@ public sealed class DivMmcDevice : IDevice
 
     public void InsertCard(string filename)
     {
-        _sdCard?.Dispose();
-        _sdCard = null;
+        _diskImage?.Dispose();
+        _diskImage = null;
 
         if (string.IsNullOrWhiteSpace(filename))
         {
@@ -65,7 +76,7 @@ public sealed class DivMmcDevice : IDevice
 
         try
         {
-            _sdCard = new SdCard(filename);
+            _diskImage = new DiskImage(filename);
         }
         catch (Exception ex)
         {
@@ -80,33 +91,31 @@ public sealed class DivMmcDevice : IDevice
             return;
         }
 
-        if ((address & 0xFF) == ControlRegister)
+        if (IsControlRegister(address))
         {
             Memory.PagingControl(value);
         }
-
-        if ((address & 0xFF) == CardSelectRegister)
+        else if (IsCardSelectRegister(address))
         {
             if ((value & 0x03) == 0x03)
             {
-                _cardDevice.EjectCard();
+                _cardDevice.Eject();
             }
             else if ((value & Sd0) == Sd0)
             {
-                if (_sdCard != null)
+                if (_diskImage != null)
                 {
-                    _cardDevice.InsertCard(_sdCard);
+                    _cardDevice.Insert(_diskImage);
                 }
             }
             else if ((value & Sd1) == Sd1)
             {
                 // TODO: Support multiple cards
-                _cardDevice.EjectCard();
+                _cardDevice.Eject();
                 //_cardDevice.InsertCard(_sdCard);
             }
         }
-
-        if ((address & 0xFF) == DataRegister)
+        else if (IsDataRegister(address))
         {
             _cardDevice.Write(value);
         }
@@ -119,13 +128,15 @@ public sealed class DivMmcDevice : IDevice
             return null;
         }
 
-        if ((address & 0xFF) == DataRegister)
+        if (IsDataRegister(address))
         {
             return _cardDevice.Read();
         }
 
         return null;
     }
+
+    public void Stop() => Dispose();
 
     private void BeforeFetch(Word pc)
     {
@@ -154,4 +165,12 @@ public sealed class DivMmcDevice : IDevice
 
         Memory.Paging(_afterFetchPagingMode);
     }
+
+    private static bool IsDataRegister(Word address) => (address & 0xFF) == DataRegister;
+
+    private static bool IsControlRegister(Word address) => (address & 0xFF) == ControlRegister;
+
+    private static bool IsCardSelectRegister(Word address) => (address & 0xFF) == CardSelectRegister;
+
+    public void Dispose() => _diskImage?.Dispose();
 }

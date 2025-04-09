@@ -220,7 +220,7 @@
                         <controls:HeaderSeparator Text="DivMMC emulation"/>
                         <CheckBox x:Name="DivMmcEnabled" Content="DivMMC enabled" Classes="Center" IsChecked="{Binding IsDivMmcEnabled}"/>
                         <CheckBox Content="EEPROM write enabled" Classes="Center" IsChecked="{Binding IsDivMmcWriteEnabled}" IsEnabled="{Binding #DivMmcEnabled.IsChecked}"/>
-                        <CheckBox Content="SD card image write enabled" Classes="Center" IsChecked="{Binding IsDivMmcDriveWriteEnabled}" IsEnabled="{Binding #DivMmcEnabled.IsChecked}"/>
+                        <CheckBox Content="Persist disk writes" Classes="Center" IsChecked="{Binding IsDivMmcDriveWriteEnabled}" IsEnabled="{Binding #DivMmcEnabled.IsChecked}"/>
 
                         <Grid ColumnDefinitions="210,*, 30" RowDefinitions="40,40" IsEnabled="{Binding #DivMmcEnabled.IsChecked}">
                             <TextBlock

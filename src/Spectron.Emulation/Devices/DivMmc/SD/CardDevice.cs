@@ -4,7 +4,7 @@ namespace OldBit.Spectron.Emulation.Devices.DivMmc.SD;
 
 internal sealed class CardDevice
 {
-    private SdCard? _sdCard;
+    private DiskImage? _diskImage;
     private Status _status;
     private bool _isAppCmd;
 
@@ -12,13 +12,13 @@ internal sealed class CardDevice
     private Command? _command;
     private DataBlock? _dataBlock;
 
-    internal void InsertCard(SdCard sdCard) => _sdCard = sdCard;
+    internal void Insert(DiskImage diskImage) => _diskImage = diskImage;
 
-    internal void EjectCard() => _sdCard = null;
+    internal void Eject() => _diskImage = null;
 
     internal void Write(byte value)
     {
-        if (_sdCard == null)
+        if (_diskImage == null)
         {
             return;
         }
@@ -78,7 +78,7 @@ internal sealed class CardDevice
 
     private void ExecuteCommand()
     {
-        if (_sdCard == null)
+        if (_diskImage == null)
         {
             _responseBuffer.Put(_status | Status.IllegalCommand);
 
@@ -108,7 +108,7 @@ internal sealed class CardDevice
                 break;
 
             case Command.SendCsd:
-                var capacity = _sdCard.DiskSizeInBytes / 1024 / 512 - 1;
+                var capacity = _diskImage.DiskSizeInBytes / 1024 / 512 - 1;
 
                 data = new BitVector(8 * 16);
 
@@ -131,10 +131,11 @@ internal sealed class CardDevice
                 data = new BitVector(8 * 16);
 
                 data.Set(127, 120, 0x03);               // Manufacturer ID
-                data.Set(119, 104, 0x2020);             // OEM/Application ID (ASCII chars)
-                data.Set(103, 64, 0x535043524E);        // Product name (ASCII chars)
-                data.Set(63, 56, 0x0100);               // Product revision
-                data.Set(19, 8, 0x31707);               // Manufacturing date (Year/Month)
+                data.Set(119, 104, 0x5753);             // OEM/Application ID (ASCII chars)
+                data.Set(103, 64, 0x537063726E);        // Product name (ASCII chars)
+                data.Set(63, 56, 0x10);                 // Product revision
+                data.Set(55, 24, 0x26031970);           // Product serial number
+                data.Set(19, 8, 0x7EC);                 // Manufacturing date (Year/Month)
                 data.Set(0, 0, 1);                      // Always set to 1
 
                 _responseBuffer.Put(_status, Token.StartBlock, data.ToArray(), 0x00, 0x00);
@@ -150,7 +151,7 @@ internal sealed class CardDevice
                 sector = _command.Arguments[0] << 24 | _command.Arguments[1] << 16 |
                          _command.Arguments[2] << 8 | _command.Arguments[3];
 
-                if (sector >= _sdCard.TotalSectors)
+                if (sector >= _diskImage.TotalSectors)
                 {
                     _responseBuffer.Put(_status | Status.IllegalCommand);
                     return;
@@ -158,7 +159,7 @@ internal sealed class CardDevice
 
                 try
                 {
-                    var buffer = _sdCard.ReadSector(sector);
+                    var buffer = _diskImage.ReadSector(sector);
 
                     _responseBuffer.Put(_status, Token.StartBlock, buffer, 0x00, 0x00);
                 }
@@ -176,13 +177,13 @@ internal sealed class CardDevice
                     sector = _command.Arguments[0] << 24 | _command.Arguments[1] << 16 |
                              _command.Arguments[2] << 8 | _command.Arguments[3];
 
-                    if (sector >= _sdCard.TotalSectors)
+                    if (sector >= _diskImage.TotalSectors)
                     {
                         _responseBuffer.Put(_status | Status.IllegalCommand);
                     }
                     else
                     {
-                        _sdCard.WriteSector(sector, _dataBlock.Data);
+                        _diskImage.WriteSector(sector, _dataBlock.Data);
                         _responseBuffer.Put([Token.DataAccepted, 0x01]); // Data accepted + busy flag
                     }
 

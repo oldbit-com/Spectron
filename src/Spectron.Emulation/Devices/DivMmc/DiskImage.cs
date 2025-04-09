@@ -10,6 +10,7 @@ internal sealed class DiskImage : IDisposable
     private const int SectorSize = 512;
 
     private readonly BinaryReader _reader;
+    private readonly BinaryWriter _writer;
     private readonly string _filename;
     private readonly Dictionary<int, byte[]> _writeSectors = new();
 
@@ -19,12 +20,16 @@ internal sealed class DiskImage : IDisposable
 
     internal uint DiskSizeInBytes => TotalSectors * SectorSize;
 
+    internal bool IsWriteEnabled { get; set; }
+
     internal DiskImage(string filename)
     {
         _filename = filename;
 
-        var file = File.Open(_filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+        var file = File.Open(_filename, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
+
         _reader = new BinaryReader(file);
+        _writer = new BinaryWriter(file);
 
         ParseMbr();
     }
@@ -36,7 +41,8 @@ internal sealed class DiskImage : IDisposable
             return data;
         }
 
-        _reader.BaseStream.Seek(_firstSectorOffset + SectorSize * sector, SeekOrigin.Begin);
+        var position = GetSectorPosition(sector);
+        _reader.BaseStream.Seek(position, SeekOrigin.Begin);
 
         data = _reader.ReadBytes(SectorSize);
 
@@ -45,7 +51,32 @@ internal sealed class DiskImage : IDisposable
 
     internal void WriteSector(int sector, byte[] data)
     {
-        _writeSectors[sector] = data;
+        if (IsWriteEnabled)
+        {
+            foreach (var (cachedSector, cachedData) in _writeSectors)
+            {
+                if (cachedSector == sector)
+                {
+                    continue;
+                }
+
+                WriteSectorPrivate(cachedSector, cachedData);
+            }
+
+            WriteSectorPrivate(sector, data);
+        }
+        else
+        {
+            _writeSectors[sector] = data;
+        }
+    }
+
+    private void WriteSectorPrivate(int sector, byte[] data)
+    {
+        var position = GetSectorPosition(sector);
+
+        _writer.BaseStream.Seek(position, SeekOrigin.Begin);
+        _writer.Write(data);
     }
 
     private void ParseMbr()
@@ -67,5 +98,11 @@ internal sealed class DiskImage : IDisposable
         _firstSectorOffset = startLba * SectorSize;
     }
 
-    public void Dispose() => _reader.Dispose();
+    private long GetSectorPosition(int sector) => _firstSectorOffset + SectorSize * sector;
+
+    public void Dispose()
+    {
+        _reader.Dispose();
+        _writer.Dispose();
+    }
 }
