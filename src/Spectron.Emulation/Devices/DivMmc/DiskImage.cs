@@ -5,13 +5,13 @@ namespace OldBit.Spectron.Emulation.Devices.DivMmc;
 /// with MBR (Master Boot Record) at the beginning and 512-byte sectors, formatted
 /// as FAT16 or FAT32. E.g. compatible with esxDOS.
 /// </summary>
-internal sealed class DiskImage : IDisposable
+public sealed class DiskImage : IDisposable
 {
     private const int SectorSize = 512;
 
     private readonly BinaryReader _reader;
     private readonly BinaryWriter _writer;
-    private readonly string _filename;
+    private readonly string _fileName;
     private readonly Dictionary<int, byte[]> _writeSectors = new();
 
     private uint _firstSectorOffset;
@@ -22,16 +22,32 @@ internal sealed class DiskImage : IDisposable
 
     internal bool IsWriteEnabled { get; set; }
 
-    internal DiskImage(string filename)
+    internal DiskImage(string fileName)
     {
-        _filename = filename;
+        _fileName = fileName;
 
-        var file = File.Open(_filename, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
+        var file = File.Open(_fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
 
         _reader = new BinaryReader(file);
         _writer = new BinaryWriter(file);
 
         ParseMbr();
+    }
+
+    public static bool Validate(string fileName, out string? errorMessage)
+    {
+        try
+        {
+            using var diskImage = new DiskImage(fileName);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+            return false;
+        }
+
+        errorMessage = null;
+        return true;
     }
 
     internal byte[] ReadSector(int sector)
@@ -81,7 +97,7 @@ internal sealed class DiskImage : IDisposable
 
     private void ParseMbr()
     {
-        using var file = File.Open(_filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+        using var file = File.Open(_fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
         using var reader = new BinaryReader(file);
 
         _reader.BaseStream.Seek(0, SeekOrigin.Begin);

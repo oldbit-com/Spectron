@@ -64,23 +64,23 @@ public sealed class DivMmcDevice : IDevice, IDisposable
         _cpu.AfterFetch -= AfterFetch;
     }
 
-    public void InsertCard(string filename)
+    public void InsertCard(string fileName)
     {
         _diskImage?.Dispose();
         _diskImage = null;
 
-        if (string.IsNullOrWhiteSpace(filename))
+        if (string.IsNullOrWhiteSpace(fileName))
         {
             return;
         }
 
         try
         {
-            _diskImage = new DiskImage(filename);
+            _diskImage = new DiskImage(fileName);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to load sd card: {Filename}",  filename);
+            _logger.LogError(ex, "Failed to load sd card: {Filename}",  fileName);
         }
     }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -12,6 +13,7 @@ using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Disassembly.Formatters;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
+using OldBit.Spectron.Emulation.Devices.DivMmc;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Rom;
@@ -235,6 +237,21 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
                 DivMmcCard1FileName = file[0].Path.LocalPath;
                 break;
         }
+    }
+
+    public static ValidationResult? ValidateCardImageFile(string fileName, ValidationContext context)
+    {
+        if (context.ObjectInstance is PreferencesViewModel { IsDivMmcEnabled: false })
+        {
+            return ValidationResult.Success;
+        }
+
+        if (string.IsNullOrWhiteSpace(fileName) || DiskImage.Validate(fileName, out var errorMessage))
+        {
+            return ValidationResult.Success;
+        }
+
+        return new ValidationResult(errorMessage, [context.MemberName ?? string.Empty]);
     }
 
     private void ProbeFFmpeg()
@@ -600,6 +617,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
     }
 
     private string _divMmcCard0FileName = string.Empty;
+    [CustomValidation(typeof(PreferencesViewModel), nameof(ValidateCardImageFile))]
     public string DivMmcCard0FileName
     {
         get => _divMmcCard0FileName;
@@ -607,6 +625,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
     }
 
     private string _divMmcCard1FileName = string.Empty;
+    [CustomValidation(typeof(PreferencesViewModel), nameof(ValidateCardImageFile))]
     public string DivMmcCard1FileName
     {
         get => _divMmcCard1FileName;

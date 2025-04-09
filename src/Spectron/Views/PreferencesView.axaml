@@ -33,6 +33,9 @@
         <Style Selector="CheckBox.Center">
             <Setter Property="Padding" Value="8 2 0 0" />
         </Style>
+        <Style Selector="TextBlock.Top">
+            <Setter Property="Padding" Value="8 10 0 0" />
+        </Style>
         <Style Selector="TextBlock.Center">
             <Setter Property="Padding" Value="8 4 0 0" />
         </Style>
@@ -222,53 +225,55 @@
                         <CheckBox Content="EEPROM write enabled" Classes="Center" IsChecked="{Binding IsDivMmcWriteEnabled}" IsEnabled="{Binding #DivMmcEnabled.IsChecked}"/>
                         <CheckBox Content="Persist disk writes" Classes="Center" IsChecked="{Binding IsDivMmcDriveWriteEnabled}" IsEnabled="{Binding #DivMmcEnabled.IsChecked}"/>
 
-                        <Grid ColumnDefinitions="210,*, 30" RowDefinitions="40,40" IsEnabled="{Binding #DivMmcEnabled.IsChecked}">
+                        <Grid ColumnDefinitions="210,*, 30" RowDefinitions="*,10,*" IsEnabled="{Binding #DivMmcEnabled.IsChecked}">
                             <TextBlock
                                 Grid.Column="0"
                                 Grid.Row="0"
                                 Text="Primary SD card disk image:"
-                                VerticalAlignment="Center"
-                                Classes="Center"/>
+                                VerticalAlignment="Top"
+                                Classes="Top"/>
 
                             <TextBox
                                 Grid.Column="1"
                                 Grid.Row="0"
                                 Text="{Binding DivMmcCard0FileName}"
                                 Margin="5 0 0 0"
-                                Height="30"
                                 Watermark="Image file containing primary SD card contents"
+                                VerticalAlignment="Top"
                                 VerticalContentAlignment="Center"/>
 
                             <Button
                                 Grid.Column="2"
                                 Grid.Row="0"
-                                Margin="4 0 0 0"
+                                Margin="4 2 0 0"
                                 ToolTip.Tip="Select Disk Image"
+                                VerticalAlignment="Top"
                                 Command="{Binding SelectSdCardImageFile}" CommandParameter="0">
                                 <material:MaterialIcon Kind="Harddisk"/>
                             </Button>
 
                             <TextBlock
                                 Grid.Column="0"
-                                Grid.Row="1"
+                                Grid.Row="2"
                                 Text="Secondary SD card disk image:"
-                                VerticalAlignment="Center"
-                                Classes="Center"/>
+                                VerticalAlignment="Top"
+                                Classes="Top"/>
 
                             <TextBox
                                 Grid.Column="1"
-                                Grid.Row="1"
+                                Grid.Row="2"
                                 Text="{Binding DivMmcCard1FileName}"
                                 Margin="5 0 0 0"
-                                Height="30"
                                 Watermark="Image file containing secondary SD card contents"
+                                VerticalAlignment="Top"
                                 VerticalContentAlignment="Center"/>
 
                             <Button
                                 Grid.Column="2"
-                                Grid.Row="1"
-                                Margin="4 0 0 0"
+                                Grid.Row="2"
+                                Margin="4 2 0 0"
                                 ToolTip.Tip="Select Disk Image"
+                                VerticalAlignment="Top"
                                 Command="{Binding SelectSdCardImageFile}" CommandParameter="1">
                                 <material:MaterialIcon Kind="Harddisk"/>
                             </Button>
