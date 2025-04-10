@@ -75,7 +75,16 @@ public static class EmulatorExtensions
 
         if (divMmcSettings.IsEnabled)
         {
-            emulator.DivMmc.InsertCard(divMmcSettings.Card0FileName);
+            if (!string.IsNullOrWhiteSpace(divMmcSettings.Card0FileName))
+            {
+                emulator.DivMmc.InsertCard(divMmcSettings.Card0FileName, slotNumber: 0);
+            }
+
+            if (!string.IsNullOrWhiteSpace(divMmcSettings.Card1FileName))
+            {
+                emulator.DivMmc.InsertCard(divMmcSettings.Card1FileName, slotNumber: 1);
+            }
+
             emulator.DivMmc.Enable();
         }
         else

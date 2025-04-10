@@ -17,11 +17,15 @@ public sealed class DivMmcDevice : IDevice, IDisposable
 
     private readonly Z80 _cpu;
     private readonly ILogger _logger;
-    private readonly CardDevice _cardDevice = new();
+    private readonly CardDevice _cardDevice0 = new();
+    private readonly CardDevice _cardDevice1 = new();
 
+    private CardDevice _activeCardDevice;
     private PagingMode _afterFetchPagingMode = PagingMode.None;
+    private bool _isDriveWriteEnabled;
 
-    private DiskImage? _diskImage;
+    private DiskImage? _diskImage0;
+    private DiskImage? _diskImage1;
 
     internal bool IsEnabled { get; private set; }
 
@@ -31,9 +35,15 @@ public sealed class DivMmcDevice : IDevice, IDisposable
     {
         set
         {
-            if (_diskImage != null)
+            _isDriveWriteEnabled = value;
+
+            if (_diskImage0 != null)
             {
-                _diskImage.IsWriteEnabled = value;
+                _diskImage0.IsWriteEnabled = value;
+            }
+            if (_diskImage1 != null)
+            {
+                _diskImage1.IsWriteEnabled = value;
             }
         }
     }
@@ -42,6 +52,7 @@ public sealed class DivMmcDevice : IDevice, IDisposable
     {
         _cpu = cpu;
         _logger = logger;
+        _activeCardDevice = _cardDevice0;
 
         var rom = RomReader.ReadRom(RomType.DivMmc);
 
@@ -64,10 +75,20 @@ public sealed class DivMmcDevice : IDevice, IDisposable
         _cpu.AfterFetch -= AfterFetch;
     }
 
-    public void InsertCard(string fileName)
+    public void InsertCard(string fileName, int slotNumber)
     {
-        _diskImage?.Dispose();
-        _diskImage = null;
+        switch (slotNumber)
+        {
+            case 0:
+                _diskImage0?.Dispose();
+                _diskImage0 = null;
+                break;
+
+            case 1:
+                _diskImage1?.Dispose();
+                _diskImage1 = null;
+                break;
+        }
 
         if (string.IsNullOrWhiteSpace(fileName))
         {
@@ -76,7 +97,19 @@ public sealed class DivMmcDevice : IDevice, IDisposable
 
         try
         {
-            _diskImage = new DiskImage(fileName);
+            var diskImage = new DiskImage(fileName);
+            diskImage.IsWriteEnabled = _isDriveWriteEnabled;
+
+            switch (slotNumber)
+            {
+                case 0:
+                    _diskImage0 = diskImage;
+                    break;
+
+                case 1:
+                    _diskImage1 = diskImage;
+                    break;
+            }
         }
         catch (Exception ex)
         {
@@ -99,25 +132,31 @@ public sealed class DivMmcDevice : IDevice, IDisposable
         {
             if ((value & 0x03) == 0x03)
             {
-                _cardDevice.Eject();
+                _cardDevice0.Eject();
+                _cardDevice1.Eject();
             }
             else if ((value & Sd0) == Sd0)
             {
-                if (_diskImage != null)
+                _activeCardDevice = _cardDevice0;
+
+                if (_diskImage0 != null)
                 {
-                    _cardDevice.Insert(_diskImage);
+                    _activeCardDevice.Insert(_diskImage0);
                 }
             }
             else if ((value & Sd1) == Sd1)
             {
-                // TODO: Support multiple cards
-                _cardDevice.Eject();
-                //_cardDevice.InsertCard(_sdCard);
+                _activeCardDevice = _cardDevice1;
+
+                if (_diskImage1 != null)
+                {
+                    _activeCardDevice.Insert(_diskImage1);
+                }
             }
         }
         else if (IsDataRegister(address))
         {
-            _cardDevice.Write(value);
+            _activeCardDevice.Write(value);
         }
     }
 
@@ -130,13 +169,19 @@ public sealed class DivMmcDevice : IDevice, IDisposable
 
         if (IsDataRegister(address))
         {
-            return _cardDevice.Read();
+            return _activeCardDevice.Read();
         }
 
         return null;
     }
 
     public void Stop() => Dispose();
+
+    public void Reset()
+    {
+        _cardDevice0.Reset();
+        _cardDevice1.Reset();
+    }
 
     private void BeforeFetch(Word pc)
     {
@@ -172,5 +217,9 @@ public sealed class DivMmcDevice : IDevice, IDisposable
 
     private static bool IsCardSelectRegister(Word address) => (address & 0xFF) == CardSelectRegister;
 
-    public void Dispose() => _diskImage?.Dispose();
+    public void Dispose()
+    {
+        _diskImage0?.Dispose();
+        _diskImage1?.Dispose();
+    }
 }

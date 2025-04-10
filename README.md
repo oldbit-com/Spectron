@@ -99,7 +99,7 @@ Floating bus is emulated and supported by both 48K and 128K modes. Only a handfu
 
 ## Audio
 Standard beeper audio is supported, as well as AY audio (mono / stereo ABC or ACB mode).
-AY is by default enabled in 48K mode, but can be disabled in the settings..
+AY is by default enabled in 48K mode, but can be disabled in the settings.
 
 Audio playback is done using [Beep](https://github.com/oldbit-com/Beep) which I created for this project since I couldn't find any simple 
 cross-platform audio player that would suit my needs.
@@ -116,13 +116,13 @@ ULA+ mode is supported and can be enabled or disabled in the emulator settings.
 
 ## DivMMC
 DivMMC emulation is supported and can be enabled or disabled in the emulator settings.
-It is based on [esxDOS 0.8.9](https://esxdos.org/). You will need to use a disk image with esxDOS files. This can be an
-image of SD card or compatible disk image: 512 bytes pe sector, MBR partition with FAT16 or FAT32 file system.
+It is based on [esxDOS 0.8.9](https://esxdos.org/). You will need to use a disk image containing esxDOS files.
+Sample disk images can be found [here](https://1drv.ms/u/c/7fd2cf29d9a4c5e1/EdULvNTWM7VLiU1_6GeGDcgBacxN6TanwmMCle2Hz8OBhg?e=3CSLB0).
 
-You can use [RTC.SYS](src/Spectron.Emulation/Devices/DivMmc/RTC) file to enable RTC support. This is not required, 
-but it will enable DivMMC to use RTC clock.
+Two SD card images are supported. Write changes can be persisted.
 
-Sample disk images can be found [here](TODO).
+You can use [RTC.SYS](src/Spectron.Emulation/Devices/DivMmc/RTC) file to enable RTC support. This is not required, but it will enable DivMMC to use current 
+date and time.
 
 ## Time Machine
 Time Machine is a feature that allows you to go back in time and continue from given time point in the past.

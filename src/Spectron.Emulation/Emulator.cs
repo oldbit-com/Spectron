@@ -164,6 +164,7 @@ public sealed class Emulator
         ScreenBuffer.Reset();
         UlaPlus.Reset();
         KeyboardState.Reset();
+        DivMmc.Reset();
 
         if (IsPaused)
         {
