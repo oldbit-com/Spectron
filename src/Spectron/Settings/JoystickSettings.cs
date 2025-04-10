@@ -1,6 +1,6 @@
 using System;
-using Avalonia.Input;
 using OldBit.Spectron.Emulation.Devices.Joystick;
+using SharpHook.Native;
 
 namespace OldBit.Spectron.Settings;
 
@@ -14,5 +14,5 @@ public record JoystickSettings
 
     public bool EmulateUsingKeyboard { get; init; } = true;
 
-    public PhysicalKey FireKey { get; init; } = PhysicalKey.Space;
+    public KeyCode FireKey { get; init; } = KeyCode.VcSpace;
 }

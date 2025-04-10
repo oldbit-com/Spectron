@@ -23,6 +23,7 @@ using OldBit.Spectron.Screen;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.Theming;
 using ReactiveUI;
+using SharpHook.Native;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -295,47 +296,47 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         new("Stereo ACB", StereoMode.StereoAcb),
     ];
 
-    public List<NameValuePair<PhysicalKey>> FireKeys { get; } =
+    public List<NameValuePair<KeyCode>> FireKeys { get; } =
     [
-        new("Space", PhysicalKey.Space),
-        new("Tab", PhysicalKey.Tab),
-        new("Enter", PhysicalKey.Enter),
-        new("A", PhysicalKey.A),
-        new("B", PhysicalKey.B),
-        new("C", PhysicalKey.C),
-        new("D", PhysicalKey.D),
-        new("E", PhysicalKey.E),
-        new("F", PhysicalKey.F),
-        new("G", PhysicalKey.G),
-        new("H", PhysicalKey.H),
-        new("I", PhysicalKey.I),
-        new("J", PhysicalKey.J),
-        new("K", PhysicalKey.K),
-        new("L", PhysicalKey.L),
-        new("M", PhysicalKey.M),
-        new("N", PhysicalKey.N),
-        new("O", PhysicalKey.O),
-        new("P", PhysicalKey.P),
-        new("Q", PhysicalKey.Q),
-        new("R", PhysicalKey.R),
-        new("S", PhysicalKey.S),
-        new("T", PhysicalKey.T),
-        new("U", PhysicalKey.U),
-        new("V", PhysicalKey.V),
-        new("W", PhysicalKey.W),
-        new("X", PhysicalKey.X),
-        new("Y", PhysicalKey.Y),
-        new("Z", PhysicalKey.Z),
-        new("0", PhysicalKey.Digit0),
-        new("1", PhysicalKey.Digit1),
-        new("2", PhysicalKey.Digit2),
-        new("3", PhysicalKey.Digit3),
-        new("4", PhysicalKey.Digit4),
-        new("5", PhysicalKey.Digit5),
-        new("6", PhysicalKey.Digit6),
-        new("7", PhysicalKey.Digit7),
-        new("8", PhysicalKey.Digit8),
-        new("9", PhysicalKey.Digit9),
+        new("Space", KeyCode.VcSpace),
+        new("Tab", KeyCode.VcTab),
+        new("Enter", KeyCode.VcEnter),
+        new("A", KeyCode.VcA),
+        new("B", KeyCode.VcB),
+        new("C", KeyCode.VcC),
+        new("D", KeyCode.VcD),
+        new("E", KeyCode.VcE),
+        new("F", KeyCode.VcF),
+        new("G", KeyCode.VcG),
+        new("H", KeyCode.VcH),
+        new("I", KeyCode.VcI),
+        new("J", KeyCode.VcJ),
+        new("K", KeyCode.VcK),
+        new("L", KeyCode.VcL),
+        new("M", KeyCode.VcM),
+        new("N", KeyCode.VcN),
+        new("O", KeyCode.VcO),
+        new("P", KeyCode.VcP),
+        new("Q", KeyCode.VcQ),
+        new("R", KeyCode.VcR),
+        new("S", KeyCode.VcS),
+        new("T", KeyCode.VcT),
+        new("U", KeyCode.VcU),
+        new("V", KeyCode.VcV),
+        new("W", KeyCode.VcW),
+        new("X", KeyCode.VcX),
+        new("Y", KeyCode.VcY),
+        new("Z", KeyCode.VcZ),
+        new("0", KeyCode.Vc0),
+        new("1", KeyCode.Vc1),
+        new("2", KeyCode.Vc2),
+        new("3", KeyCode.Vc3),
+        new("4", KeyCode.Vc4),
+        new("5", KeyCode.Vc5),
+        new("6", KeyCode.Vc6),
+        new("7", KeyCode.Vc7),
+        new("8", KeyCode.Vc8),
+        new("9", KeyCode.Vc9),
     ];
 
     public List<NameValuePair<BorderSize>> BorderSizes { get; } =
@@ -434,8 +435,8 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         set => this.RaiseAndSetIfChanged(ref _emulateUsingKeyboard, value);
     }
 
-    private PhysicalKey _fireKey = PhysicalKey.Space;
-    public PhysicalKey FireKey
+    private KeyCode _fireKey = KeyCode.VcSpace;
+    public KeyCode FireKey
     {
         get => _fireKey;
         set => this.RaiseAndSetIfChanged(ref _fireKey, value);

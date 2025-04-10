@@ -26,6 +26,7 @@ using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Emulation.Tape.Loader;
 using OldBit.Spectron.Extensions;
+using OldBit.Spectron.Keyboard;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.Recorder;
@@ -55,6 +56,7 @@ public partial class MainWindowViewModel : ReactiveObject
     private readonly ILogger _logger;
     private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
     private readonly Timer _statusBarTimer;
+    private readonly KeyboardHook _keyboardHook;
 
     private Emulator? Emulator { get; set; }
     private Preferences _preferences = new();
@@ -78,7 +80,6 @@ public partial class MainWindowViewModel : ReactiveObject
     public ReactiveCommand<WindowClosingEventArgs, Unit> WindowClosingCommand { get; private set; }
 
     public ReactiveCommand<KeyEventArgs, Unit> KeyDownCommand { get; private set; }
-    public ReactiveCommand<KeyEventArgs, Unit> KeyUpCommand { get; private set; }
 
     public ReactiveCommand<Unit, Unit> TimeMachineResumeEmulatorCommand  { get; private set; }
 
@@ -189,7 +190,6 @@ public partial class MainWindowViewModel : ReactiveObject
         WindowOpenedCommand = ReactiveCommand.CreateFromTask(WindowOpenedAsync);
         WindowClosingCommand = ReactiveCommand.CreateFromTask<WindowClosingEventArgs>(WindowClosingAsync);
         KeyDownCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyDown);
-        KeyUpCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyUp);
         TimeMachineResumeEmulatorCommand = ReactiveCommand.Create(HandleTimeMachineResumeEmulator);
 
         // File
@@ -246,6 +246,11 @@ public partial class MainWindowViewModel : ReactiveObject
         SpectrumScreen = _frameBufferConverter.ScreenBitmap;
 
         tapeManager.TapeStateChanged += HandleTapeStateChanged;
+
+        _keyboardHook = new KeyboardHook();
+        _keyboardHook.SpectrumKeyPressed  += HandleSpectrumKeyPressed;
+        _keyboardHook.SpectrumKeyReleased += HandleSpectrumKeyReleased;
+        _keyboardHook.Run();
     }
 
     public void OnViewClosed(object? viewModel)
@@ -447,6 +452,7 @@ public partial class MainWindowViewModel : ReactiveObject
         args.Cancel = true;
 
         Emulator?.Shutdown();
+        _keyboardHook?.Dispose();
 
         _preferences.AudioSettings.IsMuted = IsMuted;
 

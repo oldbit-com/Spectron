@@ -6,6 +6,11 @@ namespace OldBit.Spectron.Emulation.Devices.Keyboard;
 public enum SpectrumKey
 {
     /// <summary>
+    /// No key pressed.
+    /// </summary>
+    None,
+
+    /// <summary>
     /// The ENTER key.
     /// </summary>
     Enter,
