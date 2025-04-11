@@ -52,6 +52,7 @@ public class LoggingViewModel : ReactiveObject, IDisposable
         }
 
         var instructionLogger = new InstructionLogger(LogFilePath, _emulator);
+        instructionLogger.ShouldLockTicks = ShouldLockTicks;
 
         if (_instructionLogger?.IsEnabled == true)
         {
