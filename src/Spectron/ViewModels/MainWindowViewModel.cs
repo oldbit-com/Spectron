@@ -275,6 +275,9 @@ public partial class MainWindowViewModel : ReactiveObject
 
         _debuggerViewModel = new DebuggerViewModel(_debuggerContext, Emulator!, _preferences.DebuggerSettings);
 
+        _debuggerViewModel.HardResetCommand.Subscribe(x => HandleMachineHardReset());
+        _debuggerViewModel.ResetCommand.Subscribe(x => HandleMachineReset());
+
         this.WhenAny(x => x.IsPaused, x => x.Value)
             .Subscribe(isPaused => _debuggerViewModel?.HandlePause(isPaused));
 

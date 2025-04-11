@@ -56,17 +56,23 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
     public ReactiveCommand<Unit, Unit> DebuggerStepOutCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> DebuggerResumeCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> TogglePauseCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ResetCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> HardResetCommand { get; private set; }
 
     public DebuggerViewModel(DebuggerContext debuggerContext, Emulator emulator, DebuggerSettings debuggerSettings)
     {
         _debuggerContext = debuggerContext;
         _debuggerSettings = debuggerSettings;
 
-        DebuggerStepOverCommand = ReactiveCommand.Create(HandleDebuggerStepOver);
-        DebuggerStepIntoCommand = ReactiveCommand.Create(HandleDebuggerStepInto);
-        DebuggerStepOutCommand = ReactiveCommand.Create(HandleStepOutCommand);
-        DebuggerResumeCommand = ReactiveCommand.Create(HandleDebuggerResume);
+        var isPaused = this.WhenAnyValue(x => x.IsPaused, isPaused => isPaused == true);
+
+        DebuggerStepOverCommand = ReactiveCommand.Create(HandleDebuggerStepOver, canExecute: isPaused);
+        DebuggerStepIntoCommand = ReactiveCommand.Create(HandleDebuggerStepInto, canExecute: isPaused);
+        DebuggerStepOutCommand = ReactiveCommand.Create(HandleStepOutCommand, canExecute: isPaused);
+        DebuggerResumeCommand = ReactiveCommand.Create(HandleDebuggerResume, canExecute: isPaused);
         TogglePauseCommand = ReactiveCommand.Create(() => HandlePause(!IsPaused));
+        ResetCommand = ReactiveCommand.Create(() => { });
+        HardResetCommand = ReactiveCommand.Create(() => { });
 
         ConfigureEmulator(emulator);
     }

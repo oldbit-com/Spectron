@@ -43,20 +43,29 @@
 
     <Grid RowDefinitions="35,*,4,200" ColumnDefinitions="240,140,300,*" Margin="5">
         <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4">
+            <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                <Button Classes="Toolbar" Command="{Binding ResetCommand}" ToolTip.Tip="Reset">
+                    <material:MaterialIcon Kind="Restart" />
+                </Button>
+                <Button Classes="Toolbar" Command="{Binding HardResetCommand}" ToolTip.Tip="Hard Reset">
+                    <material:MaterialIcon Kind="RestartAlert" />
+                </Button>
+            </StackPanel>
+
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                <Button Padding="4 0 0 0" Classes="Toolbar" Command="{Binding TogglePauseCommand}" IsVisible="{Binding !IsPaused}" ToolTip.Tip="Pause [F2]">
+                <Button Classes="Toolbar" Command="{Binding TogglePauseCommand}" IsVisible="{Binding !IsPaused}" ToolTip.Tip="Pause [F2]">
                     <material:MaterialIcon Kind="Pause" Classes.IsDisabled="{Binding !$parent.IsEnabled}"/>
                 </Button>
-                <Button Padding="4 0 0 0" Classes="Toolbar" Command="{Binding DebuggerResumeCommand}" ToolTip.Tip="Resume [F5]" IsVisible="{Binding IsPaused}">
+                <Button Classes="Toolbar" Command="{Binding DebuggerResumeCommand}" ToolTip.Tip="Resume [F5]" IsVisible="{Binding IsPaused}">
                     <material:MaterialIcon Kind="Play" Classes.IsDisabled="{Binding !$parent.IsEnabled}"/>
                 </Button>
-                <Button Padding="3 2 0 0" Classes="Toolbar" Command="{Binding DebuggerStepOverCommand}" ToolTip.Tip="Step Over [F10]" IsEnabled="{Binding IsPaused}">
+                <Button Classes="Toolbar" Command="{Binding DebuggerStepOverCommand}" ToolTip.Tip="Step Over [F10]" IsEnabled="{Binding IsPaused}">
                     <material:MaterialIcon Kind="DebugStepOver" Classes.IsDisabled="{Binding !$parent.IsEnabled}"/>
                 </Button>
-                <Button Padding="3 2 0 0" Classes="Toolbar" Command="{Binding DebuggerStepIntoCommand}" ToolTip.Tip="Step Into [F11]" IsEnabled="{Binding IsPaused}">
+                <Button Classes="Toolbar" Command="{Binding DebuggerStepIntoCommand}" ToolTip.Tip="Step Into [F11]" IsEnabled="{Binding IsPaused}">
                     <material:MaterialIcon Kind="DebugStepInto" Classes.IsDisabled="{Binding !$parent.IsEnabled}"/>
                 </Button>
-                <Button Padding="3 2 0 0" Classes="Toolbar" Command="{Binding DebuggerStepOutCommand}" ToolTip.Tip="Step Out [Shift+F11]" IsEnabled="{Binding IsPaused}">
+                <Button Classes="Toolbar" Command="{Binding DebuggerStepOutCommand}" ToolTip.Tip="Step Out [Shift+F11]" IsEnabled="{Binding IsPaused}">
                     <material:MaterialIcon Kind="DebugStepOut" Classes.IsDisabled="{Binding !$parent.IsEnabled}"/>
                 </Button>
             </StackPanel>
