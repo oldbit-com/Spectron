@@ -103,9 +103,12 @@ public class DebuggerViewModel : ReactiveObject, IDisposable
     private void OnBreakpointHit(object? sender, EventArgs e)
     {
         Emulator.Pause();
-        IsPaused = true;
 
-        Dispatcher.UIThread.Post(() => Refresh());
+        Dispatcher.UIThread.Post(() =>
+        {
+            IsPaused = true;
+            Refresh();
+        });
     }
 
     public void HandlePause(bool isPaused)
