@@ -36,6 +36,7 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.4" />
         <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.4" />
         <PackageReference Include="OldBit.Z80Cpu.Spectron" Version="0.9.3-pre.10" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.116.1" />
     </ItemGroup>
 
     <ItemGroup>
