@@ -81,6 +81,12 @@ public sealed class KeyboardState
     {
         foreach (var key in keys)
         {
+            if (key == SpectrumKey.None)
+            {
+                Reset();
+                continue;
+            }
+
             if (_keyPorts.TryGetValue(key, out var mapping))
             {
                 _keyStates[mapping.Port] &= (byte)~mapping.Bit;
@@ -92,6 +98,12 @@ public sealed class KeyboardState
     {
         foreach (var key in keys)
         {
+            if (key == SpectrumKey.None)
+            {
+                Reset();
+                break;
+            }
+
             if (_keyPorts.TryGetValue(key, out var mapping))
             {
                 _keyStates[mapping.Port] |= mapping.Bit;

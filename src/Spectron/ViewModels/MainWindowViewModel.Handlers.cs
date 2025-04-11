@@ -459,30 +459,6 @@ partial class MainWindowViewModel
 
     private void HandleSetTapeLoadingSpeed(TapeSpeed tapeSpeed) => TapeLoadSpeed = tapeSpeed;
 
-    private void HandleKeyUp(KeyEventArgs e)
-    {
-        if (MainWindow?.IsActive != true || IsPaused)
-        {
-            return;
-        }
-
-        var joystickInput = JoystickInput.None;
-
-        if (IsKeyboardJoystickEmulationEnabled)
-        {
-            joystickInput = KeyMappings.ToJoystickAction(e.PhysicalKey, _preferences.Joystick.FireKey);
-
-            if (joystickInput != JoystickInput.None)
-            {
-                Emulator?.JoystickManager.Released(joystickInput);
-            }
-        }
-
-        var keys = KeyMappings.ToSpectrumKey(e, joystickInput);
-
-        Emulator?.KeyboardState.KeyUp(keys);
-    }
-
     private void HandleKeyDown(KeyEventArgs e)
     {
         if (MainWindow?.IsActive != true)
@@ -508,27 +484,63 @@ partial class MainWindowViewModel
                 HandleMachineHardReset();
                 return;
         }
+    }
 
-        if (IsPaused)
+    private void HandleSpectrumKeyPressed(object? sender, SpectrumKeyEventArgs e)
+    {
+        if (MainWindow?.IsActive != true)
         {
             return;
         }
 
-        var joystickInput = JoystickInput.None;
-
-        if (IsKeyboardJoystickEmulationEnabled)
+        if (JoystickHandled(e))
         {
-            joystickInput = KeyMappings.ToJoystickAction(e.PhysicalKey, _preferences.Joystick.FireKey);
-
-            if (joystickInput != JoystickInput.None)
-            {
-                Emulator?.JoystickManager.Pressed(joystickInput);
-            }
+            return;
         }
 
-        var keys = KeyMappings.ToSpectrumKey(e, joystickInput);
+        Emulator?.KeyboardState.KeyDown(e.Keys);
+    }
 
-        Emulator?.KeyboardState.KeyDown(keys);
+    private void HandleSpectrumKeyReleased(object? sender, SpectrumKeyEventArgs e)
+    {
+        if (MainWindow?.IsActive != true || IsPaused)
+        {
+            return;
+        }
+
+        if (JoystickHandled(e))
+        {
+            return;
+        }
+
+        Emulator?.KeyboardState.KeyUp(e.Keys);
+    }
+
+    private bool JoystickHandled(SpectrumKeyEventArgs e)
+    {
+        if (!IsKeyboardJoystickEmulationEnabled)
+        {
+            return false;
+        }
+
+        var joystickInput = KeyboardHook.ToJoystickAction(e.KeyCode, _preferences.Joystick.FireKey);
+
+        if (joystickInput == JoystickInput.None)
+        {
+            return false;
+        }
+
+        if (e.IsKeyPressed)
+        {
+            Emulator?.JoystickManager.Pressed(joystickInput);
+        }
+        else
+        {
+            Emulator?.JoystickManager.Released(joystickInput);
+        }
+
+        return true;
+
     }
 
     private bool IsKeyboardJoystickEmulationEnabled =>
