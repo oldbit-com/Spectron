@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using SharpHook;
@@ -28,82 +29,94 @@ public sealed class KeyboardHook : IDisposable
 
     private void KeyPressed(KeyboardHookEventArgs e)
     {
-        //Console.WriteLine($"Key pressed: {e.Data.KeyCode}");
-
-        HandleShiftState(e.Data.KeyCode, isPressed: true);
+        HandleShiftState(e, isPressed: true);
 
         var spectrumKeys = ToSpectrumKeySequence(e.Data.KeyCode);
 
         if (spectrumKeys.Count > 0)
         {
-            SpectrumKeyPressed?.Invoke(this,
-                new SpectrumKeyEventArgs(spectrumKeys, e.Data.KeyCode, isKeyPressed: true));
-
-            return;
+            SpectrumKeyPressed?.Invoke(this, new SpectrumKeyEventArgs(spectrumKeys, e.Data.KeyCode, isKeyPressed: true));
         }
+        else
+        {
+            switch (e.Data.KeyCode)
+            {
+                case KeyCode.VcOpenBracket:
+                    SendExtendedModeKey(!_isShiftPressed ? KeyCode.VcY : KeyCode.VcF);
+                    break;
 
-        // if (e.Data.KeyCode == KeyCode.VcOpenBracket)
-        // {
-        //     _simulator.SimulateKeyPress(KeyCode.VcLeftShift);
-        //     _simulator.SimulateKeyPress(KeyCode.VcRightShift);
-        //     _simulator.SimulateKeyPress(KeyCode.VcY);
-        // }
-        //
-        // switch (e.Data.KeyCode)
-        // {
-        //     case KeyCode.VcA:
-        //         break;
-        // }
+                case KeyCode.VcCloseBracket:
+                    SendExtendedModeKey(!_isShiftPressed ? KeyCode.VcU : KeyCode.VcG);
+                    break;
 
-    //    Console.WriteLine($"Key pressed: {e.Data.KeyCode}");
+                case KeyCode.VcBackQuote:
+                    SendExtendedModeKey(KeyCode.VcA);
+                    break;
+
+                case KeyCode.VcBackslash:
+                    SendExtendedModeKey(!_isShiftPressed ? KeyCode.VcD : KeyCode.VcS);
+                    break;
+            }
+        }
     }
 
     private void KeyReleased(KeyboardHookEventArgs e)
     {
-        //Console.WriteLine($"Key released: {e.Data.KeyCode}");
-
-        HandleShiftState(e.Data.KeyCode, isPressed: false);
+        HandleShiftState(e, isPressed: false);
 
         var spectrumKeys = ToSpectrumKeySequence(e.Data.KeyCode);
 
         if (spectrumKeys.Count > 0)
         {
-            SpectrumKeyReleased?.Invoke(this,
-                new SpectrumKeyEventArgs(spectrumKeys, e.Data.KeyCode, isKeyPressed: false));
-
-            return;
+            SpectrumKeyReleased?.Invoke(this, new SpectrumKeyEventArgs(spectrumKeys, e.Data.KeyCode, isKeyPressed: false));
         }
+        else
+        {
+            switch (e.Data.KeyCode)
+            {
+                case KeyCode.VcOpenBracket:
+                    _simulator.SimulateKeyRelease(KeyCode.VcY);
+                    _simulator.SimulateKeyRelease(KeyCode.VcF);
+                    break;
 
-        // if (e.Data.KeyCode == KeyCode.VcOpenBracket)
-        // {
-        //     _simulator.SimulateKeyPress(KeyCode.VcLeftShift);
-        //     _simulator.SimulateKeyPress(KeyCode.VcRightShift);
-        //     _simulator.SimulateKeyPress(KeyCode.VcY);
-        // }
-        //
+                case KeyCode.VcCloseBracket:
+                    _simulator.SimulateKeyRelease(KeyCode.VcU);
+                    _simulator.SimulateKeyRelease(KeyCode.VcG);
+                    break;
 
+                case KeyCode.VcBackQuote:
+                    _simulator.SimulateKeyRelease(KeyCode.VcA);
+                    break;
+
+                case KeyCode.VcBackslash:
+                    _simulator.SimulateKeyRelease(KeyCode.VcD);
+                    _simulator.SimulateKeyRelease(KeyCode.VcS);
+                    break;
+            }
+        }
     }
 
-    private void HandleShiftState(KeyCode keyCode, bool isPressed)
+    private void SendExtendedModeKey(KeyCode keyCode)
     {
-        if (keyCode is KeyCode.VcLeftShift or KeyCode.VcRightShift)
+        // Enable Extended mode
+        _simulator.SimulateKeyPress(KeyCode.VcLeftShift);
+        _simulator.SimulateKeyPress(KeyCode.VcRightShift);
+
+        Task.Delay(30).ContinueWith(_ =>
+        {
+            _simulator.SimulateKeyRelease(KeyCode.VcLeftShift);
+
+            Task.Delay(5).ContinueWith(_ =>
+                _simulator.SimulateKeyPress(keyCode));
+        });
+    }
+
+    private void HandleShiftState(KeyboardHookEventArgs e, bool isPressed)
+    {
+        if (e is { IsEventSimulated: false, Data.KeyCode: KeyCode.VcLeftShift or KeyCode.VcRightShift })
         {
             _isShiftPressed = isPressed;
         }
-
-
-        // switch (keyCode)
-        // {
-        //     case KeyCode.VcLeftShift when isPressed:
-        //     case KeyCode.VcRightShift when isPressed:
-        //         _isShiftPressed = true;
-        //         break;
-        //
-        //     case KeyCode.VcLeftShift:
-        //     case KeyCode.VcRightShift:
-        //         _isShiftPressed = false;
-        //         break;
-        // }
     }
 
     private List<SpectrumKey> ToSpectrumKeySequence(KeyCode keyCode) => keyCode switch
@@ -140,6 +153,7 @@ public sealed class KeyboardHook : IDisposable
         KeyCode.VcT => [SpectrumKey.T],
         KeyCode.VcU => [SpectrumKey.U],
         KeyCode.VcV => [SpectrumKey.V],
+        KeyCode.VcW => [SpectrumKey.W],
         KeyCode.VcX => [SpectrumKey.X],
         KeyCode.VcY => [SpectrumKey.Y],
         KeyCode.VcZ => [SpectrumKey.Z],
@@ -148,6 +162,7 @@ public sealed class KeyboardHook : IDisposable
         KeyCode.VcLeftShift => [SpectrumKey.CapsShift],
         KeyCode.VcRightShift => [SpectrumKey.SymbolShift],
         KeyCode.VcBackspace => [SpectrumKey.None, SpectrumKey.CapsShift, SpectrumKey.D0],
+        KeyCode.VcEscape => [SpectrumKey.None],
         KeyCode.VcComma => !_isShiftPressed
             ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.N]
             : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.R],
