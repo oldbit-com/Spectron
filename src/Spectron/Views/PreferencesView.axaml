@@ -90,10 +90,12 @@
                     </StackPanel>
                 </Border>
             </TabItem>
-            <TabItem Header="Joystick">
+            <TabItem Header="Input">
                 <Border Classes="Tab">
                     <Grid RowDefinitions="Auto,*">
                         <StackPanel>
+                            <controls:HeaderSeparator Text="Mouse"/>
+                            <CheckBox Content="Kempston Mouse" Classes="Center" IsChecked="{Binding IsKempstonMouseEnabled}"/>
                             <controls:HeaderSeparator Text="Joystick"/>
                             <Grid ColumnDefinitions="140,300" RowDefinitions="40,40,40">
                                 <TextBlock

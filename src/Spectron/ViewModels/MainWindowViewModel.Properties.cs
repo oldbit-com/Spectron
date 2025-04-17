@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Joystick;
@@ -129,5 +130,12 @@ partial class MainWindowViewModel
     {
         get => _timeMachineCountdownSeconds;
         set => this.RaiseAndSetIfChanged(ref _timeMachineCountdownSeconds, value);
+    }
+
+    private Cursor _mouseCursor = Cursor.Default;
+    public Cursor MouseCursor
+    {
+        get => _mouseCursor;
+        set => this.RaiseAndSetIfChanged(ref _mouseCursor, value);
     }
 }

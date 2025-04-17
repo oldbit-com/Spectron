@@ -324,7 +324,10 @@ public partial class MainWindowViewModel : ReactiveObject
             Emulator?.SetAudioSettings(preferences.AudioSettings);
             Emulator?.SetTapeSettings(preferences.TapeSettings);
             Emulator?.SetGamepad(preferences.Joystick);
+            Emulator?.SetMouse(preferences.Mouse);
             Emulator?.SetDivMMc(preferences.DivMmcSettings);
+
+            MouseCursor = _preferences.Mouse.IsKempstonMouseEnabled ? Cursor.Parse("None") : Cursor.Default;
         }
 
         if (resumeAfter)
@@ -420,6 +423,8 @@ public partial class MainWindowViewModel : ReactiveObject
         _timeMachine.SnapshotInterval = _preferences.TimeMachine.SnapshotInterval;
         _timeMachine.MaxDuration = _preferences.TimeMachine.MaxDuration;
         TimeMachineCountdownSeconds = _preferences.TimeMachine.CountdownSeconds;
+
+        MouseCursor = _preferences.Mouse.IsKempstonMouseEnabled ? Cursor.Parse("None") : Cursor.Default;
 
         await RecentFilesViewModel.LoadAsync();
 
@@ -529,6 +534,7 @@ public partial class MainWindowViewModel : ReactiveObject
         Emulator.SetFloatingBusSupport(_preferences.IsFloatingBusEnabled);
         Emulator.SetAudioSettings(_preferences.AudioSettings);
         Emulator.SetGamepad(_preferences.Joystick);
+        Emulator.SetMouse(_preferences.Mouse);
         Emulator.SetDivMMc(_preferences.DivMmcSettings);
 
         if (IsMuted)

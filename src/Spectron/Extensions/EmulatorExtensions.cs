@@ -66,6 +66,23 @@ public static class EmulatorExtensions
                 joystickSettings.JoystickType,
                 joystickSettings.GamepadSettings.Mappings.GetValueOrDefault(joystickSettings.GamepadControllerId, [])));
 
+    public static void SetMouse(this Emulator? emulator, MouseSettings mouseSettings)
+    {
+        if (emulator == null)
+        {
+            return;
+        }
+
+        if (mouseSettings.IsKempstonMouseEnabled)
+        {
+            emulator.MouseManager.Enable();
+        }
+        else
+        {
+            emulator.MouseManager.Disable();
+        }
+    }
+
     public static void SetDivMMc(this Emulator? emulator, DivMmcSettings divMmcSettings)
     {
         if (emulator == null)
