@@ -95,7 +95,9 @@
                     <Grid RowDefinitions="Auto,*">
                         <StackPanel>
                             <controls:HeaderSeparator Text="Mouse"/>
-                            <CheckBox Content="Kempston Mouse" Classes="Center" IsChecked="{Binding IsKempstonMouseEnabled}"/>
+                            <CheckBox x:Name="KempstonMouseEnabled" Content="Kempston Mouse" Classes="Center" IsChecked="{Binding IsKempstonMouseEnabled}"/>
+                            <CheckBox Margin="25 0 0 0" Content="Hide standard mouse pointer" Classes="Center" IsChecked="{Binding IsStandardMousePointerHidden}" IsEnabled="{Binding #KempstonMouseEnabled.IsChecked}"/>
+
                             <controls:HeaderSeparator Text="Joystick"/>
                             <Grid ColumnDefinitions="140,300" RowDefinitions="40,40,40">
                                 <TextBlock

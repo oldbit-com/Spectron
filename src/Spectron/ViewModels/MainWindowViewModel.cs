@@ -332,7 +332,7 @@ public partial class MainWindowViewModel : ReactiveObject
             Emulator?.SetMouse(preferences.Mouse);
             Emulator?.SetDivMMc(preferences.DivMmcSettings);
 
-            MouseCursor = _preferences.Mouse.IsKempstonMouseEnabled ? Cursor.Parse("None") : Cursor.Default;
+            SetMouseCursor();
         }
 
         if (resumeAfter)
@@ -429,7 +429,7 @@ public partial class MainWindowViewModel : ReactiveObject
         _timeMachine.MaxDuration = _preferences.TimeMachine.MaxDuration;
         TimeMachineCountdownSeconds = _preferences.TimeMachine.CountdownSeconds;
 
-        MouseCursor = _preferences.Mouse.IsKempstonMouseEnabled ? Cursor.Parse("None") : Cursor.Default;
+        SetMouseCursor();
 
         await RecentFilesViewModel.LoadAsync();
 
@@ -603,5 +603,10 @@ public partial class MainWindowViewModel : ReactiveObject
         }
 
         Title = $"{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
+    }
+
+    private void SetMouseCursor()
+    {
+        MouseCursor = _preferences.Mouse is { IsKempstonMouseEnabled: true, IsStandardMousePointerHidden: true } ? Cursor.Parse("None") : Cursor.Default;
     }
 }
