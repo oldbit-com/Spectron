@@ -8,6 +8,7 @@ using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Devices.Memory;
+using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Tape;
@@ -55,6 +56,7 @@ public sealed class Emulator
     public JoystickManager JoystickManager { get; }
     public AudioManager AudioManager { get; }
     public GamepadManager GamepadManager { get; }
+    public MouseManager MouseManager { get; }
     public CommandManager CommandManager { get; }
 
     public ComputerType ComputerType { get; }
@@ -76,6 +78,7 @@ public sealed class Emulator
         HardwareSettings hardware,
         TapeManager tapeManager,
         GamepadManager gamepadManager,
+        MouseManager mouseManager,
         KeyboardState keyboardState,
         TimeMachine timeMachine,
         CommandManager commandManager,
@@ -89,6 +92,7 @@ public sealed class Emulator
         CommandManager = commandManager;
         TapeManager = tapeManager;
         GamepadManager = gamepadManager;
+        MouseManager = mouseManager;
         ComputerType = emulatorArgs.ComputerType;
         RomType = emulatorArgs.RomType;
         _memory = emulatorArgs.Memory;
@@ -208,6 +212,7 @@ public sealed class Emulator
         _spectrumBus.AddDevice(_memory);
         _spectrumBus.AddDevice(AudioManager.Beeper);
         _spectrumBus.AddDevice(AudioManager.Ay);
+        _spectrumBus.AddDevice(MouseManager.Mouse);
         _spectrumBus.AddDevice(DivMmc);
         _spectrumBus.AddDevice(new RtcDevice(DivMmc));
 

@@ -75,13 +75,19 @@
                 DataContext="{Binding}"
                 Width="30"/>
 
-            <Border
-                Grid.Row="0"
-                Grid.Column="1">
+            <Border Grid.Row="0" Grid.Column="1">
                 <Grid>
                     <Border CornerRadius="15" HorizontalAlignment="Center" ClipToBounds="True">
                         <Grid>
-                            <Image x:Name="ScreenImage" Source="{Binding SpectrumScreen}" Stretch="Uniform" Classes.IsPaused="{Binding IsPauseOverlayVisible}">
+                            <Image
+                                x:Name="ScreenImage"
+                                Source="{Binding SpectrumScreen}"
+                                Stretch="Uniform"
+                                Cursor="{Binding MouseCursor}"
+                                PointerMoved="InputElement_OnPointerMoved"
+                                PointerPressed="InputElement_OnPointerPressed"
+                                PointerReleased="InputElement_OnPointerReleased"
+                                Classes.IsPaused="{Binding IsPauseOverlayVisible}">
                                 <Image.Styles>
                                     <Style Selector="Image.IsPaused">
                                         <Setter Property="Effect">

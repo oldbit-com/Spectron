@@ -78,6 +78,9 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
             controller => controller.ControllerId == preferences.Joystick.GamepadControllerId)?.ControllerId ?? GamepadController.None.ControllerId;
         FireKey = preferences.Joystick.FireKey;
 
+        IsKempstonMouseEnabled = preferences.Mouse.IsKempstonMouseEnabled;
+        IsStandardMousePointerHidden = preferences.Mouse.IsStandardMousePointerHidden;
+
         IsResumeEnabled = preferences.ResumeSettings.IsResumeEnabled;
         ShouldIncludeTapeInResume = preferences.ResumeSettings.ShouldIncludeTape;
         ShouldIncludeTimeMachineInResume = preferences.ResumeSettings.ShouldIncludeTimeMachine;
@@ -162,6 +165,12 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
                 GamepadControllerId = GamepadControllerId,
                 GamepadSettings = _gamepadSettings,
                 FireKey = FireKey
+            },
+
+            Mouse = new MouseSettings
+            {
+                IsKempstonMouseEnabled = IsKempstonMouseEnabled,
+                IsStandardMousePointerHidden = IsStandardMousePointerHidden,
             },
 
             ResumeSettings = new ResumeSettings
@@ -447,6 +456,20 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
     {
         get => _gamepadControllerId;
         set => this.RaiseAndSetIfChanged(ref _gamepadControllerId, value);
+    }
+
+    private bool _isKempstonMouseEnabled;
+    public bool IsKempstonMouseEnabled
+    {
+        get => _isKempstonMouseEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isKempstonMouseEnabled, value);
+    }
+
+    private bool _isStandardMousePointerHidden;
+    public bool IsStandardMousePointerHidden
+    {
+        get => _isStandardMousePointerHidden;
+        set => this.RaiseAndSetIfChanged(ref _isStandardMousePointerHidden, value);
     }
 
     private bool _isTimeMachineEnabled;

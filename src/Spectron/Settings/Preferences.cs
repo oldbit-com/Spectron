@@ -24,7 +24,7 @@ public class Preferences
 
     public JoystickSettings Joystick { get; init; } = new();
 
-    public int MaxRecentFiles { get; set; } = 10;
+    public MouseSettings Mouse { get; init; } = new();
 
     public TimeMachineSettings TimeMachine { get; init; } = new();
 

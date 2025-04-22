@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using SharpHook.Native;
 
-namespace OldBit.Spectron.Keyboard;
+namespace OldBit.Spectron.Input;
 
 public class SpectrumKeyEventArgs(List<SpectrumKey> keys, KeyCode keyCode, bool isKeyPressed) : EventArgs
 {

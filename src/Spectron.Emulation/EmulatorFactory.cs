@@ -3,6 +3,7 @@ using OldBit.Spectron.Emulation.Commands;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Devices.Memory;
+using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Z80Cpu.Contention;
@@ -19,6 +20,7 @@ public sealed class EmulatorFactory(
     TimeMachine timeMachine,
     TapeManager tapeManager,
     GamepadManager gamepadManager,
+    MouseManager mouseManager,
     KeyboardState keyboardState,
     CommandManager commandManager,
     ILogger<EmulatorFactory> logger)
@@ -69,6 +71,7 @@ public sealed class EmulatorFactory(
             Hardware.Spectrum128K,
             tapeManager,
             gamepadManager,
+            mouseManager,
             keyboardState,
             timeMachine,
             commandManager,
@@ -92,6 +95,7 @@ public sealed class EmulatorFactory(
             Hardware.Spectrum48K,
             tapeManager,
             gamepadManager,
+            mouseManager,
             keyboardState,
             timeMachine,
             commandManager,

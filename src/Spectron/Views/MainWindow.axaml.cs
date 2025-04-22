@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
+using Avalonia.Input;
 using Avalonia.ReactiveUI;
 using OldBit.Spectron.Debugger.ViewModels;
 using OldBit.Spectron.Debugger.Views;
@@ -117,5 +117,29 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         MessageDialogs.MainWindow = this;
         viewModel.MainWindow = this;
         viewModel.NotificationManager = NotificationManager;
+    }
+
+    private void InputElement_OnPointerMoved(object? sender, PointerEventArgs e)
+    {
+        var position = e.GetCurrentPoint(ScreenImage).Position;
+        var bounds = ScreenImage.Bounds;
+
+        _viewModel?.HandleMouseMoved(position, bounds);
+    }
+
+    private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        var point = e.GetCurrentPoint(ScreenImage);
+        var bounds = ScreenImage.Bounds;
+
+        _viewModel?.HandleMouseButtonStateChanged(point, bounds);
+    }
+
+    private void InputElement_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        var point = e.GetCurrentPoint(ScreenImage);
+        var bounds = ScreenImage.Bounds;
+
+        _viewModel?.HandleMouseButtonStateChanged(point, bounds);
     }
 }
