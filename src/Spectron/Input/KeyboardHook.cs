@@ -7,7 +7,7 @@ using SharpHook;
 using SharpHook.Native;
 using SharpHook.Reactive;
 
-namespace OldBit.Spectron.Keyboard;
+namespace OldBit.Spectron.Input;
 
 public sealed class KeyboardHook : IDisposable
 {

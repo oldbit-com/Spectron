@@ -2,11 +2,11 @@ namespace OldBit.Spectron.Emulation.Devices.Mouse;
 
 public sealed class KempstonMouse : IDevice
 {
-    private byte _xAxis;
-    private byte _yAxis;
-    private MouseButtons _buttons = MouseButtons.None;
-
     internal bool IsEnabled { get; set; }
+
+    internal MouseButtons Buttons { get; set; } = MouseButtons.None;
+    internal byte X { get; set; }
+    internal byte Y { get; set; }
 
     public byte? ReadPort(Word address)
     {
@@ -17,27 +17,20 @@ public sealed class KempstonMouse : IDevice
 
         if (IsXAxisPort(address))
         {
-            return _xAxis;
+            return X;
         }
 
         if (IsYAxisPort(address))
         {
-            return _yAxis;
+            return Y;
         }
 
         if (IsButtonsPort(address))
         {
-            return (byte)_buttons;
+            return (byte)Buttons;
         }
 
         return null;
-    }
-
-    public void Update(byte xAxis, byte yAxis, MouseButtons buttons)
-    {
-        _xAxis = xAxis;
-        _yAxis = yAxis;
-        _buttons = buttons;
     }
 
     private static bool IsXAxisPort(Word address) => (address & 0b0000_0111_0010_0000) == 0b0000_0011_0000_0000;

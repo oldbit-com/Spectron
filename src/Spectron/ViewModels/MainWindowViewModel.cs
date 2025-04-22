@@ -18,6 +18,7 @@ using OldBit.Spectron.Emulation.Commands;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
+using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
@@ -26,7 +27,7 @@ using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Emulation.Tape.Loader;
 using OldBit.Spectron.Extensions;
-using OldBit.Spectron.Keyboard;
+using OldBit.Spectron.Input;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.Recorder;
@@ -57,6 +58,7 @@ public partial class MainWindowViewModel : ReactiveObject
     private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
     private readonly Timer _statusBarTimer;
     private readonly KeyboardHook _keyboardHook;
+    private readonly MouseHelper _mouseHelper;
 
     private Emulator? Emulator { get; set; }
     private Preferences _preferences = new();
@@ -138,6 +140,7 @@ public partial class MainWindowViewModel : ReactiveObject
         EmulatorFactory emulatorFactory,
         TimeMachine timeMachine,
         GamepadManager gamepadManager,
+        MouseManager mouseManager,
         SnapshotManager snapshotManager,
         StateManager stateManager,
         Loader loader,
@@ -161,6 +164,8 @@ public partial class MainWindowViewModel : ReactiveObject
         _debuggerContext = debuggerContext;
         _quickSaveService = quickSaveService;
         _logger = logger;
+
+        _mouseHelper = new MouseHelper(mouseManager);
 
         RecentFilesViewModel = recentFilesViewModel;
         TapeMenuViewModel = tapeMenuViewModel;

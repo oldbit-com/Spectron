@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Input;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
@@ -15,7 +16,7 @@ using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.Tape;
-using OldBit.Spectron.Keyboard;
+using OldBit.Spectron.Input;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Recorder;
 using OldBit.Spectron.Screen;
@@ -569,4 +570,10 @@ partial class MainWindowViewModel
     }
 
     private void HandleTakeScreenshot() => _screenshotViewModel.AddScreenshot(SpectrumScreen);
+
+    public void HandleMouseMoved(Point position, Rect bounds) =>
+        _mouseHelper.MouseMoved(BorderSize, position, bounds);
+
+    public void HandleMouseButtonStateChanged(PointerPoint point, Rect bounds) =>
+        _mouseHelper.ButtonsStateChanged(point);
 }

@@ -121,6 +121,25 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
     private void InputElement_OnPointerMoved(object? sender, PointerEventArgs e)
     {
-        Console.WriteLine($"Mouse moved: {e.GetCurrentPoint(ScreenImage).Position}");
+        var position = e.GetCurrentPoint(ScreenImage).Position;
+        var bounds = ScreenImage.Bounds;
+
+        _viewModel?.HandleMouseMoved(position, bounds);
+    }
+
+    private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        var point = e.GetCurrentPoint(ScreenImage);
+        var bounds = ScreenImage.Bounds;
+
+        _viewModel?.HandleMouseButtonStateChanged(point, bounds);
+    }
+
+    private void InputElement_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        var point = e.GetCurrentPoint(ScreenImage);
+        var bounds = ScreenImage.Bounds;
+
+        _viewModel?.HandleMouseButtonStateChanged(point, bounds);
     }
 }
