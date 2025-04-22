@@ -21,6 +21,7 @@ internal class PulseStream : IDisposable
     private readonly HardwareSettings _hardware;
 
     private IEnumerator<Pulse>? _pulseEnumerator;
+    private int _loopCounter;
 
     internal PulseStream(Cassette cassette, HardwareSettings hardware)
     {
@@ -55,9 +56,30 @@ internal class PulseStream : IDisposable
         while (true)
         {
             var block = _cassette.GetNextBlock();
-            if (block == null)
+
+            switch (block)
             {
-                return null;
+                case null:
+                    return null;
+
+                case LoopStartBlock loopStartBlock:
+                    _loopCounter = loopStartBlock.Count;
+                    _cassette.SetMarker();
+
+                    break;
+
+                case LoopEndBlock:
+                {
+                    _loopCounter -= 1;
+
+                    if (_loopCounter > 0)
+                    {
+                        _cassette.GotoMarker();
+                        continue;
+                    }
+
+                    break;
+                }
             }
 
             _pulseEnumerator = GetNextBlockPulses(block).GetEnumerator();

@@ -16,7 +16,8 @@ public class BlockSelectedEventArgs(int position) : EventArgs
 /// </summary>
 public sealed class Cassette
 {
-    private byte[]? _contentBytes = null;
+    private byte[]? _contentBytes;
+    private int _marker;
 
     public int Position { get; private set; }
 
@@ -105,6 +106,10 @@ public sealed class Cassette
         Position = 0;
         BlockSelected?.Invoke(new BlockSelectedEventArgs(Position));
     }
+
+    internal void SetMarker() => _marker = Position;
+
+    internal void GotoMarker() => Position = _marker;
 
     public void SetPosition(int position)
     {
