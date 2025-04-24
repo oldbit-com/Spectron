@@ -34,14 +34,13 @@ internal sealed class FloatingBus : IDevice
             return null;
         }
 
-        var finalStateTicks = _clock.FrameTicks + 2; // adjust for the final T-state of the instruction
-
-        if (finalStateTicks < _hardware.FloatingBusStartTicks || finalStateTicks > _hardware.LastPixelTicks)
+        if (_clock.FrameTicks < _hardware.FloatingBusStartTicks || _clock.FrameTicks > _hardware.LastPixelTicks)
         {
             return null;
         }
 
-        return _floatingBusAddressIndex.TryGetValue(finalStateTicks, out var screenAddress)
+        // Note that the Z80 samples the data bus during the final T-state of the I/O machine cycle
+        return _floatingBusAddressIndex.TryGetValue(_clock.FrameTicks - 1, out var screenAddress)
             ? _memory.Read(screenAddress)
             : null;
     }
