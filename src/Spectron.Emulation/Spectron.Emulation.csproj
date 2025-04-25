@@ -44,7 +44,7 @@
       <PackageReference Include="OldBit.Beep" Version="0.9.3-pre.111" />
       <PackageReference Include="OldBit.Joypad" Version="0.0.2-rc.3" />
       <PackageReference Include="OldBit.Spectron.Files" Version="0.9.3-pre.94" />
-      <PackageReference Include="OldBit.Z80Cpu.Spectron" Version="0.9.3-pre.10" />
+      <PackageReference Include="OldBit.Z80Cpu.Spectron" Version="0.9.3-pre.11" />
     </ItemGroup>
 
 </Project>
