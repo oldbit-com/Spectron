@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Avalonia" Version="11.2.6" />
+      <PackageReference Include="Avalonia" Version="11.2.8" />
       <PackageReference Include="FFMpegCore" Version="5.2.0" />
       <PackageReference Include="SkiaSharp" Version="3.116.1" />
       <PackageReference Include="System.Text.Json" Version="9.0.4" />
