@@ -1,13 +1,14 @@
 ![Build and Test](https://github.com/oldbit-com/Spectron/actions/workflows/build.yml/badge.svg)
 
 # Spectron (ZX Spectrum emulator)
-My own ZX Spectrum emulator written in C# and Avalonia UI. It emulates ZX Spectrum 16K, 48K and classic 128K computers.
+My own ZX Spectrum emulator written in C# and Avalonia UI. It emulates classic ZX Spectrum 16K, 48K and 
+128K computers.
 
 This is work in progress, I've been improving it quite a lot recently. However it is stable and usable. 
 It can run most of the games and demos without any problems.
 
 It's a cross-platform emulator that runs on Windows, Linux and macOS. Developed on macOS, so mostly tested
-on this platform. Needs more testing and feedback on Linux.
+on this platform. Needs some more testing on Linux.
 
 This is my hobby project which I always wanted to do. It has been a lot of fun, and quite challenging, too.
 ZX Spectrum was my first computer and I love it. I am planning to keep it alive since I created it for my own 
@@ -22,10 +23,10 @@ It uses several of my own libraries that I created for this project:
 ![Main Window](docs/default.png?raw=true "Main Window")
 
 # Features
-- [x] Emulates classic ZX Spectrum 16K, 48K and 128K
-- [x] Time Machine: go back in time to continue from there
-- [x] Remembers the last state of the emulator
-- [x] Supports SNA, SZX, Z80, TAP and TZX file formats (zip is fine, too)
+- [x] Emulates classic machines: ZX Spectrum 16K, 48K and 128K
+- [x] Time Machine: rewind and continue from given time point in the past
+- [x] Emulator state is persisted when closed
+- [x] Supports SNA, SZX, Z80, TAP and TZX file formats (can be inside zip file)
 - [x] Tape content browser
 - [x] Accurate timings, including contented memory and IO
 - [x] Floating bus support
@@ -44,7 +45,7 @@ It uses several of my own libraries that I created for this project:
 [![Spectron](https://img.youtube.com/vi/Oz70N0VY_2w/default.jpg)](https://youtu.be/Oz70N0VY_2w "Quick demo")
 
 # Running the emulator
-Requires .NET 9 in order to build and run the emulator.
+Requires .NET 9 to build and run the emulator.
 Grab the latest code from the repository, build and run the emulator:
 
 ```shell
@@ -113,10 +114,10 @@ joystick or keyboard keys. Standard keyboard can also be used as a joystick, arr
 > [!NOTE]
 > Not all controllers may work, and compatibility depends on the platform. Experimental feature.
 ## ULA+ support
-ULA+ mode is supported and can be enabled or disabled in the emulator settings.
+ULA+ mode is supported and can be enabled in the emulator settings.
 
 ## DivMMC
-DivMMC emulation is supported and can be enabled or disabled in the emulator settings.
+DivMMC emulation is supported and can be enabled in the emulator settings.
 It is based on [esxDOS 0.8.9](https://esxdos.org/). You will need to use a disk image containing esxDOS files.
 Sample disk images can be found [here](https://1drv.ms/u/c/7fd2cf29d9a4c5e1/EdULvNTWM7VLiU1_6GeGDcgBacxN6TanwmMCle2Hz8OBhg?e=3CSLB0).
 
@@ -193,7 +194,7 @@ memory and disassembly. You can step through the code, set breakpoints. This is 
 - `A=10h`, `IXH=A` `HL'=DE`, `IX=0x4000`, `SP=0x8000`, etc.
 
 > [!NOTE]  
-> All instructions and operands are case insensitive.
+> All instructions and operands are case-insensitive.
 
 ### Resources
 - [Avalonia UI](https://avaloniaui.net/)
