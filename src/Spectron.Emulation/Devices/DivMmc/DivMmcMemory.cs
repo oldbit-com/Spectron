@@ -102,23 +102,20 @@ public class DivMmcMemory : IRomMemory
         switch (address)
         {
             case < 0x2000:
-            {
                 if (IsBank0Writable)
                 {
                     _bank0[address] = data;
                 }
 
                 break;
-            }
+
             case < 0x4000:
-            {
                 if (IsBank1Writable)
                 {
                     _bank1[address - 0x2000] = data;
                 }
 
                 break;
-            }
         }
     }
 
