@@ -73,14 +73,7 @@ public static class EmulatorExtensions
             return;
         }
 
-        if (mouseSettings.IsKempstonMouseEnabled)
-        {
-            emulator.MouseManager.Enable();
-        }
-        else
-        {
-            emulator.MouseManager.Disable();
-        }
+        emulator.MouseManager.Mouse.IsEnabled = mouseSettings.IsKempstonMouseEnabled;
     }
 
     public static void SetDivMMc(this Emulator? emulator, DivMmcSettings divMmcSettings)

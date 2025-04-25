@@ -11,7 +11,7 @@ public sealed class MouseHelper(MouseManager mouseManager)
 {
     public void MouseMoved(BorderSize borderSize, Point position, Rect bounds)
     {
-        if (!mouseManager.IsEnabled)
+        if (!mouseManager.Mouse.IsEnabled)
         {
             return;
         }
@@ -70,7 +70,7 @@ public sealed class MouseHelper(MouseManager mouseManager)
 
     public void ButtonsStateChanged(PointerPoint point)
     {
-        if (!mouseManager.IsEnabled)
+        if (!mouseManager.Mouse.IsEnabled)
         {
             return;
         }

@@ -2,7 +2,7 @@ namespace OldBit.Spectron.Emulation.Devices.Mouse;
 
 public sealed class KempstonMouse : IDevice
 {
-    internal bool IsEnabled { get; set; }
+    public bool IsEnabled { get; set; }
 
     internal MouseButtons Buttons { get; set; } = MouseButtons.None;
     internal byte X { get; set; }
