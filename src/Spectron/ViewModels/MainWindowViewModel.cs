@@ -324,15 +324,10 @@ public partial class MainWindowViewModel : ReactiveObject
             _timeMachine.MaxDuration = preferences.TimeMachine.MaxDuration;
             TimeMachineCountdownSeconds = preferences.TimeMachine.CountdownSeconds;
 
-            Emulator?.SetUlaPlus(IsUlaPlusEnabled);
-            Emulator?.SetFloatingBusSupport(preferences.IsFloatingBusEnabled);
-            Emulator?.SetAudioSettings(preferences.AudioSettings);
-            Emulator?.SetTapeSettings(preferences.TapeSettings);
-            Emulator?.SetGamepad(preferences.Joystick);
-            Emulator?.SetMouse(preferences.Mouse);
-            Emulator?.SetDivMMc(preferences.DivMmcSettings);
+            Emulator.SetUlaPlus(IsUlaPlusEnabled);
+            Emulator.SetTapeSettings(_preferences.TapeSettings);
 
-            SetMouseCursor();
+            ConfigureEmulatorSettings();
         }
 
         if (resumeAfter)
@@ -428,8 +423,6 @@ public partial class MainWindowViewModel : ReactiveObject
         _timeMachine.SnapshotInterval = _preferences.TimeMachine.SnapshotInterval;
         _timeMachine.MaxDuration = _preferences.TimeMachine.MaxDuration;
         TimeMachineCountdownSeconds = _preferences.TimeMachine.CountdownSeconds;
-
-        SetMouseCursor();
 
         await RecentFilesViewModel.LoadAsync();
 
@@ -536,11 +529,7 @@ public partial class MainWindowViewModel : ReactiveObject
         Emulator.TapeLoadSpeed = TapeLoadSpeed;
         Emulator.FrameCompleted += EmulatorFrameCompleted;
 
-        Emulator.SetFloatingBusSupport(_preferences.IsFloatingBusEnabled);
-        Emulator.SetAudioSettings(_preferences.AudioSettings);
-        Emulator.SetGamepad(_preferences.Joystick);
-        Emulator.SetMouse(_preferences.Mouse);
-        Emulator.SetDivMMc(_preferences.DivMmcSettings);
+        ConfigureEmulatorSettings();
 
         if (IsMuted)
         {
@@ -556,6 +545,20 @@ public partial class MainWindowViewModel : ReactiveObject
 
         Emulator.Start();
         _statusBarTimer.Start();
+    }
+
+    private void ConfigureEmulatorSettings()
+    {
+        Emulator.SetFloatingBusSupport(_preferences.IsFloatingBusEnabled);
+        Emulator.SetAudioSettings(_preferences.AudioSettings);
+        Emulator.SetGamepad(_preferences.Joystick);
+        Emulator.SetMouse(_preferences.Mouse);
+        Emulator.SetDivMMc(_preferences.DivMmcSettings);
+
+        SetMouseCursor();
+
+        StatusBarViewModel.IsDivMmcEnabled = _preferences.DivMmcSettings.IsEnabled;
+        StatusBarViewModel.IsMouseEnabled = _preferences.Mouse.IsKempstonMouseEnabled;
     }
 
     private void CommandManagerOnCommandReceived(object? sender, CommandEventArgs e)
@@ -605,8 +608,6 @@ public partial class MainWindowViewModel : ReactiveObject
         Title = $"{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
     }
 
-    private void SetMouseCursor()
-    {
+    private void SetMouseCursor() =>
         MouseCursor = _preferences.Mouse is { IsKempstonMouseEnabled: true, IsStandardMousePointerHidden: true } ? Cursor.Parse("None") : Cursor.Default;
-    }
 }

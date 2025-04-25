@@ -95,6 +95,18 @@
             <StackPanel
                 Orientation="Horizontal"
                 Margin="0 0 20 0"
+                IsVisible="{Binding IsDivMmcEnabled}"
+                ToolTip.Tip="DivMMC">
+
+                <material:MaterialIcon
+                    Margin="0 -2 2 0"
+                    Kind="SdCard"/>
+
+            </StackPanel>
+
+            <StackPanel
+                Orientation="Horizontal"
+                Margin="0 0 20 0"
                 ToolTip.Tip="Joystick">
 
                 <material:MaterialIcon
@@ -102,6 +114,17 @@
                     Kind="GamepadSquareOutline"/>
 
                 <TextBlock Text="{Binding JoystickName}"/>
+            </StackPanel>
+
+            <StackPanel
+                Orientation="Horizontal"
+                Margin="0 0 20 0"
+                IsVisible="{Binding IsMouseEnabled}"
+                ToolTip.Tip="Mouse">
+
+                <material:MaterialIcon
+                    Margin="0 -2 2 0"
+                    Kind="Mouse"/>
             </StackPanel>
 
             <StackPanel

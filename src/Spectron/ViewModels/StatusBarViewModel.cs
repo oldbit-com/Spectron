@@ -20,6 +20,8 @@ public class StatusBarViewModel : ReactiveObject
     private ComputerType _computerType;
     private JoystickType _joystickType;
     private string _speed = "100";
+    private bool _isDivMmcEnabled;
+    private bool _isMouseEnabled;
 
     private readonly ObservableAsPropertyHelper<string> _computerName;
     private readonly ObservableAsPropertyHelper<string> _joystickName;
@@ -141,5 +143,17 @@ public class StatusBarViewModel : ReactiveObject
     {
         get => _speed;
         set => this.RaiseAndSetIfChanged(ref _speed, value);
+    }
+
+    public bool IsDivMmcEnabled
+    {
+        get => _isDivMmcEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isDivMmcEnabled, value);
+    }
+
+    public bool IsMouseEnabled
+    {
+        get => _isMouseEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isMouseEnabled, value);
     }
 }
