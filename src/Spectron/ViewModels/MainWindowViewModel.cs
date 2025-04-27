@@ -278,7 +278,7 @@ public partial class MainWindowViewModel : ReactiveObject
             Pause(showOverlay: false);
         }
 
-        _debuggerViewModel = new DebuggerViewModel(_debuggerContext, Emulator!, _preferences.DebuggerSettings);
+        _debuggerViewModel = new DebuggerViewModel(_debuggerContext, Emulator!, _preferences.Debugger);
 
         _debuggerViewModel.HardResetCommand.Subscribe(x => HandleMachineHardReset());
         _debuggerViewModel.ResetCommand.Subscribe(x => HandleMachineReset());
@@ -317,7 +317,7 @@ public partial class MainWindowViewModel : ReactiveObject
             _preferences = preferences;
 
             IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
-            TapeLoadSpeed = preferences.TapeSettings.LoadSpeed;
+            TapeLoadSpeed = preferences.Tape.LoadSpeed;
 
             IsTimeMachineEnabled = preferences.TimeMachine.IsEnabled;
             _timeMachine.SnapshotInterval = preferences.TimeMachine.SnapshotInterval;
@@ -325,7 +325,7 @@ public partial class MainWindowViewModel : ReactiveObject
             TimeMachineCountdownSeconds = preferences.TimeMachine.CountdownSeconds;
 
             Emulator.SetUlaPlus(IsUlaPlusEnabled);
-            Emulator.SetTapeSettings(_preferences.TapeSettings);
+            Emulator.SetTapeSettings(_preferences.Tape);
 
             ConfigureEmulatorSettings();
         }
@@ -417,7 +417,7 @@ public partial class MainWindowViewModel : ReactiveObject
 
         ThemeManager.SelectTheme(_preferences.Theme);
 
-        IsMuted = _preferences.AudioSettings.IsMuted;
+        IsMuted = _preferences.Audio.IsMuted;
 
         IsTimeMachineEnabled = _preferences.TimeMachine.IsEnabled;
         _timeMachine.SnapshotInterval = _preferences.TimeMachine.SnapshotInterval;
@@ -428,7 +428,7 @@ public partial class MainWindowViewModel : ReactiveObject
 
         HandleChangeBorderSize(_preferences.BorderSize);
 
-        if (_preferences.ResumeSettings.IsResumeEnabled)
+        if (_preferences.Resume.IsResumeEnabled)
         {
             var snapshot = await _sessionService.LoadAsync();
 
@@ -444,8 +444,8 @@ public partial class MainWindowViewModel : ReactiveObject
             CreateEmulator(_preferences.ComputerType, _preferences.RomType);
         }
 
-        TapeLoadSpeed = _preferences.TapeSettings.LoadSpeed;
-        Emulator?.SetTapeSettings(_preferences.TapeSettings);
+        TapeLoadSpeed = _preferences.Tape.LoadSpeed;
+        Emulator?.SetTapeSettings(_preferences.Tape);
     }
 
     private async Task WindowClosingAsync(WindowClosingEventArgs args)
@@ -460,12 +460,12 @@ public partial class MainWindowViewModel : ReactiveObject
         Emulator?.Shutdown();
         _keyboardHook?.Dispose();
 
-        _preferences.AudioSettings.IsMuted = IsMuted;
+        _preferences.Audio.IsMuted = IsMuted;
 
         await Task.WhenAll(
             _preferencesService.SaveAsync(_preferences),
             RecentFilesViewModel.SaveAsync(),
-            _sessionService.SaveAsync(Emulator, _preferences.ResumeSettings));
+            _sessionService.SaveAsync(Emulator, _preferences.Resume));
 
         _canClose = true;
         MainWindow?.Close();
@@ -502,7 +502,7 @@ public partial class MainWindowViewModel : ReactiveObject
         {
             emulator = _loader.EnterLoadCommand(ComputerType);
             emulator.TapeManager.InsertTape(stream, fileType,
-                _preferences.TapeSettings.IsAutoPlayEnabled && TapeLoadSpeed != TapeSpeed.Instant);
+                _preferences.Tape.IsAutoPlayEnabled && TapeLoadSpeed != TapeSpeed.Instant);
             emulator.SetUlaPlus(_preferences.IsUlaPlusEnabled);
         }
 
@@ -550,14 +550,14 @@ public partial class MainWindowViewModel : ReactiveObject
     private void ConfigureEmulatorSettings()
     {
         Emulator.SetFloatingBusSupport(_preferences.IsFloatingBusEnabled);
-        Emulator.SetAudioSettings(_preferences.AudioSettings);
+        Emulator.SetAudioSettings(_preferences.Audio);
         Emulator.SetGamepad(_preferences.Joystick);
         Emulator.SetMouse(_preferences.Mouse);
-        Emulator.SetDivMMc(_preferences.DivMmcSettings);
+        Emulator.SetDivMMc(_preferences.DivMmc);
 
         SetMouseCursor();
 
-        StatusBarViewModel.IsDivMmcEnabled = _preferences.DivMmcSettings.IsEnabled;
+        StatusBarViewModel.IsDivMmcEnabled = _preferences.DivMmc.IsEnabled;
         StatusBarViewModel.IsMouseEnabled = _preferences.Mouse.IsKempstonMouseEnabled;
     }
 

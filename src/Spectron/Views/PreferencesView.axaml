@@ -224,6 +224,8 @@
                     <StackPanel>
                         <controls:HeaderSeparator Text="Floating bus emulation"/>
                         <CheckBox Content="Floating bus enabled" Classes="Center" IsChecked="{Binding IsFloatingBusEnabled}"/>
+                        <controls:HeaderSeparator Text="Printer emulation"/>
+                        <CheckBox Content="ZX Printer connected" Classes="Center" IsChecked="{Binding IsZxPrinterEnabled}"/>
                         <controls:HeaderSeparator Text="DivMMC emulation"/>
                         <CheckBox x:Name="DivMmcEnabled" Content="DivMMC enabled" Classes="Center" IsChecked="{Binding IsDivMmcEnabled}"/>
                         <CheckBox Content="EEPROM write enabled" Classes="Center" IsChecked="{Binding IsDivMmcWriteEnabled}" IsEnabled="{Binding #DivMmcEnabled.IsChecked}"/>

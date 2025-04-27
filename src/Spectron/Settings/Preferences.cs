@@ -10,7 +10,7 @@ public class Preferences
 {
     public Theme Theme { get; init; } = Theme.Dark;
 
-    public ResumeSettings ResumeSettings { get; init; } = new();
+    public ResumeSettings Resume { get; init; } = new();
 
     public bool IsUlaPlusEnabled { get; init; }
 
@@ -28,13 +28,15 @@ public class Preferences
 
     public TimeMachineSettings TimeMachine { get; init; } = new();
 
-    public AudioSettings AudioSettings { get; init; } = new();
+    public AudioSettings Audio { get; init; } = new();
 
-    public TapeSettings TapeSettings { get; init; } = new();
+    public TapeSettings Tape { get; init; } = new();
 
-    public RecordingSettings RecordingSettings { get; init; } = new();
+    public RecordingSettings Recording { get; init; } = new();
 
-    public DebuggerSettings DebuggerSettings { get; init; } = new();
+    public DebuggerSettings Debugger { get; init; } = new();
 
-    public DivMmcSettings DivMmcSettings { get; init; } = new();
+    public DivMmcSettings DivMmc { get; init; } = new();
+
+    public PrinterSettings Printer { get; init; } = new();
 }
