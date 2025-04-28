@@ -119,6 +119,7 @@ public partial class MainWindowViewModel : ReactiveObject
     // View
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleFullScreenCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> ShowPrintOutputCommand { get; private set; }
 
     // Tape
     public ReactiveCommand<TapeSpeed, Unit> SetTapeLoadSpeedCommand { get; private set; }
@@ -135,6 +136,7 @@ public partial class MainWindowViewModel : ReactiveObject
     public Interaction<SelectFileViewModel, ArchiveEntry?> ShowSelectFileView { get; }
     public Interaction<TimeMachineViewModel, TimeMachineEntry?> ShowTimeMachineView { get; }
     public Interaction<ScreenshotViewModel, Unit?> ShowScreenshotView { get; }
+    public Interaction<PrintOutputViewModel, Unit?> ShowPrintOutputView { get; }
 
     public MainWindowViewModel(
         EmulatorFactory emulatorFactory,
@@ -231,6 +233,7 @@ public partial class MainWindowViewModel : ReactiveObject
         // View
         ToggleFullScreenCommand = ReactiveCommand.Create(HandleToggleFullScreen);
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
+        ShowPrintOutputCommand = ReactiveCommand.Create(OpenPrintOutputViewer);
 
         // Tape
         SetTapeLoadSpeedCommand = ReactiveCommand.Create<TapeSpeed>(HandleSetTapeLoadingSpeed);
@@ -247,6 +250,7 @@ public partial class MainWindowViewModel : ReactiveObject
         ShowSelectFileView = new Interaction<SelectFileViewModel, ArchiveEntry?>();
         ShowTimeMachineView = new Interaction<TimeMachineViewModel, TimeMachineEntry?>();
         ShowScreenshotView = new Interaction<ScreenshotViewModel, Unit?>();
+        ShowPrintOutputView = new Interaction<PrintOutputViewModel, Unit?>();
 
         SpectrumScreen = _frameBufferConverter.ScreenBitmap;
 
@@ -375,6 +379,9 @@ public partial class MainWindowViewModel : ReactiveObject
 
     private async Task OpenScreenshotViewer() =>
         await ShowScreenshotView.Handle(_screenshotViewModel);
+
+    private async Task OpenPrintOutputViewer() =>
+        await ShowPrintOutputView.Handle(new PrintOutputViewModel());
 
     private void StatusBarTimerOnElapsed(object? sender, ElapsedEventArgs e)
     {
@@ -554,6 +561,7 @@ public partial class MainWindowViewModel : ReactiveObject
         Emulator.SetGamepad(_preferences.Joystick);
         Emulator.SetMouse(_preferences.Mouse);
         Emulator.SetDivMMc(_preferences.DivMmc);
+        Emulator.SetPrinter(_preferences.Printer);
 
         SetMouseCursor();
 

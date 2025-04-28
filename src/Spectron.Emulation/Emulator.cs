@@ -9,6 +9,7 @@ using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Devices.Mouse;
+using OldBit.Spectron.Emulation.Devices.Printer;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Tape;
@@ -67,6 +68,7 @@ public sealed class Emulator
     public IMemory Memory => _memory;
     public IBus Bus => _spectrumBus;
     public DivMmcDevice DivMmc { get; }
+    public ZxPrinter Printer { get; }
 
     public int TicksPerFrame => _hardware.TicksPerFrame;
 
@@ -116,6 +118,8 @@ public sealed class Emulator
         AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware);
 
         DivMmc = new DivMmcDevice(Cpu, _memory, logger);
+
+        Printer = new ZxPrinter();
 
         SetupUlaAndDevices();
         SetupEventHandlers();
@@ -213,6 +217,7 @@ public sealed class Emulator
         _spectrumBus.AddDevice(AudioManager.Beeper);
         _spectrumBus.AddDevice(AudioManager.Ay);
         _spectrumBus.AddDevice(MouseManager.Mouse);
+        _spectrumBus.AddDevice(Printer);
         _spectrumBus.AddDevice(DivMmc);
         _spectrumBus.AddDevice(new RtcDevice(DivMmc));
 

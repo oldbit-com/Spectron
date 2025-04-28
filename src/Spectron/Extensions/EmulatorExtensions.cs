@@ -105,4 +105,15 @@ public static class EmulatorExtensions
         emulator.DivMmc.Memory.IsEepromWriteEnabled = divMmcSettings.IsEepromWriteEnabled;
         emulator.DivMmc.IsDriveWriteEnabled = divMmcSettings.IsDriveWriteEnabled;
     }
+
+    public static void SetPrinter(this Emulator? emulator, PrinterSettings printerSettings)
+    {
+        if (emulator == null)
+        {
+            return;
+        }
+
+        emulator.Printer.IsEnabled = printerSettings.IsZxPrinterEnabled;
+    }
+
 }
