@@ -381,7 +381,7 @@ public partial class MainWindowViewModel : ReactiveObject
         await ShowScreenshotView.Handle(_screenshotViewModel);
 
     private async Task OpenPrintOutputViewer() =>
-        await ShowPrintOutputView.Handle(new PrintOutputViewModel());
+        await ShowPrintOutputView.Handle(new PrintOutputViewModel(Emulator!.Printer));
 
     private void StatusBarTimerOnElapsed(object? sender, ElapsedEventArgs e)
     {

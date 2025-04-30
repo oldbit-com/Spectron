@@ -8,10 +8,9 @@ public class ZxPrinter : IDevice
     private const byte PrinterMotorBit = 0x04;
     private const byte PrinterPixelBit = 0x80;
 
+    private readonly List<DataRow> _rows = [];
     private int _stylusPosition = -1;
     private bool _isNewLine;
-    private int _row;
-    private List<DataRow> _rows = [];
 
     public bool IsEnabled { get; set; }
 
@@ -33,13 +32,17 @@ public class ZxPrinter : IDevice
             _stylusPosition = 0;
             _isNewLine = true;
 
+            _rows.Add(new DataRow());
+
             return;
         }
 
         var pixel = (value & PrinterPixelBit) != 0;
 
-        if (_stylusPosition < 8)
-            Console.WriteLine($"Pos: {_stylusPosition} Row: {_row}  Pixel: {pixel}");
+        if (pixel)
+        {
+            _rows[^1].SetPixel(_stylusPosition);
+        }
 
         _isNewLine = false;
         _stylusPosition += 1;
@@ -50,7 +53,6 @@ public class ZxPrinter : IDevice
         }
 
         _stylusPosition = -1;
-        _row += 1;
     }
 
     public byte? ReadPort(Word address)

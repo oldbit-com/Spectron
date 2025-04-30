@@ -1,3 +1,6 @@
+using System.Collections;
+using System.Text;
+
 namespace OldBit.Spectron.Emulation.Devices.Printer;
 
 internal sealed class DataRow
@@ -10,5 +13,18 @@ internal sealed class DataRow
         var bit = index % 8;
 
         Pixels[column] |= (byte)(1 << bit);
+    }
+
+    public override string ToString()
+    {
+        var bits = new BitArray(Pixels);
+        var sb = new StringBuilder(bits.Length);
+
+        foreach (bool bit in bits)
+        {
+            sb.Append(bit ? '1' : '0');
+        }
+
+        return sb.ToString();
     }
 }
