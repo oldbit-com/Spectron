@@ -63,7 +63,7 @@ public sealed class ZxPrinter : IDevice
             return null;
         }
 
-        var result = PrinterStatus.Ready;
+        var result = ~PrinterStatus.PrinterDetected | PrinterStatus.Ready;
 
         if (_isNewLine)
         {

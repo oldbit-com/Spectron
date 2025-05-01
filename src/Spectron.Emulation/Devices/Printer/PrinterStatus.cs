@@ -1,7 +1,7 @@
 namespace OldBit.Spectron.Emulation.Devices.Printer;
 
 [Flags]
-public enum PrinterStatus
+public enum PrinterStatus : byte
 {
     Ready = 0x01,
 
