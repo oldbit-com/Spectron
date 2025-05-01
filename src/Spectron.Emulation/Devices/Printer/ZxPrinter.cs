@@ -1,6 +1,6 @@
 namespace OldBit.Spectron.Emulation.Devices.Printer;
 
-public class ZxPrinter : IDevice
+public sealed class ZxPrinter : IDevice
 {
     private const byte PrinterPort = 0xFB;
     private const int MaxPosition = 255;
@@ -8,11 +8,12 @@ public class ZxPrinter : IDevice
     private const byte PrinterMotorBit = 0x04;
     private const byte PrinterPixelBit = 0x80;
 
-    private readonly List<DataRow> _rows = [];
     private int _stylusPosition = -1;
     private bool _isNewLine;
 
     public bool IsEnabled { get; set; }
+
+    public List<DataRow> Rows { get; } = [];
 
     public void WritePort(Word address, byte value)
     {
@@ -32,7 +33,7 @@ public class ZxPrinter : IDevice
             _stylusPosition = 0;
             _isNewLine = true;
 
-            _rows.Add(new DataRow());
+            Rows.Add(new DataRow());
 
             return;
         }
@@ -41,7 +42,7 @@ public class ZxPrinter : IDevice
 
         if (pixel)
         {
-            _rows[^1].SetPixel(_stylusPosition);
+            Rows[^1].SetPixel(_stylusPosition);
         }
 
         _isNewLine = false;
