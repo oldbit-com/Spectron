@@ -39,6 +39,9 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             action(ViewModel!.ShowPreferencesView
                 .RegisterHandler(ShowDialogAsync<PreferencesViewModel, Preferences, PreferencesView>));
 
+            action(ViewModel!.ShowPrintOutputView
+                .RegisterHandler(Show<PrintOutputViewModel, Unit?, PrintOutputView>));
+
             action(ViewModel!.ShowScreenshotView
                 .RegisterHandler(Show<ScreenshotViewModel, Unit?, ScreenshotView>));
 

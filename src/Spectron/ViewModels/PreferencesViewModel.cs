@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Avalonia.Input;
 using Avalonia.Threading;
 using OldBit.Spectron.Debugger.Settings;
 using OldBit.Spectron.Dialogs;
@@ -81,41 +80,43 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         IsKempstonMouseEnabled = preferences.Mouse.IsKempstonMouseEnabled;
         IsStandardMousePointerHidden = preferences.Mouse.IsStandardMousePointerHidden;
 
-        IsResumeEnabled = preferences.ResumeSettings.IsResumeEnabled;
-        ShouldIncludeTapeInResume = preferences.ResumeSettings.ShouldIncludeTape;
-        ShouldIncludeTimeMachineInResume = preferences.ResumeSettings.ShouldIncludeTimeMachine;
+        IsResumeEnabled = preferences.Resume.IsResumeEnabled;
+        ShouldIncludeTapeInResume = preferences.Resume.ShouldIncludeTape;
+        ShouldIncludeTimeMachineInResume = preferences.Resume.ShouldIncludeTimeMachine;
 
-        IsBeeperEnabled = preferences.AudioSettings.IsBeeperEnabled;
-        IsAyEnabled = preferences.AudioSettings.IsAyAudioEnabled;
-        IsAySupportedStandardSpectrum = preferences.AudioSettings.IsAySupportedStandardSpectrum;
-        StereoMode = preferences.AudioSettings.StereoMode;
+        IsBeeperEnabled = preferences.Audio.IsBeeperEnabled;
+        IsAyEnabled = preferences.Audio.IsAyAudioEnabled;
+        IsAySupportedStandardSpectrum = preferences.Audio.IsAySupportedStandardSpectrum;
+        StereoMode = preferences.Audio.StereoMode;
 
         IsTimeMachineEnabled = preferences.TimeMachine.IsEnabled;
         SnapshotInterval = preferences.TimeMachine.SnapshotInterval.TotalSeconds;
         MaxDuration = preferences.TimeMachine.MaxDuration.TotalSeconds;
         TimeMachineCountdownSeconds = preferences.TimeMachine.CountdownSeconds;
 
-        IsAutoPlayEnabled = preferences.TapeSettings.IsAutoPlayEnabled;
-        IsTapeSaveEnabled = preferences.TapeSettings.IsSaveEnabled;
-        TapeSaveSpeed = preferences.TapeSettings.SaveSpeed;
-        TapeLoadSpeed = preferences.TapeSettings.LoadSpeed;
+        IsAutoPlayEnabled = preferences.Tape.IsAutoPlayEnabled;
+        IsTapeSaveEnabled = preferences.Tape.IsSaveEnabled;
+        TapeSaveSpeed = preferences.Tape.SaveSpeed;
+        TapeLoadSpeed = preferences.Tape.LoadSpeed;
 
-        RecordingBorderSize = preferences.RecordingSettings.BorderSize;
-        ScalingFactor = preferences.RecordingSettings.ScalingFactor;
-        ScalingAlgorithm = preferences.RecordingSettings.ScalingAlgorithm;
-        FFmpegPath = preferences.RecordingSettings.FFmpegPath;
+        RecordingBorderSize = preferences.Recording.BorderSize;
+        ScalingFactor = preferences.Recording.ScalingFactor;
+        ScalingAlgorithm = preferences.Recording.ScalingAlgorithm;
+        FFmpegPath = preferences.Recording.FFmpegPath;
 
         UpdatePreferencesCommand = ReactiveCommand.Create(UpdatePreferences);
         ProbeFFmpegCommand = ReactiveCommand.Create(ProbeFFmpeg);
         SelectSdCardImageFile = ReactiveCommand.Create<string, Task>(HandleOpenSdCardImageFile);
 
-        DebuggerPreferredNumberFormat = preferences.DebuggerSettings.PreferredNumberFormat;
+        DebuggerPreferredNumberFormat = preferences.Debugger.PreferredNumberFormat;
 
-        IsDivMmcEnabled = preferences.DivMmcSettings.IsEnabled;
-        IsDivMmcWriteEnabled = preferences.DivMmcSettings.IsEepromWriteEnabled;
-        DivMmcCard0FileName = preferences.DivMmcSettings.Card0FileName;
-        DivMmcCard1FileName = preferences.DivMmcSettings.Card1FileName;
-        IsDivMmcDriveWriteEnabled = preferences.DivMmcSettings.IsDriveWriteEnabled;
+        IsDivMmcEnabled = preferences.DivMmc.IsEnabled;
+        IsDivMmcWriteEnabled = preferences.DivMmc.IsEepromWriteEnabled;
+        DivMmcCard0FileName = preferences.DivMmc.Card0FileName;
+        DivMmcCard1FileName = preferences.DivMmc.Card1FileName;
+        IsDivMmcDriveWriteEnabled = preferences.DivMmc.IsDriveWriteEnabled;
+
+        IsZxPrinterEnabled = preferences.Printer.IsZxPrinterEnabled;
 
         ShowGamepadMappingView = new Interaction<GamepadMappingViewModel, List<GamepadMapping>?>();
     }
@@ -173,14 +174,14 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
                 IsStandardMousePointerHidden = IsStandardMousePointerHidden,
             },
 
-            ResumeSettings = new ResumeSettings
+            Resume = new ResumeSettings
             {
                 IsResumeEnabled = IsResumeEnabled,
                 ShouldIncludeTape = ShouldIncludeTapeInResume,
                 ShouldIncludeTimeMachine = ShouldIncludeTimeMachineInResume
             },
 
-            AudioSettings = new AudioSettings
+            Audio = new AudioSettings
             {
                 IsBeeperEnabled = IsBeeperEnabled,
                 IsAyAudioEnabled = IsAyEnabled,
@@ -196,7 +197,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
                 CountdownSeconds = TimeMachineCountdownSeconds,
             },
 
-            TapeSettings = new TapeSettings
+            Tape = new TapeSettings
             {
                 IsAutoPlayEnabled = IsAutoPlayEnabled,
                 IsSaveEnabled = IsTapeSaveEnabled,
@@ -204,7 +205,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
                 LoadSpeed = TapeLoadSpeed
             },
 
-            RecordingSettings = new RecordingSettings
+            Recording = new RecordingSettings
             {
                 BorderSize = RecordingBorderSize,
                 ScalingFactor = ScalingFactor,
@@ -212,18 +213,23 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
                 FFmpegPath = FFmpegPath
             },
 
-            DebuggerSettings = new DebuggerSettings
+            Debugger = new DebuggerSettings
             {
                 PreferredNumberFormat = DebuggerPreferredNumberFormat,
             },
 
-            DivMmcSettings = new DivMmcSettings
+            DivMmc = new DivMmcSettings
             {
                 IsEnabled = IsDivMmcEnabled,
                 IsEepromWriteEnabled = IsDivMmcWriteEnabled,
                 Card0FileName = DivMmcCard0FileName,
                 Card1FileName = DivMmcCard1FileName,
                 IsDriveWriteEnabled = IsDivMmcDriveWriteEnabled,
+            },
+
+            Printer = new PrinterSettings
+            {
+                IsZxPrinterEnabled = IsZxPrinterEnabled,
             }
         };
     }
@@ -661,6 +667,13 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
     {
         get => _isDivMmcDriveWriteEnabled;
         set => this.RaiseAndSetIfChanged(ref _isDivMmcDriveWriteEnabled, value);
+    }
+
+    private bool _isZxPrinterEnabled;
+    public bool IsZxPrinterEnabled
+    {
+        get => _isZxPrinterEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isZxPrinterEnabled, value);
     }
 
     public void Dispose()

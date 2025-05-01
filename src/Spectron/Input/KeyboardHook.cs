@@ -100,7 +100,7 @@ public sealed class KeyboardHook : IDisposable
     {
         // Enable Extended mode
         _simulator.SimulateKeyPress(KeyCode.VcLeftShift);
-        _simulator.SimulateKeyPress(KeyCode.VcRightShift);
+        _simulator.SimulateKeyPress(KeyCode.VcRightAlt);
 
         Task.Delay(30).ContinueWith(_ =>
         {
@@ -160,7 +160,8 @@ public sealed class KeyboardHook : IDisposable
         KeyCode.VcEnter => [SpectrumKey.Enter],
         KeyCode.VcSpace => [SpectrumKey.Space],
         KeyCode.VcLeftShift => [SpectrumKey.CapsShift],
-        KeyCode.VcRightShift => [SpectrumKey.SymbolShift],
+        KeyCode.VcRightShift => [SpectrumKey.CapsShift],
+        KeyCode.VcRightAlt => [SpectrumKey.SymbolShift],
         KeyCode.VcBackspace => [SpectrumKey.None, SpectrumKey.CapsShift, SpectrumKey.D0],
         KeyCode.VcEscape => [SpectrumKey.None],
         KeyCode.VcComma => !_isShiftPressed

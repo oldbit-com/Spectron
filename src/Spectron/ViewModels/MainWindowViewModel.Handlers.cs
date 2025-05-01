@@ -175,13 +175,13 @@ partial class MainWindowViewModel
     private RecorderOptions GetRecorderOptions() => new()
     {
         AudioChannels = Emulator?.AudioManager.StereoMode == StereoMode.Mono ? 1 : 2,
-        BorderLeft = BorderSizes.GetBorder(_preferences.RecordingSettings.BorderSize).Left,
-        BorderRight = BorderSizes.GetBorder(_preferences.RecordingSettings.BorderSize).Right,
-        BorderTop = BorderSizes.GetBorder(_preferences.RecordingSettings.BorderSize).Top,
-        BorderBottom = BorderSizes.GetBorder(_preferences.RecordingSettings.BorderSize).Bottom,
-        ScalingFactor = _preferences.RecordingSettings.ScalingFactor,
-        ScalingAlgorithm = _preferences.RecordingSettings.ScalingAlgorithm,
-        FFmpegPath = _preferences.RecordingSettings.FFmpegPath,
+        BorderLeft = BorderSizes.GetBorder(_preferences.Recording.BorderSize).Left,
+        BorderRight = BorderSizes.GetBorder(_preferences.Recording.BorderSize).Right,
+        BorderTop = BorderSizes.GetBorder(_preferences.Recording.BorderSize).Top,
+        BorderBottom = BorderSizes.GetBorder(_preferences.Recording.BorderSize).Bottom,
+        ScalingFactor = _preferences.Recording.ScalingFactor,
+        ScalingAlgorithm = _preferences.Recording.ScalingAlgorithm,
+        FFmpegPath = _preferences.Recording.FFmpegPath,
     };
 
     private async Task HandleStartAudioRecordingAsync()

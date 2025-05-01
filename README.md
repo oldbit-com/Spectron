@@ -35,6 +35,7 @@ It uses several of my own libraries that I created for this project:
 - [x] AY-3-8912 sound chip emulation
 - [x] DivMMC emulation
 - [x] Kempston mouse emulation
+- [x] ZX Printer emulation
 - [x] Adjustable emulator speed
 - [x] Debugger
 - [x] Keyboard joystick emulation: Kempston, Sinclair, Cursor & Fuller.
