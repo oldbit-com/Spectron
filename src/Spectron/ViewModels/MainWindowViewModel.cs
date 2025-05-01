@@ -567,6 +567,7 @@ public partial class MainWindowViewModel : ReactiveObject
 
         StatusBarViewModel.IsDivMmcEnabled = _preferences.DivMmc.IsEnabled;
         StatusBarViewModel.IsMouseEnabled = _preferences.Mouse.IsKempstonMouseEnabled;
+        StatusBarViewModel.IsPrinterEnabled = _preferences.Printer.IsZxPrinterEnabled;
     }
 
     private void CommandManagerOnCommandReceived(object? sender, CommandEventArgs e)

@@ -95,6 +95,18 @@
             <StackPanel
                 Orientation="Horizontal"
                 Margin="0 0 20 0"
+                IsVisible="{Binding IsPrinterEnabled}"
+                ToolTip.Tip="Printer">
+
+                <material:MaterialIcon
+                    Margin="0 -2 2 0"
+                    Kind="Printer"/>
+
+            </StackPanel>
+
+            <StackPanel
+                Orientation="Horizontal"
+                Margin="0 0 20 0"
                 IsVisible="{Binding IsDivMmcEnabled}"
                 ToolTip.Tip="DivMMC">
 
