@@ -6,7 +6,7 @@ public static class FileTypes
 {
     public static FilePickerFileType All { get; } = new("All Files")
     {
-        Patterns = ["*.tap", "*.tzx", "*.sna", "*.szx", "*.z80", "*.zip"]
+        Patterns = ["*.tap", "*.tzx", "*.sna", "*.szx", "*.z80", "*.zip", "*.pok"]
     };
 
     public static FilePickerFileType TapeFiles { get; } = new("Tape Files")
@@ -72,6 +72,11 @@ public static class FileTypes
     public static FilePickerFileType Img { get; } = new("Disk Image")
     {
         Patterns = ["*.img"]
+    };
+
+    public static FilePickerFileType Pok { get; } = new("POKE File")
+    {
+        Patterns = ["*.pok"]
     };
 
     public static FilePickerFileType Any { get; } = new("All Files")
