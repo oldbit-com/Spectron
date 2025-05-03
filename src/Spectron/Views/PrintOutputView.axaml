@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+        xmlns:material="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         x:DataType="viewModels:PrintOutputViewModel"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         Width="400"
@@ -12,19 +13,44 @@
         Background="{StaticResource SpectrumWhite}"
         Title="Print Output">
 
-    <Border
-        Margin="5"
-        HorizontalAlignment="Stretch"
-        VerticalAlignment="Stretch"
-        Background="{StaticResource SpectrumWhite}">
+        <Grid RowDefinitions="35,*">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Height="35">
+                <Button
+                    ToolTip.Tip="Save"
+                    Command="{Binding SaveCommand}">
+                    <material:MaterialIcon Kind="ContentSave"/>
+                </Button>
 
-        <ScrollViewer>
-            <Image
-                Source="{Binding OutputImage}"
-                Stretch="Uniform"
-                RenderOptions.BitmapInterpolationMode="None">
-            </Image>
-        </ScrollViewer>
+                <Button
+                    ToolTip.Tip="Refresh"
+                    Command="{Binding RefreshCommand}">
+                    <material:MaterialIcon Kind="Refresh"/>
+                </Button>
 
-    </Border>
+                <Button
+                    ToolTip.Tip="Clear"
+                    Command="{Binding ClearCommand}">
+                    <material:MaterialIcon Kind="Delete"/>
+                </Button>
+            </StackPanel>
+
+            <Border
+                Grid.Row="1"
+                Margin="5 0 5 5"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Background="{StaticResource SpectrumWhite}">
+
+                <ScrollViewer>
+                    <Image
+                        Name="OutputImage"
+                        Source="{Binding OutputImage}"
+                        Stretch="Uniform"
+                        RenderOptions.BitmapInterpolationMode="None">
+                    </Image>
+                </ScrollViewer>
+
+            </Border>
+        </Grid>
+
 </Window>

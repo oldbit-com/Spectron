@@ -1,6 +1,12 @@
+using System;
+using System.IO;
+using System.Reactive;
+using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation.Devices.Printer;
 using ReactiveUI;
 
@@ -9,24 +15,37 @@ namespace OldBit.Spectron.ViewModels;
 public class PrintOutputViewModel : ReactiveObject
 {
     private readonly ZxPrinter _printer;
-    private readonly int _height;
+
+    private int _height;
+
+    public Control? PreviewControl { get; set; }
+
+    public ReactiveCommand<Unit, Unit> ClearCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> RefreshCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> SaveCommand { get; private set; }
 
     public PrintOutputViewModel(ZxPrinter printer)
     {
+        ClearCommand = ReactiveCommand.Create(Clear);
+        RefreshCommand = ReactiveCommand.Create(UpdatePreview);
+        SaveCommand = ReactiveCommand.Create(Save);
+
         _printer = printer;
 
-        _height = int.Max(printer.Rows.Count, 1024);
-        const int width = 256;
-
-        var bitmap = CreateBitmap(width, _height);
-
-        OutputImage = bitmap;
-
-        Update();
+        UpdatePreview();
     }
 
-    private void Update()
+    private void CrateBitmap()
     {
+        _height = int.Max(_printer.Rows.Count, 512);
+
+        OutputImage = CreateBitmap(256, _height);
+    }
+
+    private void UpdatePreview()
+    {
+        CrateBitmap();
+
         using var bitmap = OutputImage.Lock();
 
         unsafe
@@ -37,7 +56,7 @@ public class PrintOutputViewModel : ReactiveObject
             {
                 for (var column = 0; column < _printer.Rows[row].Pixels.Length; column++)
                 {
-                    buffer[row * 32 + column] = (byte)~_printer.Rows[row].Pixels[column];
+                    buffer[row * 32 + column] = (byte)~_printer.Rows[row].Pixels[column];;
                 }
             }
 
@@ -48,6 +67,33 @@ public class PrintOutputViewModel : ReactiveObject
                     buffer[row * 32 + column] = 0xFF;
                 }
             }
+        }
+
+        PreviewControl?.InvalidateVisual();
+    }
+
+    private void Clear()
+    {
+        _printer.Rows.Clear();
+        UpdatePreview();
+    }
+
+    private async Task Save()
+    {
+        try
+        {
+            var file = await FileDialogs.SaveImageAsync("Save Printout", PreviewControl, "printout.png");
+
+            if (file != null)
+            {
+                await using var output = File.OpenWrite(file.Path.LocalPath);
+
+                OutputImage.Save(output, 100);
+            }
+        }
+        catch (Exception ex)
+        {
+            await MessageDialogs.Error(ex.Message);
         }
     }
 
