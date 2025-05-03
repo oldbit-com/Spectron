@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Reactive;
 using System.Threading.Tasks;
+using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using OldBit.Spectron.Dialogs;
 using ReactiveUI;
@@ -14,6 +15,8 @@ public record ScreenViewModel(byte[] Data);
 
 public class ScreenshotViewModel : ReactiveObject
 {
+    public Window? Window { get; set; }
+
     public ObservableCollection<ScreenViewModel> Screenshots { get; } = [];
 
     public ReactiveCommand<ScreenViewModel, Unit> RemoveCommand { get; private set; }
@@ -54,11 +57,11 @@ public class ScreenshotViewModel : ReactiveObject
         return uncompressed;
     }
 
-    private static async Task SaveScreenshot(ScreenViewModel viewModel)
+    private async Task SaveScreenshot(ScreenViewModel viewModel)
     {
         try
         {
-            var file = await FileDialogs.SaveScreenshotFileAsync("screen.png");
+            var file = await FileDialogs.SaveImageAsync("Save Screenshot", Window,"screen.png");
 
             if (file != null)
             {

@@ -121,9 +121,9 @@ public static class FileDialogs
         });
     }
 
-    public static async Task<IStorageFile?> SaveScreenshotFileAsync(string? suggestedFileName = null)
+    public static async Task<IStorageFile?> SaveImageAsync(string title, Control? owner, string? suggestedFileName = null)
     {
-        var topLevel = TopLevel.GetTopLevel(MainWindow);
+        var topLevel = owner != null ? TopLevel.GetTopLevel(owner) : TopLevel.GetTopLevel(MainWindow);
 
         if (topLevel == null)
         {
@@ -132,7 +132,7 @@ public static class FileDialogs
 
         return await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            Title = "Save Screenshot File",
+            Title = title,
             DefaultExtension = ".png",
             SuggestedFileName = suggestedFileName,
             ShowOverwritePrompt = true,
@@ -146,7 +146,7 @@ public static class FileDialogs
 
         if (topLevel == null)
         {
-            return Array.Empty<IStorageFile>();
+            return [];
         }
 
         return await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
