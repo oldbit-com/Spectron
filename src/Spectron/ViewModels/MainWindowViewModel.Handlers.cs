@@ -16,6 +16,7 @@ using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.Tape;
+using OldBit.Spectron.Files.Pok;
 using OldBit.Spectron.Input;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Recorder;
@@ -58,6 +59,13 @@ partial class MainWindowViewModel
             var fileResult = await LoadFileAsync(filePath, fileType);
             if (fileResult.Stream == null)
             {
+                return;
+            }
+
+            if (fileType == FileType.Pok)
+            {
+                LoadPokeFile(fileResult.Stream);
+
                 return;
             }
 
@@ -122,6 +130,12 @@ partial class MainWindowViewModel
         }
 
         return (stream, fileType);
+    }
+
+    private void LoadPokeFile(Stream stream)
+    {
+        var pokeFile = PokeFile.Load(stream);
+
     }
 
     private async Task HandleSaveFileAsync()
