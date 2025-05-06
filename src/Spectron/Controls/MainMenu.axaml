@@ -106,6 +106,7 @@
                 <MenuItem Header="Large" ToggleType="Radio" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static screen:BorderSize.Large}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static screen:BorderSize.Large}}"/>
                 <MenuItem Header="Full" ToggleType="Radio" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static screen:BorderSize.Full}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static screen:BorderSize.Full}}"/>
             </MenuItem>
+            <MenuItem Header="Trainers" Command="{Binding ShowTrainersCommand}"/>
             <MenuItem Header="Print Output" Command="{Binding ShowPrintOutputCommand}"/>
             <MenuItem Header="-"/>
             <MenuItem Header="Enter Full Screen" InputGesture="Shift+Alt+Enter" Command="{Binding ToggleFullScreenCommand}"/>

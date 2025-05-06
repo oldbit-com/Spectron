@@ -53,6 +53,9 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
             action(ViewModel!.ShowTimeMachineView
                 .RegisterHandler(ShowDialogAsync<TimeMachineViewModel, TimeMachineEntry?, TimeMachineView>));
+
+            action(ViewModel!.ShowTrainersView
+                .RegisterHandler(Show<TrainerViewModel, Unit?, TrainerView>));
         });
     }
 

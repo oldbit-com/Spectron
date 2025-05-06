@@ -119,6 +119,7 @@ public partial class MainWindowViewModel : ReactiveObject
     // View
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleFullScreenCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> ShowTrainersCommand { get; private set; }
     public ReactiveCommand<Unit, Task> ShowPrintOutputCommand { get; private set; }
 
     // Tape
@@ -136,6 +137,7 @@ public partial class MainWindowViewModel : ReactiveObject
     public Interaction<SelectFileViewModel, ArchiveEntry?> ShowSelectFileView { get; }
     public Interaction<TimeMachineViewModel, TimeMachineEntry?> ShowTimeMachineView { get; }
     public Interaction<ScreenshotViewModel, Unit?> ShowScreenshotView { get; }
+    public Interaction<TrainerViewModel, Unit?> ShowTrainersView { get; }
     public Interaction<PrintOutputViewModel, Unit?> ShowPrintOutputView { get; }
 
     public MainWindowViewModel(
@@ -233,6 +235,7 @@ public partial class MainWindowViewModel : ReactiveObject
         // View
         ToggleFullScreenCommand = ReactiveCommand.Create(HandleToggleFullScreen);
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
+        ShowTrainersCommand = ReactiveCommand.Create(OpenTrainersWindow);
         ShowPrintOutputCommand = ReactiveCommand.Create(OpenPrintOutputViewer);
 
         // Tape
@@ -250,6 +253,7 @@ public partial class MainWindowViewModel : ReactiveObject
         ShowSelectFileView = new Interaction<SelectFileViewModel, ArchiveEntry?>();
         ShowTimeMachineView = new Interaction<TimeMachineViewModel, TimeMachineEntry?>();
         ShowScreenshotView = new Interaction<ScreenshotViewModel, Unit?>();
+        ShowTrainersView = new Interaction<TrainerViewModel, Unit?>();
         ShowPrintOutputView = new Interaction<PrintOutputViewModel, Unit?>();
 
         SpectrumScreen = _frameBufferConverter.ScreenBitmap;
@@ -379,6 +383,9 @@ public partial class MainWindowViewModel : ReactiveObject
 
     private async Task OpenScreenshotViewer() =>
         await ShowScreenshotView.Handle(_screenshotViewModel);
+
+    private async Task OpenTrainersWindow() =>
+        await ShowTrainersView.Handle(new TrainerViewModel(Emulator!));
 
     private async Task OpenPrintOutputViewer() =>
         await ShowPrintOutputView.Handle(new PrintOutputViewModel(Emulator!.Printer));

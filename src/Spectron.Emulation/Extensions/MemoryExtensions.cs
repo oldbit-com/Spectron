@@ -17,6 +17,28 @@ public static class MemoryExtensions
         return bytes;
     }
 
+    public static byte? Read(this IMemory memory, Word address, int? bank = null)
+    {
+        if (bank is < 8 && memory is Memory128K memory128)
+        {
+           return memory128.Banks[bank.Value][address - 0xC000];
+        }
+
+        return memory.Read(address);
+    }
+
+    public static void Write(this IMemory memory, Word address, byte value, int? bank = null)
+    {
+        if (bank is < 8 && memory is Memory128K memory128)
+        {
+            memory128.Banks[bank.Value][address - 0xC000] = value;
+        }
+        else
+        {
+            memory.Write(address, value);
+        }
+    }
+
     public static byte[] GetBytes(this IMemory memory)
     {
         var memory64 = new byte[65536];
