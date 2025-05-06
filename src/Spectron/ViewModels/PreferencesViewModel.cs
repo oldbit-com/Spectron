@@ -70,6 +70,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
         IsFloatingBusEnabled = preferences.IsFloatingBusEnabled;
         RomType = preferences.RomType;
+        IsAutoLoadPokeFilesEnabled = preferences.IsAutoLoadPokeFilesEnabled;
 
         JoystickType = preferences.Joystick.JoystickType;
         EmulateUsingKeyboard = preferences.Joystick.EmulateUsingKeyboard;
@@ -159,6 +160,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
             IsUlaPlusEnabled = IsUlaPlusEnabled,
             IsFloatingBusEnabled = IsFloatingBusEnabled,
             RomType = RomType,
+            IsAutoLoadPokeFilesEnabled = IsAutoLoadPokeFilesEnabled,
             Joystick = new JoystickSettings
             {
                 JoystickType = JoystickType,
@@ -674,6 +676,13 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
     {
         get => _isZxPrinterEnabled;
         set => this.RaiseAndSetIfChanged(ref _isZxPrinterEnabled, value);
+    }
+
+    private bool _isAutoLoadPokeFilesEnabled;
+    public bool IsAutoLoadPokeFilesEnabled
+    {
+        get => _isAutoLoadPokeFilesEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isAutoLoadPokeFilesEnabled, value);
     }
 
     public void Dispose()

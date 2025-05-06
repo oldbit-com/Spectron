@@ -27,6 +27,7 @@ using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Emulation.Tape.Loader;
 using OldBit.Spectron.Extensions;
+using OldBit.Spectron.Files.Pok;
 using OldBit.Spectron.Input;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
@@ -68,6 +69,7 @@ public partial class MainWindowViewModel : ReactiveObject
     private MediaRecorder? _mediaRecorder;
     private bool _canClose;
     private DebuggerViewModel? _debuggerViewModel;
+    private PokeFile? _pokeFile;
     private readonly ScreenshotViewModel _screenshotViewModel = new();
 
     public Control ScreenControl { get; set; } = null!;
@@ -385,7 +387,7 @@ public partial class MainWindowViewModel : ReactiveObject
         await ShowScreenshotView.Handle(_screenshotViewModel);
 
     private async Task OpenTrainersWindow() =>
-        await ShowTrainersView.Handle(new TrainerViewModel(Emulator!));
+        await ShowTrainersView.Handle(new TrainerViewModel(Emulator!, _pokeFile));
 
     private async Task OpenPrintOutputViewer() =>
         await ShowPrintOutputView.Handle(new PrintOutputViewModel(Emulator!.Printer));

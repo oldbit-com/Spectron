@@ -12,21 +12,24 @@ namespace OldBit.Spectron.ViewModels;
 public class TrainerViewModel : ReactiveObject
 {
     private readonly Emulator _emulator;
-    private readonly PokeFile _pokFile;
+    private readonly PokeFile? _pokeFile;
 
     public ObservableCollection<TrainerItemViewModel> Trainers { get; } = [];
 
-    public TrainerViewModel(Emulator emulator)
+    public TrainerViewModel(Emulator emulator, PokeFile? pokeFile)
     {
         _emulator = emulator;
-        _pokFile = PokeFile.Load("/Users/voytas/Games/ZX/Manic Miner (1983)(Bug-Byte).pok");
+        _pokeFile = pokeFile;
 
-        LoadTrainers();
+        if (_pokeFile != null)
+        {
+            LoadTrainers();
+        }
     }
 
     private void LoadTrainers()
     {
-        foreach (var trainer in _pokFile.Trainers)
+        foreach (var trainer in _pokeFile!.Trainers)
         {
             var trainerItem = new TrainerItemViewModel(trainer)
             {
