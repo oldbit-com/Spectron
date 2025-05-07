@@ -16,6 +16,8 @@ public class Preferences
 
     public bool IsFloatingBusEnabled { get; init; }
 
+    public bool IsAutoLoadPokeFilesEnabled { get; init; } = true;
+
     public BorderSize BorderSize { get; init; } = BorderSize.Medium;
 
     public ComputerType ComputerType { get; init; } = ComputerType.Spectrum48K;

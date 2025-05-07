@@ -16,6 +16,7 @@ using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.Tape;
+using OldBit.Spectron.Files.Pok;
 using OldBit.Spectron.Input;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Recorder;
@@ -51,7 +52,6 @@ partial class MainWindowViewModel
             if (fileType == FileType.Unsupported)
             {
                 await MessageDialogs.Warning($"Unsupported file type: {fileType}.");
-
                 return;
             }
 
@@ -59,6 +59,16 @@ partial class MainWindowViewModel
             if (fileResult.Stream == null)
             {
                 return;
+            }
+
+            if (fileType == FileType.Pok)
+            {
+                await LoadPokeFile(fileResult.Stream);
+                return;
+            }
+            else if (_preferences.IsAutoLoadPokeFilesEnabled)
+            {
+                TryAutoLoadPokeFile(filePath, fileResult.FileType);
             }
 
             if (CreateEmulator(fileResult.Stream, fileResult.FileType))
@@ -122,6 +132,32 @@ partial class MainWindowViewModel
         }
 
         return (stream, fileType);
+    }
+
+    private async Task LoadPokeFile(Stream stream)
+    {
+        _pokeFile = PokeFile.Load(stream);
+
+        await OpenTrainersWindow();
+    }
+
+    private void TryAutoLoadPokeFile(string filePath, FileType fileType)
+    {
+        try
+        {
+            var pokeFilePath = Path.ChangeExtension(filePath, ".pok");
+
+            if (!File.Exists(pokeFilePath))
+            {
+                return;
+            }
+
+            _pokeFile = PokeFile.Load(pokeFilePath);
+        }
+        catch
+        {
+            // Ignore errors
+        }
     }
 
     private async Task HandleSaveFileAsync()
@@ -373,6 +409,8 @@ partial class MainWindowViewModel
 
     private void HandleMachineReset()
     {
+        _pokeFile = null;
+
         Emulator?.Reset();
         IsPaused = Emulator?.IsPaused ?? false;
 
@@ -382,6 +420,8 @@ partial class MainWindowViewModel
 
     private void HandleMachineHardReset()
     {
+        _pokeFile = null;
+
         CreateEmulator(_preferences.ComputerType, _preferences.RomType);
 
         RecentFilesViewModel.CurrentFileName = string.Empty;

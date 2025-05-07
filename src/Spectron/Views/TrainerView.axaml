@@ -1,0 +1,53 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+        x:DataType="viewModels:TrainerViewModel"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        Width="600"
+        Height="300"
+        WindowStartupLocation="CenterOwner"
+        x:Class="OldBit.Spectron.Views.TrainerView"
+        Title="Trainers / POKEs">
+
+    <Grid>
+        <DataGrid
+            Margin="4 4 4 10"
+            ItemsSource="{Binding Trainers}"
+            GridLinesVisibility="All"
+            CanUserSortColumns="True"
+            CanUserResizeColumns="False"
+            BorderThickness="2">
+
+            <DataGrid.Styles>
+                <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+                    <Setter Property="IsVisible" Value="false" />
+                </Style>
+            </DataGrid.Styles>
+
+            <DataGrid.Columns>
+                <DataGridCheckBoxColumn Header="Enabled" Binding="{Binding IsEnabled}"/>
+                <DataGridTextColumn Header="Trainer" Binding="{Binding Name}" IsReadOnly="True" Width="*"/>
+                <DataGridTemplateColumn Header="Custom" Width="160">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Expander Header="Enter Value" FontSize="12" MinHeight="18" Width="150" Padding="10 0 0 0" IsVisible="{Binding CustomPokes.Count}">
+                                <ItemsRepeater ItemsSource="{Binding CustomPokes}">
+                                    <ItemsRepeater.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Address}" VerticalAlignment="Center" Margin="0 0 10 0"/>
+                                                <TextBox Text="{Binding CustomValue}" VerticalAlignment="Center" MaxLength="3" VerticalContentAlignment="Center"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsRepeater.ItemTemplate>
+                                </ItemsRepeater>
+                            </Expander>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>

@@ -27,6 +27,7 @@ using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Emulation.Tape.Loader;
 using OldBit.Spectron.Extensions;
+using OldBit.Spectron.Files.Pok;
 using OldBit.Spectron.Input;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
@@ -68,6 +69,7 @@ public partial class MainWindowViewModel : ReactiveObject
     private MediaRecorder? _mediaRecorder;
     private bool _canClose;
     private DebuggerViewModel? _debuggerViewModel;
+    private PokeFile? _pokeFile;
     private readonly ScreenshotViewModel _screenshotViewModel = new();
 
     public Control ScreenControl { get; set; } = null!;
@@ -119,6 +121,7 @@ public partial class MainWindowViewModel : ReactiveObject
     // View
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleFullScreenCommand { get; private set; }
+    public ReactiveCommand<Unit, Task> ShowTrainersCommand { get; private set; }
     public ReactiveCommand<Unit, Task> ShowPrintOutputCommand { get; private set; }
 
     // Tape
@@ -136,6 +139,7 @@ public partial class MainWindowViewModel : ReactiveObject
     public Interaction<SelectFileViewModel, ArchiveEntry?> ShowSelectFileView { get; }
     public Interaction<TimeMachineViewModel, TimeMachineEntry?> ShowTimeMachineView { get; }
     public Interaction<ScreenshotViewModel, Unit?> ShowScreenshotView { get; }
+    public Interaction<TrainerViewModel, Unit?> ShowTrainersView { get; }
     public Interaction<PrintOutputViewModel, Unit?> ShowPrintOutputView { get; }
 
     public MainWindowViewModel(
@@ -233,6 +237,7 @@ public partial class MainWindowViewModel : ReactiveObject
         // View
         ToggleFullScreenCommand = ReactiveCommand.Create(HandleToggleFullScreen);
         ChangeBorderSizeCommand = ReactiveCommand.Create<BorderSize>(HandleChangeBorderSize);
+        ShowTrainersCommand = ReactiveCommand.Create(OpenTrainersWindow);
         ShowPrintOutputCommand = ReactiveCommand.Create(OpenPrintOutputViewer);
 
         // Tape
@@ -250,6 +255,7 @@ public partial class MainWindowViewModel : ReactiveObject
         ShowSelectFileView = new Interaction<SelectFileViewModel, ArchiveEntry?>();
         ShowTimeMachineView = new Interaction<TimeMachineViewModel, TimeMachineEntry?>();
         ShowScreenshotView = new Interaction<ScreenshotViewModel, Unit?>();
+        ShowTrainersView = new Interaction<TrainerViewModel, Unit?>();
         ShowPrintOutputView = new Interaction<PrintOutputViewModel, Unit?>();
 
         SpectrumScreen = _frameBufferConverter.ScreenBitmap;
@@ -379,6 +385,9 @@ public partial class MainWindowViewModel : ReactiveObject
 
     private async Task OpenScreenshotViewer() =>
         await ShowScreenshotView.Handle(_screenshotViewModel);
+
+    private async Task OpenTrainersWindow() =>
+        await ShowTrainersView.Handle(new TrainerViewModel(Emulator!, _pokeFile));
 
     private async Task OpenPrintOutputViewer() =>
         await ShowPrintOutputView.Handle(new PrintOutputViewModel(Emulator!.Printer));

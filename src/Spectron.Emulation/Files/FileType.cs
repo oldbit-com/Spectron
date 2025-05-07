@@ -14,6 +14,8 @@ public enum FileType
 
     Zip,
 
+    Pok,
+
     Unsupported
 }
 

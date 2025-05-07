@@ -10,6 +10,7 @@ public static class FileTypeHelper
         ".tap" => FileType.Tap,
         ".tzx" => FileType.Tzx,
         ".zip" => FileType.Zip,
+        ".pok" => FileType.Pok,
         _ => FileType.Unsupported
     };
 }
