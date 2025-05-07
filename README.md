@@ -27,6 +27,7 @@ It uses several of my own libraries that I created for this project:
 - [x] Time Machine: rewind and continue from given time point in the past
 - [x] Emulator state is persisted when closed
 - [x] Supports SNA, SZX, Z80, TAP and TZX file formats (can be inside zip file)
+- [x] Supports POK trainer files
 - [x] Tape content browser
 - [x] Accurate timings, including contented memory and IO
 - [x] Floating bus support
