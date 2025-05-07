@@ -64,7 +64,7 @@ partial class MainWindowViewModel
 
             if (fileType == FileType.Pok)
             {
-                LoadPokeFile(fileResult.Stream);
+                await LoadPokeFile(fileResult.Stream);
 
                 return;
             }
@@ -132,10 +132,11 @@ partial class MainWindowViewModel
         return (stream, fileType);
     }
 
-    private void LoadPokeFile(Stream stream)
+    private async Task LoadPokeFile(Stream stream)
     {
-        var pokeFile = PokeFile.Load(stream);
+        _pokeFile = PokeFile.Load(stream);
 
+        await OpenTrainersWindow();
     }
 
     private async Task HandleSaveFileAsync()
@@ -387,6 +388,8 @@ partial class MainWindowViewModel
 
     private void HandleMachineReset()
     {
+        _pokeFile = null;
+
         Emulator?.Reset();
         IsPaused = Emulator?.IsPaused ?? false;
 
@@ -396,6 +399,8 @@ partial class MainWindowViewModel
 
     private void HandleMachineHardReset()
     {
+        _pokeFile = null;
+
         CreateEmulator(_preferences.ComputerType, _preferences.RomType);
 
         RecentFilesViewModel.CurrentFileName = string.Empty;
