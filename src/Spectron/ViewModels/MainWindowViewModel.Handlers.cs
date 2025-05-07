@@ -52,7 +52,6 @@ partial class MainWindowViewModel
             if (fileType == FileType.Unsupported)
             {
                 await MessageDialogs.Warning($"Unsupported file type: {fileType}.");
-
                 return;
             }
 
@@ -65,8 +64,11 @@ partial class MainWindowViewModel
             if (fileType == FileType.Pok)
             {
                 await LoadPokeFile(fileResult.Stream);
-
                 return;
+            }
+            else if (_preferences.IsAutoLoadPokeFilesEnabled)
+            {
+                TryAutoLoadPokeFile(filePath, fileResult.FileType);
             }
 
             if (CreateEmulator(fileResult.Stream, fileResult.FileType))
@@ -137,6 +139,25 @@ partial class MainWindowViewModel
         _pokeFile = PokeFile.Load(stream);
 
         await OpenTrainersWindow();
+    }
+
+    private void TryAutoLoadPokeFile(string filePath, FileType fileType)
+    {
+        try
+        {
+            var pokeFilePath = Path.ChangeExtension(filePath, ".pok");
+
+            if (!File.Exists(pokeFilePath))
+            {
+                return;
+            }
+
+            _pokeFile = PokeFile.Load(pokeFilePath);
+        }
+        catch
+        {
+            // Ignore errors
+        }
     }
 
     private async Task HandleSaveFileAsync()
