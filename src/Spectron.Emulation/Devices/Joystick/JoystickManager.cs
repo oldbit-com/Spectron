@@ -13,7 +13,7 @@ public sealed class JoystickManager
     private readonly GamepadManager _gamepadManager;
     private readonly SpectrumBus _spectrumBus;
     private readonly KeyboardState _keyboardState;
-    private readonly Timer _updateTimer;
+    private readonly Timer _gamepadUpdateTimer;
 
     private IJoystick? _joystick;
 
@@ -28,13 +28,13 @@ public sealed class JoystickManager
         _spectrumBus = spectrumBus;
         _keyboardState = keyboardState;
 
-        _updateTimer = new Timer(_joystickUpdateInterval) { AutoReset = true };
-        _updateTimer.Elapsed += UpdateJoystickState;
+        _gamepadUpdateTimer = new Timer(_joystickUpdateInterval) { AutoReset = true };
+        _gamepadUpdateTimer.Elapsed += GamepadUpdateJoystickState;
     }
 
     public void SetupJoystick(JoystickType joystickType)
     {
-        _updateTimer.Stop();
+        _gamepadUpdateTimer.Stop();
 
         JoystickType = joystickType;
 
@@ -55,7 +55,7 @@ public sealed class JoystickManager
         if (_joystick != null)
         {
             _spectrumBus.AddDevice(_joystick);
-            _updateTimer.Start();
+            _gamepadUpdateTimer.Start();
         }
     }
 
@@ -65,11 +65,11 @@ public sealed class JoystickManager
 
     public void Stop()
     {
-        _updateTimer.Dispose();
+        _gamepadUpdateTimer.Dispose();
         _spectrumBus.RemoveDevice(_joystick);
     }
 
-    private void UpdateJoystickState(object? sender, ElapsedEventArgs e)
+    private void GamepadUpdateJoystickState(object? sender, ElapsedEventArgs e)
     {
         if (_joystick == null)
         {
@@ -81,14 +81,14 @@ public sealed class JoystickManager
             return;
         }
 
-        UpdateInputState(JoystickInput.Up);
-        UpdateInputState(JoystickInput.Right);
-        UpdateInputState(JoystickInput.Down);
-        UpdateInputState(JoystickInput.Left);
-        UpdateInputState(JoystickInput.Fire);
+        GamepadUpdateInputState(JoystickInput.Up);
+        GamepadUpdateInputState(JoystickInput.Right);
+        GamepadUpdateInputState(JoystickInput.Down);
+        GamepadUpdateInputState(JoystickInput.Left);
+        GamepadUpdateInputState(JoystickInput.Fire);
     }
 
-    private void UpdateInputState(JoystickInput input)
+    private void GamepadUpdateInputState(JoystickInput input)
     {
         var inputState = _gamepadManager.GetJoystickInputState(input);
 
