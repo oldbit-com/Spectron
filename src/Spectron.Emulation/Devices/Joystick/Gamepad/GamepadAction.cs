@@ -17,6 +17,8 @@ public enum GamepadAction
     // Emulator actions
     Pause,
     TimeTravel,
+    QuickSave,
+    QuickLoad,
 
     // Keyboard (numbers)
     D0,
@@ -82,6 +84,8 @@ public static class GamepadActionExtensions
 
         Pause => "Pause",
         TimeTravel => "Time Travel",
+        QuickSave => "Quick Save",
+        QuickLoad => "Quick Load",
 
         >= D0 and <= D9 => action.ToString()[1..],
         >= A and <= Z => action.ToString(),
