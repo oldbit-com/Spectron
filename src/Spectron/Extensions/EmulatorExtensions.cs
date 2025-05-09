@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using OldBit.Spectron.Emulation;
-using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
+using OldBit.Spectron.Emulation.Devices.Gamepad;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Settings;
 

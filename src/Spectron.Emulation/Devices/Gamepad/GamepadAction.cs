@@ -1,7 +1,7 @@
 using OldBit.Spectron.Emulation.Devices.Keyboard;
-using static OldBit.Spectron.Emulation.Devices.Joystick.Gamepad.GamepadAction;
+using static OldBit.Spectron.Emulation.Devices.Gamepad.GamepadAction;
 
-namespace OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
+namespace OldBit.Spectron.Emulation.Devices.Gamepad;
 
 public enum GamepadAction
 {

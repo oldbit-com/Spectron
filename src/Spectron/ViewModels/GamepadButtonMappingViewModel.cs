@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
+using OldBit.Spectron.Emulation.Devices.Gamepad;
 using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;

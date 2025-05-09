@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
+using OldBit.Spectron.Emulation.Devices.Gamepad;
 
 namespace OldBit.Spectron.Settings;
 

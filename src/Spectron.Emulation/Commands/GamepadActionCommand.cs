@@ -1,5 +1,5 @@
+using OldBit.Spectron.Emulation.Devices.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Joystick;
-using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
 
 namespace OldBit.Spectron.Emulation.Commands;
 

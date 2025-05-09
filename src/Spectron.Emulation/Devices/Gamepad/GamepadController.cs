@@ -1,7 +1,7 @@
 using OldBit.Joypad;
 using OldBit.Joypad.Controls;
 
-namespace OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
+namespace OldBit.Spectron.Emulation.Devices.Gamepad;
 
 public class GamepadController
 {

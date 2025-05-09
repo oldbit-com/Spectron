@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
+namespace OldBit.Spectron.Emulation.Devices.Gamepad;
 
 public class ControllerChangedEventArgs(GamepadController controller, ControllerChangedAction action) : EventArgs
 {

@@ -1,8 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using OldBit.Spectron.Emulation.Commands;
-using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
+using OldBit.Spectron.Emulation.Devices.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
-using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Emulation.Tape;

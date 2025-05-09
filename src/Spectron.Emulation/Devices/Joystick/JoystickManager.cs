@@ -1,5 +1,5 @@
 using System.Timers;
-using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
+using OldBit.Spectron.Emulation.Devices.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Joystick.Joysticks;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using Timer = System.Timers.Timer;

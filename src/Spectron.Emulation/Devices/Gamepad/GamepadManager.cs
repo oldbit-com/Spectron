@@ -1,9 +1,10 @@
 using OldBit.Joypad;
 using OldBit.Joypad.Controls;
 using OldBit.Spectron.Emulation.Commands;
+using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 
-namespace OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
+namespace OldBit.Spectron.Emulation.Devices.Gamepad;
 
 public record GamepadPreferences(
     Guid ControllerId,

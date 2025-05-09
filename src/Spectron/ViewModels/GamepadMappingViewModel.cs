@@ -7,7 +7,7 @@ using System.Timers;
 using Avalonia.Threading;
 using DynamicData;
 using OldBit.Joypad.Controls;
-using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
+using OldBit.Spectron.Emulation.Devices.Gamepad;
 using OldBit.Spectron.Settings;
 using ReactiveUI;
 

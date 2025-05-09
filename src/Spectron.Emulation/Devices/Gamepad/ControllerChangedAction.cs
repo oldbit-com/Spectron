@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
+namespace OldBit.Spectron.Emulation.Devices.Gamepad;
 
 public enum ControllerChangedAction
 {

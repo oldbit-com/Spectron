@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using OldBit.Joypad.Controls;
 
-namespace OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
+namespace OldBit.Spectron.Emulation.Devices.Gamepad;
 
 [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
 public sealed record GamepadMapping
