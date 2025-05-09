@@ -2,9 +2,9 @@ namespace OldBit.Spectron.Emulation.Devices.Mouse;
 
 internal interface IMouse : IDevice
 {
-    byte X { get; set; }
+    byte X { set; }
 
-    byte Y { get; set; }
+    byte Y { set; }
 
-    MouseButtons Buttons { get; set; }
+    MouseButtons Buttons { set; }
 }
