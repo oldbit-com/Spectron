@@ -399,8 +399,14 @@ partial class MainWindowViewModel
     private void HandleChangeMouseType(MouseType mouseType)
     {
         MouseType = mouseType;
-        Emulator?.MouseManager.SetupMouse(mouseType);
-        _mouseHelper = new MouseHelper(Emulator!.MouseManager);
+
+        if (Emulator == null)
+        {
+            return;
+        }
+
+        Emulator.MouseManager.SetupMouse(_preferences.Mouse.MouseType);
+        _mouseHelper = new MouseHelper(Emulator.MouseManager);
     }
 
     private void HandleToggleUlaPlus()

@@ -499,7 +499,9 @@ public partial class MainWindowViewModel : ReactiveObject
     {
         var emulator = _emulatorFactory.Create(computerType, romType, customRom);
 
-        SetupPreferredDevices(emulator);
+        emulator.SetUlaPlus(_preferences.IsUlaPlusEnabled);
+        emulator.MouseManager.SetupMouse(_preferences.Mouse.MouseType);
+        _mouseHelper = new MouseHelper(emulator.MouseManager);
 
         InitializeEmulator(emulator);
     }
@@ -509,6 +511,7 @@ public partial class MainWindowViewModel : ReactiveObject
         Emulator?.Reset();
 
         var emulator = _stateManager.CreateEmulator(stateSnapshot);
+        _mouseHelper = new MouseHelper(emulator.MouseManager);
 
         InitializeEmulator(emulator);
     }
@@ -527,7 +530,10 @@ public partial class MainWindowViewModel : ReactiveObject
             emulator.TapeManager.InsertTape(stream, fileType,
                 _preferences.Tape.IsAutoPlayEnabled && TapeLoadSpeed != TapeSpeed.Instant);
 
-            SetupPreferredDevices(emulator);
+            emulator.SetUlaPlus(_preferences.IsUlaPlusEnabled);
+            emulator.MouseManager.SetupMouse(_preferences.Mouse.MouseType);
+            _mouseHelper = new MouseHelper(emulator.MouseManager);
+            emulator.JoystickManager.SetupJoystick(_preferences.Joystick.JoystickType);
         }
 
         if (emulator != null)
@@ -536,15 +542,6 @@ public partial class MainWindowViewModel : ReactiveObject
         }
 
         return emulator != null;
-    }
-
-    private void SetupPreferredDevices(Emulator emulator)
-    {
-        emulator.SetUlaPlus(_preferences.IsUlaPlusEnabled);
-        emulator.MouseManager.SetupMouse(_preferences.Mouse.MouseType);
-        emulator.JoystickManager.SetupJoystick(_preferences.Joystick.JoystickType);
-
-        _mouseHelper = new MouseHelper(emulator.MouseManager);
     }
 
     private void InitializeEmulator(Emulator emulator)
@@ -592,7 +589,7 @@ public partial class MainWindowViewModel : ReactiveObject
         SetMouseCursor();
 
         StatusBarViewModel.IsDivMmcEnabled = _preferences.DivMmc.IsEnabled;
-        StatusBarViewModel.IsMouseEnabled = _preferences.Mouse.MouseType != MouseType.None;
+        StatusBarViewModel.IsMouseEnabled = Emulator!.MouseManager.MouseType != MouseType.None;
         StatusBarViewModel.IsPrinterEnabled = _preferences.Printer.IsZxPrinterEnabled;
     }
 

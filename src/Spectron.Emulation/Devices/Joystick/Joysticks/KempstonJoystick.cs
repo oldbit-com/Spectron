@@ -28,6 +28,8 @@ internal class KempstonJoystick : IJoystick
         }
     }
 
+    public int Priority => 1000;
+
     private static byte GetValue(JoystickInput input) => input switch
     {
         JoystickInput.Left => Left,

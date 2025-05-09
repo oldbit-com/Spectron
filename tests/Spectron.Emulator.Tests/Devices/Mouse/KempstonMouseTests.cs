@@ -1,3 +1,4 @@
+using OldBit.Spectron.Emulation.Devices.Joystick.Joysticks;
 using OldBit.Spectron.Emulation.Devices.Mouse;
 
 namespace OldBit.Spectron.Emulator.Tests.Devices.Mouse;
@@ -44,5 +45,14 @@ public class KempstonMouseTests
         var value = mouse.ReadPort(Buttons);
 
         value.ShouldBe((byte?)buttons);
+    }
+
+    [Fact]
+    public void KempstonMousePriority_ShouldBeLowerThanKempstonJoystick()
+    {
+        var mouse = new KempstonMouse();
+        var joystick = new KempstonJoystick();
+
+        mouse.Priority.ShouldBeLessThan(joystick.Priority);
     }
 }
