@@ -12,6 +12,7 @@ using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
+using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Snapshot;
@@ -395,6 +396,13 @@ partial class MainWindowViewModel
         Emulator?.JoystickManager.SetupJoystick(joystickType);
     }
 
+    private void HandleChangeMouseType(MouseType mouseType)
+    {
+        MouseType = mouseType;
+        Emulator?.MouseManager.SetupMouse(mouseType);
+        _mouseHelper = new MouseHelper(Emulator!.MouseManager);
+    }
+
     private void HandleToggleUlaPlus()
     {
         IsUlaPlusEnabled = !IsUlaPlusEnabled;
@@ -612,8 +620,8 @@ partial class MainWindowViewModel
     private void HandleTakeScreenshot() => _screenshotViewModel.AddScreenshot(SpectrumScreen);
 
     public void HandleMouseMoved(Point position, Rect bounds) =>
-        _mouseHelper.MouseMoved(BorderSize, position, bounds);
+        _mouseHelper?.MouseMoved(BorderSize, position, bounds);
 
     public void HandleMouseButtonStateChanged(PointerPoint point, Rect bounds) =>
-        _mouseHelper.ButtonsStateChanged(point);
+        _mouseHelper?.ButtonsStateChanged(point);
 }

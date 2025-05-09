@@ -20,7 +20,6 @@ public sealed class EmulatorFactory(
     TimeMachine timeMachine,
     TapeManager tapeManager,
     GamepadManager gamepadManager,
-    MouseManager mouseManager,
     KeyboardState keyboardState,
     CommandManager commandManager,
     ILogger<EmulatorFactory> logger)
@@ -71,7 +70,6 @@ public sealed class EmulatorFactory(
             Hardware.Spectrum128K,
             tapeManager,
             gamepadManager,
-            mouseManager,
             keyboardState,
             timeMachine,
             commandManager,
@@ -95,7 +93,6 @@ public sealed class EmulatorFactory(
             Hardware.Spectrum48K,
             tapeManager,
             gamepadManager,
-            mouseManager,
             keyboardState,
             timeMachine,
             commandManager,

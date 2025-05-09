@@ -5,6 +5,7 @@
              xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
              xmlns:rom="clr-namespace:OldBit.Spectron.Emulation.Rom;assembly=OldBit.Spectron.Emulation"
              xmlns:joy="clr-namespace:OldBit.Spectron.Emulation.Devices.Joystick;assembly=OldBit.Spectron.Emulation"
+             xmlns:mouse="clr-namespace:OldBit.Spectron.Emulation.Devices.Mouse;assembly=OldBit.Spectron.Emulation"
              xmlns:emu="clr-namespace:OldBit.Spectron.Emulation;assembly=OldBit.Spectron.Emulation"
              xmlns:screen="clr-namespace:OldBit.Spectron.Screen"
              xmlns:tape="clr-namespace:OldBit.Spectron.Emulation.Tape;assembly=OldBit.Spectron.Emulation"
@@ -49,13 +50,17 @@
                 </MenuItem>
                 <MenuItem Header="Custom" ToggleType="Radio" Command="{Binding ChangeRomCommand}" CommandParameter="{x:Static rom:RomType.Custom}" IsChecked="{Binding RomType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static rom:RomType.Custom}}"/>
             </MenuItem>
-            <MenuItem Header="Joystick" Focusable="False">
+            <MenuItem Header="Joystick">
                 <MenuItem Header="None" ToggleType="Radio" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.None}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.None}}"/>
                 <MenuItem Header="Kempston" ToggleType="Radio" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Kempston}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Kempston}}"/>
                 <MenuItem Header="Sinclair 1" ToggleType="Radio" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Sinclair1}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Sinclair1}}"/>
                 <MenuItem Header="Sinclair 2" ToggleType="Radio" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Sinclair2}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Sinclair2}}"/>
                 <MenuItem Header="Cursor" ToggleType="Radio" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Cursor}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Cursor}}"/>
                 <MenuItem Header="Fuller" ToggleType="Radio" Command="{Binding ChangeJoystickType}" CommandParameter="{x:Static joy:JoystickType.Fuller}" IsChecked="{Binding JoystickType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static joy:JoystickType.Fuller}}"/>
+            </MenuItem>
+            <MenuItem Header="Mouse">
+                <MenuItem Header="None" ToggleType="Radio" Command="{Binding ChangeMouseType}" CommandParameter="{x:Static mouse:MouseType.None}" IsChecked="{Binding MouseType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static mouse:MouseType.None}}"/>
+                <MenuItem Header="Kempston" ToggleType="Radio" Command="{Binding ChangeMouseType}" CommandParameter="{x:Static mouse:MouseType.Kempston}" IsChecked="{Binding MouseType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static mouse:MouseType.Kempston}}"/>
             </MenuItem>
             <MenuItem Header="Enable ULA+" ToggleType="CheckBox" Command="{Binding ToggleUlaPlus}" IsChecked="{Binding IsUlaPlusEnabled}"/>
         </MenuItem>

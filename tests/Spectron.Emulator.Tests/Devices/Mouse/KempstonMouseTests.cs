@@ -8,23 +8,10 @@ public class KempstonMouseTests
     private const Word YAxis = 0xFFDF;
     private const Word Buttons = 0xFADF;
 
-    [Theory]
-    [InlineData(XAxis)]
-    [InlineData(YAxis)]
-    [InlineData(Buttons)]
-    public void WhenDisabled_PortReadShouldReturnNull(Word port)
-    {
-        var mouse = new KempstonMouse { IsEnabled = false };
-
-        var value = mouse.ReadPort(port);
-
-        value.ShouldBeNull();
-    }
-
     [Fact]
     public void WhenReadingXAxis_ShouldReturnXValue()
     {
-        var mouse = new KempstonMouse { IsEnabled = true, X = 0x12 };
+        var mouse = new KempstonMouse { X = 0x12 };
 
         var value = mouse.ReadPort(XAxis);
 
@@ -35,7 +22,7 @@ public class KempstonMouseTests
     [Fact]
     public void WhenReadingYAxis_ShouldReturnYValue()
     {
-        var mouse = new KempstonMouse { IsEnabled = true, Y = 0x34 };
+        var mouse = new KempstonMouse { Y = 0x34 };
 
         var value = mouse.ReadPort(YAxis);
 
@@ -52,7 +39,7 @@ public class KempstonMouseTests
     [InlineData(MouseButtons.Left | MouseButtons.Right | MouseButtons.Middle)]
     public void WhenReadingButtons_ShouldReturnButtonValue(MouseButtons buttons)
     {
-        var mouse = new KempstonMouse { IsEnabled = true, Buttons = buttons };
+        var mouse = new KempstonMouse { Buttons = buttons };
 
         var value = mouse.ReadPort(Buttons);
 

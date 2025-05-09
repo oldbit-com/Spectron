@@ -23,6 +23,8 @@ public sealed partial class StateSnapshot
 
     public JoystickState Joystick { get; set; } = new();
 
+    public MouseState Mouse { get; set; } = new();
+
     public TapeState? Tape { get; set; }
 
     public DivMmcState? DivMmc { get; set; }

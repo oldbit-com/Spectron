@@ -35,6 +35,9 @@ using OldBit.Spectron.Recorder;
 using OldBit.Spectron.Screen;
 using OldBit.Spectron.Theming;
 using ReactiveUI;
+using ComputerType = OldBit.Spectron.Emulation.ComputerType;
+using JoystickType = OldBit.Spectron.Emulation.Devices.Joystick.JoystickType;
+using MouseType = OldBit.Spectron.Emulation.Devices.Mouse.MouseType;
 using Timer = System.Timers.Timer;
 
 namespace OldBit.Spectron.ViewModels;
@@ -59,17 +62,17 @@ public partial class MainWindowViewModel : ReactiveObject
     private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
     private readonly Timer _statusBarTimer;
     private readonly KeyboardHook _keyboardHook;
-    private readonly MouseHelper _mouseHelper;
+    private readonly Stopwatch _renderStopwatch = new();
 
     private Emulator? Emulator { get; set; }
     private Preferences _preferences = new();
     private int _frameCount;
-    private readonly Stopwatch _renderStopwatch = new();
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
     private MediaRecorder? _mediaRecorder;
     private bool _canClose;
     private DebuggerViewModel? _debuggerViewModel;
     private PokeFile? _pokeFile;
+    private MouseHelper? _mouseHelper;
     private readonly ScreenshotViewModel _screenshotViewModel = new();
 
     public Control ScreenControl { get; set; } = null!;
@@ -99,6 +102,7 @@ public partial class MainWindowViewModel : ReactiveObject
     public ReactiveCommand<ComputerType, Unit> ChangeComputerType { get; private set; }
     public ReactiveCommand<RomType, Task> ChangeRomCommand { get; private set; }
     public ReactiveCommand<JoystickType, Unit> ChangeJoystickType { get; private set; }
+    public ReactiveCommand<MouseType, Unit> ChangeMouseType { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleUlaPlus { get; private set; }
 
     // Control
@@ -146,7 +150,6 @@ public partial class MainWindowViewModel : ReactiveObject
         EmulatorFactory emulatorFactory,
         TimeMachine timeMachine,
         GamepadManager gamepadManager,
-        MouseManager mouseManager,
         SnapshotManager snapshotManager,
         StateManager stateManager,
         Loader loader,
@@ -170,8 +173,6 @@ public partial class MainWindowViewModel : ReactiveObject
         _debuggerContext = debuggerContext;
         _quickSaveService = quickSaveService;
         _logger = logger;
-
-        _mouseHelper = new MouseHelper(mouseManager);
 
         RecentFilesViewModel = recentFilesViewModel;
         TapeMenuViewModel = tapeMenuViewModel;
@@ -198,6 +199,9 @@ public partial class MainWindowViewModel : ReactiveObject
         this.WhenAny(x => x.JoystickType, x => x.Value)
             .Subscribe(joystickType => StatusBarViewModel.JoystickType = joystickType);
 
+        this.WhenAny(x => x.MouseType, x => x.Value)
+            .Subscribe(mouseType => StatusBarViewModel.IsMouseEnabled = mouseType != MouseType.None);
+
         WindowOpenedCommand = ReactiveCommand.CreateFromTask(WindowOpenedAsync);
         WindowClosingCommand = ReactiveCommand.CreateFromTask<WindowClosingEventArgs>(WindowClosingAsync);
         KeyDownCommand = ReactiveCommand.Create<KeyEventArgs>(HandleKeyDown);
@@ -215,6 +219,7 @@ public partial class MainWindowViewModel : ReactiveObject
         ChangeComputerType = ReactiveCommand.Create<ComputerType>(HandleChangeComputerType);
         ChangeRomCommand = ReactiveCommand.Create<RomType, Task>(HandleChangeRomAsync);
         ChangeJoystickType = ReactiveCommand.Create<JoystickType>(HandleChangeJoystickType);
+        ChangeMouseType = ReactiveCommand.Create<MouseType>(HandleChangeMouseType);
         ToggleUlaPlus = ReactiveCommand.Create(HandleToggleUlaPlus);
 
         // Control
@@ -333,6 +338,9 @@ public partial class MainWindowViewModel : ReactiveObject
             _timeMachine.SnapshotInterval = preferences.TimeMachine.SnapshotInterval;
             _timeMachine.MaxDuration = preferences.TimeMachine.MaxDuration;
             TimeMachineCountdownSeconds = preferences.TimeMachine.CountdownSeconds;
+
+            HandleChangeJoystickType(preferences.Joystick.JoystickType);
+            HandleChangeMouseType(preferences.Mouse.MouseType);
 
             Emulator.SetUlaPlus(IsUlaPlusEnabled);
             Emulator.SetTapeSettings(_preferences.Tape);
@@ -491,8 +499,7 @@ public partial class MainWindowViewModel : ReactiveObject
     {
         var emulator = _emulatorFactory.Create(computerType, romType, customRom);
 
-        emulator.SetUlaPlus(_preferences.IsUlaPlusEnabled);
-        emulator.JoystickManager.SetupJoystick(_preferences.Joystick.JoystickType);
+        SetupPreferredDevices(emulator);
 
         InitializeEmulator(emulator);
     }
@@ -519,7 +526,8 @@ public partial class MainWindowViewModel : ReactiveObject
             emulator = _loader.EnterLoadCommand(ComputerType);
             emulator.TapeManager.InsertTape(stream, fileType,
                 _preferences.Tape.IsAutoPlayEnabled && TapeLoadSpeed != TapeSpeed.Instant);
-            emulator.SetUlaPlus(_preferences.IsUlaPlusEnabled);
+
+            SetupPreferredDevices(emulator);
         }
 
         if (emulator != null)
@@ -528,6 +536,15 @@ public partial class MainWindowViewModel : ReactiveObject
         }
 
         return emulator != null;
+    }
+
+    private void SetupPreferredDevices(Emulator emulator)
+    {
+        emulator.SetUlaPlus(_preferences.IsUlaPlusEnabled);
+        emulator.MouseManager.SetupMouse(_preferences.Mouse.MouseType);
+        emulator.JoystickManager.SetupJoystick(_preferences.Joystick.JoystickType);
+
+        _mouseHelper = new MouseHelper(emulator.MouseManager);
     }
 
     private void InitializeEmulator(Emulator emulator)
@@ -540,6 +557,7 @@ public partial class MainWindowViewModel : ReactiveObject
         ComputerType = Emulator.ComputerType;
         RomType = Emulator.RomType;
         JoystickType = Emulator.JoystickManager.JoystickType;
+        MouseType = Emulator.MouseManager.MouseType;
         IsUlaPlusEnabled = Emulator.IsUlaPlusEnabled;
 
         Emulator.TapeLoadSpeed = TapeLoadSpeed;
@@ -568,14 +586,13 @@ public partial class MainWindowViewModel : ReactiveObject
         Emulator.SetFloatingBusSupport(_preferences.IsFloatingBusEnabled);
         Emulator.SetAudioSettings(_preferences.Audio);
         Emulator.SetGamepad(_preferences.Joystick);
-        Emulator.SetMouse(_preferences.Mouse);
         Emulator.SetDivMMc(_preferences.DivMmc);
         Emulator.SetPrinter(_preferences.Printer);
 
         SetMouseCursor();
 
         StatusBarViewModel.IsDivMmcEnabled = _preferences.DivMmc.IsEnabled;
-        StatusBarViewModel.IsMouseEnabled = _preferences.Mouse.IsKempstonMouseEnabled;
+        StatusBarViewModel.IsMouseEnabled = _preferences.Mouse.MouseType != MouseType.None;
         StatusBarViewModel.IsPrinterEnabled = _preferences.Printer.IsZxPrinterEnabled;
     }
 
@@ -627,5 +644,7 @@ public partial class MainWindowViewModel : ReactiveObject
     }
 
     private void SetMouseCursor() =>
-        MouseCursor = _preferences.Mouse is { IsKempstonMouseEnabled: true, IsStandardMousePointerHidden: true } ? Cursor.Parse("None") : Cursor.Default;
+        MouseCursor = _preferences.Mouse is { MouseType: not MouseType.None, IsStandardMousePointerHidden: true }
+            ? Cursor.Parse("None")
+            : Cursor.Default;
 }

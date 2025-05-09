@@ -15,6 +15,7 @@ using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.DivMmc;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Joystick.Gamepad;
+using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Recorder;
@@ -78,7 +79,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
             controller => controller.ControllerId == preferences.Joystick.GamepadControllerId)?.ControllerId ?? GamepadController.None.ControllerId;
         FireKey = preferences.Joystick.FireKey;
 
-        IsKempstonMouseEnabled = preferences.Mouse.IsKempstonMouseEnabled;
+        MouseType = preferences.Mouse.MouseType;
         IsStandardMousePointerHidden = preferences.Mouse.IsStandardMousePointerHidden;
 
         IsResumeEnabled = preferences.Resume.IsResumeEnabled;
@@ -172,7 +173,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
 
             Mouse = new MouseSettings
             {
-                IsKempstonMouseEnabled = IsKempstonMouseEnabled,
+                MouseType = MouseType,
                 IsStandardMousePointerHidden = IsStandardMousePointerHidden,
             },
 
@@ -304,6 +305,12 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         new("Sinclair 2", JoystickType.Sinclair2),
         new("Cursor", JoystickType.Cursor),
         new("Fuller", JoystickType.Fuller),
+    ];
+
+    public List<NameValuePair<MouseType>> MouseTypes { get; } =
+    [
+        new("None", MouseType.None),
+        new("Kempston", MouseType.Kempston),
     ];
 
     public List<NameValuePair<StereoMode>> StereoModes { get; } =
@@ -445,6 +452,13 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         set => this.RaiseAndSetIfChanged(ref _joystickType, value);
     }
 
+    private MouseType _mouseType = MouseType.None;
+    public MouseType MouseType
+    {
+        get => _mouseType;
+        set => this.RaiseAndSetIfChanged(ref _mouseType, value);
+    }
+
     private bool _emulateUsingKeyboard;
     public bool EmulateUsingKeyboard
     {
@@ -464,13 +478,6 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
     {
         get => _gamepadControllerId;
         set => this.RaiseAndSetIfChanged(ref _gamepadControllerId, value);
-    }
-
-    private bool _isKempstonMouseEnabled;
-    public bool IsKempstonMouseEnabled
-    {
-        get => _isKempstonMouseEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isKempstonMouseEnabled, value);
     }
 
     private bool _isStandardMousePointerHidden;

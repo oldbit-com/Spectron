@@ -3,6 +3,7 @@ using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.DivMmc;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Memory;
+using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.State.Components;
 using OldBit.Spectron.Emulation.Tape;
@@ -23,6 +24,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         LoadMemory(emulator.Memory, snapshot.Memory);
         LoadUlaPlus(emulator.UlaPlus, snapshot.UlaPlus);
         LoadJoystick(emulator.JoystickManager, snapshot.Joystick);
+        LoadMouse(emulator.MouseManager, snapshot.Mouse);
         LoadTape(emulator.TapeManager, snapshot.Tape);
         LoadAy(emulator.AudioManager, snapshot.Ay);
         LoadDivMmc(emulator.DivMmc, snapshot.DivMmc);
@@ -42,6 +44,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         SaveMemory(emulator.Memory, snapshot.Memory);
         SaveUlaPlus(emulator.UlaPlus, snapshot);
         SaveJoystick(emulator.JoystickManager, snapshot.Joystick);
+        SaveMouse(emulator.MouseManager, snapshot.Mouse);
         SaveTape(emulator.TapeManager, snapshot);
         SaveAy(emulator.AudioManager, snapshot);
         SaveDivMmc(emulator.DivMmc, snapshot);
@@ -126,6 +129,9 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
 
     private static void SaveJoystick(JoystickManager joystickManager, JoystickState joystickState) =>
         joystickState.JoystickType = joystickManager.JoystickType;
+
+    private static void SaveMouse(MouseManager mouseManager, MouseState mouseState) =>
+        mouseState.MouseType = mouseManager.MouseType;
 
     private static void SaveTape(TapeManager tapeManager, StateSnapshot snapshot)
     {
@@ -262,6 +268,9 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
 
     private static void LoadJoystick(JoystickManager joystickManager, JoystickState joystickState) =>
         joystickManager.SetupJoystick(joystickState.JoystickType);
+
+    private static void LoadMouse(MouseManager mouseManager, MouseState mouseState) =>
+        mouseManager.SetupMouse(mouseState.MouseType);
 
     private static void LoadTape(TapeManager tapeManager, TapeState? tapeState)
     {

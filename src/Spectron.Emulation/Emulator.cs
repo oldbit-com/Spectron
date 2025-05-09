@@ -80,7 +80,6 @@ public sealed class Emulator
         HardwareSettings hardware,
         TapeManager tapeManager,
         GamepadManager gamepadManager,
-        MouseManager mouseManager,
         KeyboardState keyboardState,
         TimeMachine timeMachine,
         CommandManager commandManager,
@@ -94,7 +93,6 @@ public sealed class Emulator
         CommandManager = commandManager;
         TapeManager = tapeManager;
         GamepadManager = gamepadManager;
-        MouseManager = mouseManager;
         ComputerType = emulatorArgs.ComputerType;
         RomType = emulatorArgs.RomType;
         _memory = emulatorArgs.Memory;
@@ -112,6 +110,7 @@ public sealed class Emulator
         };
 
         JoystickManager = new JoystickManager(gamepadManager, _spectrumBus, KeyboardState);
+        MouseManager = new MouseManager(_spectrumBus);
         KeyboardState.Reset();
         TapeManager.Attach(Cpu, Memory, hardware);
 
@@ -216,7 +215,6 @@ public sealed class Emulator
         _spectrumBus.AddDevice(_memory);
         _spectrumBus.AddDevice(AudioManager.Beeper);
         _spectrumBus.AddDevice(AudioManager.Ay);
-        _spectrumBus.AddDevice(MouseManager.Mouse);
         _spectrumBus.AddDevice(Printer);
         _spectrumBus.AddDevice(DivMmc);
         _spectrumBus.AddDevice(new RtcDevice(DivMmc));

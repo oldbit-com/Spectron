@@ -24,7 +24,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<Loader>();
         services.AddSingleton<TapeManager>();
         services.AddSingleton<GamepadManager>();
-        services.AddSingleton<MouseManager>();
         services.AddSingleton<KeyboardState>();
         services.AddSingleton<CommandManager>();
     }

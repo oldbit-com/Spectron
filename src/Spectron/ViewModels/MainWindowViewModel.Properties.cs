@@ -3,6 +3,7 @@ using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Joystick;
+using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Models;
@@ -39,6 +40,13 @@ partial class MainWindowViewModel
     {
         get => _joystickType;
         set => this.RaiseAndSetIfChanged(ref _joystickType, value);
+    }
+
+    private MouseType _mouseType = MouseType.None;
+    public MouseType MouseType
+    {
+        get => _mouseType;
+        set => this.RaiseAndSetIfChanged(ref _mouseType, value);
     }
 
     private bool _isUlaPlusEnabled;

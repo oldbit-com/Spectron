@@ -1,20 +1,15 @@
 namespace OldBit.Spectron.Emulation.Devices.Mouse;
 
-public sealed class KempstonMouse : IDevice
+public sealed class KempstonMouse : IMouse
 {
-    public bool IsEnabled { get; set; }
+    public MouseButtons Buttons { get; set; } = MouseButtons.None;
 
-    internal MouseButtons Buttons { get; set; } = MouseButtons.None;
-    internal byte X { get; set; }
-    internal byte Y { get; set; }
+    public byte X { get; set; }
+
+    public byte Y { get; set; }
 
     public byte? ReadPort(Word address)
     {
-        if (!IsEnabled)
-        {
-            return null;
-        }
-
         if (IsXAxisPort(address))
         {
             return X;
