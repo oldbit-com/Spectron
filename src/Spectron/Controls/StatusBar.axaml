@@ -82,7 +82,7 @@
 
             <StackPanel
                 Orientation="Horizontal"
-                Margin="0 0 20 0"
+                Margin="0 0 10 0"
                 ToolTip.Tip="Machine">
 
                 <material:MaterialIcon
@@ -94,31 +94,40 @@
 
             <StackPanel
                 Orientation="Horizontal"
-                Margin="0 0 20 0"
+                Margin="0 0 10 0"
+                IsVisible="{Binding IsUlaPlusEnabled}"
+                ToolTip.Tip="ULA+">
+
+                <material:MaterialIcon
+                    Margin="0 -2 2 0"
+                    Kind="PlusBox"/>
+            </StackPanel>
+
+            <StackPanel
+                Orientation="Horizontal"
+                Margin="0 0 10 0"
                 IsVisible="{Binding IsPrinterEnabled}"
                 ToolTip.Tip="Printer">
 
                 <material:MaterialIcon
                     Margin="0 -2 2 0"
                     Kind="Printer"/>
-
             </StackPanel>
 
             <StackPanel
                 Orientation="Horizontal"
-                Margin="0 0 20 0"
+                Margin="0 0 10 0"
                 IsVisible="{Binding IsDivMmcEnabled}"
                 ToolTip.Tip="DivMMC">
 
                 <material:MaterialIcon
                     Margin="0 -2 2 0"
                     Kind="SdCard"/>
-
             </StackPanel>
 
             <StackPanel
                 Orientation="Horizontal"
-                Margin="0 0 20 0"
+                Margin="0 0 10 0"
                 ToolTip.Tip="Joystick">
 
                 <material:MaterialIcon
@@ -130,7 +139,7 @@
 
             <StackPanel
                 Orientation="Horizontal"
-                Margin="0 0 20 0"
+                Margin="0 0 10 0"
                 IsVisible="{Binding IsMouseEnabled}"
                 ToolTip.Tip="Mouse">
 

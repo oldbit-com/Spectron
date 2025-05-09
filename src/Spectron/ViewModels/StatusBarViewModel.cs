@@ -23,6 +23,7 @@ public class StatusBarViewModel : ReactiveObject
     private bool _isDivMmcEnabled;
     private bool _isMouseEnabled;
     private bool _isPrinterEnabled;
+    private bool _isUlaPlusEnabled;
 
     private readonly ObservableAsPropertyHelper<string> _computerName;
     private readonly ObservableAsPropertyHelper<string> _joystickName;
@@ -162,5 +163,11 @@ public class StatusBarViewModel : ReactiveObject
     {
         get => _isPrinterEnabled;
         set => this.RaiseAndSetIfChanged(ref _isPrinterEnabled, value);
+    }
+
+    public bool IsUlaPlusEnabled
+    {
+        get => _isUlaPlusEnabled;
+        set => this.RaiseAndSetIfChanged(ref _isUlaPlusEnabled, value);
     }
 }

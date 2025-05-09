@@ -591,6 +591,7 @@ public partial class MainWindowViewModel : ReactiveObject
         StatusBarViewModel.IsDivMmcEnabled = _preferences.DivMmc.IsEnabled;
         StatusBarViewModel.IsMouseEnabled = Emulator!.MouseManager.MouseType != MouseType.None;
         StatusBarViewModel.IsPrinterEnabled = _preferences.Printer.IsZxPrinterEnabled;
+        StatusBarViewModel.IsUlaPlusEnabled = IsUlaPlusEnabled;
     }
 
     private void CommandManagerOnCommandReceived(object? sender, CommandEventArgs e)
