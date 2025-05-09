@@ -133,11 +133,16 @@ public sealed class Emulator
         _emulationTimer.Start();
     }
 
-    public void Shutdown()
+    public void Shutdown(bool isAppClosing = false)
     {
         AudioManager.Stop();
         _emulationTimer.Stop();
-        GamepadManager.Stop();
+
+        if (isAppClosing)
+        {
+            GamepadManager.Stop();
+        }
+
         JoystickManager.Stop();
         DivMmc.Stop();
 

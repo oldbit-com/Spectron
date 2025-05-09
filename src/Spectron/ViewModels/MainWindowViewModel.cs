@@ -480,7 +480,7 @@ public partial class MainWindowViewModel : ReactiveObject
 
         args.Cancel = true;
 
-        Emulator?.Shutdown();
+        Emulator?.Shutdown(isAppClosing: true);
         _keyboardHook?.Dispose();
 
         _preferences.Audio.IsMuted = IsMuted;
@@ -501,6 +501,7 @@ public partial class MainWindowViewModel : ReactiveObject
         emulator.SetUlaPlus(_preferences.IsUlaPlusEnabled);
         emulator.MouseManager.SetupMouse(_preferences.Mouse.MouseType);
         _mouseHelper = new MouseHelper(emulator.MouseManager);
+        emulator.JoystickManager.SetupJoystick(_preferences.Joystick.JoystickType);
 
         InitializeEmulator(emulator);
     }
@@ -609,7 +610,15 @@ public partial class MainWindowViewModel : ReactiveObject
                     break;
 
                 case GamepadAction.TimeTravel:
-                    //HandleTimeTravel();
+                    // TODO: HandleTimeTravel();
+                    break;
+
+                case GamepadAction.QuickSave:
+                    HandleQuickSave();
+                    break;
+
+                case GamepadAction.QuickLoad:
+                    HandleQuickLoad();
                     break;
             }
         }
@@ -625,6 +634,7 @@ public partial class MainWindowViewModel : ReactiveObject
         Emulator.Shutdown();
         Emulator.FrameCompleted -= EmulatorFrameCompleted;
         Emulator.CommandManager.CommandReceived -= CommandManagerOnCommandReceived;
+
         Emulator = null;
     }
 

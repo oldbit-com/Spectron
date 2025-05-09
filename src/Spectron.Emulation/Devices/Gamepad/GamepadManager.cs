@@ -97,7 +97,7 @@ public sealed class GamepadManager
             .ToDictionary(mapping => mapping.ControlId, mapping => mapping.Action);
 
         _commandMappings = gamepad.InputMappings
-            .Where(mapping => mapping.Action is >= GamepadAction.Pause and <= GamepadAction.TimeTravel)
+            .Where(mapping => IsCommandAction(mapping.Action))
             .ToDictionary(mapping => mapping.ControlId, mapping => mapping.Action);
     }
 
@@ -240,14 +240,15 @@ public sealed class GamepadManager
             return;
         }
 
-        switch (action)
+        if (!IsCommandAction(action))
         {
-            case GamepadAction.Pause:
-            case GamepadAction.TimeTravel:
-                var args = new GamepadActionCommand(action, e.IsPressed ? InputState.Pressed : InputState.Released);
-                _commandManager.SendCommand(args);
-
-                break;
+            return;
         }
+
+        var args = new GamepadActionCommand(action, e.IsPressed ? InputState.Pressed : InputState.Released);
+        _commandManager.SendCommand(args);
     }
+
+    private static bool IsCommandAction(GamepadAction action) =>
+        action is GamepadAction.Pause or GamepadAction.TimeTravel or GamepadAction.QuickSave or GamepadAction.QuickLoad;
 }
