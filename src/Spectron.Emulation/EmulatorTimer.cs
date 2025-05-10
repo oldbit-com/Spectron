@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using OldBit.Spectron.Emulation.Utilities;
 
 namespace OldBit.Spectron.Emulation;
 
@@ -26,7 +25,7 @@ internal sealed class EmulatorTimer
         _worker = new Thread(Worker)
         {
             IsBackground = true,
-            Priority = ThreadPriority.AboveNormal
+            Priority = ThreadPriority.Lowest,
         };
     }
 
