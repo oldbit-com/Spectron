@@ -10,6 +10,15 @@ public sealed class JoystickManager
 {
     private readonly TimeSpan _joystickUpdateInterval = TimeSpan.FromMilliseconds(20);
 
+    private readonly Dictionary<JoystickInput, InputState> _joystickStates = new()
+    {
+        { JoystickInput.Up, InputState.Released },
+        { JoystickInput.Down, InputState.Released },
+        { JoystickInput.Left, InputState.Released },
+        { JoystickInput.Right, InputState.Released },
+        { JoystickInput.Fire, InputState.Released }
+    };
+
     private readonly GamepadManager _gamepadManager;
     private readonly SpectrumBus _spectrumBus;
     private readonly KeyboardState _keyboardState;
@@ -61,21 +70,14 @@ public sealed class JoystickManager
         }
     }
 
-    public void Pressed(JoystickInput input) => OnJoystickButton(input, InputState.Pressed);
+    public void Pressed(JoystickInput input) => _joystick?.HandleInput(input, InputState.Pressed);
 
-    public void Released(JoystickInput input) => OnJoystickButton(input, InputState.Released);
+    public void Released(JoystickInput input) => _joystick?.HandleInput(input, InputState.Released);
 
     public void Stop()
     {
         _gamepadUpdateTimer.Dispose();
         _spectrumBus.RemoveDevice(_joystick);
-    }
-
-    private void OnJoystickButton(JoystickInput input, InputState state)
-    {
-        _joystick?.HandleInput(input, state);
-
-        JoystickButtonChanged?.Invoke(this, new JoystickButtonEventArgs(input));
     }
 
     private void GamepadUpdateJoystickState(object? sender, ElapsedEventArgs e)
@@ -101,6 +103,12 @@ public sealed class JoystickManager
     {
         var inputState = _gamepadManager.GetJoystickInputState(input);
 
-        OnJoystickButton(input, inputState);
+        _joystick?.HandleInput(input, inputState);
+
+        if (_joystickStates.TryGetValue(input, out var value) && value != inputState)
+        {
+            _joystickStates[input] = inputState;
+            JoystickButtonChanged?.Invoke(this, new JoystickButtonEventArgs(input, inputState));
+        }
     }
 }

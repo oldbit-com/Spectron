@@ -55,7 +55,7 @@ public class TimeMachineViewModel : ReactiveObject, IDisposable
 
     private void JoystickManagerOnJoystickButtonChanged(object? sender, JoystickButtonEventArgs e)
     {
-
+        Console.WriteLine($"Input: {e.Input} State: {e.State}");
     }
 
     private void CommandManagerOnCommandReceived(object? sender, CommandEventArgs e)
@@ -169,6 +169,8 @@ public class TimeMachineViewModel : ReactiveObject, IDisposable
 
     public void Dispose()
     {
+        GC.SuppressFinalize(this);
+
         _joystickManager.JoystickButtonChanged -= JoystickManagerOnJoystickButtonChanged;
         _commandManager.CommandReceived -= CommandManagerOnCommandReceived;
 
