@@ -371,34 +371,31 @@ public partial class MainWindowViewModel : ReactiveObject
 
         _isTimeMachineOpen = true;
 
-        await Dispatcher.UIThread.InvokeAsync(async () =>
+        var viewModel = new TimeMachineViewModel(_timeMachine, Emulator!.JoystickManager, Emulator.CommandManager, _logger);
+
+        var entry = await ShowTimeMachineView.Handle(viewModel);
+
+        if (entry != null)
         {
-            var viewModel = new TimeMachineViewModel(_timeMachine, _logger);
+            var snapshot = entry.GetSnapshot();
 
-            var entry = await ShowTimeMachineView.Handle(viewModel);
-
-            if (entry != null)
+            if (snapshot == null)
             {
-                var snapshot = entry.GetSnapshot();
-
-                if (snapshot == null)
-                {
-                    return;
-                }
-
-                IsTimeMachineCountdownVisible = true;
-
-                CreateEmulator(snapshot);
-                Emulator?.Pause();
+                return;
             }
-            else
+
+            IsTimeMachineCountdownVisible = true;
+
+            CreateEmulator(snapshot);
+            Emulator?.Pause();
+        }
+        else
+        {
+            if (resumeAfter)
             {
-                if (resumeAfter)
-                {
-                    Resume();
-                }
+                Resume();
             }
-        });
+        }
 
         _isTimeMachineOpen = false;
     }
@@ -619,6 +616,11 @@ public partial class MainWindowViewModel : ReactiveObject
             return;
         }
 
+        if (MainWindow?.IsActive != true)
+        {
+            return;
+        }
+
         switch (gamepadCommand.Action)
         {
             case GamepadAction.Pause:
@@ -626,7 +628,7 @@ public partial class MainWindowViewModel : ReactiveObject
                 break;
 
             case GamepadAction.TimeTravel:
-                _ = OpenTimeMachineWindow();
+                Dispatcher.UIThread.InvokeAsync(async () => await OpenTimeMachineWindow());
                 break;
 
             case GamepadAction.QuickSave:

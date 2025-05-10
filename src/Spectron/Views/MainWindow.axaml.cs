@@ -65,6 +65,11 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         var result = await view.ShowDialog<TOutput?>(this);
 
         context.SetOutput(result);
+
+        if (context.Input is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
     }
 
     private void Show<TInput, TOutput, TView>(IInteractionContext<TInput, TOutput?> context) where TView : Window, new()

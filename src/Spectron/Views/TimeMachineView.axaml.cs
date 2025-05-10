@@ -28,7 +28,8 @@ public partial class TimeMachineView : ReactiveWindow<TimeMachineViewModel>
     {
         if (ViewModel != null)
         {
-            ViewModel!.PreviewControl = PreviewImage;
+            ViewModel.PreviewControl = PreviewImage;
+            ViewModel.Close = Close;
         }
 
         ViewModel?.TimeTravelCommand.Subscribe(Close);

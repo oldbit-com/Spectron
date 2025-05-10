@@ -17,6 +17,8 @@ public sealed class JoystickManager
 
     private IJoystick? _joystick;
 
+    public event EventHandler<JoystickButtonEventArgs>? JoystickButtonChanged;
+
     public JoystickType JoystickType { get; private set; } = JoystickType.None;
 
     internal JoystickManager(
@@ -59,14 +61,21 @@ public sealed class JoystickManager
         }
     }
 
-    public void Pressed(JoystickInput input) => _joystick?.HandleInput(input, InputState.Pressed);
+    public void Pressed(JoystickInput input) => OnJoystickButton(input, InputState.Pressed);
 
-    public void Released(JoystickInput input) => _joystick?.HandleInput(input, InputState.Released);
+    public void Released(JoystickInput input) => OnJoystickButton(input, InputState.Released);
 
     public void Stop()
     {
         _gamepadUpdateTimer.Dispose();
         _spectrumBus.RemoveDevice(_joystick);
+    }
+
+    private void OnJoystickButton(JoystickInput input, InputState state)
+    {
+        _joystick?.HandleInput(input, state);
+
+        JoystickButtonChanged?.Invoke(this, new JoystickButtonEventArgs(input));
     }
 
     private void GamepadUpdateJoystickState(object? sender, ElapsedEventArgs e)
@@ -92,6 +101,6 @@ public sealed class JoystickManager
     {
         var inputState = _gamepadManager.GetJoystickInputState(input);
 
-        _joystick?.HandleInput(input, inputState);
+        OnJoystickButton(input, inputState);
     }
 }

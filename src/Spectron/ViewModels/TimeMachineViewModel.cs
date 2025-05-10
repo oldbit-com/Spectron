@@ -6,26 +6,39 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.Commands;
+using OldBit.Spectron.Emulation.Devices.Gamepad;
+using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Extensions;
 using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class TimeMachineViewModel : ReactiveObject
+public class TimeMachineViewModel : ReactiveObject, IDisposable
 {
     private readonly TimeMachine _timeMachine;
+    private readonly JoystickManager _joystickManager;
+    private readonly CommandManager _commandManager;
     private readonly ILogger _logger;
     private const int PreviewHeight = 192;
     private const int PreviewWidth = 256;
 
     public ReactiveCommand<Unit, TimeMachineEntry?> TimeTravelCommand { get; private set; }
     public Control? PreviewControl { get; set; }
+    public Action Close { get; set; } = () => { };
 
-    public TimeMachineViewModel(TimeMachine timeMachine, ILogger logger)
+    public TimeMachineViewModel(
+        TimeMachine timeMachine,
+        JoystickManager joystickManager,
+        CommandManager commandManager,
+        ILogger logger)
     {
         _timeMachine = timeMachine;
+        _joystickManager = joystickManager;
+        _commandManager = commandManager;
         _logger = logger;
 
         TimeTravelCommand = ReactiveCommand.Create(HandleTimeTravel);
@@ -35,6 +48,32 @@ public class TimeMachineViewModel : ReactiveObject
 
         EntriesCount = _timeMachine.Entries.Count - 1;
         CurrentEntryIndex = EntriesCount;
+
+        _joystickManager.JoystickButtonChanged += JoystickManagerOnJoystickButtonChanged;
+        _commandManager.CommandReceived += CommandManagerOnCommandReceived;
+    }
+
+    private void JoystickManagerOnJoystickButtonChanged(object? sender, JoystickButtonEventArgs e)
+    {
+
+    }
+
+    private void CommandManagerOnCommandReceived(object? sender, CommandEventArgs e)
+    {
+        if (e.Command is not GamepadActionCommand gamepadCommand)
+        {
+            return;
+        }
+
+        if (gamepadCommand.State == InputState.Pressed)
+        {
+            return;
+        }
+
+        if (gamepadCommand.Action == GamepadAction.TimeTravel)
+        {
+            Dispatcher.UIThread.Post(() => Close.Invoke());
+        }
     }
 
     private TimeMachineEntry? HandleTimeTravel()
@@ -126,5 +165,14 @@ public class TimeMachineViewModel : ReactiveObject
     {
         get => _screenBorderBrush;
         set => this.RaiseAndSetIfChanged(ref _screenBorderBrush, value);
+    }
+
+    public void Dispose()
+    {
+        _joystickManager.JoystickButtonChanged -= JoystickManagerOnJoystickButtonChanged;
+        _commandManager.CommandReceived -= CommandManagerOnCommandReceived;
+
+        _screenPreview.Dispose();
+        TimeTravelCommand.Dispose();
     }
 }
