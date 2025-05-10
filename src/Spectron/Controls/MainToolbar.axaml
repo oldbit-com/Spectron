@@ -119,7 +119,9 @@
 
         <Button
             ToolTip.Tip="Time Machine"
-            Command="{Binding ShowTimeMachineViewCommand}">
+            Name="TimeMachine"
+            Command="{Binding ShowTimeMachineViewCommand}"
+            IsVisible="{Binding IsTimeMachineEnabled}">
             <material:MaterialIcon Kind="ClockTimeTenOutline"/>
         </Button>
 

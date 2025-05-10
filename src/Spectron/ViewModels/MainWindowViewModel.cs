@@ -69,6 +69,7 @@ public partial class MainWindowViewModel : ReactiveObject
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
     private MediaRecorder? _mediaRecorder;
     private bool _canClose;
+    private bool _isTimeMachineOpen;
     private DebuggerViewModel? _debuggerViewModel;
     private PokeFile? _pokeFile;
     private MouseHelper? _mouseHelper;
@@ -355,6 +356,11 @@ public partial class MainWindowViewModel : ReactiveObject
 
     private async Task OpenTimeMachineWindow()
     {
+        if (!_preferences.TimeMachine.IsEnabled || _isTimeMachineOpen)
+        {
+            return;
+        }
+
         var resumeAfter = false;
 
         if (!IsPaused)
@@ -363,31 +369,38 @@ public partial class MainWindowViewModel : ReactiveObject
             resumeAfter = true;
         }
 
-        var viewModel = new TimeMachineViewModel(_timeMachine, _logger);
+        _isTimeMachineOpen = true;
 
-        var entry = await ShowTimeMachineView.Handle(viewModel);
-
-        if (entry != null)
+        await Dispatcher.UIThread.InvokeAsync(async () =>
         {
-            var snapshot = entry.GetSnapshot();
+            var viewModel = new TimeMachineViewModel(_timeMachine, _logger);
 
-            if (snapshot == null)
+            var entry = await ShowTimeMachineView.Handle(viewModel);
+
+            if (entry != null)
             {
-                return;
+                var snapshot = entry.GetSnapshot();
+
+                if (snapshot == null)
+                {
+                    return;
+                }
+
+                IsTimeMachineCountdownVisible = true;
+
+                CreateEmulator(snapshot);
+                Emulator?.Pause();
             }
-
-            IsTimeMachineCountdownVisible = true;
-
-            CreateEmulator(snapshot);
-            Emulator?.Pause();
-        }
-        else
-        {
-            if (resumeAfter)
+            else
             {
-                Resume();
+                if (resumeAfter)
+                {
+                    Resume();
+                }
             }
-        }
+        });
+
+        _isTimeMachineOpen = false;
     }
 
     private async Task OpenScreenshotViewer() =>
@@ -596,31 +609,33 @@ public partial class MainWindowViewModel : ReactiveObject
 
     private void CommandManagerOnCommandReceived(object? sender, CommandEventArgs e)
     {
-        if (e.Command is GamepadActionCommand gamepadCommand)
+        if (e.Command is not GamepadActionCommand gamepadCommand)
         {
-            if (gamepadCommand.State == InputState.Pressed)
-            {
-                return;
-            }
+            return;
+        }
 
-            switch (gamepadCommand.Action)
-            {
-                case GamepadAction.Pause:
-                    HandleTogglePause();
-                    break;
+        if (gamepadCommand.State == InputState.Pressed)
+        {
+            return;
+        }
 
-                case GamepadAction.TimeTravel:
-                    // TODO: HandleTimeTravel();
-                    break;
+        switch (gamepadCommand.Action)
+        {
+            case GamepadAction.Pause:
+                HandleTogglePause();
+                break;
 
-                case GamepadAction.QuickSave:
-                    HandleQuickSave();
-                    break;
+            case GamepadAction.TimeTravel:
+                _ = OpenTimeMachineWindow();
+                break;
 
-                case GamepadAction.QuickLoad:
-                    HandleQuickLoad();
-                    break;
-            }
+            case GamepadAction.QuickSave:
+                HandleQuickSave();
+                break;
+
+            case GamepadAction.QuickLoad:
+                HandleQuickLoad();
+                break;
         }
     }
 

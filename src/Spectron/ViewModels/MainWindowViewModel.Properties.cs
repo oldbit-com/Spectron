@@ -113,7 +113,7 @@ partial class MainWindowViewModel
     }
 
     private bool _isTimeMachineEnabled;
-    private bool IsTimeMachineEnabled
+    public bool IsTimeMachineEnabled
     {
         get => _isTimeMachineEnabled;
         set => this.RaiseAndSetIfChanged(ref _isTimeMachineEnabled, value);
