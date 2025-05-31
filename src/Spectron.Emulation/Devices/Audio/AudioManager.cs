@@ -87,6 +87,7 @@ public sealed class AudioManager
     internal AudioManager(Clock clock, CassettePlayer? cassettePlayer, HardwareSettings hardware)
     {
         _hasAyChip = hardware.HasAyChip;
+
         var statesPerSample = (double)hardware.TicksPerFrame / SamplesPerFrame;
 
         _beeperAudio = new BeeperAudio(clock, statesPerSample);
@@ -189,7 +190,7 @@ public sealed class AudioManager
             new PlayerOptions
             {
                 BufferSizeInBytes = 32768,
-                BufferQueueSize = NumberOfBuffers,
+                BufferQueueSize = NumberOfBuffers
             });
 
         _audioPlayer.Volume = 100;
