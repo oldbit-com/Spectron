@@ -1,6 +1,6 @@
 using System;
 using OldBit.Spectron.Emulation.Devices.Joystick;
-using SharpHook.Native;
+using SharpHook.Data;
 
 namespace OldBit.Spectron.Settings;
 

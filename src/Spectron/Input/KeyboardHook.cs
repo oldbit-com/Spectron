@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using SharpHook;
-using SharpHook.Native;
+using SharpHook.Data;
 using SharpHook.Reactive;
 
 namespace OldBit.Spectron.Input;

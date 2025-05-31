@@ -23,7 +23,7 @@ using OldBit.Spectron.Screen;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.Theming;
 using ReactiveUI;
-using SharpHook.Native;
+using SharpHook.Data;
 
 namespace OldBit.Spectron.ViewModels;
 

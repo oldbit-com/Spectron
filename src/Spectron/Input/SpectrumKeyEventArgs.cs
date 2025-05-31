@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
-using SharpHook.Native;
+using SharpHook.Data;
 
 namespace OldBit.Spectron.Input;
 
