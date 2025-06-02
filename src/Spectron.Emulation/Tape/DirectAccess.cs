@@ -21,7 +21,7 @@ internal sealed class DirectAccess
         _memory = memory;
     }
 
-    internal void LoadBytes(Cassette cassette)
+    internal void FastLoad(Cassette cassette)
     {
         var tap = cassette.GetNextTapData();
         if (tap == null)
@@ -29,42 +29,64 @@ internal sealed class DirectAccess
             return;
         }
 
-        // Check if running Load (CF=1) or Verify (CF = 0)
-        if ((_cpu.Registers.F & Flags.C) == 0)
+        var verify = (_cpu.Registers.Prime.F & Flags.C) == 0;
+        var checksum = tap.Flag;
+        var address = _cpu.Registers.IX;
+        var length = _cpu.Registers.DE;
+
+        if (_cpu.Registers.Prime.A != tap.Flag)
         {
+            _cpu.Registers.F |= ~Flags.C;
             return;
         }
 
-        var checksum = tap.Flag;
-        var startAddress = _cpu.Registers.IX;
-        var blockLength = _cpu.Registers.DE;
-
-        // Load data directly to memory
-        if (_cpu.Registers.A == tap.Flag)
+        for (var i = 0; i < length; i++)
         {
-            for (var i = 0; i < blockLength; i++)
-            {
-                if (i >= tap.Data.Count)
-                {
-                    // More bytes requested than the block contains
-                    break;
-                }
+            _cpu.Registers.DE -= 1;
+            _cpu.Registers.IX += 1;
 
-                _memory.Write((Word)(startAddress + i), tap.Data[i]);
-                checksum ^= tap.Data[i];
+            var hasMoreBytes = i < tap.Data.Count;
+            if (!hasMoreBytes)
+            {
+                break;
             }
 
-            checksum ^= tap.Checksum;
+            _cpu.Registers.L = tap.Data[i];
+            checksum ^= _cpu.Registers.L;
+
+            if (verify)
+            {
+                var data = _memory.Read((Word)(address + i));
+                if (data == _cpu.Registers.L)
+                {
+                    continue;
+                }
+
+                _cpu.Registers.F |= ~Flags.C;
+
+                return;
+            }
+
+            _memory.Write((Word)(address + i), _cpu.Registers.L);
         }
 
-        // Set registers as if the data was loaded and return to the caller
-        _cpu.Registers.DE = 0;
-        _cpu.Registers.IX = (Word)(startAddress + blockLength);
+        checksum ^= tap.Checksum;
+
+        if (checksum == 0)
+        {
+            _cpu.Registers.F |= Flags.C;
+        }
+        else
+        {
+            _cpu.Registers.F |= ~Flags.C;
+        }
+
+        _cpu.Registers.H = checksum;
         _cpu.Registers.A = checksum;
         _cpu.Registers.PC = 0x05E0;
     }
 
-    internal void SaveBytes(Cassette cassette, TapeSpeed speed)
+    internal void FastSave(Cassette cassette, TapeSpeed speed)
     {
         var blockType = _cpu.Registers.A;
         var length = _cpu.Registers.DE;

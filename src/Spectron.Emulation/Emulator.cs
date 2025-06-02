@@ -287,11 +287,11 @@ public sealed class Emulator
     {
         switch (e.PC)
         {
-            case RomRoutines.LD_BYTES:
+            case RomRoutines.LD_START:
                 switch (TapeLoadSpeed)
                 {
                     case TapeSpeed.Instant:
-                        TapeManager.LoadDirect();
+                        TapeManager.FastLoad();
                         break;
 
                     case TapeSpeed.Accelerated:
@@ -299,14 +299,13 @@ public sealed class Emulator
                         _isAcceleratedTapeSpeed = true;
                         break;
                 }
-
                 break;
 
             case RomRoutines.SA_BYTES:
                 switch (TapeManager.TapeSaveSpeed)
                 {
                     case TapeSpeed.Instant:
-                        TapeManager.SaveDirect();
+                        TapeManager.FastSave();
                         break;
 
                     case TapeSpeed.Accelerated:
