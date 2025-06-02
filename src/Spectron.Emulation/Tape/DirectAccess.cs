@@ -72,15 +72,6 @@ internal sealed class DirectAccess
 
         checksum ^= tap.Checksum;
 
-        if (checksum == 0)
-        {
-            _cpu.Registers.F |= Flags.C;
-        }
-        else
-        {
-            _cpu.Registers.F |= ~Flags.C;
-        }
-
         _cpu.Registers.H = checksum;
         _cpu.Registers.A = checksum;
         _cpu.Registers.PC = 0x05E0;
