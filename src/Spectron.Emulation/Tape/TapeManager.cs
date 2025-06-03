@@ -41,9 +41,9 @@ public sealed class TapeManager
         IsTapeLoaded = true;
     }
 
-    public void LoadDirect() => _directAccess?.LoadBytes(Cassette);
+    public void FastLoad() => _directAccess?.FastLoad(Cassette);
 
-    public void SaveDirect()
+    public void FastSave()
     {
         if (!IsTapeSaveEnabled)
         {
@@ -55,7 +55,7 @@ public sealed class TapeManager
             NewTape();
         }
 
-        _directAccess?.SaveBytes(Cassette, TapeSaveSpeed);
+        _directAccess?.FastSave(Cassette, TapeSaveSpeed);
     }
 
     public void InsertTape(Stream stream, FileType fileType, bool autoPlay = false)
