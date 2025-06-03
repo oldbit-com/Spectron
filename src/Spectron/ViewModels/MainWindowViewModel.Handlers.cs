@@ -412,6 +412,7 @@ partial class MainWindowViewModel
     private void HandleToggleUlaPlus()
     {
         IsUlaPlusEnabled = !IsUlaPlusEnabled;
+        StatusBarViewModel.IsUlaPlusEnabled = IsUlaPlusEnabled;
 
         if (Emulator != null)
         {

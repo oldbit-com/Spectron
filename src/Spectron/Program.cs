@@ -1,6 +1,5 @@
 ﻿using System;
 using Avalonia;
-using Avalonia.Logging;
 using Avalonia.ReactiveUI;
 using OldBit.Spectron.Extensions;
 using ReactiveUI;
