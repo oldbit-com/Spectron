@@ -6,7 +6,7 @@
         x:Class="OldBit.Spectron.Views.HelpKeyboardView"
         Background="Transparent"
         Width="756"
-        Height="338"
+        Height="320"
         Focusable="True"
         WindowStartupLocation="CenterOwner"
         SystemDecorations="BorderOnly"
