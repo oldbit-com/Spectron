@@ -18,6 +18,7 @@ public sealed class TapeManager
     public bool IsTapeLoaded { get; private set; }
     public bool IsTapeSaveEnabled { get; set; }
     public TapeSpeed TapeSaveSpeed { get; set; }
+    public int DataPulseCount => CassettePlayer?.DataPulseCount ?? 0;
 
     internal CassettePlayer? CassettePlayer { get; private set; }
 
