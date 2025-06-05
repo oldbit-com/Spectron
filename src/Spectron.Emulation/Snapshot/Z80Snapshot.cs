@@ -207,7 +207,7 @@ public sealed class Z80Snapshot(EmulatorFactory emulatorFactory)
             }
         }
 
-        memory128.SetPagingMode(snapshot.Header[35]);
+        memory128.SetPagingMode(snapshot.Header.Port7FFD);
     }
 
     private static void SetupJoystick(Z80File snapshot, Emulator emulator)

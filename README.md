@@ -149,7 +149,7 @@ Video is generated as **MP4** using **H.264** codec at **50 FPS**. Some video re
 can be adjusted in the emulator settings. Raw frame buffer data is used internally during the recording.
 
 Processing of the recorded data starts after the recording is stopped and it can take some time. This is 
-done in a background by converting static frames to a video stream with audio, leveraging FFmpeg.
+done in the background by converting static frames to a video stream with audio, leveraging FFmpeg.
 
 ## Debugger
 Debugger is available in the emulator. It is a simple debugger that allows you to inspect the CPU registers, 

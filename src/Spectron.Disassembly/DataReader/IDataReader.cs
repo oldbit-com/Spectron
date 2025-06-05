@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Disassembly.Helpers;
+namespace OldBit.Spectron.Disassembly.DataReader;
 
 internal interface IDataReader
 {
