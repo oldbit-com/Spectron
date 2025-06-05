@@ -23,7 +23,11 @@ internal class PulseStream : IDisposable
     private IEnumerator<Pulse>? _pulseEnumerator;
     private int _loopCounter;
 
-    internal int DataPulseCount { get; private set; }
+    private int _dataPulseCount;
+    private int _totalDataPulseCount;
+
+    internal double BlockReadProgressPercentage =>
+        _totalDataPulseCount == 0 ? 0 : 100 * (double)_dataPulseCount / _totalDataPulseCount;
 
     internal PulseStream(Cassette cassette, HardwareSettings hardware)
     {
@@ -84,7 +88,7 @@ internal class PulseStream : IDisposable
                 }
             }
 
-            DataPulseCount = 0;
+            _dataPulseCount = 0;
             _pulseEnumerator = GetNextBlockPulses(block).GetEnumerator();
 
             if (!_pulseEnumerator.MoveNext())
@@ -131,6 +135,7 @@ internal class PulseStream : IDisposable
     private IEnumerable<Pulse> GetStandardSpeedDataBlockPulses(StandardSpeedDataBlock block, HardwareSettings hardware)
     {
         var pulseSettings = PulseFactory.Create(block, hardware);
+        _totalDataPulseCount = pulseSettings.Data.TotalCount;
 
         return !TapData.TryParse(block.Data, out var tapData) ? [] : GetTapeDataPulses(pulseSettings, tapData.IsHeader);
     }
@@ -138,6 +143,7 @@ internal class PulseStream : IDisposable
     private IEnumerable<Pulse> GetTurboSpeedDataBlockPulses(TurboSpeedDataBlock block, HardwareSettings hardware)
     {
         var pulseSettings = PulseFactory.Create(block, hardware);
+        _totalDataPulseCount = pulseSettings.Data.TotalCount;
 
         return !TapData.TryParse(block.Data, out var tapData) ? [] : GetTapeDataPulses(pulseSettings, tapData.IsHeader);
     }
@@ -145,6 +151,7 @@ internal class PulseStream : IDisposable
     private IEnumerable<Pulse> GetPureDataBlockPulses(PureDataBlock block, HardwareSettings hardware)
     {
         var pulseSettings = PulseFactory.Create(block, hardware);
+        _totalDataPulseCount = pulseSettings.Data.TotalCount;
 
         return GetTapeDataPulses(pulseSettings);
     }
@@ -178,7 +185,7 @@ internal class PulseStream : IDisposable
 
         foreach (var pulse in blockPulses.Data.Pulses)
         {
-            DataPulseCount += 1;
+            _dataPulseCount += 1;
             yield return pulse;
         }
 

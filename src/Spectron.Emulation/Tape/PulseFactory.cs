@@ -3,7 +3,7 @@ using OldBit.Spectron.Files.Tzx.Blocks;
 
 namespace OldBit.Spectron.Emulation.Tape;
 
-internal record DataPulses(IEnumerable<Pulse> Pulses, int BitCount);
+internal record DataPulses(IEnumerable<Pulse> Pulses, int TotalCount);
 
 internal record BlockPulses(
     Pulse? PilotHeaderPulse,
