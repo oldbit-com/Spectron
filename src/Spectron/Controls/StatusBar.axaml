@@ -75,10 +75,21 @@
             </StackPanel>
         </StackPanel>
 
-        <StackPanel
-            Grid.Column="1"
-            HorizontalAlignment="Right"
-            Orientation="Horizontal">
+        <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
+            <StackPanel
+                Orientation="Horizontal"
+                Margin="0 0 10 0"
+                IsVisible="{Binding IsTapeLoaded}"
+                ToolTip.Tip="Tape">
+
+                <material:MaterialIcon
+                    Width="18"
+                    Height="18"
+                    Margin="0 -2 2 0"
+                    Kind="Tape"/>
+
+                <TextBlock Text="{Binding TapeLoadProgress}"/>
+            </StackPanel>
 
             <StackPanel
                 Orientation="Horizontal"

@@ -24,6 +24,8 @@ public class StatusBarViewModel : ReactiveObject
     private bool _isMouseEnabled;
     private bool _isPrinterEnabled;
     private bool _isUlaPlusEnabled;
+    private bool _isTapeLoaded;
+    private string _tapeLoadProgress = string.Empty;
 
     private readonly ObservableAsPropertyHelper<string> _computerName;
     private readonly ObservableAsPropertyHelper<string> _joystickName;
@@ -32,6 +34,7 @@ public class StatusBarViewModel : ReactiveObject
     private readonly Stopwatch _stopwatch = new();
 
     public Action AnimateQuickSave { get; set; } = () => { };
+    public Action AnimateTapeLoad { get; set; } = () => { };
 
     public StatusBarViewModel()
     {
@@ -95,11 +98,9 @@ public class StatusBarViewModel : ReactiveObject
         }
     }
 
-    private void UpdateRecordingTime(object? sender, ElapsedEventArgs e)
-    {
+    private void UpdateRecordingTime(object? sender, ElapsedEventArgs e) =>
         Dispatcher.UIThread.InvokeAsync(() =>
             TimeElapsed = _stopwatch.Elapsed.ToString(@"hh\:mm\:ss"));
-    }
 
     public ComputerType ComputerType
     {
@@ -169,5 +170,17 @@ public class StatusBarViewModel : ReactiveObject
     {
         get => _isUlaPlusEnabled;
         set => this.RaiseAndSetIfChanged(ref _isUlaPlusEnabled, value);
+    }
+
+    public bool IsTapeLoaded
+    {
+        get => _isTapeLoaded;
+        set => this.RaiseAndSetIfChanged(ref _isTapeLoaded, value);
+    }
+
+    public string TapeLoadProgress
+    {
+        get => _tapeLoadProgress;
+        set => this.RaiseAndSetIfChanged(ref _tapeLoadProgress, value);
     }
 }
