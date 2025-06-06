@@ -16,7 +16,7 @@ public enum TapeSpeed
     Instant,
 
     /// <summary>
-    /// Accelerate tape loading or saving speed. Uses increased emulation speed to make it faster.
+    /// Speed up tape loading or saving speed. Uses increased emulation speed to make it faster.
     /// </summary>
     Accelerated,
 }
