@@ -27,7 +27,7 @@ public sealed class TapeManager
 
     internal void Attach(Z80 cpu, IMemory memory, HardwareSettings hardware)
     {
-        CassettePlayer = new CassettePlayer(cpu.Clock, hardware);
+        CassettePlayer = new CassettePlayer(Cassette, cpu.Clock, hardware);
         _directAccess = new DirectAccess(cpu, memory);
     }
 
