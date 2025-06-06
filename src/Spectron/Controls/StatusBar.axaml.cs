@@ -17,14 +17,11 @@ public partial class StatusBar : UserControl
             return;
         }
 
-        if (Resources["QuickSaveAnimation"] is Animation animation)
+        if (Resources["QuickSaveAnimation"] is Animation quickSaveAnimation)
         {
             viewModel.AnimateQuickSave = () =>
             {
-                Dispatcher.UIThread.Post(() =>
-                {
-                    animation.RunAsync(QuickSaveIcon);
-                });
+                Dispatcher.UIThread.Post(() => quickSaveAnimation.RunAsync(QuickSaveIcon));
             };
         }
     }

@@ -59,13 +59,12 @@ public partial class MainWindowViewModel : ReactiveObject
     private readonly QuickSaveService _quickSaveService;
     private readonly ILogger _logger;
     private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
-    private readonly Timer _statusBarTimer;
     private readonly KeyboardHook _keyboardHook;
     private readonly Stopwatch _renderStopwatch = new();
+    private readonly FrameRateCalculator _frameRateCalculator = new();
 
     private Emulator? Emulator { get; set; }
     private Preferences _preferences = new();
-    private int _frameCount;
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
     private MediaRecorder? _mediaRecorder;
     private bool _canClose;
@@ -178,10 +177,6 @@ public partial class MainWindowViewModel : ReactiveObject
         TapeMenuViewModel = tapeMenuViewModel;
         recentFilesViewModel.OpenRecentFileAsync = async fileName => await HandleLoadFileAsync(fileName);
 
-        _statusBarTimer = new Timer(TimeSpan.FromSeconds(1));
-        _statusBarTimer.AutoReset = true;
-        _statusBarTimer.Elapsed += StatusBarTimerOnElapsed;
-
         var timeMachineEnabled = this.WhenAnyValue(x => x.IsTimeMachineEnabled);
 
         this.WhenAny(x => x.TapeLoadSpeed, x => x.Value)
@@ -271,6 +266,23 @@ public partial class MainWindowViewModel : ReactiveObject
         _keyboardHook.SpectrumKeyPressed  += HandleSpectrumKeyPressed;
         _keyboardHook.SpectrumKeyReleased += HandleSpectrumKeyReleased;
         _keyboardHook.Run();
+
+        _frameRateCalculator.FrameRateChanged = fps =>
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                StatusBarViewModel.FramesPerSecond = fps.ToString();
+
+                var tapeBlockProgress = string.Empty;
+                if (Emulator?.TapeManager.BlockReadProgressPercentage > 0)
+                {
+                    tapeBlockProgress = $"{(int)Emulator.TapeManager.BlockReadProgressPercentage}%";
+                }
+
+                StatusBarViewModel.TapeLoadProgress = tapeBlockProgress;
+            });
+        };
+        _frameRateCalculator.Start();
     }
 
     public void OnViewClosed(object? viewModel)
@@ -409,15 +421,6 @@ public partial class MainWindowViewModel : ReactiveObject
     private async Task OpenPrintOutputViewer() =>
         await ShowPrintOutputView.Handle(new PrintOutputViewModel(Emulator!.Printer));
 
-    private void StatusBarTimerOnElapsed(object? sender, ElapsedEventArgs e)
-    {
-        var fps = _frameCount.ToString();
-
-        Dispatcher.UIThread.Post(() => StatusBarViewModel.FramesPerSecond = fps);
-
-        Interlocked.Exchange(ref _frameCount, 0);
-    }
-
     private void EmulatorFrameCompleted(FrameBuffer frameBuffer, AudioBuffer audioBuffer)
     {
         // Keep max 50 FPS
@@ -427,7 +430,7 @@ public partial class MainWindowViewModel : ReactiveObject
         }
 
         _lastScreenRender = _renderStopwatch.Elapsed;
-        Interlocked.Increment(ref _frameCount);
+        _frameRateCalculator.FrameCompleted();
 
         Dispatcher.UIThread.Post(() =>
         {
@@ -492,6 +495,7 @@ public partial class MainWindowViewModel : ReactiveObject
 
         Emulator?.Shutdown(isAppClosing: true);
         _keyboardHook?.Dispose();
+        _frameRateCalculator.Dispose();
 
         _preferences.Audio.IsMuted = IsMuted;
 
@@ -585,7 +589,6 @@ public partial class MainWindowViewModel : ReactiveObject
         _debuggerViewModel?.ConfigureEmulator(Emulator);
 
         Emulator.Start();
-        _statusBarTimer.Start();
     }
 
     private void ConfigureEmulatorSettings()
@@ -602,6 +605,8 @@ public partial class MainWindowViewModel : ReactiveObject
         StatusBarViewModel.IsMouseEnabled = Emulator!.MouseManager.MouseType != MouseType.None;
         StatusBarViewModel.IsPrinterEnabled = _preferences.Printer.IsZxPrinterEnabled;
         StatusBarViewModel.IsUlaPlusEnabled = IsUlaPlusEnabled;
+        StatusBarViewModel.IsTapeLoaded = Emulator.TapeManager.IsTapeLoaded;
+        StatusBarViewModel.TapeLoadProgress = string.Empty;
     }
 
     private void CommandManagerOnCommandReceived(object? sender, CommandEventArgs e)

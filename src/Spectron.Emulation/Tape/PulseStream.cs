@@ -23,6 +23,12 @@ internal class PulseStream : IDisposable
     private IEnumerator<Pulse>? _pulseEnumerator;
     private int _loopCounter;
 
+    private int _dataPulseCount;
+    private int _totalDataPulseCount;
+
+    internal double BlockReadProgressPercentage =>
+        _totalDataPulseCount == 0 ? 0 : 100 * (double)_dataPulseCount / _totalDataPulseCount;
+
     internal PulseStream(Cassette cassette, HardwareSettings hardware)
     {
         _cassette = cassette;
@@ -82,6 +88,7 @@ internal class PulseStream : IDisposable
                 }
             }
 
+            _dataPulseCount = 0;
             _pulseEnumerator = GetNextBlockPulses(block).GetEnumerator();
 
             if (!_pulseEnumerator.MoveNext())
@@ -116,7 +123,7 @@ internal class PulseStream : IDisposable
                 return GetPureDataBlockPulses(pureDataBlock, _hardware);
 
             case StandardSpeedDataBlock standardSpeedDataBlock:
-                return  GetStandardSpeedDataBlockPulses(standardSpeedDataBlock, _hardware);
+                return GetStandardSpeedDataBlockPulses(standardSpeedDataBlock, _hardware);
 
             case TurboSpeedDataBlock turboSpeedDataBlock:
                 return GetTurboSpeedDataBlockPulses(turboSpeedDataBlock, _hardware);
@@ -125,30 +132,33 @@ internal class PulseStream : IDisposable
         return [];
     }
 
-    private static IEnumerable<Pulse> GetStandardSpeedDataBlockPulses(StandardSpeedDataBlock block, HardwareSettings hardware)
+    private IEnumerable<Pulse> GetStandardSpeedDataBlockPulses(StandardSpeedDataBlock block, HardwareSettings hardware)
     {
         var pulseSettings = PulseFactory.Create(block, hardware);
+        _totalDataPulseCount = pulseSettings.Data.TotalCount;
 
-        return !TapData.TryParse(block.Data, out var tapData) ? [] : GetTapeDataPulses(tapData, pulseSettings);
+        return !TapData.TryParse(block.Data, out var tapData) ? [] : GetTapeDataPulses(pulseSettings, tapData.IsHeader);
     }
 
-    private static IEnumerable<Pulse> GetTurboSpeedDataBlockPulses(TurboSpeedDataBlock block, HardwareSettings hardware)
+    private IEnumerable<Pulse> GetTurboSpeedDataBlockPulses(TurboSpeedDataBlock block, HardwareSettings hardware)
     {
         var pulseSettings = PulseFactory.Create(block, hardware);
+        _totalDataPulseCount = pulseSettings.Data.TotalCount;
 
-        return !TapData.TryParse(block.Data, out var tapData) ? [] : GetTapeDataPulses(tapData, pulseSettings);
+        return !TapData.TryParse(block.Data, out var tapData) ? [] : GetTapeDataPulses(pulseSettings, tapData.IsHeader);
     }
 
-    private static IEnumerable<Pulse> GetPureDataBlockPulses(PureDataBlock block, HardwareSettings hardware)
+    private IEnumerable<Pulse> GetPureDataBlockPulses(PureDataBlock block, HardwareSettings hardware)
     {
         var pulseSettings = PulseFactory.Create(block, hardware);
+        _totalDataPulseCount = pulseSettings.Data.TotalCount;
 
-        return GetTapeDataPulses(null, pulseSettings);
+        return GetTapeDataPulses(pulseSettings);
     }
 
-    private static IEnumerable<Pulse> GetTapeDataPulses(TapData? tapData, BlockPulses blockPulses)
+    private IEnumerable<Pulse> GetTapeDataPulses(BlockPulses blockPulses, bool isHeader = false)
     {
-        if (tapData?.IsHeader == true)
+        if (isHeader)
         {
             if (blockPulses.PilotHeaderPulse != null)
             {
@@ -173,8 +183,9 @@ internal class PulseStream : IDisposable
             yield return blockPulses.SecondSyncPulse;
         }
 
-        foreach (var pulse in blockPulses.DataPulses)
+        foreach (var pulse in blockPulses.Data.Pulses)
         {
+            _dataPulseCount += 1;
             yield return pulse;
         }
 

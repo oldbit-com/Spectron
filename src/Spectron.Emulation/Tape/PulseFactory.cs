@@ -3,13 +3,15 @@ using OldBit.Spectron.Files.Tzx.Blocks;
 
 namespace OldBit.Spectron.Emulation.Tape;
 
+internal record DataPulses(IEnumerable<Pulse> Pulses, int TotalCount);
+
 internal record BlockPulses(
     Pulse? PilotHeaderPulse,
     Pulse? PilotDataPulse,
     Pulse? FirstSyncPulse,
     Pulse? SecondSyncPulse,
     Pulse? PausePulse,
-    IEnumerable<Pulse> DataPulses);
+    DataPulses Data);
 
 internal static class PulseFactory
 {
@@ -34,8 +36,9 @@ internal static class PulseFactory
             FirstSyncPulse: new Pulse(RepeatCount: 1, firstSyncPulseLength),
             SecondSyncPulse: new Pulse(RepeatCount: 1, secondSyncPulseLength),
             PausePulse: CreatePausePulse(block.PauseDuration, hardware),
-            DataPulses: block.Data
-                .SelectMany(item => BitMasks.Select(mask => (item & mask) == 0 ? zeroBitPulse : oneBitPulse)));
+            Data: new DataPulses(
+                block.Data.SelectMany(data => BitMasks.Select(mask => (data & mask) == 0 ? zeroBitPulse : oneBitPulse)),
+                block.Data.Count * 8));
     }
 
     internal static BlockPulses Create(TurboSpeedDataBlock block, HardwareSettings hardware)
@@ -64,10 +67,10 @@ internal static class PulseFactory
             FirstSyncPulse: new Pulse(RepeatCount: 1, block.FirstSyncPulseLength),
             SecondSyncPulse: new Pulse(RepeatCount: 1, block.SecondSyncPulseLength),
             PausePulse: CreatePausePulse(block.PauseDuration, hardware),
-            DataPulses: GetDataPulses(block.Data, zeroBitPulse, oneBitPulse, block.UsedBitsInLastByte));
+            Data: GetDataPulses(block.Data, zeroBitPulse, oneBitPulse, block.UsedBitsInLastByte));
     }
 
-    private static IEnumerable<Pulse> GetDataPulses(List<byte> data, Pulse zeroBitPulse, Pulse oneBitPulse, byte usedBitsInLastByte)
+    private static DataPulses GetDataPulses(List<byte> data, Pulse zeroBitPulse, Pulse oneBitPulse, byte usedBitsInLastByte)
     {
         var dataPulses = data
             .SkipLast(1)
@@ -75,7 +78,8 @@ internal static class PulseFactory
             .Concat(
                 BitMasks.Take(usedBitsInLastByte).Select(mask => (data.Last() & mask) == 0 ? zeroBitPulse : oneBitPulse)
             );
-        return dataPulses;
+
+        return new DataPulses(dataPulses, (data.Count - 1) * 8 + usedBitsInLastByte);
     }
 
     internal static BlockPulses Create(PureDataBlock block, HardwareSettings hardware)
@@ -89,7 +93,7 @@ internal static class PulseFactory
             FirstSyncPulse: null,
             SecondSyncPulse: null,
             PausePulse: CreatePausePulse(block.PauseDuration, hardware),
-            DataPulses:  GetDataPulses(block.Data, zeroBitPulse, oneBitPulse, block.UsedBitsInLastByte));
+            Data: GetDataPulses(block.Data, zeroBitPulse, oneBitPulse, block.UsedBitsInLastByte));
     }
 
     internal static Pulse? CreatePausePulse(int pauseMilliseconds, HardwareSettings hardware)

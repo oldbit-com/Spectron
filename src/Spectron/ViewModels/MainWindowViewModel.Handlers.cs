@@ -450,6 +450,9 @@ partial class MainWindowViewModel
             RecentFilesViewModel.CurrentFileName = string.Empty;
         }
 
+        StatusBarViewModel.IsTapeLoaded = args.Action != TapeAction.TapeEjected;
+        StatusBarViewModel.TapeLoadProgress = string.Empty;
+
         UpdateWindowTitle();
     }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
+using System.Timers;
 using Avalonia.Threading;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Extensions;
@@ -13,11 +14,13 @@ namespace OldBit.Spectron.ViewModels;
 public class TapeViewModel : ReactiveObject, IDisposable
 {
     private readonly TapeManager _tapeManager;
+    private readonly Timer _tapeProgressTimer;
 
     private bool _canStop;
     private bool _canPlay;
     private bool _canRewind;
     private bool _canEject;
+    private double _progress;
 
     public ObservableCollection<TapeBlockViewModel> Blocks { get; } = [];
 
@@ -29,6 +32,11 @@ public class TapeViewModel : ReactiveObject, IDisposable
     public TapeViewModel(TapeManager tapeManager)
     {
         _tapeManager = tapeManager;
+
+        _tapeProgressTimer = new Timer(200);
+        _tapeProgressTimer.AutoReset = true;
+        _tapeProgressTimer.Elapsed += TapeProgressUpdate;
+        _tapeProgressTimer.Start();
 
         _tapeManager.Cassette.BlockSelected += CassetteOnPositionChanged;
         _tapeManager.Cassette.EndOfTape += CassetteOnEndOfTape;
@@ -45,6 +53,16 @@ public class TapeViewModel : ReactiveObject, IDisposable
         CanEject = _tapeManager.IsTapeLoaded;
 
         PopulateBlocks();
+    }
+
+    private void TapeProgressUpdate(object? sender, ElapsedEventArgs e)
+    {
+        if (!_tapeManager.IsPlaying)
+        {
+            return;
+        }
+
+        Dispatcher.UIThread.Post(() => Progress = _tapeManager.BlockReadProgressPercentage);
     }
 
     private void TapeManagerOnTapeStateChanged(TapeStateEventArgs e)
@@ -81,10 +99,18 @@ public class TapeViewModel : ReactiveObject, IDisposable
     }
 
     private void CassetteOnPositionChanged(BlockSelectedEventArgs e) =>
-        Dispatcher.UIThread.Post(() => MarkActiveBlock(e.Position));
+        Dispatcher.UIThread.Post(() =>
+        {
+            Progress = 0;
+            MarkActiveBlock(e.Position);
+        });
 
     private void CassetteOnEndOfTape(object? sender, EventArgs e) =>
-        Dispatcher.UIThread.Post(() => MarkActiveBlock(Blocks.Count - 1));
+        Dispatcher.UIThread.Post(() =>
+        {
+            Progress = 0;
+            MarkActiveBlock(Blocks.Count - 1);
+        });
 
     private void PopulateBlocks()
     {
@@ -157,8 +183,17 @@ public class TapeViewModel : ReactiveObject, IDisposable
         set => this.RaiseAndSetIfChanged(ref _canEject, value);
     }
 
+    public double Progress
+    {
+        get => _progress;
+        set => this.RaiseAndSetIfChanged(ref _progress, value);
+    }
+
     public void Dispose()
     {
+        _tapeProgressTimer.Stop();
+        _tapeProgressTimer.Dispose();
+
         _tapeManager.Cassette.BlockSelected -= CassetteOnPositionChanged;
         _tapeManager.Cassette.EndOfTape -= CassetteOnEndOfTape;
         _tapeManager.TapeStateChanged -= TapeManagerOnTapeStateChanged;

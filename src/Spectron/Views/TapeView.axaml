@@ -4,12 +4,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:material="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+        xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="300"
         x:Class="OldBit.Spectron.Views.TapeView"
         x:DataType="viewModels:TapeViewModel"
         Height="450" Width="600"
         WindowStartupLocation="CenterOwner"
         Title="Tape Browser">
+
+    <Window.Resources>
+        <converters:TapeProgressToWidthConverter x:Key="TapeProgressToWidthConverter"/>
+    </Window.Resources>
 
     <Window.Styles>
         <Style Selector="Path.Icon">
@@ -65,7 +70,26 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding Index}" CellStyleClasses="index" Width="70"/>
-                <DataGridTextColumn Header="Tape Block" Binding="{Binding Name}"/>
+                <DataGridTemplateColumn Header="Tape Block">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Rectangle Fill="LightGreen" Opacity="0.5" HorizontalAlignment="Left" IsVisible="{Binding IsSelected}">
+                                    <Rectangle.Width>
+                                        <MultiBinding Converter="{StaticResource TapeProgressToWidthConverter}">
+                                            <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=DataGridCell}" Path="Bounds.Width"/>
+                                            <Binding Path="$parent[Window].((viewModels:TapeViewModel)DataContext).Progress" FallbackValue="0.0"/>
+                                        </MultiBinding>
+                                    </Rectangle.Width>
+                                </Rectangle>
+                                <TextBlock
+                                    Text="{Binding Name}"
+                                    Margin="10 0 10 0"
+                                    VerticalAlignment="Center"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Data" Binding="{Binding Data}" Width="*"/>
             </DataGrid.Columns>
         </DataGrid>

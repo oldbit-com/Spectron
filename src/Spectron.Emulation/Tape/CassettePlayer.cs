@@ -16,6 +16,7 @@ internal sealed class CassettePlayer(Clock clock, HardwareSettings hardware) : I
 
     internal bool EarBit { get; private set; }
     internal bool IsPlaying { get; private set; }
+    internal double BlockReadProgressPercentage => _pulseStream?.BlockReadProgressPercentage ?? 0;
 
     internal void Play()
     {
@@ -68,6 +69,7 @@ internal sealed class CassettePlayer(Clock clock, HardwareSettings hardware) : I
         }
 
         var pulse = _pulseStream.Current;
+
         if (pulse == null)
         {
             Stop();
