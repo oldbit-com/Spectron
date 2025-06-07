@@ -1,8 +1,8 @@
 namespace OldBit.Spectron.Emulation.Utilities;
 
 /// <summary>
-/// Represents a bit vector that can be used to manipulate bits in a byte array.
-/// Array of bits is stored in reverse order, e.g. byte[0] represents most significant bits.
+/// Represents a vector that consists of bits so it can be used to manipulate bits in a byte array.
+/// Array of bits is stored in reverse order: byte[0] represents the most significant bits.
 /// </summary>
 internal sealed class BitVector
 {
