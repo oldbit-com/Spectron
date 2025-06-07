@@ -70,18 +70,6 @@ internal static class PulseFactory
             Data: GetDataPulses(block.Data, zeroBitPulse, oneBitPulse, block.UsedBitsInLastByte));
     }
 
-    private static DataPulses GetDataPulses(List<byte> data, Pulse zeroBitPulse, Pulse oneBitPulse, byte usedBitsInLastByte)
-    {
-        var dataPulses = data
-            .SkipLast(1)
-            .SelectMany(item => BitMasks.Select(mask => (item & mask) == 0 ? zeroBitPulse : oneBitPulse))
-            .Concat(
-                BitMasks.Take(usedBitsInLastByte).Select(mask => (data.Last() & mask) == 0 ? zeroBitPulse : oneBitPulse)
-            );
-
-        return new DataPulses(dataPulses, (data.Count - 1) * 8 + usedBitsInLastByte);
-    }
-
     internal static BlockPulses Create(PureDataBlock block, HardwareSettings hardware)
     {
         var zeroBitPulse = new Pulse(RepeatCount: 2, block.ZeroBitPulseLength);
@@ -96,6 +84,8 @@ internal static class PulseFactory
             Data: GetDataPulses(block.Data, zeroBitPulse, oneBitPulse, block.UsedBitsInLastByte));
     }
 
+    internal static Pulse Create(PureToneBlock block) => new(block.PulseCount, block.PulseLength);
+
     internal static Pulse? CreatePausePulse(int pauseMilliseconds, HardwareSettings hardware)
     {
         if (pauseMilliseconds == 0)
@@ -108,8 +98,18 @@ internal static class PulseFactory
         return new Pulse(RepeatCount: 1, Duration: duration, IsSilence: true);
     }
 
-    internal static Pulse Create(PureToneBlock block) => new(block.PulseCount, block.PulseLength);
-
     internal static IEnumerable<Pulse> Create(PulseSequenceBlock block) =>
         block.PulseLengths.Select(pulseLength => new Pulse(RepeatCount: 1, Duration: pulseLength));
+
+    private static DataPulses GetDataPulses(List<byte> data, Pulse zeroBitPulse, Pulse oneBitPulse, byte usedBitsInLastByte)
+    {
+        var dataPulses = data
+            .SkipLast(1)
+            .SelectMany(item => BitMasks.Select(mask => (item & mask) == 0 ? zeroBitPulse : oneBitPulse))
+            .Concat(
+                BitMasks.Take(usedBitsInLastByte).Select(mask => (data.Last() & mask) == 0 ? zeroBitPulse : oneBitPulse)
+            );
+
+        return new DataPulses(dataPulses, (data.Count - 1) * 8 + usedBitsInLastByte);
+    }
 }

@@ -31,8 +31,4 @@
       <ProjectReference Include="..\..\src\Spectron.Emulation\Spectron.Emulation.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Tape\" />
-    </ItemGroup>
-
 </Project>
