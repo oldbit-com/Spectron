@@ -18,7 +18,7 @@ internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer
     /// Uses a lookup table to determine the screen byte and attribute address for the current frame tick.
     /// </summary>
     /// <param name="frameTicks">Current ticks at which update is occurring.</param>
-    internal void Update(int frameTicks)
+    internal void UpdateFrameBuffer(int frameTicks)
     {
         if (frameTicks < hardware.FirstPixelTicks || _fetchCycleIndex >= _screenRenderEvents.Length)
         {
@@ -34,10 +34,10 @@ internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer
                 break;
             }
 
-            // First screen byte and attribute
+            // First byte and attribute
             UpdateFrameBuffer(fetchCycleData.FrameBufferIndex, fetchCycleData.BitmapAddress, fetchCycleData.AttributeAddress);
 
-            // Second screen byte and attribute
+            // Second byte and attribute
             UpdateFrameBuffer(fetchCycleData.FrameBufferIndex + 8, (Word)(fetchCycleData.BitmapAddress + 1),
                 (Word)(fetchCycleData.AttributeAddress + 1));
 
@@ -74,7 +74,7 @@ internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer
 
     internal void Invalidate() => _bitmapDirty.AsSpan().Fill(true);
 
-    internal void UpdateScreen(Word address) => UpdateScreenPrivate(address - 0x4000);
+    internal void MakeDirty(Word address) => MakeDirty(address - 0x4000);
 
     private void UpdateFrameBuffer(int frameBufferIndex, Word bitmapAddress, Word attributeAddress)
     {
@@ -108,7 +108,7 @@ internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer
         _bitmapDirty[bitmapAddress] = false;
     }
 
-    private void UpdateScreenPrivate(int address)
+    private void MakeDirty(int address)
     {
         if (address < 0x1800)
         {
@@ -139,7 +139,7 @@ internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer
         {
             if ((memory.ReadScreen(attrAddress) & 0x80) != 0)
             {
-                UpdateScreenPrivate(attrAddress);
+                MakeDirty((int)attrAddress);
             }
         }
     }

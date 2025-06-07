@@ -206,7 +206,7 @@ public sealed class Emulator
     private void SetupEventHandlers()
     {
         _memory.ScreenMemoryUpdated += address => ScreenBuffer.UpdateScreen(address);
-        Cpu.Clock.TicksAdded += (_, previousFrameTicks, _) => ScreenBuffer.UpdateContent(previousFrameTicks);
+        Cpu.Clock.TicksAdded += (_, previousFrameTicks, _) => ScreenBuffer.UpdateScreen(previousFrameTicks);
         Cpu.BeforeInstruction += BeforeInstruction;
         UlaPlus.ActiveChanged += (_) => _invalidateScreen = true;
     }
@@ -270,7 +270,7 @@ public sealed class Emulator
     {
         var audioBuffer = AudioManager.EndFrame();
 
-        ScreenBuffer.UpdateBorder(Cpu.Clock.FrameTicks);
+        ScreenBuffer.EndFrame(Cpu.Clock.FrameTicks);
 
         FrameCompleted?.Invoke(ScreenBuffer.FrameBuffer, audioBuffer);
 
