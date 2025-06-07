@@ -19,7 +19,7 @@ internal sealed class BeeperStates
 
     internal void Add(int ticks, byte earMic)
     {
-        // If the last state has the same value, simply extend the ticks
+        // If the last state has the same value, extend the last state ticks
         if (Count > 0)
         {
             var lastState = _beeperStates[Count - 1];
