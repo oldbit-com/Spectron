@@ -24,10 +24,6 @@
     </UserControl.Resources>
 
     <UserControl.Styles>
-        <Style Selector="material|MaterialIcon">
-            <Setter Property="Width" Value="20"/>
-            <Setter Property="Height" Value="20"/>
-        </Style>
         <Style Selector="material|MaterialIcon.AnimateRecord">
             <Style.Animations>
                 <Animation Duration="0:0:1" IterationCount="INFINITE" PlaybackDirection="AlternateReverse">
@@ -46,6 +42,9 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
         <Style Selector="material|MaterialIcon">
+            <Setter Property="Width" Value="20"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Margin" Value="0 -2 2 0"/>
             <Setter Property="Foreground" Value="{DynamicResource SystemBaseMediumLowColor}"/>
         </Style>
     </UserControl.Styles>
@@ -86,9 +85,7 @@
                 IsVisible="{Binding IsTapeLoaded}"
                 ToolTip.Tip="Tape">
 
-                <material:MaterialIcon
-                    Margin="0 -2 2 0"
-                    Kind="Tape"/>
+                <material:MaterialIcon Kind="Tape"/>
 
                 <TextBlock Text="{Binding TapeLoadProgress}"/>
             </StackPanel>
@@ -98,9 +95,7 @@
                 Margin="0 0 10 0"
                 ToolTip.Tip="Machine">
 
-                <material:MaterialIcon
-                    Margin="0 -2 2 0"
-                    Kind="Computer"/>
+                <material:MaterialIcon Kind="Computer"/>
 
                 <TextBlock Text="{Binding ComputerName}"/>
             </StackPanel>
@@ -111,9 +106,7 @@
                 IsVisible="{Binding IsUlaPlusEnabled}"
                 ToolTip.Tip="ULA+">
 
-                <material:MaterialIcon
-                    Margin="0 -2 2 0"
-                    Kind="PlusBox"/>
+                <material:MaterialIcon Kind="PlusBold"/>
             </StackPanel>
 
             <StackPanel
@@ -122,9 +115,7 @@
                 IsVisible="{Binding IsPrinterEnabled}"
                 ToolTip.Tip="Printer">
 
-                <material:MaterialIcon
-                    Margin="0 -2 2 0"
-                    Kind="Printer"/>
+                <material:MaterialIcon Kind="Printer"/>
             </StackPanel>
 
             <StackPanel
@@ -133,9 +124,7 @@
                 IsVisible="{Binding IsDivMmcEnabled}"
                 ToolTip.Tip="DivMMC">
 
-                <material:MaterialIcon
-                    Margin="0 -2 2 0"
-                    Kind="SdCard"/>
+                <material:MaterialIcon Kind="SdCard"/>
             </StackPanel>
 
             <StackPanel
@@ -143,9 +132,7 @@
                 Margin="0 0 10 0"
                 ToolTip.Tip="Joystick">
 
-                <material:MaterialIcon
-                    Margin="0 -2 2 0"
-                    Kind="GamepadSquareOutline"/>
+                <material:MaterialIcon Kind="GamepadSquareOutline"/>
 
                 <TextBlock Text="{Binding JoystickName}"/>
             </StackPanel>
@@ -156,22 +143,18 @@
                 IsVisible="{Binding IsMouseEnabled}"
                 ToolTip.Tip="Mouse">
 
-                <material:MaterialIcon
-                    Margin="0 -2 2 0"
-                    Kind="Mouse"/>
+                <material:MaterialIcon Kind="Mouse"/>
             </StackPanel>
 
             <StackPanel
                 Orientation="Horizontal"
                 ToolTip.Tip="Speed &amp; FPS">
 
-                <material:MaterialIcon
-                    Margin="0 -2 0 0"
-                    Kind="PlaySpeed"/>
+                <material:MaterialIcon Kind="Speedometer"/>
 
-                <TextBlock TextAlignment="Right" Text="{Binding Speed}"/>
-                <TextBlock TextAlignment="Right" Text="@"/>
-                <TextBlock TextAlignment="Left" Text="{Binding FramesPerSecond}" Width="20"/>
+                <TextBlock Text="{Binding Speed}"/>
+                <TextBlock Text="@"/>
+                <TextBlock Text="{Binding FramesPerSecond}" Width="20"/>
             </StackPanel>
 
         </StackPanel>
