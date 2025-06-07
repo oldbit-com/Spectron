@@ -22,6 +22,7 @@ using OldBit.Spectron.Input;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Recorder;
 using OldBit.Spectron.Screen;
+using FileTypes = OldBit.Spectron.Emulation.Files.FileTypes;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -49,7 +50,7 @@ partial class MainWindowViewModel
                 filePath = files[0].Path.LocalPath;
             }
 
-            var fileType = FileTypeHelper.GetFileType(filePath);
+            var fileType = FileTypes.GetFileType(filePath);
             if (fileType == FileType.Unsupported)
             {
                 await MessageDialogs.Warning($"Unsupported file type: {fileType}.");

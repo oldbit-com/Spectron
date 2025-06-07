@@ -1,6 +1,6 @@
 namespace OldBit.Spectron.Emulation.Files;
 
-public static class FileTypeHelper
+public static class FileTypes
 {
     public static FileType GetFileType(string fileName) => Path.GetExtension(fileName).ToLowerInvariant() switch
     {

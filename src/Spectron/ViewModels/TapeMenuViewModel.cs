@@ -8,6 +8,7 @@ using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Files.Extensions;
 using ReactiveUI;
+using FileTypes = OldBit.Spectron.Emulation.Files.FileTypes;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -73,7 +74,7 @@ public class TapeMenuViewModel : ReactiveObject
     {
         var fileName = string.Empty;
 
-        var fileType = FileTypeHelper.GetFileType(_recentFilesViewModel.CurrentFileName);
+        var fileType = FileTypes.GetFileType(_recentFilesViewModel.CurrentFileName);
 
         if (fileType.IsTape())
         {
@@ -87,7 +88,7 @@ public class TapeMenuViewModel : ReactiveObject
             return;
         }
 
-        fileType = FileTypeHelper.GetFileType(file.Path.LocalPath);
+        fileType = FileTypes.GetFileType(file.Path.LocalPath);
 
         if (fileType == FileType.Tap)
         {

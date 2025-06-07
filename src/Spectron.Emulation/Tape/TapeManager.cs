@@ -74,7 +74,7 @@ public sealed class TapeManager
 
     public void InsertTape(string fileName, bool autoPlay = false)
     {
-        var fileType = FileTypeHelper.GetFileType(fileName);
+        var fileType = FileTypes.GetFileType(fileName);
         var stream = File.OpenRead(fileName);
 
         InsertTape(stream, fileType, autoPlay);

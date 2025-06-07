@@ -14,7 +14,7 @@ public sealed class ZipFileReader(string filePath) : IDisposable
 
         foreach (var entry in _zip.Entries)
         {
-            var fileType = FileTypeHelper.GetFileType(entry.FullName);
+            var fileType = FileTypes.GetFileType(entry.FullName);
 
             if (fileType.IsSnapshot() || fileType.IsTape())
             {

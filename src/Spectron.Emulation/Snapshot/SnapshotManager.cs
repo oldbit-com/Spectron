@@ -21,7 +21,7 @@ public sealed class SnapshotManager(SnaSnapshot snaSnapshot, SzxSnapshot szxSnap
 
     public static void Save(string fileName, Emulator emulator)
     {
-        var fileType = FileTypeHelper.GetFileType(fileName);
+        var fileType = FileTypes.GetFileType(fileName);
 
         switch (fileType)
         {
