@@ -498,6 +498,7 @@ public partial class MainWindowViewModel : ReactiveObject
         _frameRateCalculator.Dispose();
 
         _preferences.Audio.IsMuted = IsMuted;
+        _preferences.BorderSize = BorderSize;
 
         await Task.WhenAll(
             _preferencesService.SaveAsync(_preferences),
@@ -642,6 +643,10 @@ public partial class MainWindowViewModel : ReactiveObject
 
             case GamepadAction.QuickLoad:
                 HandleQuickLoad();
+                break;
+
+            case GamepadAction.NMI:
+                HandleTriggerNmi();
                 break;
         }
     }

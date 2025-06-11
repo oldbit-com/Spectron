@@ -18,7 +18,7 @@ public class Preferences
 
     public bool IsAutoLoadPokeFilesEnabled { get; init; } = true;
 
-    public BorderSize BorderSize { get; init; } = BorderSize.Medium;
+    public BorderSize BorderSize { get; set; } = BorderSize.Medium;
 
     public ComputerType ComputerType { get; init; } = ComputerType.Spectrum48K;
 
