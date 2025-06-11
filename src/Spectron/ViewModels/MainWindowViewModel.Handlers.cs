@@ -532,7 +532,6 @@ partial class MainWindowViewModel
                 if (IsPaused)
                 {
                     HandleTogglePause();
-                    return;
                 }
                 break;
 

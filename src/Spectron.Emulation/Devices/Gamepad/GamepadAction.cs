@@ -19,6 +19,7 @@ public enum GamepadAction
     TimeTravel,
     QuickSave,
     QuickLoad,
+    NMI,
 
     // Keyboard (numbers)
     D0,
@@ -86,6 +87,7 @@ public static class GamepadActionExtensions
         TimeTravel => "Time Travel",
         QuickSave => "Quick Save",
         QuickLoad => "Quick Load",
+        NMI => "NMI",
 
         >= D0 and <= D9 => action.ToString()[1..],
         >= A and <= Z => action.ToString(),

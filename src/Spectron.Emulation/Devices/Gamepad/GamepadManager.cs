@@ -249,6 +249,10 @@ public sealed class GamepadManager
         _commandManager.SendCommand(args);
     }
 
-    private static bool IsCommandAction(GamepadAction action) =>
-        action is GamepadAction.Pause or GamepadAction.TimeTravel or GamepadAction.QuickSave or GamepadAction.QuickLoad;
+    private static bool IsCommandAction(GamepadAction action) => action is
+        GamepadAction.Pause or
+        GamepadAction.TimeTravel or
+        GamepadAction.QuickSave or
+        GamepadAction.QuickLoad or
+        GamepadAction.NMI;
 }
