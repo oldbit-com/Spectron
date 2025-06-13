@@ -2,7 +2,7 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.Devices.Memory;
 
-public delegate void ScreenMemoryUpdatedEvent(Word address);
+public delegate void MemoryUpdatedEvent(Word address);
 
 internal interface IEmulatorMemory : IMemory, IDevice
 {
@@ -12,5 +12,5 @@ internal interface IEmulatorMemory : IMemory, IDevice
 
     void ShadowRom(IRomMemory? shadowRom);
 
-    event ScreenMemoryUpdatedEvent? ScreenMemoryUpdated;
+    event MemoryUpdatedEvent? MemoryUpdated;
 }

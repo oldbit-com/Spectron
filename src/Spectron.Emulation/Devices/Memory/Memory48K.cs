@@ -38,13 +38,10 @@ internal sealed class Memory48K : IEmulatorMemory
 
         _memory[address] = data;
 
-        if (address < 0x5B00)
-        {
-            ScreenMemoryUpdated?.Invoke(address);
-        }
+        MemoryUpdated?.Invoke(address);
     }
 
     public void ShadowRom(IRomMemory? shadowRom) => _activeRom = shadowRom ?? _normalRom;
 
-    public event ScreenMemoryUpdatedEvent? ScreenMemoryUpdated;
+    public event MemoryUpdatedEvent? MemoryUpdated;
 }

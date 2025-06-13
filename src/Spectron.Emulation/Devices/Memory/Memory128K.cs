@@ -75,10 +75,7 @@ internal sealed class Memory128K : IEmulatorMemory
 
         bank[relativeAddress] = data;
 
-        if (address < 0x5B00)
-        {
-            ScreenMemoryUpdated?.Invoke(address);
-        }
+        MemoryUpdated?.Invoke(address);
     }
 
     public void ShadowRom(IRomMemory? shadowRom)
@@ -88,7 +85,7 @@ internal sealed class Memory128K : IEmulatorMemory
         _activeRom = shadowRom ?? RomBank1;
     }
 
-    public event ScreenMemoryUpdatedEvent? ScreenMemoryUpdated;
+    public event MemoryUpdatedEvent? MemoryUpdated;
 
     public void WritePort(Word address, byte data)
     {

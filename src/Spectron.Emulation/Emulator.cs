@@ -205,7 +205,13 @@ public sealed class Emulator
 
     private void SetupEventHandlers()
     {
-        _memory.ScreenMemoryUpdated += address => ScreenBuffer.UpdateScreen(address);
+        _memory.MemoryUpdated += address =>
+        {
+            if (address < 0x5B00)
+            {
+                ScreenBuffer.UpdateScreen(address);
+            }
+        };
         Cpu.Clock.TicksAdded += (_, previousFrameTicks, _) => ScreenBuffer.UpdateScreen(previousFrameTicks);
         Cpu.BeforeInstruction += BeforeInstruction;
         UlaPlus.ActiveChanged += (_) => _invalidateScreen = true;
