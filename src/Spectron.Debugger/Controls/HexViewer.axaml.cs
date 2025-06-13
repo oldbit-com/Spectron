@@ -18,18 +18,10 @@ public class HexViewer : TemplatedControl
         AvaloniaProperty.Register<HexViewer, double>(nameof(CellWidth), DefaultCellWight);
 
     public static readonly StyledProperty<IEnumerable<byte>> DataProperty =
-        AvaloniaProperty.Register<HexViewer, IEnumerable<byte>>(nameof(Data), Array.Empty<byte>());
+        AvaloniaProperty.Register<HexViewer, IEnumerable<byte>>(nameof(Data), []);
 
     private static readonly StyledProperty<int> BytesPerRowProperty =
         AvaloniaProperty.Register<HexViewer, int>(nameof(BytesPerRow), DefaultBytesPerRow, validate: i => i > 0);
-
-    // public HexViewer()
-    // {
-    //     var random = new Random(1000);
-    //     var data = new byte[65536]; // Example size
-    //     random.NextBytes(data);
-    //     Data = data;
-    // }
 
     public double CellHeight
     {
