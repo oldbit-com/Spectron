@@ -23,7 +23,7 @@
 
                 <Button
                     ToolTip.Tip="Refresh"
-                    Command="{Binding RefreshCommand}">
+                    Command="{Binding UpdatePreviewCommand}">
                     <material:MaterialIcon Kind="Refresh"/>
                 </Button>
 

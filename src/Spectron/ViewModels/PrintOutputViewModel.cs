@@ -1,38 +1,57 @@
 using System;
 using System.IO;
-using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation.Devices.Printer;
-using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class PrintOutputViewModel : ReactiveObject
+public partial class PrintOutputViewModel : ObservableObject
 {
     private readonly ZxPrinter _printer;
-
     private int _height;
+
+    [ObservableProperty]
+    private WriteableBitmap _outputImage = null!;
 
     public Control? PreviewControl { get; set; }
 
-    public ReactiveCommand<Unit, Unit> ClearCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> RefreshCommand { get; private set; }
-    public ReactiveCommand<Unit, Task> SaveCommand { get; private set; }
-
     public PrintOutputViewModel(ZxPrinter printer)
     {
-        ClearCommand = ReactiveCommand.Create(Clear);
-        RefreshCommand = ReactiveCommand.Create(UpdatePreview);
-        SaveCommand = ReactiveCommand.Create(Save);
-
         _printer = printer;
-
         UpdatePreview();
+    }
+
+    [RelayCommand]
+    private void Clear()
+    {
+        _printer.Rows.Clear();
+        UpdatePreview();
+    }
+
+    [RelayCommand]
+    private async Task Save()
+    {
+        try
+        {
+            var file = await FileDialogs.SaveImageAsync("Save Printout", PreviewControl, "printout.png");
+
+            if (file != null)
+            {
+                await using var output = File.OpenWrite(file.Path.LocalPath);
+                OutputImage.Save(output, 100);
+            }
+        }
+        catch (Exception ex)
+        {
+            await MessageDialogs.Error(ex.Message);
+        }
     }
 
     private void CrateBitmap()
@@ -42,6 +61,7 @@ public class PrintOutputViewModel : ReactiveObject
         OutputImage = CreateBitmap(256, _height);
     }
 
+    [RelayCommand]
     private void UpdatePreview()
     {
         CrateBitmap();
@@ -56,7 +76,7 @@ public class PrintOutputViewModel : ReactiveObject
             {
                 for (var column = 0; column < _printer.Rows[row].Pixels.Length; column++)
                 {
-                    buffer[row * 32 + column] = (byte)~_printer.Rows[row].Pixels[column];;
+                    buffer[row * 32 + column] = (byte)~_printer.Rows[row].Pixels[column];
                 }
             }
 
@@ -72,45 +92,11 @@ public class PrintOutputViewModel : ReactiveObject
         PreviewControl?.InvalidateVisual();
     }
 
-    private void Clear()
-    {
-        _printer.Rows.Clear();
-        UpdatePreview();
-    }
-
-    private async Task Save()
-    {
-        try
-        {
-            var file = await FileDialogs.SaveImageAsync("Save Printout", PreviewControl, "printout.png");
-
-            if (file != null)
-            {
-                await using var output = File.OpenWrite(file.Path.LocalPath);
-
-                OutputImage.Save(output, 100);
-            }
-        }
-        catch (Exception ex)
-        {
-            await MessageDialogs.Error(ex.Message);
-        }
-    }
-
     private WriteableBitmap CreateBitmap(int width, int height)
     {
         return new WriteableBitmap(
-            new PixelSize(
-                width,
-                height),
+            new PixelSize(width, height),
             new Vector(96, 96),
             PixelFormats.BlackWhite);
-    }
-
-    private WriteableBitmap _outputImage = null!;
-    public WriteableBitmap OutputImage
-    {
-        get => _outputImage;
-        set => this.RaiseAndSetIfChanged(ref _outputImage, value);
     }
 }
