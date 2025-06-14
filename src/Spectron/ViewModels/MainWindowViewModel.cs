@@ -139,7 +139,7 @@ public partial class MainWindowViewModel : ReactiveObject
     public Interaction<DebuggerViewModel, Unit?> ShowDebuggerView { get; }
     public Interaction<Unit, Unit?> ShowKeyboardHelpView { get; }
     public Interaction<PreferencesViewModel, Preferences?> ShowPreferencesView { get; }
-    public Interaction<SelectFileViewModel, ArchiveEntry?> ShowSelectFileView { get; }
+    public Interaction<SelectArchiveFileViewModel, ArchiveEntry?> ShowSelectArchiveFileView { get; }
     public Interaction<TimeMachineViewModel, TimeMachineEntry?> ShowTimeMachineView { get; }
     public Interaction<ScreenshotViewModel, Unit?> ShowScreenshotView { get; }
     public Interaction<TrainerViewModel, Unit?> ShowTrainersView { get; }
@@ -252,7 +252,7 @@ public partial class MainWindowViewModel : ReactiveObject
         ShowDebuggerView = new Interaction<DebuggerViewModel, Unit?>();
         ShowKeyboardHelpView = new Interaction<Unit, Unit?>();
         ShowPreferencesView = new Interaction<PreferencesViewModel, Preferences?>();
-        ShowSelectFileView = new Interaction<SelectFileViewModel, ArchiveEntry?>();
+        ShowSelectArchiveFileView = new Interaction<SelectArchiveFileViewModel, ArchiveEntry?>();
         ShowTimeMachineView = new Interaction<TimeMachineViewModel, TimeMachineEntry?>();
         ShowScreenshotView = new Interaction<ScreenshotViewModel, Unit?>();
         ShowTrainersView = new Interaction<TrainerViewModel, Unit?>();
