@@ -1,33 +1,37 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive;
 using System.Timers;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Extensions;
 using OldBit.Spectron.Files.Tzx.Extensions;
-using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class TapeViewModel : ReactiveObject, IDisposable
+public partial class TapeViewModel : ObservableObject, IDisposable
 {
     private readonly TapeManager _tapeManager;
     private readonly Timer _tapeProgressTimer;
 
+    [ObservableProperty]
     private bool _canStop;
+
+    [ObservableProperty]
     private bool _canPlay;
+
+    [ObservableProperty]
     private bool _canRewind;
+
+    [ObservableProperty]
     private bool _canEject;
+
+    [ObservableProperty]
     private double _progress;
 
     public ObservableCollection<TapeBlockViewModel> Blocks { get; } = [];
-
-    public ReactiveCommand<Unit, Unit> RewindCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> PlayCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> StopCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> EjectCommand { get; private set; }
 
     public TapeViewModel(TapeManager tapeManager)
     {
@@ -42,17 +46,28 @@ public class TapeViewModel : ReactiveObject, IDisposable
         _tapeManager.Cassette.EndOfTape += CassetteOnEndOfTape;
         _tapeManager.TapeStateChanged += TapeManagerOnTapeStateChanged;
 
-        RewindCommand = ReactiveCommand.Create(Rewind);
-        PlayCommand = ReactiveCommand.Create(Play);
-        StopCommand = ReactiveCommand.Create(Stop);
-        EjectCommand = ReactiveCommand.Create(Eject);
-
         CanRewind = _tapeManager.IsTapeLoaded;
         CanPlay = _tapeManager is { IsTapeLoaded: true, IsPlaying: false };
         CanStop = _tapeManager is { IsTapeLoaded: true, IsPlaying: true };
         CanEject = _tapeManager.IsTapeLoaded;
 
         PopulateBlocks();
+    }
+
+    [RelayCommand]
+    private void Rewind() => _tapeManager.RewindTape();
+
+    [RelayCommand]
+    private void Play() => _tapeManager.PlayTape();
+
+    [RelayCommand]
+    private void Stop() => _tapeManager.StopTape();
+
+    [RelayCommand]
+    private void Eject()
+    {
+        _tapeManager.EjectTape();
+        Blocks.Clear();
     }
 
     private void TapeProgressUpdate(object? sender, ElapsedEventArgs e)
@@ -114,7 +129,7 @@ public class TapeViewModel : ReactiveObject, IDisposable
 
     private void PopulateBlocks()
     {
-        for (var i = 0; i <  _tapeManager.Cassette.Content.Blocks.Count; i++)
+        for (var i = 0; i < _tapeManager.Cassette.Content.Blocks.Count; i++)
         {
             var block = _tapeManager.Cassette.Content.Blocks[i];
 
@@ -145,49 +160,7 @@ public class TapeViewModel : ReactiveObject, IDisposable
         }
     }
 
-    private void Rewind() => _tapeManager.RewindTape();
-
-    private void Eject()
-    {
-        _tapeManager.EjectTape();
-        Blocks.Clear();
-    }
-
-    private void Play() => _tapeManager.PlayTape();
-
-    private void Stop() => _tapeManager.StopTape();
-
     public void SetActiveBlock(int position) => _tapeManager.Cassette.SetPosition(position);
-
-    public bool CanStop
-    {
-        get => _canStop;
-        set => this.RaiseAndSetIfChanged(ref _canStop, value);
-    }
-
-    public bool CanPlay
-    {
-        get => _canPlay;
-        set => this.RaiseAndSetIfChanged(ref _canPlay, value);
-    }
-
-    public bool CanRewind
-    {
-        get => _canRewind;
-        set => this.RaiseAndSetIfChanged(ref _canRewind, value);
-    }
-
-    public bool CanEject
-    {
-        get => _canEject;
-        set => this.RaiseAndSetIfChanged(ref _canEject, value);
-    }
-
-    public double Progress
-    {
-        get => _progress;
-        set => this.RaiseAndSetIfChanged(ref _progress, value);
-    }
 
     public void Dispose()
     {
