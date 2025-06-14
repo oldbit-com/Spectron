@@ -117,7 +117,7 @@ partial class MainWindowViewModel
 
                 default:
                 {
-                    var selectedFile = await ShowSelectArchiveFileView.Handle(new SelectArchiveFileViewModel { FileNames = files });
+                    var selectedFile = await ShowSelectFileView.Handle(new SelectArchiveFileViewModel { FileNames = files });
                     if (selectedFile != null)
                     {
                         fileType = selectedFile.FileType;
