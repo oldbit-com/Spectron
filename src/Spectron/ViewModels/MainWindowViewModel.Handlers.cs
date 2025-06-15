@@ -65,7 +65,7 @@ partial class MainWindowViewModel
 
             if (fileType == FileType.Pok)
             {
-                await LoadPokeFile(fileResult.Stream);
+                LoadPokeFile(fileResult.Stream);
                 return;
             }
             else if (_preferences.IsAutoLoadPokeFilesEnabled)
@@ -136,11 +136,10 @@ partial class MainWindowViewModel
         return (stream, fileType);
     }
 
-    private async Task LoadPokeFile(Stream stream)
+    private void LoadPokeFile(Stream stream)
     {
         _pokeFile = PokeFile.Load(stream);
-
-        await OpenTrainersWindow();
+        OpenTrainersWindow();
     }
 
     private void TryAutoLoadPokeFile(string filePath, FileType fileType)

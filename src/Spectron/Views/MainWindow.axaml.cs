@@ -35,17 +35,11 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             action(ViewModel!.ShowPreferencesView
                 .RegisterHandler(ShowDialogAsync<PreferencesViewModel, Preferences, PreferencesView>));
 
-            action(ViewModel!.ShowScreenshotView
-                .RegisterHandler(Show<ScreenshotViewModel, Unit?, ScreenshotView>));
-
             action(ViewModel!.ShowSelectFileView
                 .RegisterHandler(ShowDialogAsync<SelectArchiveFileViewModel, ArchiveEntry?, SelectArchiveFileView>));
 
             action(ViewModel!.ShowTimeMachineView
                 .RegisterHandler(ShowDialogAsync<TimeMachineViewModel, TimeMachineEntry?, TimeMachineView>));
-
-            action(ViewModel!.ShowTrainersView
-                .RegisterHandler(ShowDialogAsync<TrainerViewModel, Unit?, TrainerView>));
         });
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowAboutViewMessage>(this, static (w, _) =>
@@ -57,8 +51,14 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         WeakReferenceMessenger.Default.Register<MainWindow, ShowPrintOutputViewMessage>(this, (w, m) =>
             Show<PrintOutputView>(w, new PrintOutputViewModel(m.Printer)));
 
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowScreenshotViewMessage>(this, (w, m) =>
+            Show<ScreenshotView>(w, new ScreenshotViewModel()));
+
         WeakReferenceMessenger.Default.Register<MainWindow, ShowTapeViewMessage>(this, static (w, m) =>
             ShowDialog<TapeView>(w, new TapeViewModel(m.TapeManager)));
+
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowTrainerViewMessage>(this, static (w, m) =>
+            ShowDialog<TrainerView>(w, new TrainerViewModel(m.Emulator, m.PokeFile)));
     }
 
     private static void ShowDialog<TView>(Window owner, object? viewModel = null) where TView : Window, new()

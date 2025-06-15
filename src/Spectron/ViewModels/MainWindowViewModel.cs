@@ -120,13 +120,13 @@ public partial class MainWindowViewModel : ReactiveObject
     public ReactiveCommand<Unit, Task> StartAudioRecordingCommand { get; private set; }
     public ReactiveCommand<Unit, Task> StartVideoRecordingCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> StopRecordingCommand { get; private set; }
-    public ReactiveCommand<Unit, Task> ShowScreenshotViewerCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ShowScreenshotViewerCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> TakeScreenshotCommand { get; private set; }
 
     // View
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleFullScreenCommand { get; private set; }
-    public ReactiveCommand<Unit, Task> ShowTrainersCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ShowTrainersCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ShowPrintOutputCommand { get; private set; }
 
     // Tape
@@ -141,8 +141,6 @@ public partial class MainWindowViewModel : ReactiveObject
     public Interaction<PreferencesViewModel, Preferences?> ShowPreferencesView { get; }
     public Interaction<SelectArchiveFileViewModel, ArchiveEntry?> ShowSelectFileView { get; }
     public Interaction<TimeMachineViewModel, TimeMachineEntry?> ShowTimeMachineView { get; }
-    public Interaction<ScreenshotViewModel, Unit?> ShowScreenshotView { get; }
-    public Interaction<TrainerViewModel, Unit?> ShowTrainersView { get; }
 
     public MainWindowViewModel(
         EmulatorFactory emulatorFactory,
@@ -251,8 +249,6 @@ public partial class MainWindowViewModel : ReactiveObject
         ShowPreferencesView = new Interaction<PreferencesViewModel, Preferences?>();
         ShowSelectFileView = new Interaction<SelectArchiveFileViewModel, ArchiveEntry?>();
         ShowTimeMachineView = new Interaction<TimeMachineViewModel, TimeMachineEntry?>();
-        ShowScreenshotView = new Interaction<ScreenshotViewModel, Unit?>();
-        ShowTrainersView = new Interaction<TrainerViewModel, Unit?>();
 
         SpectrumScreen = _frameBufferConverter.ScreenBitmap;
 
@@ -408,11 +404,11 @@ public partial class MainWindowViewModel : ReactiveObject
         _isTimeMachineOpen = false;
     }
 
-    private async Task OpenScreenshotViewer() =>
-        await ShowScreenshotView.Handle(_screenshotViewModel);
+    private static void OpenScreenshotViewer() =>
+        WeakReferenceMessenger.Default.Send(new ShowScreenshotViewMessage());
 
-    private async Task OpenTrainersWindow() =>
-        await ShowTrainersView.Handle(new TrainerViewModel(Emulator!, _pokeFile));
+    private void OpenTrainersWindow() =>
+        WeakReferenceMessenger.Default.Send(new ShowTrainerViewMessage(Emulator!, _pokeFile));
 
     private void OpenPrintOutputViewer() =>
         WeakReferenceMessenger.Default.Send(new ShowPrintOutputViewMessage(Emulator!.Printer));
