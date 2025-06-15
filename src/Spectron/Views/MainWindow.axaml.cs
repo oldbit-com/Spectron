@@ -29,9 +29,6 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
         this.WhenActivated(action =>
         {
-            action(ViewModel!.ShowDebuggerView
-                .RegisterHandler(Show<DebuggerViewModel, Unit?, DebuggerView>));
-
             action(ViewModel!.ShowPreferencesView
                 .RegisterHandler(ShowDialogAsync<PreferencesViewModel, Preferences, PreferencesView>));
 
@@ -44,6 +41,9 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowAboutViewMessage>(this, static (w, _) =>
             ShowDialog<AboutView>(w));
+
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowDebuggerViewMessage>(this, static (w, m) =>
+            ShowDialog<DebuggerView>(w, m.ViewModel!));
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowKeyboardViewMessage>(this, (w, _) =>
             Show<HelpKeyboardView>(w));

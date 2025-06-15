@@ -116,7 +116,7 @@ public partial class MainWindowViewModel : ReactiveObject
     public ReactiveCommand<Unit, Unit> HardResetCommand { get; private set; }
 
     // Tools
-    public ReactiveCommand<Unit, Task> ShowDebuggerViewCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ShowDebuggerViewCommand { get; private set; }
     public ReactiveCommand<Unit, Task> StartAudioRecordingCommand { get; private set; }
     public ReactiveCommand<Unit, Task> StartVideoRecordingCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> StopRecordingCommand { get; private set; }
@@ -137,7 +137,6 @@ public partial class MainWindowViewModel : ReactiveObject
     public ReactiveCommand<Unit, Unit> ShowKeyboardHelpViewCommand { get; private set; }
 
     // Interactions
-    public Interaction<DebuggerViewModel, Unit?> ShowDebuggerView { get; }
     public Interaction<PreferencesViewModel, Preferences?> ShowPreferencesView { get; }
     public Interaction<SelectArchiveFileViewModel, ArchiveEntry?> ShowSelectFileView { get; }
     public Interaction<TimeMachineViewModel, TimeMachineEntry?> ShowTimeMachineView { get; }
@@ -245,7 +244,6 @@ public partial class MainWindowViewModel : ReactiveObject
         ShowKeyboardHelpViewCommand = ReactiveCommand.Create(ShowKeyboardHelpWindow);
 
         // Interactions
-        ShowDebuggerView = new Interaction<DebuggerViewModel, Unit?>();
         ShowPreferencesView = new Interaction<PreferencesViewModel, Preferences?>();
         ShowSelectFileView = new Interaction<SelectArchiveFileViewModel, ArchiveEntry?>();
         ShowTimeMachineView = new Interaction<TimeMachineViewModel, TimeMachineEntry?>();
@@ -290,7 +288,7 @@ public partial class MainWindowViewModel : ReactiveObject
 
     private static void OpenAboutWindow() => WeakReferenceMessenger.Default.Send(new ShowAboutViewMessage());
 
-    private async Task OpenDebuggerWindow()
+    private void OpenDebuggerWindow()
     {
         if (!IsPaused)
         {
@@ -311,7 +309,7 @@ public partial class MainWindowViewModel : ReactiveObject
             .Switch()
             .Subscribe(isPaused => IsPaused = isPaused);
 
-        await ShowDebuggerView.Handle(_debuggerViewModel);
+        WeakReferenceMessenger.Default.Send(new ShowDebuggerViewMessage(_debuggerViewModel));
     }
 
     private static void ShowKeyboardHelpWindow() => WeakReferenceMessenger.Default.Send(new ShowKeyboardViewMessage());
