@@ -1,18 +1,18 @@
-using ReactiveUI;
-using Avalonia.ReactiveUI;
-using OldBit.Spectron.ViewModels;
-using System;
+using Avalonia.Controls;
 using Avalonia.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using OldBit.Spectron.Messages;
 
 namespace OldBit.Spectron.Views;
 
-public partial class PreferencesView : ReactiveWindow<PreferencesViewModel>
+public partial class PreferencesView : Window
 {
     public PreferencesView()
     {
         InitializeComponent();
 
-        this.WhenActivated(action => action(ViewModel!.UpdatePreferencesCommand.Subscribe(Close)));
+        WeakReferenceMessenger.Default.Register<PreferencesView, PreferencesViewClosedMessage>(this, static (window, message) =>
+            window.Close(message.Preference));
     }
 
     protected override void OnKeyDown(KeyEventArgs e)

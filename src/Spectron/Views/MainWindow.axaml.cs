@@ -29,9 +29,6 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
         this.WhenActivated(action =>
         {
-            action(ViewModel!.ShowPreferencesView
-                .RegisterHandler(ShowDialogAsync<PreferencesViewModel, Preferences, PreferencesView>));
-
             action(ViewModel!.ShowSelectFileView
                 .RegisterHandler(ShowDialogAsync<SelectArchiveFileViewModel, ArchiveEntry?, SelectArchiveFileView>));
 
@@ -47,6 +44,12 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowKeyboardViewMessage>(this, (w, _) =>
             Show<HelpKeyboardView>(w));
+
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowPreferencesViewMessage>(this, (w, m) =>
+        {
+            var result = ShowDialog<PreferencesView, Preferences>(w, new PreferencesViewModel(m.Preferences, m.GamepadManager));
+            m.Reply(result);
+        });
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowPrintOutputViewMessage>(this, (w, m) =>
             Show<PrintOutputView>(w, new PrintOutputViewModel(m.Printer)));
@@ -72,6 +75,20 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                 disposable.Dispose();
             }
         });
+    }
+
+    private static async Task<TResponse> ShowDialog<TView, TResponse>(Window owner, object? viewModel = null) where TView : Window, new()
+    {
+        var view = new TView { DataContext = viewModel };
+
+        var result = await view.ShowDialog<TResponse>(owner);
+
+        if (viewModel is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
+
+        return result;
     }
 
     private void Show<TView>(Window owner, object? viewModel = null) where TView : Window, new()
@@ -127,48 +144,6 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         {
             disposable.Dispose();
         }
-    }
-
-    private void Show<TInput, TOutput, TView>(IInteractionContext<TInput, TOutput?> context) where TView : Window, new()
-    {
-        var viewType = typeof(TView).Name;
-
-        if (_windows.TryGetValue(viewType, out var window))
-        {
-            if (viewType == nameof(HelpKeyboardView))
-            {
-                window.Close();
-            }
-            else
-            {
-                window.Show(this);
-            }
-
-            return;
-        }
-
-        var view = new TView { DataContext = context.Input };
-
-        view.Closed += (_, _) =>
-        {
-            if (!_windows.TryGetValue(viewType, out var closedWindow))
-            {
-                return;
-            }
-
-            if (closedWindow.DataContext is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-
-            _windows.Remove(viewType);
-
-            _viewModel?.OnViewClosed(context.Input);
-        };
-
-        _windows.Add(viewType, view);
-
-        view.Show(this);
     }
 
     protected override void OnDataContextChanged(EventArgs e)

@@ -137,7 +137,6 @@ public partial class MainWindowViewModel : ReactiveObject
     public ReactiveCommand<Unit, Unit> ShowKeyboardHelpViewCommand { get; private set; }
 
     // Interactions
-    public Interaction<PreferencesViewModel, Preferences?> ShowPreferencesView { get; }
     public Interaction<SelectArchiveFileViewModel, ArchiveEntry?> ShowSelectFileView { get; }
     public Interaction<TimeMachineViewModel, TimeMachineEntry?> ShowTimeMachineView { get; }
 
@@ -244,7 +243,6 @@ public partial class MainWindowViewModel : ReactiveObject
         ShowKeyboardHelpViewCommand = ReactiveCommand.Create(ShowKeyboardHelpWindow);
 
         // Interactions
-        ShowPreferencesView = new Interaction<PreferencesViewModel, Preferences?>();
         ShowSelectFileView = new Interaction<SelectArchiveFileViewModel, ArchiveEntry?>();
         ShowTimeMachineView = new Interaction<TimeMachineViewModel, TimeMachineEntry?>();
 
@@ -324,8 +322,7 @@ public partial class MainWindowViewModel : ReactiveObject
             resumeAfter = true;
         }
 
-        using var viewModel = new PreferencesViewModel(_preferences, _gamepadManager);
-        var preferences = await ShowPreferencesView.Handle(viewModel);
+        var preferences = await WeakReferenceMessenger.Default.Send(new ShowPreferencesViewMessage(_preferences, _gamepadManager));
 
         ThemeManager.SelectTheme(preferences?.Theme ?? _preferences.Theme);
 

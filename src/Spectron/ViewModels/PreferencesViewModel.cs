@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using OldBit.Spectron.Debugger.Settings;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Disassembly.Formatters;
@@ -18,6 +20,7 @@ using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
+using OldBit.Spectron.Messages;
 using OldBit.Spectron.Recorder;
 using OldBit.Spectron.Screen;
 using OldBit.Spectron.Settings;
@@ -27,16 +30,10 @@ using SharpHook.Data;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class PreferencesViewModel : ReactiveObject, IDisposable
+public partial class PreferencesViewModel : ObservableValidator, IDisposable
 {
     private readonly GamepadManager _gamepadManager;
     private readonly GamepadSettings _gamepadSettings;
-
-    public ReactiveCommand<Unit, Preferences> UpdatePreferencesCommand { get; }
-    public ReactiveCommand<Unit, Unit> ProbeFFmpegCommand { get; }
-    public ReactiveCommand<string, Task> SelectSdCardImageFile { get; }
-
-    public Interaction<GamepadMappingViewModel, List<GamepadMapping>?> ShowGamepadMappingView { get; }
 
     public GamepadMappingViewModel GamepadMappingViewModel { get; }
 
@@ -104,11 +101,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         RecordingBorderSize = preferences.Recording.BorderSize;
         ScalingFactor = preferences.Recording.ScalingFactor;
         ScalingAlgorithm = preferences.Recording.ScalingAlgorithm;
-        FFmpegPath = preferences.Recording.FFmpegPath;
-
-        UpdatePreferencesCommand = ReactiveCommand.Create(UpdatePreferences);
-        ProbeFFmpegCommand = ReactiveCommand.Create(ProbeFFmpeg);
-        SelectSdCardImageFile = ReactiveCommand.Create<string, Task>(HandleOpenSdCardImageFile);
+        FfmpegPath = preferences.Recording.FFmpegPath;
 
         DebuggerPreferredNumberFormat = preferences.Debugger.PreferredNumberFormat;
 
@@ -119,42 +112,17 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         IsDivMmcDriveWriteEnabled = preferences.DivMmc.IsDriveWriteEnabled;
 
         IsZxPrinterEnabled = preferences.Printer.IsZxPrinterEnabled;
-
-        ShowGamepadMappingView = new Interaction<GamepadMappingViewModel, List<GamepadMapping>?>();
     }
 
-    private void GamepadManagerOnControllerChanged(object? sender, ControllerChangedEventArgs e)
-    {
-        switch (e.Action)
-        {
-            case ControllerChangedAction.Added:
-                Dispatcher.UIThread.Post(() =>
-                {
-                    GamepadControllers.Add(e.Controller);
-                    GamepadControllerId = e.Controller.ControllerId;
-                });
-
-                break;
-
-            case ControllerChangedAction.Removed:
-                Dispatcher.UIThread.Post(() =>
-                {
-                    GamepadControllers.Remove(e.Controller);
-                    GamepadControllerId = GamepadController.None.ControllerId;
-                });
-
-                break;
-        }
-    }
-
-    private Preferences UpdatePreferences()
+    [RelayCommand]
+    private void UpdatePreferences()
     {
         if (GamepadControllerId != GamepadController.None.ControllerId)
         {
             _gamepadSettings.Mappings[GamepadControllerId] = GamepadMappingViewModel.GetConfiguredMappings();
         }
 
-        return new Preferences
+        var preferences = new Preferences
         {
             Theme = Theme,
             ComputerType = ComputerType,
@@ -213,7 +181,7 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
                 BorderSize = RecordingBorderSize,
                 ScalingFactor = ScalingFactor,
                 ScalingAlgorithm = ScalingAlgorithm,
-                FFmpegPath = FFmpegPath
+                FFmpegPath = FfmpegPath
             },
 
             Debugger = new DebuggerSettings
@@ -235,9 +203,20 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
                 IsZxPrinterEnabled = IsZxPrinterEnabled,
             }
         };
+
+        WeakReferenceMessenger.Default.Send(new PreferencesViewClosedMessage(preferences));
     }
 
-    private async Task HandleOpenSdCardImageFile(string cardId)
+    [RelayCommand]
+    private void ProbeFFmpeg()
+    {
+        FfmpegMessage = MediaRecorder.VerifyDependencies(FfmpegPath) ?
+            "Success. FFmpeg found" :
+            "Failure. FFmpeg not found";
+    }
+
+    [RelayCommand]
+    private async Task SelectSdCardImageFile(string cardId)
     {
         var file = await FileDialogs.OpenDiskImageFileAsync();
 
@@ -258,6 +237,30 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         }
     }
 
+    private void GamepadManagerOnControllerChanged(object? sender, ControllerChangedEventArgs e)
+    {
+        switch (e.Action)
+        {
+            case ControllerChangedAction.Added:
+                Dispatcher.UIThread.Post(() =>
+                {
+                    GamepadControllers.Add(e.Controller);
+                    GamepadControllerId = e.Controller.ControllerId;
+                });
+
+                break;
+
+            case ControllerChangedAction.Removed:
+                Dispatcher.UIThread.Post(() =>
+                {
+                    GamepadControllers.Remove(e.Controller);
+                    GamepadControllerId = GamepadController.None.ControllerId;
+                });
+
+                break;
+        }
+    }
+
     public static ValidationResult? ValidateCardImageFile(string fileName, ValidationContext context)
     {
         if (context.ObjectInstance is PreferencesViewModel { IsDivMmcEnabled: false })
@@ -271,13 +274,6 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
         }
 
         return new ValidationResult(errorMessage, [context.MemberName ?? string.Empty]);
-    }
-
-    private void ProbeFFmpeg()
-    {
-        FFmpegMessage = MediaRecorder.VerifyDependencies(FFmpegPath) ?
-            "Success. FFmpeg found" :
-            "Failure. FFmpeg not found";
     }
 
     public List<NameValuePair<ComputerType>> ComputerTypes { get; } =
@@ -417,280 +413,124 @@ public class PreferencesViewModel : ReactiveObject, IDisposable
 
     public ObservableCollection<GamepadController> GamepadControllers { get; }
 
+    [ObservableProperty]
     private Theme _theme;
-    public Theme Theme
-    {
-        get => _theme;
-        set => this.RaiseAndSetIfChanged(ref _theme, value);
-    }
 
+    [ObservableProperty]
     private ComputerType _computerType;
-    public ComputerType ComputerType
-    {
-        get => _computerType;
-        set => this.RaiseAndSetIfChanged(ref _computerType, value);
-    }
 
+    [ObservableProperty]
     private bool _isUlaPlusEnabled;
-    public bool IsUlaPlusEnabled
-    {
-        get => _isUlaPlusEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isUlaPlusEnabled, value);
-    }
 
+    [ObservableProperty]
     private RomType _romType;
-    public RomType RomType
-    {
-        get => _romType;
-        set => this.RaiseAndSetIfChanged(ref _romType, value);
-    }
 
+    [ObservableProperty]
     private JoystickType _joystickType = JoystickType.None;
-    public JoystickType JoystickType
-    {
-        get => _joystickType;
-        set => this.RaiseAndSetIfChanged(ref _joystickType, value);
-    }
 
+    [ObservableProperty]
     private MouseType _mouseType = MouseType.None;
-    public MouseType MouseType
-    {
-        get => _mouseType;
-        set => this.RaiseAndSetIfChanged(ref _mouseType, value);
-    }
 
+    [ObservableProperty]
     private bool _emulateUsingKeyboard;
-    public bool EmulateUsingKeyboard
-    {
-        get => _emulateUsingKeyboard;
-        set => this.RaiseAndSetIfChanged(ref _emulateUsingKeyboard, value);
-    }
 
+    [ObservableProperty]
     private KeyCode _fireKey = KeyCode.VcSpace;
-    public KeyCode FireKey
-    {
-        get => _fireKey;
-        set => this.RaiseAndSetIfChanged(ref _fireKey, value);
-    }
 
+    [ObservableProperty]
     private Guid _gamepadControllerId = GamepadController.None.ControllerId;
-    public Guid GamepadControllerId
-    {
-        get => _gamepadControllerId;
-        set => this.RaiseAndSetIfChanged(ref _gamepadControllerId, value);
-    }
 
+    [ObservableProperty]
     private bool _isStandardMousePointerHidden;
-    public bool IsStandardMousePointerHidden
-    {
-        get => _isStandardMousePointerHidden;
-        set => this.RaiseAndSetIfChanged(ref _isStandardMousePointerHidden, value);
-    }
 
+    [ObservableProperty]
     private bool _isTimeMachineEnabled;
-    public bool IsTimeMachineEnabled
-    {
-        get => _isTimeMachineEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isTimeMachineEnabled, value);
-    }
 
+    [ObservableProperty]
     private double _snapshotInterval;
-    public double SnapshotInterval
-    {
-        get => _snapshotInterval;
-        set => this.RaiseAndSetIfChanged(ref _snapshotInterval, value);
-    }
 
+    [ObservableProperty]
     private double _maxDuration;
-    public double MaxDuration
-    {
-        get => _maxDuration;
-        set => this.RaiseAndSetIfChanged(ref _maxDuration, value);
-    }
 
+    [ObservableProperty]
     private bool _isResumeEnabled;
-    public bool IsResumeEnabled
-    {
-        get => _isResumeEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isResumeEnabled, value);
-    }
 
+    [ObservableProperty]
     private bool _shouldIncludeTapeInResume;
-    public bool ShouldIncludeTapeInResume
-    {
-        get => _shouldIncludeTapeInResume;
-        set => this.RaiseAndSetIfChanged(ref _shouldIncludeTapeInResume, value);
-    }
 
+    [ObservableProperty]
     private bool _shouldIncludeTimeMachineInResume;
-    public bool ShouldIncludeTimeMachineInResume
-    {
-        get => _shouldIncludeTimeMachineInResume;
-        set => this.RaiseAndSetIfChanged(ref _shouldIncludeTimeMachineInResume, value);
-    }
 
+    [ObservableProperty]
     private bool _isAutoPlayEnabled;
-    public bool IsAutoPlayEnabled
-    {
-        get => _isAutoPlayEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isAutoPlayEnabled, value);
-    }
 
+    [ObservableProperty]
     private bool _isTapeSaveEnabled;
-    public bool IsTapeSaveEnabled
-    {
-        get => _isTapeSaveEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isTapeSaveEnabled, value);
-    }
 
+    [ObservableProperty]
     private TapeSpeed _tapeSaveSpeed = TapeSpeed.Normal;
-    public TapeSpeed TapeSaveSpeed
-    {
-        get => _tapeSaveSpeed;
-        set => this.RaiseAndSetIfChanged(ref _tapeSaveSpeed, value);
-    }
 
+    [ObservableProperty]
     private TapeSpeed _tapeLoadSpeed = TapeSpeed.Normal;
-    public TapeSpeed TapeLoadSpeed
-    {
-        get => _tapeLoadSpeed;
-        set => this.RaiseAndSetIfChanged(ref _tapeLoadSpeed, value);
-    }
 
+    [ObservableProperty]
     private bool _isFloatingBusEnabled;
-    public bool IsFloatingBusEnabled
-    {
-        get => _isFloatingBusEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isFloatingBusEnabled, value);
-    }
 
+    [ObservableProperty]
     private bool _isBeeperEnabled;
-    public bool IsBeeperEnabled
-    {
-        get => _isBeeperEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isBeeperEnabled, value);
-    }
 
+    [ObservableProperty]
     private bool _isAyEnabled;
-    public bool IsAyEnabled
-    {
-        get => _isAyEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isAyEnabled, value);
-    }
 
+    [ObservableProperty]
     private bool _isAySupportedStandardSpectrum;
-    public bool IsAySupportedStandardSpectrum
-    {
-        get => _isAySupportedStandardSpectrum;
-        set => this.RaiseAndSetIfChanged(ref _isAySupportedStandardSpectrum, value);
-    }
 
+    [ObservableProperty]
     private StereoMode _stereoMode;
-    public StereoMode StereoMode
-    {
-        get => _stereoMode;
-        set => this.RaiseAndSetIfChanged(ref _stereoMode, value);
-    }
 
+    [ObservableProperty]
     private BorderSize _recordingBorderSize = BorderSize.Medium;
-    public BorderSize RecordingBorderSize
-    {
-        get => _recordingBorderSize;
-        set => this.RaiseAndSetIfChanged(ref _recordingBorderSize, value);
-    }
 
+    [ObservableProperty]
     private string _scalingAlgorithm = "neighbor";
-    public string ScalingAlgorithm
-    {
-        get => _scalingAlgorithm;
-        set => this.RaiseAndSetIfChanged(ref _scalingAlgorithm, value);
-    }
 
+    [ObservableProperty]
     private int _scalingFactor = 2;
-    public int ScalingFactor
-    {
-        get => _scalingFactor;
-        set => this.RaiseAndSetIfChanged(ref _scalingFactor, value);
-    }
 
+    [ObservableProperty]
     private string _ffmpegPath = string.Empty;
-    public string FFmpegPath
-    {
-        get => _ffmpegPath;
-        set => this.RaiseAndSetIfChanged(ref _ffmpegPath, value);
-    }
 
+    [ObservableProperty()]
     private string _ffmpegMessage = string.Empty;
-    public string FFmpegMessage
-    {
-        get => _ffmpegMessage;
-        set => this.RaiseAndSetIfChanged(ref _ffmpegMessage, value);
-    }
 
+    [ObservableProperty]
     private int _timeMachineCountdownSeconds = 3;
-    public int TimeMachineCountdownSeconds
-    {
-        get => _timeMachineCountdownSeconds;
-        set => this.RaiseAndSetIfChanged(ref _timeMachineCountdownSeconds, value);
-    }
 
+    [ObservableProperty]
     private NumberFormat _debuggerPreferredNumberFormat = NumberFormat.HexPrefixDollar;
-    public NumberFormat DebuggerPreferredNumberFormat
-    {
-        get => _debuggerPreferredNumberFormat;
-        set => this.RaiseAndSetIfChanged(ref _debuggerPreferredNumberFormat, value);
-    }
 
+    [ObservableProperty]
     private bool _isDivMmcEnabled;
-    public bool IsDivMmcEnabled
-    {
-        get => _isDivMmcEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isDivMmcEnabled, value);
-    }
 
+    [ObservableProperty]
     private bool _isDivMmcWriteEnabled;
-    public bool IsDivMmcWriteEnabled
-    {
-        get => _isDivMmcWriteEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isDivMmcWriteEnabled, value);
-    }
 
+    [ObservableProperty]
+    [CustomValidation(typeof(PreferencesViewModel), nameof(ValidateCardImageFile))]
     private string _divMmcCard0FileName = string.Empty;
-    [CustomValidation(typeof(PreferencesViewModel), nameof(ValidateCardImageFile))]
-    public string DivMmcCard0FileName
-    {
-        get => _divMmcCard0FileName;
-        set => this.RaiseAndSetIfChanged(ref _divMmcCard0FileName, value);
-    }
 
+    [ObservableProperty]
+    [CustomValidation(typeof(PreferencesViewModel), nameof(ValidateCardImageFile))]
     private string _divMmcCard1FileName = string.Empty;
-    [CustomValidation(typeof(PreferencesViewModel), nameof(ValidateCardImageFile))]
-    public string DivMmcCard1FileName
-    {
-        get => _divMmcCard1FileName;
-        set => this.RaiseAndSetIfChanged(ref _divMmcCard1FileName, value);
-    }
 
+    [ObservableProperty]
     private bool _isDivMmcDriveWriteEnabled;
-    public bool IsDivMmcDriveWriteEnabled
-    {
-        get => _isDivMmcDriveWriteEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isDivMmcDriveWriteEnabled, value);
-    }
 
+    [ObservableProperty]
     private bool _isZxPrinterEnabled;
-    public bool IsZxPrinterEnabled
-    {
-        get => _isZxPrinterEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isZxPrinterEnabled, value);
-    }
 
+    [ObservableProperty]
     private bool _isAutoLoadPokeFilesEnabled;
-    public bool IsAutoLoadPokeFilesEnabled
-    {
-        get => _isAutoLoadPokeFilesEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isAutoLoadPokeFilesEnabled, value);
-    }
 
     public void Dispose()
     {

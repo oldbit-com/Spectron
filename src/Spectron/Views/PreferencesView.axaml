@@ -439,7 +439,7 @@
                                 Margin="5 0 0 0"
                                 Height="30"
                                 Watermark="Leave empty to use system PATH"
-                                Text="{Binding FFmpegPath}"
+                                Text="{Binding FfmpegPath}"
                                 VerticalContentAlignment="Center"/>
 
                             <StackPanel
@@ -453,7 +453,7 @@
 
                                 <TextBlock
                                     Margin="5 0 0 0"
-                                    Text="{Binding FFmpegMessage}"
+                                    Text="{Binding FfmpegMessage}"
                                     VerticalAlignment="Center"/>
                             </StackPanel>
                         </Grid>
