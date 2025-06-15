@@ -73,10 +73,11 @@ public partial class TimeMachineViewModel : ObservableObject, IDisposable
         }
     }
 
-    partial void OnCurrentEntryIndexChanged(double _) => UpdatePreview();
+    partial void OnCurrentEntryIndexChanged(double value) => UpdatePreview();
 
     private void JoystickManagerOnJoystickButtonChanged(object? sender, JoystickButtonEventArgs e)
     {
+        // TODO: Remove once implemented
         Console.WriteLine($"Input: {e.Input} State: {e.State}");
     }
 

@@ -51,8 +51,5 @@
       <Compile Update="ViewModels\MainWindowViewModel.Handlers.cs">
         <DependentUpon>MainWindowViewModel.cs</DependentUpon>
       </Compile>
-      <Compile Update="ViewModels\MainWindowViewModel.Properties.cs">
-        <DependentUpon>MainWindowViewModel.cs</DependentUpon>
-      </Compile>
     </ItemGroup>
 </Project>
