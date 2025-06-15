@@ -2,34 +2,28 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive;
 using System.Timers;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using DynamicData;
 using OldBit.Joypad.Controls;
 using OldBit.Spectron.Emulation.Devices.Gamepad;
 using OldBit.Spectron.Settings;
-using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class GamepadMappingViewModel : ReactiveObject, IDisposable
+public partial class GamepadMappingViewModel : ObservableObject, IDisposable
 {
     private readonly Timer _timer;
     private readonly GamepadManager _gamepadManager;
 
+    [ObservableProperty]
+    private GamepadButtonMappingViewModel? _selectedMapping;
+
     private GamepadController _controller = GamepadController.None;
 
-    public ReactiveCommand<Unit, Unit> SetDefaultMappingCommand { get; }
-
     public ObservableCollection<GamepadButtonMappingViewModel> Mappings { get; } = [];
-
-    private GamepadButtonMappingViewModel? _selectedMapping;
-    public GamepadButtonMappingViewModel? SelectedMapping
-    {
-        get => _selectedMapping;
-        set => this.RaiseAndSetIfChanged(ref _selectedMapping, value);
-    }
 
     public Action<GamepadButtonMappingViewModel> ScrollIntoView { get; set; } = _ => { };
 
@@ -37,15 +31,16 @@ public class GamepadMappingViewModel : ReactiveObject, IDisposable
     {
         _gamepadManager = gamepadManager;
 
-        SetDefaultMappingCommand = ReactiveCommand.Create(() =>
-        {
-            var defaultMappings = DefaultMappings();
-            SetupGridView(defaultMappings);
-        });
-
         _timer = new Timer(100) { AutoReset = false };
         _timer.Elapsed += GamepadUpdate;
         _timer.Start();
+    }
+
+    [RelayCommand]
+    private void SetDefaultMapping()
+    {
+        var defaultMappings = DefaultMappings();
+        SetupGridView(defaultMappings);
     }
 
     public void UpdateView(Guid controllerId, GamepadSettings settings)

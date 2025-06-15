@@ -10,6 +10,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Input;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Debugger;
 using OldBit.Spectron.Debugger.ViewModels;
@@ -28,6 +29,7 @@ using OldBit.Spectron.Emulation.Tape.Loader;
 using OldBit.Spectron.Extensions;
 using OldBit.Spectron.Files.Pok;
 using OldBit.Spectron.Input;
+using OldBit.Spectron.Messages;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.Recorder;
@@ -131,13 +133,11 @@ public partial class MainWindowViewModel : ReactiveObject
     public ReactiveCommand<TapeSpeed, Unit> SetTapeLoadSpeedCommand { get; private set; }
 
     // Help
-    public ReactiveCommand<Unit, Task> ShowAboutViewCommand { get; private set; }
-    public ReactiveCommand<Unit, Task> ShowKeyboardHelpViewCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ShowAboutViewCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ShowKeyboardHelpViewCommand { get; private set; }
 
     // Interactions
-    public Interaction<Unit, Unit?> ShowAboutView { get; }
     public Interaction<DebuggerViewModel, Unit?> ShowDebuggerView { get; }
-    public Interaction<Unit, Unit?> ShowKeyboardHelpView { get; }
     public Interaction<PreferencesViewModel, Preferences?> ShowPreferencesView { get; }
     public Interaction<SelectArchiveFileViewModel, ArchiveEntry?> ShowSelectFileView { get; }
     public Interaction<TimeMachineViewModel, TimeMachineEntry?> ShowTimeMachineView { get; }
@@ -248,9 +248,7 @@ public partial class MainWindowViewModel : ReactiveObject
         ShowKeyboardHelpViewCommand = ReactiveCommand.Create(ShowKeyboardHelpWindow);
 
         // Interactions
-        ShowAboutView = new Interaction<Unit, Unit?>();
         ShowDebuggerView = new Interaction<DebuggerViewModel, Unit?>();
-        ShowKeyboardHelpView = new Interaction<Unit, Unit?>();
         ShowPreferencesView = new Interaction<PreferencesViewModel, Preferences?>();
         ShowSelectFileView = new Interaction<SelectArchiveFileViewModel, ArchiveEntry?>();
         ShowTimeMachineView = new Interaction<TimeMachineViewModel, TimeMachineEntry?>();
@@ -296,7 +294,7 @@ public partial class MainWindowViewModel : ReactiveObject
         _debuggerViewModel = null;
     }
 
-    private async Task OpenAboutWindow() => await ShowAboutView.Handle(Unit.Default);
+    private static void OpenAboutWindow() =>  WeakReferenceMessenger.Default.Send(new ShowAboutViewMessage());
 
     private async Task OpenDebuggerWindow()
     {
@@ -322,7 +320,7 @@ public partial class MainWindowViewModel : ReactiveObject
         await ShowDebuggerView.Handle(_debuggerViewModel);
     }
 
-    private async Task ShowKeyboardHelpWindow() => await ShowKeyboardHelpView.Handle(Unit.Default);
+    private static void ShowKeyboardHelpWindow() => WeakReferenceMessenger.Default.Send(new ShowKeyboardViewMessage());
 
     public async Task OpenPreferencesWindow()
     {

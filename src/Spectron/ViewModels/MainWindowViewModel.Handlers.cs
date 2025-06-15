@@ -536,7 +536,7 @@ partial class MainWindowViewModel
                 break;
 
             case { Key: Key.F1, KeyModifiers: KeyModifiers.None }:
-                _ = ShowKeyboardHelpWindow();
+                ShowKeyboardHelpWindow();
                 return;
 
             case { Key: Key.F5, KeyModifiers: KeyModifiers.Control }:
