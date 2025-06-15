@@ -36,32 +36,32 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                 .RegisterHandler(ShowDialogAsync<TimeMachineViewModel, TimeMachineEntry?, TimeMachineView>));
         });
 
-        WeakReferenceMessenger.Default.Register<MainWindow, ShowAboutViewMessage>(this, static (w, _) =>
-            ShowDialog<AboutView>(w));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowAboutViewMessage>(this, static (window, _) =>
+            ShowDialog<AboutView>(window));
 
-        WeakReferenceMessenger.Default.Register<MainWindow, ShowDebuggerViewMessage>(this, static (w, m) =>
-            ShowDialog<DebuggerView>(w, m.ViewModel!));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowDebuggerViewMessage>(this, static (window, m) =>
+            ShowDialog<DebuggerView>(window, m.ViewModel!));
 
-        WeakReferenceMessenger.Default.Register<MainWindow, ShowKeyboardViewMessage>(this, (w, _) =>
-            Show<HelpKeyboardView>(w));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowKeyboardViewMessage>(this, (window, _) =>
+            Show<HelpKeyboardView>(window));
 
-        WeakReferenceMessenger.Default.Register<MainWindow, ShowPreferencesViewMessage>(this, (w, m) =>
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowPreferencesViewMessage>(this, (window, message) =>
         {
-            var result = ShowDialog<PreferencesView, Preferences>(w, new PreferencesViewModel(m.Preferences, m.GamepadManager));
-            m.Reply(result);
+            var result = ShowDialog<PreferencesView, Preferences>(window, new PreferencesViewModel(message.Preferences, message.GamepadManager));
+            message.Reply(result);
         });
 
-        WeakReferenceMessenger.Default.Register<MainWindow, ShowPrintOutputViewMessage>(this, (w, m) =>
-            Show<PrintOutputView>(w, new PrintOutputViewModel(m.Printer)));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowPrintOutputViewMessage>(this, (window, message) =>
+            Show<PrintOutputView>(window, new PrintOutputViewModel(message.Printer)));
 
-        WeakReferenceMessenger.Default.Register<MainWindow, ShowScreenshotViewMessage>(this, (w, m) =>
-            Show<ScreenshotView>(w, new ScreenshotViewModel()));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowScreenshotViewMessage>(this, (window, _) =>
+            Show<ScreenshotView>(window, new ScreenshotViewModel()));
 
-        WeakReferenceMessenger.Default.Register<MainWindow, ShowTapeViewMessage>(this, static (w, m) =>
-            ShowDialog<TapeView>(w, new TapeViewModel(m.TapeManager)));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowTapeViewMessage>(this, static (window, message) =>
+            ShowDialog<TapeView>(window, new TapeViewModel(message.TapeManager)));
 
-        WeakReferenceMessenger.Default.Register<MainWindow, ShowTrainerViewMessage>(this, static (w, m) =>
-            ShowDialog<TrainerView>(w, new TrainerViewModel(m.Emulator, m.PokeFile)));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowTrainerViewMessage>(this, static (window, message) =>
+            ShowDialog<TrainerView>(window, new TrainerViewModel(message.Emulator, message.PokeFile)));
     }
 
     private static void ShowDialog<TView>(Window owner, object? viewModel = null) where TView : Window, new()
