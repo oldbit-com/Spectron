@@ -127,7 +127,7 @@ public partial class MainWindowViewModel : ReactiveObject
     public ReactiveCommand<BorderSize, Unit> ChangeBorderSizeCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleFullScreenCommand { get; private set; }
     public ReactiveCommand<Unit, Task> ShowTrainersCommand { get; private set; }
-    public ReactiveCommand<Unit, Task> ShowPrintOutputCommand { get; private set; }
+    public ReactiveCommand<Unit, Unit> ShowPrintOutputCommand { get; private set; }
 
     // Tape
     public ReactiveCommand<TapeSpeed, Unit> SetTapeLoadSpeedCommand { get; private set; }
@@ -143,7 +143,6 @@ public partial class MainWindowViewModel : ReactiveObject
     public Interaction<TimeMachineViewModel, TimeMachineEntry?> ShowTimeMachineView { get; }
     public Interaction<ScreenshotViewModel, Unit?> ShowScreenshotView { get; }
     public Interaction<TrainerViewModel, Unit?> ShowTrainersView { get; }
-    public Interaction<PrintOutputViewModel, Unit?> ShowPrintOutputView { get; }
 
     public MainWindowViewModel(
         EmulatorFactory emulatorFactory,
@@ -254,7 +253,6 @@ public partial class MainWindowViewModel : ReactiveObject
         ShowTimeMachineView = new Interaction<TimeMachineViewModel, TimeMachineEntry?>();
         ShowScreenshotView = new Interaction<ScreenshotViewModel, Unit?>();
         ShowTrainersView = new Interaction<TrainerViewModel, Unit?>();
-        ShowPrintOutputView = new Interaction<PrintOutputViewModel, Unit?>();
 
         SpectrumScreen = _frameBufferConverter.ScreenBitmap;
 
@@ -294,7 +292,7 @@ public partial class MainWindowViewModel : ReactiveObject
         _debuggerViewModel = null;
     }
 
-    private static void OpenAboutWindow() =>  WeakReferenceMessenger.Default.Send(new ShowAboutViewMessage());
+    private static void OpenAboutWindow() => WeakReferenceMessenger.Default.Send(new ShowAboutViewMessage());
 
     private async Task OpenDebuggerWindow()
     {
@@ -416,8 +414,8 @@ public partial class MainWindowViewModel : ReactiveObject
     private async Task OpenTrainersWindow() =>
         await ShowTrainersView.Handle(new TrainerViewModel(Emulator!, _pokeFile));
 
-    private async Task OpenPrintOutputViewer() =>
-        await ShowPrintOutputView.Handle(new PrintOutputViewModel(Emulator!.Printer));
+    private void OpenPrintOutputViewer() =>
+        WeakReferenceMessenger.Default.Send(new ShowPrintOutputViewMessage(Emulator!.Printer));
 
     private void EmulatorFrameCompleted(FrameBuffer frameBuffer, AudioBuffer audioBuffer)
     {

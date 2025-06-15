@@ -35,9 +35,6 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             action(ViewModel!.ShowPreferencesView
                 .RegisterHandler(ShowDialogAsync<PreferencesViewModel, Preferences, PreferencesView>));
 
-            action(ViewModel!.ShowPrintOutputView
-                .RegisterHandler(Show<PrintOutputViewModel, Unit?, PrintOutputView>));
-
             action(ViewModel!.ShowScreenshotView
                 .RegisterHandler(Show<ScreenshotViewModel, Unit?, ScreenshotView>));
 
@@ -56,6 +53,9 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowKeyboardViewMessage>(this, (w, _) =>
             Show<HelpKeyboardView>(w));
+
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowPrintOutputViewMessage>(this, (w, m) =>
+            Show<PrintOutputView>(w, new PrintOutputViewModel(m.Printer)));
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowTapeViewMessage>(this, static (w, m) =>
             ShowDialog<TapeView>(w, new TapeViewModel(m.TapeManager)));

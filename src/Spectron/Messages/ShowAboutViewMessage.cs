@@ -1,3 +1,3 @@
 namespace OldBit.Spectron.Messages;
 
-public record ShowAboutViewMessage {}
+public record ShowAboutViewMessage();
