@@ -423,8 +423,6 @@ partial class MainWindowViewModel
         }
     }
 
-    private void HandleTriggerNmi() => Emulator?.RequestNmi();
-
     private void HandleMachineReset()
     {
         _pokeFile = null;
@@ -628,8 +626,6 @@ partial class MainWindowViewModel
 
         Emulator?.Resume();
     }
-
-    private void HandleTakeScreenshot() => _screenshotViewModel.AddScreenshot(SpectrumScreen);
 
     public void HandleMouseMoved(Point position, Rect bounds) =>
         _mouseHelper?.MouseMoved(BorderSize, position, bounds);

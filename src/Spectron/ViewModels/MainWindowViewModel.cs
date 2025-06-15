@@ -204,7 +204,7 @@ public partial class MainWindowViewModel : ObservableObject
     private void ToggleMute() => HandleToggleMute();
 
     [RelayCommand]
-    private void TriggerNmi() => HandleTriggerNmi();
+    private void TriggerNmi() => Emulator?.RequestNmi();
 
     [RelayCommand]
     private void Reset() => HandleMachineReset();
@@ -229,7 +229,7 @@ public partial class MainWindowViewModel : ObservableObject
     public void ShowScreenshotViewer() => OpenScreenshotViewer();
 
     [RelayCommand]
-    private void TakeScreenshot() => HandleTakeScreenshot();
+    private void TakeScreenshot() => _screenshotViewModel.AddScreenshot(SpectrumScreen);
 
     // View
     [RelayCommand]
@@ -373,7 +373,20 @@ public partial class MainWindowViewModel : ObservableObject
         _debuggerViewModel = null;
     }
 
-    private static void OpenAboutWindow() => WeakReferenceMessenger.Default.Send(new ShowAboutViewMessage());
+    private static void OpenAboutWindow() =>
+        WeakReferenceMessenger.Default.Send(new ShowAboutViewMessage());
+
+    private static void ShowKeyboardHelpWindow() =>
+        WeakReferenceMessenger.Default.Send(new ShowKeyboardViewMessage());
+
+    private static void OpenScreenshotViewer() =>
+        WeakReferenceMessenger.Default.Send(new ShowScreenshotViewMessage());
+
+    private void OpenTrainersWindow() =>
+        WeakReferenceMessenger.Default.Send(new ShowTrainerViewMessage(Emulator!, _pokeFile));
+
+    private void OpenPrintOutputViewer() =>
+        WeakReferenceMessenger.Default.Send(new ShowPrintOutputViewMessage(Emulator!.Printer));
 
     private void OpenDebuggerWindow()
     {
@@ -389,8 +402,6 @@ public partial class MainWindowViewModel : ObservableObject
 
         WeakReferenceMessenger.Default.Send(new ShowDebuggerViewMessage(_debuggerViewModel));
     }
-
-    private static void ShowKeyboardHelpWindow() => WeakReferenceMessenger.Default.Send(new ShowKeyboardViewMessage());
 
     public async Task OpenPreferencesWindow()
     {
@@ -474,15 +485,6 @@ public partial class MainWindowViewModel : ObservableObject
             Resume();
         }
     }
-
-    private static void OpenScreenshotViewer() =>
-        WeakReferenceMessenger.Default.Send(new ShowScreenshotViewMessage());
-
-    private void OpenTrainersWindow() =>
-        WeakReferenceMessenger.Default.Send(new ShowTrainerViewMessage(Emulator!, _pokeFile));
-
-    private void OpenPrintOutputViewer() =>
-        WeakReferenceMessenger.Default.Send(new ShowPrintOutputViewMessage(Emulator!.Printer));
 
     private void EmulatorFrameCompleted(FrameBuffer frameBuffer, AudioBuffer audioBuffer)
     {
@@ -709,7 +711,7 @@ public partial class MainWindowViewModel : ObservableObject
                 break;
 
             case GamepadAction.NMI:
-                HandleTriggerNmi();
+                Emulator?.RequestNmi();
                 break;
         }
     }
