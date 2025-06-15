@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -25,7 +24,6 @@ using OldBit.Spectron.Recorder;
 using OldBit.Spectron.Screen;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.Theming;
-using ReactiveUI;
 using SharpHook.Data;
 
 namespace OldBit.Spectron.ViewModels;
@@ -34,6 +32,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
 {
     private readonly GamepadManager _gamepadManager;
     private readonly GamepadSettings _gamepadSettings;
+    private Guid _previousGamepadControllerId = Guid.Empty;
 
     public GamepadMappingViewModel GamepadMappingViewModel { get; }
 
@@ -47,21 +46,6 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
 
         _gamepadManager.ControllerChanged += GamepadManagerOnControllerChanged;
 
-        this.WhenAnyValue(x => x.GamepadControllerId)
-            .Buffer(2, 1)
-            .Select(b => (Previous: b[0], Current: b[1]))
-            .Subscribe(value =>
-            {
-                if (value.Previous != Guid.Empty)
-                {
-                    _gamepadSettings.Mappings[value.Previous] = GamepadMappingViewModel.GetConfiguredMappings();
-                }
-
-                GamepadMappingViewModel.UpdateView(value.Current, _gamepadSettings);
-            });
-
-        this.WhenAnyValue(x => x.Theme).Subscribe(ThemeManager.SelectTheme);
-
         Theme = preferences.Theme;
 
         ComputerType = preferences.ComputerType;
@@ -74,6 +58,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         EmulateUsingKeyboard = preferences.Joystick.EmulateUsingKeyboard;
         GamepadControllerId = _gamepadManager.Controllers.FirstOrDefault(
             controller => controller.ControllerId == preferences.Joystick.GamepadControllerId)?.ControllerId ?? GamepadController.None.ControllerId;
+        _previousGamepadControllerId = GamepadControllerId;
         FireKey = preferences.Joystick.FireKey;
 
         MouseType = preferences.Mouse.MouseType;
@@ -112,6 +97,20 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         IsDivMmcDriveWriteEnabled = preferences.DivMmc.IsDriveWriteEnabled;
 
         IsZxPrinterEnabled = preferences.Printer.IsZxPrinterEnabled;
+    }
+
+    partial void OnThemeChanged(Theme value) => ThemeManager.SelectTheme(value);
+
+    partial void OnGamepadControllerIdChanged(Guid value)
+    {
+        if (_previousGamepadControllerId != Guid.Empty)
+        {
+            _gamepadSettings.Mappings[_previousGamepadControllerId] = GamepadMappingViewModel.GetConfiguredMappings();
+        }
+
+        GamepadMappingViewModel.UpdateView(value, _gamepadSettings);
+
+        _previousGamepadControllerId = value;
     }
 
     [RelayCommand]
