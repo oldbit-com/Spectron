@@ -203,7 +203,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
             }
         };
 
-        WeakReferenceMessenger.Default.Send(new PreferencesViewClosedMessage(preferences));
+        WeakReferenceMessenger.Default.Send(new UpdatePreferencesMessage(preferences));
     }
 
     [RelayCommand]

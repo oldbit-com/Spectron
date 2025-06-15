@@ -7,12 +7,12 @@ using OldBit.Spectron.Messages;
 
 namespace OldBit.Spectron.ViewModels;
 
-public partial class SelectArchiveFileViewModel : ObservableObject
+public partial class SelectArchiveFileViewModel(List<ArchiveEntry> fileNames) : ObservableObject
 {
     [ObservableProperty]
     private ArchiveEntry? _selectedFile;
 
-    public List<ArchiveEntry> FileNames { get; set; } = [];
+    public List<ArchiveEntry> FileNames { get; } = fileNames;
 
     [RelayCommand]
     private void SelectFile() =>

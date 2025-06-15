@@ -11,7 +11,7 @@ public partial class PreferencesView : Window
     {
         InitializeComponent();
 
-        WeakReferenceMessenger.Default.Register<PreferencesView, PreferencesViewClosedMessage>(this, static (window, message) =>
+        WeakReferenceMessenger.Default.Register<PreferencesView, UpdatePreferencesMessage>(this, static (window, message) =>
             window.Close(message.Preference));
     }
 

@@ -7,6 +7,7 @@ using Avalonia.Input;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
@@ -19,6 +20,7 @@ using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Files.Pok;
 using OldBit.Spectron.Input;
+using OldBit.Spectron.Messages;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Recorder;
 using OldBit.Spectron.Screen;
@@ -117,7 +119,8 @@ partial class MainWindowViewModel
 
                 default:
                 {
-                    var selectedFile = await ShowSelectFileView.Handle(new SelectArchiveFileViewModel { FileNames = files });
+                    var selectedFile = await WeakReferenceMessenger.Default.Send(new ShowSelectArchiveFileViewMessage(files));
+
                     if (selectedFile != null)
                     {
                         fileType = selectedFile.FileType;

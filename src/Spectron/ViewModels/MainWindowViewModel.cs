@@ -136,10 +136,6 @@ public partial class MainWindowViewModel : ReactiveObject
     public ReactiveCommand<Unit, Unit> ShowAboutViewCommand { get; private set; }
     public ReactiveCommand<Unit, Unit> ShowKeyboardHelpViewCommand { get; private set; }
 
-    // Interactions
-    public Interaction<SelectArchiveFileViewModel, ArchiveEntry?> ShowSelectFileView { get; }
-    public Interaction<TimeMachineViewModel, TimeMachineEntry?> ShowTimeMachineView { get; }
-
     public MainWindowViewModel(
         EmulatorFactory emulatorFactory,
         TimeMachine timeMachine,
@@ -241,10 +237,6 @@ public partial class MainWindowViewModel : ReactiveObject
         // Help
         ShowAboutViewCommand = ReactiveCommand.Create(OpenAboutWindow);
         ShowKeyboardHelpViewCommand = ReactiveCommand.Create(ShowKeyboardHelpWindow);
-
-        // Interactions
-        ShowSelectFileView = new Interaction<SelectArchiveFileViewModel, ArchiveEntry?>();
-        ShowTimeMachineView = new Interaction<TimeMachineViewModel, TimeMachineEntry?>();
 
         SpectrumScreen = _frameBufferConverter.ScreenBitmap;
 
@@ -372,7 +364,7 @@ public partial class MainWindowViewModel : ReactiveObject
 
         var viewModel = new TimeMachineViewModel(_timeMachine, Emulator!.JoystickManager, Emulator.CommandManager, _logger);
 
-        var entry = await ShowTimeMachineView.Handle(viewModel);
+        var entry = await WeakReferenceMessenger.Default.Send(new ShowTimeMachineViewMessage(viewModel));
 
         if (entry != null)
         {
