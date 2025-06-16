@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Input;
