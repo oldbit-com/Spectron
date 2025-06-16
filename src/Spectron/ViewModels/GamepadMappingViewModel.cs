@@ -6,9 +6,9 @@ using System.Timers;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using DynamicData;
 using OldBit.Joypad.Controls;
 using OldBit.Spectron.Emulation.Devices.Gamepad;
+using OldBit.Spectron.Extensions;
 using OldBit.Spectron.Settings;
 
 namespace OldBit.Spectron.ViewModels;
@@ -102,7 +102,7 @@ public partial class GamepadMappingViewModel : ObservableObject, IDisposable
                     actions));
 
         Mappings.Clear();
-        Mappings.AddOrInsertRange(mappedViewModels, 0);
+        mappedViewModels.ForEach(x => Mappings.Add(x));
     }
 
     private void GamepadUpdate(object? sender, ElapsedEventArgs e)

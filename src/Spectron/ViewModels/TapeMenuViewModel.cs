@@ -9,7 +9,6 @@ using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Files.Extensions;
 using OldBit.Spectron.Messages;
-using ReactiveUI;
 using FileTypes = OldBit.Spectron.Emulation.Files.FileTypes;
 
 namespace OldBit.Spectron.ViewModels;

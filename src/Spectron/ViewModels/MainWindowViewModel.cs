@@ -13,6 +13,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Debugger;
+using OldBit.Spectron.Debugger.Messages;
 using OldBit.Spectron.Debugger.ViewModels;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Commands;
@@ -176,7 +177,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     // Machine
     [RelayCommand]
-    public void ChangeComputerType(ComputerType computerType) => ComputerType = computerType;
+    public void ChangeComputerType(ComputerType computerType) => HandleChangeComputerType(computerType);
 
     [RelayCommand]
     private async Task ChangeRom(RomType romType) => await HandleChangeRomAsync(romType);
@@ -210,7 +211,7 @@ public partial class MainWindowViewModel : ObservableObject
     private void Reset() => HandleMachineReset();
 
     [RelayCommand]
-    private void HardReset() => HandleMachineHardReset();
+    private void HardReset() => HandleMachineReset(hardReset: true);
 
     // Tools
     [RelayCommand]
@@ -297,6 +298,9 @@ public partial class MainWindowViewModel : ObservableObject
         _keyboardHook.SpectrumKeyReleased += HandleSpectrumKeyReleased;
         _keyboardHook.Run();
 
+        WeakReferenceMessenger.Default.Register<ResetEmulatorMessage>(this, (_, message) =>
+            HandleMachineReset(message.HardReset));
+
         _frameRateCalculator.FrameRateChanged = fps =>
         {
             Dispatcher.UIThread.Post(() =>
@@ -367,9 +371,6 @@ public partial class MainWindowViewModel : ObservableObject
     private void OpenDebuggerWindow()
     {
         _debuggerViewModel = new DebuggerViewModel(_debuggerContext, Emulator!, _preferences.Debugger);
-
-        _debuggerViewModel.HardResetCommand.Subscribe(x => HandleMachineHardReset());
-        _debuggerViewModel.ResetCommand.Subscribe(x => HandleMachineReset());
 
         if (!IsPaused)
         {

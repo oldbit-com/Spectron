@@ -381,9 +381,9 @@ partial class MainWindowViewModel
         CreateEmulator(ComputerType, RomType, customRom);
     }
 
-    partial void OnComputerTypeChanged(ComputerType value)
+    private void HandleChangeComputerType(ComputerType computerType)
     {
-        StatusBarViewModel.ComputerType = value;
+        ComputerType = computerType;
 
         if (RomType == RomType.Custom)
         {
@@ -392,6 +392,9 @@ partial class MainWindowViewModel
 
         CreateEmulator(ComputerType, RomType);
     }
+
+    partial void OnComputerTypeChanged(ComputerType value) =>
+        StatusBarViewModel.ComputerType = value;
 
     partial void OnJoystickTypeChanged(JoystickType value)
     {
@@ -428,22 +431,19 @@ partial class MainWindowViewModel
         }
     }
 
-    private void HandleMachineReset()
+    private void HandleMachineReset(bool hardReset = false)
     {
         _pokeFile = null;
 
-        Emulator?.Reset();
-        IsPaused = Emulator?.IsPaused ?? false;
-
-        RecentFilesViewModel.CurrentFileName = string.Empty;
-        UpdateWindowTitle();
-    }
-
-    private void HandleMachineHardReset()
-    {
-        _pokeFile = null;
-
-        CreateEmulator(_preferences.ComputerType, _preferences.RomType);
+        if (hardReset)
+        {
+            CreateEmulator(_preferences.ComputerType, _preferences.RomType);
+        }
+        else
+        {
+            Emulator?.Reset();
+            IsPaused = Emulator?.IsPaused ?? false;
+        }
 
         RecentFilesViewModel.CurrentFileName = string.Empty;
         UpdateWindowTitle();
@@ -545,7 +545,7 @@ partial class MainWindowViewModel
                 return;
 
             case { Key: Key.F5, KeyModifiers: KeyModifiers.Control }:
-                HandleMachineHardReset();
+                HandleMachineReset(hardReset: true);
                 return;
         }
     }

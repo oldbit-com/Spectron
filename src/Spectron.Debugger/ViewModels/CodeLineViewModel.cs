@@ -1,12 +1,24 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using OldBit.Spectron.Debugger.Breakpoints;
-using ReactiveUI;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
-public class CodeLineViewModel : ReactiveObject
+public partial class CodeLineViewModel : ObservableObject
 {
     private readonly BreakpointListViewModel _breakpointListViewModel;
-    private bool _suppressBreakpointSubscription = true;
+    private bool _suppressBreakpointSubscription;
+
+    [ObservableProperty]
+    private Word _address;
+
+    [ObservableProperty]
+    private string _code = string.Empty;
+
+    [ObservableProperty]
+    private bool _isCurrent;
+
+    [ObservableProperty]
+    private bool _isBreakpoint;
 
     public CodeLineViewModel(
         BreakpointListViewModel breakpointListViewModel,
@@ -22,16 +34,15 @@ public class CodeLineViewModel : ReactiveObject
         IsCurrent = isCurrent;
         IsBreakpoint = isBreakpoint;
 
-        this.WhenAny(x => x.IsBreakpoint, x => x.Value)
-            .Subscribe(value =>
-            {
-                if (!_suppressBreakpointSubscription)
-                {
-                    ToggleBreakpoint(value);
-                }
-            });
-
         _suppressBreakpointSubscription = false;
+    }
+
+    partial void OnIsBreakpointChanged(bool value)
+    {
+        if (!_suppressBreakpointSubscription)
+        {
+            ToggleBreakpoint(value);
+        }
     }
 
     private void ToggleBreakpoint(bool isBreakpoint)
@@ -53,33 +64,5 @@ public class CodeLineViewModel : ReactiveObject
         IsBreakpoint = isBreakpoint;
 
         _suppressBreakpointSubscription = false;
-    }
-
-    private Word _address;
-    public Word Address
-    {
-        get => _address;
-        set => this.RaiseAndSetIfChanged(ref _address, value);
-    }
-
-    private string _code = string.Empty;
-    public string Code
-    {
-        get => _code;
-        set => this.RaiseAndSetIfChanged(ref _code, value);
-    }
-
-    private bool _isCurrent;
-    public bool IsCurrent
-    {
-        get => _isCurrent;
-        set => this.RaiseAndSetIfChanged(ref _isCurrent, value);
-    }
-
-    private bool _isBreakpoint;
-    public bool IsBreakpoint
-    {
-        get => _isBreakpoint;
-        set => this.RaiseAndSetIfChanged(ref _isBreakpoint, value);
     }
 }

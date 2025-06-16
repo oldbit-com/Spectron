@@ -1,17 +1,17 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using CommunityToolkit.Mvvm.ComponentModel;
 using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Debugger.Settings;
 using OldBit.Spectron.Disassembly;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Z80Cpu;
-using ReactiveUI;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
 public class CodeListViewModel(
     BreakpointManager breakpointManager,
-    BreakpointListViewModel breakpointListViewModel) : ReactiveObject
+    BreakpointListViewModel breakpointListViewModel) : ObservableObject
 {
     public ObservableCollection<CodeLineViewModel> CodeLines { get; } = [];
 

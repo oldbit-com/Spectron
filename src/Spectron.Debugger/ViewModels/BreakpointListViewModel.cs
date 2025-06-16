@@ -1,20 +1,16 @@
 using System.Collections;
 using System.Collections.ObjectModel;
-using System.Reactive;
-using DynamicData;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using OldBit.Spectron.Debugger.Breakpoints;
-using ReactiveUI;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
-public class BreakpointListViewModel : ReactiveObject
+public partial class BreakpointListViewModel : ObservableObject
 {
     private readonly BreakpointManager _breakpointManager;
 
     public ObservableCollection<BreakpointViewModel> Breakpoints { get; } = [];
-
-    public ReactiveCommand<Unit, Unit> AddBreakpointCommand { get; private set; }
-    public ReactiveCommand<IList, Unit> RemoveBreakpointCommand { get; private set; }
 
     public BreakpointListViewModel(DebuggerContext debuggerContext, BreakpointManager breakpointManager)
     {
@@ -24,9 +20,20 @@ public class BreakpointListViewModel : ReactiveObject
         {
             AddBreakpoint(breakpoint);
         }
+    }
 
-        AddBreakpointCommand = ReactiveCommand.Create(() => AddBreakpoint(Register.PC, 0x1000));
-        RemoveBreakpointCommand = ReactiveCommand.Create<IList>(RemoveBreakpoints);
+    [RelayCommand]
+    private void AddBreakpoint() => AddBreakpoint(Register.PC, 0x1000);
+
+    [RelayCommand]
+    private void RemoveBreakpoint(IList breakpoints)
+    {
+        foreach (var breakpoint in breakpoints.OfType<BreakpointViewModel>().ToList())
+        {
+            _breakpointManager.RemoveBreakpoint(breakpoint.Id);
+
+            Breakpoints.Remove(breakpoint);
+        }
     }
 
     private void AddBreakpoint(Breakpoint breakpoint)
@@ -70,15 +77,11 @@ public class BreakpointListViewModel : ReactiveObject
             updated.Value.Address,
             breakpoint.IsEnabled);
 
-        Breakpoints.Replace(breakpoint, breakpoint);
-    }
+        var existingIndex = Breakpoints.IndexOf(breakpoint);
 
-    private void RemoveBreakpoints(IList breakpoints)
-    {
-        foreach (var breakpoint in breakpoints.OfType<BreakpointViewModel>().ToList())
+        if (existingIndex >= 0)
         {
-            _breakpointManager.RemoveBreakpoint(breakpoint.Id);
-            Breakpoints.Remove(breakpoint);
+            Breakpoints[existingIndex] = breakpoint;
         }
     }
 }
