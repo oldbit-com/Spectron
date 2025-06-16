@@ -82,29 +82,14 @@ public partial class StatusBarViewModel : ObservableObject
         _timer.Elapsed += UpdateRecordingTime;
     }
 
-    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+
+    partial void OnComputerTypeChanged(ComputerType value) => OnPropertyChanged(nameof(ComputerName));
+
+    partial void OnJoystickTypeChanged(JoystickType value) => OnPropertyChanged(nameof(JoystickName));
+
+    partial void OnRecordingStatusChanged(RecordingStatus value)
     {
-        base.OnPropertyChanged(e);
-
-        switch (e.PropertyName)
-        {
-            case nameof(RecordingStatus):
-                UpdateRecordingStatus();
-                break;
-
-            case nameof(ComputerType):
-                OnPropertyChanged(nameof(ComputerName));
-                break;
-
-            case nameof(JoystickType):
-                OnPropertyChanged(nameof(JoystickName));
-                break;
-        }
-    }
-
-    private void UpdateRecordingStatus()
-    {
-        switch (RecordingStatus)
+        switch (value)
         {
             case RecordingStatus.Recording:
                 UpdateProcessingStatus(true, "Recording");
@@ -139,5 +124,4 @@ public partial class StatusBarViewModel : ObservableObject
 
     private void UpdateRecordingTime(object? sender, ElapsedEventArgs e) =>
         Dispatcher.UIThread.InvokeAsync(() => TimeElapsed = _stopwatch.Elapsed.ToString(@"hh\:mm\:ss"));
-
 }

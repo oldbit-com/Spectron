@@ -381,9 +381,9 @@ partial class MainWindowViewModel
         CreateEmulator(ComputerType, RomType, customRom);
     }
 
-    private void HandleChangeComputerType(ComputerType computerType)
+    partial void OnComputerTypeChanged(ComputerType value)
     {
-        ComputerType = computerType;
+        StatusBarViewModel.ComputerType = value;
 
         if (RomType == RomType.Custom)
         {
@@ -393,28 +393,33 @@ partial class MainWindowViewModel
         CreateEmulator(ComputerType, RomType);
     }
 
-    private void HandleChangeJoystickType(JoystickType joystickType)
+    partial void OnJoystickTypeChanged(JoystickType value)
     {
-        JoystickType = joystickType;
-        Emulator?.JoystickManager.SetupJoystick(joystickType);
+        StatusBarViewModel.JoystickType = value;
+        Emulator?.JoystickManager.SetupJoystick(value);
     }
 
-    private void HandleChangeMouseType(MouseType mouseType)
+    partial void OnMouseTypeChanged(MouseType value)
     {
-        MouseType = mouseType;
+        StatusBarViewModel.IsMouseEnabled = value != MouseType.None;
+
+        SetMouseCursor();
 
         if (Emulator == null)
         {
             return;
         }
 
-        Emulator.MouseManager.SetupMouse(_preferences.Mouse.MouseType);
+        Emulator.MouseManager.SetupMouse(value);
         _mouseHelper = new MouseHelper(Emulator.MouseManager);
     }
 
-    private void HandleToggleUlaPlus()
+    private void SetMouseCursor() => MouseCursor = MouseType != MouseType.None && _preferences.Mouse.IsStandardMousePointerHidden
+        ? Cursor.Parse("None")
+        : Cursor.Default;
+
+    partial void OnIsUlaPlusEnabledChanged(bool value)
     {
-        IsUlaPlusEnabled = !IsUlaPlusEnabled;
         StatusBarViewModel.IsUlaPlusEnabled = IsUlaPlusEnabled;
 
         if (Emulator != null)

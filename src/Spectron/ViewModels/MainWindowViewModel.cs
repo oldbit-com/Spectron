@@ -176,19 +176,19 @@ public partial class MainWindowViewModel : ObservableObject
 
     // Machine
     [RelayCommand]
-    public void ChangeComputerType(ComputerType computerType) => HandleChangeComputerType(computerType);
+    public void ChangeComputerType(ComputerType computerType) => ComputerType = computerType;
 
     [RelayCommand]
     private async Task ChangeRom(RomType romType) => await HandleChangeRomAsync(romType);
 
     [RelayCommand]
-    public void ChangeJoystickType(JoystickType joystickType) => HandleChangeJoystickType(joystickType);
+    public void ChangeJoystickType(JoystickType joystickType) => JoystickType = joystickType;
 
     [RelayCommand]
-    public void ChangeMouseType(MouseType mouseType) => HandleChangeMouseType(mouseType);
+    public void ChangeMouseType(MouseType mouseType) => MouseType = mouseType;
 
     [RelayCommand]
-    public void ToggleUlaPlus() => HandleToggleUlaPlus();
+    public void ToggleUlaPlus() => IsUlaPlusEnabled = !IsUlaPlusEnabled;
 
     // Control
     [RelayCommand]
@@ -315,46 +315,22 @@ public partial class MainWindowViewModel : ObservableObject
         _frameRateCalculator.Start();
 
         StatusBarViewModel.ComputerType = ComputerType;
-        StatusBarViewModel.JoystickType = JoystickType;
-        StatusBarViewModel.IsMouseEnabled = MouseType != MouseType.None;
     }
 
-    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+    partial void OnTapeLoadSpeedChanged(TapeSpeed value) =>
+        Emulator?.SetTapeLoadingSpeed(TapeLoadSpeed);
+
+    partial void OnIsTimeMachineEnabledChanged(bool value)
     {
-        base.OnPropertyChanged(e);
-
-        switch (e.PropertyName)
-        {
-            case nameof(TapeLoadSpeed):
-                Emulator?.SetTapeLoadingSpeed(TapeLoadSpeed);
-                break;
-
-            case nameof(IsTimeMachineEnabled):
-                _timeMachine.IsEnabled = IsTimeMachineEnabled;
-                NotifyCanExecuteChanged(nameof(ShowTimeMachineViewCommand));
-                break;
-
-            case nameof(RecordingStatus):
-                StatusBarViewModel.RecordingStatus = RecordingStatus;
-                break;
-
-            case nameof(ComputerType):
-                StatusBarViewModel.ComputerType = ComputerType;
-                break;
-
-            case nameof(JoystickType):
-                StatusBarViewModel.JoystickType = JoystickType;
-                break;
-
-            case nameof(MouseType):
-                StatusBarViewModel.IsMouseEnabled = MouseType != MouseType.None;
-                break;
-
-            case nameof(IsPaused):
-                _debuggerViewModel?.HandlePause(IsPaused);
-                break;
-        }
+        _timeMachine.IsEnabled = value;
+        NotifyCanExecuteChanged(nameof(ShowTimeMachineViewCommand));
     }
+
+    partial void OnRecordingStatusChanged(RecordingStatus value) =>
+        StatusBarViewModel.RecordingStatus = RecordingStatus;
+
+    partial void OnIsPausedChanged(bool value) =>
+        _debuggerViewModel?.HandlePause(value);
 
     private void NotifyCanExecuteChanged(string commandName)
     {
@@ -422,18 +398,19 @@ public partial class MainWindowViewModel : ObservableObject
             _preferences = preferences;
 
             IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
+            Emulator.SetUlaPlus(IsUlaPlusEnabled);
+
             TapeLoadSpeed = preferences.Tape.LoadSpeed;
+            Emulator.SetTapeSettings(_preferences.Tape);
 
             IsTimeMachineEnabled = preferences.TimeMachine.IsEnabled;
             _timeMachine.SnapshotInterval = preferences.TimeMachine.SnapshotInterval;
             _timeMachine.MaxDuration = preferences.TimeMachine.MaxDuration;
             TimeMachineCountdownSeconds = preferences.TimeMachine.CountdownSeconds;
 
-            HandleChangeJoystickType(preferences.Joystick.JoystickType);
-            HandleChangeMouseType(preferences.Mouse.MouseType);
-
-            Emulator.SetUlaPlus(IsUlaPlusEnabled);
-            Emulator.SetTapeSettings(_preferences.Tape);
+            JoystickType = preferences.Joystick.JoystickType;
+            MouseType = preferences.Mouse.MouseType;
+            SetMouseCursor();
 
             ConfigureEmulatorSettings();
         }
@@ -665,13 +642,10 @@ public partial class MainWindowViewModel : ObservableObject
         Emulator.SetDivMMc(_preferences.DivMmc);
         Emulator.SetPrinter(_preferences.Printer);
 
-        SetMouseCursor();
-
         StatusBarViewModel.IsDivMmcEnabled = _preferences.DivMmc.IsEnabled;
-        StatusBarViewModel.IsMouseEnabled = Emulator!.MouseManager.MouseType != MouseType.None;
         StatusBarViewModel.IsPrinterEnabled = _preferences.Printer.IsZxPrinterEnabled;
         StatusBarViewModel.IsUlaPlusEnabled = IsUlaPlusEnabled;
-        StatusBarViewModel.IsTapeLoaded = Emulator.TapeManager.IsTapeLoaded;
+        StatusBarViewModel.IsTapeLoaded = Emulator!.TapeManager.IsTapeLoaded;
         StatusBarViewModel.TapeLoadProgress = string.Empty;
     }
 
@@ -741,9 +715,4 @@ public partial class MainWindowViewModel : ObservableObject
 
         Title = $"{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
     }
-
-    private void SetMouseCursor() =>
-        MouseCursor = _preferences.Mouse is { MouseType: not MouseType.None, IsStandardMousePointerHidden: true }
-            ? Cursor.Parse("None")
-            : Cursor.Default;
 }
