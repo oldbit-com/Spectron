@@ -429,12 +429,9 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        var resumeAfter = false;
-
         if (!IsPaused)
         {
             Pause();
-            resumeAfter = true;
         }
 
         _isTimeMachineOpen = true;
@@ -453,12 +450,14 @@ public partial class MainWindowViewModel : ObservableObject
                 return;
             }
 
+            IsTimeMachineCountdownVisible = true;
+
             CreateEmulator(snapshot);
         }
 
         _isTimeMachineOpen = false;
 
-        if (resumeAfter)
+        if (!IsTimeMachineCountdownVisible)
         {
             Resume();
         }

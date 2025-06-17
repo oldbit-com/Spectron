@@ -29,6 +29,18 @@ public partial class TimeMachineViewModel : ObservableObject, IDisposable
     private const int PreviewHeight = 192;
     private const int PreviewWidth = 256;
 
+    [ObservableProperty]
+    private int _entriesCount;
+
+    [ObservableProperty]
+    private double _currentEntryIndex;
+
+    [ObservableProperty]
+    private WriteableBitmap _screenPreview;
+
+    [ObservableProperty]
+    private Brush _screenBorderBrush;
+
     public Control? PreviewControl { get; set; }
     public Action Close { get; set; } = () => { };
 
@@ -140,18 +152,6 @@ public partial class TimeMachineViewModel : ObservableObject, IDisposable
 
         return null;
     }
-
-    [ObservableProperty]
-    private int _entriesCount;
-
-    [ObservableProperty]
-    private double _currentEntryIndex;
-
-    [ObservableProperty]
-    private WriteableBitmap _screenPreview;
-
-    [ObservableProperty]
-    private Brush _screenBorderBrush;
 
     public void Dispose()
     {
