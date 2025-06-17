@@ -23,46 +23,56 @@
         </Style>
     </Window.Styles>
 
-    <ScrollViewer>
-        <ItemsControl ItemsSource="{Binding Screenshots}" HorizontalAlignment="Center">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border
-                        Classes="current"
-                        BorderBrush="{DynamicResource SystemAccentColorDark3}"
-                        BorderThickness="5"
-                        CornerRadius="4"
-                        Margin="4">
-                        <Grid>
-                            <Image
-                                Width="300"
-                                Stretch="Uniform"
-                                Source="{Binding Data, Converter={StaticResource ScreenshotBytesToImageConverter}}"/>
-                            <StackPanel
-                                Orientation="Horizontal"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Bottom"
-                                Margin="2">
-                                <Button Padding="2" Margin="0" ToolTip.Tip="Save"
-                                        Command="{Binding $parent[ItemsControl].((viewModels:ScreenshotViewModel)DataContext).SaveCommand, FallbackValue={x:Null}}"
-                                        CommandParameter="{Binding}">
-                                    <material:MaterialIcon Kind="ContentSave"/>
-                                </Button>
-                                <Button Padding="2" Margin="0" ToolTip.Tip="Remove"
-                                        Command="{Binding $parent[ItemsControl].((viewModels:ScreenshotViewModel)DataContext).RemoveCommand, FallbackValue={x:Null}}"
-                                        CommandParameter="{Binding}">
-                                    <material:MaterialIcon Kind="Remove" Foreground="Red"/>
-                                </Button>
-                            </StackPanel>
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-    </ScrollViewer>
+    <Grid>
+        <TextBlock Text="No Screenshots Available"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   FontSize="16"
+                   Opacity=".6"
+                   IsVisible="{Binding !Screenshots.Count}"/>
+
+        <ScrollViewer IsVisible="{Binding Screenshots.Count}">
+            <ItemsControl ItemsSource="{Binding Screenshots}" HorizontalAlignment="Center">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border
+                            Classes="current"
+                            BorderBrush="{DynamicResource SystemAccentColorDark3}"
+                            BorderThickness="5"
+                            CornerRadius="4"
+                            Margin="4">
+                            <Grid>
+                                <Image
+                                    Width="300"
+                                    Stretch="Uniform"
+                                    Source="{Binding Data, Converter={StaticResource ScreenshotBytesToImageConverter}}"/>
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    Margin="2">
+                                    <Button Padding="2" Margin="0" ToolTip.Tip="Save"
+                                            Command="{Binding $parent[ItemsControl].((viewModels:ScreenshotViewModel)DataContext).SaveCommand, FallbackValue={x:Null}}"
+                                            CommandParameter="{Binding}">
+                                        <material:MaterialIcon Kind="ContentSave"/>
+                                    </Button>
+                                    <Button Padding="2" Margin="0" ToolTip.Tip="Remove"
+                                            Command="{Binding $parent[ItemsControl].((viewModels:ScreenshotViewModel)DataContext).RemoveCommand, FallbackValue={x:Null}}"
+                                            CommandParameter="{Binding}">
+                                        <material:MaterialIcon Kind="Remove" Foreground="Red"/>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+
 </Window>

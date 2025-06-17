@@ -359,8 +359,8 @@ public partial class MainWindowViewModel : ObservableObject
     private static void ShowKeyboardHelpWindow() =>
         WeakReferenceMessenger.Default.Send(new ShowKeyboardViewMessage());
 
-    private static void OpenScreenshotViewer() =>
-        WeakReferenceMessenger.Default.Send(new ShowScreenshotViewMessage());
+    private void OpenScreenshotViewer() =>
+        WeakReferenceMessenger.Default.Send(new ShowScreenshotViewMessage(_screenshotViewModel));
 
     private void OpenTrainersWindow() =>
         WeakReferenceMessenger.Default.Send(new ShowTrainerViewMessage(Emulator!, _pokeFile));

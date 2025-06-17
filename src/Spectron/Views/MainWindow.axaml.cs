@@ -41,8 +41,8 @@ public partial class MainWindow : Window
         WeakReferenceMessenger.Default.Register<MainWindow, ShowPrintOutputViewMessage>(this, (window, message) =>
             Show<PrintOutputView>(window, new PrintOutputViewModel(message.Printer)));
 
-        WeakReferenceMessenger.Default.Register<MainWindow, ShowScreenshotViewMessage>(this, (window, _) =>
-            Show<ScreenshotView>(window, new ScreenshotViewModel()));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowScreenshotViewMessage>(this, (window, message) =>
+            Show<ScreenshotView>(window, message.ViewModel));
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowSelectArchiveFileViewMessage>(this, (window, message) =>
         {
