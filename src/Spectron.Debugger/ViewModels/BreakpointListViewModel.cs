@@ -2,11 +2,14 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using OldBit.Spectron.Debugger.Breakpoints;
+using OldBit.Spectron.Debugger.Messages;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
-public partial class BreakpointListViewModel : ObservableObject
+public partial class BreakpointListViewModel : ObservableObject,
+    IRecipient<ToggleBreakpointMessage>
 {
     private readonly BreakpointManager _breakpointManager;
 
@@ -20,6 +23,8 @@ public partial class BreakpointListViewModel : ObservableObject
         {
             AddBreakpoint(breakpoint);
         }
+
+        WeakReferenceMessenger.Default.RegisterAll(this);
     }
 
     [RelayCommand]
@@ -30,9 +35,7 @@ public partial class BreakpointListViewModel : ObservableObject
     {
         foreach (var breakpoint in breakpoints.OfType<BreakpointViewModel>().ToList())
         {
-            _breakpointManager.RemoveBreakpoint(breakpoint.Id);
-
-            Breakpoints.Remove(breakpoint);
+            RemoveBreakpoint(breakpoint);
         }
     }
 
@@ -42,16 +45,18 @@ public partial class BreakpointListViewModel : ObservableObject
 
         Breakpoints.Add(viewModel);
         _breakpointManager.AddBreakpoint(breakpoint);
+
+        WeakReferenceMessenger.Default.Send(new BreakpointAddedMessage((Word)breakpoint.Value));
     }
 
-    public void AddBreakpoint(Register register, Word value)
+    private void AddBreakpoint(Register register, Word value)
     {
         var breakpoint = new Breakpoint(register, value);
 
         AddBreakpoint(breakpoint);
     }
 
-    public void RemoveBreakpoint(Register register, Word value)
+    private void RemoveBreakpoint(Register register, Word value)
     {
         var breakpoint = Breakpoints.FirstOrDefault(x =>
             x.Breakpoint.Value == value &&
@@ -59,9 +64,16 @@ public partial class BreakpointListViewModel : ObservableObject
 
         if (breakpoint != null)
         {
-            _breakpointManager.RemoveBreakpoint(breakpoint.Breakpoint.Id);
-            Breakpoints.Remove(breakpoint);
+            RemoveBreakpoint(breakpoint);
         }
+    }
+
+    private void RemoveBreakpoint(BreakpointViewModel breakpoint)
+    {
+        _breakpointManager.RemoveBreakpoint(breakpoint.Id);
+        Breakpoints.Remove(breakpoint);
+
+        WeakReferenceMessenger.Default.Send(new BreakpointRemovedMessage(breakpoint.Breakpoint.Register, (Word)breakpoint.Breakpoint.Value));
     }
 
     public void UpdateBreakpoint(BreakpointViewModel breakpoint)
@@ -71,17 +83,27 @@ public partial class BreakpointListViewModel : ObservableObject
             return;
         }
 
+        var (newRegister, newAddress) = updated.Value;
+        var oldAddress = breakpoint.Breakpoint.Value;
+
         _breakpointManager.UpdateBreakpoint(
             breakpoint.Breakpoint.Id,
-            updated.Value.Register,
-            updated.Value.Address,
+            newRegister,
+            newAddress,
             breakpoint.IsEnabled);
 
-        var existingIndex = Breakpoints.IndexOf(breakpoint);
+        WeakReferenceMessenger.Default.Send(new BreakpointUpdatedMessage(newRegister, (Word)oldAddress, (Word)newAddress));
+    }
 
-        if (existingIndex >= 0)
+    public void Receive(ToggleBreakpointMessage message)
+    {
+        if (message.IsEnabled)
         {
-            Breakpoints[existingIndex] = breakpoint;
+            AddBreakpoint(message.Register, message.Address);
+        }
+        else
+        {
+            RemoveBreakpoint(message.Register, message.Address);
         }
     }
 }

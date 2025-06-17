@@ -1,13 +1,15 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using OldBit.Spectron.Debugger.Breakpoints;
+using OldBit.Spectron.Debugger.Messages;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
-public partial class CodeLineViewModel : ObservableObject
+public partial class CodeLineViewModel : ObservableObject,
+    IRecipient<BreakpointAddedMessage>,
+    IRecipient<BreakpointRemovedMessage>,
+    IRecipient<BreakpointUpdatedMessage>
 {
-    private readonly BreakpointListViewModel _breakpointListViewModel;
-    private bool _suppressBreakpointSubscription;
-
     [ObservableProperty]
     private Word _address;
 
@@ -21,48 +23,51 @@ public partial class CodeLineViewModel : ObservableObject
     private bool _isBreakpoint;
 
     public CodeLineViewModel(
-        BreakpointListViewModel breakpointListViewModel,
         Word address,
         string code,
         bool isCurrent,
         bool isBreakpoint)
     {
-        _breakpointListViewModel = breakpointListViewModel;
-
         Address = address;
         Code = code;
         IsCurrent = isCurrent;
         IsBreakpoint = isBreakpoint;
 
-        _suppressBreakpointSubscription = false;
+        WeakReferenceMessenger.Default.RegisterAll(this);
     }
 
-    partial void OnIsBreakpointChanged(bool value)
+    public void ToggleBreakpoint()
     {
-        if (!_suppressBreakpointSubscription)
+        IsBreakpoint = !IsBreakpoint;
+        WeakReferenceMessenger.Default.Send(new ToggleBreakpointMessage(Register.PC, Address, IsBreakpoint));
+    }
+
+    public void Receive(BreakpointAddedMessage message)
+    {
+        if (Address == message.Address)
         {
-            ToggleBreakpoint(value);
+            IsBreakpoint = true;
         }
     }
 
-    private void ToggleBreakpoint(bool isBreakpoint)
+    public void Receive(BreakpointRemovedMessage message)
     {
-        if (isBreakpoint)
+        if (Address == message.Address)
         {
-            _breakpointListViewModel.AddBreakpoint(Register.PC, Address);
-        }
-        else
-        {
-            _breakpointListViewModel.RemoveBreakpoint(Register.PC, Address);
+            IsBreakpoint = false;
         }
     }
 
-    public void UpdateBreakpoint(bool isBreakpoint)
+    public void Receive(BreakpointUpdatedMessage message)
     {
-        _suppressBreakpointSubscription = true;
+        if (Address == message.OldAddress)
+        {
+            IsBreakpoint = false;
+        }
 
-        IsBreakpoint = isBreakpoint;
-
-        _suppressBreakpointSubscription = false;
+        if (Address == message.NewAddress)
+        {
+            IsBreakpoint = true;
+        }
     }
 }

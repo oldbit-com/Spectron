@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using OldBit.Spectron.Debugger.Breakpoints;
+using OldBit.Spectron.Debugger.Messages;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
