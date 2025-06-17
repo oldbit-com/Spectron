@@ -1,11 +1,69 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using OldBit.Z80Cpu;
 using OldBit.Z80Cpu.Registers;
-using ReactiveUI;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
-public class CpuViewModel : ReactiveObject
+// ReSharper disable InconsistentNaming
+public partial class CpuViewModel : ObservableObject
 {
+    [ObservableProperty]
+    private Word _AF;
+
+    [ObservableProperty]
+    private Word _AFPrime;
+
+    [ObservableProperty]
+    private Word _BC;
+
+    [ObservableProperty]
+    private Word _BCPrime;
+
+    [ObservableProperty]
+    private Word _DE;
+
+    [ObservableProperty]
+    private Word _DEPrime;
+
+    [ObservableProperty]
+    private Word _HL;
+
+    [ObservableProperty]
+    private Word _HLPrime;
+
+    [ObservableProperty]
+    private Word _IX;
+
+    [ObservableProperty]
+    private Word _IY;
+
+    [ObservableProperty]
+    private Word _PC;
+
+    [ObservableProperty]
+    private Word _SP;
+
+    [ObservableProperty]
+    private byte _I;
+
+    [ObservableProperty]
+    private Flags _F;
+
+    [ObservableProperty]
+    private byte _R;
+
+    [ObservableProperty]
+    private string _IFF1 = string.Empty;
+
+    [ObservableProperty]
+    private string _IFF2 = string.Empty;
+
+    [ObservableProperty]
+    private string _IM = string.Empty;
+
+    [ObservableProperty]
+    private int _T;
+
     public void Update(Z80 cpu)
     {
         AF = cpu.Registers.AF;
@@ -35,138 +93,5 @@ public class CpuViewModel : ReactiveObject
         IM = ((int)cpu.IM).ToString();
 
         T = cpu.Clock.FrameTicks;
-    }
-
-    private Word _af;
-    public Word AF
-    {
-        get => _af;
-        set => this.RaiseAndSetIfChanged(ref _af, value);
-    }
-
-    private Word _afPrime;
-    public Word AFPrime
-    {
-        get => _afPrime;
-        set => this.RaiseAndSetIfChanged(ref _afPrime, value);
-    }
-
-    private Word _bc;
-    public Word BC
-    {
-        get => _bc;
-        set => this.RaiseAndSetIfChanged(ref _bc, value);
-    }
-
-    private Word _bcPrime;
-    public Word BCPrime
-    {
-        get => _bcPrime;
-        set => this.RaiseAndSetIfChanged(ref _bcPrime, value);
-    }
-
-    private Word _de;
-    public Word DE
-    {
-        get => _de;
-        set => this.RaiseAndSetIfChanged(ref _de, value);
-    }
-
-    private Word _dePrime;
-    public Word DEPrime
-    {
-        get => _dePrime;
-        set => this.RaiseAndSetIfChanged(ref _dePrime, value);
-    }
-
-    private Word _hl;
-    public Word HL
-    {
-        get => _hl;
-        set => this.RaiseAndSetIfChanged(ref _hl, value);
-    }
-
-    private Word _hlPrime;
-    public Word HLPrime
-    {
-        get => _hlPrime;
-        set => this.RaiseAndSetIfChanged(ref _hlPrime, value);
-    }
-
-    private Word _ix;
-    public Word IX
-    {
-        get => _ix;
-        set => this.RaiseAndSetIfChanged(ref _ix, value);
-    }
-
-    private Word _iy;
-    public Word IY
-    {
-        get => _iy;
-        set => this.RaiseAndSetIfChanged(ref _iy, value);
-    }
-
-    private Word _pc;
-    public Word PC
-    {
-        get => _pc;
-        set => this.RaiseAndSetIfChanged(ref _pc, value);
-    }
-
-    private Word _sp;
-    public Word SP
-    {
-        get => _sp;
-        set => this.RaiseAndSetIfChanged(ref _sp, value);
-    }
-
-    private byte _i;
-    public byte I
-    {
-        get => _i;
-        set => this.RaiseAndSetIfChanged(ref _i, value);
-    }
-
-    private Flags _f;
-    public Flags F
-    {
-        get => _f;
-        set => this.RaiseAndSetIfChanged(ref _f, value);
-    }
-
-    private byte _r;
-    public byte R
-    {
-        get => _r;
-        set => this.RaiseAndSetIfChanged(ref _r, value);
-    }
-
-    private string _iff1 = string.Empty;
-    public string IFF1
-    {
-        get => _iff1;
-        set => this.RaiseAndSetIfChanged(ref _iff1, value);
-    }
-
-    private string _iff2 = string.Empty;
-    public string IFF2
-    {
-        get => _iff2;
-        set => this.RaiseAndSetIfChanged(ref _iff2, value);
-    }
-
-    private string _im = string.Empty;
-    public string IM
-    {
-        get => _im;
-        set => this.RaiseAndSetIfChanged(ref _im, value);
-    }
-
-    private int _t;
-    public int T
-    {
-        get => _t;
-        set => this.RaiseAndSetIfChanged(ref _t, value);
     }
 }

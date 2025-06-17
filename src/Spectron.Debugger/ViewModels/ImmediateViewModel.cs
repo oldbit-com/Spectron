@@ -1,46 +1,36 @@
-using System.Reactive;
 using Avalonia.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using OldBit.Spectron.Debugger.Extensions;
 using OldBit.Spectron.Debugger.Parser;
 using OldBit.Spectron.Debugger.Parser.Values;
 using OldBit.Spectron.Disassembly.Formatters;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Extensions;
-using ReactiveUI;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
-public class ImmediateViewModel : ReactiveObject, IOutput
+public partial class ImmediateViewModel(
+    DebuggerContext context,
+    NumberFormat numberFormat,
+    Emulator emulator,
+    Action refreshAction,
+    Action<ListAction> action)
+    : ObservableObject, IOutput
 {
-    private readonly DebuggerContext _context;
-    private readonly Emulator _emulator;
-    private readonly Action _refreshAction;
-    private readonly Action<ListAction> _listAction;
-    private readonly NumberFormat _numberFormat;
     private int _historyIndex = -1;
     private string _currentCommandText = string.Empty;
 
     public Action ScrollToEnd { get; set; } = () => { };
 
-    public ReactiveCommand<KeyEventArgs, Unit> ImmediateCommand { get; private set; }
+    [ObservableProperty]
+    private string _commandText = string.Empty;
 
-    public ImmediateViewModel(
-        DebuggerContext context,
-        NumberFormat numberFormat,
-        Emulator emulator,
-        Action refreshAction,
-        Action<ListAction> listAction)
-    {
-        _context = context;
-        _numberFormat = numberFormat;
-        _emulator = emulator;
-        _refreshAction = refreshAction;
-        _listAction = listAction;
+    [ObservableProperty]
+    private string _outputText = string.Empty;
 
-        ImmediateCommand = ReactiveCommand.Create<KeyEventArgs>(HandleImmediateCommand);
-    }
-
-    private void HandleImmediateCommand(KeyEventArgs e)
+    [RelayCommand]
+    private void Immediate(KeyEventArgs e)
     {
         switch (e.Key)
         {
@@ -52,19 +42,19 @@ public class ImmediateViewModel : ReactiveObject, IOutput
 
                 ExecuteCommand();
 
-                if (_context.CommandHistory.Count == 0 ||
-                    _context.CommandHistory.Count > 0 && _context.CommandHistory.Last() != CommandText)
+                if (context.CommandHistory.Count == 0 ||
+                    context.CommandHistory.Count > 0 && context.CommandHistory.Last() != CommandText)
                 {
-                    _context.CommandHistory.Add(CommandText);
+                    context.CommandHistory.Add(CommandText);
                 }
 
                 CommandText = "";
-                _historyIndex = _context.CommandHistory.Count;
+                _historyIndex = context.CommandHistory.Count;
 
                 break;
 
             case Key.Up when _historyIndex > 0:
-                if (_historyIndex == _context.CommandHistory.Count)
+                if (_historyIndex == context.CommandHistory.Count)
                 {
                     _currentCommandText = CommandText;
                 }
@@ -73,16 +63,16 @@ public class ImmediateViewModel : ReactiveObject, IOutput
 
                 if (_historyIndex >= 0)
                 {
-                    CommandText = _context.CommandHistory[_historyIndex];
+                    CommandText = context.CommandHistory[_historyIndex];
                 }
 
                 break;
 
-            case Key.Down when _historyIndex < _context.CommandHistory.Count:
+            case Key.Down when _historyIndex < context.CommandHistory.Count:
                 _historyIndex += 1;
 
-                CommandText = _historyIndex < _context.CommandHistory.Count ?
-                    _context.CommandHistory[_historyIndex] :
+                CommandText = _historyIndex < context.CommandHistory.Count ?
+                    context.CommandHistory[_historyIndex] :
                     _currentCommandText;
 
                 break;
@@ -107,11 +97,11 @@ public class ImmediateViewModel : ReactiveObject, IOutput
             {
                 case Register register:
                 {
-                    var decimalValue = _emulator.Cpu.GetRegisterValue(register.Name);
+                    var decimalValue = emulator.Cpu.GetRegisterValue(register.Name);
 
                     hexValue = register.Is8Bit
-                        ? NumberFormatter.Format((byte)decimalValue, _numberFormat)
-                        : NumberFormatter.Format((Word)decimalValue, _numberFormat);
+                        ? NumberFormatter.Format((byte)decimalValue, numberFormat)
+                        : NumberFormatter.Format((Word)decimalValue, numberFormat);
 
                     var binaryValue = register.Is8Bit
                         ? Convert.ToString(decimalValue, 2).PadLeft(8, '0')
@@ -122,7 +112,7 @@ public class ImmediateViewModel : ReactiveObject, IOutput
                 }
 
                 case Integer integer:
-                    hexValue = NumberFormatter.Format(integer.Value, 4, _numberFormat);
+                    hexValue = NumberFormatter.Format(integer.Value, 4, numberFormat);
                     Print($"Hex={hexValue}   Decimal={integer.Value}");
                     break;
 
@@ -135,7 +125,7 @@ public class ImmediateViewModel : ReactiveObject, IOutput
 
     private void ExecuteCommand()
     {
-        var interpreter = new Interpreter(_emulator.Cpu, _emulator.Memory, _emulator.Bus, this);
+        var interpreter = new Interpreter(emulator.Cpu, emulator.Memory, emulator.Bus, this);
 
         try
         {
@@ -152,7 +142,7 @@ public class ImmediateViewModel : ReactiveObject, IOutput
                     break;
 
                 case Integer intValue:
-                    Print(NumberFormatter.Format(intValue.Value, intValue.Type, _numberFormat));
+                    Print(NumberFormatter.Format(intValue.Value, intValue.Type, numberFormat));
                     break;
 
                 case GotoAction gotoAction:
@@ -160,7 +150,7 @@ public class ImmediateViewModel : ReactiveObject, IOutput
                     break;
 
                 case ListAction listAction:
-                    _listAction(listAction);
+                    action(listAction);
                     Print($"Listing at ${listAction.Address:X4}");
                     return;
 
@@ -178,12 +168,12 @@ public class ImmediateViewModel : ReactiveObject, IOutput
             Print(ex.Message);
         }
 
-        _refreshAction();
+        refreshAction();
     }
 
     private void Save(SaveAction save)
     {
-        var memory = _emulator.Memory.GetBytes();
+        var memory = emulator.Memory.GetBytes();
         var length = save.Length ?? memory.Length - save.Address;
 
         if (length > memory.Length)
@@ -202,19 +192,5 @@ public class ImmediateViewModel : ReactiveObject, IOutput
         {
             Print(ex.Message);
         }
-    }
-
-    private string _commandText = string.Empty;
-    public string CommandText
-    {
-        get => _commandText;
-        set => this.RaiseAndSetIfChanged(ref _commandText, value);
-    }
-
-    private string _outputText = string.Empty;
-    public string OutputText
-    {
-        get => _outputText;
-        set => this.RaiseAndSetIfChanged(ref _outputText, value);
     }
 }

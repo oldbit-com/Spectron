@@ -2,30 +2,48 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.IO.Compression;
-using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using OldBit.Spectron.Dialogs;
-using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
 
 public record ScreenViewModel(byte[] Data);
 
-public class ScreenshotViewModel : ReactiveObject
+public partial class ScreenshotViewModel : ObservableObject
 {
     public Window? Window { get; set; }
 
     public ObservableCollection<ScreenViewModel> Screenshots { get; } = [];
 
-    public ReactiveCommand<ScreenViewModel, Unit> RemoveCommand { get; private set; }
-    public ReactiveCommand<ScreenViewModel, Task> SaveCommand { get; private set; }
-
-    public ScreenshotViewModel()
+    [RelayCommand]
+    private void Remove(ScreenViewModel item)
     {
-        RemoveCommand = ReactiveCommand.Create<ScreenViewModel>(item => Screenshots.Remove(item));
-        SaveCommand = ReactiveCommand.Create<ScreenViewModel, Task>(SaveScreenshot);
+        Screenshots.Remove(item);
+    }
+
+    [RelayCommand]
+    private async Task Save(ScreenViewModel viewModel)
+    {
+        try
+        {
+            var file = await FileDialogs.SaveImageAsync("Save Screenshot", Window, "screen.png");
+
+            if (file != null)
+            {
+                using var data = Decompress(viewModel.Data);
+                await using var output = File.OpenWrite(file.Path.LocalPath);
+
+                await data.CopyToAsync(output);
+            }
+        }
+        catch (Exception ex)
+        {
+            await MessageDialogs.Error(ex.Message);
+        }
     }
 
     public void AddScreenshot(Bitmap? screen)
@@ -55,25 +73,5 @@ public class ScreenshotViewModel : ReactiveObject
         uncompressed.Seek(0, SeekOrigin.Begin);
 
         return uncompressed;
-    }
-
-    private async Task SaveScreenshot(ScreenViewModel viewModel)
-    {
-        try
-        {
-            var file = await FileDialogs.SaveImageAsync("Save Screenshot", Window,"screen.png");
-
-            if (file != null)
-            {
-                using var data = Decompress(viewModel.Data);
-                await using var output = File.OpenWrite(file.Path.LocalPath);
-
-                await data.CopyToAsync(output);
-            }
-        }
-        catch (Exception ex)
-        {
-            await MessageDialogs.Error(ex.Message);
-        }
     }
 }

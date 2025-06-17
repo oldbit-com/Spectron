@@ -1,22 +1,20 @@
 using System;
 using System.Collections.Generic;
-using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.ReactiveUI;
-using OldBit.Spectron.Debugger.ViewModels;
+using CommunityToolkit.Mvvm.Messaging;
 using OldBit.Spectron.Debugger.Views;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Files;
+using OldBit.Spectron.Messages;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.ViewModels;
-using ReactiveUI;
 
 namespace OldBit.Spectron.Views;
 
-public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
+public partial class MainWindow : Window
 {
     private MainWindowViewModel? _viewModel;
     private readonly Dictionary<string, Window> _windows = new();
@@ -25,54 +23,74 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         InitializeComponent();
 
-        this.WhenActivated(action =>
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowAboutViewMessage>(this, static (window, _) =>
+            ShowDialog<AboutView>(window));
+
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowDebuggerViewMessage>(this, static (window, m) =>
+            ShowDialog<DebuggerView>(window, m.ViewModel!));
+
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowKeyboardViewMessage>(this, (window, _) =>
+            Show<HelpKeyboardView>(window));
+
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowPreferencesViewMessage>(this, (window, message) =>
         {
-            action(ViewModel!.ShowAboutView
-                .RegisterHandler(ShowDialogAsync<Unit, Unit?, AboutView>));
+            var result = ShowDialog<PreferencesView, Preferences?>(window, new PreferencesViewModel(message.Preferences, message.GamepadManager));
+            message.Reply(result);
+        });
 
-            action(ViewModel!.ShowDebuggerView
-                .RegisterHandler(Show<DebuggerViewModel, Unit?, DebuggerView>));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowPrintOutputViewMessage>(this, (window, message) =>
+            Show<PrintOutputView>(window, new PrintOutputViewModel(message.Printer)));
 
-            action(ViewModel!.ShowKeyboardHelpView
-                .RegisterHandler(Show<Unit, Unit?, HelpKeyboardView>));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowScreenshotViewMessage>(this, (window, _) =>
+            Show<ScreenshotView>(window, new ScreenshotViewModel()));
 
-            action(ViewModel!.ShowPreferencesView
-                .RegisterHandler(ShowDialogAsync<PreferencesViewModel, Preferences, PreferencesView>));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowSelectArchiveFileViewMessage>(this, (window, message) =>
+        {
+            var result = ShowDialog<SelectArchiveFileView, ArchiveEntry?>(window, new SelectArchiveFileViewModel(message.FileNames));
+            message.Reply(result);
+        });
 
-            action(ViewModel!.ShowPrintOutputView
-                .RegisterHandler(Show<PrintOutputViewModel, Unit?, PrintOutputView>));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowTapeViewMessage>(this, static (window, message) =>
+            ShowDialog<TapeView>(window, new TapeViewModel(message.TapeManager)));
 
-            action(ViewModel!.ShowScreenshotView
-                .RegisterHandler(Show<ScreenshotViewModel, Unit?, ScreenshotView>));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowTimeMachineViewMessage>(this, (window, message) =>
+        {
+            var result = ShowDialog<TimeMachineView, TimeMachineEntry>(window, message.ViewModel);
+            message.Reply(result);
+        });
 
-            action(ViewModel!.ShowSelectFileView
-                .RegisterHandler(ShowDialogAsync<SelectFileViewModel, ArchiveEntry?, SelectFileView>));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowTrainerViewMessage>(this, static (window, message) =>
+            ShowDialog<TrainerView>(window, new TrainerViewModel(message.Emulator, message.PokeFile)));
+    }
 
-            action(ViewModel!.TapeMenuViewModel.ShowTapeView
-                .RegisterHandler(ShowDialogAsync<TapeViewModel, Unit?, TapeView>));
+    private static void ShowDialog<TView>(Window owner, object? viewModel = null) where TView : Window, new()
+    {
+        var view = new TView { DataContext = viewModel };
 
-            action(ViewModel!.ShowTimeMachineView
-                .RegisterHandler(ShowDialogAsync<TimeMachineViewModel, TimeMachineEntry?, TimeMachineView>));
-
-            action(ViewModel!.ShowTrainersView
-                .RegisterHandler(ShowDialogAsync<TrainerViewModel, Unit?, TrainerView>));
+        view.ShowDialog(owner).ContinueWith(_ =>
+        {
+            if (viewModel is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
         });
     }
 
-    private async Task ShowDialogAsync<TInput, TOutput, TView>(IInteractionContext<TInput, TOutput?> context) where TView : Window, new()
+    private static async Task<TResponse?> ShowDialog<TView, TResponse>(Window owner, object? viewModel = null) where TView : Window, new()
     {
-        var view = new TView { DataContext = context.Input };
-        var result = await view.ShowDialog<TOutput?>(this);
+        var view = new TView { DataContext = viewModel };
 
-        context.SetOutput(result);
+        var result = await view.ShowDialog<TResponse?>(owner);
 
-        if (context.Input is IDisposable disposable)
+        if (viewModel is IDisposable disposable)
         {
             disposable.Dispose();
         }
+
+        return result;
     }
 
-    private void Show<TInput, TOutput, TView>(IInteractionContext<TInput, TOutput?> context) where TView : Window, new()
+    private void Show<TView>(Window owner, object? viewModel = null) where TView : Window, new()
     {
         var viewType = typeof(TView).Name;
 
@@ -84,13 +102,13 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             }
             else
             {
-                window.Show(this);
+                window.Show(owner);
             }
 
             return;
         }
 
-        var view = new TView { DataContext = context.Input };
+        var view = new TView { DataContext = viewModel };
 
         view.Closed += (_, _) =>
         {
@@ -106,7 +124,7 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
             _windows.Remove(viewType);
 
-            _viewModel?.OnViewClosed(context.Input);
+            _viewModel?.OnViewClosed(viewModel);
         };
 
         _windows.Add(viewType, view);

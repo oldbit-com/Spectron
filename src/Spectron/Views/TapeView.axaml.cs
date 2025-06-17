@@ -10,10 +10,7 @@ namespace OldBit.Spectron.Views;
 
 public partial class TapeView : Window
 {
-    public TapeView()
-    {
-        InitializeComponent();
-    }
+    public TapeView() => InitializeComponent();
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
@@ -26,10 +23,7 @@ public partial class TapeView : Window
         Close();
     }
 
-    private void CancelButton_OnClick(object? sender, RoutedEventArgs e)
-    {
-        Close();
-    }
+    private void CancelButton_OnClick(object? sender, RoutedEventArgs e) => Close();
 
     private void InputElement_OnDoubleTapped(object? sender, TappedEventArgs e)
     {

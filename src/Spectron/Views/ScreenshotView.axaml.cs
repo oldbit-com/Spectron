@@ -1,11 +1,11 @@
 using System;
+using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.ReactiveUI;
 using OldBit.Spectron.ViewModels;
 
 namespace OldBit.Spectron.Views;
 
-public partial class ScreenshotView : ReactiveWindow<ScreenshotViewModel>
+public partial class ScreenshotView : Window
 {
     public ScreenshotView() => InitializeComponent();
 
@@ -22,9 +22,11 @@ public partial class ScreenshotView : ReactiveWindow<ScreenshotViewModel>
 
     protected override void OnDataContextChanged(EventArgs e)
     {
-        if (ViewModel != null)
+        base.OnDataContextChanged(e);
+
+        if (DataContext is ScreenshotViewModel viewModel)
         {
-            ViewModel.Window = this;
+            viewModel.Window = this;
         }
     }
 }

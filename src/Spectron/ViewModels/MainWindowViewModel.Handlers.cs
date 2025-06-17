@@ -1,12 +1,12 @@
 using System;
 using System.IO;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Input;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
@@ -19,6 +19,7 @@ using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Files.Pok;
 using OldBit.Spectron.Input;
+using OldBit.Spectron.Messages;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Recorder;
 using OldBit.Spectron.Screen;
@@ -65,7 +66,7 @@ partial class MainWindowViewModel
 
             if (fileType == FileType.Pok)
             {
-                await LoadPokeFile(fileResult.Stream);
+                LoadPokeFile(fileResult.Stream);
                 return;
             }
             else if (_preferences.IsAutoLoadPokeFilesEnabled)
@@ -117,7 +118,8 @@ partial class MainWindowViewModel
 
                 default:
                 {
-                    var selectedFile = await ShowSelectFileView.Handle(new SelectFileViewModel { FileNames = files });
+                    var selectedFile = await WeakReferenceMessenger.Default.Send(new ShowSelectArchiveFileViewMessage(files));
+
                     if (selectedFile != null)
                     {
                         fileType = selectedFile.FileType;
@@ -136,11 +138,10 @@ partial class MainWindowViewModel
         return (stream, fileType);
     }
 
-    private async Task LoadPokeFile(Stream stream)
+    private void LoadPokeFile(Stream stream)
     {
         _pokeFile = PokeFile.Load(stream);
-
-        await OpenTrainersWindow();
+        OpenTrainersWindow();
     }
 
     private void TryAutoLoadPokeFile(string filePath, FileType fileType)
@@ -391,28 +392,36 @@ partial class MainWindowViewModel
         CreateEmulator(ComputerType, RomType);
     }
 
-    private void HandleChangeJoystickType(JoystickType joystickType)
+    partial void OnComputerTypeChanged(ComputerType value) =>
+        StatusBarViewModel.ComputerType = value;
+
+    partial void OnJoystickTypeChanged(JoystickType value)
     {
-        JoystickType = joystickType;
-        Emulator?.JoystickManager.SetupJoystick(joystickType);
+        StatusBarViewModel.JoystickType = value;
+        Emulator?.JoystickManager.SetupJoystick(value);
     }
 
-    private void HandleChangeMouseType(MouseType mouseType)
+    partial void OnMouseTypeChanged(MouseType value)
     {
-        MouseType = mouseType;
+        StatusBarViewModel.IsMouseEnabled = value != MouseType.None;
+
+        SetMouseCursor();
 
         if (Emulator == null)
         {
             return;
         }
 
-        Emulator.MouseManager.SetupMouse(_preferences.Mouse.MouseType);
+        Emulator.MouseManager.SetupMouse(value);
         _mouseHelper = new MouseHelper(Emulator.MouseManager);
     }
 
-    private void HandleToggleUlaPlus()
+    private void SetMouseCursor() => MouseCursor = MouseType != MouseType.None && _preferences.Mouse.IsStandardMousePointerHidden
+        ? Cursor.Parse("None")
+        : Cursor.Default;
+
+    partial void OnIsUlaPlusEnabledChanged(bool value)
     {
-        IsUlaPlusEnabled = !IsUlaPlusEnabled;
         StatusBarViewModel.IsUlaPlusEnabled = IsUlaPlusEnabled;
 
         if (Emulator != null)
@@ -421,24 +430,19 @@ partial class MainWindowViewModel
         }
     }
 
-    private void HandleTriggerNmi() => Emulator?.RequestNmi();
-
-    private void HandleMachineReset()
+    private void HandleMachineReset(bool hardReset = false)
     {
         _pokeFile = null;
 
-        Emulator?.Reset();
-        IsPaused = Emulator?.IsPaused ?? false;
-
-        RecentFilesViewModel.CurrentFileName = string.Empty;
-        UpdateWindowTitle();
-    }
-
-    private void HandleMachineHardReset()
-    {
-        _pokeFile = null;
-
-        CreateEmulator(_preferences.ComputerType, _preferences.RomType);
+        if (hardReset)
+        {
+            CreateEmulator(_preferences.ComputerType, _preferences.RomType);
+        }
+        else
+        {
+            Emulator?.Reset();
+            IsPaused = Emulator?.IsPaused ?? false;
+        }
 
         RecentFilesViewModel.CurrentFileName = string.Empty;
         UpdateWindowTitle();
@@ -536,11 +540,11 @@ partial class MainWindowViewModel
                 break;
 
             case { Key: Key.F1, KeyModifiers: KeyModifiers.None }:
-                _ = ShowKeyboardHelpWindow();
+                ShowKeyboardHelpWindow();
                 return;
 
             case { Key: Key.F5, KeyModifiers: KeyModifiers.Control }:
-                HandleMachineHardReset();
+                HandleMachineReset(hardReset: true);
                 return;
         }
     }
@@ -626,8 +630,6 @@ partial class MainWindowViewModel
 
         Emulator?.Resume();
     }
-
-    private void HandleTakeScreenshot() => _screenshotViewModel.AddScreenshot(SpectrumScreen);
 
     public void HandleMouseMoved(Point position, Rect bounds) =>
         _mouseHelper?.MouseMoved(BorderSize, position, bounds);

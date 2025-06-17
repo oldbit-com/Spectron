@@ -1,84 +1,108 @@
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
-using System.Reactive.Linq;
 using System.Timers;
 using Avalonia.Threading;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Models;
-using ReactiveUI;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class StatusBarViewModel : ReactiveObject
+public partial class StatusBarViewModel : ObservableObject
 {
+    [ObservableProperty]
     private RecordingStatus _recordingStatus = RecordingStatus.None;
 
+    [ObservableProperty]
     private string _framesPerSecond = "0";
-    private string _message = string.Empty;
-    private string _timeElapsed = "";
-    private ComputerType _computerType;
-    private JoystickType _joystickType;
-    private string _speed = "100";
-    private bool _isDivMmcEnabled;
-    private bool _isMouseEnabled;
-    private bool _isPrinterEnabled;
-    private bool _isUlaPlusEnabled;
-    private bool _isTapeLoaded;
-    private string _tapeLoadProgress = string.Empty;
 
-    private readonly ObservableAsPropertyHelper<string> _computerName;
-    private readonly ObservableAsPropertyHelper<string> _joystickName;
+    [ObservableProperty]
+    private string _message = string.Empty;
+
+    [ObservableProperty]
+    private string _timeElapsed = "";
+
+    [ObservableProperty]
+    private ComputerType _computerType;
+
+    [ObservableProperty]
+    private JoystickType _joystickType;
+
+    [ObservableProperty]
+    private string _speed = "100";
+
+    [ObservableProperty]
+    private bool _isDivMmcEnabled;
+
+    [ObservableProperty]
+    private bool _isMouseEnabled;
+
+    [ObservableProperty]
+    private bool _isPrinterEnabled;
+
+    [ObservableProperty]
+    private bool _isUlaPlusEnabled;
+
+    [ObservableProperty]
+    private bool _isTapeLoaded;
+
+    [ObservableProperty]
+    private string _tapeLoadProgress = string.Empty;
 
     private readonly Timer _timer;
     private readonly Stopwatch _stopwatch = new();
 
-    public Action AnimateQuickSave { get; set; } = () => { };
-    public Action AnimateTapeLoad { get; set; } = () => { };
+    public string ComputerName => ComputerType switch
+    {
+        ComputerType.Spectrum16K => "16k",
+        ComputerType.Spectrum48K => "48k",
+        ComputerType.Spectrum128K => "128k",
+        ComputerType.Timex2048 => "Timex",
+        _ => "Unknown"
+    };
+
+    public string JoystickName => JoystickType switch
+    {
+        JoystickType.None => "None",
+        JoystickType.Kempston => "Kempston",
+        JoystickType.Sinclair1 => "Sinclair 1",
+        JoystickType.Sinclair2 => "Sinclair 2",
+        JoystickType.Cursor => "Cursor",
+        JoystickType.Fuller => "Fuller",
+        _ => "Unknown"
+    };
+
+    public Action AnimateQuickSave { get; set; } = () => {};
 
     public StatusBarViewModel()
     {
         _timer = new Timer(1000);
         _timer.Elapsed += UpdateRecordingTime;
+    }
 
-        this.WhenAny(x => x.RecordingStatus, x => x.Value)
-            .Subscribe(status =>
-            {
-                switch (status)
-                {
-                    case RecordingStatus.None:
-                        UpdateProcessingStatus(false);
-                        break;
 
-                    case RecordingStatus.Recording:
-                        UpdateProcessingStatus(true, "Recording");
-                        break;
+    partial void OnComputerTypeChanged(ComputerType value) => OnPropertyChanged(nameof(ComputerName));
 
-                    case RecordingStatus.Processing:
-                        UpdateProcessingStatus(true, "Processing");
-                        break;
-                }
-            });
+    partial void OnJoystickTypeChanged(JoystickType value) => OnPropertyChanged(nameof(JoystickName));
 
-        this.WhenAnyValue(x => x.ComputerType).Select(computerType => computerType switch
+    partial void OnRecordingStatusChanged(RecordingStatus value)
+    {
+        switch (value)
         {
-            ComputerType.Spectrum16K => "16k",
-            ComputerType.Spectrum48K => "48k",
-            ComputerType.Spectrum128K => "128k",
-            ComputerType.Timex2048 => "Timex",
-            _ => "Unknown"
-        }).ToProperty(this, x => x.ComputerName, out _computerName);
+            case RecordingStatus.Recording:
+                UpdateProcessingStatus(true, "Recording");
+                break;
 
-        this.WhenAnyValue(x => x.JoystickType).Select(joystickType => joystickType switch
-        {
-            JoystickType.None => "None",
-            JoystickType.Kempston => "Kempston",
-            JoystickType.Sinclair1 => "Sinclair 1",
-            JoystickType.Sinclair2 => "Sinclair 2",
-            JoystickType.Cursor => "Cursor",
-            JoystickType.Fuller => "Fuller",
-            _ => "Unknown"
-        }).ToProperty(this, x => x.JoystickName, out _joystickName);
+            case RecordingStatus.Processing:
+                UpdateProcessingStatus(true, "Processing");
+                break;
+
+            default:
+                UpdateProcessingStatus(false);
+                break;
+        }
     }
 
     private void UpdateProcessingStatus(bool isActive, string message = "")
@@ -99,88 +123,5 @@ public class StatusBarViewModel : ReactiveObject
     }
 
     private void UpdateRecordingTime(object? sender, ElapsedEventArgs e) =>
-        Dispatcher.UIThread.InvokeAsync(() =>
-            TimeElapsed = _stopwatch.Elapsed.ToString(@"hh\:mm\:ss"));
-
-    public ComputerType ComputerType
-    {
-        get => _computerType;
-        set => this.RaiseAndSetIfChanged(ref _computerType, value);
-    }
-
-    public string ComputerName => _computerName.Value;
-
-    public JoystickType JoystickType
-    {
-        get => _joystickType;
-        set => this.RaiseAndSetIfChanged(ref _joystickType, value);
-    }
-
-    public string JoystickName => _joystickName.Value;
-
-    public string FramesPerSecond
-    {
-        get => _framesPerSecond;
-        set => this.RaiseAndSetIfChanged(ref _framesPerSecond, value);
-    }
-
-    public RecordingStatus RecordingStatus
-    {
-        get => _recordingStatus;
-        set => this.RaiseAndSetIfChanged(ref _recordingStatus, value);
-    }
-
-    public string Message
-    {
-        get => _message;
-        set => this.RaiseAndSetIfChanged(ref _message, value);
-    }
-
-    public string TimeElapsed
-    {
-        get => _timeElapsed;
-        set => this.RaiseAndSetIfChanged(ref _timeElapsed, value);
-    }
-
-    public string Speed
-    {
-        get => _speed;
-        set => this.RaiseAndSetIfChanged(ref _speed, value);
-    }
-
-    public bool IsDivMmcEnabled
-    {
-        get => _isDivMmcEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isDivMmcEnabled, value);
-    }
-
-    public bool IsMouseEnabled
-    {
-        get => _isMouseEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isMouseEnabled, value);
-    }
-
-    public bool IsPrinterEnabled
-    {
-        get => _isPrinterEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isPrinterEnabled, value);
-    }
-
-    public bool IsUlaPlusEnabled
-    {
-        get => _isUlaPlusEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isUlaPlusEnabled, value);
-    }
-
-    public bool IsTapeLoaded
-    {
-        get => _isTapeLoaded;
-        set => this.RaiseAndSetIfChanged(ref _isTapeLoaded, value);
-    }
-
-    public string TapeLoadProgress
-    {
-        get => _tapeLoadProgress;
-        set => this.RaiseAndSetIfChanged(ref _tapeLoadProgress, value);
-    }
+        Dispatcher.UIThread.InvokeAsync(() => TimeElapsed = _stopwatch.Elapsed.ToString(@"hh\:mm\:ss"));
 }

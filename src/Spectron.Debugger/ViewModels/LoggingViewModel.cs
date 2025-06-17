@@ -1,46 +1,46 @@
-using System.Reactive;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using OldBit.Spectron.Debugger.Logging;
 using OldBit.Spectron.Emulation;
-using ReactiveUI;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
-public class LoggingViewModel : ReactiveObject, IDisposable
+public partial class LoggingViewModel : ObservableObject, IDisposable
 {
     private Emulator _emulator = null!;
     private InstructionLogger? _instructionLogger;
 
     public UserControl? Control { get; set; }
 
-    public ReactiveCommand<Unit, Task> SelectLogFileFileCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> StartLoggingCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> StopLoggingCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> ClearLogFileCommand { get; private set; }
+    private bool CanStartLogging => !IsLoggingRunning;
+    private bool CanStopLogging => IsLoggingRunning;
+    private bool CanClearLogFile => !string.IsNullOrEmpty(LogFilePath);
 
-    public LoggingViewModel()
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ClearLogFileCommand))]
+    private string _logFilePath = string.Empty;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(StartLoggingCommand))]
+    [NotifyCanExecuteChangedFor(nameof(StopLoggingCommand))]
+    private bool _isLoggingRunning;
+
+    [ObservableProperty]
+    private bool _shouldLogTicks = true;
+
+    partial void OnShouldLogTicksChanged(bool value)
     {
-        SelectLogFileFileCommand = ReactiveCommand.Create(HandleSelectLogFileFileAsync,
-            this.WhenAnyValue(x => x.IsLoggingRunning, x => x == false));
-
-        StartLoggingCommand = ReactiveCommand.Create(StartLogging,
-            this.WhenAnyValue(x => x.IsLoggingRunning, x => x == false));
-
-        StopLoggingCommand = ReactiveCommand.Create(StopLogging,
-            this.WhenAnyValue(x => x.IsLoggingRunning, x => x == true));
-
-        ClearLogFileCommand= ReactiveCommand.Create(ClearLogFile,
-            this.WhenAnyValue(x => x.LogFilePath, x => !string.IsNullOrEmpty(x)));
-
-        this.WhenAnyValue(x => x.ShouldLockTicks).Subscribe(shouldLockTicks =>
+        if (_instructionLogger != null)
         {
-            if (_instructionLogger != null)
-            {
-                _instructionLogger.ShouldLockTicks = shouldLockTicks;
-            }
-        });
+            _instructionLogger.ShouldLogTicks = value;
+        }
     }
+
+    partial void OnLogFilePathChanged(string value) => OnPropertyChanged(nameof(CanClearLogFile));
+
+    partial void OnIsLoggingRunningChanged(bool value) => OnPropertyChanged(nameof(IsLoggingRunning));
 
     public void Configure(Emulator emulator)
     {
@@ -52,7 +52,7 @@ public class LoggingViewModel : ReactiveObject, IDisposable
         }
 
         var instructionLogger = new InstructionLogger(LogFilePath, _emulator);
-        instructionLogger.ShouldLockTicks = ShouldLockTicks;
+        instructionLogger.ShouldLogTicks = ShouldLogTicks;
 
         if (_instructionLogger?.IsEnabled == true)
         {
@@ -62,7 +62,8 @@ public class LoggingViewModel : ReactiveObject, IDisposable
         _instructionLogger = instructionLogger;
     }
 
-    private async Task HandleSelectLogFileFileAsync()
+    [RelayCommand(CanExecute = nameof(CanSelectLogFile))]
+    private async Task SelectLogFileFile()
     {
         var file = await SelectLogFileFileAsync();
 
@@ -73,6 +74,8 @@ public class LoggingViewModel : ReactiveObject, IDisposable
             _instructionLogger = new InstructionLogger(LogFilePath, _emulator);
         }
     }
+
+    private bool CanSelectLogFile() => !IsLoggingRunning;
 
     private async Task<IStorageFile?> SelectLogFileFileAsync()
     {
@@ -93,50 +96,26 @@ public class LoggingViewModel : ReactiveObject, IDisposable
         });
     }
 
+    [RelayCommand(CanExecute = nameof(CanStartLogging))]
     private void StartLogging()
     {
         IsLoggingRunning = true;
         _instructionLogger?.Enable();
     }
 
+    [RelayCommand(CanExecute = nameof(CanStopLogging))]
     private void StopLogging()
     {
         IsLoggingRunning = false;
         _instructionLogger?.Disable();
     }
 
+    [RelayCommand(CanExecute = nameof(CanClearLogFile))]
     private void ClearLogFile() => _instructionLogger?.ClearLogFile();
-
-    private string _logFilePath = string.Empty;
-    public string LogFilePath
-    {
-        get => _logFilePath;
-        set => this.RaiseAndSetIfChanged(ref _logFilePath, value);
-    }
-
-    private bool _isLoggingRunning;
-    private bool IsLoggingRunning
-    {
-        get => _isLoggingRunning;
-        set => this.RaiseAndSetIfChanged(ref _isLoggingRunning, value);
-    }
-
-    private bool _shouldLockTicks = true;
-    public bool ShouldLockTicks
-    {
-        get => _shouldLockTicks;
-        set => this.RaiseAndSetIfChanged(ref _shouldLockTicks, value);
-    }
 
     public void Dispose()
     {
         _instructionLogger?.Dispose();
-
-        SelectLogFileFileCommand.Dispose();
-        StartLoggingCommand.Dispose();
-        StopLoggingCommand.Dispose();
-        ClearLogFileCommand.Dispose();
-
         GC.SuppressFinalize(this);
     }
 }

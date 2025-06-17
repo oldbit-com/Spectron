@@ -1,17 +1,14 @@
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
+using CommunityToolkit.Mvvm.ComponentModel;
 using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Debugger.Settings;
 using OldBit.Spectron.Disassembly;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Z80Cpu;
-using ReactiveUI;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
-public class CodeListViewModel(
-    BreakpointManager breakpointManager,
-    BreakpointListViewModel breakpointListViewModel) : ReactiveObject
+public class CodeListViewModel(BreakpointManager breakpointManager) : ObservableObject
 {
     public ObservableCollection<CodeLineViewModel> CodeLines { get; } = [];
 
@@ -27,56 +24,16 @@ public class CodeListViewModel(
 
         var instructions = disassembly.Disassemble();
 
-        for (var i = 0; i < instructions.Count; i++)
+        foreach (var instruction in instructions)
         {
-            var isBreakpoint = breakpointManager.HasBreakpoint(Register.PC, instructions[i].Address);
-            var isCurrent = instructions[i].Address == pc;
+            var isBreakpoint = breakpointManager.HasBreakpoint(Register.PC, instruction.Address);
+            var isCurrent = instruction.Address == pc;
 
             CodeLines.Add(new CodeLineViewModel(
-                breakpointListViewModel,
-                instructions[i].Address,
-                instructions[i].Code,
+                instruction.Address,
+                instruction.Code,
                 isCurrent,
                 isBreakpoint));
-        }
-    }
-
-    public void UpdateBreakpoints(NotifyCollectionChangedEventArgs e)
-    {
-        switch (e.Action)
-        {
-            case NotifyCollectionChangedAction.Add:
-
-                foreach (var viewModel in e.NewItems?.Cast<BreakpointViewModel>() ?? [])
-                {
-                    if (CodeLines.FirstOrDefault(x => x.Address == viewModel.Breakpoint.Value ) is { } codeLine)
-                    {
-                        codeLine.IsBreakpoint = true;
-                    }
-                }
-                break;
-
-            case NotifyCollectionChangedAction.Replace:
-
-                foreach (var viewModel in e.NewItems?.Cast<BreakpointViewModel>() ?? [])
-                {
-                    if (CodeLines.FirstOrDefault(x => x.Address == viewModel.Breakpoint.Value) is { } codeLine)
-                    {
-                        codeLine.UpdateBreakpoint(true);
-                    }
-                }
-                break;
-
-            case NotifyCollectionChangedAction.Remove:
-
-                foreach (var viewModel in e.OldItems?.Cast<BreakpointViewModel>() ?? [])
-                {
-                    if (CodeLines.FirstOrDefault(x => x.Address == viewModel.Breakpoint.Value) is { } codeLine)
-                    {
-                        codeLine.IsBreakpoint = false;
-                    }
-                }
-                break;
         }
     }
 }

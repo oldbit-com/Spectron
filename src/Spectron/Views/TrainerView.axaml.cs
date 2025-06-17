@@ -1,9 +1,8 @@
-using Avalonia.ReactiveUI;
-using OldBit.Spectron.ViewModels;
+using Avalonia.Controls;
 
 namespace OldBit.Spectron.Views;
 
-public partial class TrainerView : ReactiveWindow<TrainerViewModel>
+public partial class TrainerView : Window
 {
     public TrainerView() => InitializeComponent();
 }

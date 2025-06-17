@@ -15,7 +15,7 @@ internal sealed class InstructionLogger : IDisposable
 
     internal bool IsEnabled { get; private set; }
 
-    internal bool ShouldLockTicks { get; set; } = true;
+    internal bool ShouldLogTicks { get; set; } = true;
 
     internal InstructionLogger(string logFilePath, Emulator emulator)
     {
@@ -56,7 +56,7 @@ internal sealed class InstructionLogger : IDisposable
             instruction = instructions[0].ToString();
         }
 
-        _textWriter.WriteLine(ShouldLockTicks ?
+        _textWriter.WriteLine(ShouldLogTicks ?
             $"{ticks} {address:X4} {instruction}" :
             $"{address:X4} {instruction}");
     }

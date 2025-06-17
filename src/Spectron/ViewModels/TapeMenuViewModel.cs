@@ -1,34 +1,31 @@
 using System.IO;
-using System.Reactive;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Files.Extensions;
-using ReactiveUI;
+using OldBit.Spectron.Messages;
 using FileTypes = OldBit.Spectron.Emulation.Files.FileTypes;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class TapeMenuViewModel : ReactiveObject
+public partial class TapeMenuViewModel : ObservableObject
 {
+    [ObservableProperty]
     private bool _canStop;
+
+    [ObservableProperty]
     private bool _canPlay;
+
+    [ObservableProperty]
     private bool _canRewind;
+
+    [ObservableProperty]
     private bool _canEject;
-
-    public ReactiveCommand<Unit, Unit> NewCommand { get; private set; }
-    public ReactiveCommand<Unit, Task> InsertCommand { get; private set; }
-    public ReactiveCommand<Unit, Task> SaveCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> PlayCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> StopCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> RewindCommand { get; private set; }
-    public ReactiveCommand<Unit, Unit> EjectCommand { get; private set; }
-    public ReactiveCommand<Unit, Task> ViewCommand { get; private set; }
-
-    public Interaction<TapeViewModel, Unit?> ShowTapeView { get; }
 
     private readonly TapeManager _tapeManager;
     private readonly RecentFilesViewModel _recentFilesViewModel;
@@ -38,38 +35,26 @@ public class TapeMenuViewModel : ReactiveObject
         _tapeManager = tapeManager;
         _recentFilesViewModel = recentFilesViewModel;
 
-        NewCommand = ReactiveCommand.Create(NewTape);
-        InsertCommand = ReactiveCommand.Create(InsertTape);
-
-        SaveCommand = ReactiveCommand.Create(
-            Save,
-            this.WhenAnyValue(x => x.CanEject).Select(canEject => canEject));
-
-       PlayCommand = ReactiveCommand.Create(
-            () => { _tapeManager?.PlayTape(); },
-            this.WhenAnyValue(x => x.CanPlay).Select(canPlay => canPlay));
-
-        StopCommand = ReactiveCommand.Create(
-            () => { _tapeManager?.StopTape(); },
-            this.WhenAnyValue(x => x.CanStop).Select(canStop => canStop));
-
-        RewindCommand = ReactiveCommand.Create(
-            () => { _tapeManager?.RewindTape(); },
-            this.WhenAnyValue(x => x.CanRewind).Select(canRewind => canRewind));
-
-        EjectCommand = ReactiveCommand.Create(
-            () => { _tapeManager?.EjectTape(); },
-            this.WhenAnyValue(x => x.CanEject).Select(canEject => canEject));
-
-        ViewCommand = ReactiveCommand.Create(
-            OpenTapeView,
-            this.WhenAnyValue(x => x.CanEject).Select(canEject => canEject));
-
-        ShowTapeView = new Interaction<TapeViewModel, Unit?>();
-
         _tapeManager.TapeStateChanged += args => Dispatcher.UIThread.Post(() => { UpdateTapeState(args); });
     }
 
+    [RelayCommand]
+    private void New() => _tapeManager.NewTape();
+
+    [RelayCommand]
+    private async Task Insert()
+    {
+        var files = await FileDialogs.OpenTapeFileAsync();
+
+        if (files.Count == 0)
+        {
+            return;
+        }
+
+        _tapeManager.InsertTape(files[0].Path.LocalPath);
+    }
+
+    [RelayCommand(CanExecute = nameof(CanEject))]
     private async Task Save()
     {
         var fileName = string.Empty;
@@ -101,6 +86,33 @@ public class TapeMenuViewModel : ReactiveObject
         }
     }
 
+    [RelayCommand(CanExecute = nameof(CanPlay))]
+    private void Play()
+    {
+        _tapeManager?.PlayTape();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanStop))]
+    private void Stop()
+    {
+        _tapeManager?.StopTape();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRewind))]
+    private void Rewind()
+    {
+        _tapeManager?.RewindTape();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanEject))]
+    private void Eject()
+    {
+        _tapeManager?.EjectTape();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanEject))]
+    private void View() => WeakReferenceMessenger.Default.Send(new ShowTapeViewMessage(_tapeManager));
+
     private void UpdateTapeState(TapeStateEventArgs args)
     {
         Dispatcher.UIThread.Post(() =>
@@ -112,7 +124,6 @@ public class TapeMenuViewModel : ReactiveObject
                     CanPlay = true;
                     CanStop = false;
                     CanEject = true;
-
                     break;
 
                 case TapeAction.TapeStopped:
@@ -120,7 +131,6 @@ public class TapeMenuViewModel : ReactiveObject
                     CanPlay = true;
                     CanStop = false;
                     CanEject = true;
-
                     break;
 
                 case TapeAction.TapeStarted:
@@ -128,7 +138,6 @@ public class TapeMenuViewModel : ReactiveObject
                     CanPlay = false;
                     CanStop = true;
                     CanEject = true;
-
                     break;
 
                 case TapeAction.TapeEjected:
@@ -136,53 +145,8 @@ public class TapeMenuViewModel : ReactiveObject
                     CanPlay = false;
                     CanStop = false;
                     CanEject = false;
-
                     break;
             }
         });
-    }
-
-    private async Task OpenTapeView()
-    {
-        using var viewModel = new TapeViewModel(_tapeManager);
-        await ShowTapeView.Handle(viewModel);
-    }
-
-    private void NewTape() => _tapeManager.NewTape();
-
-    private async Task InsertTape()
-    {
-        var files = await FileDialogs.OpenTapeFileAsync();
-
-        if (files.Count == 0)
-        {
-            return;
-        }
-
-        _tapeManager.InsertTape(files[0].Path.LocalPath);
-    }
-
-    private bool CanStop
-    {
-        get => _canStop;
-        set => this.RaiseAndSetIfChanged(ref _canStop, value);
-    }
-
-    private bool CanPlay
-    {
-        get => _canPlay;
-        set => this.RaiseAndSetIfChanged(ref _canPlay, value);
-    }
-
-    private bool CanRewind
-    {
-        get => _canRewind;
-        set => this.RaiseAndSetIfChanged(ref _canRewind, value);
-    }
-
-    private bool CanEject
-    {
-        get => _canEject;
-        set => this.RaiseAndSetIfChanged(ref _canEject, value);
     }
 }

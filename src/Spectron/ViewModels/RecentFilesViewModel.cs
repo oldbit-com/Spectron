@@ -1,19 +1,17 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
-using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class RecentFilesViewModel : ReactiveObject
+public partial class RecentFilesViewModel : ObservableObject
 {
     private readonly RecentFilesService _recentFilesService;
-    private readonly ReactiveCommand<string, Unit> _openRecentFileCommand;
     private RecentFilesSettings _recentFilesSettings = new();
 
     public string CurrentFileName
@@ -27,16 +25,15 @@ public class RecentFilesViewModel : ReactiveObject
     public RecentFilesViewModel(RecentFilesService recentFilesService)
     {
         _recentFilesService = recentFilesService;
+    }
 
-        _openRecentFileCommand = ReactiveCommand.CreateFromTask<string, Unit>(async fileName =>
+    [RelayCommand]
+    private async Task OpenRecentFile(string fileName)
+    {
+        if (OpenRecentFileAsync != null)
         {
-            if (OpenRecentFileAsync != null)
-            {
-                await OpenRecentFileAsync(fileName);
-            }
-
-            return Unit.Default;
-        });
+            await OpenRecentFileAsync(fileName);
+        }
     }
 
     public async Task LoadAsync() => _recentFilesSettings = await _recentFilesService.LoadAsync();
@@ -54,7 +51,7 @@ public class RecentFilesViewModel : ReactiveObject
             items.Add(new MenuItem
             {
                 Header = fileName,
-                Command = _openRecentFileCommand,
+                Command = OpenRecentFileCommand,
                 CommandParameter = file
             });
         }

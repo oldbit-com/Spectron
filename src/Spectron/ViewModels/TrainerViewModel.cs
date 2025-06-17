@@ -1,15 +1,13 @@
-using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Linq;
+using CommunityToolkit.Mvvm.ComponentModel;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Spectron.Files.Pok;
-using ReactiveUI;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class TrainerViewModel : ReactiveObject
+public class TrainerViewModel : ObservableObject
 {
     private readonly Emulator _emulator;
     private readonly PokeFile? _pokeFile;
@@ -47,19 +45,22 @@ public class TrainerViewModel : ReactiveObject
                 trainerItem.CustomPokes.Add(pokeItem);
             }
 
-            trainerItem.WhenAnyValue(x => x.IsEnabled)
-                .Skip(1)
-                .Subscribe(isEnabled =>
+            trainerItem.PropertyChanged += (sender, e) =>
             {
-                if (isEnabled)
+                if (e.PropertyName != nameof(TrainerItemViewModel.IsEnabled) || sender is not TrainerItemViewModel item)
                 {
-                    ApplyTrainer(trainerItem);
+                    return;
+                }
+
+                if (item.IsEnabled)
+                {
+                    ApplyTrainer(item);
                 }
                 else
                 {
-                    UndoTrainer(trainerItem);
+                    UndoTrainer(item);
                 }
-            });
+            };
 
             Trainers.Add(trainerItem);
         }

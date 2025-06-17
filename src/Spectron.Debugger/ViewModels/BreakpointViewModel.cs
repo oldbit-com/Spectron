@@ -1,12 +1,19 @@
 using System.ComponentModel.DataAnnotations;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using OldBit.Spectron.Debugger.Breakpoints;
-using ReactiveUI;
+using OldBit.Spectron.Debugger.Messages;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
-public class BreakpointViewModel : ReactiveObject
+public partial class BreakpointViewModel : ObservableValidator
 {
+    [ObservableProperty]
+    [Required(ErrorMessage = "Condition is required.")]
+    [CustomValidation(typeof(BreakpointViewModel), nameof(ValidateCondition))]
     private string _condition = string.Empty;
+
+    [ObservableProperty]
     private bool _isEnabled;
 
     public BreakpointViewModel(Breakpoint breakpoint)
@@ -29,18 +36,4 @@ public class BreakpointViewModel : ReactiveObject
     public Guid Id => Breakpoint.Id;
 
     public Breakpoint Breakpoint { get; }
-
-    [Required(ErrorMessage = "Condition is required.")]
-    [CustomValidation(typeof(BreakpointViewModel), nameof(ValidateCondition))]
-    public string Condition
-    {
-        get => _condition;
-        set => this.RaiseAndSetIfChanged(ref _condition, value);
-    }
-
-    public bool IsEnabled
-    {
-        get => _isEnabled;
-        set => this.RaiseAndSetIfChanged(ref _isEnabled, value);
-    }
 }

@@ -6,10 +6,7 @@ namespace OldBit.Spectron.Debugger.Controls;
 
 public partial class CodeList : UserControl
 {
-    public CodeList()
-    {
-        InitializeComponent();
-    }
+    public CodeList() => InitializeComponent();
 
     private void ListBox_OnDoubleTapped(object? sender, TappedEventArgs e)
     {
@@ -20,7 +17,7 @@ public partial class CodeList : UserControl
 
         if (control.DataContext is CodeLineViewModel codeLine)
         {
-            codeLine.IsBreakpoint = !codeLine.IsBreakpoint;
+            codeLine.ToggleBreakpoint();
         }
     }
 }

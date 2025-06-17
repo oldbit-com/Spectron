@@ -1,18 +1,20 @@
 using System;
-using Avalonia.ReactiveUI;
+using Avalonia.Controls;
 using OldBit.Spectron.ViewModels;
 
 namespace OldBit.Spectron.Views;
 
-public partial class PrintOutputView : ReactiveWindow<PrintOutputViewModel>
+public partial class PrintOutputView : Window
 {
     public PrintOutputView() => InitializeComponent();
 
     protected override void OnDataContextChanged(EventArgs e)
     {
-        if (ViewModel != null)
+        base.OnDataContextChanged(e);
+
+        if (DataContext is PrintOutputViewModel viewModel)
         {
-            ViewModel.PreviewControl = OutputImage;
+            viewModel.PreviewControl = OutputImage;
         }
     }
 }

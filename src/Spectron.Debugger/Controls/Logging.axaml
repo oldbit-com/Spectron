@@ -14,7 +14,7 @@
         </Grid>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left">
-            <CheckBox Content="T-states" IsChecked="{Binding ShouldLockTicks}"/>
+            <CheckBox Content="T-states" IsChecked="{Binding ShouldLogTicks}"/>
         </StackPanel>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
