@@ -45,10 +45,4 @@
       <ProjectReference Include="..\Spectron.Emulation\Spectron.Emulation.csproj" />
       <ProjectReference Include="..\Spectron.Recorder\Spectron.Recorder.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Compile Update="ViewModels\MainWindowViewModel.Handlers.cs">
-        <DependentUpon>MainWindowViewModel.cs</DependentUpon>
-      </Compile>
-    </ItemGroup>
 </Project>
