@@ -110,7 +110,7 @@ partial class MainWindowViewModel
 
     private void OpenDebuggerWindow()
     {
-        _debuggerViewModel = new DebuggerViewModel(_debuggerContext, Emulator!, _preferences.Debugger);
+        _debuggerViewModel = new DebuggerViewModel(_debuggerContext, Emulator!, _preferences.Debugger, _breakpointHandler!);
 
         if (!IsPaused)
         {

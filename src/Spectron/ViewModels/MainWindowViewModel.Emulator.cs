@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Files;
@@ -81,6 +82,7 @@ partial class MainWindowViewModel
         Emulator.FrameCompleted += EmulatorFrameCompleted;
 
         ConfigureEmulatorSettings();
+        ConfigureDebugging(Emulator);
 
         if (IsMuted)
         {
@@ -110,6 +112,20 @@ partial class MainWindowViewModel
         StatusBarViewModel.IsUlaPlusEnabled = IsUlaPlusEnabled;
         StatusBarViewModel.IsTapeLoaded = Emulator!.TapeManager.IsTapeLoaded;
         StatusBarViewModel.TapeLoadProgress = string.Empty;
+    }
+
+    private void ConfigureDebugging(Emulator emulator)
+    {
+        if (_breakpointHandler == null)
+        {
+            _breakpointHandler = new BreakpointHandler(emulator.Cpu, emulator.Memory);
+        }
+        else
+        {
+            _breakpointHandler.Update(emulator.Cpu);
+        }
+
+        // TODO: Add breakpoint handler and open debugger window
     }
 
     private void ShutdownEmulator()

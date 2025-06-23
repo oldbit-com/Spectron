@@ -65,7 +65,7 @@ public sealed class Emulator
     public TapeSpeed TapeLoadSpeed { get; set; }
 
     public Z80 Cpu { get; }
-    public IMemory Memory => _memory;
+    public IEmulatorMemory Memory => _memory;
     public IBus Bus => _spectrumBus;
     public DivMmcDevice DivMmc { get; }
     public ZxPrinter Printer { get; }

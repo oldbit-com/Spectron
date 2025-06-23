@@ -11,6 +11,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Debugger;
+using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Debugger.Messages;
 using OldBit.Spectron.Debugger.ViewModels;
 using OldBit.Spectron.Emulation;
@@ -56,6 +57,7 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly KeyboardHook _keyboardHook;
     private readonly Stopwatch _renderStopwatch = new();
     private readonly FrameRateCalculator _frameRateCalculator = new();
+    private readonly ScreenshotViewModel _screenshotViewModel = new();
 
     private Emulator? Emulator { get; set; }
     private Preferences _preferences = new();
@@ -66,7 +68,7 @@ public partial class MainWindowViewModel : ObservableObject
     private DebuggerViewModel? _debuggerViewModel;
     private PokeFile? _pokeFile;
     private MouseHelper? _mouseHelper;
-    private readonly ScreenshotViewModel _screenshotViewModel = new();
+    private BreakpointHandler? _breakpointHandler;
 
     public Control ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }

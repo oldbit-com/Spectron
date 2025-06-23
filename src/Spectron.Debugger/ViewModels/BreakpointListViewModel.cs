@@ -15,11 +15,11 @@ public partial class BreakpointListViewModel : ObservableObject,
 
     public ObservableCollection<BreakpointViewModel> Breakpoints { get; } = [];
 
-    public BreakpointListViewModel(DebuggerContext debuggerContext, BreakpointManager breakpointManager)
+    public BreakpointListViewModel(BreakpointManager breakpointManager)
     {
         _breakpointManager = breakpointManager;
 
-        foreach (var breakpoint in debuggerContext.Breakpoints)
+        foreach (var breakpoint in breakpointManager.Breakpoints)
         {
             AddBreakpoint(breakpoint);
         }

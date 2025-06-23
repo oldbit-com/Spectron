@@ -14,9 +14,7 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
 {
     private readonly DebuggerContext _debuggerContext;
     private readonly DebuggerSettings _debuggerSettings;
-
-    private BreakpointHandler _breakpointHandler = null!;
-    private BreakpointManager? _breakpointManager;
+    private readonly BreakpointHandler _breakpointHandler;
 
     private Emulator Emulator { get; set; } = null!;
 
@@ -39,10 +37,15 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private bool _isPaused;
 
-    public DebuggerViewModel(DebuggerContext debuggerContext, Emulator emulator, DebuggerSettings debuggerSettings)
+    public DebuggerViewModel(
+        DebuggerContext debuggerContext,
+        Emulator emulator,
+        DebuggerSettings debuggerSettings,
+        BreakpointHandler breakpointHandler)
     {
         _debuggerContext = debuggerContext;
         _debuggerSettings = debuggerSettings;
+        _breakpointHandler = breakpointHandler;
 
         ConfigureEmulator(emulator);
     }
@@ -51,20 +54,18 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
     {
         Emulator = emulator;
 
-        UpdateContextBreakpoints();
-
-        _breakpointManager = new BreakpointManager(emulator.Cpu);
-
-        _breakpointHandler = new BreakpointHandler(_breakpointManager, emulator.Cpu);
+        _breakpointHandler.BreakpointHit -= OnBreakpointHit;
         _breakpointHandler.BreakpointHit += OnBreakpointHit;
 
-        BreakpointListViewModel = new BreakpointListViewModel(_debuggerContext, _breakpointManager);
-        CodeListViewModel = new CodeListViewModel(_breakpointManager);
+        BreakpointListViewModel = new BreakpointListViewModel(_breakpointHandler.BreakpointManager);
+        CodeListViewModel = new CodeListViewModel(_breakpointHandler.BreakpointManager);
         ImmediateViewModel = new ImmediateViewModel(_debuggerContext, _debuggerSettings.PreferredNumberFormat, emulator,
             () => Refresh(),
             list => CodeListViewModel.Update(Emulator.Memory, list.Address, emulator.Cpu.Registers.PC, _debuggerSettings));
 
         LoggingViewModel.Configure(emulator);
+
+        HandlePause(Emulator.IsPaused);
     }
 
     private void OnBreakpointHit(object? sender, EventArgs e)
@@ -82,11 +83,13 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
     {
         IsPaused = isPaused;
 
-        if (isPaused)
+        if (!isPaused)
         {
-            Emulator.Pause();
-            Refresh();
+            return;
         }
+
+        Emulator.Pause();
+        Refresh();
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteStepCommands))]
@@ -109,7 +112,7 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
 
         if (returnAddress != null)
         {
-            _breakpointManager?.AddBreakpoint(new Breakpoint(Register.PC, returnAddress.Value) { ShouldRemoveOnHit = true });
+            _breakpointHandler?.BreakpointManager?.AddBreakpoint(new Breakpoint(Register.PC, returnAddress.Value) { ShouldRemoveOnHit = true });
             DebuggerResume();
         }
         else
@@ -137,7 +140,7 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
         var sp = Emulator.Cpu.Registers.SP;
         var returnAddress = Emulator.Memory.ReadWord(sp);
 
-        _breakpointManager?.AddBreakpoint(new Breakpoint(Register.PC, returnAddress) { ShouldRemoveOnHit = true });
+        _breakpointHandler?.BreakpointManager?.AddBreakpoint(new Breakpoint(Register.PC, returnAddress) { ShouldRemoveOnHit = true });
         DebuggerResume();
     }
 
@@ -163,24 +166,7 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
     {
         LoggingViewModel.Dispose();
 
-        UpdateContextBreakpoints();
-
-        _breakpointHandler.Dispose();
-    }
-
-    private void UpdateContextBreakpoints()
-    {
-        _debuggerContext.Breakpoints.Clear();
-
-        if (_breakpointManager == null)
-        {
-            return;
-        }
-
-        foreach (var breakpoint in _breakpointManager.Breakpoints)
-        {
-            _debuggerContext.Breakpoints.Add(breakpoint);
-        }
+        _breakpointHandler.BreakpointHit -= OnBreakpointHit;
     }
 
     private void Refresh(bool refreshMemory = true)
