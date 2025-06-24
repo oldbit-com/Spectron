@@ -16,7 +16,7 @@ partial class MainWindowViewModel
 
     private void OpenDebuggerWindow()
     {
-        _debuggerViewModel = new DebuggerViewModel(_debuggerContext, Emulator!, _preferences.Debugger, _breakpointHandler!);
+        _debuggerViewModel = new DebuggerViewModel( Emulator!, _debuggerContext, _preferences.Debugger, _breakpointHandler!);
 
         if (!IsPaused)
         {
@@ -53,10 +53,14 @@ partial class MainWindowViewModel
 
     private void DebuggerWindowClosed()
     {
-        Resume();
+        Resume(isDebuggerResume: true);
 
         _debuggerViewModel = null;
     }
+
+    private void ResumeFromDebug() => Resume(isDebuggerResume: true);
+
+    private void PauseForDebug() => Pause(showOverlay: false);
 
     partial void OnBreakpointsEnabledChanged(bool value)
     {

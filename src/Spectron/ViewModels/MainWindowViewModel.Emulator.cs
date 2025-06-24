@@ -248,9 +248,9 @@ partial class MainWindowViewModel
         }
     }
 
-    private void Resume()
+    private void Resume(bool isDebuggerResume = false)
     {
-        Emulator?.Resume();
+        Emulator?.Resume(isDebuggerResume);
         IsPaused = false;
         IsPauseOverlayVisible = false;
     }

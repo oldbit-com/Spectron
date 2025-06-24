@@ -299,6 +299,12 @@ public partial class MainWindowViewModel : ObservableObject
         WeakReferenceMessenger.Default.Register<ResetEmulatorMessage>(this, (_, message) =>
             HandleMachineReset(message.HardReset));
 
+        WeakReferenceMessenger.Default.Register<ResumeFromDebugMessage>(this, (_, _) =>
+            ResumeFromDebug());
+
+        WeakReferenceMessenger.Default.Register<PauseForDebugMessage>(this, (_, _) =>
+            PauseForDebug());
+
         _frameRateCalculator.FrameRateChanged = fps =>
         {
             Dispatcher.UIThread.Post(() =>

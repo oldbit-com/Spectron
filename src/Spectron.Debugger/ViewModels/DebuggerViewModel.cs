@@ -38,8 +38,8 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
     private bool _isPaused;
 
     public DebuggerViewModel(
-        DebuggerContext debuggerContext,
         Emulator emulator,
+        DebuggerContext debuggerContext,
         DebuggerSettings debuggerSettings,
         BreakpointHandler breakpointHandler)
     {
@@ -88,7 +88,10 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
             return;
         }
 
+        WeakReferenceMessenger.Default.Send(new PauseForDebugMessage());
+
         Emulator.Pause();
+
         Refresh();
     }
 
@@ -147,7 +150,8 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
     [RelayCommand(CanExecute = nameof(CanExecuteStepCommands))]
     private void DebuggerResume()
     {
-        Emulator.Resume(isDebuggerResume: true);
+        WeakReferenceMessenger.Default.Send(new ResumeFromDebugMessage());
+
         IsPaused = false;
     }
 
