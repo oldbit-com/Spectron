@@ -7,8 +7,19 @@ namespace OldBit.Spectron.Debugger.Breakpoints;
 public class BreakpointHandler : IDisposable
 {
     private Z80 _cpu;
+    private bool _isEnabled;
 
     public BreakpointManager BreakpointManager { get; }
+
+    public bool IsEnabled
+    {
+        get => _isEnabled;
+        set
+        {
+            _isEnabled = value;
+            HandleIsEnabled();
+        }
+    }
 
     public event EventHandler<EventArgs>? BreakpointHit;
 
@@ -38,6 +49,16 @@ public class BreakpointHandler : IDisposable
         e.IsBreakpoint = true;
 
         BreakpointHit?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void HandleIsEnabled()
+    {
+        _cpu.BeforeInstruction -= BeforeInstruction;
+
+        if (IsEnabled)
+        {
+            _cpu.BeforeInstruction += BeforeInstruction;
+        }
     }
 
     public void Dispose()

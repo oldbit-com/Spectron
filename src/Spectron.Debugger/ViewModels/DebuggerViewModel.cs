@@ -202,6 +202,7 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         Close();
+
         GC.SuppressFinalize(this);
     }
 }

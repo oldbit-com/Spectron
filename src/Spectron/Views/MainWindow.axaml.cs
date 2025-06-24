@@ -16,17 +16,17 @@ namespace OldBit.Spectron.Views;
 
 public partial class MainWindow : Window
 {
-    private MainWindowViewModel? _viewModel;
+    private MainWindowViewModel? _mainViewModel;
     private readonly Dictionary<string, Window> _windows = new();
 
     public MainWindow()
     {
         InitializeComponent();
 
-        WeakReferenceMessenger.Default.Register<MainWindow, ShowAboutViewMessage>(this, static (window, _) =>
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowAboutViewMessage>(this, (window, _) =>
             ShowDialog<AboutView>(window));
 
-        WeakReferenceMessenger.Default.Register<MainWindow, ShowDebuggerViewMessage>(this, static (window, m) =>
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowDebuggerViewMessage>(this, (window, m) =>
             ShowDialog<DebuggerView>(window, m.ViewModel!));
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowKeyboardViewMessage>(this, (window, _) =>
@@ -50,7 +50,7 @@ public partial class MainWindow : Window
             message.Reply(result);
         });
 
-        WeakReferenceMessenger.Default.Register<MainWindow, ShowTapeViewMessage>(this, static (window, message) =>
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowTapeViewMessage>(this, (window, message) =>
             ShowDialog<TapeView>(window, new TapeViewModel(message.TapeManager)));
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowTimeMachineViewMessage>(this, (window, message) =>
@@ -59,33 +59,46 @@ public partial class MainWindow : Window
             message.Reply(result);
         });
 
-        WeakReferenceMessenger.Default.Register<MainWindow, ShowTrainerViewMessage>(this, static (window, message) =>
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowTrainerViewMessage>(this, (window, message) =>
             ShowDialog<TrainerView>(window, new TrainerViewModel(message.Emulator, message.PokeFile)));
     }
 
-    private static void ShowDialog<TView>(Window owner, object? viewModel = null) where TView : Window, new()
+    private void ShowDialog<TView>(Window owner, object? viewModel = null) where TView : Window, new()
     {
         var view = new TView { DataContext = viewModel };
 
-        view.ShowDialog(owner).ContinueWith(_ =>
+        view.Closed += (_, _) =>
         {
+            var viewModelType = viewModel?.GetType();
+
             if (viewModel is IDisposable disposable)
             {
                 disposable.Dispose();
             }
-        });
+
+            _mainViewModel?.OnViewClosed(viewModelType);
+        };
+
+        view.ShowDialog(owner);
     }
 
-    private static async Task<TResponse?> ShowDialog<TView, TResponse>(Window owner, object? viewModel = null) where TView : Window, new()
+    private async Task<TResponse?> ShowDialog<TView, TResponse>(Window owner, object? viewModel = null) where TView : Window, new()
     {
         var view = new TView { DataContext = viewModel };
 
-        var result = await view.ShowDialog<TResponse?>(owner);
-
-        if (viewModel is IDisposable disposable)
+        view.Closed += (_, _) =>
         {
-            disposable.Dispose();
-        }
+            var viewModelType = viewModel?.GetType();
+
+            if (viewModel is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+
+            _mainViewModel?.OnViewClosed(viewModelType);
+        };
+
+        var result = await view.ShowDialog<TResponse?>(owner);
 
         return result;
     }
@@ -117,6 +130,8 @@ public partial class MainWindow : Window
                 return;
             }
 
+            var viewModelType = viewModel?.GetType();
+
             if (closedWindow.DataContext is IDisposable disposable)
             {
                 disposable.Dispose();
@@ -124,7 +139,7 @@ public partial class MainWindow : Window
 
             _windows.Remove(viewType);
 
-            _viewModel?.OnViewClosed(viewModel);
+            _mainViewModel?.OnViewClosed(viewModelType);
         };
 
         _windows.Add(viewType, view);
@@ -139,8 +154,8 @@ public partial class MainWindow : Window
             return;
         }
 
-        _viewModel = viewModel;
-        _viewModel.ScreenControl = ScreenImage;
+        _mainViewModel = viewModel;
+        _mainViewModel.ScreenControl = ScreenImage;
 
         FileDialogs.MainWindow = this;
         MessageDialogs.MainWindow = this;
@@ -153,7 +168,7 @@ public partial class MainWindow : Window
         var position = e.GetCurrentPoint(ScreenImage).Position;
         var bounds = ScreenImage.Bounds;
 
-        _viewModel?.HandleMouseMoved(position, bounds);
+        _mainViewModel?.HandleMouseMoved(position, bounds);
     }
 
     private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -161,7 +176,7 @@ public partial class MainWindow : Window
         var point = e.GetCurrentPoint(ScreenImage);
         var bounds = ScreenImage.Bounds;
 
-        _viewModel?.HandleMouseButtonStateChanged(point, bounds);
+        _mainViewModel?.HandleMouseButtonStateChanged(point, bounds);
     }
 
     private void InputElement_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
@@ -169,6 +184,6 @@ public partial class MainWindow : Window
         var point = e.GetCurrentPoint(ScreenImage);
         var bounds = ScreenImage.Bounds;
 
-        _viewModel?.HandleMouseButtonStateChanged(point, bounds);
+        _mainViewModel?.HandleMouseButtonStateChanged(point, bounds);
     }
 }

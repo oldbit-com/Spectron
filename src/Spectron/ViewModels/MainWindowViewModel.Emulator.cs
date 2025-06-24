@@ -114,20 +114,6 @@ partial class MainWindowViewModel
         StatusBarViewModel.TapeLoadProgress = string.Empty;
     }
 
-    private void ConfigureDebugging(Emulator emulator)
-    {
-        if (_breakpointHandler == null)
-        {
-            _breakpointHandler = new BreakpointHandler(emulator.Cpu, emulator.Memory);
-        }
-        else
-        {
-            _breakpointHandler.Update(emulator.Cpu);
-        }
-
-        // TODO: Add breakpoint handler and open debugger window
-    }
-
     private void ShutdownEmulator()
     {
         if (Emulator == null)

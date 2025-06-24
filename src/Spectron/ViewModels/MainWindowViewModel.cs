@@ -209,9 +209,6 @@ public partial class MainWindowViewModel : ObservableObject
 
     // Tools
     [RelayCommand]
-    private void ShowDebuggerView() => OpenDebuggerWindow();
-
-    [RelayCommand]
     private async Task StartAudioRecording() => await HandleStartAudioRecordingAsync();
 
     [RelayCommand]
@@ -243,12 +240,19 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void SetTapeLoadSpeed(TapeSpeed tapeSpeed) => HandleSetTapeLoadingSpeed(tapeSpeed);
 
-    // Help
+    // Debug
     [RelayCommand]
-    private void ShowAboutView() => OpenAboutWindow();
+    private void ShowDebuggerView() => OpenDebuggerWindow();
 
     [RelayCommand]
-    private void ShowKeyboardHelpView() => ShowKeyboardHelpWindow();
+    private void ToggleBreakpoints() => BreakpointsEnabled = !BreakpointsEnabled;
+
+    // Help
+    [RelayCommand]
+    private static void ShowAboutView() => OpenAboutWindow();
+
+    [RelayCommand]
+    private static void ShowKeyboardHelpView() => ShowKeyboardHelpWindow();
     #endregion
 
     public MainWindowViewModel(
@@ -348,15 +352,12 @@ public partial class MainWindowViewModel : ObservableObject
         command?.NotifyCanExecuteChanged();
     }
 
-    public void OnViewClosed(object? viewModel)
+    public void OnViewClosed(Type? viewModel)
     {
-        if (viewModel is not DebuggerViewModel)
+        if (viewModel == typeof(DebuggerViewModel))
         {
-            return;
+            DebuggerWindowClosed();
         }
-
-        Resume();
-        _debuggerViewModel = null;
     }
 
     private void HandleToggleMute()
