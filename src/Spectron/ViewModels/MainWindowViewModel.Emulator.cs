@@ -136,10 +136,12 @@ partial class MainWindowViewModel
         {
             CreateEmulator(_preferences.ComputerType, _preferences.RomType);
         }
-        else
+        else if (Emulator != null)
         {
-            Emulator?.Reset();
-            IsPaused = Emulator?.IsPaused ?? false;
+            Emulator.Reset();
+            IsPaused = Emulator.IsPaused;
+
+            ConfigureDebugging(Emulator);
         }
 
         RecentFilesViewModel.CurrentFileName = string.Empty;

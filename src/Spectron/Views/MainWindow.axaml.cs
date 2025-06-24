@@ -27,7 +27,7 @@ public partial class MainWindow : Window
             ShowDialog<AboutView>(window));
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowDebuggerViewMessage>(this, (window, m) =>
-            ShowDialog<DebuggerView>(window, m.ViewModel!));
+            Show<DebuggerView>(window, m.ViewModel!));
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowKeyboardViewMessage>(this, (window, _) =>
             Show<HelpKeyboardView>(window));

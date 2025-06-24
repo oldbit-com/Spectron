@@ -34,6 +34,8 @@ public class BreakpointHandler : IDisposable
     public void Update(Z80 cpu)
     {
         _cpu.BeforeInstruction -= BeforeInstruction;
+        _cpu.BeforeInstruction += BeforeInstruction;
+
         BreakpointManager.Update(cpu);
 
         _cpu = cpu;
