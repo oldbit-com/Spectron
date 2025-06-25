@@ -43,6 +43,7 @@ partial class MainWindowViewModel
             MouseType = preferences.Mouse.MouseType;
             SetMouseCursor();
 
+            UpdateShiftKeys(_preferences.Keyboard);
             ConfigureEmulatorSettings();
         }
 

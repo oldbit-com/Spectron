@@ -164,9 +164,118 @@
 
             <TabItem Header="Input">
                 <Border Classes="Tab">
-                    <Grid RowDefinitions="Auto,*">
-                        <StackPanel>
-                            <controls:HeaderSeparator Text="Mouse"/>
+                    <TabControl TabStripPlacement="Top">
+                        <TabItem Header="Keyboard">
+                            <StackPanel>
+                                <Grid ColumnDefinitions="140,*" RowDefinitions="40,40,*">
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        Grid.Column="0"
+                                        Text="Caps Shift"
+                                        VerticalAlignment="Center"
+                                        Classes="Center"/>
+
+                                    <ComboBox
+                                        Grid.Row="0"
+                                        Grid.Column="1"
+                                        Margin="5 0 0 0"
+                                        Width="150"
+                                        ItemsSource="{Binding ShiftKeys}"
+                                        SelectedValue="{Binding CapsShiftKey}"
+                                        DisplayMemberBinding="{Binding Name}"
+                                        SelectedValueBinding="{Binding Value}"/>
+
+                                    <TextBlock
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        Text="Symbol Shift"
+                                        VerticalAlignment="Center"
+                                        Classes="Center"/>
+
+                                    <ComboBox
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Margin="5 0 0 0"
+                                        Width="150"
+                                        ItemsSource="{Binding ShiftKeys}"
+                                        SelectedValue="{Binding SymbolShiftKey}"
+                                        DisplayMemberBinding="{Binding Name}"
+                                        SelectedValueBinding="{Binding Value}"/>
+
+                                    <TextBlock
+                                        Grid.Row="2"
+                                        Grid.Column="1"
+                                        Margin="10"
+                                        Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}"
+                                        VerticalAlignment="Stretch"
+                                        TextWrapping="Wrap"
+                                        Text="{Binding ValidationSummary}"/>
+                                </Grid>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="Joystick">
+                            <Grid RowDefinitions="Auto,*">
+                                <Grid ColumnDefinitions="140,300" RowDefinitions="40,40,40">
+                                    <TextBlock
+                                        Text="Device"
+                                        VerticalAlignment="Center"
+                                        Classes="Center"/>
+                                    <ComboBox
+                                        Grid.Row="0"
+                                        Grid.Column="1"
+                                        Name="Gamepad"
+                                        Margin="5 0 10 0"
+                                        Width="250"
+                                        ItemsSource="{Binding GamepadControllers}"
+                                        SelectedValue="{Binding GamepadControllerId}"
+                                        DisplayMemberBinding="{Binding Name}"
+                                        SelectedValueBinding="{Binding ControllerId}"/>
+                                    <TextBlock
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        Text="Emulated Joystick"
+                                        VerticalAlignment="Center"
+                                        Classes="Center"/>
+                                    <ComboBox
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Name="Joystick"
+                                        Margin="5 0 0 0"
+                                        Width="250"
+                                        ItemsSource="{Binding JoystickTypes}"
+                                        SelectedValue="{Binding JoystickType}"
+                                        DisplayMemberBinding="{Binding Name}"
+                                        SelectedValueBinding="{Binding Value}"/>
+                                    <StackPanel
+                                        Grid.Row="2"
+                                        Grid.Column="1"
+                                        Orientation="Horizontal">
+                                        <CheckBox
+                                            Content="Use keyboard (← ↑ ↓ →). Fire key:"
+                                            Margin="5 0 0 0"
+                                            VerticalAlignment="Center"
+                                            VerticalContentAlignment="Center"
+                                            IsChecked="{Binding EmulateUsingKeyboard}"
+                                            IsEnabled="{Binding #Joystick.SelectedIndex}"/>
+                                        <ComboBox
+                                            Margin="15 0 0 0"
+                                            Width="120"
+                                            ItemsSource="{Binding FireKeys}"
+                                            SelectedValue="{Binding FireKey}"
+                                            DisplayMemberBinding="{Binding Name}"
+                                            SelectedValueBinding="{Binding Value}"
+                                            IsEnabled="{Binding #Joystick.SelectedIndex}"/>
+                                    </StackPanel>
+                                </Grid>
+                                <Grid Grid.Row="1">
+                                    <controls:GamepadControlsMapping
+                                        HorizontalAlignment="Stretch"
+                                        DataContext="{Binding GamepadMappingViewModel}"
+                                        IsVisible="{Binding #Gamepad.SelectedIndex}"/>
+                                </Grid>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Mouse">
                             <Grid ColumnDefinitions="140,300" RowDefinitions="40,40">
                                 <TextBlock
                                     Grid.Row="0"
@@ -193,65 +302,8 @@
                                     IsChecked="{Binding IsStandardMousePointerHidden}"
                                     IsEnabled="{Binding #Mouse.SelectedIndex}"/>
                             </Grid>
-
-                            <controls:HeaderSeparator Text="Joystick"/>
-                            <Grid ColumnDefinitions="140,300" RowDefinitions="40,40,40">
-                                <TextBlock
-                                    Text="Device"
-                                    VerticalAlignment="Center"
-                                    Classes="Center"/>
-                                <ComboBox
-                                    Grid.Row="0"
-                                    Grid.Column="1"
-                                    Name="Gamepad"
-                                    Margin="5 0 10 0"
-                                    Width="250"
-                                    ItemsSource="{Binding GamepadControllers}"
-                                    SelectedValue="{Binding GamepadControllerId}"
-                                    DisplayMemberBinding="{Binding Name}"
-                                    SelectedValueBinding="{Binding ControllerId}"/>
-                                <TextBlock
-                                    Grid.Row="1"
-                                    Grid.Column="0"
-                                    Text="Emulated Joystick"
-                                    VerticalAlignment="Center"
-                                    Classes="Center"/>
-                                <ComboBox
-                                    Grid.Row="1"
-                                    Grid.Column="1"
-                                    Name="Joystick"
-                                    Margin="5 0 0 0"
-                                    Width="250"
-                                    ItemsSource="{Binding JoystickTypes}"
-                                    SelectedValue="{Binding JoystickType}"
-                                    DisplayMemberBinding="{Binding Name}"
-                                    SelectedValueBinding="{Binding Value}"/>
-                                <StackPanel
-                                    Grid.Row="2"
-                                    Grid.Column="1"
-                                    Orientation="Horizontal">
-                                    <CheckBox
-                                        Content="Use keyboard (← ↑ ↓ →). Fire key:"
-                                        Margin="5 0 0 0"
-                                        VerticalAlignment="Center"
-                                        VerticalContentAlignment="Center"
-                                        IsChecked="{Binding EmulateUsingKeyboard}"
-                                        IsEnabled="{Binding #Joystick.SelectedIndex}"/>
-                                    <ComboBox
-                                        Margin="15 0 0 0"
-                                        Width="120"
-                                        ItemsSource="{Binding FireKeys}"
-                                        SelectedValue="{Binding FireKey}"
-                                        DisplayMemberBinding="{Binding Name}"
-                                        SelectedValueBinding="{Binding Value}"
-                                        IsEnabled="{Binding #Joystick.SelectedIndex}"/>
-                                </StackPanel>
-                            </Grid>
-                        </StackPanel>
-                        <Grid Grid.Row="1">
-                            <controls:GamepadControlsMapping DataContext="{Binding GamepadMappingViewModel}" IsVisible="{Binding #Gamepad.SelectedIndex}"/>
-                        </Grid>
-                    </Grid>
+                        </TabItem>
+                    </TabControl>
                 </Border>
             </TabItem>
 

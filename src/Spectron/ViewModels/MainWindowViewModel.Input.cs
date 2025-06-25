@@ -6,6 +6,7 @@ using OldBit.Spectron.Emulation.Devices.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Input;
+using OldBit.Spectron.Settings;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -66,6 +67,10 @@ partial class MainWindowViewModel
 
         Emulator?.KeyboardState.KeyUp(e.Keys);
     }
+
+    private void UpdateShiftKeys(KeyboardSettings settings) => _keyboardHook.UpdateShiftKeys(
+        settings.CapsShiftKey,
+        settings.SymbolShiftKey);
 
     private bool JoystickHandled(SpectrumKeyEventArgs e)
     {
