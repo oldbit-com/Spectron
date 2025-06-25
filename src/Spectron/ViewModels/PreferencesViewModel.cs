@@ -311,7 +311,9 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
             { CapsShiftKey: KeyCode.VcLeftControl, SymbolShiftKey: KeyCode.VcRightControl } or
             { CapsShiftKey: KeyCode.VcRightControl, SymbolShiftKey: KeyCode.VcLeftControl })
         {
-            return new ValidationResult("Using both left and right Shift, Alt or Control may not work correctly");
+            var altKeyName = OperatingSystem.IsMacOS() ? "Option" : "Alt";
+
+            return new ValidationResult($"Using both left and right Shift, {altKeyName} or Control may not work correctly");
         }
 
         return ValidationResult.Success;
@@ -366,8 +368,8 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
     [
         new("Left Shift", KeyCode.VcLeftShift),
         new("Right Shift", KeyCode.VcRightShift),
-        new("Left Alt", KeyCode.VcLeftAlt),
-        new("Right Alt", KeyCode.VcRightAlt),
+        new(OperatingSystem.IsMacOS() ? "Left Option" : "Left Alt", KeyCode.VcLeftAlt),
+        new(OperatingSystem.IsMacOS() ? "Right Option" : "Right Alt", KeyCode.VcRightAlt),
         new("Left Control", KeyCode.VcLeftControl),
         new("Right Control", KeyCode.VcRightControl),
     ];
