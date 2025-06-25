@@ -217,7 +217,7 @@
                             <Grid RowDefinitions="Auto,*">
                                 <Grid ColumnDefinitions="140,300" RowDefinitions="40,40,40">
                                     <TextBlock
-                                        Text="Device"
+                                        Text="Gamepad"
                                         VerticalAlignment="Center"
                                         Classes="Center"/>
                                     <ComboBox
