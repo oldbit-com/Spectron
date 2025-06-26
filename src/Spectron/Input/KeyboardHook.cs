@@ -18,6 +18,7 @@ public sealed class KeyboardHook : IDisposable
     private KeyCode _symbolShift = KeyCode.VcRightAlt;
 
     private bool _isShiftPressed;
+    private bool _isMetaKeyPressed;
 
     public event EventHandler<SpectrumKeyEventArgs>? SpectrumKeyPressed;
     public event EventHandler<SpectrumKeyEventArgs>? SpectrumKeyReleased;
@@ -32,6 +33,17 @@ public sealed class KeyboardHook : IDisposable
 
     private void KeyPressed(KeyboardHookEventArgs e)
     {
+        if (_isMetaKeyPressed)
+        {
+            return;
+        }
+
+        if (IsMetaKey(e.Data.KeyCode))
+        {
+            _isMetaKeyPressed = true;
+            return;
+        }
+
         HandleShiftState(e, isPressed: true);
 
         var spectrumKeys = ToSpectrumKeySequence(e.Data.KeyCode);
@@ -65,6 +77,12 @@ public sealed class KeyboardHook : IDisposable
 
     private void KeyReleased(KeyboardHookEventArgs e)
     {
+        if (IsMetaKey(e.Data.KeyCode))
+        {
+            _isMetaKeyPressed = false;
+            return;
+        }
+
         HandleShiftState(e, isPressed: false);
 
         var spectrumKeys = ToSpectrumKeySequence(e.Data.KeyCode);
@@ -204,6 +222,8 @@ public sealed class KeyboardHook : IDisposable
             _ => []
         };
     }
+
+    private static bool IsMetaKey(KeyCode keyCode) => keyCode == KeyCode.VcLeftMeta || keyCode == KeyCode.VcRightMeta;
 
     public void UpdateShiftKeys(KeyCode capsShift, KeyCode symbolShift)
     {
