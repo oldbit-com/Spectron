@@ -148,7 +148,7 @@ public partial class MainWindow : Window
         viewModel.NotificationManager = NotificationManager;
     }
 
-    private void InputElement_OnPointerMoved(object? sender, PointerEventArgs e)
+    private void Screen_OnPointerMoved(object? sender, PointerEventArgs e)
     {
         var position = e.GetCurrentPoint(ScreenImage).Position;
         var bounds = ScreenImage.Bounds;
@@ -156,7 +156,7 @@ public partial class MainWindow : Window
         _viewModel?.HandleMouseMoved(position, bounds);
     }
 
-    private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    private void Screen_OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         var point = e.GetCurrentPoint(ScreenImage);
         var bounds = ScreenImage.Bounds;
@@ -164,7 +164,7 @@ public partial class MainWindow : Window
         _viewModel?.HandleMouseButtonStateChanged(point, bounds);
     }
 
-    private void InputElement_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
+    private void Screen_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
         var point = e.GetCurrentPoint(ScreenImage);
         var bounds = ScreenImage.Bounds;

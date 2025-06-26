@@ -14,7 +14,6 @@
         Width="850"
         Height="600"
         WindowStartupLocation="CenterOwner"
-        Focusable="True"
         CanResize="False"
         Title="Preferences">
 

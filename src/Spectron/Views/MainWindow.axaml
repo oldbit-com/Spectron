@@ -81,9 +81,9 @@
                                 Source="{Binding SpectrumScreen}"
                                 Stretch="Uniform"
                                 Cursor="{Binding MouseCursor}"
-                                PointerMoved="InputElement_OnPointerMoved"
-                                PointerPressed="InputElement_OnPointerPressed"
-                                PointerReleased="InputElement_OnPointerReleased"
+                                PointerMoved="Screen_OnPointerMoved"
+                                PointerPressed="Screen_OnPointerPressed"
+                                PointerReleased="Screen_OnPointerReleased"
                                 Classes.IsPaused="{Binding IsPauseOverlayVisible}">
                                 <Image.Styles>
                                     <Style Selector="Image.IsPaused">
