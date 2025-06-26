@@ -11,6 +11,8 @@
         x:DataType="viewModels:MainWindowViewModel"
         Icon="/Assets/spectron.ico"
         Title="{Binding Title}"
+        MinHeight="500"
+        MinWidth="650"
         Width="1024" Height="768"
         WindowStartupLocation="CenterScreen"
         WindowState="{Binding WindowState}"
@@ -31,12 +33,6 @@
     <Window.Resources>
         <converters:ValueInequalityConverter x:Key="ValueInequalityConverter"/>
     </Window.Resources>
-
-    <Window.Styles>
-        <Style Selector="MenuItem">
-            <Setter Property="Padding" Value="10 8 10 8"/>
-        </Style>
-    </Window.Styles>
 
     <Window.KeyBindings>
         <KeyBinding Gesture="{OnPlatform Ctrl+O, macOS=Cmd+O}" Command="{Binding LoadFileCommand}"/>
@@ -72,13 +68,13 @@
                 DockPanel.Dock="Top"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                Margin="6 10 0 0"
+                Margin="6 0 6 0"
                 DataContext="{Binding}"
                 Width="30"/>
 
             <Border Grid.Row="0" Grid.Column="1">
                 <Grid>
-                    <Border CornerRadius="15" HorizontalAlignment="Center" ClipToBounds="True">
+                    <Border CornerRadius="15" HorizontalAlignment="Center" VerticalAlignment="Center" ClipToBounds="True">
                         <Grid>
                             <Image
                                 x:Name="ScreenImage"
