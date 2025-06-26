@@ -8,8 +8,6 @@
     <NativeMenu.Menu>
         <NativeMenu>
             <NativeMenuItem Header="About Spectron" Click="AboutMenuItem_OnClick" />
-            <NativeMenuItemSeparator/>
-            <NativeMenuItem Header="Settings..." Gesture="Cmd+," Click="SettingsMenuItem_OnClick"/>
         </NativeMenu>
     </NativeMenu.Menu>
 
