@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
+using OldBit.Spectron.Settings;
 using SharpHook;
 using SharpHook.Data;
 using SharpHook.Reactive;
@@ -16,6 +17,7 @@ public sealed class KeyboardHook : IDisposable
 
     private KeyCode _capsShift = KeyCode.VcLeftShift;
     private KeyCode _symbolShift = KeyCode.VcRightAlt;
+    private bool _shouldHandleExtendedKeys;
 
     private bool _isShiftPressed;
     private bool _isMetaKeyPressed;
@@ -52,7 +54,7 @@ public sealed class KeyboardHook : IDisposable
         {
             SpectrumKeyPressed?.Invoke(this, new SpectrumKeyEventArgs(spectrumKeys, e.Data.KeyCode, isKeyPressed: true));
         }
-        else
+        else if (_shouldHandleExtendedKeys)
         {
             switch (e.Data.KeyCode)
             {
@@ -91,7 +93,7 @@ public sealed class KeyboardHook : IDisposable
         {
             SpectrumKeyReleased?.Invoke(this, new SpectrumKeyEventArgs(spectrumKeys, e.Data.KeyCode, isKeyPressed: false));
         }
-        else
+        else if (_shouldHandleExtendedKeys)
         {
             switch (e.Data.KeyCode)
             {
@@ -152,7 +154,7 @@ public sealed class KeyboardHook : IDisposable
             return [SpectrumKey.SymbolShift];
         }
 
-        return keyCode switch
+        List<SpectrumKey> keys = keyCode switch
         {
             KeyCode.Vc0 => [SpectrumKey.D0],
             KeyCode.Vc1 => [SpectrumKey.D1],
@@ -192,43 +194,54 @@ public sealed class KeyboardHook : IDisposable
             KeyCode.VcZ => [SpectrumKey.Z],
             KeyCode.VcEnter => [SpectrumKey.Enter],
             KeyCode.VcSpace => [SpectrumKey.Space],
-            KeyCode.VcBackspace => [SpectrumKey.None, SpectrumKey.CapsShift, SpectrumKey.D0],
-            KeyCode.VcEscape => [SpectrumKey.None],
-            KeyCode.VcComma => !_isShiftPressed
-                ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.N]
-                : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.R],
-            KeyCode.VcPeriod => !_isShiftPressed
-                ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.M]
-                : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.T],
-            KeyCode.VcSemicolon => !_isShiftPressed
-                ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.O]
-                : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.Z],
-            KeyCode.VcSlash => !_isShiftPressed
-                ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.V]
-                : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.C],
-            KeyCode.VcQuote => !_isShiftPressed
-                ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.P]
-                : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.D7],
-            KeyCode.VcEquals => !_isShiftPressed
-                ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.L]
-                : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.K],
-            KeyCode.VcMinus => !_isShiftPressed
-                ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.J]
-                : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.D0],
-            KeyCode.VcLeft => [SpectrumKey.CapsShift, SpectrumKey.D5],
-            KeyCode.VcDown => [SpectrumKey.CapsShift, SpectrumKey.D6],
-            KeyCode.VcUp => [SpectrumKey.CapsShift, SpectrumKey.D7],
-            KeyCode.VcRight => [SpectrumKey.CapsShift, SpectrumKey.D8],
             _ => []
         };
+
+        if (keys.Count == 0 && _shouldHandleExtendedKeys)
+        {
+            keys = keyCode switch
+            {
+                KeyCode.VcBackspace => [SpectrumKey.None, SpectrumKey.CapsShift, SpectrumKey.D0],
+                KeyCode.VcEscape => [SpectrumKey.None],
+                KeyCode.VcComma => !_isShiftPressed
+                    ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.N]
+                    : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.R],
+                KeyCode.VcPeriod => !_isShiftPressed
+                    ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.M]
+                    : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.T],
+                KeyCode.VcSemicolon => !_isShiftPressed
+                    ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.O]
+                    : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.Z],
+                KeyCode.VcSlash => !_isShiftPressed
+                    ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.V]
+                    : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.C],
+                KeyCode.VcQuote => !_isShiftPressed
+                    ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.P]
+                    : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.D7],
+                KeyCode.VcEquals => !_isShiftPressed
+                    ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.L]
+                    : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.K],
+                KeyCode.VcMinus => !_isShiftPressed
+                    ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.J]
+                    : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.D0],
+                KeyCode.VcLeft => [SpectrumKey.CapsShift, SpectrumKey.D5],
+                KeyCode.VcDown => [SpectrumKey.CapsShift, SpectrumKey.D6],
+                KeyCode.VcUp => [SpectrumKey.CapsShift, SpectrumKey.D7],
+                KeyCode.VcRight => [SpectrumKey.CapsShift, SpectrumKey.D8],
+                _ => []
+            };
+        }
+
+        return keys;
     }
 
     private static bool IsMetaKey(KeyCode keyCode) => keyCode == KeyCode.VcLeftMeta || keyCode == KeyCode.VcRightMeta;
 
-    public void UpdateShiftKeys(KeyCode capsShift, KeyCode symbolShift)
+    public void UpdateSettings(KeyboardSettings  keyboardSettings)
     {
-        _capsShift = capsShift;
-        _symbolShift = symbolShift;
+        _capsShift = keyboardSettings.CapsShiftKey;
+        _symbolShift = keyboardSettings.SymbolShiftKey;
+        _shouldHandleExtendedKeys  = keyboardSettings.ShouldHandleExtendedKeys;
     }
 
     public static JoystickInput ToJoystickAction(KeyCode keyCode, KeyCode fireKey) => keyCode switch

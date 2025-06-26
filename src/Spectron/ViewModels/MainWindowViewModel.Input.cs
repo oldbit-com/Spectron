@@ -68,9 +68,7 @@ partial class MainWindowViewModel
         Emulator?.KeyboardState.KeyUp(e.Keys);
     }
 
-    private void UpdateShiftKeys(KeyboardSettings settings) => _keyboardHook.UpdateShiftKeys(
-        settings.CapsShiftKey,
-        settings.SymbolShiftKey);
+    private void UpdateShiftKeys(KeyboardSettings settings) => _keyboardHook.UpdateSettings(settings);
 
     private bool JoystickHandled(SpectrumKeyEventArgs e)
     {

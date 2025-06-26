@@ -64,6 +64,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
 
         CapsShiftKey = preferences.Keyboard.CapsShiftKey;
         SymbolShiftKey = preferences.Keyboard.SymbolShiftKey;
+        ShouldHandleExtendedKeys  = preferences.Keyboard.ShouldHandleExtendedKeys;
 
         MouseType = preferences.Mouse.MouseType;
         IsStandardMousePointerHidden = preferences.Mouse.IsStandardMousePointerHidden;
@@ -138,6 +139,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
             {
                 CapsShiftKey = CapsShiftKey,
                 SymbolShiftKey = SymbolShiftKey,
+                ShouldHandleExtendedKeys = ShouldHandleExtendedKeys,
             },
 
             Joystick = new JoystickSettings
@@ -508,6 +510,9 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
     [NotifyDataErrorInfo]
     [CustomValidation(typeof(PreferencesViewModel), nameof(ValidateKeyboardMapping))]
     private KeyCode _capsShiftKey = KeyCode.VcLeftShift;
+
+    [ObservableProperty]
+    private bool _shouldHandleExtendedKeys = true;
 
     [ObservableProperty]
     private KeyCode _fireKey = KeyCode.VcSpace;

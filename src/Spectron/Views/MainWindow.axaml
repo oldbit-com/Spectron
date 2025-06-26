@@ -63,6 +63,7 @@
         <Grid ColumnDefinitions="40,*,40"
             RowDefinitions="*,Auto"
             Focusable="True"
+            IsTabStop="True"
             FocusAdorner="{x:Null}">
 
             <controls:MainToolbar
