@@ -47,16 +47,62 @@ public sealed class KeyboardHook : IDisposable
         }
 
         HandleShiftState(e, isPressed: true);
+        HandleKeyEvent(e, isPressed: true);
+    }
 
+    private void KeyReleased(KeyboardHookEventArgs e)
+    {
+        if (IsMetaKey(e.Data.KeyCode))
+        {
+            _isMetaKeyPressed = false;
+            return;
+        }
+
+        HandleShiftState(e, isPressed: false);
+        HandleKeyEvent(e, isPressed: false);
+    }
+
+    private void HandleKeyEvent(KeyboardHookEventArgs e, bool isPressed)
+    {
         var spectrumKeys = ToSpectrumKeySequence(e.Data.KeyCode);
 
         if (spectrumKeys.Count > 0)
         {
-            SpectrumKeyPressed?.Invoke(this, new SpectrumKeyEventArgs(spectrumKeys, e.Data.KeyCode, isKeyPressed: true));
+            var eventArgs = new SpectrumKeyEventArgs(spectrumKeys, e.Data.KeyCode, isPressed);
+
+            if (isPressed)
+            {
+                SpectrumKeyPressed?.Invoke(this, eventArgs);
+            }
+            else
+            {
+                SpectrumKeyReleased?.Invoke(this, eventArgs);
+            }
         }
         else if (_shouldHandleExtendedKeys)
         {
-            switch (e.Data.KeyCode)
+            HandleExtendedKey(e.Data.KeyCode, isPressed);
+        }
+        else
+        {
+            var eventArgs = new SpectrumKeyEventArgs([], e.Data.KeyCode, isPressed);
+
+            if (isPressed)
+            {
+                SpectrumKeyPressed?.Invoke(this, eventArgs);
+            }
+            else
+            {
+                SpectrumKeyReleased?.Invoke(this, eventArgs);
+            }
+        }
+    }
+
+    private void HandleExtendedKey(KeyCode keyCode, bool isPressed)
+    {
+        if (isPressed)
+        {
+            switch (keyCode)
             {
                 case KeyCode.VcOpenBracket:
                     SendExtendedModeKey(!_isShiftPressed ? KeyCode.VcY : KeyCode.VcF);
@@ -73,29 +119,15 @@ public sealed class KeyboardHook : IDisposable
                 case KeyCode.VcBackslash:
                     SendExtendedModeKey(!_isShiftPressed ? KeyCode.VcD : KeyCode.VcS);
                     break;
+
+                default:
+                    SpectrumKeyPressed?.Invoke(this, new SpectrumKeyEventArgs([], keyCode, isPressed));
+                    break;
             }
         }
-    }
-
-    private void KeyReleased(KeyboardHookEventArgs e)
-    {
-        if (IsMetaKey(e.Data.KeyCode))
+        else
         {
-            _isMetaKeyPressed = false;
-            return;
-        }
-
-        HandleShiftState(e, isPressed: false);
-
-        var spectrumKeys = ToSpectrumKeySequence(e.Data.KeyCode);
-
-        if (spectrumKeys.Count > 0)
-        {
-            SpectrumKeyReleased?.Invoke(this, new SpectrumKeyEventArgs(spectrumKeys, e.Data.KeyCode, isKeyPressed: false));
-        }
-        else if (_shouldHandleExtendedKeys)
-        {
-            switch (e.Data.KeyCode)
+            switch (keyCode)
             {
                 case KeyCode.VcOpenBracket:
                     _simulator.SimulateKeyRelease(KeyCode.VcY);
@@ -115,6 +147,10 @@ public sealed class KeyboardHook : IDisposable
                     _simulator.SimulateKeyRelease(KeyCode.VcD);
                     _simulator.SimulateKeyRelease(KeyCode.VcS);
                     break;
+
+                default:
+                    SpectrumKeyReleased?.Invoke(this, new SpectrumKeyEventArgs([], keyCode, isPressed));
+                    break;
             }
         }
     }
@@ -129,8 +165,12 @@ public sealed class KeyboardHook : IDisposable
         {
             _simulator.SimulateKeyRelease(_capsShift);
 
-            Task.Delay(5).ContinueWith(_ =>
-                _simulator.SimulateKeyPress(keyCode));
+            Task.Delay(5)
+                .ContinueWith(_ =>
+                {
+                    _simulator.SimulateKeyPress(keyCode);
+                    Task.Delay(30).ContinueWith(_ => _simulator.SimulateKeyRelease(_symbolShift));
+                });
         });
     }
 
@@ -235,7 +275,7 @@ public sealed class KeyboardHook : IDisposable
         return keys;
     }
 
-    private static bool IsMetaKey(KeyCode keyCode) => keyCode == KeyCode.VcLeftMeta || keyCode == KeyCode.VcRightMeta;
+    private static bool IsMetaKey(KeyCode keyCode) => keyCode is KeyCode.VcLeftMeta or KeyCode.VcRightMeta;
 
     public void UpdateSettings(KeyboardSettings  keyboardSettings)
     {
@@ -244,7 +284,7 @@ public sealed class KeyboardHook : IDisposable
         _shouldHandleExtendedKeys  = keyboardSettings.ShouldHandleExtendedKeys;
     }
 
-    public static JoystickInput ToJoystickAction(KeyCode keyCode, KeyCode fireKey) => keyCode switch
+    public static JoystickInput ToJoystickAction(KeyCode keyCode, KeyCode fireKey) =>keyCode switch
     {
         KeyCode.VcLeft => JoystickInput.Left,
         KeyCode.VcRight => JoystickInput.Right,

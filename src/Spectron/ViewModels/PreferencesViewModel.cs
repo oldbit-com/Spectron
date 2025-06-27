@@ -385,6 +385,12 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
 
     public List<NameValuePair<KeyCode>> FireKeys { get; } =
     [
+        new("Left Shift", KeyCode.VcLeftShift),
+        new("Right Shift", KeyCode.VcRightShift),
+        new("Left Control", KeyCode.VcLeftControl),
+        new("Right Control", KeyCode.VcRightControl),
+        new(OperatingSystem.IsMacOS() ? "Left Option" : "Left Alt", KeyCode.VcLeftAlt),
+        new(OperatingSystem.IsMacOS() ? "Right Option" : "Right Alt", KeyCode.VcRightAlt),
         new("Space", KeyCode.VcSpace),
         new("Tab", KeyCode.VcTab),
         new("Enter", KeyCode.VcEnter),

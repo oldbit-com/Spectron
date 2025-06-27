@@ -214,8 +214,8 @@
                                 <CheckBox
                                     Grid.Row="2"
                                     Grid.Column="1"
-                                    Content="Simulate standard keyboard keys as Spectrum keys"
-                                    ToolTip.Tip="Keys like cursor arrows, backspace, brackets, comma, period etc will be translated to corresponding Spectrum key combination"
+                                    Content="Enable extra keys in the emulator"
+                                    ToolTip.Tip="Keys like arrows, backspace, brackets, comma, period etc will be translated to the corresponding Spectrum key"
                                     Margin="5 0 0 0"
                                     Classes="Center"
                                     IsChecked="{Binding ShouldHandleExtendedKeys}"/>
@@ -223,7 +223,7 @@
                         </TabItem>
                         <TabItem Header="Joystick">
                             <Grid RowDefinitions="Auto,*">
-                                <Grid ColumnDefinitions="140,300" RowDefinitions="40,40,40">
+                                <Grid ColumnDefinitions="140,300" RowDefinitions="40,40,40,40">
                                     <TextBlock
                                         Text="Gamepad"
                                         VerticalAlignment="Center"
@@ -254,17 +254,27 @@
                                         SelectedValue="{Binding JoystickType}"
                                         DisplayMemberBinding="{Binding Name}"
                                         SelectedValueBinding="{Binding Value}"/>
-                                    <StackPanel
+
+                                    <CheckBox
                                         Grid.Row="2"
                                         Grid.Column="1"
+                                        Content="Use keyboard (← ↑ ↓ →)"
+                                        Margin="5 0 0 0"
+                                        VerticalAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        IsChecked="{Binding EmulateUsingKeyboard}"
+                                        IsEnabled="{Binding #Joystick.SelectedIndex}"/>
+
+                                    <StackPanel
+                                        Grid.Row="3"
+                                        Grid.Column="1"
+                                        Margin="35 0 0 0"
                                         Orientation="Horizontal">
-                                        <CheckBox
-                                            Content="Use keyboard (← ↑ ↓ →). Fire key:"
-                                            Margin="5 0 0 0"
+
+                                        <TextBlock
                                             VerticalAlignment="Center"
-                                            VerticalContentAlignment="Center"
-                                            IsChecked="{Binding EmulateUsingKeyboard}"
-                                            IsEnabled="{Binding #Joystick.SelectedIndex}"/>
+                                            Text="Fire"/>
+
                                         <ComboBox
                                             Margin="15 0 0 0"
                                             Width="120"

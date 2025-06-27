@@ -78,9 +78,22 @@ public partial class MainWindow : Window
 
     private static async Task<TResponse?> ShowDialog<TView, TResponse>(Window owner, object? viewModel = null) where TView : Window, new()
     {
+        // Workaround for tooltips not always showing in the opened dialog window
+        owner.IsHitTestVisible = false;
+
         var view = new TView { DataContext = viewModel };
 
-        var result = await view.ShowDialog<TResponse?>(owner);
+        TResponse? result;
+
+        try
+        {
+            result = await view.ShowDialog<TResponse?>(owner);
+        }
+        finally
+        {
+            owner.IsHitTestVisible = true;
+        }
+
 
         if (viewModel is IDisposable disposable)
         {
