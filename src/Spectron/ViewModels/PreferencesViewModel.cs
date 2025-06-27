@@ -273,8 +273,6 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         }
     }
 
-
-
     public static ValidationResult? ValidateCardImageFile(string fileName, ValidationContext context)
     {
         if (context.ObjectInstance is PreferencesViewModel { IsDivMmcEnabled: false })
