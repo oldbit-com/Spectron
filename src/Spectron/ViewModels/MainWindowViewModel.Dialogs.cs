@@ -10,7 +10,7 @@ namespace OldBit.Spectron.ViewModels;
 
 partial class MainWindowViewModel
 {
-    public async Task OpenPreferencesWindow()
+    private async Task OpenPreferencesWindow()
     {
         var resumeAfter = false;
 
@@ -43,6 +43,7 @@ partial class MainWindowViewModel
             MouseType = preferences.Mouse.MouseType;
             SetMouseCursor();
 
+            UpdateShiftKeys(_preferences.Keyboard);
             ConfigureEmulatorSettings();
         }
 
