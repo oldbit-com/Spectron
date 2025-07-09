@@ -24,6 +24,8 @@ public class Preferences
 
     public RomType RomType { get; init; } = RomType.Original;
 
+    public KeyboardSettings Keyboard { get; init; } = new();
+
     public JoystickSettings Joystick { get; init; } = new();
 
     public MouseSettings Mouse { get; init; } = new();

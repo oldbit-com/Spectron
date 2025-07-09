@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,7 +33,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
 {
     private readonly GamepadManager _gamepadManager;
     private readonly GamepadSettings _gamepadSettings;
-    private Guid _previousGamepadControllerId = Guid.Empty;
+    private Guid _previousGamepadControllerId;
 
     public GamepadMappingViewModel GamepadMappingViewModel { get; }
 
@@ -60,6 +61,10 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
             controller => controller.ControllerId == preferences.Joystick.GamepadControllerId)?.ControllerId ?? GamepadController.None.ControllerId;
         _previousGamepadControllerId = GamepadControllerId;
         FireKey = preferences.Joystick.FireKey;
+
+        CapsShiftKey = preferences.Keyboard.CapsShiftKey;
+        SymbolShiftKey = preferences.Keyboard.SymbolShiftKey;
+        ShouldHandleExtendedKeys  = preferences.Keyboard.ShouldHandleExtendedKeys;
 
         MouseType = preferences.Mouse.MouseType;
         IsStandardMousePointerHidden = preferences.Mouse.IsStandardMousePointerHidden;
@@ -129,6 +134,14 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
             IsFloatingBusEnabled = IsFloatingBusEnabled,
             RomType = RomType,
             IsAutoLoadPokeFilesEnabled = IsAutoLoadPokeFilesEnabled,
+
+            Keyboard = new KeyboardSettings
+            {
+                CapsShiftKey = CapsShiftKey,
+                SymbolShiftKey = SymbolShiftKey,
+                ShouldHandleExtendedKeys = ShouldHandleExtendedKeys,
+            },
+
             Joystick = new JoystickSettings
             {
                 JoystickType = JoystickType,
@@ -215,7 +228,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
     }
 
     [RelayCommand]
-    private async Task SelectSdCardImageFile(string cardId)
+    public async Task SelectSdCardImageFile(string cardId)
     {
         var file = await FileDialogs.OpenDiskImageFileAsync();
 
@@ -275,6 +288,49 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         return new ValidationResult(errorMessage, [context.MemberName ?? string.Empty]);
     }
 
+    public static ValidationResult? ValidateKeyboardMapping(KeyCode keyCode, ValidationContext context)
+    {
+        if (context.ObjectInstance is not PreferencesViewModel preferences)
+        {
+            return ValidationResult.Success;
+        }
+
+        preferences.ClearErrors(nameof(CapsShiftKey));
+        preferences.ClearErrors(nameof(SymbolShiftKey));
+
+        if (preferences.CapsShiftKey == preferences.SymbolShiftKey)
+        {
+            return new ValidationResult("Keys should be mapped differently");
+        }
+
+        if (preferences is
+            { CapsShiftKey: KeyCode.VcLeftShift, SymbolShiftKey: KeyCode.VcRightShift } or
+            { CapsShiftKey: KeyCode.VcRightShift, SymbolShiftKey: KeyCode.VcLeftShift } or
+            { CapsShiftKey: KeyCode.VcLeftAlt, SymbolShiftKey: KeyCode.VcRightAlt } or
+            { CapsShiftKey: KeyCode.VcRightAlt, SymbolShiftKey: KeyCode.VcLeftAlt } or
+            { CapsShiftKey: KeyCode.VcLeftControl, SymbolShiftKey: KeyCode.VcRightControl } or
+            { CapsShiftKey: KeyCode.VcRightControl, SymbolShiftKey: KeyCode.VcLeftControl })
+        {
+            var altKeyName = OperatingSystem.IsMacOS() ? "Option" : "Alt";
+
+            return new ValidationResult($"Using both left and right Shift, {altKeyName} or Control may not work correctly");
+        }
+
+        return ValidationResult.Success;
+    }
+
+    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+
+        var errors = GetErrors();
+        var validationResults = errors as ValidationResult[] ?? errors.ToArray();
+
+        ValidationSummary = validationResults.Length == 0
+            ? string.Empty
+            : validationResults.Aggregate(string.Empty, (current, error) => current + error + Environment.NewLine);
+    }
+
     public List<NameValuePair<ComputerType>> ComputerTypes { get; } =
     [
         new("ZX Spectrum 16k", ComputerType.Spectrum16K),
@@ -308,6 +364,16 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         new("Kempston", MouseType.Kempston),
     ];
 
+    public List<NameValuePair<KeyCode>> ShiftKeys { get; } =
+    [
+        new("Left Shift", KeyCode.VcLeftShift),
+        new("Right Shift", KeyCode.VcRightShift),
+        new(OperatingSystem.IsMacOS() ? "Left Option" : "Left Alt", KeyCode.VcLeftAlt),
+        new(OperatingSystem.IsMacOS() ? "Right Option" : "Right Alt", KeyCode.VcRightAlt),
+        new("Left Control", KeyCode.VcLeftControl),
+        new("Right Control", KeyCode.VcRightControl),
+    ];
+
     public List<NameValuePair<StereoMode>> StereoModes { get; } =
     [
         new("Mono", StereoMode.Mono),
@@ -317,6 +383,12 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
 
     public List<NameValuePair<KeyCode>> FireKeys { get; } =
     [
+        new("Left Shift", KeyCode.VcLeftShift),
+        new("Right Shift", KeyCode.VcRightShift),
+        new("Left Control", KeyCode.VcLeftControl),
+        new("Right Control", KeyCode.VcRightControl),
+        new(OperatingSystem.IsMacOS() ? "Left Option" : "Left Alt", KeyCode.VcLeftAlt),
+        new(OperatingSystem.IsMacOS() ? "Right Option" : "Right Alt", KeyCode.VcRightAlt),
         new("Space", KeyCode.VcSpace),
         new("Tab", KeyCode.VcTab),
         new("Enter", KeyCode.VcEnter),
@@ -434,6 +506,19 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
     private bool _emulateUsingKeyboard;
 
     [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [CustomValidation(typeof(PreferencesViewModel), nameof(ValidateKeyboardMapping))]
+    private KeyCode _symbolShiftKey = KeyCode.VcRightAlt;
+
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [CustomValidation(typeof(PreferencesViewModel), nameof(ValidateKeyboardMapping))]
+    private KeyCode _capsShiftKey = KeyCode.VcLeftShift;
+
+    [ObservableProperty]
+    private bool _shouldHandleExtendedKeys = true;
+
+    [ObservableProperty]
     private KeyCode _fireKey = KeyCode.VcSpace;
 
     [ObservableProperty]
@@ -530,6 +615,9 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
 
     [ObservableProperty]
     private bool _isAutoLoadPokeFilesEnabled;
+
+    [ObservableProperty]
+    private string _validationSummary = string.Empty;
 
     public void Dispose()
     {

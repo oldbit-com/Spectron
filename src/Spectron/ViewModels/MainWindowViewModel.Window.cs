@@ -22,6 +22,7 @@ partial class MainWindowViewModel
 
         await RecentFilesViewModel.LoadAsync();
 
+        UpdateShiftKeys(_preferences.Keyboard);
         HandleChangeBorderSize(_preferences.BorderSize);
 
         if (_preferences.Resume.IsResumeEnabled)

@@ -84,23 +84,33 @@ public partial class MainWindow : Window
 
     private async Task<TResponse?> ShowDialog<TView, TResponse>(Window owner, object? viewModel = null) where TView : Window, new()
     {
+        // Workaround for tooltips not always showing in the opened dialog window
+        owner.IsHitTestVisible = false;
+
         var view = new TView { DataContext = viewModel };
 
-        view.Closed += (_, _) =>
+        TResponse? result;
+
+        var viewModelType = viewModel?.GetType();
+
+        try
         {
-            var viewModelType = viewModel?.GetType();
+            result = await view.ShowDialog<TResponse?>(owner);
+        }
+        finally
+        {
+            owner.IsHitTestVisible = true;
+        }
 
-            if (viewModel is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
+        _mainViewModel?.OnViewClosed(viewModelType);
 
-            _mainViewModel?.OnViewClosed(viewModelType);
-        };
-
-        var result = await view.ShowDialog<TResponse?>(owner);
+        if (viewModel is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
 
         return result;
+
     }
 
     private void Show<TView>(Window owner, object? viewModel = null) where TView : Window, new()
@@ -163,7 +173,7 @@ public partial class MainWindow : Window
         viewModel.NotificationManager = NotificationManager;
     }
 
-    private void InputElement_OnPointerMoved(object? sender, PointerEventArgs e)
+    private void Screen_OnPointerMoved(object? sender, PointerEventArgs e)
     {
         var position = e.GetCurrentPoint(ScreenImage).Position;
         var bounds = ScreenImage.Bounds;
@@ -171,7 +181,7 @@ public partial class MainWindow : Window
         _mainViewModel?.HandleMouseMoved(position, bounds);
     }
 
-    private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    private void Screen_OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         var point = e.GetCurrentPoint(ScreenImage);
         var bounds = ScreenImage.Bounds;
@@ -179,7 +189,7 @@ public partial class MainWindow : Window
         _mainViewModel?.HandleMouseButtonStateChanged(point, bounds);
     }
 
-    private void InputElement_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
+    private void Screen_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
         var point = e.GetCurrentPoint(ScreenImage);
         var bounds = ScreenImage.Bounds;

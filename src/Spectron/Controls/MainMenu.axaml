@@ -18,6 +18,12 @@
         <converters:ValueEqualityConverter x:Key="ValueEqualityConverter"/>
     </UserControl.Resources>
 
+    <UserControl.Styles>
+        <Style Selector="MenuItem">
+            <Setter Property="Padding" Value="10 6 10 6"/>
+        </Style>
+    </UserControl.Styles>
+
     <Menu Focusable="False">
         <MenuItem Header="File" Padding="10 0 10 0" IsTabStop="False" Focusable="False">
             <MenuItem Header="Load..." InputGesture="{OnPlatform Ctrl+O, macOS=Cmd+O}" Command="{Binding LoadFileCommand}"/>
