@@ -61,7 +61,12 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
         CodeListViewModel = new CodeListViewModel(_breakpointHandler.BreakpointManager);
         ImmediateViewModel = new ImmediateViewModel(_debuggerContext, _debuggerSettings.PreferredNumberFormat, emulator,
             () => Refresh(),
-            list => CodeListViewModel.Update(Emulator.Memory, list.Address, emulator.Cpu.Registers.PC, _debuggerSettings));
+            list => CodeListViewModel.Update(
+                Emulator.Memory,
+                list.Address,
+                emulator.Cpu.Registers.PC,
+                null,
+                _debuggerSettings));
 
         LoggingViewModel.Configure(emulator);
 
@@ -75,7 +80,7 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
         Dispatcher.UIThread.Post(() =>
         {
             IsPaused = true;
-            Refresh();
+            Refresh(isBreakpointHit: true);
         });
     }
 
@@ -173,11 +178,11 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
         _breakpointHandler.BreakpointHit -= OnBreakpointHit;
     }
 
-    private void Refresh(bool refreshMemory = true)
+    private void Refresh(bool refreshMemory = true, bool isBreakpointHit = false)
     {
         RefreshCpu();
         RefreshStack();
-        RefreshCode();
+        RefreshCode(isBreakpointHit);
 
         if (refreshMemory)
         {
@@ -189,7 +194,12 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
 
     private void RefreshStack() => StackViewModel.Update(Emulator.Memory, Emulator.Cpu.Registers.SP);
 
-    private void RefreshCode() => CodeListViewModel.Update(Emulator.Memory, Emulator.Cpu.Registers.PC, Emulator.Cpu.Registers.PC, _debuggerSettings);
+    private void RefreshCode(bool isBreakpointHit) => CodeListViewModel.Update(
+        Emulator.Memory,
+        Emulator.Cpu.Registers.PC,
+        Emulator.Cpu.Registers.PC,
+        isBreakpointHit ? _breakpointHandler.BeforeBreakpointPC : null,
+        _debuggerSettings);
 
     private void RefreshMemory() => MemoryViewModel.Update(Emulator.Memory);
 

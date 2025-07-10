@@ -11,6 +11,8 @@ public class BreakpointHandler : IDisposable
 
     public BreakpointManager BreakpointManager { get; }
 
+    public Word BeforeBreakpointPC { get; private set; }
+
     public bool IsEnabled
     {
         get => _isEnabled;
@@ -45,6 +47,7 @@ public class BreakpointHandler : IDisposable
     {
         if (!BreakpointManager.CheckHit())
         {
+            BeforeBreakpointPC = e.PC;
             return;
         }
 
