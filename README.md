@@ -4,21 +4,35 @@
 My own ZX Spectrum emulator written in C# and Avalonia UI. It emulates classic ZX Spectrum 16K, 48K and 
 128K computers.
 
-This is work in progress, I've been improving it quite a lot recently. However it is stable and usable. 
-It can run most of the games and demos without any problems.
+It is quite accurate and stable, it can run most of the games and demos without any issues, load protected
+tapes.
 
-It's a cross-platform emulator that runs on Windows, Linux and macOS. Developed on macOS, so mostly tested
-on this platform. Needs some more testing on Linux.
+It's a cross-platform emulator that runs on Windows, Linux and macOS. Developed on macOS, so generally tested
+on this platform. Needs some more testing on Linux, seems to be running fine on Windows.
 
-This is my hobby project which I always wanted to do. It has been a lot of fun, and quite challenging, too.
-ZX Spectrum was my first computer and I love it. I am planning to keep it alive since I created it for my own 
-use and I am using it to play games and demos.
+This is my hobby project which I always wanted to do. It has been a lot of fun, and quite a challenge.
+There are other emulators out there, but my focus was on making it better structured, easier to understand.
+It is written all by hand, no AI generated code.
+
+ZX Spectrum was my first computer and I still love it. I am planning to keep this project alive since 
+I have created it for my personal use to play games and demos. It is a lot of fun.
 
 It uses several of my own libraries that I created for this project:
 - [Z80 CPU emulator](https://github.com/oldbit-com/Z80/tree/spectron)
 - [File format handling](https://github.com/oldbit-com/Spectron.Files)
 - [Audio player](https://github.com/oldbit-com/Beep)
 - [Gamepad support](https://github.com/oldbit-com/Joypad)
+
+Solution consists of several projects:
+
+| Project                | Description                                            |
+|------------------------|--------------------------------------------------------|
+| Spectron               | Avalonia based UI                                      |
+| Spectron.Debugger      | Fully featured Code debugger, includes UI and controls |
+| Spectron.Disassembly   | Simple Z80 disassembler, used by the debugger          |
+| **Spectrin.Emulation** | This is the core of the emulator, e.g. the main thing  |
+| Spectron.Recorder      | Audio and Video recording helper                       |
+
 
 ![Main Window](docs/default.png?raw=true "Main Window")
 
@@ -206,4 +220,3 @@ memory and disassembly. You can step through the code, set breakpoints. This is 
 - [ZX Spectrum Font](https://github.com/comptic/zx-spectrum-font)
 - [Hack Font](https://sourcefoundry.org/hack/)
 - [VT220 Font](https://github.com/svofski/glasstty/blob/master/Glass_TTY_VT220.ttf)
-
