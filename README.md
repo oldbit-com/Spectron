@@ -21,7 +21,7 @@ It uses several of my own libraries that I created for this project:
 
 | Library                                                | Description                                  |
 |--------------------------------------------------------|----------------------------------------------|
-| [Z80](https://github.com/oldbit-com/Z80/tree/spectron) | Z80 CPU emulator                             |
+| [Z80](https://github.com/oldbit-com/Z80/tree/spectron) | Generic Z80 CPU emulator                     |
 | [Files](https://github.com/oldbit-com/Spectron.Files)  | Handles TZX, Z80, SNA and other file formats |
 | [Beep](https://github.com/oldbit-com/Beep)             | Basic audio player, cross-platform, native   |
 | [Joypad](https://github.com/oldbit-com/Joypad)         | Gamepad handler, cross-platform, native      |
