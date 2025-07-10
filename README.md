@@ -33,7 +33,7 @@ Solution consists of several projects:
 | Spectron               | Avalonia based UI                                      |
 | Spectron.Debugger      | Fully featured Code debugger, includes UI and controls |
 | Spectron.Disassembly   | Simple Z80 disassembler, used by the debugger          |
-| **Spectrin.Emulation** | This is the core of the emulator, e.g. the main thing  |
+| **Spectron.Emulation** | This is the core of the emulator, e.g. the main thing  |
 | Spectron.Recorder      | Audio and Video recording helper                       |
 
 
