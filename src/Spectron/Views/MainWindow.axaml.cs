@@ -71,10 +71,7 @@ public partial class MainWindow : Window
         {
             var viewModelType = viewModel?.GetType();
 
-            if (viewModel is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
+            (viewModel as IDisposable)?.Dispose();
 
             _mainViewModel?.OnViewClosed(viewModelType);
         };
@@ -91,8 +88,6 @@ public partial class MainWindow : Window
 
         TResponse? result;
 
-        var viewModelType = viewModel?.GetType();
-
         try
         {
             result = await view.ShowDialog<TResponse?>(owner);
@@ -102,15 +97,11 @@ public partial class MainWindow : Window
             owner.IsHitTestVisible = true;
         }
 
-        _mainViewModel?.OnViewClosed(viewModelType);
+        _mainViewModel?.OnViewClosed(viewModel?.GetType());
 
-        if (viewModel is IDisposable disposable)
-        {
-            disposable.Dispose();
-        }
+        (viewModel as IDisposable)?.Dispose();
 
         return result;
-
     }
 
     private void Show<TView>(Window owner, object? viewModel = null) where TView : Window, new()
@@ -142,10 +133,7 @@ public partial class MainWindow : Window
 
             var viewModelType = viewModel?.GetType();
 
-            if (closedWindow.DataContext is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
+            (closedWindow.DataContext as IDisposable)?.Dispose();
 
             _windows.Remove(viewType);
 
