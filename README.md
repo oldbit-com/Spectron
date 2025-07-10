@@ -18,10 +18,13 @@ ZX Spectrum was my first computer and I still love it. I am planning to keep thi
 I have created it for my personal use to play games and demos. It is a lot of fun.
 
 It uses several of my own libraries that I created for this project:
-- [Z80 CPU emulator](https://github.com/oldbit-com/Z80/tree/spectron)
-- [File format handling](https://github.com/oldbit-com/Spectron.Files)
-- [Audio player](https://github.com/oldbit-com/Beep)
-- [Gamepad support](https://github.com/oldbit-com/Joypad)
+
+| Library                                                | Description                                  |
+|--------------------------------------------------------|----------------------------------------------|
+| [Z80](https://github.com/oldbit-com/Z80/tree/spectron) | Z80 CPU emulator                             |
+| [Files](ttps://github.com/oldbit-com/Spectron.Files)   | Handles TZX, Z80, SNA and other file formats |
+| [Audio](https://github.com/oldbit-com/Beep)            | Basic audio player, cross-platform, native   |
+| [Gamepad](https://github.com/oldbit-com/Joypad)        | Gamepad handler, cross-platform, native      |
 
 Solution consists of several projects:
 
