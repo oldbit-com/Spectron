@@ -1,18 +1,12 @@
 namespace OldBit.Spectron.Debugger.Breakpoints;
 
-public class Breakpoint(Register register, int value)
+public abstract class Breakpoint
 {
     public Guid Id { get; } = Guid.NewGuid();
 
     public bool IsEnabled { get; set; } = true;
 
-    public int Value { get; set; } = value;
+    public int Value { get; set; }
 
-    public Register Register { get; set; } = register;
-
-    public int? ValueAtLastHit { get; set; } = value;
-
-    public bool ShouldRemoveOnHit { get; set; } = false;
-
-    public override string ToString() => $"{Register} == ${Value:X4}";
+    public int? ValueAtLastHit { get; set; }
 }

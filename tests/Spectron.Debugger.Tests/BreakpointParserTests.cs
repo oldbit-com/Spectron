@@ -14,7 +14,7 @@ public class BreakpointParserTests
     [InlineData("BC=0")]
     public void WhenInvalidCondition_ShouldReturnFalse(string condition)
     {
-        var result = BreakpointParser.TryParseCondition(condition, out var breakpoint);
+        var result = BreakpointParser.TryParse(condition, out var breakpoint);
 
         result.ShouldBeFalse();
         breakpoint.ShouldBeNull();
@@ -25,13 +25,18 @@ public class BreakpointParserTests
     [InlineData("PC == $1234")]
     [InlineData("PC == 1234h")]
     [InlineData(" PC== 4660 ")]
+    [InlineData("PC== #1234")]
     public void WhenValidCondition_ShouldReturnTrue(string condition)
     {
-        var result = BreakpointParser.TryParseCondition(condition, out var breakpoint);
+        var result = BreakpointParser.TryParse(condition, out var breakpoint);
 
         result.ShouldBeTrue();
         breakpoint.ShouldNotBeNull();
-        breakpoint!.Value.Register.ShouldBe(Register.PC);
-        breakpoint!.Value.Address.ShouldBe(0x1234);
+        breakpoint.ShouldBeOfType<RegisterBreakpoint>();
+
+        var registerBreakpoint = (RegisterBreakpoint)breakpoint;
+
+        registerBreakpoint.Register.ShouldBe(Register.PC);
+        registerBreakpoint.Value.ShouldBe(0x1234);
     }
 }

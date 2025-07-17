@@ -1,8 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
 using OldBit.Spectron.Debugger.Breakpoints;
-using OldBit.Spectron.Debugger.Messages;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
@@ -16,16 +14,13 @@ public partial class BreakpointViewModel : ObservableValidator
     [ObservableProperty]
     private bool _isEnabled;
 
-    public BreakpointViewModel(Breakpoint breakpoint)
-    {
-        Breakpoint = breakpoint;
-        Condition = breakpoint.ToString();
-        IsEnabled = breakpoint.IsEnabled;
-    }
+    private Breakpoint _breakpoint = null!;
+
+    public BreakpointViewModel(Breakpoint breakpoint) => Breakpoint = breakpoint;
 
     public static ValidationResult? ValidateCondition(string? condition, ValidationContext context)
     {
-        if (!BreakpointParser.TryParseCondition(condition, out _))
+        if (!BreakpointParser.TryParse(condition, out _))
         {
             return new ValidationResult("Invalid condition.", [nameof(Condition)]);
         }
@@ -33,7 +28,15 @@ public partial class BreakpointViewModel : ObservableValidator
         return ValidationResult.Success;
     }
 
-    public Guid Id => Breakpoint.Id;
+    public Breakpoint Breakpoint
+    {
+        get => _breakpoint;
+        set
+        {
+            _breakpoint = value;
 
-    public Breakpoint Breakpoint { get; }
+            Condition = _breakpoint.ToString() ?? string.Empty;
+            IsEnabled = _breakpoint.IsEnabled;
+        }
+    }
 }

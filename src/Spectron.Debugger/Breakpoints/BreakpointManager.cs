@@ -11,18 +11,16 @@ public class BreakpointManager
 
     public BreakpointManager(Z80 cpu) => CreateRegistersIndex(cpu);
 
-    public void UpdateBreakpoint(Guid id, Register register, int value, bool isEnabled)
+    public void UpdateBreakpoint(Breakpoint original, Breakpoint updated)
     {
-        var existing = _breakpoints.FirstOrDefault(x => x.Id == id);
+        var existingIndex = _breakpoints.IndexOf(original);
 
-        if (existing == null)
+        if (existingIndex < 0)
         {
             return;
         }
 
-        existing.IsEnabled = isEnabled;
-        existing.Register = register;
-        existing.Value = value;
+        _breakpoints[existingIndex] = updated;
     }
 
     public void Update(Z80 cpu) => CreateRegistersIndex(cpu);
@@ -37,6 +35,13 @@ public class BreakpointManager
         }
     }
 
+    public void AddSingleUseBreakpoint(Word address)
+    {
+        var breakpoint = new RegisterBreakpoint(Register.PC, address) { IsSingleUse = true };
+
+        _breakpoints.Add(breakpoint);
+    }
+
     public void RemoveBreakpoint(Guid id)
     {
         var index = _breakpoints.FindIndex(x => x.Id == id);
@@ -47,12 +52,13 @@ public class BreakpointManager
         }
     }
 
-    public bool HasBreakpoint(Register register, Word address) =>
-        _breakpoints.Any(x => x.Register == register && x.Value == address);
+    public bool HasBreakpoint(Register register, Word address) => _breakpoints
+        .OfType<RegisterBreakpoint>()
+        .Any(x => x.Register == register && x.Value == address);
 
     public bool CheckHit()
     {
-        foreach (var breakpoint in _breakpoints)
+        foreach (var breakpoint in _breakpoints.OfType<RegisterBreakpoint>())
         {
             if (!breakpoint.IsEnabled)
             {
@@ -67,7 +73,7 @@ public class BreakpointManager
                 {
                     breakpoint.ValueAtLastHit = value;
 
-                    if (breakpoint.ShouldRemoveOnHit)
+                    if (breakpoint.IsSingleUse)
                     {
                         RemoveBreakpoint(breakpoint.Id);
                     }

@@ -65,7 +65,7 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
                 Emulator.Memory,
                 list.Address,
                 emulator.Cpu.Registers.PC,
-                null,
+                _breakpointHandler,
                 _debuggerSettings));
 
         LoggingViewModel.Configure(emulator);
@@ -80,7 +80,7 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
         Dispatcher.UIThread.Post(() =>
         {
             IsPaused = true;
-            Refresh(isBreakpointHit: true);
+            Refresh();
         });
     }
 
@@ -120,7 +120,7 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
 
         if (returnAddress != null)
         {
-            _breakpointHandler?.BreakpointManager?.AddBreakpoint(new Breakpoint(Register.PC, returnAddress.Value) { ShouldRemoveOnHit = true });
+            _breakpointHandler.BreakpointManager.AddSingleUseBreakpoint((Word)returnAddress.Value);
             DebuggerResume();
         }
         else
@@ -148,7 +148,8 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
         var sp = Emulator.Cpu.Registers.SP;
         var returnAddress = Emulator.Memory.ReadWord(sp);
 
-        _breakpointHandler?.BreakpointManager?.AddBreakpoint(new Breakpoint(Register.PC, returnAddress) { ShouldRemoveOnHit = true });
+        _breakpointHandler.BreakpointManager.AddSingleUseBreakpoint(returnAddress);
+
         DebuggerResume();
     }
 
@@ -178,11 +179,11 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
         _breakpointHandler.BreakpointHit -= OnBreakpointHit;
     }
 
-    private void Refresh(bool refreshMemory = true, bool isBreakpointHit = false)
+    private void Refresh(bool refreshMemory = true)
     {
         RefreshCpu();
         RefreshStack();
-        RefreshCode(isBreakpointHit);
+        RefreshCode();
 
         if (refreshMemory)
         {
@@ -194,11 +195,11 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
 
     private void RefreshStack() => StackViewModel.Update(Emulator.Memory, Emulator.Cpu.Registers.SP);
 
-    private void RefreshCode(bool isBreakpointHit) => CodeListViewModel.Update(
+    private void RefreshCode() => CodeListViewModel.Update(
         Emulator.Memory,
         Emulator.Cpu.Registers.PC,
         Emulator.Cpu.Registers.PC,
-        isBreakpointHit ? _breakpointHandler.BeforeBreakpointPC : null,
+        _breakpointHandler,
         _debuggerSettings);
 
     private void RefreshMemory() => MemoryViewModel.Update(Emulator.Memory);

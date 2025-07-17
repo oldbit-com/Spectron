@@ -1,10 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Text.RegularExpressions;
+using OldBit.Spectron.Debugger.ViewModels;
 
 namespace OldBit.Spectron.Debugger.Breakpoints;
 
-public static partial class BreakpointParser
+public static class BreakpointParser
 {
     private static readonly string[] ValidRegisters =
     [
@@ -12,7 +12,25 @@ public static partial class BreakpointParser
         "AF", "BC", "DE", "HL", "SP", "PC", "IX", "IY"
     ];
 
-    public static bool TryParseCondition(string? condition, [NotNullWhen(true)]out (Register Register, int Address)? breakpoint)
+    public static bool TryParse(string? condition, [NotNullWhen(true)] out Breakpoint? breakpoint)
+    {
+        if (TryParse(condition, out RegisterBreakpoint? registerBreakpoint))
+        {
+            breakpoint = registerBreakpoint;
+            return true;
+        }
+
+        if (TryParse(condition, out RegisterBreakpoint? memoryBreakpoint))
+        {
+            breakpoint = memoryBreakpoint;
+            return true;
+        }
+
+        breakpoint = null;
+        return false;
+    }
+
+    private static bool TryParse(string? condition, [NotNullWhen(true)] out RegisterBreakpoint? breakpoint)
     {
         breakpoint = null;
 
@@ -28,14 +46,14 @@ public static partial class BreakpointParser
             return false;
         }
 
-        var register = GetRegister(items[0].Trim());
+        var register = ParseRegister(items[0].Trim());
 
         if (register == null)
         {
             return false;
         }
 
-        var address = GetAddress(items[1].Trim());
+        var address = ParseAddress(items[1].Trim());
 
         if (address == null)
         {
@@ -44,8 +62,10 @@ public static partial class BreakpointParser
 
         if (Is16BitRegister(register))
         {
-            if (address < 0 || address > 0xFFFF)
+            if (address is < 0 or > 0xFFFF)
+            {
                 return false;
+            }
         }
         else
         {
@@ -55,22 +75,24 @@ public static partial class BreakpointParser
             }
         }
 
-        breakpoint = (Enum.Parse<Register>(register, true), address.Value);
+        breakpoint = new RegisterBreakpoint(Enum.Parse<Register>(register, true), (Word)address.Value);
 
         return true;
     }
 
-    private static string? GetRegister(string value) =>
+    private static bool TryParse(string? condition, [NotNullWhen(true)] out MemoryBreakpoint? breakpoint)
+    {
+        breakpoint = null;
+
+        return false;
+    }
+
+    private static string? ParseRegister(string value) =>
         ValidRegisters.FirstOrDefault(r => r.Equals(value, StringComparison.OrdinalIgnoreCase));
 
-    private static int? GetAddress(string value)
+    private static int? ParseAddress(string value)
     {
-        if (int.TryParse(value, out var address))
-        {
-            return address;
-        }
-
-        if (TryParseHex(value, out address))
+        if (int.TryParse(value, out var address) || TryParseHex(value, out address))
         {
             return address;
         }
@@ -80,7 +102,7 @@ public static partial class BreakpointParser
 
     private static bool TryParseHex(string hex, out int value)
     {
-        if (hex.StartsWith('$'))
+        if (hex.StartsWith('$') || hex.StartsWith('#'))
         {
             if (int.TryParse(hex.AsSpan(1), NumberStyles.HexNumber, null, out value))
             {

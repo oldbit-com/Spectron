@@ -12,15 +12,15 @@ public class CodeListViewModel(BreakpointManager breakpointManager) : Observable
 {
     public ObservableCollection<CodeLineViewModel> CodeLines { get; } = [];
 
-    public void Update(IMemory memory, Word address, Word pc, Word? beforeBreakpointPC, DebuggerSettings debuggerSettings)
+    public void Update(IMemory memory, Word address, Word pc, BreakpointHandler breakpointHandler, DebuggerSettings debuggerSettings)
     {
         CodeLines.Clear();
 
         var startAddress = address;
 
-        if (beforeBreakpointPC != null && address - beforeBreakpointPC.Value < 5)
+        if (breakpointHandler.IsBreakpointHit  && address - breakpointHandler.BeforeBreakpointPC < 5)
         {
-            startAddress = beforeBreakpointPC.Value;
+            startAddress = breakpointHandler.BeforeBreakpointPC;
         }
 
         var disassembly = new Disassembler(
