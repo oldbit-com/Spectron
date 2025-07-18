@@ -75,7 +75,10 @@ public static class BreakpointParser
             }
         }
 
-        breakpoint = new RegisterBreakpoint(Enum.Parse<Register>(register, true), (Word)address.Value);
+        breakpoint = new RegisterBreakpoint(Enum.Parse<Register>(register, true), (Word)address.Value)
+        {
+            Condition = condition
+        };
 
         return true;
     }

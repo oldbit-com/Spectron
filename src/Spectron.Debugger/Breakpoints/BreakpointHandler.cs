@@ -11,7 +11,8 @@ public class BreakpointHandler : IDisposable
 
     public BreakpointManager BreakpointManager { get; }
 
-    public Word BeforeBreakpointPC { get; private set; }
+    public Word PreviousAddress { get; private set; }
+
     public bool IsBreakpointHit { get; private set; }
 
     public bool IsEnabled
@@ -50,7 +51,7 @@ public class BreakpointHandler : IDisposable
 
         if (!IsBreakpointHit)
         {
-            BeforeBreakpointPC = e.PC;
+            PreviousAddress = e.PC;
             return;
         }
 

@@ -28,6 +28,8 @@ public partial class BreakpointViewModel : ObservableValidator
         return ValidationResult.Success;
     }
 
+    partial void OnIsEnabledChanged(bool value) => _breakpoint.IsEnabled = value;
+
     public Breakpoint Breakpoint
     {
         get => _breakpoint;
@@ -35,7 +37,7 @@ public partial class BreakpointViewModel : ObservableValidator
         {
             _breakpoint = value;
 
-            Condition = _breakpoint.ToString() ?? string.Empty;
+            Condition = _breakpoint.Condition;
             IsEnabled = _breakpoint.IsEnabled;
         }
     }

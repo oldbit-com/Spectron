@@ -57,9 +57,9 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
         _breakpointHandler.BreakpointHit -= OnBreakpointHit;
         _breakpointHandler.BreakpointHit += OnBreakpointHit;
 
-        BreakpointListViewModel = new BreakpointListViewModel(_breakpointHandler.BreakpointManager);
+        BreakpointListViewModel = new BreakpointListViewModel(_breakpointHandler.BreakpointManager, _debuggerSettings.NumberFormat);
         CodeListViewModel = new CodeListViewModel(_breakpointHandler.BreakpointManager);
-        ImmediateViewModel = new ImmediateViewModel(_debuggerContext, _debuggerSettings.PreferredNumberFormat, emulator,
+        ImmediateViewModel = new ImmediateViewModel(_debuggerContext, _debuggerSettings.NumberFormat, emulator,
             () => Refresh(),
             list => CodeListViewModel.Update(
                 Emulator.Memory,

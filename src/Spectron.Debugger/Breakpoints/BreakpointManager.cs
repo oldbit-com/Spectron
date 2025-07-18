@@ -27,9 +27,7 @@ public class BreakpointManager
 
     public void AddBreakpoint(Breakpoint breakpoint)
     {
-        var index = _breakpoints.FindIndex(x => x.Id == breakpoint.Id);
-
-        if (index < 0)
+        if (!_breakpoints.Contains(breakpoint))
         {
             _breakpoints.Add(breakpoint);
         }
@@ -42,15 +40,7 @@ public class BreakpointManager
         _breakpoints.Add(breakpoint);
     }
 
-    public void RemoveBreakpoint(Guid id)
-    {
-        var index = _breakpoints.FindIndex(x => x.Id == id);
-
-        if (index >= 0)
-        {
-            _breakpoints.RemoveAt(index);
-        }
-    }
+    public void RemoveBreakpoint(Breakpoint breakpoint) => _breakpoints.Remove(breakpoint);
 
     public bool HasBreakpoint(Register register, Word address) => _breakpoints
         .OfType<RegisterBreakpoint>()
@@ -58,31 +48,35 @@ public class BreakpointManager
 
     public bool CheckHit()
     {
-        foreach (var breakpoint in _breakpoints.OfType<RegisterBreakpoint>())
+        foreach (var breakpoint in _breakpoints.Where(b => b.IsEnabled))
         {
-            if (!breakpoint.IsEnabled)
+            switch (breakpoint)
             {
-                continue;
-            }
+                case RegisterBreakpoint registerBreakpoint:
+                    var value = _registerValueIndex[(int)registerBreakpoint.Register]();
 
-            var value = _registerValueIndex[(int)breakpoint.Register]();
-
-            if (value == breakpoint.Value)
-            {
-                if (breakpoint.ValueAtLastHit != value)
-                {
-                    breakpoint.ValueAtLastHit = value;
-
-                    if (breakpoint.IsSingleUse)
+                    if (value == breakpoint.Value)
                     {
-                        RemoveBreakpoint(breakpoint.Id);
+                        if (breakpoint.ValueAtLastHit != value)
+                        {
+                            breakpoint.ValueAtLastHit = value;
+
+                            if (registerBreakpoint.IsSingleUse)
+                            {
+                                RemoveBreakpoint(breakpoint);
+                            }
+
+                            return true;
+                        }
                     }
 
-                    return true;
-                }
-            }
+                    registerBreakpoint.ValueAtLastHit = value;
+                    break;
 
-            breakpoint.ValueAtLastHit = value;
+                case MemoryBreakpoint memoryBreakpoint:
+                    // TODO: Implement memory check
+                    break;
+            }
         }
 
         return false;

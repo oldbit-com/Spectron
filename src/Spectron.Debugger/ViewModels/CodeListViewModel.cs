@@ -18,16 +18,18 @@ public class CodeListViewModel(BreakpointManager breakpointManager) : Observable
 
         var startAddress = address;
 
-        if (breakpointHandler.IsBreakpointHit  && address - breakpointHandler.BeforeBreakpointPC < 5)
+        if (breakpointHandler.IsBreakpointHit &&
+            address - breakpointHandler.PreviousAddress < 5 &&
+            address - breakpointHandler.PreviousAddress > 0)
         {
-            startAddress = breakpointHandler.BeforeBreakpointPC;
+            startAddress = breakpointHandler.PreviousAddress;
         }
 
         var disassembly = new Disassembler(
             memory.GetBytes(),
             startAddress,
             maxCount: 25,
-            new DisassemblerOptions { NumberFormat = debuggerSettings.PreferredNumberFormat });
+            new DisassemblerOptions { NumberFormat = debuggerSettings.NumberFormat });
 
         var instructions = disassembly.Disassemble();
 

@@ -4,5 +4,5 @@ namespace OldBit.Spectron.Debugger.Settings;
 
 public record DebuggerSettings
 {
-    public NumberFormat PreferredNumberFormat { get; set; } = NumberFormat.HexPrefixDollar;
+    public NumberFormat NumberFormat { get; init; } = NumberFormat.HexPrefixDollar;
 }

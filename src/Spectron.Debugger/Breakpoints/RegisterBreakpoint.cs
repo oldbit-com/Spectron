@@ -13,6 +13,4 @@ public class RegisterBreakpoint : Breakpoint
     public Register Register { get; set; }
 
     public bool IsSingleUse { get; init; }
-
-    public override string ToString() => $"{Register} == ${Value:X4}";
 }

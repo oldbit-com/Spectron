@@ -2,7 +2,6 @@ namespace OldBit.Spectron.Debugger.Breakpoints;
 
 public enum Register
 {
-    None,
     A,
     B,
     C,
