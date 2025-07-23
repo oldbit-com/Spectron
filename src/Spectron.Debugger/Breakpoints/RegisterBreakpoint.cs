@@ -6,7 +6,7 @@ public class RegisterBreakpoint(Register register, Word value) : Breakpoint
 
     public Word Value { get; } = value;
 
-    public int? ValueAtLastHit { get; set; } = value;
+    public int? LastValue { get; set; }
 
     public bool IsSingleUse { get; init; }
 }

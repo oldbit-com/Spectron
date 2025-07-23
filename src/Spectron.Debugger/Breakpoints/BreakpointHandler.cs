@@ -49,7 +49,7 @@ public class BreakpointHandler : IDisposable
 
     private void BeforeInstruction(Word pc)
     {
-        IsBreakpointHit = BreakpointManager.CheckRegisterBreakpointHit();
+        IsBreakpointHit = BreakpointManager.IsRegisterBreakpointHit();
 
         if (!IsBreakpointHit)
         {
@@ -64,7 +64,7 @@ public class BreakpointHandler : IDisposable
 
     private void MemoryOnMemoryUpdated(Word address)
     {
-        IsBreakpointHit = BreakpointManager.CheckMemoryBreakpointHit(address, _memory);
+        IsBreakpointHit = BreakpointManager.IsMemoryBreakpointHit(address, _memory);
 
         if (!IsBreakpointHit)
         {

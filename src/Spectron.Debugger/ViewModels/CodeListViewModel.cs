@@ -35,7 +35,7 @@ public class CodeListViewModel(BreakpointManager breakpointManager) : Observable
 
         foreach (var instruction in instructions)
         {
-            var isBreakpoint = breakpointManager.HasBreakpoint(Register.PC, instruction.Address);
+            var isBreakpoint = breakpointManager.ContainsBreakpoint(Register.PC, instruction.Address);
             var isCurrent = instruction.Address == pc;
 
             CodeLines.Add(new CodeLineViewModel(

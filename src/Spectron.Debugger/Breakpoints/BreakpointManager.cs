@@ -29,10 +29,10 @@ public class BreakpointManager
 
     public void RemoveBreakpoint(Breakpoint breakpoint) => _breakpoints.Remove(breakpoint);
 
-    public bool HasBreakpoint(Register register, Word address) => _breakpoints.Register
-        .Any(breakpoint => breakpoint.Register == register && breakpoint.Value == address);
+    public bool ContainsBreakpoint(Register register, Word address) => _breakpoints.Register
+        .Any(breakpoint => breakpoint.Register == register && breakpoint.Value == address && !breakpoint.IsSingleUse);
 
-    public bool CheckRegisterBreakpointHit()
+    public bool IsRegisterBreakpointHit()
     {
         // ReSharper disable once ForCanBeConvertedToForeach - foreach in this case is not memory efficient
         for (var index = 0; index < _breakpoints.Register.Count; index++)
@@ -46,28 +46,25 @@ public class BreakpointManager
 
             var value = _registerValueIndex[(int)breakpoint.Register]();
 
-            if (value == breakpoint.Value)
+            if (breakpoint.Value == value && breakpoint.LastValue != value)
             {
-                if (breakpoint.ValueAtLastHit != value)
+                breakpoint.LastValue = value;
+
+                if (breakpoint.IsSingleUse)
                 {
-                    breakpoint.ValueAtLastHit = value;
-
-                    if (breakpoint.IsSingleUse)
-                    {
-                        RemoveBreakpoint(breakpoint);
-                    }
-
-                    return true;
+                    RemoveBreakpoint(breakpoint);
                 }
+
+                return true;
             }
 
-            breakpoint.ValueAtLastHit = value;
+            breakpoint.LastValue = value;
         }
 
         return false;
     }
 
-    public bool CheckMemoryBreakpointHit(Word address, IMemory memory)
+    public bool IsMemoryBreakpointHit(Word address, IMemory memory)
     {
         var value = memory.Read(address);
 
@@ -76,7 +73,7 @@ public class BreakpointManager
         {
             var breakpoint = _breakpoints.Memory[index];
 
-            if (breakpoint.Address != address)
+            if (!breakpoint.IsEnabled || breakpoint.Address != address)
             {
                 continue;
             }
