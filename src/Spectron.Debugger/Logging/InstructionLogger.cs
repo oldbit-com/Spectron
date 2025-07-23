@@ -1,7 +1,5 @@
-using System.IO.IsolatedStorage;
 using OldBit.Spectron.Disassembly;
 using OldBit.Spectron.Emulation;
-using OldBit.Z80Cpu.Events;
 
 namespace OldBit.Spectron.Debugger.Logging;
 
@@ -38,7 +36,7 @@ internal sealed class InstructionLogger : IDisposable
         _textWriter = new StreamWriter(_logFilePath, false);
     }
 
-    private void CpuOnBeforeInstruction(BeforeInstructionEventArgs e)
+    private void CpuOnBeforeInstruction(Word pc)
     {
         if (!IsEnabled)
         {

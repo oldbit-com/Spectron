@@ -37,7 +37,7 @@ partial class MainWindowViewModel
         }
         else
         {
-            _breakpointHandler.Update(emulator.Cpu);
+            _breakpointHandler.Update(emulator.Cpu, emulator.Memory);
         }
     }
 

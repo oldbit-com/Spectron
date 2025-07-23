@@ -1,37 +1,24 @@
+using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Debugger.Breakpoints;
 
 public class BreakpointManager
 {
-    private readonly List<Breakpoint> _breakpoints = [];
+    private readonly BreakpointList  _breakpoints = new();
     private readonly Func<Word>[] _registerValueIndex = new Func<Word>[(int)Register.Last];
 
-    public IReadOnlyList<Breakpoint> Breakpoints => _breakpoints;
+    public IReadOnlyList<Breakpoint> Breakpoints => _breakpoints.Breakpoints;
 
     public BreakpointManager(Z80 cpu) => CreateRegistersIndex(cpu);
 
-    public void UpdateBreakpoint(Breakpoint original, Breakpoint updated)
-    {
-        var existingIndex = _breakpoints.IndexOf(original);
-
-        if (existingIndex < 0)
-        {
-            return;
-        }
-
-        _breakpoints[existingIndex] = updated;
-    }
+    public void UpdateBreakpoint(Breakpoint original, Breakpoint updated) =>
+        _breakpoints.Replace(original, updated);
 
     public void Update(Z80 cpu) => CreateRegistersIndex(cpu);
 
-    public void AddBreakpoint(Breakpoint breakpoint)
-    {
-        if (!_breakpoints.Contains(breakpoint))
-        {
-            _breakpoints.Add(breakpoint);
-        }
-    }
+    public void AddBreakpoint(Breakpoint breakpoint) =>
+        _breakpoints.AddIfNotExists(breakpoint);
 
     public void AddSingleUseBreakpoint(Word address)
     {
@@ -42,41 +29,64 @@ public class BreakpointManager
 
     public void RemoveBreakpoint(Breakpoint breakpoint) => _breakpoints.Remove(breakpoint);
 
-    public bool HasBreakpoint(Register register, Word address) => _breakpoints
-        .OfType<RegisterBreakpoint>()
-        .Any(x => x.Register == register && x.Value == address);
+    public bool HasBreakpoint(Register register, Word address) => _breakpoints.Register
+        .Any(breakpoint => breakpoint.Register == register && breakpoint.Value == address);
 
-    public bool CheckHit()
+    public bool CheckRegisterBreakpointHit()
     {
-        foreach (var breakpoint in _breakpoints.Where(b => b.IsEnabled))
+        // ReSharper disable once ForCanBeConvertedToForeach - foreach in this case is not memory efficient
+        for (var index = 0; index < _breakpoints.Register.Count; index++)
         {
-            switch (breakpoint)
+            var breakpoint = _breakpoints.Register[index];
+
+            if (!breakpoint.IsEnabled)
             {
-                case RegisterBreakpoint registerBreakpoint:
-                    var value = _registerValueIndex[(int)registerBreakpoint.Register]();
+                continue;
+            }
 
-                    if (value == breakpoint.Value)
+            var value = _registerValueIndex[(int)breakpoint.Register]();
+
+            if (value == breakpoint.Value)
+            {
+                if (breakpoint.ValueAtLastHit != value)
+                {
+                    breakpoint.ValueAtLastHit = value;
+
+                    if (breakpoint.IsSingleUse)
                     {
-                        if (breakpoint.ValueAtLastHit != value)
-                        {
-                            breakpoint.ValueAtLastHit = value;
-
-                            if (registerBreakpoint.IsSingleUse)
-                            {
-                                RemoveBreakpoint(breakpoint);
-                            }
-
-                            return true;
-                        }
+                        RemoveBreakpoint(breakpoint);
                     }
 
-                    registerBreakpoint.ValueAtLastHit = value;
-                    break;
-
-                case MemoryBreakpoint memoryBreakpoint:
-                    // TODO: Implement memory check
-                    break;
+                    return true;
+                }
             }
+
+            breakpoint.ValueAtLastHit = value;
+        }
+
+        return false;
+    }
+
+    public bool CheckMemoryBreakpointHit(Word address, IMemory memory)
+    {
+        var value = memory.Read(address);
+
+        // ReSharper disable once ForCanBeConvertedToForeach - foreach in this case is not memory efficient
+        for (var index = 0; index < _breakpoints.Memory.Count; index++)
+        {
+            var breakpoint = _breakpoints.Memory[index];
+
+            if (breakpoint.Address != address)
+            {
+                continue;
+            }
+
+            if (breakpoint.Value != null)
+            {
+                return breakpoint.Value == value;
+            }
+
+            return true;
         }
 
         return false;

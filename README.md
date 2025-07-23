@@ -170,9 +170,9 @@ done in the background by converting static frames to a video stream with audio,
 
 ## Debugger
 Debugger is available in the emulator. It is a simple debugger that allows you to inspect the CPU registers, 
-memory and disassembly. You can step through the code, set breakpoints. This is still work in progress.
+memory and disassembly. You can step through the code, set breakpoints.
 
-### Commands
+### Shortcuts
 - **Step Over** - `F10` \
   For `CALL`, `JR cc`, `JP cc`, `DJNZ`, `LDIR` or `LDDR` instructions, debugger will try to step over the subroutine.
 - **Step Into** - `F11` \
@@ -180,6 +180,19 @@ memory and disassembly. You can step through the code, set breakpoints. This is 
 - **Step Out** - `Shift + F11` \
   Debugger will step out of the subroutine using the current return address on the stack. 
   So this will only work if the value on the stack contains return address.
+
+### Breakpoints
+
+Two types of breakpoints are supported: on register value change or on memory write
+
+#### Register breakpoints
+Typical scenario is use a condition for PC register, for example `PC==32768`. This would break execution
+at the specified address. However any register can be used, for example `HL==16384`, `A==0x79`etc. 
+
+#### Memory breakpoints
+Memory breakpoints can have two forms: trigger when specific value is written to e memory cell or more generic
+when memory cell is written. For example `16384==32` will break when value `32` has been written to `16384` memory address.
+If condition is just `16384`, execution will break when any value  has been written to that address.
 
 ### Immediate window instructions, case insensitive:
 - `HELP` - print help information

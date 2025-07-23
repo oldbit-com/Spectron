@@ -44,7 +44,12 @@ public partial class CodeLineViewModel : ObservableObject,
 
     public void Receive(BreakpointAddedMessage message)
     {
-        if (Address == message.Breakpoint.Value)
+        if (message.Breakpoint is not RegisterBreakpoint registerBreakpoint)
+        {
+            return;
+        }
+
+        if (Address == registerBreakpoint.Value)
         {
             IsBreakpoint = true;
         }
@@ -52,7 +57,12 @@ public partial class CodeLineViewModel : ObservableObject,
 
     public void Receive(BreakpointRemovedMessage message)
     {
-        if (Address == message.Breakpoint.Value)
+        if (message.Breakpoint is not RegisterBreakpoint registerBreakpoint)
+        {
+            return;
+        }
+
+        if (Address == registerBreakpoint.Value)
         {
             IsBreakpoint = false;
         }

@@ -14,7 +14,6 @@ using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Z80Cpu;
-using OldBit.Z80Cpu.Events;
 
 namespace OldBit.Spectron.Emulation;
 
@@ -289,9 +288,9 @@ public sealed class Emulator
         _invalidateScreen = true;
     }
 
-    private void BeforeInstruction(BeforeInstructionEventArgs e)
+    private void BeforeInstruction(Word pc)
     {
-        switch (e.PC)
+        switch (pc)
         {
             case RomRoutines.LD_START:
                 switch (TapeLoadSpeed)

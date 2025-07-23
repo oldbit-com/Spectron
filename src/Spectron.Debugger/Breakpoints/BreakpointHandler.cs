@@ -1,12 +1,12 @@
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Z80Cpu;
-using OldBit.Z80Cpu.Events;
 
 namespace OldBit.Spectron.Debugger.Breakpoints;
 
 public class BreakpointHandler : IDisposable
 {
     private Z80 _cpu;
+    private IEmulatorMemory _memory;
     private bool _isEnabled;
 
     public BreakpointManager BreakpointManager { get; }
@@ -31,49 +31,77 @@ public class BreakpointHandler : IDisposable
     {
         BreakpointManager = new BreakpointManager(cpu);
         _cpu = cpu;
+        _memory = memory;
 
-        _cpu.BeforeInstruction += BeforeInstruction;
+        SubscribeToEvents();
     }
 
-    public void Update(Z80 cpu)
+    public void Update(Z80 cpu, IEmulatorMemory memory)
     {
-        _cpu.BeforeInstruction -= BeforeInstruction;
-        _cpu.BeforeInstruction += BeforeInstruction;
+        UnsubscribeFromEvents();
+        SubscribeToEvents();
 
         BreakpointManager.Update(cpu);
 
         _cpu = cpu;
+        _memory = memory;
     }
 
-    private void BeforeInstruction(BeforeInstructionEventArgs e)
+    private void BeforeInstruction(Word pc)
     {
-        IsBreakpointHit = BreakpointManager.CheckHit();
+        IsBreakpointHit = BreakpointManager.CheckRegisterBreakpointHit();
 
         if (!IsBreakpointHit)
         {
-            PreviousAddress = e.PC;
+            PreviousAddress = pc;
             return;
         }
 
-        e.IsBreakpoint = true;
+        _cpu.Break();
+
+        BreakpointHit?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void MemoryOnMemoryUpdated(Word address)
+    {
+        IsBreakpointHit = BreakpointManager.CheckMemoryBreakpointHit(address, _memory);
+
+        if (!IsBreakpointHit)
+        {
+            return;
+        }
+
+        _cpu.Break();
 
         BreakpointHit?.Invoke(this, EventArgs.Empty);
     }
 
     private void HandleIsEnabled()
     {
-        _cpu.BeforeInstruction -= BeforeInstruction;
+        UnsubscribeFromEvents();
 
         if (IsEnabled)
         {
-            _cpu.BeforeInstruction += BeforeInstruction;
+            SubscribeToEvents();
         }
+    }
+
+    private void SubscribeToEvents()
+    {
+        _cpu.BeforeInstruction += BeforeInstruction;
+        _memory.MemoryUpdated += MemoryOnMemoryUpdated;
+    }
+
+    private void UnsubscribeFromEvents()
+    {
+        _cpu.BeforeInstruction -= BeforeInstruction;
+        _memory.MemoryUpdated -= MemoryOnMemoryUpdated;
     }
 
     public void Dispose()
     {
         GC.SuppressFinalize(this);
 
-        _cpu.BeforeInstruction -= BeforeInstruction;
+        UnsubscribeFromEvents();
     }
 }

@@ -1,16 +1,12 @@
 namespace OldBit.Spectron.Debugger.Breakpoints;
 
-public class RegisterBreakpoint : Breakpoint
+public class RegisterBreakpoint(Register register, Word value) : Breakpoint
 {
-    public RegisterBreakpoint(Register register, Word address)
-    {
-        Register = register;
+    public Register Register { get; } = register;
 
-        Value = address;
-        ValueAtLastHit = address;
-    }
+    public Word Value { get; } = value;
 
-    public Register Register { get; set; }
+    public int? ValueAtLastHit { get; set; } = value;
 
     public bool IsSingleUse { get; init; }
 }

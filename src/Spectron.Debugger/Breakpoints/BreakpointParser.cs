@@ -20,7 +20,7 @@ public static class BreakpointParser
             return true;
         }
 
-        if (TryParse(condition, out RegisterBreakpoint? memoryBreakpoint))
+        if (TryParse(condition, out MemoryBreakpoint? memoryBreakpoint))
         {
             breakpoint = memoryBreakpoint;
             return true;
@@ -46,36 +46,22 @@ public static class BreakpointParser
             return false;
         }
 
-        var register = ParseRegister(items[0].Trim());
-
-        if (register == null)
+        if (!TryParseRegister(items[0].Trim(), out var register))
         {
             return false;
         }
 
-        var address = ParseAddress(items[1].Trim());
-
-        if (address == null)
+        if (!TryParseWord(items[1].Trim(), out var value))
         {
             return false;
         }
 
-        if (Is16BitRegister(register))
+        if (!Is16BitRegister(register) && value > 0xFF)
         {
-            if (address is < 0 or > 0xFFFF)
-            {
-                return false;
-            }
-        }
-        else
-        {
-            if (address is < 0 or > 0xFF)
-            {
-                return false;
-            }
+            return false;
         }
 
-        breakpoint = new RegisterBreakpoint(Enum.Parse<Register>(register, true), (Word)address.Value)
+        breakpoint = new RegisterBreakpoint(Enum.Parse<Register>(register, true), value)
         {
             Condition = condition
         };
@@ -87,20 +73,89 @@ public static class BreakpointParser
     {
         breakpoint = null;
 
-        return false;
-    }
-
-    private static string? ParseRegister(string value) =>
-        ValidRegisters.FirstOrDefault(r => r.Equals(value, StringComparison.OrdinalIgnoreCase));
-
-    private static int? ParseAddress(string value)
-    {
-        if (int.TryParse(value, out var address) || TryParseHex(value, out address))
+        if (string.IsNullOrWhiteSpace(condition))
         {
-            return address;
+            return false;
         }
 
-        return null;
+        var items = condition.Split("==");
+
+        if (items.Length != 1 && items.Length != 2)
+        {
+            return false;
+        }
+
+        if (!TryParseWord(items[0].Trim(), out var address))
+        {
+            return false;
+        }
+
+        if (items.Length == 1)
+        {
+            breakpoint = new MemoryBreakpoint(address)
+            {
+                Condition = condition
+            };
+        }
+        else
+        {
+            if (!TryParseByte(items[1].Trim(), out var value))
+            {
+                return false;
+            }
+
+            breakpoint = new MemoryBreakpoint(address, value)
+            {
+                Condition = condition
+            };
+        }
+
+        return true;
+    }
+
+    private static bool TryParseRegister(string value, [NotNullWhen(true)] out string? register)
+    {
+        register = ValidRegisters.FirstOrDefault(r => r.Equals(value, StringComparison.OrdinalIgnoreCase));
+
+        return register != null;
+    }
+
+    private static bool TryParseWord(string value, out Word result)
+    {
+        result = 0;
+
+        if (!int.TryParse(value, out var intValue) && !TryParseHex(value, out intValue))
+        {
+            return false;
+        }
+
+        if (intValue is < 0 or > 0xFFFF)
+        {
+            return false;
+        }
+
+        result = (Word)intValue;
+
+        return true;
+    }
+
+    private static bool TryParseByte(string value, out byte result)
+    {
+        result = 0;
+
+        if (!TryParseWord(value, out var word))
+        {
+            return false;
+        }
+
+        if (word > 0xFF)
+        {
+            return false;
+        }
+
+        result = (byte)word;
+
+        return true;
     }
 
     private static bool TryParseHex(string hex, out int value)
