@@ -218,11 +218,9 @@ partial class MainWindowViewModel
         CreateEmulator(ComputerType, RomType);
     }
 
-    partial void OnIsPausedChanged(bool value) =>
-        _debuggerViewModel?.HandlePause(value);
+    partial void OnIsPausedChanged(bool value) => _debuggerViewModel?.HandlePause(value, _breakpointHitEventArgs);
 
-    partial void OnComputerTypeChanged(ComputerType value) =>
-        StatusBarViewModel.ComputerType = value;
+    partial void OnComputerTypeChanged(ComputerType value) => StatusBarViewModel.ComputerType = value;
 
     partial void OnIsUlaPlusEnabledChanged(bool value)
     {

@@ -66,8 +66,6 @@ public class BreakpointManager
 
     public bool IsMemoryBreakpointHit(Word address, IMemory memory)
     {
-        var value = memory.Read(address);
-
         // ReSharper disable once ForCanBeConvertedToForeach - foreach in this case is not memory efficient
         for (var index = 0; index < _breakpoints.Memory.Count; index++)
         {
@@ -80,7 +78,7 @@ public class BreakpointManager
 
             if (breakpoint.Value != null)
             {
-                return breakpoint.Value == value;
+                return breakpoint.Value == memory.Read(address);
             }
 
             return true;

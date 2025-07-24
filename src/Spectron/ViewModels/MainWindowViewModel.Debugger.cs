@@ -13,10 +13,14 @@ partial class MainWindowViewModel
 {
     [ObservableProperty]
     private bool _breakpointsEnabled;
+    private BreakpointHitEventArgs? _breakpointHitEventArgs;
 
-    private void OpenDebuggerWindow()
+    private void OpenDebuggerWindow(BreakpointHitEventArgs? breakpointHitEventArgs = null)
     {
-        _debuggerViewModel = new DebuggerViewModel( Emulator!, _debuggerContext, _preferences.Debugger, _breakpointHandler!);
+        _breakpointHitEventArgs = breakpointHitEventArgs;
+
+        _debuggerViewModel = new DebuggerViewModel(Emulator!, _debuggerContext,
+            _preferences.Debugger, _breakpointHandler!, breakpointHitEventArgs);
 
         if (!IsPaused)
         {
@@ -32,23 +36,23 @@ partial class MainWindowViewModel
     {
         if (_breakpointHandler == null)
         {
-            _breakpointHandler = new BreakpointHandler(emulator.Cpu, emulator.Memory);
+            _breakpointHandler = new BreakpointHandler(emulator);
             _breakpointHandler.BreakpointHit += OnBreakpointHit;
         }
         else
         {
-            _breakpointHandler.Update(emulator.Cpu, emulator.Memory);
+            _breakpointHandler.Update(emulator);
         }
     }
 
-    private void OnBreakpointHit(object? sender, EventArgs e)
+    private void OnBreakpointHit(object? sender, BreakpointHitEventArgs e)
     {
         if (_debuggerViewModel != null)
         {
             return;
         }
 
-        Dispatcher.UIThread.Post(OpenDebuggerWindow);
+        Dispatcher.UIThread.Post(() => OpenDebuggerWindow(e));
     }
 
     private void DebuggerWindowClosed()
@@ -56,6 +60,7 @@ partial class MainWindowViewModel
         Resume(isDebuggerResume: true);
 
         _debuggerViewModel = null;
+        _breakpointHitEventArgs = null;
     }
 
     private void ResumeFromDebug() => Resume(isDebuggerResume: true);

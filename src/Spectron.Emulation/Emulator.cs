@@ -33,6 +33,7 @@ public sealed class Emulator
     private bool _invalidateScreen;
     private bool _isAcceleratedTapeSpeed;
     private bool _isNmiRequested;
+    private bool _isDebuggerBreak;
     private FloatingBus _floatingBus = null!;
 
     public delegate void FrameEvent(FrameBuffer frameBuffer, AudioBuffer audioBuffer);
@@ -163,12 +164,16 @@ public sealed class Emulator
 
     public void Resume(bool isDebuggerResume = false)
     {
+        _isDebuggerBreak = false;
         _isDebuggerResume = isDebuggerResume;
+
         _emulationTimer.Resume();
     }
 
     public void Reset()
     {
+        _isDebuggerBreak = false;
+
         AudioManager.ResetAudio();
         _memory.Reset();
         Cpu.Reset();
@@ -183,6 +188,13 @@ public sealed class Emulator
         }
     }
 
+    public void Break()
+    {
+        Cpu.Break();
+
+        _isDebuggerBreak = true;
+    }
+
     public void RequestNmi() => _isNmiRequested = true;
 
     public void SetEmulationSpeed(int emulationSpeedPercentage) =>
@@ -192,6 +204,11 @@ public sealed class Emulator
 
     private void OnTimerElapsed(EventArgs e)
     {
+        if (_isDebuggerBreak)
+        {
+            return;
+        }
+
         try
         {
             RunFrame();

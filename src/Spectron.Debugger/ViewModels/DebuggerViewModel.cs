@@ -41,16 +41,17 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
         Emulator emulator,
         DebuggerContext debuggerContext,
         DebuggerSettings debuggerSettings,
-        BreakpointHandler breakpointHandler)
+        BreakpointHandler breakpointHandler,
+        BreakpointHitEventArgs? breakpointHitEventArgs)
     {
         _debuggerContext = debuggerContext;
         _debuggerSettings = debuggerSettings;
         _breakpointHandler = breakpointHandler;
 
-        ConfigureEmulator(emulator);
+        ConfigureEmulator(emulator, breakpointHitEventArgs);
     }
 
-    public void ConfigureEmulator(Emulator emulator)
+    public void ConfigureEmulator(Emulator emulator, BreakpointHitEventArgs? breakpointHitEventArgs = null)
     {
         Emulator = emulator;
 
@@ -64,27 +65,28 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
             list => CodeListViewModel.Update(
                 Emulator.Memory,
                 list.Address,
-                emulator.Cpu.Registers.PC,
-                _breakpointHandler,
-                _debuggerSettings));
+                Emulator.Cpu.Registers.PC,
+                _debuggerSettings,
+                breakpointHitEventArgs));
 
-        LoggingViewModel.Configure(emulator);
+        LoggingViewModel.Configure(Emulator);
 
-        HandlePause(Emulator.IsPaused);
+        HandlePause(Emulator.IsPaused, breakpointHitEventArgs);
     }
 
-    private void OnBreakpointHit(object? sender, EventArgs e)
+    private void OnBreakpointHit(object? sender, BreakpointHitEventArgs e)
     {
         Emulator.Pause();
 
         Dispatcher.UIThread.Post(() =>
         {
             IsPaused = true;
-            Refresh();
+
+            Refresh(breakpointHitEventArgs: e);
         });
     }
 
-    public void HandlePause(bool isPaused)
+    public void HandlePause(bool isPaused, BreakpointHitEventArgs? breakpointHitEventArgs = null)
     {
         IsPaused = isPaused;
 
@@ -97,7 +99,7 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
 
         Emulator.Pause();
 
-        Refresh();
+        Refresh(breakpointHitEventArgs: breakpointHitEventArgs);
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteStepCommands))]
@@ -112,7 +114,8 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
         {
             returnAddress = Emulator.Cpu.Registers.PC + 3;
         }
-        else if (IsDjnzInstruction(opCode) || IsShortJumpConditionInstruction(opCode) ||
+        else if (IsDjnzInstruction(opCode) ||
+                 IsShortJumpConditionInstruction(opCode) ||
                  opCode == 0xED && IsBlockTransferInstruction(nextOpCode))
         {
             returnAddress = Emulator.Cpu.Registers.PC + 2;
@@ -179,11 +182,11 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
         _breakpointHandler.BreakpointHit -= OnBreakpointHit;
     }
 
-    private void Refresh(bool refreshMemory = true)
+    private void Refresh(bool refreshMemory = true, BreakpointHitEventArgs? breakpointHitEventArgs = null)
     {
         RefreshCpu();
         RefreshStack();
-        RefreshCode();
+        RefreshCode(breakpointHitEventArgs);
 
         if (refreshMemory)
         {
@@ -195,12 +198,12 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
 
     private void RefreshStack() => StackViewModel.Update(Emulator.Memory, Emulator.Cpu.Registers.SP);
 
-    private void RefreshCode() => CodeListViewModel.Update(
+    private void RefreshCode(BreakpointHitEventArgs? breakpointHitEventArgs = null) => CodeListViewModel.Update(
         Emulator.Memory,
         Emulator.Cpu.Registers.PC,
         Emulator.Cpu.Registers.PC,
-        _breakpointHandler,
-        _debuggerSettings);
+        _debuggerSettings,
+        breakpointHitEventArgs);
 
     private void RefreshMemory() => MemoryViewModel.Update(Emulator.Memory);
 
