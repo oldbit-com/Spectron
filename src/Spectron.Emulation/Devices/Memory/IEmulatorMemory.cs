@@ -4,7 +4,7 @@ namespace OldBit.Spectron.Emulation.Devices.Memory;
 
 public delegate void MemoryUpdatedEvent(Word address);
 
-internal interface IEmulatorMemory : IMemory, IDevice
+public interface IEmulatorMemory : IMemory, IDevice
 {
     void Reset() { }
 

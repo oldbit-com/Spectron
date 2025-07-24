@@ -1,15 +1,93 @@
+using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Debugger.Breakpoints;
 
 public class BreakpointManager
 {
-    private readonly List<Breakpoint> _breakpoints = [];
+    private readonly BreakpointList  _breakpoints = new();
     private readonly Func<Word>[] _registerValueIndex = new Func<Word>[(int)Register.Last];
 
-    public IReadOnlyList<Breakpoint> Breakpoints => _breakpoints;
+    public IReadOnlyList<Breakpoint> Breakpoints => _breakpoints.Breakpoints;
 
-    public BreakpointManager(Z80 cpu)
+    public BreakpointManager(Z80 cpu) => CreateRegistersIndex(cpu);
+
+    public void UpdateBreakpoint(Breakpoint original, Breakpoint updated) =>
+        _breakpoints.Replace(original, updated);
+
+    public void Update(Z80 cpu) => CreateRegistersIndex(cpu);
+
+    public void AddBreakpoint(Breakpoint breakpoint) =>
+        _breakpoints.AddIfNotExists(breakpoint);
+
+    public void AddSingleUseBreakpoint(Word address)
+    {
+        var breakpoint = new RegisterBreakpoint(Register.PC, address) { IsSingleUse = true };
+
+        _breakpoints.Add(breakpoint);
+    }
+
+    public void RemoveBreakpoint(Breakpoint breakpoint) => _breakpoints.Remove(breakpoint);
+
+    public bool ContainsBreakpoint(Register register, Word address) => _breakpoints.Register
+        .Any(breakpoint => breakpoint.Register == register && breakpoint.Value == address && !breakpoint.IsSingleUse);
+
+    public bool IsRegisterBreakpointHit()
+    {
+        // ReSharper disable once ForCanBeConvertedToForeach - foreach in this case is not memory efficient
+        for (var index = 0; index < _breakpoints.Register.Count; index++)
+        {
+            var breakpoint = _breakpoints.Register[index];
+
+            if (!breakpoint.IsEnabled)
+            {
+                continue;
+            }
+
+            var value = _registerValueIndex[(int)breakpoint.Register]();
+
+            if (breakpoint.Value == value && breakpoint.LastValue != value)
+            {
+                breakpoint.LastValue = value;
+
+                if (breakpoint.IsSingleUse)
+                {
+                    RemoveBreakpoint(breakpoint);
+                }
+
+                return true;
+            }
+
+            breakpoint.LastValue = value;
+        }
+
+        return false;
+    }
+
+    public bool IsMemoryBreakpointHit(Word address, IMemory memory)
+    {
+        // ReSharper disable once ForCanBeConvertedToForeach - foreach in this case is not memory efficient
+        for (var index = 0; index < _breakpoints.Memory.Count; index++)
+        {
+            var breakpoint = _breakpoints.Memory[index];
+
+            if (!breakpoint.IsEnabled || breakpoint.Address != address)
+            {
+                continue;
+            }
+
+            if (breakpoint.Value != null)
+            {
+                return breakpoint.Value == memory.Read(address);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private void CreateRegistersIndex(Z80 cpu)
     {
         _registerValueIndex[(int)Register.A] = () => cpu.Registers.A;
         _registerValueIndex[(int)Register.B] = () => cpu.Registers.B;
@@ -34,74 +112,5 @@ public class BreakpointManager
         _registerValueIndex[(int)Register.PC] = () => cpu.Registers.PC;
         _registerValueIndex[(int)Register.IX] = () => cpu.Registers.IX;
         _registerValueIndex[(int)Register.IY] = () => cpu.Registers.IY;
-    }
-
-    public void UpdateBreakpoint(Guid id, Register register, int value, bool isEnabled)
-    {
-        var existing = _breakpoints.FirstOrDefault(x => x.Id == id);
-
-        if (existing == null)
-        {
-            return;
-        }
-
-        existing.IsEnabled = isEnabled;
-        existing.Register = register;
-        existing.Value = value;
-    }
-
-    public void AddBreakpoint(Breakpoint breakpoint)
-    {
-        var index = _breakpoints.FindIndex(x => x.Id == breakpoint.Id);
-
-        if (index < 0)
-        {
-            _breakpoints.Add(breakpoint);
-        }
-    }
-
-    public void RemoveBreakpoint(Guid id)
-    {
-        var index = _breakpoints.FindIndex(x => x.Id == id);
-
-        if (index >= 0)
-        {
-            _breakpoints.RemoveAt(index);
-        }
-    }
-
-    public bool HasBreakpoint(Register register, Word address) =>
-        _breakpoints.Any(x => x.Register == register && x.Value == address);
-
-    public bool CheckHit()
-    {
-        foreach (var breakpoint in _breakpoints)
-        {
-            if (!breakpoint.IsEnabled)
-            {
-                continue;
-            }
-
-            var value = _registerValueIndex[(int)breakpoint.Register]();
-
-            if (value == breakpoint.Value)
-            {
-                if (breakpoint.ValueAtLastHit != value)
-                {
-                    breakpoint.ValueAtLastHit = value;
-
-                    if (breakpoint.ShouldRemoveOnHit)
-                    {
-                        RemoveBreakpoint(breakpoint.Id);
-                    }
-
-                    return true;
-                }
-            }
-
-            breakpoint.ValueAtLastHit = value;
-        }
-
-        return false;
     }
 }

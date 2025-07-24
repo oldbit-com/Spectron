@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Debugger.Messages;
+using OldBit.Spectron.Disassembly.Formatters;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
@@ -12,14 +13,16 @@ public partial class BreakpointListViewModel : ObservableObject,
     IRecipient<ToggleBreakpointMessage>
 {
     private readonly BreakpointManager _breakpointManager;
+    private readonly NumberFormatter _numberFormatter;
 
     public ObservableCollection<BreakpointViewModel> Breakpoints { get; } = [];
 
-    public BreakpointListViewModel(DebuggerContext debuggerContext, BreakpointManager breakpointManager)
+    public BreakpointListViewModel(BreakpointManager breakpointManager, NumberFormat numberFormat)
     {
         _breakpointManager = breakpointManager;
+        _numberFormatter = new NumberFormatter(numberFormat);
 
-        foreach (var breakpoint in debuggerContext.Breakpoints)
+        foreach (var breakpoint in _breakpointManager.Breakpoints)
         {
             AddBreakpoint(breakpoint);
         }
@@ -28,7 +31,7 @@ public partial class BreakpointListViewModel : ObservableObject,
     }
 
     [RelayCommand]
-    private void AddBreakpoint() => AddBreakpoint(Register.PC, 0x1000);
+    private void AddBreakpoint() => AddBreakpoint(Register.PC, 56);
 
     [RelayCommand]
     private void RemoveBreakpoint(IList breakpoints)
@@ -46,21 +49,25 @@ public partial class BreakpointListViewModel : ObservableObject,
         Breakpoints.Add(viewModel);
         _breakpointManager.AddBreakpoint(breakpoint);
 
-        WeakReferenceMessenger.Default.Send(new BreakpointAddedMessage((Word)breakpoint.Value));
+        WeakReferenceMessenger.Default.Send(new BreakpointAddedMessage(breakpoint));
     }
 
     private void AddBreakpoint(Register register, Word value)
     {
-        var breakpoint = new Breakpoint(register, value);
+        var breakpoint = new RegisterBreakpoint(register, value)
+        {
+            Condition = $"{register} == {_numberFormatter.Format(value)}"
+        };
 
         AddBreakpoint(breakpoint);
     }
 
-    private void RemoveBreakpoint(Register register, Word value)
+    private void RemoveBreakpoint(Register register, Word address)
     {
-        var breakpoint = Breakpoints.FirstOrDefault(x =>
-            x.Breakpoint.Value == value &&
-            x.Breakpoint.Register == register);
+        var breakpoint = Breakpoints.FirstOrDefault(vm =>
+            vm.Breakpoint is RegisterBreakpoint registerBreakpoint &&
+            registerBreakpoint.Value == address &&
+            registerBreakpoint.Register == register);
 
         if (breakpoint != null)
         {
@@ -68,31 +75,28 @@ public partial class BreakpointListViewModel : ObservableObject,
         }
     }
 
-    private void RemoveBreakpoint(BreakpointViewModel breakpoint)
+    private void RemoveBreakpoint(BreakpointViewModel breakpointViewModel)
     {
-        _breakpointManager.RemoveBreakpoint(breakpoint.Id);
-        Breakpoints.Remove(breakpoint);
+        _breakpointManager.RemoveBreakpoint(breakpointViewModel.Breakpoint);
+        Breakpoints.Remove(breakpointViewModel);
 
-        WeakReferenceMessenger.Default.Send(new BreakpointRemovedMessage(breakpoint.Breakpoint.Register, (Word)breakpoint.Breakpoint.Value));
+        WeakReferenceMessenger.Default.Send(new BreakpointRemovedMessage(breakpointViewModel.Breakpoint));
     }
 
-    public void UpdateBreakpoint(BreakpointViewModel breakpoint)
+    public void UpdateBreakpoint(BreakpointViewModel breakpointViewModel)
     {
-        if (!BreakpointParser.TryParseCondition(breakpoint.Condition, out var updated))
+        if (!BreakpointParser.TryParse(breakpointViewModel.Condition, out var updated))
         {
             return;
         }
 
-        var (newRegister, newAddress) = updated.Value;
-        var oldAddress = breakpoint.Breakpoint.Value;
+        var original = breakpointViewModel.Breakpoint;
+        breakpointViewModel.Breakpoint = updated;
 
-        _breakpointManager.UpdateBreakpoint(
-            breakpoint.Breakpoint.Id,
-            newRegister,
-            newAddress,
-            breakpoint.IsEnabled);
+        updated.IsEnabled = original.IsEnabled;
+        _breakpointManager.UpdateBreakpoint(original, updated);
 
-        WeakReferenceMessenger.Default.Send(new BreakpointUpdatedMessage(newRegister, (Word)oldAddress, (Word)newAddress));
+        WeakReferenceMessenger.Default.Send(new BreakpointUpdatedMessage(original, updated));
     }
 
     public void Receive(ToggleBreakpointMessage message)

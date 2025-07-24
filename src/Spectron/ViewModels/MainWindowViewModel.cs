@@ -11,6 +11,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Debugger;
+using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Debugger.Messages;
 using OldBit.Spectron.Debugger.ViewModels;
 using OldBit.Spectron.Emulation;
@@ -56,6 +57,7 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly KeyboardHook _keyboardHook;
     private readonly Stopwatch _renderStopwatch = new();
     private readonly FrameRateCalculator _frameRateCalculator = new();
+    private readonly ScreenshotViewModel _screenshotViewModel = new();
 
     private Emulator? Emulator { get; set; }
     private Preferences _preferences = new();
@@ -66,7 +68,7 @@ public partial class MainWindowViewModel : ObservableObject
     private DebuggerViewModel? _debuggerViewModel;
     private PokeFile? _pokeFile;
     private MouseHelper? _mouseHelper;
-    private readonly ScreenshotViewModel _screenshotViewModel = new();
+    private BreakpointHandler? _breakpointHandler;
 
     public Control ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }
@@ -207,9 +209,6 @@ public partial class MainWindowViewModel : ObservableObject
 
     // Tools
     [RelayCommand]
-    private void ShowDebuggerView() => OpenDebuggerWindow();
-
-    [RelayCommand]
     private async Task StartAudioRecording() => await HandleStartAudioRecordingAsync();
 
     [RelayCommand]
@@ -241,12 +240,19 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void SetTapeLoadSpeed(TapeSpeed tapeSpeed) => HandleSetTapeLoadingSpeed(tapeSpeed);
 
-    // Help
+    // Debug
     [RelayCommand]
-    private void ShowAboutView() => OpenAboutWindow();
+    private void ShowDebuggerView() => OpenDebuggerWindow();
 
     [RelayCommand]
-    private void ShowKeyboardHelpView() => ShowKeyboardHelpWindow();
+    private void ToggleBreakpoints() => BreakpointsEnabled = !BreakpointsEnabled;
+
+    // Help
+    [RelayCommand]
+    private static void ShowAboutView() => OpenAboutWindow();
+
+    [RelayCommand]
+    private static void ShowKeyboardHelpView() => ShowKeyboardHelpWindow();
     #endregion
 
     public MainWindowViewModel(
@@ -292,6 +298,12 @@ public partial class MainWindowViewModel : ObservableObject
 
         WeakReferenceMessenger.Default.Register<ResetEmulatorMessage>(this, (_, message) =>
             HandleMachineReset(message.HardReset));
+
+        WeakReferenceMessenger.Default.Register<ResumeFromDebugMessage>(this, (_, _) =>
+            ResumeFromDebug());
+
+        WeakReferenceMessenger.Default.Register<PauseForDebugMessage>(this, (_, _) =>
+            PauseForDebug());
 
         _frameRateCalculator.FrameRateChanged = fps =>
         {
@@ -346,15 +358,12 @@ public partial class MainWindowViewModel : ObservableObject
         command?.NotifyCanExecuteChanged();
     }
 
-    public void OnViewClosed(object? viewModel)
+    public void OnViewClosed(Type? viewModel)
     {
-        if (viewModel is not DebuggerViewModel)
+        if (viewModel == typeof(DebuggerViewModel))
         {
-            return;
+            DebuggerWindowClosed();
         }
-
-        Resume();
-        _debuggerViewModel = null;
     }
 
     private void HandleToggleMute()

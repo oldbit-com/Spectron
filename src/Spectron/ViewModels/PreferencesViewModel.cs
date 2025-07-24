@@ -93,7 +93,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         ScalingAlgorithm = preferences.Recording.ScalingAlgorithm;
         FfmpegPath = preferences.Recording.FFmpegPath;
 
-        DebuggerPreferredNumberFormat = preferences.Debugger.PreferredNumberFormat;
+        DebuggerNumberFormat = preferences.Debugger.NumberFormat;
 
         IsDivMmcEnabled = preferences.DivMmc.IsEnabled;
         IsDivMmcWriteEnabled = preferences.DivMmc.IsEepromWriteEnabled;
@@ -198,7 +198,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
 
             Debugger = new DebuggerSettings
             {
-                PreferredNumberFormat = DebuggerPreferredNumberFormat,
+                NumberFormat = DebuggerNumberFormat,
             },
 
             DivMmc = new DivMmcSettings
@@ -591,7 +591,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
     private int _timeMachineCountdownSeconds = 3;
 
     [ObservableProperty]
-    private NumberFormat _debuggerPreferredNumberFormat = NumberFormat.HexPrefixDollar;
+    private NumberFormat _debuggerNumberFormat = NumberFormat.HexPrefixDollar;
 
     [ObservableProperty]
     private bool _isDivMmcEnabled;

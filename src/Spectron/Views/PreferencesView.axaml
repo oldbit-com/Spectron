@@ -545,7 +545,7 @@
                                 FontSize="22"
                                 Width="130"
                                 ItemsSource="{Binding HexNumberFormats}"
-                                SelectedValue="{Binding DebuggerPreferredNumberFormat}"
+                                SelectedValue="{Binding DebuggerNumberFormat}"
                                 DisplayMemberBinding="{Binding Name}"
                                 SelectedValueBinding="{Binding Value}"/>
                         </Grid>

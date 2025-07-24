@@ -4,21 +4,38 @@
 My own ZX Spectrum emulator written in C# and Avalonia UI. It emulates classic ZX Spectrum 16K, 48K and 
 128K computers.
 
-This is work in progress, I've been improving it quite a lot recently. However it is stable and usable. 
-It can run most of the games and demos without any problems.
+It is quite accurate and stable, it can run most of the games and demos without any issues, load protected
+tapes.
 
-It's a cross-platform emulator that runs on Windows, Linux and macOS. Developed on macOS, so mostly tested
-on this platform. Needs some more testing on Linux.
+It's a cross-platform emulator that runs on Windows, Linux and macOS. Developed on macOS, so generally tested
+on this platform. Needs some more testing on Linux, seems to be running fine on Windows.
 
-This is my hobby project which I always wanted to do. It has been a lot of fun, and quite challenging, too.
-ZX Spectrum was my first computer and I love it. I am planning to keep it alive since I created it for my own 
-use and I am using it to play games and demos.
+This is my hobby project which I always wanted to do. It has been a lot of fun, and quite a challenge.
+There are other emulators out there, but my focus was on making it better structured, easier to understand.
+It is written all by hand, no AI generated code.
+
+ZX Spectrum was my first computer and I still love it. I am planning to keep this project alive since 
+I have created it for my personal use to play games and demos. It is a lot of fun.
 
 It uses several of my own libraries that I created for this project:
-- [Z80 CPU emulator](https://github.com/oldbit-com/Z80/tree/spectron)
-- [File format handling](https://github.com/oldbit-com/Spectron.Files)
-- [Audio player](https://github.com/oldbit-com/Beep)
-- [Gamepad support](https://github.com/oldbit-com/Joypad)
+
+| Library                                                | Description                                  |
+|--------------------------------------------------------|----------------------------------------------|
+| [Z80](https://github.com/oldbit-com/Z80/tree/spectron) | Generic Z80 CPU emulator                     |
+| [Files](https://github.com/oldbit-com/Spectron.Files)  | Handles TZX, Z80, SNA and other file formats |
+| [Beep](https://github.com/oldbit-com/Beep)             | Basic audio player, cross-platform, native   |
+| [Joypad](https://github.com/oldbit-com/Joypad)         | Gamepad handler, cross-platform, native      |
+
+Solution consists of several projects:
+
+| Project                | Description                                            |
+|------------------------|--------------------------------------------------------|
+| Spectron               | Avalonia based UI                                      |
+| Spectron.Debugger      | Fully featured Code debugger, includes UI and controls |
+| Spectron.Disassembly   | Simple Z80 disassembler, used by the debugger          |
+| **Spectron.Emulation** | This is the core of the emulator, e.g. the main thing  |
+| Spectron.Recorder      | Audio and Video recording helper                       |
+
 
 ![Main Window](docs/default.png?raw=true "Main Window")
 
@@ -153,9 +170,9 @@ done in the background by converting static frames to a video stream with audio,
 
 ## Debugger
 Debugger is available in the emulator. It is a simple debugger that allows you to inspect the CPU registers, 
-memory and disassembly. You can step through the code, set breakpoints. This is still work in progress.
+memory and disassembly. You can step through the code, set breakpoints.
 
-### Commands
+### Shortcuts
 - **Step Over** - `F10` \
   For `CALL`, `JR cc`, `JP cc`, `DJNZ`, `LDIR` or `LDDR` instructions, debugger will try to step over the subroutine.
 - **Step Into** - `F11` \
@@ -163,6 +180,19 @@ memory and disassembly. You can step through the code, set breakpoints. This is 
 - **Step Out** - `Shift + F11` \
   Debugger will step out of the subroutine using the current return address on the stack. 
   So this will only work if the value on the stack contains return address.
+
+### Breakpoints
+
+Two types of breakpoints are supported: on register value change or on memory write
+
+#### Register breakpoints
+Typical scenario is use a condition for PC register, for example `PC==32768`. This would break execution
+at the specified address. However any register can be used, for example `HL==16384`, `A==0x79`etc. 
+
+#### Memory breakpoints
+Memory breakpoints can have two forms: trigger when specific value is written to e memory cell or more generic
+when memory cell is written. For example `16384==32` will break when value `32` has been written to `16384` memory address.
+If condition is just `16384`, execution will break when any value  has been written to that address.
 
 ### Immediate window instructions, case insensitive:
 - `HELP` - print help information
@@ -206,4 +236,3 @@ memory and disassembly. You can step through the code, set breakpoints. This is 
 - [ZX Spectrum Font](https://github.com/comptic/zx-spectrum-font)
 - [Hack Font](https://sourcefoundry.org/hack/)
 - [VT220 Font](https://github.com/svofski/glasstty/blob/master/Glass_TTY_VT220.ttf)
-

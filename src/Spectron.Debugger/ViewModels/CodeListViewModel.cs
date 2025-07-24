@@ -12,21 +12,23 @@ public class CodeListViewModel(BreakpointManager breakpointManager) : Observable
 {
     public ObservableCollection<CodeLineViewModel> CodeLines { get; } = [];
 
-    public void Update(IMemory memory, Word address, Word pc, DebuggerSettings debuggerSettings)
+    public void Update(IMemory memory, Word address, Word pc, DebuggerSettings debuggerSettings, BreakpointHitEventArgs? breakpointHitEventArgs)
     {
         CodeLines.Clear();
 
+        var startAddress = DetermineStartAddress(address, breakpointHitEventArgs);
+
         var disassembly = new Disassembler(
             memory.GetBytes(),
-            address,
+            startAddress,
             maxCount: 25,
-            new DisassemblerOptions { NumberFormat = debuggerSettings.PreferredNumberFormat });
+            new DisassemblerOptions { NumberFormat = debuggerSettings.NumberFormat });
 
         var instructions = disassembly.Disassemble();
 
         foreach (var instruction in instructions)
         {
-            var isBreakpoint = breakpointManager.HasBreakpoint(Register.PC, instruction.Address);
+            var isBreakpoint = breakpointManager.ContainsBreakpoint(Register.PC, instruction.Address);
             var isCurrent = instruction.Address == pc;
 
             CodeLines.Add(new CodeLineViewModel(
@@ -35,5 +37,17 @@ public class CodeListViewModel(BreakpointManager breakpointManager) : Observable
                 isCurrent,
                 isBreakpoint));
         }
+    }
+
+    private static Word DetermineStartAddress(Word address, BreakpointHitEventArgs? breakpointHitEventArgs)
+    {
+        if (breakpointHitEventArgs != null &&
+            address - breakpointHitEventArgs.PreviousAddress < 5 &&
+            address - breakpointHitEventArgs.PreviousAddress > 0)
+        {
+            return breakpointHitEventArgs.PreviousAddress;
+        }
+
+        return address;
     }
 }

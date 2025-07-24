@@ -56,7 +56,7 @@
                 <Button Classes="Toolbar" Command="{Binding TogglePauseCommand}" IsVisible="{Binding !IsPaused}" ToolTip.Tip="Pause [F2]">
                     <material:MaterialIcon Kind="Pause" Classes.IsDisabled="{Binding !$parent.IsEnabled}"/>
                 </Button>
-                <Button Classes="Toolbar" Command="{Binding DebuggerResumeCommand}" ToolTip.Tip="Resume [F5]" IsVisible="{Binding IsPaused}">
+                <Button Classes="Toolbar" Command="{Binding DebuggerResumeCommand}" IsVisible="{Binding IsPaused}" ToolTip.Tip="Resume [F5]">
                     <material:MaterialIcon Kind="Play" Classes.IsDisabled="{Binding !$parent.IsEnabled}"/>
                 </Button>
                 <Button Classes="Toolbar" Command="{Binding DebuggerStepOverCommand}" ToolTip.Tip="Step Over [F10]" IsEnabled="{Binding IsPaused}">

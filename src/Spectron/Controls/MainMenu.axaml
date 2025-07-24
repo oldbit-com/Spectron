@@ -99,8 +99,6 @@
         </MenuItem>
 
         <MenuItem Header="Tools" Padding="10 0 10 0" Focusable="False">
-            <MenuItem Header="Debugger" InputGesture="F11" Command="{Binding ShowDebuggerViewCommand}"/>
-            <MenuItem Header="-"/>
             <MenuItem Header="Record Audio..." Command="{Binding StartAudioRecordingCommand}" IsEnabled="{Binding !RecordingStatus}"/>
             <MenuItem Header="Record Video..." Command="{Binding StartVideoRecordingCommand}" IsEnabled="{Binding !RecordingStatus}"/>
             <MenuItem Header="Stop Recording" Command="{Binding StopRecordingCommand}" IsEnabled="{Binding !!RecordingStatus}"/>
@@ -139,6 +137,11 @@
                 <MenuItem Header="Instant" ToggleType="Radio" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeSpeed.Instant}" IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Instant}}"/>
                 <MenuItem Header="Accelerated" ToggleType="Radio" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeSpeed.Accelerated}" IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Accelerated}}"/>
             </MenuItem>
+        </MenuItem>
+
+        <MenuItem Header="Debug" Padding="10 0 10 0" Focusable="False">
+            <MenuItem Header="Open Debugger" InputGesture="F11" Command="{Binding ShowDebuggerViewCommand}"/>
+            <MenuItem Header="Breakpoints Enabled" ToggleType="CheckBox" IsChecked="{Binding BreakpointsEnabled}" Command="{Binding ToggleBreakpointsCommand}"/>
         </MenuItem>
 
         <MenuItem Header="Help" Padding="10 0 10 0" Focusable="False">

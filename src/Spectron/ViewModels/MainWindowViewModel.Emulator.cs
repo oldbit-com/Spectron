@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Files;
@@ -81,6 +82,7 @@ partial class MainWindowViewModel
         Emulator.FrameCompleted += EmulatorFrameCompleted;
 
         ConfigureEmulatorSettings();
+        ConfigureDebugging(Emulator);
 
         if (IsMuted)
         {
@@ -134,10 +136,12 @@ partial class MainWindowViewModel
         {
             CreateEmulator(_preferences.ComputerType, _preferences.RomType);
         }
-        else
+        else if (Emulator != null)
         {
-            Emulator?.Reset();
-            IsPaused = Emulator?.IsPaused ?? false;
+            Emulator.Reset();
+            IsPaused = Emulator.IsPaused;
+
+            ConfigureDebugging(Emulator);
         }
 
         RecentFilesViewModel.CurrentFileName = string.Empty;
@@ -214,11 +218,9 @@ partial class MainWindowViewModel
         CreateEmulator(ComputerType, RomType);
     }
 
-    partial void OnIsPausedChanged(bool value) =>
-        _debuggerViewModel?.HandlePause(value);
+    partial void OnIsPausedChanged(bool value) => _debuggerViewModel?.HandlePause(value, _breakpointHitEventArgs);
 
-    partial void OnComputerTypeChanged(ComputerType value) =>
-        StatusBarViewModel.ComputerType = value;
+    partial void OnComputerTypeChanged(ComputerType value) => StatusBarViewModel.ComputerType = value;
 
     partial void OnIsUlaPlusEnabledChanged(bool value)
     {
@@ -246,9 +248,9 @@ partial class MainWindowViewModel
         }
     }
 
-    private void Resume()
+    private void Resume(bool isDebuggerResume = false)
     {
-        Emulator?.Resume();
+        Emulator?.Resume(isDebuggerResume);
         IsPaused = false;
         IsPauseOverlayVisible = false;
     }

@@ -108,16 +108,4 @@ partial class MainWindowViewModel
 
     private void OpenPrintOutputViewer() =>
         WeakReferenceMessenger.Default.Send(new ShowPrintOutputViewMessage(Emulator!.Printer));
-
-    private void OpenDebuggerWindow()
-    {
-        _debuggerViewModel = new DebuggerViewModel(_debuggerContext, Emulator!, _preferences.Debugger);
-
-        if (!IsPaused)
-        {
-            Pause(showOverlay: false);
-        }
-
-        WeakReferenceMessenger.Default.Send(new ShowDebuggerViewMessage(_debuggerViewModel));
-    }
 }

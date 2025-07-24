@@ -14,7 +14,6 @@ using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Z80Cpu;
-using OldBit.Z80Cpu.Events;
 
 namespace OldBit.Spectron.Emulation;
 
@@ -34,6 +33,7 @@ public sealed class Emulator
     private bool _invalidateScreen;
     private bool _isAcceleratedTapeSpeed;
     private bool _isNmiRequested;
+    private bool _isDebuggerBreak;
     private FloatingBus _floatingBus = null!;
 
     public delegate void FrameEvent(FrameBuffer frameBuffer, AudioBuffer audioBuffer);
@@ -65,7 +65,7 @@ public sealed class Emulator
     public TapeSpeed TapeLoadSpeed { get; set; }
 
     public Z80 Cpu { get; }
-    public IMemory Memory => _memory;
+    public IEmulatorMemory Memory => _memory;
     public IBus Bus => _spectrumBus;
     public DivMmcDevice DivMmc { get; }
     public ZxPrinter Printer { get; }
@@ -164,12 +164,16 @@ public sealed class Emulator
 
     public void Resume(bool isDebuggerResume = false)
     {
+        _isDebuggerBreak = false;
         _isDebuggerResume = isDebuggerResume;
+
         _emulationTimer.Resume();
     }
 
     public void Reset()
     {
+        _isDebuggerBreak = false;
+
         AudioManager.ResetAudio();
         _memory.Reset();
         Cpu.Reset();
@@ -184,6 +188,13 @@ public sealed class Emulator
         }
     }
 
+    public void Break()
+    {
+        Cpu.Break();
+
+        _isDebuggerBreak = true;
+    }
+
     public void RequestNmi() => _isNmiRequested = true;
 
     public void SetEmulationSpeed(int emulationSpeedPercentage) =>
@@ -193,6 +204,11 @@ public sealed class Emulator
 
     private void OnTimerElapsed(EventArgs e)
     {
+        if (_isDebuggerBreak)
+        {
+            return;
+        }
+
         try
         {
             RunFrame();
@@ -289,9 +305,9 @@ public sealed class Emulator
         _invalidateScreen = true;
     }
 
-    private void BeforeInstruction(BeforeInstructionEventArgs e)
+    private void BeforeInstruction(Word pc)
     {
-        switch (e.PC)
+        switch (pc)
         {
             case RomRoutines.LD_START:
                 switch (TapeLoadSpeed)
