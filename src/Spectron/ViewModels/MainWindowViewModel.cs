@@ -10,6 +10,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
+using OldBit.Spectron.CommandLine;
 using OldBit.Spectron.Debugger;
 using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Debugger.Messages;
@@ -72,6 +73,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     public Control ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }
+    public CommandLineArgs? CommandLineArgs { get; set; }
     public WindowNotificationManager NotificationManager { get; set; } = null!;
 
     public StatusBarViewModel StatusBarViewModel { get; } = new();

@@ -1,6 +1,9 @@
 ﻿using System;
 using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using OldBit.Spectron.CommandLine;
 using OldBit.Spectron.Extensions;
+using OldBit.Spectron.ViewModels;
 
 namespace OldBit.Spectron;
 
@@ -14,14 +17,29 @@ class Program
     {
         Console.WriteLine("Starting Spectron...");
 
-        try
+        CommandLineParser.Parse(commandLineArgs =>
         {
-            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.ToString());
-        }
+            try
+            {
+                BuildAvaloniaApp().StartWithClassicDesktopLifetime(args, builder =>
+                {
+                    builder.Startup += (sender, e) =>
+                    {
+                        if (sender is ClassicDesktopStyleApplicationLifetime { MainWindow.DataContext: MainWindowViewModel viewModel })
+                        {
+                            viewModel.CommandLineArgs = commandLineArgs;
+                        }
+                    };
+                });
+
+                Console.WriteLine("Terminated Spectron...");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }, args);
+
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.
