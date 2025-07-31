@@ -100,7 +100,7 @@
         <ToggleButton
             Name="VolumeButton"
             ToolTip.Tip="Mute"
-            IsChecked="{Binding IsMuted, Mode=OneWay}"
+            IsChecked="{Binding IsAudioMuted, Mode=OneWay}"
             Command="{Binding ToggleMuteCommand}">
 
             <Interaction.Behaviors>

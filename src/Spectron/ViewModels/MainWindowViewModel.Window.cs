@@ -11,9 +11,9 @@ partial class MainWindowViewModel
     {
         _preferences = await _preferencesService.LoadAsync();
 
-        ThemeManager.SelectTheme(_preferences.Theme);
+        ThemeManager.SelectTheme(CommandLineArgs?.Theme ?? _preferences.Theme);
 
-        IsMuted = _preferences.Audio.IsMuted;
+        IsAudioMuted = CommandLineArgs?.IsAudioMuted ?? _preferences.Audio.IsMuted;
 
         IsTimeMachineEnabled = _preferences.TimeMachine.IsEnabled;
         _timeMachine.SnapshotInterval = _preferences.TimeMachine.SnapshotInterval;
@@ -23,26 +23,34 @@ partial class MainWindowViewModel
         await RecentFilesViewModel.LoadAsync();
 
         UpdateShiftKeys(_preferences.Keyboard);
-        HandleChangeBorderSize(_preferences.BorderSize);
+        HandleChangeBorderSize(CommandLineArgs?.BorderSize ?? _preferences.BorderSize);
 
-        if (_preferences.Resume.IsResumeEnabled)
+        TapeLoadSpeed = CommandLineArgs?.TapeLoadSpeed ?? _preferences.Tape.LoadSpeed;
+
+        if (await ResumeEmulatorSession())
         {
-            var snapshot = await _sessionService.LoadAsync();
+            return;
+        }
 
-            if (snapshot != null)
-            {
-                CreateEmulator(snapshot);
-                UpdateWindowTitle();
-            }
+        if (CommandLineArgs?.FilePath != null)
+        {
+            await HandleLoadFileAsync(CommandLineArgs?.FilePath);
+        }
+
+        if (CommandLineArgs?.IsAyEnabled != null)
+        {
+            Emulator!.AudioManager.IsAyEnabled = CommandLineArgs.IsAyEnabled.Value;
+            StatusBarViewModel.IsAyEnabled = CommandLineArgs.IsAyEnabled.Value;
         }
 
         if (Emulator == null)
         {
-            CreateEmulator(_preferences.ComputerType, _preferences.RomType);
-        }
+            CreateEmulator(
+                CommandLineArgs?.ComputerType ??_preferences.ComputerType,
+                CommandLineArgs?.RomType ?? _preferences.RomType);
 
-        TapeLoadSpeed = _preferences.Tape.LoadSpeed;
-        Emulator?.SetTapeSettings(_preferences.Tape);
+            Emulator.SetTapeSettings(_preferences.Tape);
+        }
     }
 
     private async Task WindowClosingAsync(WindowClosingEventArgs args)
@@ -58,7 +66,7 @@ partial class MainWindowViewModel
         _keyboardHook?.Dispose();
         _frameRateCalculator.Dispose();
 
-        _preferences.Audio.IsMuted = IsMuted;
+        _preferences.Audio.IsMuted = IsAudioMuted;
         _preferences.BorderSize = BorderSize;
 
         await Task.WhenAll(

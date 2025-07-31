@@ -51,6 +51,9 @@ public partial class StatusBarViewModel : ObservableObject
     [ObservableProperty]
     private string _tapeLoadProgress = string.Empty;
 
+    [ObservableProperty]
+    private bool _isAyEnabled;
+
     private readonly Timer _timer;
     private readonly Stopwatch _stopwatch = new();
 

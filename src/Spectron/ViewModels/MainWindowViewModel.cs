@@ -121,7 +121,7 @@ public partial class MainWindowViewModel : ObservableObject
     private TapeSpeed _tapeLoadSpeed = TapeSpeed.Normal;
 
     [ObservableProperty]
-    private bool _isMuted;
+    private bool _isAudioMuted;
 
     [ObservableProperty]
     private bool _isTimeMachineEnabled;
@@ -370,9 +370,9 @@ public partial class MainWindowViewModel : ObservableObject
 
     private void HandleToggleMute()
     {
-        IsMuted = !IsMuted;
+        IsAudioMuted = !IsAudioMuted;
 
-        if (IsMuted)
+        if (IsAudioMuted)
         {
             Emulator?.AudioManager.Mute();
         }

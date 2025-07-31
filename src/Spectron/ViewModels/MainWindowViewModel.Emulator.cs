@@ -84,7 +84,7 @@ partial class MainWindowViewModel
         ConfigureEmulatorSettings();
         ConfigureDebugging(Emulator);
 
-        if (IsMuted)
+        if (IsAudioMuted)
         {
             Emulator.AudioManager.Mute();
         }
@@ -110,6 +110,7 @@ partial class MainWindowViewModel
         StatusBarViewModel.IsDivMmcEnabled = _preferences.DivMmc.IsEnabled;
         StatusBarViewModel.IsPrinterEnabled = _preferences.Printer.IsZxPrinterEnabled;
         StatusBarViewModel.IsUlaPlusEnabled = IsUlaPlusEnabled;
+        StatusBarViewModel.IsAyEnabled = _preferences.Audio.IsAyAudioEnabled;
         StatusBarViewModel.IsTapeLoaded = Emulator!.TapeManager.IsTapeLoaded;
         StatusBarViewModel.TapeLoadProgress = string.Empty;
     }
@@ -126,6 +127,25 @@ partial class MainWindowViewModel
         Emulator.CommandManager.CommandReceived -= CommandManagerOnCommandReceived;
 
         Emulator = null;
+    }
+
+    private async Task<bool> ResumeEmulatorSession()
+    {
+        if (!_preferences.Resume.IsResumeEnabled || CommandLineArgs != null)
+        {
+            return false;
+        }
+
+        var snapshot = await _sessionService.LoadAsync();
+        if (snapshot == null)
+        {
+            return false;
+        }
+
+        CreateEmulator(snapshot);
+        UpdateWindowTitle();
+
+        return true;
     }
 
     private void HandleMachineReset(bool hardReset = false)
