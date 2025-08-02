@@ -13,7 +13,7 @@ public readonly record struct Color
     public uint Abgr => (uint)(0xFF << 24 | Blue << 16 | Green << 8 | Red);
     public uint Argb => (uint)(0xFF << 24 | Red << 16 | Green << 8 | Blue);
 
-    internal Color(int Red, int Green, int Blue) : this((byte)Red, (byte)Green, (byte)Blue) { }
+    public Color(int Red, int Green, int Blue) : this((byte)Red, (byte)Green, (byte)Blue) { }
 
     private Color(byte Red, byte Green, byte Blue)
     {
