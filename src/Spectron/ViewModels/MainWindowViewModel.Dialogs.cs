@@ -28,19 +28,18 @@ partial class MainWindowViewModel
         {
             _preferences = preferences;
 
-            IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
-            Emulator.SetUlaPlus(IsUlaPlusEnabled);
+            IsUlaPlusEnabled = _preferences.IsUlaPlusEnabled;
 
             TapeLoadSpeed = preferences.Tape.LoadSpeed;
             Emulator.SetTapeSettings(_preferences.Tape);
 
-            IsTimeMachineEnabled = preferences.TimeMachine.IsEnabled;
-            _timeMachine.SnapshotInterval = preferences.TimeMachine.SnapshotInterval;
-            _timeMachine.MaxDuration = preferences.TimeMachine.MaxDuration;
-            TimeMachineCountdownSeconds = preferences.TimeMachine.CountdownSeconds;
+            IsTimeMachineEnabled = _preferences.TimeMachine.IsEnabled;
+            _timeMachine.SnapshotInterval = _preferences.TimeMachine.SnapshotInterval;
+            _timeMachine.MaxDuration = _preferences.TimeMachine.MaxDuration;
+            TimeMachineCountdownSeconds = _preferences.TimeMachine.CountdownSeconds;
 
-            JoystickType = preferences.Joystick.JoystickType;
-            MouseType = preferences.Mouse.MouseType;
+            JoystickType = _preferences.Joystick.JoystickType;
+            MouseType = _preferences.Mouse.MouseType;
             SetMouseCursor();
 
             UpdateShiftKeys(_preferences.Keyboard);

@@ -19,7 +19,7 @@ partial class MainWindowViewModel
     {
         var emulator = _emulatorFactory.Create(computerType, romType, customRom);
 
-        emulator.SetUlaPlus(_preferences.IsUlaPlusEnabled);
+        RefreshUlaPlusState(_preferences.IsUlaPlusEnabled);
         emulator.MouseManager.SetupMouse(_preferences.Mouse.MouseType);
         _mouseHelper = new MouseHelper(emulator.MouseManager);
         emulator.JoystickManager.SetupJoystick(_preferences.Joystick.JoystickType);
@@ -51,7 +51,6 @@ partial class MainWindowViewModel
             emulator.TapeManager.InsertTape(stream, fileType,
                 _preferences.Tape.IsAutoPlayEnabled && TapeLoadSpeed != TapeSpeed.Instant);
 
-            emulator.SetUlaPlus(_preferences.IsUlaPlusEnabled);
             emulator.MouseManager.SetupMouse(_preferences.Mouse.MouseType);
             _mouseHelper = new MouseHelper(emulator.MouseManager);
             emulator.JoystickManager.SetupJoystick(_preferences.Joystick.JoystickType);
@@ -105,14 +104,14 @@ partial class MainWindowViewModel
         Emulator.SetAudioSettings(_preferences.Audio);
         Emulator.SetGamepad(_preferences.Joystick);
         Emulator.SetDivMMc(_preferences.DivMmc);
-        Emulator.SetPrinter(_preferences.Printer);
 
         StatusBarViewModel.IsDivMmcEnabled = _preferences.DivMmc.IsEnabled;
-        StatusBarViewModel.IsPrinterEnabled = _preferences.Printer.IsZxPrinterEnabled;
-        StatusBarViewModel.IsUlaPlusEnabled = IsUlaPlusEnabled;
-        StatusBarViewModel.IsAyEnabled = _preferences.Audio.IsAyAudioEnabled;
         StatusBarViewModel.IsTapeLoaded = Emulator!.TapeManager.IsTapeLoaded;
         StatusBarViewModel.TapeLoadProgress = string.Empty;
+
+        RefreshUlaPlusState(_preferences.IsUlaPlusEnabled);
+        RefreshAyState(Emulator.AudioManager.IsAyEnabled);
+        RefreshPrinterState(_preferences.Printer.IsZxPrinterEnabled);
     }
 
     private void ShutdownEmulator()
@@ -242,13 +241,50 @@ partial class MainWindowViewModel
 
     partial void OnComputerTypeChanged(ComputerType value) => StatusBarViewModel.ComputerType = value;
 
-    partial void OnIsUlaPlusEnabledChanged(bool value)
+    partial void OnIsUlaPlusEnabledChanged(bool value) => RefreshUlaPlusState(value);
+
+    private void RefreshUlaPlusState(bool? isEnabled)
     {
-        StatusBarViewModel.IsUlaPlusEnabled = IsUlaPlusEnabled;
+        if (isEnabled == null)
+        {
+            return;
+        }
+
+        StatusBarViewModel.IsUlaPlusEnabled = isEnabled.Value;
 
         if (Emulator != null)
         {
-            Emulator.IsUlaPlusEnabled = IsUlaPlusEnabled;
+            Emulator.IsUlaPlusEnabled = isEnabled.Value;
+        }
+    }
+
+    private void RefreshPrinterState(bool? isEnabled)
+    {
+        if (isEnabled == null)
+        {
+            return;
+        }
+
+        StatusBarViewModel.IsPrinterEnabled = isEnabled.Value;
+
+        if (Emulator != null)
+        {
+            Emulator.Printer.IsEnabled = isEnabled.Value;
+        }
+    }
+
+    private void RefreshAyState(bool? isEnabled)
+    {
+        if (isEnabled == null)
+        {
+            return;
+        }
+
+        StatusBarViewModel.IsAyEnabled = isEnabled.Value;
+
+        if (Emulator != null)
+        {
+            Emulator.AudioManager.IsAyEnabled = isEnabled.Value;
         }
     }
 

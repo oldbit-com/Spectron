@@ -92,7 +92,7 @@ public partial class PrintOutputViewModel : ObservableObject
         PreviewControl?.InvalidateVisual();
     }
 
-    private WriteableBitmap CreateBitmap(int width, int height)
+    private static WriteableBitmap CreateBitmap(int width, int height)
     {
         return new WriteableBitmap(
             new PixelSize(width, height),

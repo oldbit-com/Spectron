@@ -37,12 +37,6 @@ partial class MainWindowViewModel
             await HandleLoadFileAsync(CommandLineArgs?.FilePath);
         }
 
-        if (CommandLineArgs?.IsAyEnabled != null)
-        {
-            Emulator!.AudioManager.IsAyEnabled = CommandLineArgs.IsAyEnabled.Value;
-            StatusBarViewModel.IsAyEnabled = CommandLineArgs.IsAyEnabled.Value;
-        }
-
         if (Emulator == null)
         {
             CreateEmulator(
@@ -51,6 +45,52 @@ partial class MainWindowViewModel
 
             Emulator.SetTapeSettings(_preferences.Tape);
         }
+
+        ApplyCommandLineArguments();
+    }
+
+    private void ApplyCommandLineArguments()
+    {
+        if (Emulator == null)
+        {
+            return;
+        }
+
+        if (CommandLineArgs?.JoystickType != null)
+        {
+            JoystickType = CommandLineArgs.JoystickType.Value;
+        }
+
+        if (CommandLineArgs?.MouseType != null)
+        {
+            MouseType = CommandLineArgs.MouseType.Value;
+        }
+
+        if (CommandLineArgs?.IsDivMmcEnabled != null)
+        {
+            if (CommandLineArgs.IsDivMmcEnabled.Value)
+            {
+                Emulator.DivMmc.Enable();
+
+                if (CommandLineArgs?.DivMmcImageFile != null)
+                {
+                    Emulator.DivMmc.InsertCard(CommandLineArgs.DivMmcImageFile, 0);
+                }
+
+                if (CommandLineArgs?.IsDivMmcReadOnly != null)
+                {
+                    Emulator.DivMmc.IsDriveWriteEnabled = !CommandLineArgs.IsDivMmcReadOnly.Value;
+                }
+            }
+            else
+            {
+                Emulator.DivMmc.Disable();
+            }
+        }
+
+        RefreshAyState(CommandLineArgs?.IsAyEnabled);
+        RefreshPrinterState(CommandLineArgs?.IsZxPrinterEnabled);
+        RefreshUlaPlusState(CommandLineArgs?.IsUlaPlusEnabled);
     }
 
     private async Task WindowClosingAsync(WindowClosingEventArgs args)
