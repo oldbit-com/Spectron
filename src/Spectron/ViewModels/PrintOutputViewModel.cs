@@ -9,11 +9,16 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation.Devices.Printer;
+using OldBit.Spectron.Emulation.Screen;
 
 namespace OldBit.Spectron.ViewModels;
 
 public partial class PrintOutputViewModel : ObservableObject
 {
+    private static readonly Color Black = new(0x00, 0x00, 0x00);
+    private static readonly Color White = new(0xD8, 0xD8, 0xD8);
+    private static readonly byte[] Masks = [0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01];
+
     private readonly ZxPrinter _printer;
     private int _height;
 
@@ -68,23 +73,22 @@ public partial class PrintOutputViewModel : ObservableObject
 
         using var bitmap = OutputImage.Lock();
 
-        unsafe
+        var targetAddress = bitmap.Address;
+
+        foreach (var row in _printer.Rows)
         {
-            var buffer = (byte*)bitmap.Address;
-
-            for (var row = 0; row < _printer.Rows.Count; row++)
+            foreach (var cell in row.Pixels)
             {
-                for (var column = 0; column < _printer.Rows[row].Pixels.Length; column++)
+                for (var bit = 0; bit < 8; bit++)
                 {
-                    buffer[row * 32 + column] = (byte)~_printer.Rows[row].Pixels[column];
-                }
-            }
+                    var color = (cell & Masks[bit]) != 0 ? Black : White;
 
-            for (var row = _printer.Rows.Count; row < _height; row++)
-            {
-                for (var column = 0; column < 32; column++)
-                {
-                    buffer[row * 32 + column] = 0xFF;
+                    unsafe
+                    {
+                        *(uint*)targetAddress = *(uint*)&color;
+                    }
+
+                    targetAddress += 4;
                 }
             }
         }
@@ -92,11 +96,8 @@ public partial class PrintOutputViewModel : ObservableObject
         PreviewControl?.InvalidateVisual();
     }
 
-    private WriteableBitmap CreateBitmap(int width, int height)
-    {
-        return new WriteableBitmap(
-            new PixelSize(width, height),
-            new Vector(96, 96),
-            PixelFormats.BlackWhite);
-    }
+    private static WriteableBitmap CreateBitmap(int width, int height) => new(
+        new PixelSize(width, height),
+        new Vector(96, 96),
+        PixelFormats.Rgba8888);
 }
