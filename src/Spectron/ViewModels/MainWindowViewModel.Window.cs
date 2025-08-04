@@ -96,7 +96,7 @@ partial class MainWindowViewModel
             }
         }
 
-        RefreshAyState(CommandLineArgs?.IsAyEnabled);
+        RefreshAyState(CommandLineArgs?.IsAyEnabled, CommandLineArgs?.AyStereoMode);
         RefreshPrinterState(CommandLineArgs?.IsZxPrinterEnabled);
         RefreshUlaPlusState(CommandLineArgs?.IsUlaPlusEnabled);
     }

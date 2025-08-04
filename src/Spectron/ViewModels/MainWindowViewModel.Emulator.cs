@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Rom;
@@ -110,7 +111,7 @@ partial class MainWindowViewModel
         StatusBarViewModel.TapeLoadProgress = string.Empty;
 
         RefreshUlaPlusState(_preferences.IsUlaPlusEnabled);
-        RefreshAyState(Emulator.AudioManager.IsAyEnabled);
+        RefreshAyState(Emulator.AudioManager.IsAyEnabled, Emulator.AudioManager.StereoMode);
         RefreshPrinterState(_preferences.Printer.IsZxPrinterEnabled);
     }
 
@@ -273,19 +274,22 @@ partial class MainWindowViewModel
         }
     }
 
-    private void RefreshAyState(bool? isEnabled)
+    private void RefreshAyState(bool? isEnabled, StereoMode? stereoMode)
     {
-        if (isEnabled == null)
+        if (isEnabled == null || Emulator == null)
         {
             return;
         }
 
-        StatusBarViewModel.IsAyEnabled = isEnabled.Value;
+        Emulator.AudioManager.IsAyEnabled = isEnabled.Value;
 
-        if (Emulator != null)
+        if (stereoMode != null)
         {
-            Emulator.AudioManager.IsAyEnabled = isEnabled.Value;
+            Emulator.AudioManager.StereoMode = stereoMode.Value;
         }
+
+        StatusBarViewModel.IsAyEnabled = Emulator.AudioManager.IsAyEnabled;
+        StatusBarViewModel.StereoMode = Emulator.AudioManager.StereoMode;
     }
 
     private void Pause(bool showOverlay = true)

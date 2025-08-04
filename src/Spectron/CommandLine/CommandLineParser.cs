@@ -3,6 +3,7 @@ using System.CommandLine;
 using System.IO;
 using System.Linq;
 using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Rom;
@@ -32,6 +33,7 @@ public static class CommandLineParser
         var tapeLoadSpeedOption = GetTapeLoadSpeedOption();
         var ayEnabledOption = GetAyEnabledOption();
         var ayDisabledOption = GetAyDisabledOption();
+        var ayStereoModeOption = GetAyStereoModeOption();
         var borderSizeOption = GetBorderSizeOption();
         var joystickOption = GetJoystickTypeOption();
         var mouseOption = GetMouseTypeOption();
@@ -63,6 +65,7 @@ public static class CommandLineParser
         rootCommand.Options.Add(muteAudioOption);
         rootCommand.Options.Add(ayEnabledOption);
         rootCommand.Options.Add(ayDisabledOption);
+        rootCommand.Options.Add(ayStereoModeOption);
         rootCommand.Options.Add(zxPrinterEnabledOption);
         rootCommand.Options.Add(zxPrinterDisabledOption);
         rootCommand.Options.Add(ulaPlusEnabledOption);
@@ -144,6 +147,7 @@ public static class CommandLineParser
                 parseResult.GetValue(mouseOption),
                 parseResult.GetValue(muteAudioOption),
                 IsEnabled(parseResult.GetValue(ayEnabledOption), parseResult.GetValue(ayDisabledOption)),
+                parseResult.GetValue(ayStereoModeOption),
                 IsEnabled(parseResult.GetValue(divMmcEnabledOption), parseResult.GetValue(divMmcDisabledOption)),
                 parseResult.GetValue(divMmcImageOption)?.FullName,
                 IsDivMmcReadOnly(parseResult.GetValue(divMmcReadOnly), parseResult.GetValue(divMmcWritable)),
@@ -228,6 +232,12 @@ public static class CommandLineParser
         new("--no-ay")
         {
             Description = "Disables AY sound emulation",
+        };
+
+    private static Option<StereoMode?> GetAyStereoModeOption() =>
+        new("--ay-mode")
+        {
+            Description = "Specifies AY mono or stereo mode",
         };
 
     private static Option<BorderSize?> GetBorderSizeOption() =>

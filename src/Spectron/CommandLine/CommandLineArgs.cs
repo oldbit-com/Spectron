@@ -1,4 +1,5 @@
 using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Rom;
@@ -18,6 +19,7 @@ public record CommandLineArgs(
     MouseType? MouseType,
     bool IsAudioMuted,
     bool? IsAyEnabled,
+    StereoMode? AyStereoMode,
     bool? IsDivMmcEnabled,
     string? DivMmcImageFile,
     bool? IsDivMmcReadOnly,

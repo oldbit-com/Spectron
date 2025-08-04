@@ -111,7 +111,7 @@
                 Orientation="Horizontal"
                 Margin="0 0 10 0"
                 IsVisible="{Binding IsAyEnabled}"
-                ToolTip.Tip="AY">
+                ToolTip.Tip="{Binding ToolTipAy}">
 
                 <material:MaterialIcon Kind="Waveform"/>
             </StackPanel>
