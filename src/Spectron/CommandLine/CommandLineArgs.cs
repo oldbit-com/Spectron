@@ -13,6 +13,7 @@ public record CommandLineArgs(
     TapeSpeed? TapeLoadSpeed,
     ComputerType? ComputerType,
     RomType? RomType,
+    string[]? CustomRomFiles,
     JoystickType? JoystickType,
     MouseType? MouseType,
     bool IsAudioMuted,

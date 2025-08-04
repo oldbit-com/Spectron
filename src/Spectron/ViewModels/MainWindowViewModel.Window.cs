@@ -39,9 +39,17 @@ partial class MainWindowViewModel
 
         if (Emulator == null)
         {
+            byte[]? customRom = null;
+
+            if (CommandLineArgs?.CustomRomFiles?.Length > 0)
+            {
+                customRom = await ReadCustomRom(CommandLineArgs.CustomRomFiles);
+            }
+
             CreateEmulator(
                 CommandLineArgs?.ComputerType ??_preferences.ComputerType,
-                CommandLineArgs?.RomType ?? _preferences.RomType);
+                CommandLineArgs?.RomType ?? _preferences.RomType,
+                customRom);
 
             Emulator.SetTapeSettings(_preferences.Tape);
         }

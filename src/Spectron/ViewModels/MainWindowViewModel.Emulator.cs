@@ -1,9 +1,9 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.State;
@@ -323,6 +323,20 @@ partial class MainWindowViewModel
                 Pause();
                 break;
         }
+    }
+
+    private static async Task<byte[]> ReadCustomRom(string[] fileNames)
+    {
+        byte[] result = [];
+
+        foreach (var fileName in fileNames)
+        {
+            var data = await File.ReadAllBytesAsync(fileName);
+
+            result = result.Concatenate(data);
+        }
+
+        return result;
     }
 
     partial void OnTapeLoadSpeedChanged(TapeSpeed value) =>

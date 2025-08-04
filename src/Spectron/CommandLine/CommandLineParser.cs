@@ -1,6 +1,7 @@
 using System;
 using System.CommandLine;
 using System.IO;
+using System.Linq;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Mouse;
@@ -25,6 +26,7 @@ public static class CommandLineParser
         var fileOption = GetFileOption();
         var computerOption = GetComputerOption();
         var romOption = GetRomOption();
+        var romFileOption = GetRomFileOption();
         var muteAudioOption = GetMuteAudioOption();
         var themeOption = GetThemeOption();
         var tapeLoadSpeedOption = GetTapeLoadSpeedOption();
@@ -37,17 +39,23 @@ public static class CommandLineParser
         var divMmcDisabledOption = GetDivMmcDisabledOption();
         var divMmcImageOption = GetDivMmcImageOption();
         var divMmcReadOnly = GetDivMmcReadOnlyOption();
+        var divMmcWritable = GetDivMmcWritableOption();
         var zxPrinterEnabledOption = GetZxPrinterEnabledOption();
         var zxPrinterDisabledOption = GetZxPrinterDisabledOption();
         var ulaPlusEnabledOption = GetUlaPlusEnabledOption();
         var ulaPlusDisabledOption = GetUlaPlusDisabledOption();
 
-        var rootCommand = new RootCommand("Starts Spectron Emulator with options");
+        var rootCommand = new RootCommand("""
+                                          **** Spectron ZX Spectrum Emulator ****
+                                          
+                                          If some option is not provided explicitly, current preferences value will be used as a default");
+                                          """);
 
         rootCommand.Options.Add(fileOption);
         rootCommand.Options.Add(tapeLoadSpeedOption);
         rootCommand.Options.Add(computerOption);
         rootCommand.Options.Add(romOption);
+        rootCommand.Options.Add(romFileOption);
         rootCommand.Options.Add(joystickOption);
         rootCommand.Options.Add(mouseOption);
         rootCommand.Options.Add(themeOption);
@@ -63,7 +71,7 @@ public static class CommandLineParser
         rootCommand.Options.Add(divMmcDisabledOption);
         rootCommand.Options.Add(divMmcImageOption);
         rootCommand.Options.Add(divMmcReadOnly);
-
+        rootCommand.Options.Add(divMmcWritable);
 
         rootCommand.Validators.Add(result =>
         {
@@ -95,6 +103,35 @@ public static class CommandLineParser
             }
         });
 
+        romOption.Validators.Add(result =>
+        {
+            var rom = result.GetValue(romOption);
+            var romFilePath = result.GetValue(romFileOption);
+
+            if (rom == RomType.Custom && (romFilePath == null || romFilePath.Length == 0))
+            {
+                result.AddError($"Custom ROM option requires at least one ROM file specified using {romFileOption} option");
+            }
+        });
+
+        romFileOption.Validators.Add(result =>
+        {
+            var files = result.GetValue(romFileOption);
+
+            if (files == null)
+            {
+                return;
+            }
+
+            foreach (var file in files)
+            {
+                if (!File.Exists(file.FullName))
+                {
+                    result.AddError($"Custom ROM file does not exist: '{file.FullName}'");
+                }
+            }
+        });
+
         rootCommand.SetAction(parseResult =>
         {
             onParsed(new CommandLineArgs(
@@ -102,13 +139,14 @@ public static class CommandLineParser
                 parseResult.GetValue(tapeLoadSpeedOption),
                 parseResult.GetValue(computerOption),
                 parseResult.GetValue(romOption),
+                parseResult.GetValue(romFileOption)?.Select(file => file.FullName)?.ToArray(),
                 parseResult.GetValue(joystickOption),
                 parseResult.GetValue(mouseOption),
                 parseResult.GetValue(muteAudioOption),
                 IsEnabled(parseResult.GetValue(ayEnabledOption), parseResult.GetValue(ayDisabledOption)),
                 IsEnabled(parseResult.GetValue(divMmcEnabledOption), parseResult.GetValue(divMmcDisabledOption)),
                 parseResult.GetValue(divMmcImageOption)?.FullName,
-                parseResult.GetValue(divMmcReadOnly),
+                IsDivMmcReadOnly(parseResult.GetValue(divMmcReadOnly), parseResult.GetValue(divMmcWritable)),
                 IsEnabled(parseResult.GetValue(zxPrinterEnabledOption), parseResult.GetValue(zxPrinterDisabledOption)),
                 IsEnabled(parseResult.GetValue(ulaPlusEnabledOption), parseResult.GetValue(ulaPlusDisabledOption)),
                 parseResult.GetValue(borderSizeOption),
@@ -122,6 +160,15 @@ public static class CommandLineParser
         (isEnabledValue, isDisabledValue) switch
         {
             (true, _) => true,
+            (_, true) => false,
+            _ => null,
+        };
+
+    private static bool? IsDivMmcReadOnly(bool? isReadOnly, bool? isWritable) =>
+        (isReadOnly, isWritable) switch
+        {
+            (true, _) => true,
+            (_, false) => true,
             (_, true) => false,
             _ => null,
         };
@@ -145,6 +192,12 @@ public static class CommandLineParser
                 Description = "Specifies the ROM to load",
             }
             .AcceptOnlyFromAmong("Original", "Retroleum", "GoshWonderful", "BusySoft", "Harston", "BrendanAlford", "Custom");
+
+    private static Option<FileInfo[]> GetRomFileOption() =>
+        new("--rom-file", "-rf")
+        {
+            Description = "Specifies the custom ROM file"
+        };
 
     private static Option<bool> GetMuteAudioOption() =>
         new("--mute", "-m")
@@ -198,7 +251,7 @@ public static class CommandLineParser
     private static Option<bool?> GetDivMmcEnabledOption() =>
         new("--divmmc")
         {
-            Description = "Enables divMMC emulation, requires --divmmc-image to be specified",
+            Description = "Enables divMMC emulation, --divmmc-image is required",
         };
 
     private static Option<bool?> GetDivMmcDisabledOption() =>
@@ -216,7 +269,13 @@ public static class CommandLineParser
     private static Option<bool?> GetDivMmcReadOnlyOption() =>
         new("--divmmc-readonly")
         {
-            Description = "Specifies the SD card image is readonly",
+            Description = "Specifies the SD card image is readonly, SD card writes will be cached in-memory only",
+        };
+
+    private static Option<bool?> GetDivMmcWritableOption() =>
+        new("--divmmc-writable")
+        {
+            Description = "Specifies the SD card image is writable, SD card writes will persisted",
         };
 
     private static Option<bool?> GetZxPrinterEnabledOption() =>
