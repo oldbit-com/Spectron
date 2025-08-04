@@ -25,5 +25,7 @@ public record CommandLineArgs(
     bool? IsDivMmcReadOnly,
     bool? IsZxPrinterEnabled,
     bool? IsUlaPlusEnabled,
+    bool? IsTimeMachineEnabled,
+    bool? IsResumeEnabled,
     BorderSize? BorderSize,
     Theme? Theme);

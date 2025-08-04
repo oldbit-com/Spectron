@@ -15,7 +15,7 @@ partial class MainWindowViewModel
 
         IsAudioMuted = CommandLineArgs?.IsAudioMuted ?? _preferences.Audio.IsMuted;
 
-        IsTimeMachineEnabled = _preferences.TimeMachine.IsEnabled;
+        IsTimeMachineEnabled = CommandLineArgs?.IsTimeMachineEnabled ?? _preferences.TimeMachine.IsEnabled;
         _timeMachine.SnapshotInterval = _preferences.TimeMachine.SnapshotInterval;
         _timeMachine.MaxDuration = _preferences.TimeMachine.MaxDuration;
         TimeMachineCountdownSeconds = _preferences.TimeMachine.CountdownSeconds;
@@ -29,6 +29,8 @@ partial class MainWindowViewModel
 
         if (await ResumeEmulatorSession())
         {
+            ApplyCommandLineArguments();
+
             return;
         }
 

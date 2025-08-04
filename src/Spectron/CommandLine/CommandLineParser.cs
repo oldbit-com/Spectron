@@ -46,6 +46,10 @@ public static class CommandLineParser
         var zxPrinterDisabledOption = GetZxPrinterDisabledOption();
         var ulaPlusEnabledOption = GetUlaPlusEnabledOption();
         var ulaPlusDisabledOption = GetUlaPlusDisabledOption();
+        var timeMachineEnabledOption = GetTimeMachineEnabledOption();
+        var timeMachineDisabledOption = GetTimeMachineDisabledOption();
+        var resumeEnabledOption = GetResumeEnabledOption();
+        var resumeDisabledOption = GetResumeDisabledOption();
 
         var rootCommand = new RootCommand("""
                                           **** Spectron ZX Spectrum Emulator ****
@@ -75,6 +79,10 @@ public static class CommandLineParser
         rootCommand.Options.Add(divMmcImageOption);
         rootCommand.Options.Add(divMmcReadOnly);
         rootCommand.Options.Add(divMmcWritable);
+        rootCommand.Options.Add(timeMachineEnabledOption);
+        rootCommand.Options.Add(timeMachineDisabledOption);
+        rootCommand.Options.Add(resumeEnabledOption);
+        rootCommand.Options.Add(resumeDisabledOption);
 
         rootCommand.Validators.Add(result =>
         {
@@ -153,6 +161,8 @@ public static class CommandLineParser
                 IsDivMmcReadOnly(parseResult.GetValue(divMmcReadOnly), parseResult.GetValue(divMmcWritable)),
                 IsEnabled(parseResult.GetValue(zxPrinterEnabledOption), parseResult.GetValue(zxPrinterDisabledOption)),
                 IsEnabled(parseResult.GetValue(ulaPlusEnabledOption), parseResult.GetValue(ulaPlusDisabledOption)),
+                IsEnabled(parseResult.GetValue(timeMachineEnabledOption), parseResult.GetValue(timeMachineDisabledOption)),
+                IsEnabled(parseResult.GetValue(resumeEnabledOption), parseResult.GetValue(resumeDisabledOption)),
                 parseResult.GetValue(borderSizeOption),
                 parseResult.GetValue(themeOption)));
         });
@@ -310,5 +320,29 @@ public static class CommandLineParser
         new("--no-ula-plus")
         {
             Description = "Disables ULA+ emulation",
+        };
+
+    private static Option<bool?> GetTimeMachineEnabledOption() =>
+        new("--time-machine")
+        {
+            Description = "Enables Time Machine",
+        };
+
+    private static Option<bool?> GetTimeMachineDisabledOption() =>
+        new("--no-time-machine")
+        {
+            Description = "Disables Time Machine",
+        };
+
+    private static Option<bool?> GetResumeEnabledOption() =>
+        new("--resume")
+        {
+            Description = "Resume emulator state assuming there is a previously saved state",
+        };
+
+    private static Option<bool?> GetResumeDisabledOption() =>
+        new("--no-resume")
+        {
+            Description = "Do not resume emulator state",
         };
 }

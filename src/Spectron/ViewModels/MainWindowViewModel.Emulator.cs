@@ -131,7 +131,9 @@ partial class MainWindowViewModel
 
     private async Task<bool> ResumeEmulatorSession()
     {
-        if (!_preferences.Resume.IsResumeEnabled || CommandLineArgs != null)
+        if (CommandLineArgs?.IsResumeEnabled == false ||
+            (!_preferences.Resume.IsResumeEnabled && CommandLineArgs?.IsResumeEnabled == null) ||
+            CommandLineArgs?.FilePath != null)
         {
             return false;
         }
