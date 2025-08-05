@@ -11,11 +11,11 @@ partial class MainWindowViewModel
     {
         _preferences = await _preferencesService.LoadAsync();
 
-        ThemeManager.SelectTheme(_preferences.Theme);
+        ThemeManager.SelectTheme(CommandLineArgs?.Theme ?? _preferences.Theme);
 
-        IsMuted = _preferences.Audio.IsMuted;
+        IsAudioMuted = CommandLineArgs?.IsAudioMuted ?? _preferences.Audio.IsMuted;
 
-        IsTimeMachineEnabled = _preferences.TimeMachine.IsEnabled;
+        IsTimeMachineEnabled = CommandLineArgs?.IsTimeMachineEnabled ?? _preferences.TimeMachine.IsEnabled;
         _timeMachine.SnapshotInterval = _preferences.TimeMachine.SnapshotInterval;
         _timeMachine.MaxDuration = _preferences.TimeMachine.MaxDuration;
         TimeMachineCountdownSeconds = _preferences.TimeMachine.CountdownSeconds;
@@ -23,26 +23,84 @@ partial class MainWindowViewModel
         await RecentFilesViewModel.LoadAsync();
 
         UpdateShiftKeys(_preferences.Keyboard);
-        HandleChangeBorderSize(_preferences.BorderSize);
+        HandleChangeBorderSize(CommandLineArgs?.BorderSize ?? _preferences.BorderSize);
 
-        if (_preferences.Resume.IsResumeEnabled)
+        TapeLoadSpeed = CommandLineArgs?.TapeLoadSpeed ?? _preferences.Tape.LoadSpeed;
+
+        if (await ResumeEmulatorSession())
         {
-            var snapshot = await _sessionService.LoadAsync();
+            ApplyCommandLineArguments();
 
-            if (snapshot != null)
-            {
-                CreateEmulator(snapshot);
-                UpdateWindowTitle();
-            }
+            return;
+        }
+
+        if (CommandLineArgs?.FilePath != null)
+        {
+            await HandleLoadFileAsync(CommandLineArgs?.FilePath);
         }
 
         if (Emulator == null)
         {
-            CreateEmulator(_preferences.ComputerType, _preferences.RomType);
+            byte[]? customRom = null;
+
+            if (CommandLineArgs?.CustomRomFiles?.Length > 0)
+            {
+                customRom = await ReadCustomRom(CommandLineArgs.CustomRomFiles);
+            }
+
+            CreateEmulator(
+                CommandLineArgs?.ComputerType ??_preferences.ComputerType,
+                CommandLineArgs?.RomType ?? _preferences.RomType,
+                customRom);
+
+            Emulator.SetTapeSettings(_preferences.Tape);
         }
 
-        TapeLoadSpeed = _preferences.Tape.LoadSpeed;
-        Emulator?.SetTapeSettings(_preferences.Tape);
+        ApplyCommandLineArguments();
+    }
+
+    private void ApplyCommandLineArguments()
+    {
+        if (Emulator == null)
+        {
+            return;
+        }
+
+        if (CommandLineArgs?.JoystickType != null)
+        {
+            JoystickType = CommandLineArgs.JoystickType.Value;
+        }
+
+        if (CommandLineArgs?.MouseType != null)
+        {
+            MouseType = CommandLineArgs.MouseType.Value;
+        }
+
+        if (CommandLineArgs?.IsDivMmcEnabled != null)
+        {
+            if (CommandLineArgs.IsDivMmcEnabled.Value)
+            {
+                Emulator.DivMmc.Enable();
+
+                if (CommandLineArgs?.DivMmcImageFile != null)
+                {
+                    Emulator.DivMmc.InsertCard(CommandLineArgs.DivMmcImageFile, 0);
+                }
+
+                if (CommandLineArgs?.IsDivMmcReadOnly != null)
+                {
+                    Emulator.DivMmc.IsDriveWriteEnabled = !CommandLineArgs.IsDivMmcReadOnly.Value;
+                }
+            }
+            else
+            {
+                Emulator.DivMmc.Disable();
+            }
+        }
+
+        RefreshAyState(CommandLineArgs?.IsAyEnabled, CommandLineArgs?.AyStereoMode);
+        RefreshPrinterState(CommandLineArgs?.IsZxPrinterEnabled);
+        RefreshUlaPlusState(CommandLineArgs?.IsUlaPlusEnabled);
     }
 
     private async Task WindowClosingAsync(WindowClosingEventArgs args)
@@ -58,7 +116,7 @@ partial class MainWindowViewModel
         _keyboardHook?.Dispose();
         _frameRateCalculator.Dispose();
 
-        _preferences.Audio.IsMuted = IsMuted;
+        _preferences.Audio.IsMuted = IsAudioMuted;
         _preferences.BorderSize = BorderSize;
 
         await Task.WhenAll(

@@ -42,23 +42,23 @@ partial class MainWindowViewModel
                 return;
             }
 
-            var fileResult = await LoadFileAsync(filePath, fileType);
-            if (fileResult.Stream == null)
+            (stream, fileType) = await LoadFileAsync(filePath, fileType);
+            if (stream == null)
             {
                 return;
             }
 
             if (fileType == FileType.Pok)
             {
-                LoadPokeFile(fileResult.Stream);
+                LoadPokeFile(stream);
                 return;
             }
             else if (_preferences.IsAutoLoadPokeFilesEnabled)
             {
-                TryAutoLoadPokeFile(filePath, fileResult.FileType);
+                TryAutoLoadPokeFile(filePath, fileType);
             }
 
-            if (CreateEmulator(fileResult.Stream, fileResult.FileType))
+            if (CreateEmulator(stream, fileType))
             {
                 RecentFilesViewModel.Add(filePath);
                 Title = $"{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
@@ -80,7 +80,7 @@ partial class MainWindowViewModel
         }
     }
 
-    private async Task<(Stream? Stream, FileType FileType)> LoadFileAsync(string filePath, FileType fileType)
+    private static async Task<(Stream? Stream, FileType FileType)> LoadFileAsync(string filePath, FileType fileType)
     {
         Stream? stream = null;
 
@@ -109,7 +109,6 @@ partial class MainWindowViewModel
                         fileType = selectedFile.FileType;
                         stream = archive.GetFile(selectedFile.Name);
                     }
-
                     break;
                 }
             }

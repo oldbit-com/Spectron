@@ -4,7 +4,7 @@ public enum StereoMode
 {
     Mono,
 
-    StereoAbc,
+    StereoABC,
 
-    StereoAcb,
+    StereoACB,
 }

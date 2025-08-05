@@ -1,9 +1,10 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.Devices.Audio;
+using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.State;
@@ -19,7 +20,7 @@ partial class MainWindowViewModel
     {
         var emulator = _emulatorFactory.Create(computerType, romType, customRom);
 
-        emulator.SetUlaPlus(_preferences.IsUlaPlusEnabled);
+        RefreshUlaPlusState(_preferences.IsUlaPlusEnabled);
         emulator.MouseManager.SetupMouse(_preferences.Mouse.MouseType);
         _mouseHelper = new MouseHelper(emulator.MouseManager);
         emulator.JoystickManager.SetupJoystick(_preferences.Joystick.JoystickType);
@@ -51,7 +52,6 @@ partial class MainWindowViewModel
             emulator.TapeManager.InsertTape(stream, fileType,
                 _preferences.Tape.IsAutoPlayEnabled && TapeLoadSpeed != TapeSpeed.Instant);
 
-            emulator.SetUlaPlus(_preferences.IsUlaPlusEnabled);
             emulator.MouseManager.SetupMouse(_preferences.Mouse.MouseType);
             _mouseHelper = new MouseHelper(emulator.MouseManager);
             emulator.JoystickManager.SetupJoystick(_preferences.Joystick.JoystickType);
@@ -84,7 +84,7 @@ partial class MainWindowViewModel
         ConfigureEmulatorSettings();
         ConfigureDebugging(Emulator);
 
-        if (IsMuted)
+        if (IsAudioMuted)
         {
             Emulator.AudioManager.Mute();
         }
@@ -105,13 +105,14 @@ partial class MainWindowViewModel
         Emulator.SetAudioSettings(_preferences.Audio);
         Emulator.SetGamepad(_preferences.Joystick);
         Emulator.SetDivMMc(_preferences.DivMmc);
-        Emulator.SetPrinter(_preferences.Printer);
 
         StatusBarViewModel.IsDivMmcEnabled = _preferences.DivMmc.IsEnabled;
-        StatusBarViewModel.IsPrinterEnabled = _preferences.Printer.IsZxPrinterEnabled;
-        StatusBarViewModel.IsUlaPlusEnabled = IsUlaPlusEnabled;
         StatusBarViewModel.IsTapeLoaded = Emulator!.TapeManager.IsTapeLoaded;
         StatusBarViewModel.TapeLoadProgress = string.Empty;
+
+        RefreshUlaPlusState(_preferences.IsUlaPlusEnabled);
+        RefreshAyState(Emulator.AudioManager.IsAyEnabled, Emulator.AudioManager.StereoMode);
+        RefreshPrinterState(_preferences.Printer.IsZxPrinterEnabled);
     }
 
     private void ShutdownEmulator()
@@ -126,6 +127,27 @@ partial class MainWindowViewModel
         Emulator.CommandManager.CommandReceived -= CommandManagerOnCommandReceived;
 
         Emulator = null;
+    }
+
+    private async Task<bool> ResumeEmulatorSession()
+    {
+        if (CommandLineArgs?.IsResumeEnabled == false ||
+            (!_preferences.Resume.IsResumeEnabled && CommandLineArgs?.IsResumeEnabled == null) ||
+            CommandLineArgs?.FilePath != null)
+        {
+            return false;
+        }
+
+        var snapshot = await _sessionService.LoadAsync();
+        if (snapshot == null)
+        {
+            return false;
+        }
+
+        CreateEmulator(snapshot);
+        UpdateWindowTitle();
+
+        return true;
     }
 
     private void HandleMachineReset(bool hardReset = false)
@@ -222,14 +244,54 @@ partial class MainWindowViewModel
 
     partial void OnComputerTypeChanged(ComputerType value) => StatusBarViewModel.ComputerType = value;
 
-    partial void OnIsUlaPlusEnabledChanged(bool value)
+    partial void OnIsUlaPlusEnabledChanged(bool value) => RefreshUlaPlusState(value);
+
+    private void RefreshUlaPlusState(bool? isEnabled)
     {
-        StatusBarViewModel.IsUlaPlusEnabled = IsUlaPlusEnabled;
+        if (isEnabled == null)
+        {
+            return;
+        }
+
+        StatusBarViewModel.IsUlaPlusEnabled = isEnabled.Value;
 
         if (Emulator != null)
         {
-            Emulator.IsUlaPlusEnabled = IsUlaPlusEnabled;
+            Emulator.IsUlaPlusEnabled = isEnabled.Value;
         }
+    }
+
+    private void RefreshPrinterState(bool? isEnabled)
+    {
+        if (isEnabled == null)
+        {
+            return;
+        }
+
+        StatusBarViewModel.IsPrinterEnabled = isEnabled.Value;
+
+        if (Emulator != null)
+        {
+            Emulator.Printer.IsEnabled = isEnabled.Value;
+        }
+    }
+
+    private void RefreshAyState(bool? isEnabled, StereoMode? stereoMode)
+    {
+        if (isEnabled == null || Emulator == null)
+        {
+            return;
+        }
+
+        Emulator.AudioManager.IsAyEnabled = isEnabled.Value;
+
+        if (stereoMode != null)
+        {
+            Emulator.AudioManager.StereoMode = stereoMode.Value;
+        }
+
+        StatusBarViewModel.IsAyEnabled = Emulator.AudioManager.IsAyEnabled;
+        StatusBarViewModel.StereoMode = Emulator.AudioManager.StereoMode;
     }
 
     private void Pause(bool showOverlay = true)
@@ -267,6 +329,20 @@ partial class MainWindowViewModel
                 Pause();
                 break;
         }
+    }
+
+    private static async Task<byte[]> ReadCustomRom(string[] fileNames)
+    {
+        byte[] result = [];
+
+        foreach (var fileName in fileNames)
+        {
+            var data = await File.ReadAllBytesAsync(fileName);
+
+            result = result.Concatenate(data);
+        }
+
+        return result;
     }
 
     partial void OnTapeLoadSpeedChanged(TapeSpeed value) =>

@@ -150,11 +150,11 @@ public sealed class AudioManager
                         sample = MonoMix(sample, Ay.ChannelA.Samples[i], Ay.ChannelB.Samples[i], Ay.ChannelC.Samples[i]);
                         break;
 
-                    case StereoMode.StereoAbc:
+                    case StereoMode.StereoABC:
                         (sampleL, sampleR) = StereoMix(sample, Ay.ChannelA.Samples[i], Ay.ChannelB.Samples[i], Ay.ChannelC.Samples[i]);
                         break;
 
-                    case StereoMode.StereoAcb:
+                    case StereoMode.StereoACB:
                         (sampleL, sampleR) = StereoMix(sample, Ay.ChannelA.Samples[i], Ay.ChannelC.Samples[i], Ay.ChannelB.Samples[i]);
                         break;
                 }

@@ -90,7 +90,7 @@
             <MenuItem Header="Pause" InputGesture="F2" Command="{Binding TogglePauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
             <MenuItem Header="Time Machine" InputGesture="F3" Command="{Binding ShowTimeMachineViewCommand}"/>
             <MenuItem Header="-"/>
-            <MenuItem Header="Mute" ToggleType="CheckBox" Command="{Binding ToggleMuteCommand}" IsChecked="{Binding IsMuted}"/>
+            <MenuItem Header="Mute" ToggleType="CheckBox" Command="{Binding ToggleMuteCommand}" IsChecked="{Binding IsAudioMuted}"/>
             <MenuItem Header="-"/>
             <MenuItem Header="NMI" Command="{Binding TriggerNmiCommand}"/>
             <MenuItem Header="-"/>

@@ -110,6 +110,15 @@
             <StackPanel
                 Orientation="Horizontal"
                 Margin="0 0 10 0"
+                IsVisible="{Binding IsAyEnabled}"
+                ToolTip.Tip="{Binding ToolTipAy}">
+
+                <material:MaterialIcon Kind="Waveform"/>
+            </StackPanel>
+
+            <StackPanel
+                Orientation="Horizontal"
+                Margin="0 0 10 0"
                 IsVisible="{Binding IsPrinterEnabled}"
                 ToolTip.Tip="Printer">
 

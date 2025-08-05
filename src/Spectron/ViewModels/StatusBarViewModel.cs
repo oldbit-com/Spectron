@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Timers;
 using Avalonia.Threading;
@@ -7,6 +6,7 @@ using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
+using OldBit.Spectron.Emulation.Devices.Audio;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -51,6 +51,15 @@ public partial class StatusBarViewModel : ObservableObject
     [ObservableProperty]
     private string _tapeLoadProgress = string.Empty;
 
+    [ObservableProperty]
+    private bool _isAyEnabled;
+
+    [ObservableProperty]
+    private StereoMode _stereoMode;
+
+    [ObservableProperty]
+    private string _toolTipAy = string.Empty;
+
     private readonly Timer _timer;
     private readonly Stopwatch _stopwatch = new();
 
@@ -82,7 +91,6 @@ public partial class StatusBarViewModel : ObservableObject
         _timer.Elapsed += UpdateRecordingTime;
     }
 
-
     partial void OnComputerTypeChanged(ComputerType value) => OnPropertyChanged(nameof(ComputerName));
 
     partial void OnJoystickTypeChanged(JoystickType value) => OnPropertyChanged(nameof(JoystickName));
@@ -103,6 +111,17 @@ public partial class StatusBarViewModel : ObservableObject
                 UpdateProcessingStatus(false);
                 break;
         }
+    }
+
+    partial void OnStereoModeChanged(StereoMode value)
+    {
+        ToolTipAy = value switch
+        {
+            StereoMode.Mono => "AY Mono",
+            StereoMode.StereoABC => "AY Stereo ABC",
+            StereoMode.StereoACB => "AY Stereo ACB",
+            _ => ToolTipAy
+        };
     }
 
     private void UpdateProcessingStatus(bool isActive, string message = "")

@@ -72,6 +72,42 @@ dotnet build -c Release
 dotnet run --project ./src/Spectron   
 ```
 
+### Command line options
+Command lines allow overriding most of the default options and loading specified file.
+```
+Options:
+  -?, -h, --help                                                                      Show help and usage information
+  --version                                                                           Show version information
+  -f, --file                                                                          Specifies the file to load. This can be any supported file type: TAP | TZX | Z80 | SNA | 
+                                                                                      SZX | POK | ZIP
+  -ts, --tape-load-speed <Accelerated|Instant|Normal>                                 Specifies the tape loading speed
+  -c, --computer <Spectrum128K|Spectrum16K|Spectrum48K>                               Specifies the computer to emulate
+  -r, --rom <BrendanAlford|BusySoft|Custom|GoshWonderful|Harston|Original|Retroleum>  Specifies the ROM to load
+  -rf, --rom-file                                                                     Specifies the custom ROM file
+  -j, --joystick <Cursor|Fuller|Kempston|None|Sinclair1|Sinclair2>                    Specifies the emulated joystick type
+  -m, --mouse <Kempston|None>                                                         Specifies the emulated mouse type
+  -t, --theme <Dark|Light>                                                            Specifies the application theme
+  -b, --border <Full|Large|Medium|None|Small>                                         Specifies the border size
+  -m, --mute                                                                          Mutes the audio playback [default: False]
+  --ay                                                                                Enables AY sound emulation
+  --no-ay                                                                             Disables AY sound emulation
+  --ay-mode <Mono|StereoABC|StereoACB>                                                Specifies AY mono or stereo mode
+  --zx-printer                                                                        Enables ZX Printer emulation
+  --no-zx-printer                                                                     Disables ZX Printer emulation
+  --ula-plus                                                                          Enables ULA+ emulation
+  --no-ula-plus                                                                       Disables ULA+ emulation
+  --divmmc                                                                            Enables divMMC emulation, --divmmc-image is required
+  --no-divmmc                                                                         Disables divMMC emulation
+  --divmmc-image                                                                      Specifies the SD card image to use with divMMC
+  --divmmc-readonly                                                                   Specifies the SD card image is readonly, SD card writes will be cached in-memory only
+  --divmmc-writable                                                                   Specifies the SD card image is writable, SD card writes will persisted
+  --time-machine                                                                      Enables Time Machine
+  --no-time-machine                                                                   Disables Time Machine
+  --resume                                                                            Resume emulator state assuming there is a previously saved state
+  --no-resume                                                                         Do not resume emulator state
+
+```
+
 ## Testing and compatibility
 - [x] Passes floatspy v0.33 (RAMSOFT) floating bus test in both 48k and 128k mode
 - [x] Passes HALT2INT v3 (Mark Woodmass) test in both 48k and 128k mode

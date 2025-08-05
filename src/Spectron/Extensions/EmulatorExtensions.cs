@@ -43,14 +43,6 @@ public static class EmulatorExtensions
         emulator.AudioManager.StereoMode = audioSettings.StereoMode;
     }
 
-    public static void SetUlaPlus(this Emulator? emulator, bool isUlaPlusEnabled)
-    {
-        if (emulator != null)
-        {
-            emulator.IsUlaPlusEnabled = isUlaPlusEnabled;
-        }
-    }
-
     public static void SetFloatingBusSupport(this Emulator? emulator, bool isFloatingBusEnabled)
     {
         if (emulator != null)
@@ -95,15 +87,4 @@ public static class EmulatorExtensions
         emulator.DivMmc.Memory.IsEepromWriteEnabled = divMmcSettings.IsEepromWriteEnabled;
         emulator.DivMmc.IsDriveWriteEnabled = divMmcSettings.IsDriveWriteEnabled;
     }
-
-    public static void SetPrinter(this Emulator? emulator, PrinterSettings printerSettings)
-    {
-        if (emulator == null)
-        {
-            return;
-        }
-
-        emulator.Printer.IsEnabled = printerSettings.IsZxPrinterEnabled;
-    }
-
 }

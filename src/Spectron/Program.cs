@@ -1,6 +1,9 @@
 ﻿using System;
 using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using OldBit.Spectron.CommandLine;
 using OldBit.Spectron.Extensions;
+using OldBit.Spectron.ViewModels;
 
 namespace OldBit.Spectron;
 
@@ -10,18 +13,32 @@ class Program
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
     [STAThread]
-    public static void Main(string[] args)
+    public static int Main(string[] args)
     {
         Console.WriteLine("Starting Spectron...");
 
-        try
+        return CommandLineParser.Parse(commandLineArgs =>
         {
-            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.ToString());
-        }
+            try
+            {
+                BuildAvaloniaApp().StartWithClassicDesktopLifetime(args, builder =>
+                {
+                    builder.Startup += (sender, e) =>
+                    {
+                        if (sender is ClassicDesktopStyleApplicationLifetime { MainWindow.DataContext: MainWindowViewModel viewModel })
+                        {
+                            viewModel.CommandLineArgs = commandLineArgs;
+                        }
+                    };
+                });
+
+                Console.WriteLine("Terminated Spectron...");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }, args);
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.

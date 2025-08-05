@@ -38,6 +38,7 @@
         <PackageReference Include="OldBit.Z80Cpu.Spectron" Version="0.9.3-pre.13" />
         <PackageReference Include="SharpHook.Reactive" Version="6.1.2" />
         <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.119.0" />
+        <PackageReference Include="System.CommandLine" Version="2.0.0-beta6.25358.103" />
     </ItemGroup>
 
     <ItemGroup>

@@ -377,8 +377,8 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
     public List<NameValuePair<StereoMode>> StereoModes { get; } =
     [
         new("Mono", StereoMode.Mono),
-        new("Stereo ABC", StereoMode.StereoAbc),
-        new("Stereo ACB", StereoMode.StereoAcb),
+        new("Stereo ABC", StereoMode.StereoABC),
+        new("Stereo ACB", StereoMode.StereoACB),
     ];
 
     public List<NameValuePair<KeyCode>> FireKeys { get; } =
