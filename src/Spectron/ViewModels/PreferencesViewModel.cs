@@ -16,6 +16,7 @@ using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.DivMmc;
 using OldBit.Spectron.Emulation.Devices.Gamepad;
+using OldBit.Spectron.Emulation.Devices.Interface1;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Rom;
@@ -100,6 +101,9 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         DivMmcCard0FileName = preferences.DivMmc.Card0FileName;
         DivMmcCard1FileName = preferences.DivMmc.Card1FileName;
         IsDivMmcDriveWriteEnabled = preferences.DivMmc.IsDriveWriteEnabled;
+
+        IsInterface1Enabled = preferences.Interface1.IsEnabled;
+        Interface1RomVersion = preferences.Interface1.RomVersion;
 
         IsZxPrinterEnabled = preferences.Printer.IsZxPrinterEnabled;
     }
@@ -208,6 +212,12 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
                 Card0FileName = DivMmcCard0FileName,
                 Card1FileName = DivMmcCard1FileName,
                 IsDriveWriteEnabled = IsDivMmcDriveWriteEnabled,
+            },
+
+            Interface1 = new Interface1Settings
+            {
+                IsEnabled = IsInterface1Enabled,
+                RomVersion = Interface1RomVersion,
             },
 
             Printer = new PrinterSettings
@@ -612,6 +622,12 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
 
     [ObservableProperty]
     private bool _isZxPrinterEnabled;
+
+    [ObservableProperty]
+    private bool _isInterface1Enabled;
+
+    [ObservableProperty]
+    private RomVersion _interface1RomVersion = RomVersion.V2;
 
     [ObservableProperty]
     private bool _isAutoLoadPokeFilesEnabled;
