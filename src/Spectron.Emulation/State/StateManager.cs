@@ -1,6 +1,7 @@
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.DivMmc;
+using OldBit.Spectron.Emulation.Devices.Interface1;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Devices.Mouse;
@@ -28,6 +29,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         LoadTape(emulator.TapeManager, snapshot.Tape);
         LoadAy(emulator.AudioManager, snapshot.Ay);
         LoadDivMmc(emulator.DivMmc, snapshot.DivMmc);
+        LoadInterface1(emulator.Interface1, snapshot.Interface1);
         LoadOther(emulator, snapshot);
 
         return emulator;
@@ -48,6 +50,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         SaveTape(emulator.TapeManager, snapshot);
         SaveAy(emulator.AudioManager, snapshot);
         SaveDivMmc(emulator.DivMmc, snapshot);
+        SaveInterface1(emulator.Interface1, snapshot);
         SaveOther(emulator, snapshot);
 
         if (emulator.RomType.IsCustomRom())
@@ -172,6 +175,19 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         {
             ControlRegister = divMmc.Memory.ControlRegister,
             Banks = divMmc.Memory.Banks,
+        };
+    }
+
+    private static void SaveInterface1(Interface1Device interface1, StateSnapshot stateSnapshot)
+    {
+        if (!interface1.IsEnabled)
+        {
+            return;
+        }
+
+        stateSnapshot.Interface1 = new Interface1State
+        {
+            RomVersion = interface1.ShadowRom.RomVersion,
         };
     }
 
@@ -314,5 +330,17 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
 
         divMmc.Memory.Banks = divMmcState.Banks;
         divMmc.Memory.PagingControl(divMmcState.ControlRegister);
+        divMmc.Enable();
+    }
+
+    private static void LoadInterface1(Interface1Device interface1, Interface1State? interface1State)
+    {
+        if (interface1State == null)
+        {
+            return;
+        }
+
+        interface1.ShadowRom.RomVersion = interface1State.RomVersion;
+        interface1.Enable();
     }
 }
