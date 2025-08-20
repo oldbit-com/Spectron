@@ -1,7 +1,7 @@
 namespace OldBit.Spectron.Emulation.Tape;
 
 /// <summary>
-/// Specifies the speed at which the tape should be loaded or saved
+/// Specifies the speed at which the tape should be loaded or saved.
 /// </summary>
 public enum TapeSpeed
 {

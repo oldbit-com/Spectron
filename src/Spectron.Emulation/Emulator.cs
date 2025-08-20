@@ -62,7 +62,6 @@ public sealed class Emulator
 
     public ComputerType ComputerType { get; }
     public RomType RomType { get; }
-    public TapeSpeed TapeLoadSpeed { get; set; }
 
     public Z80 Cpu { get; }
     public IEmulatorMemory Memory => _memory;
@@ -310,7 +309,7 @@ public sealed class Emulator
         switch (pc)
         {
             case RomRoutines.LD_START:
-                switch (TapeLoadSpeed)
+                switch (TapeManager.TapeLoadSpeed)
                 {
                     case TapeSpeed.Instant:
                         TapeManager.FastLoad();

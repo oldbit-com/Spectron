@@ -31,7 +31,7 @@ public sealed class Cassette
     public event BlockSelectedEvent? BlockSelected;
     public event EventHandler? EndOfTape;
 
-    internal void Load(Stream stream, FileType fileType)
+    internal void SetContent(Stream stream, FileType fileType)
     {
         Position = 0;
 
@@ -39,13 +39,13 @@ public sealed class Cassette
         {
             case FileType.Tap:
                 var tapFile = TapFile.Load(stream);
-                Load(tapFile.ToTzx());
+                SetContent(tapFile.ToTzx());
 
                 break;
 
             case FileType.Tzx:
                 var tzxFile = TzxFile.Load(stream);
-                Load(tzxFile);
+                SetContent(tzxFile);
 
                 break;
         }
@@ -53,7 +53,7 @@ public sealed class Cassette
         _contentBytes = null;
     }
 
-    internal void Load(TzxFile tzxFile, int currentPosition = 0)
+    internal void SetContent(TzxFile tzxFile, int currentPosition = 0)
     {
         Position = currentPosition;
         Content = tzxFile;
