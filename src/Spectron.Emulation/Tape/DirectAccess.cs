@@ -24,6 +24,7 @@ internal sealed class DirectAccess
     internal void FastLoad(Cassette cassette)
     {
         var tap = cassette.GetNextTapData();
+
         if (tap == null)
         {
             return;
@@ -77,7 +78,7 @@ internal sealed class DirectAccess
         _cpu.Registers.PC = 0x05E0;     // CP $01; RET
     }
 
-    internal void FastSave(Cassette cassette, TapeSpeed speed)
+    internal void FastSave(Cassette cassette)
     {
         var blockType = _cpu.Registers.A;
         var length = _cpu.Registers.DE;
@@ -88,9 +89,6 @@ internal sealed class DirectAccess
 
         cassette.Content.Blocks.Add(new StandardSpeedDataBlock(tapData));
 
-        if (speed == TapeSpeed.Instant)
-        {
-            _cpu.Registers.PC = RomRoutines.SA_DELAY - 2;
-        }
+        _cpu.Registers.PC = RomRoutines.SA_DELAY - 2;
     }
 }

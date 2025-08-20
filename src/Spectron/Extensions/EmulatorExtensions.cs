@@ -15,7 +15,7 @@ public static class EmulatorExtensions
             return;
         }
 
-        emulator.TapeLoadSpeed = tapeSpeed;
+        emulator.TapeManager.TapeLoadSpeed = tapeSpeed;
     }
 
     public static void SetTapeSettings(this Emulator? emulator, TapeSettings tapeSettings)
@@ -27,7 +27,7 @@ public static class EmulatorExtensions
 
         emulator.TapeManager.IsTapeSaveEnabled = tapeSettings.IsSaveEnabled;
         emulator.TapeManager.TapeSaveSpeed = tapeSettings.SaveSpeed;
-        emulator.TapeLoadSpeed = tapeSettings.LoadSpeed;
+        emulator.TapeManager.TapeLoadSpeed = tapeSettings.LoadSpeed;
     }
 
     public static void SetAudioSettings(this Emulator? emulator, AudioSettings audioSettings)

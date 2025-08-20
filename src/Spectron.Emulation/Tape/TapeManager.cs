@@ -13,17 +13,22 @@ public sealed class TapeManager
 {
     private DirectAccess? _directAccess;
 
-    public Cassette Cassette { get; private set; } = new();
+    public Cassette Cassette { get; private set; }
 
     public bool IsTapeLoaded { get; private set; }
     public bool IsTapeSaveEnabled { get; set; }
+
+    public TapeSpeed TapeLoadSpeed { get; set; }
     public TapeSpeed TapeSaveSpeed { get; set; }
+
     public double BlockReadProgressPercentage => CassettePlayer?.BlockReadProgressPercentage ?? 0;
 
     internal CassettePlayer? CassettePlayer { get; private set; }
 
     public delegate void TapeStateChangedEvent(TapeStateEventArgs e);
     public event TapeStateChangedEvent? TapeStateChanged;
+
+    public TapeManager() => Cassette = CreateCassette();
 
     internal void Attach(Z80 cpu, IMemory memory, HardwareSettings hardware)
     {
@@ -35,7 +40,7 @@ public sealed class TapeManager
 
     public void NewTape()
     {
-        Cassette = new Cassette();
+        Cassette = CreateCassette();
 
         TapeStateChanged?.Invoke(new TapeStateEventArgs(TapeAction.TapeInserted));
 
@@ -56,14 +61,14 @@ public sealed class TapeManager
             NewTape();
         }
 
-        _directAccess?.FastSave(Cassette, TapeSaveSpeed);
+        _directAccess?.FastSave(Cassette);
     }
 
     public void InsertTape(Stream stream, FileType fileType, bool autoPlay = false)
     {
         StopTape();
 
-        Cassette.Load(stream, fileType);
+        Cassette.SetContent(stream, fileType);
         InsertTape();
 
         if (autoPlay)
@@ -72,17 +77,17 @@ public sealed class TapeManager
         }
     }
 
-    public void InsertTape(string fileName, bool autoPlay = false)
+    public void InsertTape(string fileName)
     {
         var fileType = FileTypes.GetFileType(fileName);
         var stream = File.OpenRead(fileName);
 
-        InsertTape(stream, fileType, autoPlay);
+        InsertTape(stream, fileType);
     }
 
     public void InsertTape(TzxFile tzxFile, int currentBlockIndex)
     {
-        Cassette.Load(tzxFile, currentBlockIndex);
+        Cassette.SetContent(tzxFile, currentBlockIndex);
         InsertTape();
     }
 
@@ -111,9 +116,38 @@ public sealed class TapeManager
         StopTape();
         TapeStateChanged?.Invoke(new TapeStateEventArgs(TapeAction.TapeEjected));
 
-        Cassette = new Cassette();
+        Cassette = CreateCassette();
         IsTapeLoaded = false;
     }
 
     public void RewindTape() => CassettePlayer?.Rewind();
+
+    private Cassette CreateCassette()
+    {
+        var cassette = new Cassette();
+
+        cassette.BlockSelected += CassetteOnBlockSelected;
+
+        return cassette;
+    }
+
+    private void CassetteOnBlockSelected(BlockSelectedEventArgs e)
+    {
+        if (CassettePlayer?.IsPlaying == true)
+        {
+            return;
+        }
+
+        if (e.Position == Cassette.Content.Blocks.Count - 1)
+        {
+            return;
+        }
+
+        if (Cassette.Content.Blocks[e.Position + 1].BlockId == BlockCode.TurboSpeedData)
+        {
+            //PlayTape();
+        }
+
+        Console.WriteLine($"Block selected: {e.Position}");
+    }
 }

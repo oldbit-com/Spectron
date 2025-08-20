@@ -78,7 +78,7 @@ partial class MainWindowViewModel
         MouseType = Emulator.MouseManager.MouseType;
         IsUlaPlusEnabled = Emulator.IsUlaPlusEnabled;
 
-        Emulator.TapeLoadSpeed = TapeLoadSpeed;
+        Emulator.TapeManager.TapeLoadSpeed = TapeLoadSpeed;
         Emulator.FrameCompleted += EmulatorFrameCompleted;
 
         ConfigureEmulatorSettings();
