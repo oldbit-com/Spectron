@@ -22,6 +22,10 @@ internal static class RomReader
     // DivMMC ROM
     private const string DivMmcRomResourceName = "OldBit.Spectron.Emulation.Rom.Files.ESXMMC.0.8.9.BIN";
 
+    // Interface 1 ROMs
+    private const string Interface1V1RomResourceName = "OldBit.Spectron.Emulation.Rom.Files.interface1-v1.rom";
+    private const string Interface1V2RomResourceName = "OldBit.Spectron.Emulation.Rom.Files.interface1-v2.rom";
+
     internal static byte[] ReadRom(RomType romType)
     {
         var resourceName = romType switch
@@ -36,6 +40,8 @@ internal static class RomReader
             RomType.Harston => HarstonRomResourceName,
             RomType.BrendanAlford => BrendanAlfordRomResourceName,
             RomType.DivMmc => DivMmcRomResourceName,
+            RomType.Interface1V1 => Interface1V1RomResourceName,
+            RomType.Interface1V2 => Interface1V2RomResourceName,
             _ => throw new ArgumentOutOfRangeException(nameof(romType), romType, null)
         };
 

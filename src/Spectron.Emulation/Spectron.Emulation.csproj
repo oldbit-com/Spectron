@@ -23,6 +23,8 @@
       <EmbeddedResource Include="Tape\Loader\Files\16.szx" />
       <EmbeddedResource Include="Tape\Loader\Files\128.szx" />
       <EmbeddedResource Include="Rom\Files\ESXMMC.0.8.9.BIN" />
+      <EmbeddedResource Include="Rom\Files\interface1-v1.rom" />
+      <EmbeddedResource Include="Rom\Files\interface1-v2.rom" />
     </ItemGroup>
 
     <ItemGroup>
