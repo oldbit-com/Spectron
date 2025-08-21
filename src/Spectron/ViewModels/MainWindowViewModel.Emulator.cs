@@ -105,6 +105,7 @@ partial class MainWindowViewModel
         Emulator.SetAudioSettings(_preferences.Audio);
         Emulator.SetGamepad(_preferences.Joystick);
         Emulator.SetDivMMc(_preferences.DivMmc);
+        Emulator.SetInterface1(_preferences.Interface1);
 
         StatusBarViewModel.IsDivMmcEnabled = _preferences.DivMmc.IsEnabled;
         StatusBarViewModel.IsTapeLoaded = Emulator!.TapeManager.IsTapeLoaded;

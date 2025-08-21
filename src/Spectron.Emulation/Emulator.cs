@@ -181,6 +181,7 @@ public sealed class Emulator
         ScreenBuffer.Reset();
         UlaPlus.Reset();
         KeyboardState.Reset();
+        Interface1.Reset();
         DivMmc.Reset();
 
         if (IsPaused)
@@ -244,6 +245,7 @@ public sealed class Emulator
         _spectrumBus.AddDevice(AudioManager.Beeper);
         _spectrumBus.AddDevice(AudioManager.Ay);
         _spectrumBus.AddDevice(Printer);
+        _spectrumBus.AddDevice(Interface1);
         _spectrumBus.AddDevice(DivMmc);
         _spectrumBus.AddDevice(new RtcDevice(DivMmc));
 

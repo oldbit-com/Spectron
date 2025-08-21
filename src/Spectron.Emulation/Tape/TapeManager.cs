@@ -131,6 +131,7 @@ public sealed class TapeManager
         return cassette;
     }
 
+    // TODO: Auto play if turbo block
     private void CassetteOnBlockSelected(BlockSelectedEventArgs e)
     {
         if (CassettePlayer?.IsPlaying == true)
@@ -147,7 +148,5 @@ public sealed class TapeManager
         {
             //PlayTape();
         }
-
-        Console.WriteLine($"Block selected: {e.Position}");
     }
 }

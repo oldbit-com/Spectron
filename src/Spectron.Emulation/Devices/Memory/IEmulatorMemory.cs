@@ -12,5 +12,7 @@ public interface IEmulatorMemory : IMemory, IDevice
 
     void ShadowRom(IRomMemory? shadowRom);
 
+    IRomMemory OriginalRom { get; }
+
     event MemoryUpdatedEvent? MemoryUpdated;
 }

@@ -5,14 +5,15 @@ namespace OldBit.Spectron.Emulation.Devices.Memory;
 /// </summary>
 internal sealed class Memory16K : IEmulatorMemory
 {
-    private readonly IRomMemory _normalRom;
     private readonly byte[] _memory = new byte[65536];
     private IRomMemory _activeRom;
 
+    public IRomMemory OriginalRom { get; }
+
     internal Memory16K(byte[] rom)
     {
-        _normalRom = new RomMemory(rom);
-        _activeRom = _normalRom;
+        OriginalRom = new RomMemory(rom);
+        _activeRom = OriginalRom;
 
         Array.Fill(_memory, (byte)0xFF, 32768, 32768);
     }
@@ -46,7 +47,7 @@ internal sealed class Memory16K : IEmulatorMemory
         MemoryUpdated?.Invoke(address);
     }
 
-    public void ShadowRom(IRomMemory? shadowRom) => _activeRom = shadowRom ?? _normalRom;
+    public void ShadowRom(IRomMemory? shadowRom) => _activeRom = shadowRom ?? OriginalRom;
 
     public event MemoryUpdatedEvent? MemoryUpdated;
 }

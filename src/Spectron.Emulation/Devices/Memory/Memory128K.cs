@@ -29,6 +29,8 @@ internal sealed class Memory128K : IEmulatorMemory
     internal IRomMemory RomBank1 { get; }
     internal ReadOnlySpan<byte> Rom => _activeRom.Memory;
 
+    public IRomMemory OriginalRom => RomBank1;
+
     internal Memory128K(byte[] romBank0, byte[] romBank1)
     {
         RomBank0 = new RomMemory(romBank0);

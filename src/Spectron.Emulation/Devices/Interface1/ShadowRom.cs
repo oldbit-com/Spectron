@@ -3,39 +3,37 @@ using OldBit.Spectron.Emulation.Rom;
 
 namespace OldBit.Spectron.Emulation.Devices.Interface1;
 
-internal sealed class ShadowRom : IRomMemory
+public sealed class ShadowRom : IRomMemory
 {
     private readonly IEmulatorMemory _emulatorMemory;
-    private RomVersion _romVersion = RomVersion.V2;
+    private RomVersion _version = RomVersion.V2;
 
-    internal RomVersion RomVersion
+    public RomVersion Version
     {
-        get => _romVersion;
+        get => _version;
         set
         {
-            _romVersion = value;
+            _version = value;
 
-            Memory = RomReader.ReadRom(_romVersion == RomVersion.V1 ?
+            Memory = RomReader.ReadRom(_version == RomVersion.V1 ?
                 RomType.Interface1V1 :
                 RomType.Interface1V2);
         }
     }
 
-    internal ShadowRom(IEmulatorMemory emulatorMemory, RomVersion romVersion)
+    internal ShadowRom(IEmulatorMemory emulatorMemory, RomVersion version)
     {
         _emulatorMemory = emulatorMemory;
 
-        RomVersion = romVersion;
+        Version = version;
     }
 
     internal void Page() => _emulatorMemory.ShadowRom(this);
 
-    internal void Unpage() => _emulatorMemory.ShadowRom(null);
+    internal void UnPage() => _emulatorMemory.ShadowRom(null);
 
-    public byte Read(Word address)
-    {
-        throw new NotImplementedException();
-    }
+    public byte Read(Word address) => address < 0x2000 ?
+        Memory[address] : _emulatorMemory.OriginalRom.Read(address);
 
     public byte[] Memory { get; private set; } = [];
 }

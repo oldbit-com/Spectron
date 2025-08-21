@@ -187,7 +187,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
 
         stateSnapshot.Interface1 = new Interface1State
         {
-            RomVersion = interface1.ShadowRom.RomVersion,
+            RomVersion = interface1.ShadowRom.Version,
         };
     }
 
@@ -340,7 +340,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
             return;
         }
 
-        interface1.ShadowRom.RomVersion = interface1State.RomVersion;
+        interface1.ShadowRom.Version = interface1State.RomVersion;
         interface1.Enable();
     }
 }
