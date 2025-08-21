@@ -3,18 +3,38 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.Devices.Interface1;
 
-public sealed class Interface1Device(Z80 cpu, IEmulatorMemory emulatorMemory) : IDevice
+public sealed class Interface1Device : IDevice
 {
-    public readonly ShadowRom ShadowRom = new(emulatorMemory, RomVersion.V2);
+    public readonly ShadowRom ShadowRom;
+
+    private const int COMMS_DATA = 0x01;
+    private const int COMMS_CLK = 0x02;
+
+    private readonly Microdrive[] _microdrives = new Microdrive[8];
+    private readonly Z80 _cpu;
+
+    private byte _previousControlValue = 0xFF;
+
+    public Interface1Device(Z80 cpu, IEmulatorMemory emulatorMemory)
+    {
+        _cpu = cpu;
+        ShadowRom = new ShadowRom(emulatorMemory, RomVersion.V2);
+
+        for (var i = 0; i < _microdrives.Length; i++)
+        {
+            _microdrives[i] = new Microdrive();
+        }
+    }
 
     internal bool IsEnabled { get; private set; }
+
 
     public void Enable()
     {
         IsEnabled = true;
 
-        cpu.BeforeFetch += BeforeFetch;
-        cpu.AfterFetch += AfterFetch;
+        _cpu.BeforeFetch += BeforeFetch;
+        _cpu.AfterFetch += AfterFetch;
     }
 
     public void Disable()
@@ -23,8 +43,8 @@ public sealed class Interface1Device(Z80 cpu, IEmulatorMemory emulatorMemory) : 
 
         ShadowRom.UnPage();
 
-        cpu.BeforeFetch -= BeforeFetch;
-        cpu.AfterFetch -= AfterFetch;
+        _cpu.BeforeFetch -= BeforeFetch;
+        _cpu.AfterFetch -= AfterFetch;
     }
 
     public void Reset() => ShadowRom.UnPage();
@@ -36,11 +56,36 @@ public sealed class Interface1Device(Z80 cpu, IEmulatorMemory emulatorMemory) : 
             return;
         }
 
-        if (IsControlPort(address) || IsMicrodrivePort(address) || IsNetworkPort(address))
+        if (IsControlPort(address))
         {
-            //Console.WriteLine($"Writing port {address:X4}: {value}");
+            Console.WriteLine($"Writing port {address:X4}: {value:B8}");
+
+            if (IsFallingClockEdge(value, _previousControlValue))
+            {
+                ShiftDrivesLeftOnClock(value);
+            }
+
+            _previousControlValue = value;
         }
+
+        // if (IsControlPort(address) || IsMicrodrivePort(address) || IsNetworkPort(address))
+        // {
+        //     //Console.WriteLine($"Writing port {address:X4}: {value}");
+        // }
     }
+
+    private void ShiftDrivesLeftOnClock(byte value)
+    {
+        for (var driveNumber = 7; driveNumber > 0; driveNumber--)
+        {
+            _microdrives[driveNumber].IsMotorOn = _microdrives[driveNumber - 1].IsMotorOn;
+        }
+
+        _microdrives[0].IsMotorOn = (value & COMMS_DATA) == 0;
+    }
+
+    private static bool IsFallingClockEdge(byte value, byte previousValue) =>
+        (previousValue & COMMS_CLK) != 0 && (value & COMMS_CLK) == 0;
 
     public byte? ReadPort(Word address)
     {
@@ -51,7 +96,7 @@ public sealed class Interface1Device(Z80 cpu, IEmulatorMemory emulatorMemory) : 
 
         if (IsControlPort(address) || IsMicrodrivePort(address) || IsNetworkPort(address))
         {
-            Console.WriteLine($"Reading port {address:X4}");
+            //Console.WriteLine($"Reading port {address:X4}");
         }
 
         return null;
