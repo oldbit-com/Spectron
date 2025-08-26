@@ -78,6 +78,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     public StatusBarViewModel StatusBarViewModel { get; } = new();
     public TapeMenuViewModel TapeMenuViewModel { get; }
+    public MicrodriveMenuViewModel MicrodriveMenuViewModel { get; }
     public RecentFilesViewModel RecentFilesViewModel { get; }
 
     #region Observable properties
@@ -268,6 +269,7 @@ public partial class MainWindowViewModel : ObservableObject
         SessionService sessionService,
         RecentFilesViewModel recentFilesViewModel,
         TapeMenuViewModel tapeMenuViewModel,
+        MicrodriveMenuViewModel microdriveMenuViewModel,
         DebuggerContext debuggerContext,
         TapeManager tapeManager,
         QuickSaveService quickSaveService,
@@ -287,6 +289,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         RecentFilesViewModel = recentFilesViewModel;
         TapeMenuViewModel = tapeMenuViewModel;
+        MicrodriveMenuViewModel = microdriveMenuViewModel;
         recentFilesViewModel.OpenRecentFileAsync = async fileName => await HandleLoadFileAsync(fileName);
 
         SpectrumScreen = _frameBufferConverter.ScreenBitmap;

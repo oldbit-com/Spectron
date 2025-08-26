@@ -80,6 +80,7 @@ public sealed class Emulator
         EmulatorArgs emulatorArgs,
         HardwareSettings hardware,
         TapeManager tapeManager,
+        MicrodriveManager microdriveManager,
         GamepadManager gamepadManager,
         KeyboardState keyboardState,
         TimeMachine timeMachine,
@@ -118,7 +119,7 @@ public sealed class Emulator
         AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware);
 
         DivMmc = new DivMmcDevice(Cpu, _memory, logger);
-        Interface1 = new Interface1Device(Cpu, _memory);
+        Interface1 = microdriveManager.CreateDevice(Cpu, _memory);
         Printer = new ZxPrinter();
 
         SetupUlaAndDevices();

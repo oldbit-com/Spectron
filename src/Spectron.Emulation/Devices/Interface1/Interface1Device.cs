@@ -15,10 +15,17 @@ public sealed class Interface1Device : IDevice
 
     private byte _previousControlValue = 0xFF;
 
+    internal Dictionary<MicrodriveId, Microdrive> Microdrives = new();
+
     public Interface1Device(Z80 cpu, IEmulatorMemory emulatorMemory)
     {
         _cpu = cpu;
         ShadowRom = new ShadowRom(emulatorMemory, RomVersion.V2);
+
+        foreach (var microdrive in Enum.GetValues<MicrodriveId>())
+        {
+            Microdrives.Add(microdrive, new Microdrive());
+        }
 
         for (var i = 0; i < _microdrives.Length; i++)
         {
@@ -27,7 +34,6 @@ public sealed class Interface1Device : IDevice
     }
 
     internal bool IsEnabled { get; private set; }
-
 
     public void Enable()
     {
@@ -66,12 +72,77 @@ public sealed class Interface1Device : IDevice
             }
 
             _previousControlValue = value;
+
+            // microdrives_restart();
+            // libspectrum_microdrive_set_cartridge_len( microdrive,
+            // data_length / LIBSPECTRUM_MICRODRIVE_BLOCK_LEN );  543
+        }
+    }
+
+    // Preamble: 10 zeros and 2 FF bytes (the preamble)
+    // 15 bte header
+
+
+    public byte? ReadPort(Word address)
+    {
+        if (!IsEnabled)
+        {
+            return null;
         }
 
-        // if (IsControlPort(address) || IsMicrodrivePort(address) || IsNetworkPort(address))
-        // {
-        //     //Console.WriteLine($"Writing port {address:X4}: {value}");
-        // }
+        if (IsControlPort(address))
+        {
+            var microdrive = GetActiveMicrodrive();
+
+            if (microdrive == null)
+            {
+                return 0; // TODO: 0, null, or FF?
+            }
+
+            if (microdrive is { IsMotorOn: true, IsCartridgeInserted: true })
+            {
+                var result = 0xFF;
+
+                if (microdrive.GapCounter > 0)
+                {
+                    // 15 times GAP and SYNC high
+                    microdrive.GapCounter -= 1;
+                }
+                else
+                {
+                    result &= 0xF9;     // 15 times GAP and SYNC low
+
+                    if (microdrive.SyncCounter > 0)
+                    {
+                        microdrive.SyncCounter -= 1;
+                    }
+                    else
+                    {
+                        microdrive.GapCounter = 15;
+                        microdrive.SyncCounter = 15;
+                    }
+                }
+
+                // Write protect b0
+
+                return (byte)result;
+            }
+        }
+
+        if (IsMicrodrivePort(address))
+        {
+            var activeMicrodrive = GetActiveMicrodrive();
+
+            if (activeMicrodrive is { IsMotorOn: true, IsCartridgeInserted: true })
+            {
+                // Logic
+                //
+            }
+
+            return 0xFF;
+        }
+
+        return null;
     }
 
     private void ShiftDrivesLeftOnClock(byte value)
@@ -86,21 +157,6 @@ public sealed class Interface1Device : IDevice
 
     private static bool IsFallingClockEdge(byte value, byte previousValue) =>
         (previousValue & COMMS_CLK) != 0 && (value & COMMS_CLK) == 0;
-
-    public byte? ReadPort(Word address)
-    {
-        if (!IsEnabled)
-        {
-            return null;
-        }
-
-        if (IsControlPort(address) || IsMicrodrivePort(address) || IsNetworkPort(address))
-        {
-            //Console.WriteLine($"Reading port {address:X4}");
-        }
-
-        return null;
-    }
 
     private void BeforeFetch(Word pc)
     {
@@ -119,6 +175,8 @@ public sealed class Interface1Device : IDevice
             ShadowRom.UnPage();
         }
     }
+
+    private Microdrive? GetActiveMicrodrive() => _microdrives.FirstOrDefault(microdrive => microdrive.IsMotorOn);
 
     private static bool IsControlPort(Word address) => (address & 0x18) == 0x08;
     private static bool IsMicrodrivePort(Word address) => (address & 0x18) == 0x00;

@@ -79,6 +79,11 @@ public static class FileTypes
         Patterns = ["*.pok"]
     };
 
+    public static FilePickerFileType Mdr { get; } = new("Microdrive File")
+    {
+        Patterns = ["*.mdr"]
+    };
+
     public static FilePickerFileType Any { get; } = new("All Files")
     {
         Patterns = ["*.*"]

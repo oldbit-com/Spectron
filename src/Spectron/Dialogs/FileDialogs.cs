@@ -45,6 +45,13 @@ public static class FileDialogs
             FileTypes.Any,
         ]);
 
+    public static async Task<IReadOnlyList<IStorageFile>> OpenMicrodriveFileAsync() =>
+        await OpenFileAsync("Select Microdrive File",
+        [
+            FileTypes.Mdr,
+            FileTypes.Any,
+        ]);
+
     public static async Task<IStorageFile?> SaveTapeFileAsync(string? suggestedFileName = null)
     {
         var topLevel = TopLevel.GetTopLevel(MainWindow);
