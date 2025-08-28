@@ -5,14 +5,17 @@ namespace OldBit.Spectron.Emulator.Tests.Devices.Interface1;
 public class CartridgeTests
 {
     [Fact]
-    public void CartridgeShouldLoad()
+    public void Cartridge_ShouldCreateFromBytes()
     {
         var data = CreateEmptyCartridge();
 
         var cartridge = new Cartridge(data);
+
+        cartridge.BlockCount.ShouldBe(254);
+        cartridge.IsWriteProtected.ShouldBeTrue();
     }
 
-    private static byte[] CreateEmptyCartridge(bool includeWriteProtected = true)
+    private static byte[] CreateEmptyCartridge()
     {
         var data = new List<byte>();
 
@@ -25,7 +28,7 @@ public class CartridgeTests
             data.AddRange(Enumerable.Repeat((byte)0, 528));
         }
 
-        // Write protect
+        // Write protect indicator
         data.Add(0x01);
 
         return data.ToArray();
