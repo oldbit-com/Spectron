@@ -12,7 +12,7 @@ namespace OldBit.Spectron.Input;
 
 public sealed class KeyboardHook : IDisposable
 {
-    private readonly SimpleReactiveGlobalHook _hook = new();
+    private readonly ReactiveGlobalHook _hook = new();
     private readonly EventSimulator _simulator = new();
 
     private KeyCode _capsShift = KeyCode.VcLeftShift;
