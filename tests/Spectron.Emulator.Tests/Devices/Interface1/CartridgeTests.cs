@@ -1,4 +1,4 @@
-using OldBit.Spectron.Emulation.Devices.Interface1;
+using OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
 
 namespace OldBit.Spectron.Emulator.Tests.Devices.Interface1;
 

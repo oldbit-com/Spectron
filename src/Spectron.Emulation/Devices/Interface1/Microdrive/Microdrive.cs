@@ -1,55 +1,65 @@
-namespace OldBit.Spectron.Emulation.Devices.Interface1;
+namespace OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
 
-internal sealed class Microdrive
+public sealed class Microdrive
 {
     private int _position;
     private int _transferredCount;
-    private int _currentBlockSize;
+    private Cartridge? _cartridge;
 
     internal bool IsMotorOn { get; set; }
 
-    internal Cartridge? Cartridge  { get; private set; }
     internal int GapCounter { get; set; } = 15;
     internal int SyncCounter { get; set; } = 15;
 
-    internal bool IsCartridgeInserted => Cartridge != null;
+    public bool IsCartridgeInserted => _cartridge != null;
 
-    internal void InsertCartridge(Cartridge cartridge) => Cartridge = cartridge;
+    internal void NewCartridge()
+    {
+        _cartridge = new Cartridge();
+
+        Reset();
+    }
 
     internal void InsertCartridge(string filePath)
     {
-        var cartridge = new Cartridge(filePath);
+        _cartridge = new Cartridge(filePath);
 
-        InsertCartridge(cartridge);
+        Reset();
+    }
+
+    internal void EjectCartridge()
+    {
+        _cartridge = null;
+
+        Reset();
     }
 
     internal byte? Read()
     {
-        if (Cartridge == null || !IsMotorOn)
+        if (_cartridge == null || !IsMotorOn)
         {
             return null;
         }
 
-        if (Cartridge.CurrentBlockLength < _transferredCount)
+        if (_cartridge.CurrentBlockLength < _transferredCount)
         {
-            var date = Cartridge.Read(_position);
+            var date = _cartridge.Read(_position);
 
         }
-
 
         return 0;
     }
 
     private void Move()
     {
-        if (Cartridge == null)
+        if (_cartridge == null)
         {
             return;
         }
 
         _position += 1;
 
-        if (_position >= Cartridge.BlockSize * Cartridge.BlockCount)
+        if (_position >= Cartridge.BlockSize * _cartridge.BlockCount)
         {
             _position = 0;
         }
@@ -72,6 +82,9 @@ internal sealed class Microdrive
 
     internal void Reset()
     {
-        // TODO: Implement reset
+        _position = 0;
+        _transferredCount = 0;
+
+        IsMotorOn = false;
     }
 }

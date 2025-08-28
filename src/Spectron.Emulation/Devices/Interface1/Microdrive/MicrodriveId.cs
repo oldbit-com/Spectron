@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.Devices.Interface1;
+namespace OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
 
 /// <summary>
 /// Represents the identifier for a Microdrive unit in the Interface 1 emulation.

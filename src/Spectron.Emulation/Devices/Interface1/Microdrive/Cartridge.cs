@@ -1,7 +1,7 @@
-namespace OldBit.Spectron.Emulation.Devices.Interface1;
+namespace OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
 
 /// <summary>
-/// Represents Microdrive cartridge as stored in an MDR data file.
+/// Represents Microdrive cartridge stored in an MDR data file.
 /// MDR file consists of 15 bytes header block, followed by 528 bytes data block repeated 254 times.
 /// </summary>
 internal sealed class Cartridge
@@ -21,8 +21,22 @@ internal sealed class Cartridge
     internal int BlockCount { get; }
     internal int CurrentBlockLength => _blocks[_currentBlock].Length;
 
+    private string? _filePath;
+
+    public Cartridge()
+    {
+        _blocks  = [];
+
+        for (var i = MaxBlocks; i > 0; i--)
+        {
+            _blocks.AddRange(new byte[HeaderSize]);
+            _blocks.AddRange(new byte[BlockSize - HeaderSize]);
+        }
+    }
+
     public Cartridge(string filePath) : this(File.ReadAllBytes(filePath))
     {
+        _filePath = filePath;
     }
 
     public Cartridge(byte[] data)

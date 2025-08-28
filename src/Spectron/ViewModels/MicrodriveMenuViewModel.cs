@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation.Devices.Interface1;
+using OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -32,12 +33,14 @@ public class MicrodriveMenuViewModel : ObservableObject
 
         NewCommand = new RelayCommand<MicrodriveId>(execute: New);
         InsertCommand = new AsyncRelayCommand<MicrodriveId>(execute: Insert);
-        SaveCommand = new AsyncRelayCommand<MicrodriveId>(execute: Save, canExecute: CanExecuteSave);
-        EjectCommand = new AsyncRelayCommand<MicrodriveId>(execute: Eject, canExecute: CanExecuteEject);
+        SaveCommand = new AsyncRelayCommand<MicrodriveId>(execute: Save, canExecute: CanExecute);
+        EjectCommand = new AsyncRelayCommand<MicrodriveId>(execute: Eject, canExecute: CanExecute);
     }
 
     private void New(MicrodriveId driveId)
     {
+        _microdriveManager.NewCartridge(driveId);
+
         EjectCommandHeadings[driveId].Value = "Eject 'New Cartridge'";
     }
 
@@ -52,9 +55,9 @@ public class MicrodriveMenuViewModel : ObservableObject
                 return;
             }
 
-            var cartridge = _microdriveManager.InsertCartridge(driveId, files[0].Path.LocalPath);
+            _microdriveManager.InsertCartridge(driveId, files[0].Path.LocalPath);
 
-            var fileName = Path.GetFileName(cartridge.FilePath);
+            var fileName = Path.GetFileName(files[0].Path.LocalPath);
             EjectCommandHeadings[driveId].Value = $"Eject '{fileName}'";
         }
         catch (Exception ex)
@@ -77,9 +80,6 @@ public class MicrodriveMenuViewModel : ObservableObject
         await Task.CompletedTask;
     }
 
-    private bool CanExecuteSave(MicrodriveId driveId) =>
-        _microdriveManager.MicrodriveStates[driveId].IsInserted;
-
-    private bool CanExecuteEject(MicrodriveId driveId) =>
-        _microdriveManager.MicrodriveStates[driveId].IsInserted;
+    private bool CanExecute(MicrodriveId driveId) =>
+        _microdriveManager[driveId].IsCartridgeInserted;
 }

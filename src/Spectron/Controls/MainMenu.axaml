@@ -11,6 +11,7 @@
              xmlns:tape="clr-namespace:OldBit.Spectron.Emulation.Tape;assembly=OldBit.Spectron.Emulation"
              xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
              xmlns:if1="clr-namespace:OldBit.Spectron.Emulation.Devices.Interface1;assembly=OldBit.Spectron.Emulation"
+             xmlns:microdrive="clr-namespace:OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;assembly=OldBit.Spectron.Emulation"
              x:DataType="viewModels:MainWindowViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="OldBit.Spectron.Controls.MainMenu">
@@ -143,52 +144,52 @@
         <!-- Should use ItemsSource to generate dynamically, if possible in Avalonia -->
         <MenuItem x:Name="Drives" Header="Microdrive" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="Drive 1">
-                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive1}"/>
-                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive1}"/>
-                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive1}"/>
-                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive1].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive1}"/>
+                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive1}"/>
+                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive1}"/>
+                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive1}"/>
+                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive1].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive1}"/>
             </MenuItem>
             <MenuItem Header="Drive 2">
-                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive2}"/>
-                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive2}"/>
-                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive2}"/>
-                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive2].Value}}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive2}"/>
+                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive2}"/>
+                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive2}"/>
+                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive2}"/>
+                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive2].Value}}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive2}"/>
             </MenuItem>
             <MenuItem Header="Drive 3">
-                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive3}"/>
-                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive3}"/>
-                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive3}"/>
-                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive3].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive3}"/>
+                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive3}"/>
+                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive3}"/>
+                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive3}"/>
+                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive3].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive3}"/>
             </MenuItem>
             <MenuItem Header="Drive 4">
-                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive4}"/>
-                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive4}"/>
-                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive4}"/>
-                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive4].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive4}"/>
+                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive4}"/>
+                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive4}"/>
+                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive4}"/>
+                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive4].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive4}"/>
             </MenuItem>
             <MenuItem Header="Drive 5">
-                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive5}"/>
-                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive5}"/>
-                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive5}"/>
-                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive5].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive5}"/>
+                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive5}"/>
+                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive5}"/>
+                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive5}"/>
+                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive5].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive5}"/>
             </MenuItem>
             <MenuItem Header="Drive 6">
-                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive6}"/>
-                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive6}"/>
-                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive6}"/>
-                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive6].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive6}"/>
+                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive6}"/>
+                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive6}"/>
+                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive6}"/>
+                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive6].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive6}"/>
             </MenuItem>
             <MenuItem Header="Drive 7">
-                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive7}"/>
-                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive7}"/>
-                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive7}"/>
-                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive7].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive7}"/>
+                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive7}"/>
+                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive7}"/>
+                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive7}"/>
+                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive7].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive7}"/>
             </MenuItem>
             <MenuItem Header="Drive 8">
-                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive8}"/>
-                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive8}"/>
-                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive8}"/>
-                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive8].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static if1:MicrodriveId.Drive8}"/>
+                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive8}"/>
+                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive8}"/>
+                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive8}"/>
+                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive8].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive8}"/>
             </MenuItem>
         </MenuItem>
 

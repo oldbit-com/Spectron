@@ -1,37 +1,20 @@
+using OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.Devices.Interface1;
 
-public sealed class Interface1Device : IDevice
+public sealed class Interface1Device(
+    Z80 cpu,
+    IEmulatorMemory emulatorMemory,
+    IMicrodriveProvider microdriveProvider) : IDevice, IDisposable
 {
-    public readonly ShadowRom ShadowRom;
+    public readonly ShadowRom ShadowRom = new(emulatorMemory, RomVersion.V2);
 
     private const int COMMS_DATA = 0x01;
     private const int COMMS_CLK = 0x02;
 
-    private readonly Microdrive[] _microdrives = new Microdrive[8];
-    private readonly Z80 _cpu;
-
     private byte _previousControlValue = 0xFF;
-
-    internal Dictionary<MicrodriveId, Microdrive> Microdrives = new();
-
-    public Interface1Device(Z80 cpu, IEmulatorMemory emulatorMemory)
-    {
-        _cpu = cpu;
-        ShadowRom = new ShadowRom(emulatorMemory, RomVersion.V2);
-
-        foreach (var microdrive in Enum.GetValues<MicrodriveId>())
-        {
-            Microdrives.Add(microdrive, new Microdrive());
-        }
-
-        for (var i = 0; i < _microdrives.Length; i++)
-        {
-            _microdrives[i] = new Microdrive();
-        }
-    }
 
     internal bool IsEnabled { get; private set; }
 
@@ -39,21 +22,31 @@ public sealed class Interface1Device : IDevice
     {
         IsEnabled = true;
 
-        _cpu.BeforeFetch += BeforeFetch;
-        _cpu.AfterFetch += AfterFetch;
+        Reset();
+
+        SubscribeCpuEvents();
     }
 
     public void Disable()
     {
         IsEnabled = false;
 
-        ShadowRom.UnPage();
+        Reset();
 
-        _cpu.BeforeFetch -= BeforeFetch;
-        _cpu.AfterFetch -= AfterFetch;
+        UnsubscribeCpuEvents();
     }
 
-    public void Reset() => ShadowRom.UnPage();
+    public void Reset()
+    {
+        ShadowRom.UnPage();
+
+        _previousControlValue =  0xFF;
+
+        foreach (var drive in microdriveProvider.Microdrives.Values)
+        {
+            drive.Reset();
+        }
+    }
 
     public void WritePort(Word address, byte value)
     {
@@ -64,7 +57,9 @@ public sealed class Interface1Device : IDevice
 
         if (IsControlPort(address))
         {
-            Console.WriteLine($"Writing port {address:X4}: {value:B8}");
+            //Console.WriteLine($"Writing port {address:X4}: {value:X2}");
+
+            //Console.Write($"0x{value:X2}, ");
 
             if (IsFallingClockEdge(value, _previousControlValue))
             {
@@ -145,14 +140,27 @@ public sealed class Interface1Device : IDevice
         return null;
     }
 
+    private void SubscribeCpuEvents()
+    {
+        cpu.BeforeFetch += BeforeFetch;
+        cpu.AfterFetch += AfterFetch;
+    }
+
+    private void UnsubscribeCpuEvents()
+    {
+        cpu.BeforeFetch -= BeforeFetch;
+        cpu.AfterFetch -= AfterFetch;
+    }
+
     private void ShiftDrivesLeftOnClock(byte value)
     {
-        for (var driveNumber = 7; driveNumber > 0; driveNumber--)
+        for (var driveNumber = 8; driveNumber > 1; driveNumber--)
         {
-            _microdrives[driveNumber].IsMotorOn = _microdrives[driveNumber - 1].IsMotorOn;
+            microdriveProvider.Microdrives[(MicrodriveId)driveNumber].IsMotorOn =
+                microdriveProvider.Microdrives[(MicrodriveId)(driveNumber - 1)].IsMotorOn;
         }
 
-        _microdrives[0].IsMotorOn = (value & COMMS_DATA) == 0;
+        microdriveProvider.Microdrives[MicrodriveId.Drive1].IsMotorOn = (value & COMMS_DATA) == 0;
     }
 
     private static bool IsFallingClockEdge(byte value, byte previousValue) =>
@@ -176,9 +184,16 @@ public sealed class Interface1Device : IDevice
         }
     }
 
-    private Microdrive? GetActiveMicrodrive() => _microdrives.FirstOrDefault(microdrive => microdrive.IsMotorOn);
+    private Microdrive.Microdrive? GetActiveMicrodrive() => microdriveProvider.Microdrives.Values
+        .FirstOrDefault(microdrive => microdrive.IsMotorOn);
 
     private static bool IsControlPort(Word address) => (address & 0x18) == 0x08;
     private static bool IsMicrodrivePort(Word address) => (address & 0x18) == 0x00;
-    private static bool IsNetworkPort(Word address) => (address & 0x18) == 0x10;
+
+    public void Dispose()
+    {
+        UnsubscribeCpuEvents();
+
+        Reset();
+    }
 }
