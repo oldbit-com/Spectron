@@ -2,16 +2,32 @@ namespace OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
 
 public sealed class Microdrive
 {
+    private bool _isMotorOn;
     private int _position;
     private int _transferredCount;
     private Cartridge? _cartridge;
 
-    internal bool IsMotorOn { get; set; }
+    internal bool IsMotorOn
+    {
+        get => _isMotorOn;
+        set
+        {
+            if (_isMotorOn != value)
+            {
+                _isMotorOn = value;
+
+                StateChanged?.Invoke(EventArgs.Empty);
+            }
+        }
+    }
 
     internal int GapCounter { get; set; } = 15;
     internal int SyncCounter { get; set; } = 15;
 
     public bool IsCartridgeInserted => _cartridge != null;
+
+    public delegate void MicrodriveStateChangedEvent(EventArgs e);
+    public event MicrodriveStateChangedEvent? StateChanged;
 
     internal void NewCartridge()
     {
@@ -73,7 +89,6 @@ public sealed class Microdrive
         }
 
         _transferredCount = 0;
-
     }
 
     private bool IsHeadPositionedAtBlockStart =>

@@ -16,7 +16,7 @@ public sealed class Interface1Device(
 
     private byte _previousControlValue = 0xFF;
 
-    internal bool IsEnabled { get; private set; }
+    public bool IsEnabled { get; private set; }
 
     public void Enable()
     {

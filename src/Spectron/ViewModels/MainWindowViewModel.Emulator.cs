@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
@@ -108,12 +109,13 @@ partial class MainWindowViewModel
         Emulator.SetInterface1(_preferences.Interface1);
 
         StatusBarViewModel.IsDivMmcEnabled = _preferences.DivMmc.IsEnabled;
-        StatusBarViewModel.IsTapeLoaded = Emulator!.TapeManager.IsTapeLoaded;
+        StatusBarViewModel.IsTapeInserted = Emulator!.TapeManager.IsTapeLoaded;
         StatusBarViewModel.TapeLoadProgress = string.Empty;
 
         RefreshUlaPlusState(_preferences.IsUlaPlusEnabled);
         RefreshAyState(Emulator.AudioManager.IsAyEnabled, Emulator.AudioManager.StereoMode);
         RefreshPrinterState(_preferences.Printer.IsZxPrinterEnabled);
+        RefreshInterface1State(_preferences.Interface1.IsEnabled);
     }
 
     private void ShutdownEmulator()
@@ -275,6 +277,18 @@ partial class MainWindowViewModel
         {
             Emulator.Printer.IsEnabled = isEnabled.Value;
         }
+    }
+
+    private void RefreshInterface1State(bool? isEnabled)
+    {
+        if (isEnabled == null)
+        {
+            return;
+        }
+
+        StatusBarViewModel.IsMicroDriveCartridgeInserted =
+            isEnabled == true &&
+            Emulator?.MicrodriveManager.Microdrives.Values.Any(microdrive => microdrive.IsCartridgeInserted) == true;
     }
 
     private void RefreshAyState(bool? isEnabled, StereoMode? stereoMode)

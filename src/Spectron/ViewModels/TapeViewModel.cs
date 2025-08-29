@@ -44,7 +44,7 @@ public partial class TapeViewModel : ObservableObject, IDisposable
 
         _tapeManager.Cassette.BlockSelected += CassetteOnPositionChanged;
         _tapeManager.Cassette.EndOfTape += CassetteOnEndOfTape;
-        _tapeManager.TapeStateChanged += TapeManagerOnTapeStateChanged;
+        _tapeManager.StateChanged += TapeOnStateChanged;
 
         CanRewind = _tapeManager.IsTapeLoaded;
         CanPlay = _tapeManager is { IsTapeLoaded: true, IsPlaying: false };
@@ -80,13 +80,13 @@ public partial class TapeViewModel : ObservableObject, IDisposable
         Dispatcher.UIThread.Post(() => Progress = _tapeManager.BlockReadProgressPercentage);
     }
 
-    private void TapeManagerOnTapeStateChanged(TapeStateEventArgs e)
+    private void TapeOnStateChanged(TapeStateEventArgs e)
     {
         Dispatcher.UIThread.Post(() =>
         {
             switch (e.Action)
             {
-                case TapeAction.TapeStopped:
+                case TapeAction.Stopped:
                     CanRewind = true;
                     CanPlay = true;
                     CanStop = false;
@@ -94,7 +94,7 @@ public partial class TapeViewModel : ObservableObject, IDisposable
 
                     break;
 
-                case TapeAction.TapeStarted:
+                case TapeAction.Started:
                     CanRewind = false;
                     CanPlay = false;
                     CanStop = true;
@@ -102,7 +102,7 @@ public partial class TapeViewModel : ObservableObject, IDisposable
 
                     break;
 
-                case TapeAction.TapeEjected:
+                case TapeAction.Ejected:
                     CanPlay = false;
                     CanStop = false;
                     CanRewind = false;
@@ -169,7 +169,7 @@ public partial class TapeViewModel : ObservableObject, IDisposable
 
         _tapeManager.Cassette.BlockSelected -= CassetteOnPositionChanged;
         _tapeManager.Cassette.EndOfTape -= CassetteOnEndOfTape;
-        _tapeManager.TapeStateChanged -= TapeManagerOnTapeStateChanged;
+        _tapeManager.StateChanged -= TapeOnStateChanged;
 
         GC.SuppressFinalize(this);
     }

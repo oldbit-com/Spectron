@@ -9,14 +9,28 @@ public sealed class MicrodriveManager : IMicrodriveProvider
 
     public Dictionary<MicrodriveId, Microdrive> Microdrives { get; } = new();
 
-    public Microdrive this[MicrodriveId driveId] => Microdrives[driveId];
+    public Microdrive this[MicrodriveId drive] => Microdrives[drive];
+
+    public delegate void MicrodriveStateChangedEvent(EventArgs e);
+    public event MicrodriveStateChangedEvent? StateChanged;
 
     public MicrodriveManager()
     {
-        foreach (var driveId in Enum.GetValues<MicrodriveId>())
+        foreach (var drive in Enum.GetValues<MicrodriveId>())
         {
-            Microdrives[driveId] = new Microdrive();
+            var microdrive = new Microdrive();
+
+            microdrive.StateChanged += _ => { OnStateChanged(drive); };
+
+            Microdrives[drive] = microdrive;
         }
+    }
+
+    private void OnStateChanged(MicrodriveId drive)
+    {
+        StateChanged?.Invoke(EventArgs.Empty);
+
+        Console.WriteLine($"Microdrive state changed for {drive}");
     }
 
     public Interface1Device CreateDevice(Z80 cpu, IEmulatorMemory emulatorMemory)
@@ -28,12 +42,24 @@ public sealed class MicrodriveManager : IMicrodriveProvider
         return _interface1Device;
     }
 
-    public void NewCartridge(MicrodriveId driveId) =>
-        Microdrives[driveId].NewCartridge();
+    public void NewCartridge(MicrodriveId drive)
+    {
+        Microdrives[drive].NewCartridge();
 
-    public void InsertCartridge(MicrodriveId driveId, string filePath) =>
-        Microdrives[driveId].InsertCartridge(filePath);
+        OnStateChanged(drive);
+    }
 
-    public void EjectCartridge(MicrodriveId driveId) =>
-        Microdrives[driveId].EjectCartridge();
+    public void InsertCartridge(MicrodriveId drive, string filePath)
+    {
+        Microdrives[drive].InsertCartridge(filePath);
+
+        OnStateChanged(drive);
+    }
+
+    public void EjectCartridge(MicrodriveId drive)
+    {
+        Microdrives[drive].EjectCartridge();
+
+        OnStateChanged(drive);
+    }
 }

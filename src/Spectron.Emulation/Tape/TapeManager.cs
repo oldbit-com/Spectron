@@ -26,7 +26,7 @@ public sealed class TapeManager
     internal CassettePlayer? CassettePlayer { get; private set; }
 
     public delegate void TapeStateChangedEvent(TapeStateEventArgs e);
-    public event TapeStateChangedEvent? TapeStateChanged;
+    public event TapeStateChangedEvent? StateChanged;
 
     public TapeManager() => Cassette = CreateCassette();
 
@@ -42,7 +42,7 @@ public sealed class TapeManager
     {
         Cassette = CreateCassette();
 
-        TapeStateChanged?.Invoke(new TapeStateEventArgs(TapeAction.TapeInserted));
+        StateChanged?.Invoke(new TapeStateEventArgs(TapeAction.Inserted));
 
         IsTapeLoaded = true;
     }
@@ -94,7 +94,7 @@ public sealed class TapeManager
     private void InsertTape()
     {
         CassettePlayer?.LoadTape(Cassette);
-        TapeStateChanged?.Invoke(new TapeStateEventArgs(TapeAction.TapeInserted));
+        StateChanged?.Invoke(new TapeStateEventArgs(TapeAction.Inserted));
 
         IsTapeLoaded = true;
     }
@@ -102,19 +102,19 @@ public sealed class TapeManager
     public void StopTape()
     {
         CassettePlayer?.Stop();
-        TapeStateChanged?.Invoke(new TapeStateEventArgs(TapeAction.TapeStopped));
+        StateChanged?.Invoke(new TapeStateEventArgs(TapeAction.Stopped));
     }
 
     public void PlayTape()
     {
         CassettePlayer?.Play();
-        TapeStateChanged?.Invoke(new TapeStateEventArgs(TapeAction.TapeStarted));
+        StateChanged?.Invoke(new TapeStateEventArgs(TapeAction.Started));
    }
 
     public void EjectTape()
     {
         StopTape();
-        TapeStateChanged?.Invoke(new TapeStateEventArgs(TapeAction.TapeEjected));
+        StateChanged?.Invoke(new TapeStateEventArgs(TapeAction.Ejected));
 
         Cassette = CreateCassette();
         IsTapeLoaded = false;
