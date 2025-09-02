@@ -3,7 +3,10 @@ namespace OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
 public sealed class Microdrive
 {
     private bool _isMotorOn;
-    private int _position;
+    private int _currentBlock;
+    private int _currentPositon;
+
+    private byte _lastValue = 0xFF;
     private int _transferredCount;
     private Cartridge? _cartridge;
 
@@ -25,6 +28,7 @@ public sealed class Microdrive
     internal int SyncCounter { get; set; } = 15;
 
     public bool IsCartridgeInserted => _cartridge != null;
+    public bool IsWriteProtected => _cartridge?.IsWriteProtected == true;
 
     public delegate void MicrodriveStateChangedEvent(EventArgs e);
     public event MicrodriveStateChangedEvent? StateChanged;
@@ -50,55 +54,46 @@ public sealed class Microdrive
         Reset();
     }
 
-    internal byte? Read()
+    internal byte Read()
     {
-        if (_cartridge == null || !IsMotorOn)
+        if (_transferredCount < _cartridge?.Blocks[_currentBlock].Length)
         {
-            return null;
+            _lastValue = _cartridge.Blocks[_currentBlock][_currentPositon];
+            _currentPositon += 1;
         }
 
-        if (_cartridge.CurrentBlockLength < _transferredCount)
-        {
-            var date = _cartridge.Read(_position);
+        _transferredCount += 1;
 
-        }
-
-        return 0;
+        return _lastValue;
     }
 
-    private void Move()
+    internal void Synchronize()
     {
-        if (_cartridge == null)
+        if (_transferredCount != 0)
         {
-            return;
-        }
+            NextBlock();
 
-        _position += 1;
-
-        if (_position >= Cartridge.BlockSize * _cartridge.BlockCount)
-        {
-            _position = 0;
+            _transferredCount = 0;
         }
     }
 
-    private void SeekNextBlock()
+    private void NextBlock()
     {
-        while (!IsHeadPositionedAtBlockStart)
+        _currentBlock += 1;
+        _currentPositon = 0;
+
+        if (_currentBlock >= _cartridge?.Blocks.Count)
         {
-            Move();
+            _currentBlock = 0;
         }
-
-        _transferredCount = 0;
     }
-
-    private bool IsHeadPositionedAtBlockStart =>
-        _position % Cartridge.BlockSize == 0 ||
-        _position % Cartridge.BlockSize == Cartridge.HeaderSize;
 
     internal void Reset()
     {
-        _position = 0;
+        _currentBlock = 0;
+        _currentPositon = 0;
         _transferredCount = 0;
+        _lastValue = 0xFF;
 
         IsMotorOn = false;
     }

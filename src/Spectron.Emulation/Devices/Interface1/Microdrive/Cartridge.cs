@@ -6,31 +6,27 @@ namespace OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
 /// </summary>
 internal sealed class Cartridge
 {
-    internal const int HeaderSize = 15;
-    internal const int DataSize = 512;
-    internal const int BlockSize = HeaderSize + HeaderSize + DataSize + 1;
-
+    private const int HeaderSize = 15;
+    private const int DataSize = 512;
+    private const int BlockSize = HeaderSize + HeaderSize + DataSize + 1;
     private const int MaxBlocks = 254;
     private const int MaxMdrSizeInBytes = MaxBlocks * BlockSize + 1;
-
-    private readonly List<byte[]> _blocks;
-    private int _currentBlock;
 
     public bool IsWriteProtected { get; private set; }
 
     internal int BlockCount { get; }
-    internal int CurrentBlockLength => _blocks[_currentBlock].Length;
+    internal List<byte[]> Blocks { get; }
 
     private string? _filePath;
 
     public Cartridge()
     {
-        _blocks  = [];
+        Blocks  = [];
 
         for (var i = MaxBlocks; i > 0; i--)
         {
-            _blocks.AddRange(new byte[HeaderSize]);
-            _blocks.AddRange(new byte[BlockSize - HeaderSize]);
+            Blocks.AddRange(new byte[HeaderSize]);
+            Blocks.AddRange(new byte[BlockSize - HeaderSize]);
         }
     }
 
@@ -50,10 +46,8 @@ internal sealed class Cartridge
             IsWriteProtected = data[^1] != 0;
         }
 
-        _blocks = SplitToBlocks(data);
+        Blocks = SplitToBlocks(data);
     }
-
-    internal byte Read(int position) => _blocks[_currentBlock][position];
 
     private static List<byte[]> SplitToBlocks(byte[] data)
     {

@@ -1,5 +1,4 @@
 using System;
-using OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
 using OldBit.Spectron.Emulation.Tape;
 
 namespace OldBit.Spectron.ViewModels;

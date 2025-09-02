@@ -29,8 +29,6 @@ public sealed class MicrodriveManager : IMicrodriveProvider
     private void OnStateChanged(MicrodriveId drive)
     {
         StateChanged?.Invoke(EventArgs.Empty);
-
-        Console.WriteLine($"Microdrive state changed for {drive}");
     }
 
     public Interface1Device CreateDevice(Z80 cpu, IEmulatorMemory emulatorMemory)

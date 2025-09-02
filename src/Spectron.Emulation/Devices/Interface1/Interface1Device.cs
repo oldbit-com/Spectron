@@ -23,7 +23,6 @@ public sealed class Interface1Device(
         IsEnabled = true;
 
         Reset();
-
         SubscribeCpuEvents();
     }
 
@@ -32,7 +31,6 @@ public sealed class Interface1Device(
         IsEnabled = false;
 
         Reset();
-
         UnsubscribeCpuEvents();
     }
 
@@ -57,10 +55,6 @@ public sealed class Interface1Device(
 
         if (IsControlPort(address))
         {
-            //Console.WriteLine($"Writing port {address:X4}: {value:X2}");
-
-            //Console.Write($"0x{value:X2}, ");
-
             if (IsFallingClockEdge(value, _previousControlValue))
             {
                 ShiftDrivesLeftOnClock(value);
@@ -68,15 +62,10 @@ public sealed class Interface1Device(
 
             _previousControlValue = value;
 
-            // microdrives_restart();
-            // libspectrum_microdrive_set_cartridge_len( microdrive,
-            // data_length / LIBSPECTRUM_MICRODRIVE_BLOCK_LEN );  543
+            var microdrive = GetActiveMicrodrive();
+            microdrive?.Synchronize();
         }
     }
-
-    // Preamble: 10 zeros and 2 FF bytes (the preamble)
-    // 15 bte header
-
 
     public byte? ReadPort(Word address)
     {
@@ -85,19 +74,35 @@ public sealed class Interface1Device(
             return null;
         }
 
+        byte? value = null;
+
         if (IsControlPort(address))
         {
-            var microdrive = GetActiveMicrodrive();
+            value = GetControlValue();
+        }
 
-            if (microdrive == null)
-            {
+        if (IsMicrodrivePort(address))
+        {
+            value = GetDataValue();
+        }
+
+        return value;
+    }
+
+    private byte? GetControlValue()
+    {
+        var microdrive = GetActiveMicrodrive();
+
+        switch (microdrive)
+        {
+            case null:
                 return 0; // TODO: 0, null, or FF?
-            }
 
-            if (microdrive is { IsMotorOn: true, IsCartridgeInserted: true })
+            case { IsMotorOn: true, IsCartridgeInserted: true }:
             {
                 var result = 0xFF;
 
+                // Synchronization
                 if (microdrive.GapCounter > 0)
                 {
                     // 15 times GAP and SYNC high
@@ -118,26 +123,28 @@ public sealed class Interface1Device(
                     }
                 }
 
-                // Write protect b0
+                if (microdrive.IsWriteProtected)
+                {
+                    result &= 0xFE; // WR-PROT: A "low" indicates a cartridge is write protected.
+                }
+
+                microdrive.Synchronize();
 
                 return (byte)result;
             }
+
+            default:
+                return null;
         }
+    }
 
-        if (IsMicrodrivePort(address))
-        {
-            var activeMicrodrive = GetActiveMicrodrive();
+    private byte? GetDataValue()
+    {
+        var microdrive = GetActiveMicrodrive();
 
-            if (activeMicrodrive is { IsMotorOn: true, IsCartridgeInserted: true })
-            {
-                // Logic
-                //
-            }
-
-            return 0xFF;
-        }
-
-        return null;
+        return microdrive is { IsMotorOn: true, IsCartridgeInserted: true } ?
+            microdrive.Read() :
+            (byte?)0xFF;
     }
 
     private void SubscribeCpuEvents()
@@ -184,8 +191,8 @@ public sealed class Interface1Device(
         }
     }
 
-    private Microdrive.Microdrive? GetActiveMicrodrive() => microdriveProvider.Microdrives.Values
-        .FirstOrDefault(microdrive => microdrive.IsMotorOn);
+    private Microdrive.Microdrive? GetActiveMicrodrive() =>
+        microdriveProvider.Microdrives.Values.FirstOrDefault(microdrive => microdrive.IsMotorOn);
 
     private static bool IsControlPort(Word address) => (address & 0x18) == 0x08;
     private static bool IsMicrodrivePort(Word address) => (address & 0x18) == 0x00;
@@ -193,7 +200,6 @@ public sealed class Interface1Device(
     public void Dispose()
     {
         UnsubscribeCpuEvents();
-
         Reset();
     }
 }
