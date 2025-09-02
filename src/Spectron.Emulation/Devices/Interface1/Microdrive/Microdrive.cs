@@ -58,22 +58,20 @@ public sealed class Microdrive
         if (_currentPositon < _cartridge?.Blocks[_currentBlock].Length)
         {
             _lastValue = _cartridge.Blocks[_currentBlock][_currentPositon];
+
             _currentPositon += 1;
         }
 
         return _lastValue;
     }
 
-    internal void Synchronize()
+    internal void SynchronizeBlock()
     {
-        if (_currentPositon != 0)
+        if (_currentPositon == 0)
         {
-            NextBlock();
+            return;
         }
-    }
 
-    private void NextBlock()
-    {
         _currentBlock += 1;
         _currentPositon = 0;
 

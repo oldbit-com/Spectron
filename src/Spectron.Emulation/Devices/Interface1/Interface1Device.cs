@@ -63,7 +63,7 @@ public sealed class Interface1Device(
             _previousControlValue = value;
 
             var microdrive = GetActiveMicrodrive();
-            microdrive?.Synchronize();
+            microdrive?.SynchronizeBlock();
         }
 
         if (IsDataPort(address))
@@ -132,7 +132,7 @@ public sealed class Interface1Device(
             result &= 0xFE; // WR-PROT: A "low" indicates a cartridge is write protected.
         }
 
-        microdrive.Synchronize();
+        microdrive.SynchronizeBlock();
 
         return (byte)result;
     }
