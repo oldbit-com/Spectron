@@ -11,8 +11,8 @@ public sealed class Interface1Device(
 {
     public readonly ShadowRom ShadowRom = new(emulatorMemory, RomVersion.V2);
 
-    private const int COMMS_DATA = 0x01;
-    private const int COMMS_CLK = 0x02;
+    private const int CommsData = 0x01;
+    private const int CommsClk = 0x02;
 
     private byte _previousControlValue = 0xFF;
 
@@ -65,6 +65,11 @@ public sealed class Interface1Device(
             var microdrive = GetActiveMicrodrive();
             microdrive?.Synchronize();
         }
+
+        if (IsDataPort(address))
+        {
+            // Write to microdrive
+        }
     }
 
     public byte? ReadPort(Word address)
@@ -81,7 +86,7 @@ public sealed class Interface1Device(
             value = GetControlValue();
         }
 
-        if (IsMicrodrivePort(address))
+        if (IsDataPort(address))
         {
             value = GetDataValue();
         }
@@ -93,49 +98,43 @@ public sealed class Interface1Device(
     {
         var microdrive = GetActiveMicrodrive();
 
-        switch (microdrive)
+        if (microdrive is not { IsMotorOn: true, IsCartridgeInserted: true })
         {
-            case null:
-                return 0; // TODO: 0, null, or FF?
-
-            case { IsMotorOn: true, IsCartridgeInserted: true }:
-            {
-                var result = 0xFF;
-
-                // Synchronization
-                if (microdrive.GapCounter > 0)
-                {
-                    // 15 times GAP and SYNC high
-                    microdrive.GapCounter -= 1;
-                }
-                else
-                {
-                    result &= 0xF9;     // 15 times GAP and SYNC low
-
-                    if (microdrive.SyncCounter > 0)
-                    {
-                        microdrive.SyncCounter -= 1;
-                    }
-                    else
-                    {
-                        microdrive.GapCounter = 15;
-                        microdrive.SyncCounter = 15;
-                    }
-                }
-
-                if (microdrive.IsWriteProtected)
-                {
-                    result &= 0xFE; // WR-PROT: A "low" indicates a cartridge is write protected.
-                }
-
-                microdrive.Synchronize();
-
-                return (byte)result;
-            }
-
-            default:
-                return null;
+            return null;
         }
+
+        var result = 0xFF;
+
+        // TODO: Rework, we only need 15 GAP and SYNC signals
+        // Synchronization
+        if (microdrive.GapCounter > 0)
+        {
+            // 15 times GAP and SYNC high
+            microdrive.GapCounter -= 1;
+        }
+        else
+        {
+            result &= 0xF9; // 15 times GAP and SYNC low
+
+            if (microdrive.SyncCounter > 0)
+            {
+                microdrive.SyncCounter -= 1;
+            }
+            else
+            {
+                microdrive.GapCounter = 15;
+                microdrive.SyncCounter = 15;
+            }
+        }
+
+        if (microdrive.IsWriteProtected)
+        {
+            result &= 0xFE; // WR-PROT: A "low" indicates a cartridge is write protected.
+        }
+
+        microdrive.Synchronize();
+
+        return (byte)result;
     }
 
     private byte? GetDataValue()
@@ -167,11 +166,11 @@ public sealed class Interface1Device(
                 microdriveProvider.Microdrives[(MicrodriveId)(driveNumber - 1)].IsMotorOn;
         }
 
-        microdriveProvider.Microdrives[MicrodriveId.Drive1].IsMotorOn = (value & COMMS_DATA) == 0;
+        microdriveProvider.Microdrives[MicrodriveId.Drive1].IsMotorOn = (value & CommsData) == 0;
     }
 
     private static bool IsFallingClockEdge(byte value, byte previousValue) =>
-        (previousValue & COMMS_CLK) != 0 && (value & COMMS_CLK) == 0;
+        (previousValue & CommsClk) != 0 && (value & CommsClk) == 0;
 
     private void BeforeFetch(Word pc)
     {
@@ -195,7 +194,7 @@ public sealed class Interface1Device(
         microdriveProvider.Microdrives.Values.FirstOrDefault(microdrive => microdrive.IsMotorOn);
 
     private static bool IsControlPort(Word address) => (address & 0x18) == 0x08;
-    private static bool IsMicrodrivePort(Word address) => (address & 0x18) == 0x00;
+    private static bool IsDataPort(Word address) => (address & 0x18) == 0x00;
 
     public void Dispose()
     {

@@ -89,6 +89,9 @@ public sealed class Microdrive
         _currentPositon = 0;
         _lastValue = 0xFF;
 
+        GapCounter = 15;
+        SyncCounter = 15;
+
         IsMotorOn = false;
     }
 }
