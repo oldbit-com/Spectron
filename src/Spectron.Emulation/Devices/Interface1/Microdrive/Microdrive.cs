@@ -7,7 +7,6 @@ public sealed class Microdrive
     private int _currentPositon;
 
     private byte _lastValue = 0xFF;
-    private int _transferredCount;
     private Cartridge? _cartridge;
 
     internal bool IsMotorOn
@@ -56,24 +55,20 @@ public sealed class Microdrive
 
     internal byte Read()
     {
-        if (_transferredCount < _cartridge?.Blocks[_currentBlock].Length)
+        if (_currentPositon < _cartridge?.Blocks[_currentBlock].Length)
         {
             _lastValue = _cartridge.Blocks[_currentBlock][_currentPositon];
             _currentPositon += 1;
         }
-
-        _transferredCount += 1;
 
         return _lastValue;
     }
 
     internal void Synchronize()
     {
-        if (_transferredCount != 0)
+        if (_currentPositon != 0)
         {
             NextBlock();
-
-            _transferredCount = 0;
         }
     }
 
@@ -92,7 +87,6 @@ public sealed class Microdrive
     {
         _currentBlock = 0;
         _currentPositon = 0;
-        _transferredCount = 0;
         _lastValue = 0xFF;
 
         IsMotorOn = false;
