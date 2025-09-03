@@ -4,6 +4,14 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.Devices.Interface1;
 
+/// <summary>
+/// Interface 1 emulation for Microdrives only. No serial port on network emulation.
+/// <remarks>
+/// https://sinclair.wiki.zxnet.co.uk/wiki/ZX_Interface_1
+/// https://worldofspectrum.org/faq/reference/48kreference.htm#PortE7
+/// https://worldofspectrum.org/faq/reference/formats.htm
+/// </remarks>
+/// </summary>
 public sealed class Interface1Device(
     Z80 cpu,
     IEmulatorMemory emulatorMemory,
@@ -55,20 +63,12 @@ public sealed class Interface1Device(
 
         if (IsControlPort(address))
         {
-            if (IsFallingClockEdge(value, _previousControlValue))
-            {
-                ShiftDrivesLeftOnClock(value);
-            }
-
-            _previousControlValue = value;
-
-            var microdrive = GetActiveMicrodrive();
-            microdrive?.SynchronizeBlock();
+            ControlMicrodrive(value);
         }
 
         if (IsDataPort(address))
         {
-            // Write to microdrive
+            WriteData(value);
         }
     }
 
@@ -88,7 +88,7 @@ public sealed class Interface1Device(
 
         if (IsDataPort(address))
         {
-            value = GetDataValue();
+            value = GetData();
         }
 
         return value;
@@ -105,29 +105,12 @@ public sealed class Interface1Device(
 
         var result = 0xFF;
 
-        // TODO: Rework, we only need 15 GAP and SYNC signals
-        // Synchronization
-        if (microdrive.GapCounter > 0)
+        if (microdrive.IsGapSync())
         {
-            // 15 times GAP and SYNC high
-            microdrive.GapCounter -= 1;
-        }
-        else
-        {
-            result &= 0xF9; // 15 times GAP and SYNC low
-
-            if (microdrive.SyncCounter > 0)
-            {
-                microdrive.SyncCounter -= 1;
-            }
-            else
-            {
-                microdrive.GapCounter = 15;
-                microdrive.SyncCounter = 15;
-            }
+            result = 0xF9; // GAP and SYNC low
         }
 
-        if (microdrive.IsWriteProtected)
+        if (microdrive.IsCartridgeWriteProtected)
         {
             result &= 0xFE; // WR-PROT: A "low" indicates a cartridge is write protected.
         }
@@ -137,13 +120,38 @@ public sealed class Interface1Device(
         return (byte)result;
     }
 
-    private byte? GetDataValue()
+    private byte? GetData()
     {
         var microdrive = GetActiveMicrodrive();
 
         return microdrive is { IsMotorOn: true, IsCartridgeInserted: true } ?
             microdrive.Read() :
             (byte?)0xFF;
+    }
+
+    private void ControlMicrodrive(byte value)
+    {
+        if (IsFallingClockEdge(value, _previousControlValue))
+        {
+            ShiftDrivesLeftOnClock(value);
+        }
+
+        _previousControlValue = value;
+
+        var microdrive = GetActiveMicrodrive();
+        microdrive?.SynchronizeBlock();
+    }
+
+    private void WriteData(byte value)
+    {
+        var microdrive = GetActiveMicrodrive();
+
+        if (microdrive is not { IsMotorOn: true, IsCartridgeInserted: true })
+        {
+            return;
+        }
+
+        microdrive.Write(value);
     }
 
     private void SubscribeCpuEvents()

@@ -71,6 +71,25 @@ public static class FileDialogs
         });
     }
 
+    public static async Task<IStorageFile?> SaveMicrodriveFileAsync(string? suggestedFileName = null)
+    {
+        var topLevel = TopLevel.GetTopLevel(MainWindow);
+
+        if (topLevel == null)
+        {
+            return null;
+        }
+
+        return await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Save Microdrive File",
+            DefaultExtension = ".mdr",
+            SuggestedFileName = suggestedFileName,
+            ShowOverwritePrompt = true,
+            FileTypeChoices = [FileTypes.Mdr]
+        });
+    }
+
     public static async Task<IStorageFile?> SaveSnapshotFileAsync(string? suggestedFileName = null)
     {
         var topLevel = TopLevel.GetTopLevel(MainWindow);

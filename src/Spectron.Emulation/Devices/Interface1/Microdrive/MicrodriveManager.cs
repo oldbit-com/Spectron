@@ -20,13 +20,13 @@ public sealed class MicrodriveManager : IMicrodriveProvider
         {
             var microdrive = new Microdrive();
 
-            microdrive.StateChanged += _ => { OnStateChanged(drive); };
+            microdrive.StateChanged += _ => { OnStateChanged(); };
 
             Microdrives[drive] = microdrive;
         }
     }
 
-    private void OnStateChanged(MicrodriveId drive)
+    private void OnStateChanged()
     {
         StateChanged?.Invoke(EventArgs.Empty);
     }
@@ -44,20 +44,20 @@ public sealed class MicrodriveManager : IMicrodriveProvider
     {
         Microdrives[drive].NewCartridge();
 
-        OnStateChanged(drive);
+        OnStateChanged();
     }
 
     public void InsertCartridge(MicrodriveId drive, string filePath)
     {
         Microdrives[drive].InsertCartridge(filePath);
 
-        OnStateChanged(drive);
+        OnStateChanged();
     }
 
     public void EjectCartridge(MicrodriveId drive)
     {
         Microdrives[drive].EjectCartridge();
 
-        OnStateChanged(drive);
+        OnStateChanged();
     }
 }

@@ -4,7 +4,7 @@ namespace OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
 /// Represents Microdrive cartridge stored in an MDR data file.
 /// MDR file consists of 15 bytes header block, followed by 528 bytes data block repeated 254 times.
 /// </summary>
-internal sealed class Cartridge
+public sealed class Cartridge
 {
     private const int HeaderSize = 15;
     private const int DataSize = 512;
@@ -12,14 +12,14 @@ internal sealed class Cartridge
     private const int MaxBlocks = 254;
     private const int MaxMdrSizeInBytes = MaxBlocks * BlockSize + 1;
 
-    public bool IsWriteProtected { get; private set; }
+    internal bool IsWriteProtected { get; set; }
 
     internal int BlockCount { get; }
     internal List<byte[]> Blocks { get; }
 
-    private string? _filePath;
+    public string? FilePath { get; }
 
-    public Cartridge()
+    internal Cartridge()
     {
         Blocks  = [];
 
@@ -30,12 +30,10 @@ internal sealed class Cartridge
         }
     }
 
-    public Cartridge(string filePath) : this(File.ReadAllBytes(filePath))
-    {
-        _filePath = filePath;
-    }
+    internal Cartridge(string filePath) : this(File.ReadAllBytes(filePath)) =>
+        FilePath = filePath;
 
-    public Cartridge(byte[] data)
+    internal Cartridge(byte[] data)
     {
         EnsureValidMdrDataSize(data);
 
@@ -47,6 +45,21 @@ internal sealed class Cartridge
         }
 
         Blocks = SplitToBlocks(data);
+    }
+
+    public async Task SaveAsync(string filePath)
+    {
+        await using var file = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+
+        foreach (var block in Blocks)
+        {
+            await file.WriteAsync(block);
+        }
+
+        file.Write(IsWriteProtected ? [0x01] : [0x00]);
+
+        file.Flush();
+        file.Close();
     }
 
     private static List<byte[]> SplitToBlocks(byte[] data)

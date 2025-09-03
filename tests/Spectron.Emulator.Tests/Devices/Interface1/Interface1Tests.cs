@@ -1,3 +1,4 @@
+using System.Reflection;
 using OldBit.Spectron.Emulation.Devices.Interface1;
 using OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
 using OldBit.Spectron.Emulation.Devices.Memory;
@@ -8,6 +9,9 @@ namespace OldBit.Spectron.Emulator.Tests.Devices.Interface1;
 
 public class Interface1Tests : IDisposable
 {
+    private const Word ControlPort = 0xEEEF;
+    private const Word DataPort = 0xEEE7;
+
     private readonly TestMicrodriveProvider _microdriveProvider = new();
     private readonly Interface1Device _interface1;
 
@@ -30,7 +34,7 @@ public class Interface1Tests : IDisposable
     {
         foreach (var value in values)
         {
-            _interface1.WritePort(0xEEEF, value);
+            _interface1.WritePort(ControlPort, value);
         }
 
         _microdriveProvider.Microdrives
@@ -43,9 +47,55 @@ public class Interface1Tests : IDisposable
             .ShouldAllBe(microdrive => !microdrive.IsMotorOn);
     }
 
+    [Fact]
+    public void Microdrive_ShouldReturnSyncAndGapFlags()
+    {
+        InsertDemoCartridge();
+        ActivateDrive7();
+
+        for (var repeat = 0; repeat < 10; repeat++)
+        {
+            // GAP / SYNC are not present
+            for (var i = 0; i < 15; i++)
+            {
+                var value = _interface1.ReadPort(ControlPort);
+
+                value.ShouldBe((byte)0xFF);
+            }
+
+            // GAP / SYNC are present
+            for (var i = 0; i < 15; i++)
+            {
+                var value = _interface1.ReadPort(ControlPort);
+
+                value.ShouldBe((byte)0xF9);
+            }
+        }
+    }
+
+    private void ActivateDrive7()
+    {
+        byte[] values = [0xEE, 0xEE, 0xEF, 0xED, 0xEE, 0xEC, 0xEF, 0xED, 0xEF, 0xED, 0xEF, 0xED, 0xEF, 0xED, 0xEF, 0xED, 0xEF, 0xED, 0xEE];
+
+        foreach (var value in values)
+        {
+            _interface1.WritePort(ControlPort, value);
+        }
+    }
+
+    private void InsertDemoCartridge()
+    {
+        var binFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+        var testFilePath =  Path.Combine(binFolder, "TestData", "Demo Cartridge.mdr");
+
+        var microdrive = _microdriveProvider.Microdrives.First(kv => kv.Key == MicrodriveId.Drive7).Value;
+        microdrive.InsertCartridge(testFilePath);
+    }
+
     public void Dispose()
     {
         GC.SuppressFinalize(this);
+
         _interface1.Dispose();
     }
 }
