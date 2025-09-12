@@ -6,6 +6,7 @@ namespace OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
 public sealed class MicrodriveManager : IMicrodriveProvider
 {
     private Interface1Device? _interface1Device;
+    private Microdrive? _activeMicrodrive;
 
     public Dictionary<MicrodriveId, Microdrive> Microdrives { get; } = new();
 
@@ -26,8 +27,12 @@ public sealed class MicrodriveManager : IMicrodriveProvider
         }
     }
 
+    public Microdrive? GetActiveDrive() => _activeMicrodrive;
+
     private void OnStateChanged()
     {
+        _activeMicrodrive = Microdrives.Values.FirstOrDefault(microdrive => microdrive.IsMotorOn);
+
         StateChanged?.Invoke(EventArgs.Empty);
     }
 

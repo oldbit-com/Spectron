@@ -6,14 +6,11 @@ public sealed class Microdrive
     private const int GapEnd = 30;
 
     private bool _isMotorOn;
-    private int _currentBlock;
     private int _position;
-    private int _preamblePosition;
     private int _gapSyncCounter;
 
     public Cartridge? Cartridge { get; private set; }
-
-    private List<byte> _blockPreambles = [];
+    internal int CurrentBlock { get; private set; }
 
     internal bool IsMotorOn
     {
@@ -69,12 +66,17 @@ public sealed class Microdrive
 
     internal byte? Read()
     {
-        if (Cartridge == null || _position >= Cartridge.Blocks[_currentBlock].Length)
+        if (Cartridge == null)
         {
             return null;
         }
 
-        var value = Cartridge.Blocks[_currentBlock][_position];
+        if (_position >= Cartridge.Blocks[CurrentBlock].Data.Length)
+        {
+            return Cartridge.Blocks[CurrentBlock].Data[^1];
+        }
+
+        var value = Cartridge.Blocks[CurrentBlock].Data[_position];
 
         _position += 1;
 
@@ -83,31 +85,16 @@ public sealed class Microdrive
 
     internal void Write(byte value)
     {
-        // Handle preamble - not saved to MDR, it is 12 bytes long:  10×00 + 2×FF
-        switch (_preamblePosition)
+        var isPreamble = Cartridge?.Blocks[CurrentBlock].ProcessPreamble(value);
+
+        if (isPreamble == true || _position >= Cartridge!.Blocks[CurrentBlock].Data.Length)
         {
-            case 0 when value == 0x00:
-                _blockPreambles[_currentBlock] = 1;
-                break;
-
-            case > 0 and < 10 when value == 0x00:
-            case > 9 and < 12 when value == 0xFF:
-                _blockPreambles[_currentBlock] += 1;
-                break;
-
-            case 12 when _blockPreambles[_currentBlock] == 12:
-                _blockPreambles[_currentBlock] = 0xFF;
-                break;
+            return;
         }
 
-        if (_preamblePosition > 11 && _position < Cartridge!.Blocks[_currentBlock].Length)
-        {
-            Cartridge!.Blocks[_currentBlock][_position] = value;
+        Cartridge!.Blocks[CurrentBlock].Data[_position] = value;
 
-            _position += 1;
-        }
-
-        _preamblePosition += 1;
+        _position += 1;
     }
 
     internal void SynchronizeBlock()
@@ -117,15 +104,16 @@ public sealed class Microdrive
             return;
         }
 
-        _currentBlock += 1;
-
         _position = 0;
-        _preamblePosition = 0;
 
-        if (_currentBlock >= Cartridge?.Blocks.Count)
+        CurrentBlock += 1;
+
+        if (CurrentBlock >= Cartridge?.Blocks.Count)
         {
-            _currentBlock = 0;
+            CurrentBlock = 0;
         }
+
+        Cartridge?.Blocks[CurrentBlock].Synchronize();
     }
 
     internal bool IsGapSync()
@@ -145,20 +133,10 @@ public sealed class Microdrive
 
     internal void Reset()
     {
-        _currentBlock = 0;
         _gapSyncCounter = 0;
-
         _position = 0;
-        _preamblePosition = 0;
 
-        _blockPreambles = new List<byte>(100);
-
-        if (Cartridge != null)
-        {
-            _blockPreambles = new List<byte>(Cartridge.Blocks.Count);
-            _blockPreambles.AddRange(Cartridge.Blocks.Select(x => (byte)0));
-        }
-
+        CurrentBlock = 0;
         IsMotorOn = false;
     }
 }

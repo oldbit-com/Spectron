@@ -15,7 +15,7 @@ public sealed class Cartridge
     internal bool IsWriteProtected { get; set; }
 
     internal int BlockCount { get; }
-    internal List<byte[]> Blocks { get; }
+    internal List<Block> Blocks { get; }
 
     public string? FilePath { get; }
 
@@ -25,8 +25,8 @@ public sealed class Cartridge
 
         for (var i = MaxBlocks; i > 0; i--)
         {
-            Blocks.AddRange(new byte[HeaderSize]);
-            Blocks.AddRange(new byte[BlockSize - HeaderSize]);
+            Blocks.AddRange(new Block(Enumerable.Repeat((byte)0xFF, HeaderSize).ToArray()));
+            Blocks.AddRange(new Block(Enumerable.Repeat((byte)0xFF, BlockSize - HeaderSize).ToArray()));
         }
     }
 
@@ -53,7 +53,7 @@ public sealed class Cartridge
 
         foreach (var block in Blocks)
         {
-            await file.WriteAsync(block);
+            await file.WriteAsync(block.Data);
         }
 
         file.Write(IsWriteProtected ? [0x01] : [0x00]);
@@ -62,9 +62,9 @@ public sealed class Cartridge
         file.Close();
     }
 
-    private static List<byte[]> SplitToBlocks(byte[] data)
+    private static List<Block> SplitToBlocks(byte[] data)
     {
-        var result = new List<byte[]>();
+        var result = new List<Block>();
 
         foreach (var chunk in data.Chunk(BlockSize))
         {
@@ -73,8 +73,8 @@ public sealed class Cartridge
                 break;
             }
 
-            result.AddRange(chunk.Take(HeaderSize).ToArray());
-            result.AddRange(chunk.Skip(HeaderSize).ToArray());
+            result.AddRange(new Block(chunk.Take(HeaderSize).ToArray(), isPreambleValid: true));
+            result.AddRange(new Block(chunk.Skip(HeaderSize).ToArray(), isPreambleValid: true));
         }
 
         return result;

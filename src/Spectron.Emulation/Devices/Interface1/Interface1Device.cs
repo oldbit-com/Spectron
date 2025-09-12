@@ -96,14 +96,15 @@ public sealed class Interface1Device(
 
     private byte? GetControlValue()
     {
-        var microdrive = GetActiveMicrodrive();
+        var microdrive = microdriveProvider.GetActiveDrive();
 
-        if (microdrive is not { IsMotorOn: true, IsCartridgeInserted: true })
+        byte result = 0xFF;
+
+        if (microdrive is not { IsMotorOn: true, IsCartridgeInserted: true } ||
+            !microdrive.Cartridge!.Blocks[microdrive.CurrentBlock].IsPreambleValid)
         {
-            return null;
+            return result;
         }
-
-        var result = 0xFF;
 
         if (microdrive.IsGapSync())
         {
@@ -117,12 +118,12 @@ public sealed class Interface1Device(
 
         microdrive.SynchronizeBlock();
 
-        return (byte)result;
+        return result;
     }
 
     private byte? GetData()
     {
-        var microdrive = GetActiveMicrodrive();
+        var microdrive = microdriveProvider.GetActiveDrive();
 
         return microdrive is { IsMotorOn: true, IsCartridgeInserted: true } ?
             microdrive.Read() :
@@ -138,13 +139,13 @@ public sealed class Interface1Device(
 
         _previousControlValue = value;
 
-        var microdrive = GetActiveMicrodrive();
+        var microdrive = microdriveProvider.GetActiveDrive();
         microdrive?.SynchronizeBlock();
     }
 
     private void WriteData(byte value)
     {
-        var microdrive = GetActiveMicrodrive();
+        var microdrive = microdriveProvider.GetActiveDrive();
 
         if (microdrive is not { IsMotorOn: true, IsCartridgeInserted: true })
         {
@@ -197,9 +198,6 @@ public sealed class Interface1Device(
             ShadowRom.UnPage();
         }
     }
-
-    private Microdrive.Microdrive? GetActiveMicrodrive() =>
-        microdriveProvider.Microdrives.Values.FirstOrDefault(microdrive => microdrive.IsMotorOn);
 
     private static bool IsControlPort(Word address) => (address & 0x18) == 0x08;
     private static bool IsDataPort(Word address) => (address & 0x18) == 0x00;

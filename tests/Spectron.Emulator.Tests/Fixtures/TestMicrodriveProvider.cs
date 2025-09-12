@@ -13,4 +13,7 @@ public class TestMicrodriveProvider : IMicrodriveProvider
             Microdrives[driveId] = new Microdrive();
         }
     }
+
+    public Microdrive? GetActiveDrive() => 
+        Microdrives.Values.FirstOrDefault(drive => drive.IsMotorOn);
 }
