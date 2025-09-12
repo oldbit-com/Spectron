@@ -7,7 +7,7 @@ internal sealed class Block(byte[] data, bool isPreambleValid = false)
     private int _preamblePosition;
     private int _preambleCounter;
 
-    public byte[] Data { get; init; } = data;
+    public byte[] Data { get; } = data;
     public bool IsPreambleValid { get; private set; } = isPreambleValid;
 
     internal bool ProcessPreamble(byte value)
