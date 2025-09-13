@@ -104,6 +104,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
 
         IsInterface1Enabled = preferences.Interface1.IsEnabled;
         Interface1RomVersion = preferences.Interface1.RomVersion;
+        ConnectedMicrodrivesCount = preferences.Interface1.ConnectedMicrodrivesCount;
 
         IsZxPrinterEnabled = preferences.Printer.IsZxPrinterEnabled;
     }
@@ -218,6 +219,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
             {
                 IsEnabled = IsInterface1Enabled,
                 RomVersion = Interface1RomVersion,
+                ConnectedMicrodrivesCount = ConnectedMicrodrivesCount,
             },
 
             Printer = new PrinterSettings
@@ -492,6 +494,18 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         new("#0A2F", NumberFormat.HexPrefixHash),
     ];
 
+    public List<NameValuePair<int>> Microdrives { get; } =
+    [
+        new("One", 1),
+        new("Two", 2),
+        new("Three", 3),
+        new("Four", 4),
+        new("Five", 5),
+        new("Six", 6),
+        new("Seven", 7),
+        new("Eight", 8)
+    ];
+
     public ObservableCollection<GamepadController> GamepadControllers { get; }
 
     [ObservableProperty]
@@ -628,6 +642,9 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
 
     [ObservableProperty]
     private RomVersion _interface1RomVersion = RomVersion.V2;
+    
+    [ObservableProperty]
+    private int _connectedMicrodrivesCount = 2;
 
     [ObservableProperty]
     private bool _isAutoLoadPokeFilesEnabled;

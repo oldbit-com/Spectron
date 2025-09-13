@@ -17,6 +17,7 @@
 
     <UserControl.Resources>
         <converters:ValueEqualityConverter x:Key="ValueEqualityConverter"/>
+        <converters:GreaterThanConverter x:Key="GreaterThanConverter"/>
     </UserControl.Resources>
 
     <UserControl.Styles>
@@ -121,90 +122,92 @@
             <MenuItem Header="-"/>
             <MenuItem Header="Enter Full Screen" InputGesture="Shift+Alt+Enter" Command="{Binding ToggleFullScreenCommand}"/>
         </MenuItem>
-
-        <MenuItem Header="Tape" Padding="10 0 10 0" Focusable="False">
-            <MenuItem Header="New" Command="{Binding TapeMenuViewModel.NewCommand}"/>
-            <MenuItem Header="Insert..." InputGesture="Cmd+T" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
-            <MenuItem Header="Save..." Command="{Binding TapeMenuViewModel.SaveCommand}"/>
-            <MenuItem Header="-"/>
-            <MenuItem Header="Play" Command="{Binding TapeMenuViewModel.PlayCommand}"/>
-            <MenuItem Header="Stop" Command="{Binding TapeMenuViewModel.StopCommand}"/>
-            <MenuItem Header="Rewind" Command="{Binding TapeMenuViewModel.RewindCommand}"/>
-            <MenuItem Header="Eject" Command="{Binding TapeMenuViewModel.EjectCommand}"/>
-            <MenuItem Header="View" Command="{Binding TapeMenuViewModel.ViewCommand}"/>
-            <MenuItem Header="-"/>
-            <MenuItem Header="Loading Speed">
-                <MenuItem Header="Normal" ToggleType="Radio" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeSpeed.Normal}" IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Normal}}"/>
-                <MenuItem Header="Instant" ToggleType="Radio" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeSpeed.Instant}" IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Instant}}"/>
-                <MenuItem Header="Accelerated" ToggleType="Radio" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeSpeed.Accelerated}" IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Accelerated}}"/>
-            </MenuItem>
-        </MenuItem>
-
-        <!-- Should use ItemsSource to generate dynamically, if possible in Avalonia -->
-        <MenuItem x:Name="Drives" Header="Microdrive" Padding="10 0 10 0" Focusable="False">
-            <MenuItem Header="Drive 1">
-                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive1}"/>
-                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive1}"/>
-                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive1}"/>
-                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive1].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive1}"/>
+        
+        <MenuItem Header="Media" Padding="10 0 10 0" Focusable="False">
+            <MenuItem Header="Tape">
+                <MenuItem Header="New" Command="{Binding TapeMenuViewModel.NewCommand}"/>
+                <MenuItem Header="Insert..." InputGesture="Cmd+T" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
+                <MenuItem Header="Save..." Command="{Binding TapeMenuViewModel.SaveCommand}"/>
                 <MenuItem Header="-"/>
-                <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding MicrodriveMenuViewModel.IsWriteProtected[Drive1].Value}" Command="{Binding MicrodriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive1}"/>
-            </MenuItem>
-            <MenuItem Header="Drive 2">
-                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive2}"/>
-                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive2}"/>
-                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive2}"/>
-                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive2].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive2}"/>
+                <MenuItem Header="Play" Command="{Binding TapeMenuViewModel.PlayCommand}"/>
+                <MenuItem Header="Stop" Command="{Binding TapeMenuViewModel.StopCommand}"/>
+                <MenuItem Header="Rewind" Command="{Binding TapeMenuViewModel.RewindCommand}"/>
+                <MenuItem Header="Eject" Command="{Binding TapeMenuViewModel.EjectCommand}"/>
+                <MenuItem Header="View" Command="{Binding TapeMenuViewModel.ViewCommand}"/>
                 <MenuItem Header="-"/>
-                <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding MicrodriveMenuViewModel.IsWriteProtected[Drive2].Value}" Command="{Binding MicrodriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive2}"/>
+                <MenuItem Header="Loading Speed">
+                    <MenuItem Header="Normal" ToggleType="Radio" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeSpeed.Normal}" IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Normal}}"/>
+                    <MenuItem Header="Instant" ToggleType="Radio" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeSpeed.Instant}" IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Instant}}"/>
+                    <MenuItem Header="Accelerated" ToggleType="Radio" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeSpeed.Accelerated}" IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Accelerated}}"/>
+                </MenuItem>
             </MenuItem>
-            <MenuItem Header="Drive 3">
-                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive3}"/>
-                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive3}"/>
-                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive3}"/>
-                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive3].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive3}"/>
-                <MenuItem Header="-"/>
-                <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding MicrodriveMenuViewModel.IsWriteProtected[Drive3].Value}" Command="{Binding MicrodriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive3}"/>
-            </MenuItem>
-            <MenuItem Header="Drive 4">
-                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive4}"/>
-                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive4}"/>
-                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive4}"/>
-                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive4].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive4}"/>
-                <MenuItem Header="-"/>
-                <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding MicrodriveMenuViewModel.IsWriteProtected[Drive4].Value}" Command="{Binding MicrodriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive4}"/>
-            </MenuItem>
-            <MenuItem Header="Drive 5">
-                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive5}"/>
-                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive5}"/>
-                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive5}"/>
-                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive5].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive5}"/>
-                <MenuItem Header="-"/>
-                <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding MicrodriveMenuViewModel.IsWriteProtected[Drive5].Value}" Command="{Binding MicrodriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive5}"/>
-            </MenuItem>
-            <MenuItem Header="Drive 6">
-                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive6}"/>
-                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive6}"/>
-                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive6}"/>
-                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive6].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive6}"/>
-                <MenuItem Header="-"/>
-                <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding MicrodriveMenuViewModel.IsWriteProtected[Drive6].Value}" Command="{Binding MicrodriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive6}"/>
-            </MenuItem>
-            <MenuItem Header="Drive 7">
-                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive7}"/>
-                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive7}"/>
-                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive7}"/>
-                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive7].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive7}"/>
-                <MenuItem Header="-"/>
-                <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding MicrodriveMenuViewModel.IsWriteProtected[Drive7].Value}" Command="{Binding MicrodriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive7}"/>
-            </MenuItem>
-            <MenuItem Header="Drive 8">
-                <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive8}"/>
-                <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive8}"/>
-                <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive8}"/>
-                <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive8].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive8}"/>
-                <MenuItem Header="-"/>
-                <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding MicrodriveMenuViewModel.IsWriteProtected[Drive8].Value}" Command="{Binding MicrodriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive8}"/>
+            
+            <!-- Should use ItemsSource to generate dynamically, if possible in Avalonia -->
+            <MenuItem x:Name="Drives" Header="Microdrive" IsEnabled="{Binding IsInterface1Enabled}">
+                <MenuItem Header="Drive 1">
+                    <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive1}"/>
+                    <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive1}"/>
+                    <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive1}"/>
+                    <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive1].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive1}"/>
+                    <MenuItem Header="-"/>
+                    <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding MicrodriveMenuViewModel.IsWriteProtected[Drive1].Value}" Command="{Binding MicrodriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive1}"/>
+                </MenuItem>
+                <MenuItem Header="Drive 2" IsVisible="{Binding ConnectedMicrodrivesCount, Converter={StaticResource GreaterThanConverter}, ConverterParameter=1}">
+                    <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive2}"/>
+                    <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive2}"/>
+                    <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive2}"/>
+                    <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive2].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive2}"/>
+                    <MenuItem Header="-"/>
+                    <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding MicrodriveMenuViewModel.IsWriteProtected[Drive2].Value}" Command="{Binding MicrodriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive2}"/>
+                </MenuItem>
+                <MenuItem Header="Drive 3" IsVisible="{Binding ConnectedMicrodrivesCount, Converter={StaticResource GreaterThanConverter}, ConverterParameter=2}">
+                    <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive3}"/>
+                    <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive3}"/>
+                    <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive3}"/>
+                    <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive3].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive3}"/>
+                    <MenuItem Header="-"/>
+                    <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding MicrodriveMenuViewModel.IsWriteProtected[Drive3].Value}" Command="{Binding MicrodriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive3}"/>
+                </MenuItem>
+                <MenuItem Header="Drive 4" IsVisible="{Binding ConnectedMicrodrivesCount, Converter={StaticResource GreaterThanConverter}, ConverterParameter=3}">
+                    <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive4}"/>
+                    <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive4}"/>
+                    <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive4}"/>
+                    <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive4].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive4}"/>
+                    <MenuItem Header="-"/>
+                    <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding MicrodriveMenuViewModel.IsWriteProtected[Drive4].Value}" Command="{Binding MicrodriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive4}"/>
+                </MenuItem>
+                <MenuItem Header="Drive 5" IsVisible="{Binding ConnectedMicrodrivesCount, Converter={StaticResource GreaterThanConverter}, ConverterParameter=4}">
+                    <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive5}"/>
+                    <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive5}"/>
+                    <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive5}"/>
+                    <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive5].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive5}"/>
+                    <MenuItem Header="-"/>
+                    <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding MicrodriveMenuViewModel.IsWriteProtected[Drive5].Value}" Command="{Binding MicrodriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive5}"/>
+                </MenuItem>
+                <MenuItem Header="Drive 6" IsVisible="{Binding ConnectedMicrodrivesCount, Converter={StaticResource GreaterThanConverter}, ConverterParameter=5}">
+                    <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive6}"/>
+                    <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive6}"/>
+                    <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive6}"/>
+                    <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive6].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive6}"/>
+                    <MenuItem Header="-"/>
+                    <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding MicrodriveMenuViewModel.IsWriteProtected[Drive6].Value}" Command="{Binding MicrodriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive6}"/>
+                </MenuItem>
+                <MenuItem Header="Drive 7" IsVisible="{Binding ConnectedMicrodrivesCount, Converter={StaticResource GreaterThanConverter}, ConverterParameter=6}">
+                    <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive7}"/>
+                    <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive7}"/>
+                    <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive7}"/>
+                    <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive7].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive7}"/>
+                    <MenuItem Header="-"/>
+                    <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding MicrodriveMenuViewModel.IsWriteProtected[Drive7].Value}" Command="{Binding MicrodriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive7}"/>
+                </MenuItem>
+                <MenuItem Header="Drive 8" IsVisible="{Binding ConnectedMicrodrivesCount, Converter={StaticResource GreaterThanConverter}, ConverterParameter=7}">
+                    <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive8}"/>
+                    <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive8}"/>
+                    <MenuItem Header="Save..." Command="{Binding MicrodriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive8}"/>
+                    <MenuItem Header="{Binding MicrodriveMenuViewModel.EjectCommandHeadings[Drive8].Value}" Command="{Binding MicrodriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive8}"/>
+                    <MenuItem Header="-"/>
+                    <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding MicrodriveMenuViewModel.IsWriteProtected[Drive8].Value}" Command="{Binding MicrodriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive8}"/>
+                </MenuItem>
             </MenuItem>
         </MenuItem>
 

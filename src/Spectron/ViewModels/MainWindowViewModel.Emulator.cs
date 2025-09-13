@@ -286,8 +286,11 @@ partial class MainWindowViewModel
             return;
         }
 
+        IsInterface1Enabled = isEnabled == true;
+        ConnectedMicrodrivesCount = _preferences.Interface1.ConnectedMicrodrivesCount;
+
         StatusBarViewModel.IsMicroDriveCartridgeInserted =
-            isEnabled == true &&
+            IsInterface1Enabled &&
             Emulator?.MicrodriveManager.Microdrives.Values.Any(microdrive => microdrive.IsCartridgeInserted) == true;
     }
 

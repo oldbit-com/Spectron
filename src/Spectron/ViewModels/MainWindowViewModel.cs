@@ -139,6 +139,12 @@ public partial class MainWindowViewModel : ObservableObject
 
     [ObservableProperty]
     private Cursor _mouseCursor = Cursor.Default;
+    
+    [ObservableProperty]
+    private bool _isInterface1Enabled;
+
+    [ObservableProperty]
+    private int _connectedMicrodrivesCount;
     #endregion
 
     #region Relay commands

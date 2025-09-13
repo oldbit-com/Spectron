@@ -89,24 +89,6 @@
                                 <controls:HeaderSeparator Text="Printer emulation"/>
                                 <CheckBox Content="ZX Printer connected" Classes="Center" IsChecked="{Binding IsZxPrinterEnabled}"/>
 
-                                <controls:HeaderSeparator Text="Interface I emulation"/>
-                                <CheckBox x:Name="Interface1Enabled" Content="Interface I enabled" Classes="Center" IsChecked="{Binding IsInterface1Enabled}"/>
-                                <StackPanel Orientation="Horizontal" IsEnabled="{Binding #Interface1Enabled.IsChecked}">
-                                    <RadioButton
-                                        Content="Version 1"
-                                        ToolTip.Tip="Use first revision of shadow ROM"
-                                        IsChecked="{Binding Interface1RomVersion, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static if1:RomVersion.V1}}"
-                                        Classes="Center"
-                                        Margin="25 0 0 0"/>
-
-                                    <RadioButton
-                                        Content="Version 2"
-                                        ToolTip.Tip="Use second revision of shadow ROM"
-                                        IsChecked="{Binding Interface1RomVersion, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static if1:RomVersion.V2}}"
-                                        Classes="Center"
-                                        Margin="10 0 0 0"/>
-                                </StackPanel>
-
                             </StackPanel>
                         </TabItem>
 
@@ -169,6 +151,33 @@
                                         <material:MaterialIcon Kind="Harddisk"/>
                                     </Button>
                                 </Grid>
+                            </StackPanel>
+                        </TabItem>
+                        
+                        <TabItem Header="Interface 1">
+                            <StackPanel>
+                                <CheckBox x:Name="Interface1Enabled" Content="Interface 1 enabled" Classes="Center" IsChecked="{Binding IsInterface1Enabled}"/>
+                                
+                                <StackPanel Orientation="Horizontal" IsEnabled="{Binding #Interface1Enabled.IsChecked}">
+                                    <RadioButton
+                                        Content="ROM Version 1"
+                                        ToolTip.Tip="Use first revision of shadow ROM"
+                                        IsChecked="{Binding Interface1RomVersion, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static if1:RomVersion.V1}}"
+                                        Classes="Center"/>
+
+                                    <RadioButton
+                                        Content="ROM Version 2"
+                                        ToolTip.Tip="Use second revision of shadow ROM"
+                                        IsChecked="{Binding Interface1RomVersion, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static if1:RomVersion.V2}}"
+                                        Classes="Center"
+                                        Margin="10 0 0 0"/>
+                                </StackPanel>
+                                
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Connected microdrives:" Padding="0 0 10 0" VerticalAlignment="Center" Classes="Center"/>
+                                    <ComboBox Width="150" ItemsSource="{Binding Microdrives}" SelectedValue="{Binding ConnectedMicrodrivesCount}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}" IsEnabled="{Binding #Interface1Enabled.IsChecked}"/>
+                                </StackPanel>
+                                
                             </StackPanel>
                         </TabItem>
                     </TabControl>
