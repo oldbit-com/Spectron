@@ -57,6 +57,13 @@ public sealed class Microdrive
         Reset();
     }
 
+    internal void InsertCartridge(string? filePath, byte[] data)
+    {
+        Cartridge = new Cartridge(filePath, data);
+
+        Reset();
+    }
+
     internal void EjectCartridge()
     {
         Cartridge = null;

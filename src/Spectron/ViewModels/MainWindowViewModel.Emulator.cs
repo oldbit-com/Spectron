@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
@@ -29,14 +30,25 @@ partial class MainWindowViewModel
         InitializeEmulator(emulator);
     }
 
-    private void CreateEmulator(StateSnapshot stateSnapshot)
+    private bool CreateEmulator(StateSnapshot snapshot)
     {
         Emulator?.Reset();
 
-        var emulator = _stateManager.CreateEmulator(stateSnapshot);
-        _mouseHelper = new MouseHelper(emulator.MouseManager);
+        try
+        {
+            var emulator = _stateManager.CreateEmulator(snapshot);
+            _mouseHelper = new MouseHelper(emulator.MouseManager);
 
-        InitializeEmulator(emulator);
+            InitializeEmulator(emulator);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to restore emulator state");
+        }
+
+        return false;
     }
 
     private bool CreateEmulator(Stream stream, FileType fileType)
@@ -142,15 +154,16 @@ partial class MainWindowViewModel
         }
 
         var snapshot = await _sessionService.LoadAsync();
-        if (snapshot == null)
+
+        if (snapshot == null || !CreateEmulator(snapshot))
         {
             return false;
         }
 
-        CreateEmulator(snapshot);
         UpdateWindowTitle();
 
         return true;
+
     }
 
     private void HandleMachineReset(bool hardReset = false)

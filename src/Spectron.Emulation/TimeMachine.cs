@@ -35,7 +35,7 @@ public sealed class TimeMachine
             return;
         }
 
-        var snapshot = StateManager.CreateSnapshot(emulator);
+        var snapshot = StateManager.CreateSnapshot(emulator, isTimeMachine: true);
         _entries.Add(new TimeMachineEntry(now, snapshot));
 
         while (Entries.Count > MaxSnapshots)

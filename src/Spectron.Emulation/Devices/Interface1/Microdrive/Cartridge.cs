@@ -13,11 +13,10 @@ public sealed class Cartridge
     private const int MaxMdrSizeInBytes = MaxBlocks * BlockSize + 1;
 
     internal bool IsWriteProtected { get; set; }
-
     internal int BlockCount { get; }
     internal List<Block> Blocks { get; }
 
-    public string? FilePath { get; }
+    public string? FilePath { get; private set; }
 
     internal Cartridge()
     {
@@ -31,6 +30,9 @@ public sealed class Cartridge
     }
 
     internal Cartridge(string filePath) : this(File.ReadAllBytes(filePath)) =>
+        FilePath = filePath;
+
+    internal Cartridge(string? filePath, byte[] data): this(data) =>
         FilePath = filePath;
 
     internal Cartridge(byte[] data)
@@ -58,8 +60,26 @@ public sealed class Cartridge
 
         file.Write(IsWriteProtected ? [0x01] : [0x00]);
 
+        FilePath = filePath;
+
         file.Flush();
         file.Close();
+    }
+
+    public byte[] GetData()
+    {
+        var totalLength = Blocks.Sum(block => block.Data.Length);
+
+        var result = new byte[totalLength];
+        var offset = 0;
+
+        foreach (var block in Blocks)
+        {
+            Buffer.BlockCopy(block.Data, 0, result, offset, block.Data.Length);
+            offset += block.Data.Length;
+        }
+
+        return result;
     }
 
     private static List<Block> SplitToBlocks(byte[] data)

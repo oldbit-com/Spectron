@@ -3,6 +3,11 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
 
+public class MicrodriveStateChangedEventArgs : EventArgs
+{
+    public MicrodriveId MicrodriveId { get; init; }
+}
+
 public sealed class MicrodriveManager : IMicrodriveProvider
 {
     private Interface1Device? _interface1Device;
@@ -12,7 +17,7 @@ public sealed class MicrodriveManager : IMicrodriveProvider
 
     public Microdrive this[MicrodriveId drive] => Microdrives[drive];
 
-    public delegate void MicrodriveStateChangedEvent(EventArgs e);
+    public delegate void MicrodriveStateChangedEvent(MicrodriveStateChangedEventArgs e);
     public event MicrodriveStateChangedEvent? StateChanged;
 
     public MicrodriveManager()
@@ -31,9 +36,22 @@ public sealed class MicrodriveManager : IMicrodriveProvider
 
     private void OnStateChanged()
     {
-        _activeMicrodrive = Microdrives.Values.FirstOrDefault(microdrive => microdrive.IsMotorOn);
+        var activeMicrodriveId = Microdrives.FirstOrDefault(microdrive => microdrive.Value.IsMotorOn).Key;
 
-        StateChanged?.Invoke(EventArgs.Empty);
+        _activeMicrodrive = Microdrives.GetValueOrDefault(activeMicrodriveId);
+
+        StateChanged?.Invoke(new MicrodriveStateChangedEventArgs
+        {
+            MicrodriveId = activeMicrodriveId
+        });
+    }
+
+    private void OnStateChanged(MicrodriveId drive)
+    {
+        StateChanged?.Invoke(new MicrodriveStateChangedEventArgs
+        {
+            MicrodriveId = drive
+        });
     }
 
     public Interface1Device CreateDevice(Z80 cpu, IEmulatorMemory emulatorMemory)
@@ -49,20 +67,20 @@ public sealed class MicrodriveManager : IMicrodriveProvider
     {
         Microdrives[drive].NewCartridge();
 
-        OnStateChanged();
+        OnStateChanged(drive);
     }
 
     public void InsertCartridge(MicrodriveId drive, string filePath)
     {
         Microdrives[drive].InsertCartridge(filePath);
 
-        OnStateChanged();
+        OnStateChanged(drive);
     }
 
     public void EjectCartridge(MicrodriveId drive)
     {
         Microdrives[drive].EjectCartridge();
 
-        OnStateChanged();
+        OnStateChanged(drive);
     }
 }

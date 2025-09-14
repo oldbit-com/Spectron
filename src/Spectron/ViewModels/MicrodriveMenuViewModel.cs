@@ -34,6 +34,8 @@ public class MicrodriveMenuViewModel : ObservableObject
 
         _microdriveManager = microdriveManager;
 
+        _microdriveManager.StateChanged += OnDriveStateChanged;
+
         NewCommand = new RelayCommand<MicrodriveId>(execute: New);
         InsertCommand = new AsyncRelayCommand<MicrodriveId>(execute: Insert);
         SaveCommand = new AsyncRelayCommand<MicrodriveId>(execute: Save, canExecute: IsCartridgeInserted);
@@ -41,11 +43,32 @@ public class MicrodriveMenuViewModel : ObservableObject
         ToggleWriteProtectCommand = new RelayCommand<MicrodriveId>(execute: ToggleWriteProtect, canExecute: IsCartridgeInserted);
     }
 
+    private void OnDriveStateChanged(MicrodriveStateChangedEventArgs e)
+    {
+        var microdrive = _microdriveManager.Microdrives.GetValueOrDefault(e.MicrodriveId);
+
+        if (microdrive == null)
+        {
+            return;
+        }
+
+        if (microdrive.Cartridge?.FilePath != null)
+        {
+            var fileName = Path.GetFileName(microdrive.Cartridge.FilePath);
+
+            EjectCommandHeadings[e.MicrodriveId].Value = $"Eject '{fileName}'";
+        }
+        else
+        {
+            EjectCommandHeadings[e.MicrodriveId].Value = "Eject 'New Cartridge'";
+        }
+    }
+
     private void New(MicrodriveId driveId)
     {
         _microdriveManager.NewCartridge(driveId);
 
-        EjectCommandHeadings[driveId].Value = "Eject 'New Cartridge'";
+       // EjectCommandHeadings[driveId].Value = "Eject 'New Cartridge'";
         IsWriteProtected[driveId].Value = false;
     }
 
@@ -64,7 +87,7 @@ public class MicrodriveMenuViewModel : ObservableObject
 
             var fileName = Path.GetFileName(files[0].Path.LocalPath);
 
-            EjectCommandHeadings[driveId].Value = $"Eject '{fileName}'";
+            //EjectCommandHeadings[driveId].Value = $"Eject '{fileName}'";
             IsWriteProtected[driveId].Value = _microdriveManager[driveId].IsCartridgeWriteProtected;
         }
         catch (Exception ex)
@@ -92,6 +115,9 @@ public class MicrodriveMenuViewModel : ObservableObject
             }
 
             await cartridge.SaveAsync(file.Path.LocalPath);
+
+            var fileName = Path.GetFileName(file.Path.LocalPath);
+            EjectCommandHeadings[driveId].Value = $"Eject '{fileName}'";
         }
         catch (Exception ex)
         {

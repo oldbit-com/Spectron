@@ -7,4 +7,6 @@ namespace OldBit.Spectron.Emulation.State.Components;
 public partial record Interface1State
 {
     public RomVersion RomVersion { get; init; }
+
+    public MicrodriveState[] Microdrives { get; init; } = [];
 }
