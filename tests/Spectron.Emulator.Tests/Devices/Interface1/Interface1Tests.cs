@@ -53,24 +53,34 @@ public class Interface1Tests : IDisposable
         InsertDemoCartridge();
         ActivateDrive7();
 
-        for (var repeat = 0; repeat < 10; repeat++)
+        Repeat.Run(10, () =>
         {
             // GAP / SYNC are not present
-            for (var i = 0; i < 15; i++)
+            Repeat.Run(15, () =>
             {
                 var value = _interface1.ReadPort(ControlPort);
 
                 value.ShouldBe((byte)0xFF);
-            }
+            });
 
             // GAP / SYNC are present
-            for (var i = 0; i < 15; i++)
+            Repeat.Run(15, () =>
             {
                 var value = _interface1.ReadPort(ControlPort);
 
                 value.ShouldBe((byte)0xF9);
-            }
-        }
+            });
+        });
+    }
+
+    [Fact]
+    public void Microdrive_ShouldDetectPreamble()
+    {
+        InsertNewCartridge();
+        ActivateDrive7();
+
+        Repeat.Run(10, () => _interface1.WritePort(DataPort, 0x00));
+        Repeat.Run(2, () => _interface1.WritePort(DataPort, 0xFF));
     }
 
     private void ActivateDrive7()
@@ -90,6 +100,12 @@ public class Interface1Tests : IDisposable
 
         var microdrive = _microdriveProvider.Microdrives.First(kv => kv.Key == MicrodriveId.Drive7).Value;
         microdrive.InsertCartridge(testFilePath);
+    }
+
+    private void InsertNewCartridge()
+    {
+        var microdrive = _microdriveProvider.Microdrives.First(kv => kv.Key == MicrodriveId.Drive7).Value;
+        microdrive.NewCartridge();
     }
 
     public void Dispose()
