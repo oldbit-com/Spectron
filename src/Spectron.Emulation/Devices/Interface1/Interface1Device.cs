@@ -96,7 +96,7 @@ public sealed class Interface1Device(
 
     private byte? GetControlValue()
     {
-        var microdrive = microdriveProvider.GetActiveDrive();
+        var microdrive = microdriveProvider.ActiveDrive;
 
         byte result = 0xFF;
 
@@ -123,7 +123,7 @@ public sealed class Interface1Device(
 
     private byte? GetData()
     {
-        var microdrive = microdriveProvider.GetActiveDrive();
+        var microdrive = microdriveProvider.ActiveDrive;
 
         return microdrive is { IsMotorOn: true, IsCartridgeInserted: true } ?
             microdrive.Read() :
@@ -139,13 +139,13 @@ public sealed class Interface1Device(
 
         _previousControlValue = value;
 
-        var microdrive = microdriveProvider.GetActiveDrive();
+        var microdrive = microdriveProvider.ActiveDrive;
         microdrive?.SynchronizeBlock();
     }
 
     private void WriteData(byte value)
     {
-        var microdrive = microdriveProvider.GetActiveDrive();
+        var microdrive = microdriveProvider.ActiveDrive;
 
         if (microdrive is not { IsMotorOn: true, IsCartridgeInserted: true })
         {

@@ -4,5 +4,5 @@ public interface IMicrodriveProvider
 {
     Dictionary<MicrodriveId, Microdrive> Microdrives { get; }
 
-    Microdrive? GetActiveDrive();
+    Microdrive? ActiveDrive { get; }
 }

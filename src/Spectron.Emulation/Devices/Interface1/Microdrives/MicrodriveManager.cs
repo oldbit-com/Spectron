@@ -14,7 +14,6 @@ public sealed class MicrodriveManager : IMicrodriveProvider
     public Microdrive this[MicrodriveId drive] => Microdrives[drive];
 
     public event CartridgeChangedEvent? CartridgeChanged;
-    public event MicrodriveMotorStateChangedEvent? MotorStateChanged;
 
     public MicrodriveManager()
     {
@@ -22,20 +21,16 @@ public sealed class MicrodriveManager : IMicrodriveProvider
         {
             var microdrive = new Microdrive(drive);
 
-            microdrive.MotorStateChanged += e =>
-            {
-                _activeMicrodrive = Microdrives.GetValueOrDefault(e.DriveId);
+            Microdrives[drive] = microdrive;
 
-                MotorStateChanged?.Invoke(e);
-            };
+            microdrive.MotorStateChanged += _ =>
+                _activeMicrodrive = Microdrives.Values.FirstOrDefault(x => x.IsMotorOn);
 
             microdrive.CartridgeChanged += e => CartridgeChanged?.Invoke(e);
-
-            Microdrives[drive] = microdrive;
         }
     }
 
-    public Microdrive? GetActiveDrive() => _activeMicrodrive;
+    public Microdrive? ActiveDrive => _activeMicrodrive;
 
     public Interface1Device CreateDevice(Z80 cpu, IEmulatorMemory emulatorMemory)
     {

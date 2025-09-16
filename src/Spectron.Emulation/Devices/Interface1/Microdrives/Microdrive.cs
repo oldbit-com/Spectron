@@ -13,7 +13,6 @@ public sealed class Microdrive(MicrodriveId driveId)
 
     public Cartridge? Cartridge { get; private set; }
     internal int CurrentBlock { get; private set; }
-    internal MicrodriveId DriveId { get; private set; } = driveId;
 
     internal bool IsMotorOn
     {
@@ -24,7 +23,7 @@ public sealed class Microdrive(MicrodriveId driveId)
             {
                 _isMotorOn = value;
 
-                MotorStateChanged?.Invoke(new MicrodriveMotorStateChangedEventArgs(DriveId, value));
+                MotorStateChanged?.Invoke(new MicrodriveMotorStateChangedEventArgs(driveId, value));
             }
         }
     }
@@ -158,5 +157,5 @@ public sealed class Microdrive(MicrodriveId driveId)
         IsMotorOn = false;
     }
 
-    private void OnCartridgeChanged() => CartridgeChanged?.Invoke(new CartridgeChangedEventArgs { DriveId = DriveId });
+    private void OnCartridgeChanged() => CartridgeChanged?.Invoke(new CartridgeChangedEventArgs { DriveId = driveId });
 }
