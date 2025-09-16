@@ -44,7 +44,7 @@ public partial class TapeViewModel : ObservableObject, IDisposable
 
         _tapeManager.Cassette.BlockSelected += CassetteOnPositionChanged;
         _tapeManager.Cassette.EndOfTape += CassetteOnEndOfTape;
-        _tapeManager.StateChanged += TapeOnStateChanged;
+        _tapeManager.TapeChanged += TapeOnTapeChanged;
 
         CanRewind = _tapeManager.IsTapeLoaded;
         CanPlay = _tapeManager is { IsTapeLoaded: true, IsPlaying: false };
@@ -80,7 +80,7 @@ public partial class TapeViewModel : ObservableObject, IDisposable
         Dispatcher.UIThread.Post(() => Progress = _tapeManager.BlockReadProgressPercentage);
     }
 
-    private void TapeOnStateChanged(TapeStateEventArgs e)
+    private void TapeOnTapeChanged(TapeChangedEventArgs e)
     {
         Dispatcher.UIThread.Post(() =>
         {
@@ -169,7 +169,7 @@ public partial class TapeViewModel : ObservableObject, IDisposable
 
         _tapeManager.Cassette.BlockSelected -= CassetteOnPositionChanged;
         _tapeManager.Cassette.EndOfTape -= CassetteOnEndOfTape;
-        _tapeManager.StateChanged -= TapeOnStateChanged;
+        _tapeManager.TapeChanged -= TapeOnTapeChanged;
 
         GC.SuppressFinalize(this);
     }

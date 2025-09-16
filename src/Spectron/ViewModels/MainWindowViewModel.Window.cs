@@ -101,6 +101,9 @@ partial class MainWindowViewModel
         RefreshAyState(CommandLineArgs?.IsAyEnabled, CommandLineArgs?.AyStereoMode);
         RefreshPrinterState(CommandLineArgs?.IsZxPrinterEnabled);
         RefreshUlaPlusState(CommandLineArgs?.IsUlaPlusEnabled);
+        RefreshInterface1State(CommandLineArgs?.IsInterface1Enabled, CommandLineArgs?.Interface1RomVersion);
+
+        RefreshStatusBar();
     }
 
     private async Task WindowClosingAsync(WindowClosingEventArgs args)

@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
+namespace OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 
 internal sealed class Block(byte[] data, bool isPreambleValid = false)
 {

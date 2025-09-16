@@ -1,6 +1,6 @@
 using System.Reflection;
 using OldBit.Spectron.Emulation.Devices.Interface1;
-using OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
+using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Z80Cpu;

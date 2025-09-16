@@ -1,4 +1,4 @@
-using OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
+using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 
 namespace OldBit.Spectron.Emulator.Tests.Fixtures;
 
@@ -8,9 +8,9 @@ public class TestMicrodriveProvider : IMicrodriveProvider
 
     public TestMicrodriveProvider()
     {
-        foreach (var driveId in Enum.GetValues<MicrodriveId>())
+        foreach (var drive in Enum.GetValues<MicrodriveId>())
         {
-            Microdrives[driveId] = new Microdrive();
+            Microdrives[drive] = new Microdrive(drive);
         }
     }
 

@@ -1,8 +1,7 @@
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation.Commands;
 using OldBit.Spectron.Emulation.Devices.Gamepad;
-using OldBit.Spectron.Emulation.Devices.Interface1;
-using OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
+using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;

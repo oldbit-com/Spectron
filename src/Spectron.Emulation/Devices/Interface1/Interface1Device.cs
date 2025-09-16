@@ -1,4 +1,4 @@
-using OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
+using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Z80Cpu;
 
@@ -17,7 +17,7 @@ public sealed class Interface1Device(
     IEmulatorMemory emulatorMemory,
     IMicrodriveProvider microdriveProvider) : IDevice, IDisposable
 {
-    public readonly ShadowRom ShadowRom = new(emulatorMemory, RomVersion.V2);
+    public readonly ShadowRom ShadowRom = new(emulatorMemory, Interface1RomVersion.V2);
 
     private const int CommsData = 0x01;
     private const int CommsClk = 0x02;

@@ -6,7 +6,7 @@ namespace OldBit.Spectron.Emulation.State.Components;
 [MemoryPackable]
 public partial record Interface1State
 {
-    public RomVersion RomVersion { get; init; }
+    public Interface1RomVersion RomVersion { get; init; }
 
     public MicrodriveState[] Microdrives { get; init; } = [];
 }

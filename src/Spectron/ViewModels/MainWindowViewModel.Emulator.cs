@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
+using OldBit.Spectron.Emulation.Devices.Interface1;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Rom;
@@ -118,16 +119,13 @@ partial class MainWindowViewModel
         Emulator.SetAudioSettings(_preferences.Audio);
         Emulator.SetGamepad(_preferences.Joystick);
         Emulator.SetDivMMc(_preferences.DivMmc);
-        Emulator.SetInterface1(_preferences.Interface1);
-
-        StatusBarViewModel.IsDivMmcEnabled = _preferences.DivMmc.IsEnabled;
-        StatusBarViewModel.IsTapeInserted = Emulator!.TapeManager.IsTapeLoaded;
-        StatusBarViewModel.TapeLoadProgress = string.Empty;
 
         RefreshUlaPlusState(_preferences.IsUlaPlusEnabled);
-        RefreshAyState(Emulator.AudioManager.IsAyEnabled, Emulator.AudioManager.StereoMode);
+        RefreshAyState(Emulator?.AudioManager.IsAyEnabled, Emulator?.AudioManager.StereoMode);
         RefreshPrinterState(_preferences.Printer.IsZxPrinterEnabled);
-        RefreshInterface1State(_preferences.Interface1.IsEnabled);
+        RefreshInterface1State(_preferences.Interface1.IsEnabled, _preferences.Interface1.RomVersion);
+
+        RefreshStatusBar();
     }
 
     private void ShutdownEmulator()
@@ -269,8 +267,6 @@ partial class MainWindowViewModel
             return;
         }
 
-        StatusBarViewModel.IsUlaPlusEnabled = isEnabled.Value;
-
         if (Emulator != null)
         {
             Emulator.IsUlaPlusEnabled = isEnabled.Value;
@@ -284,27 +280,35 @@ partial class MainWindowViewModel
             return;
         }
 
-        StatusBarViewModel.IsPrinterEnabled = isEnabled.Value;
-
         if (Emulator != null)
         {
             Emulator.Printer.IsEnabled = isEnabled.Value;
         }
     }
 
-    private void RefreshInterface1State(bool? isEnabled)
+    private void RefreshInterface1State(bool? isEnabled, Interface1RomVersion? romVersion = null)
     {
         if (isEnabled == null)
         {
             return;
         }
 
+        if (isEnabled.Value)
+        {
+            Emulator?.Interface1.Enable();
+        }
+        else
+        {
+            Emulator?.Interface1.Disable();
+        }
+
+        if (romVersion != null && Emulator != null)
+        {
+            Emulator.Interface1.ShadowRom.Version = romVersion.Value;
+        }
+
         IsInterface1Enabled = isEnabled == true;
         ConnectedMicrodrivesCount = _preferences.Interface1.ConnectedMicrodrivesCount;
-
-        StatusBarViewModel.IsMicroDriveCartridgeInserted =
-            IsInterface1Enabled &&
-            Emulator?.MicrodriveManager.Microdrives.Values.Any(microdrive => microdrive.IsCartridgeInserted) == true;
     }
 
     private void RefreshAyState(bool? isEnabled, StereoMode? stereoMode)
@@ -320,6 +324,25 @@ partial class MainWindowViewModel
         {
             Emulator.AudioManager.StereoMode = stereoMode.Value;
         }
+    }
+
+    private void RefreshStatusBar()
+    {
+        if (Emulator == null)
+        {
+            return;
+        }
+
+        StatusBarViewModel.IsDivMmcEnabled = Emulator.DivMmc.IsEnabled;
+        StatusBarViewModel.IsTapeInserted = Emulator.TapeManager.IsTapeLoaded;
+        StatusBarViewModel.TapeLoadProgress = string.Empty;
+
+        StatusBarViewModel.IsUlaPlusEnabled = Emulator.IsUlaPlusEnabled;
+        StatusBarViewModel.IsPrinterEnabled = Emulator.Printer.IsEnabled;
+
+        StatusBarViewModel.IsMicroDriveCartridgeInserted =
+            Emulator.Interface1.IsEnabled &&
+            Emulator.MicrodriveManager.Microdrives.Values.Any(microdrive => microdrive.IsCartridgeInserted) == true;
 
         StatusBarViewModel.IsAyEnabled = Emulator.AudioManager.IsAyEnabled;
         StatusBarViewModel.StereoMode = Emulator.AudioManager.StereoMode;

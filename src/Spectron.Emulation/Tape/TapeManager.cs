@@ -4,7 +4,7 @@ using OldBit.Spectron.Files.Tzx;
 
 namespace OldBit.Spectron.Emulation.Tape;
 
-public class TapeStateEventArgs(TapeAction action) : EventArgs
+public class TapeChangedEventArgs(TapeAction action) : EventArgs
 {
     public TapeAction Action { get; } = action;
 }
@@ -25,8 +25,8 @@ public sealed class TapeManager
 
     internal CassettePlayer? CassettePlayer { get; private set; }
 
-    public delegate void TapeStateChangedEvent(TapeStateEventArgs e);
-    public event TapeStateChangedEvent? StateChanged;
+    public delegate void TapeChangedEvent(TapeChangedEventArgs e);
+    public event TapeChangedEvent? TapeChanged;
 
     public TapeManager() => Cassette = CreateCassette();
 
@@ -42,7 +42,7 @@ public sealed class TapeManager
     {
         Cassette = CreateCassette();
 
-        StateChanged?.Invoke(new TapeStateEventArgs(TapeAction.Inserted));
+        TapeChanged?.Invoke(new TapeChangedEventArgs(TapeAction.Inserted));
 
         IsTapeLoaded = true;
     }
@@ -94,7 +94,7 @@ public sealed class TapeManager
     private void InsertTape()
     {
         CassettePlayer?.LoadTape(Cassette);
-        StateChanged?.Invoke(new TapeStateEventArgs(TapeAction.Inserted));
+        TapeChanged?.Invoke(new TapeChangedEventArgs(TapeAction.Inserted));
 
         IsTapeLoaded = true;
     }
@@ -102,19 +102,19 @@ public sealed class TapeManager
     public void StopTape()
     {
         CassettePlayer?.Stop();
-        StateChanged?.Invoke(new TapeStateEventArgs(TapeAction.Stopped));
+        TapeChanged?.Invoke(new TapeChangedEventArgs(TapeAction.Stopped));
     }
 
     public void PlayTape()
     {
         CassettePlayer?.Play();
-        StateChanged?.Invoke(new TapeStateEventArgs(TapeAction.Started));
+        TapeChanged?.Invoke(new TapeChangedEventArgs(TapeAction.Started));
    }
 
     public void EjectTape()
     {
         StopTape();
-        StateChanged?.Invoke(new TapeStateEventArgs(TapeAction.Ejected));
+        TapeChanged?.Invoke(new TapeChangedEventArgs(TapeAction.Ejected));
 
         Cassette = CreateCassette();
         IsTapeLoaded = false;

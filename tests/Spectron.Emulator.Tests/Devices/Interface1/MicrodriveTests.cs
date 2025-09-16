@@ -1,10 +1,11 @@
 using System.Reflection;
+using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 
 namespace OldBit.Spectron.Emulator.Tests.Devices.Interface1;
 
 public class MicrodriveTests
 {
-    private readonly Emulation.Devices.Interface1.Microdrive.Microdrive _microdrive = new();
+    private readonly Microdrive _microdrive = new(MicrodriveId.Drive1);
     private readonly string _testFilePath;
 
     public MicrodriveTests()

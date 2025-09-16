@@ -2,7 +2,7 @@ using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.DivMmc;
 using OldBit.Spectron.Emulation.Devices.Interface1;
-using OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
+using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Devices.Mouse;

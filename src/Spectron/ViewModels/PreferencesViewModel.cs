@@ -641,7 +641,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
     private bool _isInterface1Enabled;
 
     [ObservableProperty]
-    private RomVersion _interface1RomVersion = RomVersion.V2;
+    private Interface1RomVersion _interface1RomVersion = Emulation.Devices.Interface1.Interface1RomVersion.V2;
     
     [ObservableProperty]
     private int _connectedMicrodrivesCount = 2;

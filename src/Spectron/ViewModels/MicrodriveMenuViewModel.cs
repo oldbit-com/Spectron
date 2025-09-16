@@ -6,8 +6,8 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OldBit.Spectron.Dialogs;
-using OldBit.Spectron.Emulation.Devices.Interface1;
-using OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
+using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
+using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives.Events;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -34,7 +34,7 @@ public class MicrodriveMenuViewModel : ObservableObject
 
         _microdriveManager = microdriveManager;
 
-        _microdriveManager.StateChanged += OnDriveStateChanged;
+        _microdriveManager.CartridgeChanged += OnCartridgeChanged;
 
         NewCommand = new RelayCommand<MicrodriveId>(execute: New);
         InsertCommand = new AsyncRelayCommand<MicrodriveId>(execute: Insert);
@@ -43,32 +43,34 @@ public class MicrodriveMenuViewModel : ObservableObject
         ToggleWriteProtectCommand = new RelayCommand<MicrodriveId>(execute: ToggleWriteProtect, canExecute: IsCartridgeInserted);
     }
 
-    private void OnDriveStateChanged(MicrodriveStateChangedEventArgs e)
+    private void OnCartridgeChanged(CartridgeChangedEventArgs e)
     {
-        var microdrive = _microdriveManager.Microdrives.GetValueOrDefault(e.MicrodriveId);
+        var microdrive = _microdriveManager.Microdrives.GetValueOrDefault(e.DriveId);
 
         if (microdrive == null)
         {
             return;
         }
 
-        if (microdrive.Cartridge?.FilePath != null)
+        if (!microdrive.IsCartridgeInserted)
+        {
+            EjectCommandHeadings[e.DriveId].Value = "Eject";
+        }
+        else if (microdrive.Cartridge?.FilePath != null)
         {
             var fileName = Path.GetFileName(microdrive.Cartridge.FilePath);
 
-            EjectCommandHeadings[e.MicrodriveId].Value = $"Eject '{fileName}'";
+            EjectCommandHeadings[e.DriveId].Value = $"Eject '{fileName}'";
         }
         else
         {
-            EjectCommandHeadings[e.MicrodriveId].Value = "Eject 'New Cartridge'";
+            EjectCommandHeadings[e.DriveId].Value = "Eject 'New Cartridge'";
         }
     }
 
     private void New(MicrodriveId driveId)
     {
-        _microdriveManager.NewCartridge(driveId);
-
-       // EjectCommandHeadings[driveId].Value = "Eject 'New Cartridge'";
+        _microdriveManager[driveId].NewCartridge();
         IsWriteProtected[driveId].Value = false;
     }
 
@@ -83,11 +85,7 @@ public class MicrodriveMenuViewModel : ObservableObject
                 return;
             }
 
-            _microdriveManager.InsertCartridge(driveId, files[0].Path.LocalPath);
-
-            var fileName = Path.GetFileName(files[0].Path.LocalPath);
-
-            //EjectCommandHeadings[driveId].Value = $"Eject '{fileName}'";
+            _microdriveManager[driveId].InsertCartridge(files[0].Path.LocalPath);
             IsWriteProtected[driveId].Value = _microdriveManager[driveId].IsCartridgeWriteProtected;
         }
         catch (Exception ex)
@@ -127,9 +125,7 @@ public class MicrodriveMenuViewModel : ObservableObject
 
     private async Task Eject(MicrodriveId driveId)
     {
-        _microdriveManager.EjectCartridge(driveId);
-
-        EjectCommandHeadings[driveId].Value = "Eject";
+        _microdriveManager[driveId].EjectCartridge();
 
         await Task.CompletedTask;
     }

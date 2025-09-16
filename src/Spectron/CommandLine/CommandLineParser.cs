@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
+using OldBit.Spectron.Emulation.Devices.Interface1;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Rom;
@@ -50,6 +51,9 @@ public static class CommandLineParser
         var timeMachineDisabledOption = GetTimeMachineDisabledOption();
         var resumeEnabledOption = GetResumeEnabledOption();
         var resumeDisabledOption = GetResumeDisabledOption();
+        var interface1EnabledOption = GetInterface1EnabledOption();
+        var interface1DisabledOption = GetInterface1DisabledOption();
+        var interface1RomOption = GetInterface1RomOption();
 
         var rootCommand = new RootCommand("""
                                           **** Spectron ZX Spectrum Emulator ****
@@ -83,6 +87,9 @@ public static class CommandLineParser
         rootCommand.Options.Add(timeMachineDisabledOption);
         rootCommand.Options.Add(resumeEnabledOption);
         rootCommand.Options.Add(resumeDisabledOption);
+        rootCommand.Options.Add(interface1EnabledOption);
+        rootCommand.Options.Add(interface1DisabledOption);
+        rootCommand.Options.Add(interface1RomOption);
 
         rootCommand.Validators.Add(result =>
         {
@@ -163,6 +170,8 @@ public static class CommandLineParser
                 IsEnabled(parseResult.GetValue(ulaPlusEnabledOption), parseResult.GetValue(ulaPlusDisabledOption)),
                 IsEnabled(parseResult.GetValue(timeMachineEnabledOption), parseResult.GetValue(timeMachineDisabledOption)),
                 IsEnabled(parseResult.GetValue(resumeEnabledOption), parseResult.GetValue(resumeDisabledOption)),
+                IsEnabled(parseResult.GetValue(interface1EnabledOption), parseResult.GetValue(interface1DisabledOption)),
+                parseResult.GetValue(interface1RomOption),
                 parseResult.GetValue(borderSizeOption),
                 parseResult.GetValue(themeOption)));
         });
@@ -344,5 +353,23 @@ public static class CommandLineParser
         new("--no-resume")
         {
             Description = "Do not resume emulator state",
+        };
+
+    private static Option<bool?> GetInterface1EnabledOption() =>
+        new("--interface1", "--if1")
+        {
+            Description = "Enables Interface 1 emulation",
+        };
+
+    private static Option<bool?> GetInterface1DisabledOption() =>
+        new("--no-interface1", "--no-if1")
+        {
+            Description = "Disables Interface 1 emulation",
+        };
+
+    private static Option<Interface1RomVersion?> GetInterface1RomOption() =>
+        new("--interface1-rom")
+        {
+            Description = "Specifies ROM version to use for Interface 1 emulation",
         };
 }

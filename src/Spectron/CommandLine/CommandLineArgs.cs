@@ -1,5 +1,6 @@
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
+using OldBit.Spectron.Emulation.Devices.Interface1;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Rom;
@@ -27,5 +28,7 @@ public record CommandLineArgs(
     bool? IsUlaPlusEnabled,
     bool? IsTimeMachineEnabled,
     bool? IsResumeEnabled,
+    bool? IsInterface1Enabled,
+    Interface1RomVersion? Interface1RomVersion,
     BorderSize? BorderSize,
     Theme? Theme);

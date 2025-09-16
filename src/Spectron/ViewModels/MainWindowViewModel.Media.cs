@@ -1,11 +1,12 @@
-using OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
+using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
+using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives.Events;
 using OldBit.Spectron.Emulation.Tape;
 
 namespace OldBit.Spectron.ViewModels;
 
 partial class MainWindowViewModel
 {
-    private void HandleTapeStateChanged(TapeStateEventArgs e)
+    private void HandleTapeTapeChanged(TapeChangedEventArgs e)
     {
         if (e.Action == TapeAction.Ejected)
         {
@@ -18,8 +19,7 @@ partial class MainWindowViewModel
         UpdateWindowTitle();
     }
 
-    private void HandleMicrodriveStateChanged(MicrodriveStateChangedEventArgs e) =>
-        RefreshInterface1State(Emulator?.Interface1.IsEnabled == true);
+    private void HandleCartridgeChanged(CartridgeChangedEventArgs e) => RefreshStatusBar();
 
     private void HandleSetTapeLoadingSpeed(TapeSpeed tapeSpeed) => TapeLoadSpeed = tapeSpeed;
 }

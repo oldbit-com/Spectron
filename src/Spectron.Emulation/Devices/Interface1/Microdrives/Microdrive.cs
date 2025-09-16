@@ -1,6 +1,8 @@
-namespace OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
+using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives.Events;
 
-public sealed class Microdrive
+namespace OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
+
+public sealed class Microdrive(MicrodriveId driveId)
 {
     private const int GapStart = 15;
     private const int GapEnd = 30;
@@ -11,6 +13,7 @@ public sealed class Microdrive
 
     public Cartridge? Cartridge { get; private set; }
     internal int CurrentBlock { get; private set; }
+    internal MicrodriveId DriveId { get; private set; } = driveId;
 
     internal bool IsMotorOn
     {
@@ -21,7 +24,7 @@ public sealed class Microdrive
             {
                 _isMotorOn = value;
 
-                StateChanged?.Invoke(EventArgs.Empty);
+                MotorStateChanged?.Invoke(new MicrodriveMotorStateChangedEventArgs(DriveId, value));
             }
         }
     }
@@ -40,21 +43,25 @@ public sealed class Microdrive
         }
     }
 
-    public delegate void MicrodriveStateChangedEvent(EventArgs e);
-    public event MicrodriveStateChangedEvent? StateChanged;
+    public event MicrodriveMotorStateChangedEvent? MotorStateChanged;
+    public event CartridgeChangedEvent? CartridgeChanged;
 
-    internal void NewCartridge()
+    public void NewCartridge()
     {
         Cartridge = new Cartridge();
 
         Reset();
+
+        OnCartridgeChanged();
     }
 
-    internal void InsertCartridge(string filePath)
+    public void InsertCartridge(string filePath)
     {
         Cartridge = new Cartridge(filePath);
 
         Reset();
+
+        OnCartridgeChanged();
     }
 
     internal void InsertCartridge(string? filePath, byte[] data)
@@ -62,13 +69,17 @@ public sealed class Microdrive
         Cartridge = new Cartridge(filePath, data);
 
         Reset();
+
+        OnCartridgeChanged();
     }
 
-    internal void EjectCartridge()
+    public void EjectCartridge()
     {
         Cartridge = null;
 
         Reset();
+
+        OnCartridgeChanged();
     }
 
     internal byte? Read()
@@ -146,4 +157,6 @@ public sealed class Microdrive
         CurrentBlock = 0;
         IsMotorOn = false;
     }
+
+    private void OnCartridgeChanged() => CartridgeChanged?.Invoke(new CartridgeChangedEventArgs { DriveId = DriveId });
 }

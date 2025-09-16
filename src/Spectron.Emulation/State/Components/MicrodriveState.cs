@@ -1,5 +1,5 @@
 using MemoryPack;
-using OldBit.Spectron.Emulation.Devices.Interface1.Microdrive;
+using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 
 namespace OldBit.Spectron.Emulation.State.Components;
 

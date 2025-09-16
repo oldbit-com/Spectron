@@ -162,13 +162,13 @@
                                     <RadioButton
                                         Content="ROM Version 1"
                                         ToolTip.Tip="Use first revision of shadow ROM"
-                                        IsChecked="{Binding Interface1RomVersion, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static if1:RomVersion.V1}}"
+                                        IsChecked="{Binding Interface1RomVersion, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static if1:Interface1RomVersion.V1}}"
                                         Classes="Center"/>
 
                                     <RadioButton
                                         Content="ROM Version 2"
                                         ToolTip.Tip="Use second revision of shadow ROM"
-                                        IsChecked="{Binding Interface1RomVersion, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static if1:RomVersion.V2}}"
+                                        IsChecked="{Binding Interface1RomVersion, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static if1:Interface1RomVersion.V2}}"
                                         Classes="Center"
                                         Margin="10 0 0 0"/>
                                 </StackPanel>
