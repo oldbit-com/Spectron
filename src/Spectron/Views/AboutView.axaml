@@ -50,7 +50,7 @@
         <Image Grid.Row="0" Source="../Assets/Logo.png" Height="128" Width="96"/>
         <StackPanel Grid.Row="1">
             <TextBlock Text="Spectron" FontFamily="{StaticResource SpectrumStrictFont}" FontSize="64" HorizontalAlignment="Center" Classes="Spectron"/>
-            <TextBlock Text="Version 0.8.0" FontFamily="{StaticResource SpectrumStrictFont}" FontSize="24" HorizontalAlignment="Center" Padding="8" Foreground="{StaticResource SpectrumBrightGreen}"/>
+            <TextBlock Text="Version 0.9.0" FontFamily="{StaticResource SpectrumStrictFont}" FontSize="24" HorizontalAlignment="Center" Padding="8" Foreground="{StaticResource SpectrumBrightGreen}"/>
             <TextBlock Text="© 2025 OldBit Ltd" FontFamily="{StaticResource SpectrumStrictFont}" FontSize="20" HorizontalAlignment="Center" Padding="0,20,0,3" Foreground="{StaticResource SpectrumBrightCyan}"/>
             <TextBlock Text="Wojciech Sobieszek" FontFamily="{StaticResource SpectrumStrictFont}" FontSize="20" HorizontalAlignment="Center" Foreground="{StaticResource SpectrumBrightCyan}"/>
         </StackPanel>
