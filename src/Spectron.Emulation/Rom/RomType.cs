@@ -25,6 +25,10 @@ public enum RomType
     Harston,
 
     BrendanAlford,
+
+    Interface1V1,
+
+    Interface1V2,
 }
 
 internal static class RomTypeExtensions

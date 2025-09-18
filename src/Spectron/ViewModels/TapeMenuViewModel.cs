@@ -35,7 +35,7 @@ public partial class TapeMenuViewModel : ObservableObject
         _tapeManager = tapeManager;
         _recentFilesViewModel = recentFilesViewModel;
 
-        _tapeManager.TapeStateChanged += args => Dispatcher.UIThread.Post(() => { UpdateTapeState(args); });
+        _tapeManager.TapeChanged += args => Dispatcher.UIThread.Post(() => { UpdateTapeState(args); });
     }
 
     [RelayCommand]
@@ -113,34 +113,34 @@ public partial class TapeMenuViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanEject))]
     private void View() => WeakReferenceMessenger.Default.Send(new ShowTapeViewMessage(_tapeManager));
 
-    private void UpdateTapeState(TapeStateEventArgs args)
+    private void UpdateTapeState(TapeChangedEventArgs args)
     {
         Dispatcher.UIThread.Post(() =>
         {
             switch (args.Action)
             {
-                case TapeAction.TapeInserted:
+                case TapeAction.Inserted:
                     CanRewind = true;
                     CanPlay = true;
                     CanStop = false;
                     CanEject = true;
                     break;
 
-                case TapeAction.TapeStopped:
+                case TapeAction.Stopped:
                     CanRewind = true;
                     CanPlay = true;
                     CanStop = false;
                     CanEject = true;
                     break;
 
-                case TapeAction.TapeStarted:
+                case TapeAction.Started:
                     CanRewind = false;
                     CanPlay = false;
                     CanStop = true;
                     CanEject = true;
                     break;
 
-                case TapeAction.TapeEjected:
+                case TapeAction.Ejected:
                     CanRewind = false;
                     CanPlay = false;
                     CanStop = false;

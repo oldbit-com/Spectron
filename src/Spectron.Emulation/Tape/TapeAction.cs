@@ -2,11 +2,11 @@ namespace OldBit.Spectron.Emulation.Tape;
 
 public enum TapeAction
 {
-    TapeInserted,
+    Inserted,
 
-    TapeStopped,
+    Stopped,
 
-    TapeStarted,
+    Started,
 
-    TapeEjected
+    Ejected
 }

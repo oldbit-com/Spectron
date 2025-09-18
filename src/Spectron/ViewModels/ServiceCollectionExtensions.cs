@@ -10,5 +10,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<RecentFilesViewModel>();
         services.AddSingleton<TimeMachineViewModel>();
         services.AddSingleton<TapeMenuViewModel>();
+        services.AddSingleton<MicrodriveMenuViewModel>();
     }
 }

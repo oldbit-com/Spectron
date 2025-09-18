@@ -5,6 +5,8 @@ using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.DivMmc;
 using OldBit.Spectron.Emulation.Devices.DivMmc.RTC;
 using OldBit.Spectron.Emulation.Devices.Gamepad;
+using OldBit.Spectron.Emulation.Devices.Interface1;
+using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Devices.Memory;
@@ -54,6 +56,7 @@ public sealed class Emulator
 
     public KeyboardState KeyboardState { get; }
     public TapeManager TapeManager { get; }
+    public MicrodriveManager MicrodriveManager { get; }
     public JoystickManager JoystickManager { get; }
     public AudioManager AudioManager { get; }
     public GamepadManager GamepadManager { get; }
@@ -67,6 +70,7 @@ public sealed class Emulator
     public IEmulatorMemory Memory => _memory;
     public IBus Bus => _spectrumBus;
     public DivMmcDevice DivMmc { get; }
+    public Interface1Device Interface1 { get; }
     public ZxPrinter Printer { get; }
 
     public int TicksPerFrame => _hardware.TicksPerFrame;
@@ -78,6 +82,7 @@ public sealed class Emulator
         EmulatorArgs emulatorArgs,
         HardwareSettings hardware,
         TapeManager tapeManager,
+        MicrodriveManager microdriveManager,
         GamepadManager gamepadManager,
         KeyboardState keyboardState,
         TimeMachine timeMachine,
@@ -91,6 +96,7 @@ public sealed class Emulator
 
         CommandManager = commandManager;
         TapeManager = tapeManager;
+        MicrodriveManager = microdriveManager;
         GamepadManager = gamepadManager;
         ComputerType = emulatorArgs.ComputerType;
         RomType = emulatorArgs.RomType;
@@ -116,7 +122,7 @@ public sealed class Emulator
         AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware);
 
         DivMmc = new DivMmcDevice(Cpu, _memory, logger);
-
+        Interface1 = microdriveManager.CreateDevice(Cpu, _memory);
         Printer = new ZxPrinter();
 
         SetupUlaAndDevices();
@@ -179,6 +185,7 @@ public sealed class Emulator
         ScreenBuffer.Reset();
         UlaPlus.Reset();
         KeyboardState.Reset();
+        Interface1.Reset();
         DivMmc.Reset();
 
         if (IsPaused)
@@ -242,6 +249,7 @@ public sealed class Emulator
         _spectrumBus.AddDevice(AudioManager.Beeper);
         _spectrumBus.AddDevice(AudioManager.Ay);
         _spectrumBus.AddDevice(Printer);
+        _spectrumBus.AddDevice(Interface1);
         _spectrumBus.AddDevice(DivMmc);
         _spectrumBus.AddDevice(new RtcDevice(DivMmc));
 

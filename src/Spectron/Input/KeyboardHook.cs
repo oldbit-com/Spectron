@@ -256,8 +256,8 @@ public sealed class KeyboardHook : IDisposable
                     ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.V]
                     : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.C],
                 KeyCode.VcQuote => !_isShiftPressed
-                    ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.P]
-                    : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.D7],
+                    ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.D7]
+                    : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.P],
                 KeyCode.VcEquals => !_isShiftPressed
                     ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.L]
                     : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.K],

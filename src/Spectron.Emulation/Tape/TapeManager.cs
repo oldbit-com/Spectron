@@ -4,7 +4,7 @@ using OldBit.Spectron.Files.Tzx;
 
 namespace OldBit.Spectron.Emulation.Tape;
 
-public class TapeStateEventArgs(TapeAction action) : EventArgs
+public class TapeChangedEventArgs(TapeAction action) : EventArgs
 {
     public TapeAction Action { get; } = action;
 }
@@ -25,8 +25,8 @@ public sealed class TapeManager
 
     internal CassettePlayer? CassettePlayer { get; private set; }
 
-    public delegate void TapeStateChangedEvent(TapeStateEventArgs e);
-    public event TapeStateChangedEvent? TapeStateChanged;
+    public delegate void TapeChangedEvent(TapeChangedEventArgs e);
+    public event TapeChangedEvent? TapeChanged;
 
     public TapeManager() => Cassette = CreateCassette();
 
@@ -42,7 +42,7 @@ public sealed class TapeManager
     {
         Cassette = CreateCassette();
 
-        TapeStateChanged?.Invoke(new TapeStateEventArgs(TapeAction.TapeInserted));
+        TapeChanged?.Invoke(new TapeChangedEventArgs(TapeAction.Inserted));
 
         IsTapeLoaded = true;
     }
@@ -94,7 +94,7 @@ public sealed class TapeManager
     private void InsertTape()
     {
         CassettePlayer?.LoadTape(Cassette);
-        TapeStateChanged?.Invoke(new TapeStateEventArgs(TapeAction.TapeInserted));
+        TapeChanged?.Invoke(new TapeChangedEventArgs(TapeAction.Inserted));
 
         IsTapeLoaded = true;
     }
@@ -102,19 +102,19 @@ public sealed class TapeManager
     public void StopTape()
     {
         CassettePlayer?.Stop();
-        TapeStateChanged?.Invoke(new TapeStateEventArgs(TapeAction.TapeStopped));
+        TapeChanged?.Invoke(new TapeChangedEventArgs(TapeAction.Stopped));
     }
 
     public void PlayTape()
     {
         CassettePlayer?.Play();
-        TapeStateChanged?.Invoke(new TapeStateEventArgs(TapeAction.TapeStarted));
+        TapeChanged?.Invoke(new TapeChangedEventArgs(TapeAction.Started));
    }
 
     public void EjectTape()
     {
         StopTape();
-        TapeStateChanged?.Invoke(new TapeStateEventArgs(TapeAction.TapeEjected));
+        TapeChanged?.Invoke(new TapeChangedEventArgs(TapeAction.Ejected));
 
         Cassette = CreateCassette();
         IsTapeLoaded = false;
@@ -131,6 +131,7 @@ public sealed class TapeManager
         return cassette;
     }
 
+    // TODO: Auto play if turbo block
     private void CassetteOnBlockSelected(BlockSelectedEventArgs e)
     {
         if (CassettePlayer?.IsPlaying == true)
@@ -147,7 +148,5 @@ public sealed class TapeManager
         {
             //PlayTape();
         }
-
-        Console.WriteLine($"Block selected: {e.Position}");
     }
 }

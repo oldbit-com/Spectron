@@ -31,4 +31,10 @@
       <ProjectReference Include="..\..\src\Spectron.Emulation\Spectron.Emulation.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="TestData\Demo Cartridge.mdr">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

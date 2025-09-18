@@ -1,6 +1,8 @@
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.DivMmc;
+using OldBit.Spectron.Emulation.Devices.Interface1;
+using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Devices.Mouse;
@@ -28,12 +30,13 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         LoadTape(emulator.TapeManager, snapshot.Tape);
         LoadAy(emulator.AudioManager, snapshot.Ay);
         LoadDivMmc(emulator.DivMmc, snapshot.DivMmc);
+        LoadInterface1(emulator.Interface1, emulator.MicrodriveManager, snapshot.Interface1);
         LoadOther(emulator, snapshot);
 
         return emulator;
     }
 
-    public static StateSnapshot CreateSnapshot(Emulator emulator)
+    public static StateSnapshot CreateSnapshot(Emulator emulator, bool isTimeMachine = false)
     {
         var snapshot = new StateSnapshot
         {
@@ -48,6 +51,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         SaveTape(emulator.TapeManager, snapshot);
         SaveAy(emulator.AudioManager, snapshot);
         SaveDivMmc(emulator.DivMmc, snapshot);
+        SaveInterface1(emulator.Interface1, emulator.MicrodriveManager, isTimeMachine, snapshot);
         SaveOther(emulator, snapshot);
 
         if (emulator.RomType.IsCustomRom())
@@ -172,6 +176,39 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         {
             ControlRegister = divMmc.Memory.ControlRegister,
             Banks = divMmc.Memory.Banks,
+        };
+    }
+
+    private static void SaveInterface1(Interface1Device interface1, MicrodriveManager microdriveManager,
+        bool isTimeMachine, StateSnapshot stateSnapshot)
+    {
+        if (!interface1.IsEnabled)
+        {
+            return;
+        }
+
+        var microdrives = new List<MicrodriveState>();
+
+        if (!isTimeMachine)
+        {
+            foreach (var (microdriveId, microdrive) in microdriveManager.Microdrives)
+            {
+                if (microdrive.IsCartridgeInserted)
+                {
+                    microdrives.Add(new MicrodriveState
+                    {
+                        MicrodriveId = microdriveId,
+                        FilePath = microdrive.Cartridge!.FilePath,
+                        Data = microdrive.Cartridge.GetData()
+                    });
+                }
+            }
+        }
+
+        stateSnapshot.Interface1 = new Interface1State
+        {
+            RomVersion = interface1.ShadowRom.Version,
+            Microdrives = microdrives.ToArray(),
         };
     }
 
@@ -314,5 +351,25 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
 
         divMmc.Memory.Banks = divMmcState.Banks;
         divMmc.Memory.PagingControl(divMmcState.ControlRegister);
+        divMmc.Enable();
+    }
+
+    private static void LoadInterface1(Interface1Device interface1, MicrodriveManager microdriveManager,
+        Interface1State? interface1State)
+    {
+        if (interface1State == null)
+        {
+            return;
+        }
+
+        interface1.ShadowRom.Version = interface1State.RomVersion;
+
+        foreach (var microdrive in interface1State.Microdrives)
+        {
+            microdriveManager.Microdrives[microdrive.MicrodriveId]
+                .InsertCartridge(microdrive.FilePath, microdrive.Data);
+        }
+
+        interface1.Enable();
     }
 }

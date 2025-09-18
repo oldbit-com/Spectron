@@ -43,4 +43,6 @@ public class Preferences
     public DivMmcSettings DivMmc { get; init; } = new();
 
     public PrinterSettings Printer { get; init; } = new();
+
+    public Interface1Settings Interface1 { get; init; } = new();
 }

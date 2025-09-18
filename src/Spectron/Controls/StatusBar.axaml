@@ -80,12 +80,21 @@
             <StackPanel
                 Orientation="Horizontal"
                 Margin="0 0 10 0"
-                IsVisible="{Binding IsTapeLoaded}"
+                IsVisible="{Binding IsTapeInserted}"
                 ToolTip.Tip="Tape">
 
                 <material:MaterialIcon Kind="Tape"/>
 
                 <TextBlock Text="{Binding TapeLoadProgress}"/>
+            </StackPanel>
+
+            <StackPanel
+                Orientation="Horizontal"
+                Margin="0 0 10 0"
+                IsVisible="{Binding IsMicroDriveCartridgeInserted}"
+                ToolTip.Tip="Microdrive Cartridge">
+
+                <material:MaterialIcon Kind="TapeDrive"/>
             </StackPanel>
 
             <StackPanel
@@ -104,7 +113,7 @@
                 IsVisible="{Binding IsUlaPlusEnabled}"
                 ToolTip.Tip="ULA+">
 
-                <material:MaterialIcon Kind="PlusBold"/>
+                <material:MaterialIcon Kind="PaletteOutline"/>
             </StackPanel>
 
             <StackPanel
@@ -113,7 +122,7 @@
                 IsVisible="{Binding IsAyEnabled}"
                 ToolTip.Tip="{Binding ToolTipAy}">
 
-                <material:MaterialIcon Kind="Waveform"/>
+                <material:MaterialIcon Kind="Music"/>
             </StackPanel>
 
             <StackPanel

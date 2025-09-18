@@ -20,6 +20,7 @@ public static class FileDialogs
             FileTypes.Z80,
             FileTypes.Zip,
             FileTypes.Pok,
+            FileTypes.Mdr
         ]);
 
     public static async Task<IReadOnlyList<IStorageFile>> OpenTapeFileAsync() =>
@@ -45,6 +46,13 @@ public static class FileDialogs
             FileTypes.Any,
         ]);
 
+    public static async Task<IReadOnlyList<IStorageFile>> OpenMicrodriveFileAsync() =>
+        await OpenFileAsync("Select Microdrive File",
+        [
+            FileTypes.Mdr,
+            FileTypes.Any,
+        ]);
+
     public static async Task<IStorageFile?> SaveTapeFileAsync(string? suggestedFileName = null)
     {
         var topLevel = TopLevel.GetTopLevel(MainWindow);
@@ -61,6 +69,25 @@ public static class FileDialogs
             SuggestedFileName = suggestedFileName,
             ShowOverwritePrompt = true,
             FileTypeChoices = [FileTypes.Tzx, FileTypes.Tap]
+        });
+    }
+
+    public static async Task<IStorageFile?> SaveMicrodriveFileAsync(string? suggestedFileName = null)
+    {
+        var topLevel = TopLevel.GetTopLevel(MainWindow);
+
+        if (topLevel == null)
+        {
+            return null;
+        }
+
+        return await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Save Microdrive File",
+            DefaultExtension = ".mdr",
+            SuggestedFileName = suggestedFileName,
+            ShowOverwritePrompt = true,
+            FileTypeChoices = [FileTypes.Mdr]
         });
     }
 

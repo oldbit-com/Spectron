@@ -52,6 +52,7 @@ Solution consists of several projects:
 - [x] ULA+ support
 - [x] AY-3-8912 sound chip emulation
 - [x] DivMMC emulation
+- [x] Microdrive emulation
 - [x] Kempston mouse emulation
 - [x] ZX Printer emulation
 - [x] Adjustable emulator speed
@@ -105,7 +106,6 @@ Options:
   --no-time-machine                                                                   Disables Time Machine
   --resume                                                                            Resume emulator state assuming there is a previously saved state
   --no-resume                                                                         Do not resume emulator state
-
 ```
 
 ## Testing and compatibility
@@ -180,6 +180,11 @@ Two SD card images are supported. Write changes can be persisted.
 
 You can use [RTC.SYS](src/Spectron.Emulation/Devices/DivMmc/RTC) file to enable RTC support. This is not required, but it will enable DivMMC to use current 
 date and time.
+
+## Microdrives
+Emulation of microdrives is supported and can be enabled in the emulator settings. 
+Up to eight drives can be emulated, mdr files can be loaded/saved. No other features of Interface 1 are emulated
+currently.
 
 ## Time Machine
 Time Machine is a feature that allows you to go back in time and continue from given time point in the past.

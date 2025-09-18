@@ -27,7 +27,7 @@ public sealed class DivMmcDevice : IDevice, IDisposable
     private DiskImage? _diskImage0;
     private DiskImage? _diskImage1;
 
-    internal bool IsEnabled { get; private set; }
+    public bool IsEnabled { get; private set; }
 
     public DivMmcMemory Memory { get; }
 

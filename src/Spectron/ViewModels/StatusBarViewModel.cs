@@ -46,7 +46,10 @@ public partial class StatusBarViewModel : ObservableObject
     private bool _isUlaPlusEnabled;
 
     [ObservableProperty]
-    private bool _isTapeLoaded;
+    private bool _isTapeInserted;
+
+    [ObservableProperty]
+    private bool _isMicroDriveCartridgeInserted;
 
     [ObservableProperty]
     private string _tapeLoadProgress = string.Empty;
