@@ -113,7 +113,7 @@
                 IsVisible="{Binding IsUlaPlusEnabled}"
                 ToolTip.Tip="ULA+">
 
-                <material:MaterialIcon Kind="PlusBold"/>
+                <material:MaterialIcon Kind="PaletteOutline"/>
             </StackPanel>
 
             <StackPanel
@@ -122,7 +122,7 @@
                 IsVisible="{Binding IsAyEnabled}"
                 ToolTip.Tip="{Binding ToolTipAy}">
 
-                <material:MaterialIcon Kind="Waveform"/>
+                <material:MaterialIcon Kind="Music"/>
             </StackPanel>
 
             <StackPanel

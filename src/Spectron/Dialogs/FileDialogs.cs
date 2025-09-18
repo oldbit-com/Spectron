@@ -20,6 +20,7 @@ public static class FileDialogs
             FileTypes.Z80,
             FileTypes.Zip,
             FileTypes.Pok,
+            FileTypes.Mdr
         ]);
 
     public static async Task<IReadOnlyList<IStorageFile>> OpenTapeFileAsync() =>

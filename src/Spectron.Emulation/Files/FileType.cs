@@ -16,6 +16,8 @@ public enum FileType
 
     Pok,
 
+    Mdr,
+
     Unsupported
 }
 
@@ -29,4 +31,7 @@ public static class FileTypeExtensions
 
     public static bool IsArchive(this FileType fileType) =>
         fileType is FileType.Zip;
+
+    public static bool IsMicrodrive(this FileType fileType) =>
+        fileType is FileType.Mdr;
 }

@@ -11,6 +11,7 @@ public static class FileTypes
         ".tzx" => FileType.Tzx,
         ".zip" => FileType.Zip,
         ".pok" => FileType.Pok,
+        ".mdr" => FileType.Mdr,
         _ => FileType.Unsupported
     };
 }

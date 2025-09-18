@@ -126,6 +126,7 @@ public class MicrodriveMenuViewModel : ObservableObject
     private async Task Eject(MicrodriveId driveId)
     {
         _microdriveManager[driveId].EjectCartridge();
+        IsWriteProtected[driveId].Value = false;
 
         await Task.CompletedTask;
     }
