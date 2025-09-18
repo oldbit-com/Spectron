@@ -7,7 +7,6 @@ namespace OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 public sealed class MicrodriveManager : IMicrodriveProvider
 {
     private Interface1Device? _interface1Device;
-    private Microdrive? _activeMicrodrive;
 
     public Dictionary<MicrodriveId, Microdrive> Microdrives { get; } = new();
 
@@ -24,13 +23,13 @@ public sealed class MicrodriveManager : IMicrodriveProvider
             Microdrives[drive] = microdrive;
 
             microdrive.MotorStateChanged += _ =>
-                _activeMicrodrive = Microdrives.Values.FirstOrDefault(x => x.IsMotorOn);
+                ActiveDrive = Microdrives.Values.FirstOrDefault(x => x.IsMotorOn);
 
             microdrive.CartridgeChanged += e => CartridgeChanged?.Invoke(e);
         }
     }
 
-    public Microdrive? ActiveDrive => _activeMicrodrive;
+    public Microdrive? ActiveDrive { get; private set; }
 
     public Interface1Device CreateDevice(Z80 cpu, IEmulatorMemory emulatorMemory)
     {
