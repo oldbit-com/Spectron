@@ -43,7 +43,7 @@ Solution consists of several projects:
 - [x] Emulates classic machines: ZX Spectrum 16K, 48K and 128K
 - [x] Time Machine: rewind and continue from given time point in the past
 - [x] Emulator state is persisted when closed
-- [x] Supports SNA, SZX, Z80, TAP and TZX file formats (can be inside zip file)
+- [x] Supports SNA, SZX, Z80, TAP and TZX file formats (zipped, too)
 - [x] Supports POK trainer files
 - [x] Tape content browser
 - [x] Accurate timings, including contented memory and IO
