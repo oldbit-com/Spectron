@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation.Commands;
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Audio;
+using OldBit.Spectron.Emulation.Devices.Beta128;
 using OldBit.Spectron.Emulation.Devices.DivMmc;
 using OldBit.Spectron.Emulation.Devices.DivMmc.RTC;
 using OldBit.Spectron.Emulation.Devices.Gamepad;
@@ -70,6 +71,7 @@ public sealed class Emulator
     public IEmulatorMemory Memory => _memory;
     public IBus Bus => _spectrumBus;
     public DivMmcDevice DivMmc { get; }
+    public Beta128Device Beta128 { get; }
     public Interface1Device Interface1 { get; }
     public ZxPrinter Printer { get; }
 
@@ -122,6 +124,7 @@ public sealed class Emulator
         AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware);
 
         DivMmc = new DivMmcDevice(Cpu, _memory, logger);
+        Beta128 = new Beta128Device(Cpu, _memory);
         Interface1 = microdriveManager.CreateDevice(Cpu, _memory);
         Printer = new ZxPrinter();
 
@@ -187,6 +190,7 @@ public sealed class Emulator
         KeyboardState.Reset();
         Interface1.Reset();
         DivMmc.Reset();
+        Beta128.Reset();
 
         if (IsPaused)
         {
@@ -241,7 +245,7 @@ public sealed class Emulator
 
     private void SetupUlaAndDevices()
     {
-        var ula = new Ula(KeyboardState, ScreenBuffer, Cpu.Clock, TapeManager?.CassettePlayer);
+        var ula = new Ula(KeyboardState, ScreenBuffer, Cpu.Clock, TapeManager.CassettePlayer);
 
         _spectrumBus.AddDevice(ula);
         _spectrumBus.AddDevice(UlaPlus);
@@ -251,6 +255,7 @@ public sealed class Emulator
         _spectrumBus.AddDevice(Printer);
         _spectrumBus.AddDevice(Interface1);
         _spectrumBus.AddDevice(DivMmc);
+        _spectrumBus.AddDevice(Beta128);
         _spectrumBus.AddDevice(new RtcDevice(DivMmc));
 
         _floatingBus = new FloatingBus(_hardware, Memory, Cpu.Clock);

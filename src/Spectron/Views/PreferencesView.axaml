@@ -86,6 +86,9 @@
                                 <controls:HeaderSeparator Text="Floating bus emulation"/>
                                 <CheckBox Content="Floating bus enabled" Classes="Center" IsChecked="{Binding IsFloatingBusEnabled}"/>
 
+                                <controls:HeaderSeparator Text="Beta 128"/>
+                                <CheckBox Content="Disk Interface enabled" Classes="Center" IsChecked="{Binding IsBeta128Enabled}"/>
+
                                 <controls:HeaderSeparator Text="Printer emulation"/>
                                 <CheckBox Content="ZX Printer connected" Classes="Center" IsChecked="{Binding IsZxPrinterEnabled}"/>
 

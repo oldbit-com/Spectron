@@ -26,6 +26,7 @@
       <EmbeddedResource Include="Rom\Files\ESXMMC.0.8.9.BIN" />
       <EmbeddedResource Include="Rom\Files\interface1-v1.rom" />
       <EmbeddedResource Include="Rom\Files\interface1-v2.rom" />
+      <EmbeddedResource Include="Rom\Files\trdos-503.rom" />
     </ItemGroup>
 
     <ItemGroup>

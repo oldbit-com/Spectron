@@ -5,14 +5,14 @@ My own ZX Spectrum emulator written in C# and Avalonia UI. It emulates classic Z
 128K computers.
 
 It is quite accurate and stable, it can run most of the games and demos without any issues, load protected
-tapes.
+tapes, etc.
 
-It's a cross-platform emulator that runs on Windows, Linux and macOS. Developed on macOS, so generally tested
+It's a cross-platform emulator that runs on Windows, Linux and macOS. Developed on macOS, so generally well tested
 on this platform. Needs some more testing on Linux, seems to be running fine on Windows.
 
 This is my hobby project which I always wanted to do. It has been a lot of fun, and quite a challenge.
 There are other emulators out there, but my focus was on making it better structured, easier to understand.
-It is written all by hand, no AI generated code.
+It is written all by hand, no AI generated code :).
 
 ZX Spectrum was my first computer and I still love it. I am planning to keep this project alive since 
 I have created it for my personal use to play games and demos. It is a lot of fun.
@@ -41,17 +41,18 @@ Solution consists of several projects:
 
 # Features
 - [x] Emulates classic machines: ZX Spectrum 16K, 48K and 128K
-- [x] Time Machine: rewind and continue from given time point in the past
-- [x] Emulator state is persisted when closed
-- [x] Supports SNA, SZX, Z80, TAP and TZX file formats (zipped, too)
+- [x] Time Machine: rewind and continue from a given time point in the past
+- [x] Emulator state is persisted when emulator is closed
+- [x] Supports SNA, SZX, Z80, TAP, TZX, MDR and TRD file formats (inside zip, too)
 - [x] Supports POK trainer files
-- [x] Tape content browser
+- [x] Tape content viewer
 - [x] Accurate timings, including contented memory and IO
 - [x] Floating bus support
-- [x] Multicolor screen effects in games and demos
+- [x] Multicolor screen effects work, timings are quite accurate
 - [x] ULA+ support
 - [x] AY-3-8912 sound chip emulation
 - [x] DivMMC emulation
+- [x] Beta 128 Disk support
 - [x] Microdrive emulation
 - [x] Kempston mouse emulation
 - [x] ZX Printer emulation
@@ -183,7 +184,7 @@ date and time.
 
 ## Microdrives
 Emulation of microdrives is supported and can be enabled in the emulator settings. 
-Up to eight drives can be emulated, mdr files can be loaded/saved. No other features of Interface 1 are emulated
+Up to eight drives can be emulated, MDR files can be loaded/saved. No other features of Interface 1 are emulated
 currently.
 
 ## Time Machine

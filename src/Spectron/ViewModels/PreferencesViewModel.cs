@@ -102,6 +102,8 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         DivMmcCard1FileName = preferences.DivMmc.Card1FileName;
         IsDivMmcDriveWriteEnabled = preferences.DivMmc.IsDriveWriteEnabled;
 
+        IsBeta128Enabled = preferences.Beta128.IsEnabled;
+
         IsInterface1Enabled = preferences.Interface1.IsEnabled;
         Interface1RomVersion = preferences.Interface1.RomVersion;
         ConnectedMicrodrivesCount = preferences.Interface1.ConnectedMicrodrivesCount;
@@ -215,6 +217,11 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
                 IsDriveWriteEnabled = IsDivMmcDriveWriteEnabled,
             },
 
+            Beta128 = new Beta128Settings
+            {
+                IsEnabled = IsBeta128Enabled,
+            },
+
             Interface1 = new Interface1Settings
             {
                 IsEnabled = IsInterface1Enabled,
@@ -287,12 +294,8 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
 
     public static ValidationResult? ValidateCardImageFile(string fileName, ValidationContext context)
     {
-        if (context.ObjectInstance is PreferencesViewModel { IsDivMmcEnabled: false })
-        {
-            return ValidationResult.Success;
-        }
-
-        if (string.IsNullOrWhiteSpace(fileName) || DiskImage.Validate(fileName, out var errorMessage))
+        if (context.ObjectInstance is PreferencesViewModel { IsDivMmcEnabled: false } ||
+            string.IsNullOrWhiteSpace(fileName) || DiskImage.Validate(fileName, out var errorMessage))
         {
             return ValidationResult.Success;
         }
@@ -621,6 +624,9 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
     private bool _isDivMmcEnabled;
 
     [ObservableProperty]
+    private bool _isBeta128Enabled;
+
+    [ObservableProperty]
     private bool _isDivMmcWriteEnabled;
 
     [ObservableProperty]
@@ -641,8 +647,8 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
     private bool _isInterface1Enabled;
 
     [ObservableProperty]
-    private Interface1RomVersion _interface1RomVersion = Emulation.Devices.Interface1.Interface1RomVersion.V2;
-    
+    private Interface1RomVersion _interface1RomVersion = Interface1RomVersion.V2;
+
     [ObservableProperty]
     private int _connectedMicrodrivesCount = 2;
 

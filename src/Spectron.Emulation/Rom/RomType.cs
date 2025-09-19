@@ -29,6 +29,8 @@ public enum RomType
     Interface1V1,
 
     Interface1V2,
+
+    TrDos,
 }
 
 internal static class RomTypeExtensions

@@ -124,6 +124,7 @@ partial class MainWindowViewModel
         RefreshAyState(Emulator?.AudioManager.IsAyEnabled, Emulator?.AudioManager.StereoMode);
         RefreshPrinterState(_preferences.Printer.IsZxPrinterEnabled);
         RefreshInterface1State(_preferences.Interface1.IsEnabled, _preferences.Interface1.RomVersion);
+        RefreshBeta128State(_preferences.Beta128.IsEnabled);
 
         RefreshStatusBar();
     }
@@ -309,6 +310,23 @@ partial class MainWindowViewModel
 
         IsInterface1Enabled = isEnabled == true;
         ConnectedMicrodrivesCount = _preferences.Interface1.ConnectedMicrodrivesCount;
+    }
+
+    private void RefreshBeta128State(bool? isEnabled)
+    {
+        if (isEnabled == null)
+        {
+            return;
+        }
+
+        if (isEnabled.Value)
+        {
+            Emulator?.Beta128.Enable();
+        }
+        else
+        {
+            Emulator?.Beta128.Disable();
+        }
     }
 
     private void RefreshAyState(bool? isEnabled, StereoMode? stereoMode)

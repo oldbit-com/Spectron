@@ -26,6 +26,9 @@ internal static class RomReader
     private const string Interface1V1RomResourceName = "OldBit.Spectron.Emulation.Rom.Files.interface1-v1.rom";
     private const string Interface1V2RomResourceName = "OldBit.Spectron.Emulation.Rom.Files.interface1-v2.rom";
 
+    // TR-DOS
+    private const string TrDosRomResourceName = "OldBit.Spectron.Emulation.Rom.Files.trdos-503.rom";
+
     internal static byte[] ReadRom(RomType romType)
     {
         var resourceName = romType switch
@@ -42,6 +45,7 @@ internal static class RomReader
             RomType.DivMmc => DivMmcRomResourceName,
             RomType.Interface1V1 => Interface1V1RomResourceName,
             RomType.Interface1V2 => Interface1V2RomResourceName,
+            RomType.TrDos => TrDosRomResourceName,
             _ => throw new ArgumentOutOfRangeException(nameof(romType), romType, null)
         };
 
