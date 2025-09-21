@@ -9,7 +9,6 @@ public sealed class ShadowRom(IEmulatorMemory emulatorMemory) : IRomMemory
 
     public byte[] Memory { get; } = RomReader.ReadRom(RomType.TrDos);
 
-
     internal void Page() => emulatorMemory.ShadowRom(this);
 
     internal void UnPage() => emulatorMemory.ShadowRom(null);
