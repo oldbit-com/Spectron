@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.Devices.Beta128.Disks;
+namespace OldBit.Spectron.Emulation.Devices.Beta128.Drive;
 
 internal static class DiskType
 {

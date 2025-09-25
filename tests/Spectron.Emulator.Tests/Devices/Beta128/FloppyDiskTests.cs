@@ -1,5 +1,4 @@
-using OldBit.Spectron.Emulation.Devices.Beta128;
-using OldBit.Spectron.Emulation.Devices.Beta128.Disks;
+using OldBit.Spectron.Emulation.Devices.Beta128.Drive;
 
 namespace OldBit.Spectron.Emulator.Tests.Devices.Beta128;
 
