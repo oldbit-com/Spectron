@@ -18,7 +18,7 @@ public class Beta128Tests
         _memory = new Memory48K(_spectrumRom);
         _z80 = new Z80(_memory);
 
-        _beta128 = new Beta128Device(_z80, _memory);
+        _beta128 = new Beta128Device(_z80, 3.5f, _memory);
     }
 
     [Fact]

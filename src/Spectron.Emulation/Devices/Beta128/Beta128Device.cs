@@ -1,18 +1,17 @@
+using OldBit.Spectron.Emulation.Devices.Beta128.Controller;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128;
 
-public class Beta128Device(Z80 cpu, IEmulatorMemory emulatorMemory) : IDevice
+public class Beta128Device(Z80 cpu, float clockMhz, IEmulatorMemory emulatorMemory) : IDevice
 {
-    private const byte CommandRegister = 0x1F;
-    private const byte StatusRegister = 0x1F;
-    private const byte TrackRegister = 0x3F;
-    private const byte SectorRegister = 0x5F;
-    private const byte DataRegister = 0x7F;
-    private const byte ControlRegister = 0xFF;
+    private readonly DiskController _controller = new(clockMhz);
 
     private bool _isPaged;
+
+    private long _ticksSinceReset;
+    private long Now => _ticksSinceReset + cpu.Clock.FrameTicks;
 
     public readonly ShadowRom ShadowRom = new(emulatorMemory);
 
@@ -25,23 +24,35 @@ public class Beta128Device(Z80 cpu, IEmulatorMemory emulatorMemory) : IDevice
             return;
         }
 
-        var register = address & 0xFF;
+        var portType = GetPortType(address);
 
-        switch (register)
+        if (portType == PortType.None)
         {
-            case CommandRegister:
+            return;
+        }
+
+        _controller.ProcessState(Now);
+
+        switch (portType)
+        {
+            case PortType.Command:
+                _controller.ProcessCommand(Now, value);
                 break;
 
-            case TrackRegister:
+            case PortType.Track:
+                _controller.Track = value;
                 break;
 
-            case SectorRegister:
+            case PortType.Sector:
+                _controller.Sector = value;
                 break;
 
-            case DataRegister:
+            case PortType.Data:
+                _controller.Data = value;
                 break;
 
-            case ControlRegister:
+            case PortType.Control:
+                _controller.Control = value;
                 break;
         }
     }
@@ -53,21 +64,31 @@ public class Beta128Device(Z80 cpu, IEmulatorMemory emulatorMemory) : IDevice
             return null;
         }
 
-        var register = address & 0xFF;
+        var portType = GetPortType(address);
 
-        switch (register)
+        if (portType == PortType.None)
         {
-            case StatusRegister:
-                break;
+            return null;
+        }
 
-            case TrackRegister:
-                break;
+        _controller.ProcessState(Now);
 
-            case SectorRegister:
-                break;
+        switch (portType)
+        {
+            case PortType.Status:
+                return _controller.Status;
 
-            case DataRegister:
-                break;
+            case PortType.Track:
+                return _controller.Track;
+
+            case PortType.Sector:
+                return _controller.Sector;
+
+            case PortType.Data:
+                return _controller.Data;
+
+            case PortType.Control:
+                return (byte)(_controller.Request | ~(RequestStatus.InterruptRequest | RequestStatus.DataRequest));
         }
 
         return null;
@@ -109,8 +130,23 @@ public class Beta128Device(Z80 cpu, IEmulatorMemory emulatorMemory) : IDevice
         }
     }
 
-    public void Reset()
+    internal void NewFrame(long ticksSinceReset) => _ticksSinceReset  = ticksSinceReset;
+
+    private static PortType GetPortType(Word address) => (address & 0xFF) switch
     {
+        0x1F => PortType.Command,
+        0x3F => PortType.Track,
+        0x5F => PortType.Sector,
+        0x7F => PortType.Data,
+        0xFF => PortType.Control,
+        _ => PortType.None
+    };
+
+    internal void Reset()
+    {
+        _ticksSinceReset = 0;
         // TODO: Any reset logic
     }
+
+
 }
