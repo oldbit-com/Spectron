@@ -37,6 +37,7 @@ public sealed class Emulator
     private bool _isAcceleratedTapeSpeed;
     private bool _isNmiRequested;
     private bool _isDebuggerBreak;
+    private long _ticksSinceReset;
     private FloatingBus _floatingBus = null!;
 
     public delegate void FrameEvent(FrameBuffer frameBuffer, AudioBuffer audioBuffer);
@@ -124,7 +125,7 @@ public sealed class Emulator
         AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware);
 
         DivMmc = new DivMmcDevice(Cpu, _memory, logger);
-        Beta128 = new Beta128Device(Cpu, _memory);
+        Beta128 = new Beta128Device(Cpu, _hardware.ClockMhz, _memory);
         Interface1 = microdriveManager.CreateDevice(Cpu, _memory);
         Printer = new ZxPrinter();
 
@@ -181,6 +182,7 @@ public sealed class Emulator
     public void Reset()
     {
         _isDebuggerBreak = false;
+        _ticksSinceReset = 0;
 
         AudioManager.ResetAudio();
         _memory.Reset();
@@ -279,11 +281,13 @@ public sealed class Emulator
 
         EndFrame();
 
-        if (_invalidateScreen)
+        if (!_invalidateScreen)
         {
-            ScreenBuffer.Invalidate();
-            _invalidateScreen = false;
+            return;
         }
+
+        ScreenBuffer.Invalidate();
+        _invalidateScreen = false;
     }
 
     private void StartFrame()
@@ -298,10 +302,13 @@ public sealed class Emulator
         Cpu.Clock.NewFrame(_hardware.TicksPerFrame);
         ScreenBuffer.NewFrame();
         AudioManager.NewFrame();
+        Beta128.NewFrame(_ticksSinceReset);
     }
 
     private void EndFrame()
     {
+        _ticksSinceReset += Cpu.Clock.FrameTicks;
+
         var audioBuffer = AudioManager.EndFrame();
 
         ScreenBuffer.EndFrame(Cpu.Clock.FrameTicks);
