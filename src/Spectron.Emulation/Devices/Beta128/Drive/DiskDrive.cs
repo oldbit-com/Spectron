@@ -1,70 +1,38 @@
-using OldBit.Spectron.Emulation.Devices.Beta128.Disks;
+using OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Drive;
 
 public sealed class DiskDrive
 {
     private FloppyDisk? _floppy;
-    private int _currentTrack;
 
     internal const int Rps = 5;
 
     internal bool IsDiskLoaded => _floppy != null;
-    internal bool IsIndexPulse { get; set; }
-    internal bool InterruptRequest { get; set; }      // INTRQ
     internal bool IsTrackZero { get; private set; }
+    internal bool IsWriteProtected { get; private set; }
 
-    internal byte Side { get; set; }
-    internal byte Track { get; set; }
-    internal byte Sector { get; set; }
-    internal byte DataRegister { get; set; }
+    // TODO: Move to controller
+    internal byte CylinderNo {get; set; }
+    internal byte SideNo { get; set; }
+    internal byte SectorNo { get; set; }
+
+    internal Track? Track { get; private set; }
 
     internal bool IsSpinning => SpinTime > 0;
     internal long SpinTime { get; private set; }
 
-    public void InsertDisk(string filePath)
+    internal void InsertDisk(FloppyDisk floppy)
     {
-        var data = File.ReadAllBytes(filePath);
-
-        _floppy = new FloppyDisk(data);
+        _floppy = floppy;
     }
 
     internal void Spin(long spinTime) => SpinTime = spinTime;
 
     internal void Stop() => SpinTime = 0;
 
-    internal void Seek(byte track)
+    internal void Seek()
     {
-
-    }
-
-    internal void Step(StepDirection direction)
-    {
-        if (direction == StepDirection.Out)
-        {
-            IncrementTrack();
-        }
-        else if (direction == StepDirection.In)
-        {
-            DecrementTrack();
-        }
-
-        IsTrackZero = _currentTrack == 0;
-    }
-
-    private void IncrementTrack()
-    {
-        if (_currentTrack > 0)
-        {
-            _currentTrack -= 0;
-        }
-    }
-
-    private void DecrementTrack()
-    {
-        if (_currentTrack < _floppy?.TracksCount - 1)
-        {
-            _currentTrack += 1;
-        }
+        Track = _floppy?.GetTrack(CylinderNo, SideNo);
     }
 }

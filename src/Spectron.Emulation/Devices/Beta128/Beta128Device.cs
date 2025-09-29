@@ -40,11 +40,11 @@ public class Beta128Device(Z80 cpu, float clockMhz, IEmulatorMemory emulatorMemo
                 break;
 
             case PortType.Track:
-                _controller.Track = value;
+                _controller.TrackNo = value;
                 break;
 
             case PortType.Sector:
-                _controller.Sector = value;
+                _controller.SectorNo = value;
                 break;
 
             case PortType.Data:
@@ -73,25 +73,15 @@ public class Beta128Device(Z80 cpu, float clockMhz, IEmulatorMemory emulatorMemo
 
         _controller.ProcessState(Now);
 
-        switch (portType)
+        return portType switch
         {
-            case PortType.Status:
-                return _controller.Status;
-
-            case PortType.Track:
-                return _controller.Track;
-
-            case PortType.Sector:
-                return _controller.Sector;
-
-            case PortType.Data:
-                return _controller.Data;
-
-            case PortType.Control:
-                return (byte)(_controller.Request | ~(RequestStatus.InterruptRequest | RequestStatus.DataRequest));
-        }
-
-        return null;
+            PortType.Status => _controller.Status,
+            PortType.Track => _controller.TrackNo,
+            PortType.Sector => _controller.SectorNo,
+            PortType.Data => _controller.Data,
+            PortType.Control => (byte)(_controller.Request | ~(RequestStatus.InterruptRequest | RequestStatus.DataRequest)),
+            _ => null
+        };
     }
 
     public void Enable()

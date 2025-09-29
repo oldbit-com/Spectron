@@ -9,7 +9,7 @@ namespace OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 internal sealed class FloppyDisk
 {
     private const int TotalSectors = 16;
-    private const int BytesPerSector = 256;
+    internal const int BytesPerSector = 256;
 
     private readonly byte[] _sectorInterleave = [1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15, 8, 16];
 
@@ -24,18 +24,22 @@ internal sealed class FloppyDisk
         _totalSides = totalSides;
 
         _tracks = new Track[_totalCylinders][];
+
+        Initialize();
     }
 
+    internal Track GetTrack(int cylinderNo, int sideNo) => _tracks[cylinderNo][sideNo];
+
     // Use standard IBM track layout for MFM disks
-    internal void Initialize()
+    private void Initialize()
     {
         var size = (byte)Math.Log2(BytesPerSector / 128.0);
 
-        for (byte cylinderNo = 0; cylinderNo < _totalCylinders; cylinderNo += 1)
+        for (byte cylinderNo = 0; cylinderNo < _totalCylinders; cylinderNo++)
         {
             _tracks[cylinderNo] = new Track[_totalSides];
 
-            for (byte sideNo = 0; sideNo < _totalSides; sideNo += 1)
+            for (byte sideNo = 0; sideNo < _totalSides; sideNo++)
             {
                 var position = 0;
 
@@ -46,12 +50,13 @@ internal sealed class FloppyDisk
                 Write(ref position, track, 0x00, 12);           // SYNC 1
                 Write(ref position, track, 0xC2, 3, true);      // IAM
                 Write(ref position, track, 0xFC);               // IAM
-                Write(ref position, track, 0x4E, 50);           // GAP 1
+                //Write(ref position, track, 0x4E, 50);           // GAP 1
 
-                for (byte sectorNo = 0; sectorNo < TotalSectors; sectorNo += 1)
+                for (byte sectorNo = 0; sectorNo < TotalSectors; sectorNo++)
                 {
                     var interleaveSectorNo = _sectorInterleave[sectorNo];
 
+                    Write(ref position, track, 0x4E, 40);       // GAP 1 50 fixme: recalculate gap1 only for non standard formats
                     Write(ref position, track, 0x00, 12);       // SYNC
                     Write(ref position, track, 0xA1, 3, true);  // IDAM
                     Write(ref position, track, 0xFE);           // IDAM
@@ -103,8 +108,18 @@ internal sealed class FloppyDisk
         sector.UpdateCrc();
     }
 
-    private Sector GetSector(int track, int side, int sector) =>
-        _tracks[track][side].Sectors[sector - 1];
+    private Sector GetSector(int trackNo, int sideNo, int sectorNo) =>
+        _tracks[trackNo][sideNo].Sectors[sectorNo - 1];
+
+    internal void WriteSector(int trackNo, int sideNo, int sectorNo, ReadOnlySpan<byte> data)
+    {
+        var sector = GetSector(trackNo, sideNo, sectorNo);
+
+        for (var i = 0; i < data.Length; i++)
+        {
+            sector[i] = data[i];
+        }
+    }
 
     private static void Write(ref int position, Track track, byte value, int count = 1, bool isMarker = false)
     {

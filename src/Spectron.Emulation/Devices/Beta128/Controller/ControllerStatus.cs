@@ -33,7 +33,7 @@ public enum ControllerStatus
     /// Lost Data.
     /// Type II, III: When set, it indicates the computer did not respond to DRQ in one byte time. This bit is reset to zero when updated.
     /// </summary>
-    LostData = 0x04,
+    Lost = 0x04,
 
     /// <summary>
     /// CRC Error.
@@ -52,7 +52,7 @@ public enum ControllerStatus
     /// Record Not Found.
     /// Type II, III: When set, it indicates the desired track, sector, or side were not found. This bit is reset when updated.
     /// </summary>
-    RecordNotFound = 0x10,
+    NotFound = 0x10,
 
     /// <summary>
     /// Head Loaded.
@@ -65,14 +65,14 @@ public enum ControllerStatus
     /// Type II, III: On Read Record: it indicates the record-type code from data field address mark (1: Deleted Data Mark, 0: Data Mark).
     /// On any write: it indicates a Write Fault. This bit is reset when updated.
     /// </summary>
-    RecordTypeWriteFault = 0x20,
+    WriteFault = 0x20,
 
     /// <summary>
     /// Protected.
     /// Type I: When set, indicates Write Protect is activated. This bit is an inverted copy of /WRPT input.
     /// Type II, III: On Read Record or Read Track, not used. On any write: it indicates a Write Protect. This bit is reset when updated.
     /// </summary>
-    Protected = 0x40,
+    WriteProtect = 0x40,
 
     /// <summary>
     /// Not Ready.

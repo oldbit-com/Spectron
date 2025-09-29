@@ -5,7 +5,7 @@ internal enum State
     Idle,
     Wait,
     DelayBeforeCommand,
-    CMD_RW,
+    CommandReadWrite,
     FOUND_NEXT_ID,
     ReadSector,
     Read,

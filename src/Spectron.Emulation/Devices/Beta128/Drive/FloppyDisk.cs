@@ -1,6 +1,6 @@
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Drive;
 
-internal sealed class FloppyDisk
+internal sealed class FloppyDiskOld
 {
     private const int NumberOfSectors = 16;
     private const int NumberOfBytesPerSector = 256;
@@ -12,7 +12,7 @@ internal sealed class FloppyDisk
 
     internal int TracksCount => _tracksCount;
 
-    internal FloppyDisk(byte[] data)
+    internal FloppyDiskOld(byte[] data)
     {
         var diskType = data[0x8E3];
 

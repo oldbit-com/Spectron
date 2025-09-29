@@ -1,5 +1,5 @@
-using OldBit.Spectron.Emulation.Devices.Beta128.Disks;
 using OldBit.Spectron.Emulation.Devices.Beta128.Drive;
+using OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Controller;
 
@@ -10,10 +10,9 @@ internal sealed partial class DiskController
     private const byte ControlResetPulse = 0b0000_0100;
     private const byte ControlHeadEnable = 0b0000_1000;
 
-    private const byte RotationSpeed = 5;
-
     private readonly int _millisecond;      // number of T states in 1 ms
-    private readonly int _rotation;         // number of T states in 1 rotation
+    private readonly int _rotation;         // number of T states in 1 disk rotation
+    private readonly int _byteTime;         // number of T states per 1 byte
 
     private readonly int _clockHz;
     private readonly DiskDrive[] _drives = new DiskDrive[4];
@@ -23,16 +22,32 @@ internal sealed partial class DiskController
     private byte _control;
 
     private long _next;
+    private long _maxAddressMarkWaitTime;
+    private Sector? _sectorFound;
+
     private byte _command;
     private int _shift;
+    private int _readWritePosition;
+    private int _readWriteLength;
+
     private CommandType _commandType;
     private State _state = State.Idle;
     private State _nextState = State.Idle;
     private ControllerStatus _controllerStatus = 0;
     private RequestStatus _requestStatus = 0;
 
-    internal byte Track { get; set; }
-    internal byte Sector { get; set; }
+    internal byte TrackNo
+    {
+        get => _drive.SectorNo;
+        set => _drive.SectorNo = value;
+    }
+
+    internal byte SectorNo
+    {
+        get => _drive.SectorNo;
+        set => _drive.SectorNo = value;
+    }
+    // internal byte SectorNo { get; set; }
 
     internal RequestStatus Request => _requestStatus;
 
@@ -41,6 +56,9 @@ internal sealed partial class DiskController
         _clockHz = (int)(clockMhz * 1_000_000);
         _millisecond = _clockHz / 1000;
         _rotation = _clockHz / DiskDrive.Rps;
+
+        // ts_byte
+        _byteTime = _clockHz / (Track.DataLength * DiskDrive.Rps);
 
         _drives[0] = new DiskDrive();   // A:
         _drives[1] = new DiskDrive();   // B:
@@ -75,7 +93,7 @@ internal sealed partial class DiskController
             _control = value;
 
             _drive = _drives[_control & ControlDriveSelect];
-            _drive.Side = (byte)((_control & ControlDriveSide) != 0 ? 0 : 1);
+            _drive.SideNo = (byte)((_control & ControlDriveSide) != 0 ? 0 : 1);
 
             if ((_control & ControlResetPulse) != 0)
             {
@@ -146,6 +164,23 @@ internal sealed partial class DiskController
                 case State.Wait:
                     ProcessWait(now);
                     break;
+
+                case State.DelayBeforeCommand:
+                    ProcessDelayBeforeCommand();
+                    break;
+
+                case State.CommandReadWrite:
+                    ProcessCommandReadWrite();
+                    break;
+
+                case State.FOUND_NEXT_ID:
+                    ProcessFoundNextId();
+                    break;
+
+                default:
+                    // Temporary exit
+                    //_controllerStatus |= ControllerStatus.NotReady;
+                    return;
             }
         }
     }
@@ -209,6 +244,65 @@ internal sealed partial class DiskController
         _state = State.DelayBeforeCommand;;
     }
 
+    private void FindMarker()
+    {
+        _drive.Seek();
+
+        var wait = 10 * _rotation;
+        _sectorFound = null;
+
+        if (_drive is { IsSpinning: true, IsDiskLoaded: true, Track: not null })
+        {
+            var trackDuration = _drive.Track.Data.Length * _byteTime; // TODO: This is constant value
+            var position = (int)((_next + _shift) % trackDuration / _byteTime);
+
+            wait = int.MaxValue;
+
+            foreach (var sector in _drive.Track.Sectors)
+            {
+                var idPosition = sector.IdPosition;
+
+                var distance = idPosition > position ?
+                    idPosition - position :
+                    _drive.Track.Data.Length + idPosition - position;
+
+                if (distance < wait)
+                {
+                    wait = distance;
+                    _sectorFound = sector;
+                }
+            }
+
+            wait = _sectorFound != null ? wait * _byteTime : 10 * _rotation;
+        }
+
+        _next += wait;
+
+        if (_drive.IsDiskLoaded && _next > _maxAddressMarkWaitTime)
+        {
+            _next = _maxAddressMarkWaitTime;
+            _sectorFound = null;
+        }
+
+        _state = State.Wait;
+        _nextState = State.FOUND_NEXT_ID;
+    }
+
+    private void FindIndex()
+    {
+        var trackDuration = _drive.Track!.Data.Length * _byteTime ;
+        var position = (int)((_next + _shift) % trackDuration / _byteTime);
+
+        _next += trackDuration - position;
+        _readWritePosition = 0;
+        _readWriteLength = _drive.Track.Data.Length;
+    }
+
+    private void ReadFirstByte()
+    {
+        //
+    }
+
     private bool IsBusy => (_controllerStatus & ControllerStatus.Busy) != 0;
     private bool IsNotReady => (_controllerStatus & ControllerStatus.NotReady) != 0;
     private bool IsHeadLoaded => (_control & ControlHeadEnable) != 0;
@@ -216,16 +310,4 @@ internal sealed partial class DiskController
 
     private void SetFlag(ControllerStatus status) => _controllerStatus |= status;
     private void ResetFlag(ControllerStatus status) => _controllerStatus &= ~status;
-
-    private void SetResetFlags(bool setCondition, ControllerStatus status)
-    {
-        if (setCondition)
-        {
-            SetFlag(status);
-        }
-        else
-        {
-            ResetFlag(status);
-        }
-    }
 }
