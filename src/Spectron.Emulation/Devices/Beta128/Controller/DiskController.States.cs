@@ -1,10 +1,12 @@
+using OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
+
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Controller;
 
 internal partial class DiskController
 {
     private void ProcessIdle()
     {
-        ResetFlag(ControllerStatus.Busy);
+        _controllerStatus &= ~ControllerStatus.Busy;
         _requestStatus = RequestStatus.InterruptRequest;
     }
 
@@ -25,13 +27,12 @@ internal partial class DiskController
             _next += 15 * _millisecond;
         }
 
-        SetFlag(ControllerStatus.Busy);
-        ResetFlag(
-            ControllerStatus.DataRequest |
-            ControllerStatus.Lost |
-            ControllerStatus.NotFound |
-            ControllerStatus.WriteFault |
-            ControllerStatus.WriteProtect);
+        _controllerStatus |= ControllerStatus.Busy;
+        _controllerStatus &= ~(ControllerStatus.DataRequest |
+                               ControllerStatus.Lost |
+                               ControllerStatus.NotFound |
+                               ControllerStatus.WriteFault |
+                               ControllerStatus.WriteProtect);
 
         _state = State.Wait;
         _nextState = State.CommandReadWrite;
@@ -41,7 +42,7 @@ internal partial class DiskController
     {
         if ((Command.IsWriteSector(_command) || Command.IsWriteTrack(_command)) && _drive.IsWriteProtected)
         {
-            SetFlag(ControllerStatus.WriteProtect);
+            _controllerStatus |= ControllerStatus.WriteProtect;
             _state = State.Idle;
 
             return;
@@ -58,7 +59,7 @@ internal partial class DiskController
         if (Command.IsWriteTrack(_command))
         {
             _requestStatus = RequestStatus.DataRequest;
-            SetFlag(ControllerStatus.DataRequest);
+            _controllerStatus |= ControllerStatus.DataRequest;
 
             _next += 3 * _byteTime;
             _state = State.Write;
@@ -89,23 +90,24 @@ internal partial class DiskController
             return;
         }
 
-        if (_next >= _maxAddressMarkWaitTime || _sectorFound == null)
+        if (_next >= _maxAddressMarkWaitTime || _currentSector == null)
         {
-            SetFlag(ControllerStatus.NotFound);
+            _controllerStatus |= ControllerStatus.NotFound;
             _state = State.Idle;
 
             return;
         }
 
-        ResetFlag(ControllerStatus.CrcError);
+        _controllerStatus &= ~ControllerStatus.CrcError;
+        _drive.Seek();
 
         if (_commandType == CommandType.Type1)
         {
-            if (_sectorFound.CylinderNo != TrackNo)
+            if (_currentSector.CylinderNo != TrackNo)
             {
                 FindMarker();
             }
-            else if (_sectorFound.CalculateIdCrc() != _sectorFound.IdCrc)
+            else if (!_currentSector.VerifyIdCrc())
             {
                 _controllerStatus |= ControllerStatus.CrcError;
                 FindMarker();
@@ -113,20 +115,44 @@ internal partial class DiskController
             else
             {
                 _state = State.Idle;
-
-                return;
             }
 
-            if (Command.IsReadAddress(_command))
-            {
-                _readWritePosition = _sectorFound.IdPosition;
-                _readWriteLength = 6;
-                ReadFirstByte();
-
-                return;
-            }
+            return;
         }
 
-        _drive.Seek();
+        if (Command.IsReadAddress(_command))
+        {
+            _readWritePosition = _currentSector.IdPosition;
+            _readWriteLength = 6;
+            ReadFirstByte();
+
+            return;
+        }
+
+        if (_currentSector.CylinderNo != TrackNo || _currentSector.SectorNo != SectorNo ||
+            (Command.IsSideCompareFlagSet(_command) && (Command.GetSideSelectFlag(_command) ^ _currentSector.SideNo) != 0))
+        {
+            FindMarker();
+
+            return;
+        }
+
+        if (!_currentSector.VerifyIdCrc())
+        {
+            _controllerStatus |= ControllerStatus.CrcError;
+            FindMarker();
+
+            return;
+        }
+
+        // if(cmd & 0x20) //write sector(s)
+        // {
+        // 	rqs = R_DRQ;
+        // 	status |= ST_DRQ;
+        // 	next += fdd->TSByte() * 9;
+        // 	state = S_WAIT;
+        // 	state_next = S_WRSEC;
+        // 	break;
+        // }
     }
 }

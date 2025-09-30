@@ -43,4 +43,10 @@ internal static class Command
 
     // 1  1  1  1  0  E  0  0
     internal static bool IsWriteTrack(byte command) => (command & 0xFB) == 0xF0;
+
+    // C flag value for ReadSector or WriteSector
+    internal static bool IsSideCompareFlagSet(byte command) => (command & 0x02) == 0x02;
+
+    // S flag value for ReadSector or WriteSector
+    internal static int GetSideSelectFlag(byte command) => (command & 0x08) >> 3;
 }

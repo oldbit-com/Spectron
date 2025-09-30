@@ -23,10 +23,12 @@ internal sealed partial class DiskController
 
     private long _next;
     private long _maxAddressMarkWaitTime;
-    private Sector? _sectorFound;
+    private Sector? _currentSector;
 
     private byte _command;
     private int _shift;
+
+    private Word _crc;
     private int _readWritePosition;
     private int _readWriteLength;
 
@@ -38,8 +40,8 @@ internal sealed partial class DiskController
 
     internal byte TrackNo
     {
-        get => _drive.SectorNo;
-        set => _drive.SectorNo = value;
+        get => _drive.CylinderNo;
+        set => _drive.CylinderNo = value;
     }
 
     internal byte SectorNo
@@ -126,30 +128,30 @@ internal sealed partial class DiskController
 
         if (_drive.IsDiskLoaded)
         {
-            ResetFlag(ControllerStatus.NotReady);
+            _controllerStatus &= ~ControllerStatus.NotReady;
         }
         else
         {
-            SetFlag(ControllerStatus.NotReady);
+            _controllerStatus |= ControllerStatus.NotReady;
         }
 
         if (_commandType != CommandType.Type4)
         {
-            ResetFlag(ControllerStatus.TrackZero | ControllerStatus.Index);
+            _controllerStatus &= ~(ControllerStatus.TrackZero | ControllerStatus.Index);
 
             if (_drive.IsSpinning && IsHeadLoaded)
             {
-                SetFlag(ControllerStatus.HeadLoaded);
+                _controllerStatus |= ControllerStatus.HeadLoaded;
             }
 
             if (_drive.IsTrackZero)
             {
-                SetFlag(ControllerStatus.TrackZero);
+                _controllerStatus |= ControllerStatus.TrackZero;
             }
 
             if (_drive is { IsDiskLoaded: true, IsSpinning: true } && IsWithinIndexHole(now))
             {
-                SetFlag(ControllerStatus.Index);
+                _controllerStatus |= ControllerStatus.Index;
             }
         }
 
@@ -249,7 +251,7 @@ internal sealed partial class DiskController
         _drive.Seek();
 
         var wait = 10 * _rotation;
-        _sectorFound = null;
+        _currentSector = null;
 
         if (_drive is { IsSpinning: true, IsDiskLoaded: true, Track: not null })
         {
@@ -258,8 +260,9 @@ internal sealed partial class DiskController
 
             wait = int.MaxValue;
 
-            foreach (var sector in _drive.Track.Sectors)
+            for(var sectorNo = 1; sectorNo <= 16; sectorNo++)
             {
+                var sector = _drive.Track[sectorNo];
                 var idPosition = sector.IdPosition;
 
                 var distance = idPosition > position ?
@@ -269,11 +272,11 @@ internal sealed partial class DiskController
                 if (distance < wait)
                 {
                     wait = distance;
-                    _sectorFound = sector;
+                    _currentSector = sector;
                 }
             }
 
-            wait = _sectorFound != null ? wait * _byteTime : 10 * _rotation;
+            wait = _currentSector != null ? wait * _byteTime : 10 * _rotation;
         }
 
         _next += wait;
@@ -281,7 +284,7 @@ internal sealed partial class DiskController
         if (_drive.IsDiskLoaded && _next > _maxAddressMarkWaitTime)
         {
             _next = _maxAddressMarkWaitTime;
-            _sectorFound = null;
+            _currentSector = null;
         }
 
         _state = State.Wait;
@@ -300,14 +303,22 @@ internal sealed partial class DiskController
 
     private void ReadFirstByte()
     {
-        //
+        _crc = Crc.Calculate(_drive.Track!.Data[_readWritePosition - 1]); // Address/Data Mark
+        _data = _drive.Track.Data[_readWritePosition];
+        _crc = Crc.Calculate(_data, _crc);
+
+        _readWritePosition += 1;
+        _readWriteLength -= 1;
+
+        _requestStatus = RequestStatus.DataRequest;
+        _controllerStatus |= ControllerStatus.DataRequest;
+
+        _state = State.Wait;
+        _nextState = State.Read;
     }
 
     private bool IsBusy => (_controllerStatus & ControllerStatus.Busy) != 0;
     private bool IsNotReady => (_controllerStatus & ControllerStatus.NotReady) != 0;
     private bool IsHeadLoaded => (_control & ControlHeadEnable) != 0;
     private bool IsWithinIndexHole(long now) => (now + _shift) % _rotation < 4 * _millisecond;
-
-    private void SetFlag(ControllerStatus status) => _controllerStatus |= status;
-    private void ResetFlag(ControllerStatus status) => _controllerStatus &= ~status;
 }

@@ -24,9 +24,7 @@ public class FloppyDiskTests
                     var sector = track[sectorNo];
 
                     sector.CylinderNo.ShouldBe(cylinderNo);
-
-                    var idCrc = sector.CalculateIdCrc();
-                    sector.IdCrc.ShouldBe(idCrc);
+                    sector.VerifyIdCrc().ShouldBeTrue();
 
                     var idPosition = CalculateIdPosition(sectorNo);
                     sector.IdPosition.ShouldBe(idPosition);
