@@ -3,7 +3,7 @@ using OldBit.Spectron.Emulation.Devices.Beta128.Drive;
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
 /// <summary>
-/// Represents floppy disk formatted for TR-DOS. 16 sectors per track, 256 bytes per sector.
+/// Represents a floppy disk formatted for TR-DOS. 16 sectors per track, 256 bytes per sector.
 /// Sectors are interleaved. Compatible with 40 or 80 cylinders, 1 or 2 sides.
 /// </summary>
 internal sealed class FloppyDisk
@@ -77,7 +77,7 @@ internal sealed class FloppyDisk
                     Write(ref position, track, 0xA1, 3, true);          // DAM
                     Write(ref position, track, 0xFB);                   // DAM
 
-                    track.Sectors[interleaveSectorNo - 1] = new Sector(track, idPosition, position, BytesPerSector);
+                    track[interleaveSectorNo] = new Sector(track, idPosition, position, BytesPerSector);
                     crc = Crc.Calculate(track.Data.AsSpan().Slice(position - 1, BytesPerSector + 1));
                     position += BytesPerSector;
 
@@ -96,7 +96,7 @@ internal sealed class FloppyDisk
     private void AddTrDosDiskInfo()
     {
         var totalFreeSectors = _totalCylinders * _totalSides * TotalSectors - 16;
-        var sector = GetSector(0, 0, 9);
+        var sector = _tracks[0][0][9];
 
         sector[0xE1] = 0;
         sector[0xE2] = 1;       // E1:E2 First free sector address sec:track
@@ -108,17 +108,16 @@ internal sealed class FloppyDisk
         sector.UpdateCrc();
     }
 
-    private Sector GetSector(int trackNo, int sideNo, int sectorNo) =>
-        _tracks[trackNo][sideNo].Sectors[sectorNo - 1];
-
     internal void WriteSector(int trackNo, int sideNo, int sectorNo, ReadOnlySpan<byte> data)
     {
-        var sector = GetSector(trackNo, sideNo, sectorNo);
+        var sector = _tracks[trackNo][sideNo][sectorNo];
 
         for (var i = 0; i < data.Length; i++)
         {
             sector[i] = data[i];
         }
+
+        sector.UpdateCrc();
     }
 
     private static void Write(ref int position, Track track, byte value, int count = 1, bool isMarker = false)

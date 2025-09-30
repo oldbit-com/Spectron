@@ -38,14 +38,21 @@ internal static class Crc
         0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0
     ];
 
-    // CRC-16-CCITT
+    // Using CRC-16-CCITT
+    internal static Word Calculate(byte value, uint initial = 0xCDB4)
+    {
+        var crc = (initial << 8) ^ LookupTable[((initial >> 8) ^ value) & 0xFF];
+
+        return (Word)crc;
+    }
+
     internal static Word Calculate(ReadOnlySpan<byte> data, uint initial = 0xCDB4)
     {
         var crc = initial;
 
         foreach (var value in data)
         {
-            crc = (crc << 8) ^ LookupTable[((crc >> 8) ^ value) & 0xFF];
+            crc = Calculate(value, crc);
         }
 
         return (Word)crc;
