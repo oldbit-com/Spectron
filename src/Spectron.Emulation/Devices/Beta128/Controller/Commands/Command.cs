@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Emulation.Devices.Beta128.Controller;
+namespace OldBit.Spectron.Emulation.Devices.Beta128.Controller.Commands;
 
 internal readonly struct Command
 {

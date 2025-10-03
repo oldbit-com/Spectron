@@ -1,19 +1,19 @@
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Controller;
 
-internal enum State
+internal enum ControllerState
 {
     Idle,
     Wait,
+    CommandType1,
     DelayBeforeCommand,
     CommandReadWrite,
     FOUND_NEXT_ID,
-    ReadSector,
     Read,
-    WriteSector,
+    ReadSector,
     Write,
+    WriteSector,
     WriteTrack,
     WriteTrackData,
-    CommandType1,
     Step,
     SeekStart,
     Seek,

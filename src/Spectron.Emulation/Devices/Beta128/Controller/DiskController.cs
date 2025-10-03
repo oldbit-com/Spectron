@@ -1,3 +1,4 @@
+using OldBit.Spectron.Emulation.Devices.Beta128.Controller.Commands;
 using OldBit.Spectron.Emulation.Devices.Beta128.Drive;
 using OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
@@ -35,8 +36,8 @@ internal sealed partial class DiskController
     private int _readWritePosition;
     private int _readWriteLength;
 
-    private State _state = State.Idle;
-    private State _nextState = State.Idle;
+    private ControllerState _controllerState = ControllerState.Idle;
+    private ControllerState _nextControllerState = ControllerState.Idle;
     private ControllerStatus _controllerStatus = 0;
     private RequestStatus _requestStatus = 0;
 
@@ -105,7 +106,7 @@ internal sealed partial class DiskController
 
             _controllerStatus = ControllerStatus.NotReady;
             _requestStatus = RequestStatus.InterruptRequest;
-            _state = State.Idle;
+            _controllerState = ControllerState.Idle;
 
             _drive.Stop();
         }
@@ -158,49 +159,49 @@ internal sealed partial class DiskController
 
         while (true)
         {
-            switch (_state)
+            switch (_controllerState)
             {
-                case State.Idle:
+                case ControllerState.Idle:
                     ProcessIdle();
                     return;
 
-                case State.Wait:
+                case ControllerState.Wait:
                     ProcessWait(now);
                     break;
 
-                case State.DelayBeforeCommand:
+                case ControllerState.DelayBeforeCommand:
                     ProcessDelayBeforeCommand();
                     break;
 
-                case State.CommandType1:
+                case ControllerState.CommandType1:
                     ProcessCommandType1();
                     break;
 
-                case State.CommandReadWrite:
+                case ControllerState.CommandReadWrite:
                     ProcessCommandReadWrite();
                     break;
 
-                case State.ReadSector:
+                case ControllerState.ReadSector:
                     ProcessReadSector();
                     break;
 
-                case State.Read:
+                case ControllerState.Read:
                     ProcessRead();
                     break;
 
-                case State.Write:
+                case ControllerState.Write:
                     break;
 
-                case State.WriteSector:
+                case ControllerState.WriteSector:
                     break;
 
-                case State.WriteTrack:
+                case ControllerState.WriteTrack:
                     break;
 
-                case State.WriteTrackData:
+                case ControllerState.WriteTrackData:
                     break;
 
-                case State.FOUND_NEXT_ID:
+                case ControllerState.FOUND_NEXT_ID:
                     ProcessFoundNextId();
                     break;
 
@@ -239,12 +240,12 @@ internal sealed partial class DiskController
             return;
         }
 
-        _state = State.CommandType1;
+        _controllerState = ControllerState.CommandType1;
     }
 
     private void ProcessForceInterruptCommand(long now, Command command)
     {
-        _state = State.Idle;
+        _controllerState = ControllerState.Idle;
         _requestStatus = RequestStatus.InterruptRequest;
         _controllerStatus &= ~ControllerStatus.Busy;
 
@@ -256,7 +257,7 @@ internal sealed partial class DiskController
     {
         if (IsNotReady)
         {
-            _state = State.Idle;
+            _controllerState = ControllerState.Idle;
             _requestStatus = RequestStatus.InterruptRequest;
 
             return;
@@ -267,7 +268,7 @@ internal sealed partial class DiskController
             _drive.Spin(_next + 2 * _clockHz);
         }
 
-        _state = State.DelayBeforeCommand;;
+        _controllerState = ControllerState.DelayBeforeCommand;;
     }
 
     private void FindMarker()
@@ -311,8 +312,8 @@ internal sealed partial class DiskController
             _currentSector = null;
         }
 
-        _state = State.Wait;
-        _nextState = State.FOUND_NEXT_ID;
+        _controllerState = ControllerState.Wait;
+        _nextControllerState = ControllerState.FOUND_NEXT_ID;
     }
 
     private void FindIndex()
@@ -337,8 +338,8 @@ internal sealed partial class DiskController
         _requestStatus = RequestStatus.DataRequest;
         _controllerStatus |= ControllerStatus.DataRequest;
 
-        _state = State.Wait;
-        _nextState = State.Read;
+        _controllerState = ControllerState.Wait;
+        _nextControllerState = ControllerState.Read;
     }
 
     private bool IsBusy => (_controllerStatus & ControllerStatus.Busy) != 0;
