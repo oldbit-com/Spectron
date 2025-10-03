@@ -22,7 +22,7 @@ internal partial class DiskController
 
     private void ProcessDelayBeforeCommand()
     {
-        if (Command.ShouldDelay(_command))
+        if (_command.ShouldDelay)
         {
             _next += 15 * _millisecond;
         }
@@ -40,7 +40,7 @@ internal partial class DiskController
 
     private void ProcessCommandReadWrite()
     {
-        if ((Command.IsWriteSector(_command) || Command.IsWriteTrack(_command)) && _drive.IsWriteProtected)
+        if ((_command.IsWriteSector || _command.IsWriteTrack) && _drive.IsWriteProtected)
         {
             _controllerStatus |= ControllerStatus.WriteProtect;
             _state = State.Idle;
@@ -48,7 +48,7 @@ internal partial class DiskController
             return;
         }
 
-        if (Command.IsReadSector(_command) || Command.IsWriteSector(_command) || Command.IsReadAddress(_command))
+        if (_command.IsReadSector || _command.IsWriteSector || _command.IsReadAddress)
         {
             _maxAddressMarkWaitTime = _next + 5 * _rotation;
             FindMarker();
@@ -56,7 +56,7 @@ internal partial class DiskController
             return;
         }
 
-        if (Command.IsWriteTrack(_command))
+        if (_command.IsWriteTrack)
         {
             _requestStatus = RequestStatus.DataRequest;
             _controllerStatus |= ControllerStatus.DataRequest;
@@ -68,7 +68,7 @@ internal partial class DiskController
             return;
         }
 
-        if (Command.IsReadTrack(_command))
+        if (_command.IsReadTrack)
         {
             _drive.Seek();
             FindIndex();
@@ -85,8 +85,8 @@ internal partial class DiskController
         if (!_drive.IsDiskLoaded)
         {
             _maxAddressMarkWaitTime = _next + 5 * _rotation;
-            FindMarker();
 
+            FindMarker();
             return;
         }
 
@@ -94,14 +94,13 @@ internal partial class DiskController
         {
             _controllerStatus |= ControllerStatus.NotFound;
             _state = State.Idle;
-
             return;
         }
 
         _controllerStatus &= ~ControllerStatus.CrcError;
         _drive.Seek();
 
-        if (_commandType == CommandType.Type1)
+        if (_command.Type == CommandType.Type1)
         {
             if (_currentSector.CylinderNo != TrackNo)
             {
@@ -110,49 +109,173 @@ internal partial class DiskController
             else if (!_currentSector.VerifyIdCrc())
             {
                 _controllerStatus |= ControllerStatus.CrcError;
+
                 FindMarker();
             }
             else
             {
                 _state = State.Idle;
             }
-
             return;
         }
 
-        if (Command.IsReadAddress(_command))
+        if (_command.IsReadAddress)
         {
             _readWritePosition = _currentSector.IdPosition;
             _readWriteLength = 6;
-            ReadFirstByte();
 
+            ReadFirstByte();
             return;
         }
 
         if (_currentSector.CylinderNo != TrackNo || _currentSector.SectorNo != SectorNo ||
-            (Command.IsSideCompareFlagSet(_command) && (Command.GetSideSelectFlag(_command) ^ _currentSector.SideNo) != 0))
+            (_command.IsSideCompareFlagSet && (_command.GetSideSelectFlag ^ _currentSector.SideNo) != 0))
         {
             FindMarker();
-
             return;
         }
 
         if (!_currentSector.VerifyIdCrc())
         {
             _controllerStatus |= ControllerStatus.CrcError;
-            FindMarker();
 
+            FindMarker();
             return;
         }
 
-        // if(cmd & 0x20) //write sector(s)
+        if (_command.IsWriteSector)
+        {
+            _requestStatus = RequestStatus.DataRequest;
+            _controllerStatus |= ControllerStatus.DataRequest;
+            _next += _byteTime * 9;
+
+            _state = State.Wait;
+            _nextState =  State.WriteSector;
+            return;
+        }
+
+        if (_command.IsReadSector)
+        {
+            // if(!found_sec->data)
+            // {
+            // 	FindMarker();
+            // 	break;
+            // }
+
+            _next += _byteTime*(_currentSector.DataPosition - _currentSector.IdPosition);
+
+            _state = State.Wait;
+            _nextState =  State.ReadSector;
+        }
+    }
+
+    private void ProcessReadSector()
+    {
+        if (_currentSector == null)
+        {
+            return;
+        }
+
+        _controllerStatus &= ~ControllerStatus.RecordType;
+
+        if (_currentSector.DataAddressMark == DataAddressMark.Deleted)
+        {
+            _controllerStatus |= ControllerStatus.RecordType;
+        }
+
+        _readWritePosition = _currentSector.DataPosition;
+        _readWriteLength = _currentSector.Length;
+
+        ReadFirstByte();
+    }
+
+    private void ProcessRead()
+    {
+        if (_currentSector == null)
+        {
+            _state = State.Idle;
+            return;
+        }
+
+        _drive.Seek();
+
+        if (_readWriteLength > 0)
+        {
+            if ((_requestStatus & RequestStatus.DataRequest) != 0)
+            {
+                _controllerStatus |= ControllerStatus.Lost;
+            }
+
+            _data = _drive.Track!.Data[_readWritePosition];
+            _crc = Crc.Calculate(_data, _crc);
+
+            _readWritePosition += 1;
+            _readWriteLength -= 1;
+
+            _requestStatus = RequestStatus.DataRequest;
+            _controllerStatus |= ControllerStatus.DataRequest;
+
+            _next += _byteTime;
+            _state = State.Wait;
+            _nextState  = State.Read;
+        }
+        else
+        {
+            if (_command.IsReadSector)
+            {
+                if (_crc != _currentSector.DataCrc)
+                {
+                    _controllerStatus |= ControllerStatus.CrcError;
+                }
+
+                if (_command.IsMultiple)
+                {
+                    SectorNo += 1;
+                    _state = State.CommandReadWrite;
+
+                    return;
+                }
+            }
+
+            if (_command.IsReadAddress)
+            {
+                if (!_currentSector.VerifyIdCrc())
+                {
+                    _controllerStatus |= ControllerStatus.CrcError;
+                }
+            }
+
+            _state = State.Idle;
+        }
+    }
+
+    private void ProcessCommandType1()
+    {
+        _controllerStatus = (_controllerStatus | ControllerStatus.Busy)
+                            & ~(ControllerStatus.DataRequest | ControllerStatus.CrcError |
+                                ControllerStatus.SeekError | ControllerStatus.WriteProtect);
+        if (_drive.IsWriteProtected)
+        {
+            _controllerStatus |= ControllerStatus.WriteProtect;
+        }
+
+        _requestStatus = RequestStatus.None;
+
+        _drive.Spin(_next + 2 * _clockHz);
+        _nextState = State.SeekStart;
+
+        if (_command.IsStep || _command.IsStepIn || _command.IsStepOut)
+        {
+            _stepIncrement = _command.IsStepOut ? -1 : 1;
+            _nextState = State.Step;
+        }
+
+        //if(!wd93_nodelay)
         // {
-        // 	rqs = R_DRQ;
-        // 	status |= ST_DRQ;
-        // 	next += fdd->TSByte() * 9;
-        // 	state = S_WAIT;
-        // 	state_next = S_WRSEC;
-        // 	break;
+        // 	next += 32;
         // }
+        // state = S_WAIT;
+
+        _state = State.Wait;
     }
 }

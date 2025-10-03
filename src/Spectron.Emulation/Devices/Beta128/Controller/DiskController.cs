@@ -25,14 +25,16 @@ internal sealed partial class DiskController
     private long _maxAddressMarkWaitTime;
     private Sector? _currentSector;
 
-    private byte _command;
+    private int _stepIncrement = 1;
+
+    private Command _command;
+
     private int _shift;
 
     private Word _crc;
     private int _readWritePosition;
     private int _readWriteLength;
 
-    private CommandType _commandType;
     private State _state = State.Idle;
     private State _nextState = State.Idle;
     private ControllerStatus _controllerStatus = 0;
@@ -49,7 +51,6 @@ internal sealed partial class DiskController
         get => _drive.SectorNo;
         set => _drive.SectorNo = value;
     }
-    // internal byte SectorNo { get; set; }
 
     internal RequestStatus Request => _requestStatus;
 
@@ -135,7 +136,7 @@ internal sealed partial class DiskController
             _controllerStatus |= ControllerStatus.NotReady;
         }
 
-        if (_commandType != CommandType.Type4)
+        if (_command.Type != CommandType.Type4)
         {
             _controllerStatus &= ~(ControllerStatus.TrackZero | ControllerStatus.Index);
 
@@ -171,8 +172,32 @@ internal sealed partial class DiskController
                     ProcessDelayBeforeCommand();
                     break;
 
+                case State.CommandType1:
+                    ProcessCommandType1();
+                    break;
+
                 case State.CommandReadWrite:
                     ProcessCommandReadWrite();
+                    break;
+
+                case State.ReadSector:
+                    ProcessReadSector();
+                    break;
+
+                case State.Read:
+                    ProcessRead();
+                    break;
+
+                case State.Write:
+                    break;
+
+                case State.WriteSector:
+                    break;
+
+                case State.WriteTrack:
+                    break;
+
+                case State.WriteTrackData:
                     break;
 
                 case State.FOUND_NEXT_ID:
@@ -187,11 +212,11 @@ internal sealed partial class DiskController
         }
     }
 
-    internal void ProcessCommand(long now, byte command)
+    internal void ProcessCommand(long now, byte commandCode)
     {
-        var commandType = Command.GetType(command);
+        var command = new Command(commandCode);
 
-        if (commandType == CommandType.Type4)
+        if (_command.Type == CommandType.Type4)
         {
             ProcessForceInterruptCommand(now, command);
             return;
@@ -203,13 +228,12 @@ internal sealed partial class DiskController
         }
 
         _command = command;
-        _commandType = commandType;
         _next = now;
 
         _controllerStatus |= ControllerStatus.Busy;
         _requestStatus = RequestStatus.None;
 
-        if (commandType is CommandType.Type2 or CommandType.Type3)
+        if (_command.Type is CommandType.Type2 or CommandType.Type3)
         {
             ProcessReadWriteCommands();
             return;
@@ -218,7 +242,7 @@ internal sealed partial class DiskController
         _state = State.CommandType1;
     }
 
-    private void ProcessForceInterruptCommand(long now, byte command)
+    private void ProcessForceInterruptCommand(long now, Command command)
     {
         _state = State.Idle;
         _requestStatus = RequestStatus.InterruptRequest;

@@ -61,9 +61,14 @@ public enum ControllerStatus
     HeadLoaded = 0x20,
 
     /// <summary>
-    /// Record Type / Write Fault.
+    /// Record Type
     /// Type II, III: On Read Record: it indicates the record-type code from data field address mark (1: Deleted Data Mark, 0: Data Mark).
-    /// On any write: it indicates a Write Fault. This bit is reset when updated.
+    /// </summary>
+    RecordType = 0x20,
+
+    /// <summary>
+    /// Write Fault.
+    /// Type II, III: On any write: it indicates a Write Fault. This bit is reset when updated.
     /// </summary>
     WriteFault = 0x20,
 

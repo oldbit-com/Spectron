@@ -10,11 +10,15 @@ internal sealed class Sector
     private readonly ArraySegment<byte> _data; // 0xFB | ...DATA... | CRC
 
     internal int IdPosition => _id.Offset + 1;
+    internal int DataPosition => _data.Offset + 1;
     internal byte CylinderNo => _id[CylinderByte];
     internal byte SectorNo => _id[SectorByte];
     internal byte SideNo => _id[SideByte];
+    internal byte DataAddressMark => _data[0];
+    internal int Length => _data.Count - 3;
 
-    private Word IdCrc => (Word)(_id[5] << 8 | _id[6]);
+    private Word IdCrc => (Word)(_id[^2] << 8 | _id[^1]);
+    internal Word DataCrc => (Word)(_data[^2] << 8 | _data[^1]);
 
     internal Sector(Track track, int idPosition, int dataPosition, int bytesPerSector)
     {

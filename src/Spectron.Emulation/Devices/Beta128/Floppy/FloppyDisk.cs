@@ -1,3 +1,4 @@
+using OldBit.Spectron.Emulation.Devices.Beta128.Controller;
 using OldBit.Spectron.Emulation.Devices.Beta128.Drive;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
@@ -75,7 +76,7 @@ internal sealed class FloppyDisk
                     Write(ref position, track, 0x4E, 22);               // GAP 2
                     Write(ref position, track, 0x00, 12);               // SYNC
                     Write(ref position, track, 0xA1, 3, true);          // DAM
-                    Write(ref position, track, 0xFB);                   // DAM
+                    Write(ref position, track, DataAddressMark.Normal); // DAM
 
                     track[interleaveSectorNo] = new Sector(track, idPosition, position, BytesPerSector);
                     crc = Crc.Calculate(track.Data.AsSpan().Slice(position - 1, BytesPerSector + 1));

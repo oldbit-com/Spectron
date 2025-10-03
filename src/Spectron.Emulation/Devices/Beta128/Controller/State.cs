@@ -15,7 +15,7 @@ internal enum State
     WriteTrackData,
     CommandType1,
     Step,
-    SEEKSTART,
+    SeekStart,
     Seek,
     Verify,
     Reset
