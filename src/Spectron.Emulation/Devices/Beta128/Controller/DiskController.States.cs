@@ -271,12 +271,7 @@ internal partial class DiskController
             _nextControllerState = ControllerState.Step;
         }
 
-        //if(!wd93_nodelay)
-        // {
-        // 	next += 32;
-        // }
-        // state = S_WAIT;
-
+        _next += 32;
         _controllerState = ControllerState.Wait;
     }
 }
