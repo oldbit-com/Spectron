@@ -40,6 +40,12 @@ internal readonly struct Command
     // Bit E - 15 ms delay (0: no 15ms delay, 1: 15 ms delay)
     internal bool ShouldDelay => (_command & 0x04) != 0;
 
+    // 0  0  0  0  h  V r1 r0
+    internal bool IsRestore => (_command & 0xF0) == 0xF0;
+
+    // 0  0  0  1  h  V r1 r0
+    internal bool IsSeek => (_command & 0xF0) == 0x10;
+
     // 0  0  1  T  h  V r1 r0
     internal bool IsStep => (_command & 0xE0) == 0x20;
 
@@ -64,12 +70,18 @@ internal readonly struct Command
     // 1  1  1  1  0  E  0  0
     internal bool IsWriteTrack => (_command & 0xFB) == 0xF0;
 
-    // C flag value for ReadSector or WriteSector
+    // C flag value for ReadSector/WriteSector
     internal bool IsSideCompareFlagSet => (_command & 0x02) == 0x02;
 
-    // S flag value for ReadSector or WriteSector
-    internal int GetSideSelectFlag => (_command & 0x08) >> 3;
+    // S flag value for ReadSector/WriteSector
+    internal int SideSelectFlag => (_command & 0x08) >> 3;
 
-    // m flag set for ReadSector or WriteSector
+    // m flag set for ReadSector/WriteSector
     internal bool IsMultiple => (_command & 0x10) == 0x10;
+
+    // T flag set for ReadSector/WriteSector
+    internal bool IsTrackUpdate => (_command & 0x10) == 0x10;
+
+    // r0 r1 for Restore/Seek/Step/StepIn/StepOut
+    internal int SteppingRate => _command & 0x03;
 }

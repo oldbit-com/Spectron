@@ -6,17 +6,14 @@ public sealed class DiskDrive
 {
     private FloppyDisk? _floppy;
 
+    private const int MaxCylinders = 80;
     internal const int Rps = 5;
 
     internal bool IsDiskLoaded => _floppy != null;
-    internal bool IsTrackZero { get; private set; }
+    internal bool IsTrackZero => CylinderNo == 0;
     internal bool IsWriteProtected { get; private set; }
 
-    // TODO: Move to controller
-    internal byte CylinderNo {get; set; }
-    internal byte SideNo { get; set; }
-    internal byte SectorNo { get; set; }
-
+    internal byte CylinderNo { get; private set; }
     internal Track? Track { get; private set; }
 
     internal bool IsSpinning => SpinTime > 0;
@@ -31,8 +28,27 @@ public sealed class DiskDrive
 
     internal void Stop() => SpinTime = 0;
 
-    internal void Seek()
+    internal void Seek(byte cylinderNo, byte sideNo)
     {
-        Track = _floppy?.GetTrack(CylinderNo, SideNo);
+        CylinderNo = cylinderNo;
+        Track = _floppy?.GetTrack(CylinderNo, sideNo);
+    }
+
+    internal void Step(int stepIncrement)
+    {
+        int cylinderNo = CylinderNo;
+        cylinderNo += stepIncrement;
+
+        if (cylinderNo < 0)
+        {
+            cylinderNo = 0;
+        }
+
+        if (cylinderNo >= MaxCylinders)
+        {
+            cylinderNo = MaxCylinders;
+        }
+
+        CylinderNo = (byte)cylinderNo;
     }
 }

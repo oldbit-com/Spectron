@@ -71,7 +71,7 @@ internal partial class DiskController
 
         if (_command.IsReadTrack)
         {
-            _drive.Seek();
+            Seek();
             FindIndex();
             _nextControllerState = ControllerState.Read;
 
@@ -99,11 +99,11 @@ internal partial class DiskController
         }
 
         _controllerStatus &= ~ControllerStatus.CrcError;
-        _drive.Seek();
+        Seek();
 
         if (_command.Type == CommandType.Type1)
         {
-            if (_currentSector.CylinderNo != TrackNo)
+            if (_currentSector.CylinderNo != TrackRegister)
             {
                 FindMarker();
             }
@@ -129,8 +129,8 @@ internal partial class DiskController
             return;
         }
 
-        if (_currentSector.CylinderNo != TrackNo || _currentSector.SectorNo != SectorNo ||
-            (_command.IsSideCompareFlagSet && (_command.GetSideSelectFlag ^ _currentSector.SideNo) != 0))
+        if (_currentSector.CylinderNo != TrackRegister || _currentSector.SectorNo != SectorRegister ||
+            (_command.IsSideCompareFlagSet && (_command.SideSelectFlag ^ _currentSector.SideNo) != 0))
         {
             FindMarker();
             return;
@@ -198,7 +198,7 @@ internal partial class DiskController
             return;
         }
 
-        _drive.Seek();
+        Seek();
 
         if (_readWriteLength > 0)
         {
@@ -231,7 +231,7 @@ internal partial class DiskController
 
                 if (_command.IsMultiple)
                 {
-                    SectorNo += 1;
+                    SectorRegister += 1;
                     _controllerState = ControllerState.CommandReadWrite;
 
                     return;
@@ -273,5 +273,38 @@ internal partial class DiskController
 
         _next += 32;
         _controllerState = ControllerState.Wait;
+    }
+
+    private void ProcessStepState()
+    {
+        if (_command.IsRestore && _drive.CylinderNo == 0)
+        {
+            TrackRegister = 0;
+            _controllerState = ControllerState.Verify;
+
+            return;
+        }
+
+        if (_command.IsSeek || _command.IsTrackUpdate)
+        {
+            int trackRegister = TrackRegister;
+            trackRegister += _stepIncrement;
+            TrackRegister = (byte)trackRegister;
+        }
+
+        _drive.Step(_stepIncrement);
+
+        var delay = _command.SteppingRate switch
+        {
+           0 => 6,
+           1 => 12,
+           2 => 20,
+           3 => 30,
+        };
+
+        _next += delay * _millisecond;
+
+        _controllerState =  ControllerState.Wait;
+        _nextControllerState = _command.IsSeek ? ControllerState.Seek : ControllerState.Verify;
     }
 }

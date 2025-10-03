@@ -40,17 +40,9 @@ internal sealed partial class DiskController
     private ControllerStatus _controllerStatus = 0;
     private RequestStatus _requestStatus = 0;
 
-    internal byte TrackNo
-    {
-        get => _drive.CylinderNo;
-        set => _drive.CylinderNo = value;
-    }
-
-    internal byte SectorNo
-    {
-        get => _drive.SectorNo;
-        set => _drive.SectorNo = value;
-    }
+    internal byte TrackRegister { get; set; }
+    internal byte SectorRegister { get; set; }
+    internal byte SideNo { get; set; }
 
     internal RequestStatus Request => _requestStatus;
 
@@ -71,7 +63,7 @@ internal sealed partial class DiskController
         _drive = _drives[0];
     }
 
-    internal byte Data
+    internal byte DataRegister
     {
         get
         {
@@ -89,14 +81,14 @@ internal sealed partial class DiskController
         }
     }
 
-    internal byte Control
+    internal byte ControlRegister
     {
         set
         {
             _control = value;
 
             _drive = _drives[_control & ControlDriveSelect];
-            _drive.SideNo = (byte)((_control & ControlDriveSide) != 0 ? 0 : 1);
+            SideNo = (byte)((_control & ControlDriveSide) != 0 ? 0 : 1);
 
             if ((_control & ControlResetPulse) != 0)
             {
@@ -200,6 +192,10 @@ internal sealed partial class DiskController
                 case ControllerState.WriteTrackData:
                     break;
 
+                case ControllerState.Step:
+                    ProcessStepState();
+                    break;
+
                 case ControllerState.FOUND_NEXT_ID:
                     ProcessFoundNextIdState();
                     break;
@@ -272,7 +268,7 @@ internal sealed partial class DiskController
 
     private void FindMarker()
     {
-        _drive.Seek();
+        Seek();
 
         var wait = 10 * _rotation;
         _currentSector = null;
@@ -340,6 +336,8 @@ internal sealed partial class DiskController
         _controllerState = ControllerState.Wait;
         _nextControllerState = ControllerState.Read;
     }
+
+    private void Seek() => _drive.Seek(TrackRegister, SideNo);
 
     private bool IsBusy => (_controllerStatus & ControllerStatus.Busy) != 0;
     private bool IsNotReady => (_controllerStatus & ControllerStatus.NotReady) != 0;
