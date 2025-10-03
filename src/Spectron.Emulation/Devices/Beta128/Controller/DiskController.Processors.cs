@@ -1,5 +1,4 @@
 using OldBit.Spectron.Emulation.Devices.Beta128.Controller.Commands;
-using OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Controller;
 
@@ -300,11 +299,62 @@ internal partial class DiskController
            1 => 12,
            2 => 20,
            3 => 30,
+           _ => 0,
         };
 
         _next += delay * _millisecond;
 
         _controllerState =  ControllerState.Wait;
         _nextControllerState = _command.IsSeek ? ControllerState.Seek : ControllerState.Verify;
+    }
+
+    private void ProcessSeekStartState()
+    {
+        if (_command.IsRestore)
+        {
+            TrackRegister = 0xFF;
+            DataRegister = 0;
+        }
+    }
+
+    private void ProcessSeekState()
+    {
+        if (DataRegister == TrackRegister)
+        {
+            _controllerState = ControllerState.Verify;
+        }
+        else
+        {
+            _stepIncrement = DataRegister < TrackRegister ? 1 : -1;
+            _controllerState = ControllerState.Step;
+        }
+    }
+
+    private void ProcessVerifyState()
+    {
+        // if(!(cmd & CB_SEEK_VERIFY))
+        // {
+        // 	status |= ST_BUSY;
+        // 	state_next = S_IDLE;
+        // 	state = S_WAIT;
+        // 	next += 128;
+        // 	break;
+        // }
+        // end_waiting_am = next + 6 * Z80FQ / FDD_RPS; //max wait disk 6 turns
+        // Load();
+        // FindMarker();
+    }
+
+    private void ProcessResetState()
+    {
+        // if(!fdd->Cyl())
+        // {
+        // 	state = S_IDLE;
+        // }
+        // else
+        // {
+        // 	fdd->Cyl(fdd->Cyl() - 1);
+        // }
+        // next += 6 * Z80FQ / 1000;
     }
 }

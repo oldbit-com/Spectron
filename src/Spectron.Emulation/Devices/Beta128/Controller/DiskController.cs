@@ -184,26 +184,40 @@ internal sealed partial class DiskController
                     break;
 
                 case ControllerState.WriteSector:
+                    // TODO: Implement WriteSector
                     break;
 
                 case ControllerState.WriteTrack:
+                    // TODO: Implement WriteTrack
                     break;
 
                 case ControllerState.WriteTrackData:
+                    // TODO: Implement WriteTrackData
                     break;
 
                 case ControllerState.Step:
                     ProcessStepState();
                     break;
 
+                case ControllerState.SeekStart:
+                    ProcessSeekStartState();
+                    break;
+
+                case ControllerState.Seek:
+                    ProcessSeekState();
+                    break;
+
+                case ControllerState.Verify:
+                    ProcessVerifyState();
+                    break;
+
+                case ControllerState.Reset:
+                    ProcessResetState();
+                    break;
+
                 case ControllerState.FOUND_NEXT_ID:
                     ProcessFoundNextIdState();
                     break;
-
-                default:
-                    // Temporary exit
-                    //_controllerStatus |= ControllerStatus.NotReady;
-                    return;
             }
         }
     }
