@@ -5,13 +5,13 @@ namespace OldBit.Spectron.Emulation.Devices.Beta128.Controller;
 
 internal partial class DiskController
 {
-    private void ProcessIdle()
+    private void ProcessIdleState()
     {
         _controllerStatus &= ~ControllerStatus.Busy;
         _requestStatus = RequestStatus.InterruptRequest;
     }
 
-    private void ProcessWait(long now)
+    private void ProcessWaitState(long now)
     {
         if (_next > now)
         {
@@ -21,7 +21,7 @@ internal partial class DiskController
         _controllerState = _nextControllerState;
     }
 
-    private void ProcessDelayBeforeCommand()
+    private void ProcessDelayBeforeCommandState()
     {
         if (_command.ShouldDelay)
         {
@@ -39,7 +39,7 @@ internal partial class DiskController
         _nextControllerState = ControllerState.CommandReadWrite;
     }
 
-    private void ProcessCommandReadWrite()
+    private void ProcessCommandReadWriteState()
     {
         if ((_command.IsWriteSector || _command.IsWriteTrack) && _drive.IsWriteProtected)
         {
@@ -81,7 +81,7 @@ internal partial class DiskController
         _controllerState = ControllerState.Idle;
     }
 
-    private void ProcessFoundNextId()
+    private void ProcessFoundNextIdState()
     {
         if (!_drive.IsDiskLoaded)
         {
@@ -170,7 +170,7 @@ internal partial class DiskController
         }
     }
 
-    private void ProcessReadSector()
+    private void ProcessReadSectorState()
     {
         if (_currentSector == null)
         {
@@ -190,7 +190,7 @@ internal partial class DiskController
         ReadFirstByte();
     }
 
-    private void ProcessRead()
+    private void ProcessReadState()
     {
         if (_currentSector == null)
         {
@@ -250,7 +250,7 @@ internal partial class DiskController
         }
     }
 
-    private void ProcessCommandType1()
+    private void ProcessCommandType1State()
     {
         _controllerStatus = (_controllerStatus | ControllerStatus.Busy)
                             & ~(ControllerStatus.DataRequest | ControllerStatus.CrcError |

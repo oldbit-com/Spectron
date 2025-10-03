@@ -14,8 +14,8 @@ internal sealed partial class DiskController
     private readonly int _millisecond;      // number of T states in 1 ms
     private readonly int _rotation;         // number of T states in 1 disk rotation
     private readonly int _byteTime;         // number of T states per 1 byte
-
     private readonly int _clockHz;
+
     private readonly DiskDrive[] _drives = new DiskDrive[4];
     private DiskDrive _drive;
 
@@ -25,7 +25,6 @@ internal sealed partial class DiskController
     private long _next;
     private long _maxAddressMarkWaitTime;
     private Sector? _currentSector;
-
     private int _stepIncrement = 1;
 
     private Command _command;
@@ -162,31 +161,31 @@ internal sealed partial class DiskController
             switch (_controllerState)
             {
                 case ControllerState.Idle:
-                    ProcessIdle();
+                    ProcessIdleState();
                     return;
 
                 case ControllerState.Wait:
-                    ProcessWait(now);
+                    ProcessWaitState(now);
                     break;
 
                 case ControllerState.DelayBeforeCommand:
-                    ProcessDelayBeforeCommand();
+                    ProcessDelayBeforeCommandState();
                     break;
 
                 case ControllerState.CommandType1:
-                    ProcessCommandType1();
+                    ProcessCommandType1State();
                     break;
 
                 case ControllerState.CommandReadWrite:
-                    ProcessCommandReadWrite();
+                    ProcessCommandReadWriteState();
                     break;
 
                 case ControllerState.ReadSector:
-                    ProcessReadSector();
+                    ProcessReadSectorState();
                     break;
 
                 case ControllerState.Read:
-                    ProcessRead();
+                    ProcessReadState();
                     break;
 
                 case ControllerState.Write:
@@ -202,7 +201,7 @@ internal sealed partial class DiskController
                     break;
 
                 case ControllerState.FOUND_NEXT_ID:
-                    ProcessFoundNextId();
+                    ProcessFoundNextIdState();
                     break;
 
                 default:
