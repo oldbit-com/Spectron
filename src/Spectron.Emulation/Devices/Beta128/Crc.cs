@@ -1,5 +1,8 @@
 namespace OldBit.Spectron.Emulation.Devices.Beta128;
 
+/// <summary>
+/// Calculates CRC using using CRC-16-CCITT algorithm.
+/// </summary>
 internal static class Crc
 {
     private static readonly uint[] LookupTable =
@@ -38,7 +41,6 @@ internal static class Crc
         0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0
     ];
 
-    // Using CRC-16-CCITT
     internal static Word Calculate(byte value, uint initial = 0xCDB4)
     {
         var crc = (initial << 8) ^ LookupTable[((initial >> 8) ^ value) & 0xFF];
