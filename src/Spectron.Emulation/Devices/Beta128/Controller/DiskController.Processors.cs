@@ -7,7 +7,7 @@ internal partial class DiskController
     private void ProcessIdleState()
     {
         _controllerStatus &= ~ControllerStatus.Busy;
-        _requestStatus = RequestStatus.InterruptRequest;
+        Request = RequestStatus.InterruptRequest;
     }
 
     private bool ProcessWaitState(long now)
@@ -60,7 +60,7 @@ internal partial class DiskController
 
         if (_command.IsWriteTrack)
         {
-            _requestStatus = RequestStatus.DataRequest;
+            Request = RequestStatus.DataRequest;
             _controllerStatus |= ControllerStatus.DataRequest;
 
             _next += 3 * _byteTime;
@@ -147,7 +147,7 @@ internal partial class DiskController
 
         if (_command.IsWriteSector)
         {
-            _requestStatus = RequestStatus.DataRequest;
+            Request = RequestStatus.DataRequest;
             _controllerStatus |= ControllerStatus.DataRequest;
             _next += _byteTime * 9;
 
@@ -203,18 +203,18 @@ internal partial class DiskController
 
         if (_readWriteLength > 0)
         {
-            if ((_requestStatus & RequestStatus.DataRequest) != 0)
+            if ((Request & RequestStatus.DataRequest) != 0)
             {
                 _controllerStatus |= ControllerStatus.Lost;
             }
 
-            _data = _drive.Track!.Data[_readWritePosition];
-            _crc = Crc.Calculate(_data, _crc);
+            _dataRegister = _drive.Track!.Data[_readWritePosition];
+            _crc = Crc.Calculate(_dataRegister, _crc);
 
             _readWritePosition += 1;
             _readWriteLength -= 1;
 
-            _requestStatus = RequestStatus.DataRequest;
+            Request = RequestStatus.DataRequest;
             _controllerStatus |= ControllerStatus.DataRequest;
 
             _next += _byteTime;
@@ -261,7 +261,7 @@ internal partial class DiskController
             _controllerStatus |= ControllerStatus.WriteProtect;
         }
 
-        _requestStatus = RequestStatus.None;
+        Request = RequestStatus.None;
 
         _drive.Spin(_next + 2 * _clockHz);
         _nextControllerState = ControllerState.SeekStart;

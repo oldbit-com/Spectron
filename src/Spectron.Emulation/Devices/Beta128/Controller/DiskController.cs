@@ -19,32 +19,30 @@ internal sealed partial class DiskController
     private readonly DiskDrive[] _drives = new DiskDrive[4];
     private DiskDrive _drive;
 
-    private byte _data;
-    private byte _control;
+    private byte _sideNo;
+    private byte _dataRegister;
+    private byte _controlRegister;
 
     private long _next;
+    private int _shift;
     private long _maxAddressMarkWaitTime;
     private Sector? _currentSector;
     private int _stepIncrement = 1;
 
     private Command _command;
-
-    private int _shift;
-
     private Word _crc;
+
     private int _readWritePosition;
     private int _readWriteLength;
 
     private ControllerState _controllerState = ControllerState.Idle;
     private ControllerState _nextControllerState = ControllerState.Idle;
     private ControllerStatus _controllerStatus = 0;
-    private RequestStatus _requestStatus = 0;
 
     internal byte TrackRegister { get; set; }
     internal byte SectorRegister { get; set; }
-    internal byte SideNo { get; set; }
 
-    internal RequestStatus Request => _requestStatus;
+    internal RequestStatus Request { get; private set; } = 0;
 
     public DiskController(float clockMhz)
     {
@@ -52,7 +50,6 @@ internal sealed partial class DiskController
         _millisecond = _clockHz / 1000;
         _rotationTime = _clockHz / DiskDrive.Rps;
 
-        // ts_byte
         _byteTime = _clockHz / (Track.DataLength * DiskDrive.Rps);
 
         _drives[0] = new DiskDrive();   // A:
@@ -68,16 +65,16 @@ internal sealed partial class DiskController
         get
         {
             _controllerStatus &= ~ControllerStatus.DataRequest;
-            _requestStatus &= ~RequestStatus.DataRequest;
+            Request &= ~RequestStatus.DataRequest;
 
-            return _data;
+            return _dataRegister;
         }
         set
         {
-            _data = value;
+            _dataRegister = value;
 
             _controllerStatus &= ~ControllerStatus.DataRequest;
-            _requestStatus &= ~RequestStatus.DataRequest;
+            Request &= ~RequestStatus.DataRequest;
         }
     }
 
@@ -85,18 +82,18 @@ internal sealed partial class DiskController
     {
         set
         {
-            _control = value;
+            _controlRegister = value;
 
-            _drive = _drives[_control & ControlDriveSelect];
-            SideNo = (byte)((_control & ControlDriveSide) != 0 ? 0 : 1);
+            _drive = _drives[_controlRegister & ControlDriveSelect];
+            _sideNo = (byte)((_controlRegister & ControlDriveSide) != 0 ? 0 : 1);
 
-            if ((_control & ControlResetPulse) != 0)
+            if ((_controlRegister & ControlResetPulse) != 0)
             {
                 return;
             }
 
             _controllerStatus = ControllerStatus.NotReady;
-            _requestStatus = RequestStatus.InterruptRequest;
+            Request = RequestStatus.InterruptRequest;
             _controllerState = ControllerState.Idle;
 
             _drive.Stop();
@@ -107,7 +104,7 @@ internal sealed partial class DiskController
     {
         get
         {
-            _requestStatus &= ~RequestStatus.InterruptRequest;
+            Request &= ~RequestStatus.InterruptRequest;
             return (byte)_controllerStatus;
         }
     }
@@ -244,7 +241,7 @@ internal sealed partial class DiskController
         _next = now;
 
         _controllerStatus |= ControllerStatus.Busy;
-        _requestStatus = RequestStatus.None;
+        Request = RequestStatus.None;
 
         if (_command.Type is CommandType.Type2 or CommandType.Type3)
         {
@@ -258,7 +255,7 @@ internal sealed partial class DiskController
     private void ProcessForceInterruptCommand(long now, Command command)
     {
         _controllerState = ControllerState.Idle;
-        _requestStatus = RequestStatus.InterruptRequest;
+        Request = RequestStatus.InterruptRequest;
         _controllerStatus &= ~ControllerStatus.Busy;
 
         _command = command;
@@ -270,7 +267,7 @@ internal sealed partial class DiskController
         if (IsNotReady)
         {
             _controllerState = ControllerState.Idle;
-            _requestStatus = RequestStatus.InterruptRequest;
+            Request = RequestStatus.InterruptRequest;
 
             return;
         }
@@ -341,23 +338,23 @@ internal sealed partial class DiskController
     private void ReadFirstByte()
     {
         _crc = Crc.Calculate(_drive.Track!.Data[_readWritePosition - 1]); // Address/Data Mark
-        _data = _drive.Track.Data[_readWritePosition];
-        _crc = Crc.Calculate(_data, _crc);
+        _dataRegister = _drive.Track.Data[_readWritePosition];
+        _crc = Crc.Calculate(_dataRegister, _crc);
 
         _readWritePosition += 1;
         _readWriteLength -= 1;
 
-        _requestStatus = RequestStatus.DataRequest;
+        Request = RequestStatus.DataRequest;
         _controllerStatus |= ControllerStatus.DataRequest;
 
         _controllerState = ControllerState.Wait;
         _nextControllerState = ControllerState.Read;
     }
 
-    private void Seek() => _drive.Seek(TrackRegister, SideNo);
+    private void Seek() => _drive.Seek(TrackRegister, _sideNo);
 
     private bool IsBusy => (_controllerStatus & ControllerStatus.Busy) != 0;
     private bool IsNotReady => (_controllerStatus & ControllerStatus.NotReady) != 0;
-    private bool IsHeadLoaded => (_control & ControlHeadEnable) != 0;
+    private bool IsHeadLoaded => (_controlRegister & ControlHeadEnable) != 0;
     private bool IsWithinIndexHole(long now) => (now + _shift) % _rotationTime < 4 * _millisecond;
 }
