@@ -11,6 +11,7 @@
              xmlns:tape="clr-namespace:OldBit.Spectron.Emulation.Tape;assembly=OldBit.Spectron.Emulation"
              xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
              xmlns:microdrive="clr-namespace:OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;assembly=OldBit.Spectron.Emulation"
+             xmlns:diskDrive="clr-namespace:OldBit.Spectron.Emulation.Devices.Beta128.Drive;assembly=OldBit.Spectron.Emulation"
              x:DataType="viewModels:MainWindowViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="OldBit.Spectron.Controls.MainMenu">
@@ -122,7 +123,7 @@
             <MenuItem Header="-"/>
             <MenuItem Header="Enter Full Screen" InputGesture="Shift+Alt+Enter" Command="{Binding ToggleFullScreenCommand}"/>
         </MenuItem>
-        
+
         <MenuItem Header="Media" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="Tape">
                 <MenuItem Header="New" Command="{Binding TapeMenuViewModel.NewCommand}"/>
@@ -141,9 +142,9 @@
                     <MenuItem Header="Accelerated" ToggleType="Radio" Command="{Binding SetTapeLoadSpeedCommand}" CommandParameter="{x:Static tape:TapeSpeed.Accelerated}" IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Accelerated}}"/>
                 </MenuItem>
             </MenuItem>
-            
+
             <!-- Should use ItemsSource to generate dynamically, if possible in Avalonia -->
-            <MenuItem x:Name="Drives" Header="Microdrive" IsEnabled="{Binding IsInterface1Enabled}">
+            <MenuItem Header="Microdrive" IsEnabled="{Binding IsInterface1Enabled}">
                 <MenuItem Header="Drive 1">
                     <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive1}"/>
                     <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive1}"/>
@@ -209,6 +210,34 @@
                     <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding MicrodriveMenuViewModel.IsWriteProtected[Drive8].Value}" Command="{Binding MicrodriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive8}"/>
                 </MenuItem>
             </MenuItem>
+
+            <MenuItem Header="Disk Drive">
+                <MenuItem Header="A:">
+                    <MenuItem Header="Insert..." Command="{Binding DiskDriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveA}"/>
+                    <MenuItem Header="{Binding DiskDriveMenuViewModel.EjectCommandHeadings[DriveA].Value}" Command="{Binding DiskDriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveA}"/>
+                    <MenuItem Header="-"/>
+                    <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding DiskDriveMenuViewModel.IsWriteProtected[DriveA].Value}" Command="{Binding DiskDriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveA}"/>
+                </MenuItem>
+                <MenuItem Header="B:">
+                    <MenuItem Header="Insert..." Command="{Binding DiskDriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveB}"/>
+                    <MenuItem Header="{Binding DiskDriveMenuViewModel.EjectCommandHeadings[DriveB].Value}" Command="{Binding DiskDriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveB}"/>
+                    <MenuItem Header="-"/>
+                    <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding DiskDriveMenuViewModel.IsWriteProtected[DriveB].Value}" Command="{Binding DiskDriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveB}"/>
+                </MenuItem>
+                <MenuItem Header="C:">
+                    <MenuItem Header="Insert..." Command="{Binding DiskDriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveC}"/>
+                    <MenuItem Header="{Binding DiskDriveMenuViewModel.EjectCommandHeadings[DriveC].Value}" Command="{Binding DiskDriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveC}"/>
+                    <MenuItem Header="-"/>
+                    <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding DiskDriveMenuViewModel.IsWriteProtected[DriveB].Value}" Command="{Binding DiskDriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveC}"/>
+                </MenuItem>
+                <MenuItem Header="D:">
+                    <MenuItem Header="Insert..." Command="{Binding DiskDriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveD}"/>
+                    <MenuItem Header="{Binding DiskDriveMenuViewModel.EjectCommandHeadings[DriveD].Value}" Command="{Binding DiskDriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveD}"/>
+                    <MenuItem Header="-"/>
+                    <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding DiskDriveMenuViewModel.IsWriteProtected[DriveB].Value}" Command="{Binding DiskDriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveD}"/>
+                </MenuItem>
+            </MenuItem>
+
         </MenuItem>
 
         <MenuItem Header="Debug" Padding="10 0 10 0" Focusable="False">

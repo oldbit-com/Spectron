@@ -80,6 +80,7 @@ public partial class MainWindowViewModel : ObservableObject
     public StatusBarViewModel StatusBarViewModel { get; } = new();
     public TapeMenuViewModel TapeMenuViewModel { get; }
     public MicrodriveMenuViewModel MicrodriveMenuViewModel { get; }
+    public DiskDriveMenuViewModel DiskDriveMenuViewModel { get; }
     public RecentFilesViewModel RecentFilesViewModel { get; }
 
     #region Observable properties
@@ -139,7 +140,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     [ObservableProperty]
     private Cursor _mouseCursor = Cursor.Default;
-    
+
     [ObservableProperty]
     private bool _isInterface1Enabled;
 
@@ -277,6 +278,7 @@ public partial class MainWindowViewModel : ObservableObject
         RecentFilesViewModel recentFilesViewModel,
         TapeMenuViewModel tapeMenuViewModel,
         MicrodriveMenuViewModel microdriveMenuViewModel,
+        DiskDriveMenuViewModel diskDriveMenuViewModel,
         DebuggerContext debuggerContext,
         TapeManager tapeManager,
         MicrodriveManager microdriveManager,
@@ -298,6 +300,7 @@ public partial class MainWindowViewModel : ObservableObject
         RecentFilesViewModel = recentFilesViewModel;
         TapeMenuViewModel = tapeMenuViewModel;
         MicrodriveMenuViewModel = microdriveMenuViewModel;
+        DiskDriveMenuViewModel = diskDriveMenuViewModel;
         recentFilesViewModel.OpenRecentFileAsync = async fileName => await HandleLoadFileAsync(fileName);
 
         SpectrumScreen = _frameBufferConverter.ScreenBitmap;

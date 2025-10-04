@@ -53,6 +53,13 @@ public static class FileDialogs
             FileTypes.Any,
         ]);
 
+    public static async Task<IReadOnlyList<IStorageFile>> OpenDiskFileAsync() =>
+        await OpenFileAsync("Select Disk File",
+        [
+            FileTypes.Trd,
+            FileTypes.Any,
+        ]);
+
     public static async Task<IStorageFile?> SaveTapeFileAsync(string? suggestedFileName = null)
     {
         var topLevel = TopLevel.GetTopLevel(MainWindow);

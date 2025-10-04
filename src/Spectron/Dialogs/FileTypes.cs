@@ -84,6 +84,11 @@ public static class FileTypes
         Patterns = ["*.mdr"]
     };
 
+    public static FilePickerFileType Trd { get; } = new("TRD Disk File")
+    {
+        Patterns = ["*.trd"]
+    };
+
     public static FilePickerFileType Any { get; } = new("All Files")
     {
         Patterns = ["*.*"]
