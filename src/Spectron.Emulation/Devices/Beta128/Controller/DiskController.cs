@@ -229,7 +229,7 @@ internal sealed partial class DiskController
     {
         var command = new Command(commandCode);
 
-        if (_command.Type == CommandType.Type4)
+        if (command.IsForceInterrupt)
         {
             ProcessForceInterruptCommand(now, command);
             return;

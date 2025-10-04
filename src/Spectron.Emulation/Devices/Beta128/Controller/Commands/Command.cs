@@ -14,6 +14,12 @@ internal readonly struct Command
 
     private static CommandType GetType(byte value)
     {
+        // Type IV (Force Interrupt)
+        if ((value & 0xF0) == 0xD0)
+        {
+            return CommandType.Type4;
+        }
+
         // Type I (Restore, Seek, Step)
         if ((value & 0x80) == 0)
         {
@@ -24,12 +30,6 @@ internal readonly struct Command
         if ((value & 0x40) == 0)
         {
             return CommandType.Type2;
-        }
-
-        // Type IV (Force Interrupt)
-        if ((value & 0xF0) == 0xD0)
-        {
-            return CommandType.Type4;
         }
 
         // Type III (Read Address, Read Track, Write Track)]
@@ -69,6 +69,9 @@ internal readonly struct Command
 
     // 1  1  1  1  0  E  0  0
     internal bool IsWriteTrack => (_command & 0xFB) == 0xF0;
+
+    // 1  1  0  1 i3 i2 i1 i0
+    internal bool IsForceInterrupt => (_command & 0xF0) == 0xD0;
 
     // C flag value for ReadSector/WriteSector
     internal bool HasSideCompareFlagSet => (_command & 0x02) == 0x02;
