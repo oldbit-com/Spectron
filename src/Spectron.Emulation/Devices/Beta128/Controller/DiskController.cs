@@ -12,7 +12,7 @@ internal sealed partial class DiskController
     private const byte ControlHeadEnable = 0b0000_1000;
 
     private readonly int _millisecond;      // number of T states in 1 ms
-    private readonly int _rotation;         // number of T states in 1 disk rotation
+    private readonly int _rotationTime;     // number of T states in 1 disk rotation
     private readonly int _byteTime;         // number of T states per 1 byte
     private readonly int _clockHz;
 
@@ -50,7 +50,7 @@ internal sealed partial class DiskController
     {
         _clockHz = (int)(clockMhz * 1_000_000);
         _millisecond = _clockHz / 1000;
-        _rotation = _clockHz / DiskDrive.Rps;
+        _rotationTime = _clockHz / DiskDrive.Rps;
 
         // ts_byte
         _byteTime = _clockHz / (Track.DataLength * DiskDrive.Rps);
@@ -157,7 +157,10 @@ internal sealed partial class DiskController
                     return;
 
                 case ControllerState.Wait:
-                    ProcessWaitState(now);
+                    if (!ProcessWaitState(now))
+                    {
+                        return;
+                    }
                     break;
 
                 case ControllerState.DelayBeforeCommand:
@@ -284,7 +287,7 @@ internal sealed partial class DiskController
     {
         Seek();
 
-        var wait = 10 * _rotation;
+        var wait = 10 * _rotationTime;
         _currentSector = null;
 
         if (_drive is { IsSpinning: true, IsDiskLoaded: true, Track: not null })
@@ -310,7 +313,7 @@ internal sealed partial class DiskController
                 }
             }
 
-            wait = _currentSector != null ? wait * _byteTime : 10 * _rotation;
+            wait = _currentSector != null ? wait * _byteTime : 10 * _rotationTime;
         }
 
         _next += wait;
@@ -356,5 +359,5 @@ internal sealed partial class DiskController
     private bool IsBusy => (_controllerStatus & ControllerStatus.Busy) != 0;
     private bool IsNotReady => (_controllerStatus & ControllerStatus.NotReady) != 0;
     private bool IsHeadLoaded => (_control & ControlHeadEnable) != 0;
-    private bool IsWithinIndexHole(long now) => (now + _shift) % _rotation < 4 * _millisecond;
+    private bool IsWithinIndexHole(long now) => (now + _shift) % _rotationTime < 4 * _millisecond;
 }

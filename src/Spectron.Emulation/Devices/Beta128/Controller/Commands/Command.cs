@@ -71,16 +71,19 @@ internal readonly struct Command
     internal bool IsWriteTrack => (_command & 0xFB) == 0xF0;
 
     // C flag value for ReadSector/WriteSector
-    internal bool IsSideCompareFlagSet => (_command & 0x02) == 0x02;
+    internal bool HasSideCompareFlagSet => (_command & 0x02) == 0x02;
 
     // S flag value for ReadSector/WriteSector
-    internal int SideSelectFlag => (_command & 0x08) >> 3;
+    internal int SideSelectFlagSet => (_command & 0x08) >> 3;
 
     // m flag set for ReadSector/WriteSector
-    internal bool IsMultiple => (_command & 0x10) == 0x10;
+    internal bool HasMultipleFlagSet => (_command & 0x10) == 0x10;
 
     // T flag set for ReadSector/WriteSector
-    internal bool IsTrackUpdate => (_command & 0x10) == 0x10;
+    internal bool HasTrackUpdateFlagSet => (_command & 0x10) == 0x10;
+
+    // V flag set for Restore/Seek/Step/StepIn/StepOut
+    internal bool HasVerifyFlagSet => (_command & 0x04) == 0x04;
 
     // r0 r1 for Restore/Seek/Step/StepIn/StepOut
     internal int SteppingRate => _command & 0x03;

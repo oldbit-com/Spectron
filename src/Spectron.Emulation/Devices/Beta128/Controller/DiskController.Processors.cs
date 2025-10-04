@@ -10,14 +10,16 @@ internal partial class DiskController
         _requestStatus = RequestStatus.InterruptRequest;
     }
 
-    private void ProcessWaitState(long now)
+    private bool ProcessWaitState(long now)
     {
         if (_next > now)
         {
-            return;
+            return false;
         }
 
         _controllerState = _nextControllerState;
+
+        return true;
     }
 
     private void ProcessDelayBeforeCommandState()
@@ -50,7 +52,7 @@ internal partial class DiskController
 
         if (_command.IsReadSector || _command.IsWriteSector || _command.IsReadAddress)
         {
-            _maxAddressMarkWaitTime = _next + 5 * _rotation;
+            _maxAddressMarkWaitTime = _next + 5 * _rotationTime;
             FindMarker();
 
             return;
@@ -84,7 +86,7 @@ internal partial class DiskController
     {
         if (!_drive.IsDiskLoaded)
         {
-            _maxAddressMarkWaitTime = _next + 5 * _rotation;
+            _maxAddressMarkWaitTime = _next + 5 * _rotationTime;
 
             FindMarker();
             return;
@@ -129,7 +131,7 @@ internal partial class DiskController
         }
 
         if (_currentSector.CylinderNo != TrackRegister || _currentSector.SectorNo != SectorRegister ||
-            (_command.IsSideCompareFlagSet && (_command.SideSelectFlag ^ _currentSector.SideNo) != 0))
+            (_command.HasSideCompareFlagSet && (_command.SideSelectFlagSet ^ _currentSector.SideNo) != 0))
         {
             FindMarker();
             return;
@@ -228,7 +230,7 @@ internal partial class DiskController
                     _controllerStatus |= ControllerStatus.CrcError;
                 }
 
-                if (_command.IsMultiple)
+                if (_command.HasMultipleFlagSet)
                 {
                     SectorRegister += 1;
                     _controllerState = ControllerState.CommandReadWrite;
@@ -284,7 +286,7 @@ internal partial class DiskController
             return;
         }
 
-        if (_command.IsSeek || _command.IsTrackUpdate)
+        if (_command.IsSeek || _command.HasTrackUpdateFlagSet)
         {
             int trackRegister = TrackRegister;
             trackRegister += _stepIncrement;
@@ -332,29 +334,33 @@ internal partial class DiskController
 
     private void ProcessVerifyState()
     {
-        // if(!(cmd & CB_SEEK_VERIFY))
-        // {
-        // 	status |= ST_BUSY;
-        // 	state_next = S_IDLE;
-        // 	state = S_WAIT;
-        // 	next += 128;
-        // 	break;
-        // }
-        // end_waiting_am = next + 6 * Z80FQ / FDD_RPS; //max wait disk 6 turns
-        // Load();
-        // FindMarker();
+        if (!_command.HasVerifyFlagSet)
+        {
+            _controllerStatus |= ControllerStatus.Busy;
+            _controllerState = ControllerState.Wait;
+            _nextControllerState = ControllerState.Idle;
+            _next += 128;
+
+            return;
+        }
+
+        _maxAddressMarkWaitTime = _next + 6 * _rotationTime;
+
+        Seek();
+        FindMarker();
     }
 
     private void ProcessResetState()
     {
-        // if(!fdd->Cyl())
-        // {
-        // 	state = S_IDLE;
-        // }
-        // else
-        // {
-        // 	fdd->Cyl(fdd->Cyl() - 1);
-        // }
-        // next += 6 * Z80FQ / 1000;
+        if (_drive.IsTrackZero)
+        {
+            _controllerState = ControllerState.Idle;
+        }
+        else
+        {
+            _drive.Step(-1);
+        }
+
+        _next += 6 * _millisecond;
     }
 }
