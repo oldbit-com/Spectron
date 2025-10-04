@@ -4,7 +4,7 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128;
 
-public class Beta128Device(Z80 cpu, float clockMhz, IEmulatorMemory emulatorMemory) : IDevice
+public class Beta128Device(Z80 cpu, float clockMhz, IEmulatorMemory emulatorMemory, ComputerType computerType) : IDevice
 {
     private readonly DiskController _controller = new(clockMhz);
 
@@ -102,25 +102,25 @@ public class Beta128Device(Z80 cpu, float clockMhz, IEmulatorMemory emulatorMemo
     {
         switch (pc)
         {
-            case >= 0x3D00 and <= 0x3DFF:
-                if (!_isPaged)
-                {
-                    ShadowRom.Page();
-                    _isPaged = true;
-                }
+            case >= 0x3D00 and <= 0x3DFF when !_isPaged && CanPageRom:
+                ShadowRom.Page();
+                _isPaged = true;
+
                 break;
 
-            case >= 0x4000:
-                if (_isPaged)
-                {
-                    ShadowRom.UnPage();
-                    _isPaged = false;
-                }
+            case >= 0x4000 when _isPaged:
+                ShadowRom.UnPage();
+                _isPaged = false;
+
                 break;
         }
     }
 
     internal void NewFrame(long ticksSinceReset) => _ticksSinceReset  = ticksSinceReset;
+
+    private bool CanPageRom =>
+        (computerType == ComputerType.Spectrum128K && emulatorMemory.RomBank == RomBank.Bank1 ||
+         computerType == ComputerType.Spectrum48K);
 
     private static PortType GetPortType(Word address) => (address & 0xFF) switch
     {

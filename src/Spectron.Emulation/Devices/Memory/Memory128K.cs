@@ -30,6 +30,7 @@ internal sealed class Memory128K : IEmulatorMemory
     internal ReadOnlySpan<byte> Rom => _activeRom.Memory;
 
     public IRomMemory OriginalRom => RomBank1;
+    public RomBank RomBank { get; private set; } = RomBank.Bank0;
 
     internal Memory128K(byte[] romBank0, byte[] romBank1)
     {
@@ -104,6 +105,7 @@ internal sealed class Memory128K : IEmulatorMemory
     {
         _isPagingDisabledUntilReset = false;
 
+        RomBank = RomBank.Bank0;
         _activeRom = RomBank0;
         _activeScreen = Banks[5];
         _activeRam = Banks[0];
@@ -181,6 +183,7 @@ internal sealed class Memory128K : IEmulatorMemory
             return;
         }
 
+        RomBank = RomBank.Bank1;
         _activeRom = RomBank1;
     }
 
@@ -191,6 +194,7 @@ internal sealed class Memory128K : IEmulatorMemory
             return;
         }
 
+        RomBank = RomBank.Bank0;
         _activeRom = RomBank0;
     }
 
