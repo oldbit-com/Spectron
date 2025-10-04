@@ -44,6 +44,11 @@ public sealed class Interface1Device(
 
     public void Reset()
     {
+        if (!IsEnabled)
+        {
+            return;
+        }
+
         ShadowRom.UnPage();
 
         _previousControlValue =  0xFF;
