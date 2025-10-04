@@ -317,6 +317,8 @@ internal partial class DiskController
             TrackRegister = 0xFF;
             DataRegister = 0;
         }
+
+        ProcessSeekState();
     }
 
     private void ProcessSeekState()
