@@ -36,12 +36,8 @@ internal readonly struct Command
         return CommandType.Type3;
     }
 
-
-    // Bit E - 15 ms delay (0: no 15ms delay, 1: 15 ms delay)
-    internal bool ShouldDelay => (_command & 0x04) != 0;
-
     // 0  0  0  0  h  V r1 r0
-    internal bool IsRestore => (_command & 0xF0) == 0xF0;
+    internal bool IsRestore => (_command & 0xF0) == 0x00;
 
     // 0  0  0  1  h  V r1 r0
     internal bool IsSeek => (_command & 0xF0) == 0x10;
@@ -75,6 +71,9 @@ internal readonly struct Command
 
     // C flag value for ReadSector/WriteSector
     internal bool HasSideCompareFlagSet => (_command & 0x02) == 0x02;
+
+    // Bit E - 15 ms delay (0: no 15ms delay, 1: 15 ms delay)
+    internal bool ShouldDelay => (_command & 0x04) != 0;
 
     // S flag value for ReadSector/WriteSector
     internal int SideSelectFlagSet => (_command & 0x08) >> 3;

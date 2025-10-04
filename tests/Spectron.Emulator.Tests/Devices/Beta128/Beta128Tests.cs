@@ -1,3 +1,4 @@
+using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Beta128;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
@@ -18,7 +19,7 @@ public class Beta128Tests
         _memory = new Memory48K(_spectrumRom);
         _z80 = new Z80(_memory);
 
-        _beta128 = new Beta128Device(_z80, 3.5f, _memory);
+        _beta128 = new Beta128Device(_z80, 3.5f, _memory, ComputerType.Spectrum48K);
     }
 
     [Fact]
