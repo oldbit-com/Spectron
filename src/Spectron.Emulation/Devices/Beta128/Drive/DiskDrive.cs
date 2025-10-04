@@ -2,7 +2,7 @@ using OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Drive;
 
-public sealed class DiskDrive
+public sealed class DiskDrive(DriveId driveId)
 {
     private FloppyDisk? _floppy;
 
@@ -11,13 +11,14 @@ public sealed class DiskDrive
 
     internal bool IsDiskLoaded => _floppy != null;
     internal bool IsTrackZero => CylinderNo == 0;
-    internal bool IsWriteProtected { get; private set; }
 
     internal byte CylinderNo { get; private set; }
     internal Track? Track { get; private set; }
 
     internal bool IsSpinning => SpinTime > 0;
     internal long SpinTime { get; private set; }
+
+    public bool IsWriteProtected { get; set; }
 
     internal void InsertDisk(FloppyDisk floppy)
     {

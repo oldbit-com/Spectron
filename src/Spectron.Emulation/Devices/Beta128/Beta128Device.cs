@@ -4,9 +4,14 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128;
 
-public class Beta128Device(Z80 cpu, float clockMhz, IEmulatorMemory emulatorMemory, ComputerType computerType) : IDevice
+public class Beta128Device(
+    Z80 cpu,
+    float clockMhz,
+    IEmulatorMemory emulatorMemory,
+    ComputerType computerType,
+    IDiskDriveProvider diskDriveProvider) : IDevice
 {
-    private readonly DiskController _controller = new(clockMhz);
+    private readonly DiskController _controller = new(clockMhz, diskDriveProvider);
 
     private bool _isPaged;
 

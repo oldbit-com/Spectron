@@ -86,6 +86,7 @@ public sealed class Emulator
         HardwareSettings hardware,
         TapeManager tapeManager,
         MicrodriveManager microdriveManager,
+        DiskDriveManager diskDriveManager,
         GamepadManager gamepadManager,
         KeyboardState keyboardState,
         TimeMachine timeMachine,
@@ -125,7 +126,7 @@ public sealed class Emulator
         AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware);
 
         DivMmc = new DivMmcDevice(Cpu, _memory, logger);
-        Beta128 = new Beta128Device(Cpu, _hardware.ClockMhz, _memory, ComputerType);
+        Beta128 = new Beta128Device(Cpu, _hardware.ClockMhz, _memory, ComputerType, diskDriveManager);
         Interface1 = microdriveManager.CreateDevice(Cpu, _memory);
         Printer = new ZxPrinter();
 

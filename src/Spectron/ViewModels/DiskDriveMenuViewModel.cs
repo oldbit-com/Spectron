@@ -5,12 +5,14 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OldBit.Spectron.Dialogs;
+using OldBit.Spectron.Emulation.Devices.Beta128;
 using OldBit.Spectron.Emulation.Devices.Beta128.Drive;
 
 namespace OldBit.Spectron.ViewModels;
 
 public class DiskDriveMenuViewModel : ObservableObject
 {
+    private readonly DiskDriveManager _diskDriveManager;
     public ICommand InsertCommand { get; }
     public ICommand EjectCommand { get; }
     public ICommand ToggleWriteProtectCommand { get; }
@@ -18,13 +20,15 @@ public class DiskDriveMenuViewModel : ObservableObject
     public Dictionary<DriveId, Observable<string>> EjectCommandHeadings { get; } = new();
     public Dictionary<DriveId, Observable<bool>> IsWriteProtected { get; } = new();
 
-    public DiskDriveMenuViewModel()
+    public DiskDriveMenuViewModel(DiskDriveManager diskDriveManager)
     {
         foreach (var drive in Enum.GetValues<DriveId>())
         {
             EjectCommandHeadings.Add(drive, new Observable<string>("Eject"));
             IsWriteProtected.Add(drive, new Observable<bool>(false));
         }
+
+        _diskDriveManager = diskDriveManager;
 
         InsertCommand = new AsyncRelayCommand<DriveId>(execute: Insert);
         EjectCommand = new AsyncRelayCommand<DriveId>(execute: Eject, canExecute: IsDiskInserted);
@@ -62,7 +66,7 @@ public class DiskDriveMenuViewModel : ObservableObject
     private void ToggleWriteProtect(DriveId driveId)
     {
         IsWriteProtected[driveId].Value = !IsWriteProtected[driveId].Value;
-        //_microdriveManager[driveId].IsCartridgeWriteProtected = IsWriteProtected[driveId].Value;
+        _diskDriveManager[driveId].IsWriteProtected = IsWriteProtected[driveId].Value;
     }
 
     private bool IsDiskInserted(DriveId driveId) => false;

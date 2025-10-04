@@ -19,7 +19,6 @@ public sealed class MicrodriveManager : IMicrodriveProvider
         foreach (var drive in Enum.GetValues<MicrodriveId>())
         {
             var microdrive = new Microdrive(drive);
-
             Microdrives[drive] = microdrive;
 
             microdrive.MotorStateChanged += _ =>

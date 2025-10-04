@@ -6,6 +6,7 @@ namespace OldBit.Spectron.Emulation.Devices.Beta128.Controller;
 
 internal sealed partial class DiskController
 {
+    private readonly IDiskDriveProvider _diskDriveProvider;
     private const byte ControlDriveSelect = 0b000_0011;
     private const byte ControlDriveSide = 0b0001_0000;
     private const byte ControlResetPulse = 0b0000_0100;
@@ -16,7 +17,6 @@ internal sealed partial class DiskController
     private readonly int _byteTime;         // number of T states per 1 byte
     private readonly int _clockHz;
 
-    private readonly DiskDrive[] _drives = new DiskDrive[4];
     private DiskDrive _drive;
 
     private byte _sideNo;
@@ -44,20 +44,17 @@ internal sealed partial class DiskController
 
     internal RequestStatus Request { get; private set; } = 0;
 
-    public DiskController(float clockMhz)
+    public DiskController(float clockMhz, IDiskDriveProvider diskDriveProvider)
     {
+        _diskDriveProvider = diskDriveProvider;
+
         _clockHz = (int)(clockMhz * 1_000_000);
         _millisecond = _clockHz / 1000;
         _rotationTime = _clockHz / DiskDrive.Rps;
 
         _byteTime = _clockHz / (Track.DataLength * DiskDrive.Rps);
 
-        _drives[0] = new DiskDrive();   // A:
-        _drives[1] = new DiskDrive();   // B:
-        _drives[2] = new DiskDrive();   // C:
-        _drives[3] = new DiskDrive();   // D:
-
-        _drive = _drives[0];
+        _drive = _diskDriveProvider.Drives[DriveId.DriveA];
     }
 
     internal byte DataRegister
@@ -84,7 +81,9 @@ internal sealed partial class DiskController
         {
             _controlRegister = value;
 
-            _drive = _drives[_controlRegister & ControlDriveSelect];
+            var driveId = (DriveId)(_controlRegister & ControlDriveSelect + 1);
+
+            _drive = _diskDriveProvider.Drives[driveId];
             _sideNo = (byte)((_controlRegister & ControlDriveSide) != 0 ? 0 : 1);
 
             if ((_controlRegister & ControlResetPulse) != 0)

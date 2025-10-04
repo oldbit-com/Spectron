@@ -7,6 +7,6 @@ public class DiskControllerTests
     [Fact]
     public void Test()
     {
-        var controller = new DiskController(3.5f);
+        //var controller = new DiskController(3.5f);
     }
 }

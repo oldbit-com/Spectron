@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using OldBit.Spectron.Emulation.Commands;
+using OldBit.Spectron.Emulation.Devices.Beta128;
 using OldBit.Spectron.Emulation.Devices.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
@@ -24,6 +25,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<Loader>();
         services.AddSingleton<TapeManager>();
         services.AddSingleton<MicrodriveManager>();
+        services.AddSingleton<DiskDriveManager>();
         services.AddSingleton<GamepadManager>();
         services.AddSingleton<KeyboardState>();
         services.AddSingleton<CommandManager>();
