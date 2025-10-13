@@ -1,15 +1,14 @@
+using OldBit.Spectron.Emulation.Devices.Beta128.Events;
 using OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Drive;
 
 public sealed class DiskDrive(DriveId driveId)
 {
-    private FloppyDisk? _floppy;
-
     private const int MaxCylinders = 80;
     internal const int Rps = 5;
 
-    internal bool IsDiskLoaded => _floppy != null;
+    public bool IsDiskInserted => Image?.Floppy != null;
     internal bool IsTrackZero => CylinderNo == 0;
 
     internal byte CylinderNo { get; private set; }
@@ -18,11 +17,24 @@ public sealed class DiskDrive(DriveId driveId)
     internal bool IsSpinning => SpinTime > 0;
     internal long SpinTime { get; private set; }
 
+    public DiskImage? Image { get; private set; }
+
     public bool IsWriteProtected { get; set; }
 
-    internal void InsertDisk(FloppyDisk floppy)
+    public event DiskChangedEvent? DiskChanged;
+
+    public void InsertDisk(string filePath)
     {
-        _floppy = floppy;
+        Image = new DiskImage(filePath);
+
+        OnDiskChanged();
+    }
+
+    public void EjectDisk()
+    {
+        Image = null;
+
+        OnDiskChanged();
     }
 
     internal void Spin(long spinTime) => SpinTime = spinTime;
@@ -32,7 +44,7 @@ public sealed class DiskDrive(DriveId driveId)
     internal void Seek(byte cylinderNo, byte sideNo)
     {
         CylinderNo = cylinderNo;
-        Track = _floppy?.GetTrack(CylinderNo, sideNo);
+        Track = Image?.Floppy.GetTrack(CylinderNo, sideNo);
     }
 
     internal void Step(int stepIncrement)
@@ -52,4 +64,7 @@ public sealed class DiskDrive(DriveId driveId)
 
         CylinderNo = (byte)cylinderNo;
     }
+
+    private void OnDiskChanged() => DiskChanged?.Invoke(new DiskChangedEventArgs { DriveId = driveId });
+
 }

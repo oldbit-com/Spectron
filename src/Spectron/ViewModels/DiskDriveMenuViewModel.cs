@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -7,6 +8,7 @@ using CommunityToolkit.Mvvm.Input;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation.Devices.Beta128;
 using OldBit.Spectron.Emulation.Devices.Beta128.Drive;
+using OldBit.Spectron.Emulation.Devices.Beta128.Events;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -29,10 +31,36 @@ public class DiskDriveMenuViewModel : ObservableObject
         }
 
         _diskDriveManager = diskDriveManager;
+        _diskDriveManager.DiskChanged += OnDiskChanged;
 
         InsertCommand = new AsyncRelayCommand<DriveId>(execute: Insert);
         EjectCommand = new AsyncRelayCommand<DriveId>(execute: Eject, canExecute: IsDiskInserted);
         ToggleWriteProtectCommand = new RelayCommand<DriveId>(execute: ToggleWriteProtect, canExecute: IsDiskInserted);
+    }
+
+    private void OnDiskChanged(DiskChangedEventArgs e)
+    {
+        var diskDrive = _diskDriveManager.Drives.GetValueOrDefault(e.DriveId);
+
+        if (diskDrive == null)
+        {
+            return;
+        }
+
+        if (!diskDrive.IsDiskInserted)
+        {
+            EjectCommandHeadings[e.DriveId].Value = "Eject";
+        }
+        else if (diskDrive.Image?.FilePath != null)
+        {
+            var fileName = Path.GetFileName(diskDrive.Image.FilePath);
+
+            EjectCommandHeadings[e.DriveId].Value = $"Eject '{fileName}'";
+        }
+        else
+        {
+            EjectCommandHeadings[e.DriveId].Value = "Eject 'New Disk'";
+        }
     }
 
     private async Task Insert(DriveId driveId)
@@ -46,8 +74,7 @@ public class DiskDriveMenuViewModel : ObservableObject
                 return;
             }
 
-            // _microdriveManager[driveId].InsertCartridge(files[0].Path.LocalPath);
-            // IsWriteProtected[driveId].Value = _microdriveManager[driveId].IsCartridgeWriteProtected;
+            _diskDriveManager[driveId].InsertDisk(files[0].Path.LocalPath);
         }
         catch (Exception ex)
         {
@@ -57,8 +84,8 @@ public class DiskDriveMenuViewModel : ObservableObject
 
     private async Task Eject(DriveId driveId)
     {
-        // _microdriveManager[driveId].EjectCartridge();
-        // IsWriteProtected[driveId].Value = false;
+        _diskDriveManager[driveId].EjectDisk();
+        IsWriteProtected[driveId].Value = false;
 
         await Task.CompletedTask;
     }
@@ -69,6 +96,6 @@ public class DiskDriveMenuViewModel : ObservableObject
         _diskDriveManager[driveId].IsWriteProtected = IsWriteProtected[driveId].Value;
     }
 
-    private bool IsDiskInserted(DriveId driveId) => false;
-        //_microdriveManager[driveId].IsCartridgeInserted;
+    private bool IsDiskInserted(DriveId driveId) =>
+        _diskDriveManager[driveId].IsDiskInserted;
 }

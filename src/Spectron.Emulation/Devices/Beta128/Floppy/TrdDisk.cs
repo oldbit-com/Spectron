@@ -1,10 +1,8 @@
-using OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
+namespace OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
-namespace OldBit.Spectron.Emulation.Devices.Beta128;
-
-internal static class TrdImage
+internal static class TrdDisk
 {
-    internal static void Read(string filePath)
+    internal static FloppyDisk Read(string filePath)
     {
         var data = File.ReadAllBytes(filePath).AsSpan();
 
@@ -19,5 +17,7 @@ internal static class TrdImage
             var sectorData = data.Slice(i, FloppyDisk.BytesPerSector);
             disk.WriteSector(cylinderNo, sideNo, sectorNo, sectorData);
         }
+
+        return disk;
     }
 }

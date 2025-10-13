@@ -115,7 +115,7 @@ internal sealed partial class DiskController
             _drive.Stop();
         }
 
-        if (_drive.IsDiskLoaded)
+        if (_drive.IsDiskInserted)
         {
             _controllerStatus &= ~ControllerStatus.NotReady;
         }
@@ -138,7 +138,7 @@ internal sealed partial class DiskController
                 _controllerStatus |= ControllerStatus.TrackZero;
             }
 
-            if (_drive is { IsDiskLoaded: true, IsSpinning: true } && IsWithinIndexHole(now))
+            if (_drive is { IsDiskInserted: true, IsSpinning: true } && IsWithinIndexHole(now))
             {
                 _controllerStatus |= ControllerStatus.Index;
             }
@@ -286,7 +286,7 @@ internal sealed partial class DiskController
         var wait = 10 * _rotationTime;
         _currentSector = null;
 
-        if (_drive is { IsSpinning: true, IsDiskLoaded: true, Track: not null })
+        if (_drive is { IsSpinning: true, IsDiskInserted: true, Track: not null })
         {
             var trackDuration = _drive.Track.Data.Length * _byteTime; // TODO: This is constant value
             var position = (int)((_next + _shift) % trackDuration / _byteTime);
@@ -314,7 +314,7 @@ internal sealed partial class DiskController
 
         _next += wait;
 
-        if (_drive.IsDiskLoaded && _next > _maxAddressMarkWaitTime)
+        if (_drive.IsDiskInserted && _next > _maxAddressMarkWaitTime)
         {
             _next = _maxAddressMarkWaitTime;
             _currentSector = null;

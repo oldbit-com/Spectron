@@ -84,7 +84,7 @@ internal partial class DiskController
 
     private void ProcessFoundNextIdState()
     {
-        if (!_drive.IsDiskLoaded)
+        if (!_drive.IsDiskInserted)
         {
             _maxAddressMarkWaitTime = _next + 5 * _rotationTime;
 
