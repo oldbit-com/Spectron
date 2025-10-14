@@ -4,6 +4,9 @@ using OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Controller;
 
+/// <summary>
+/// Based on UnrealSpeccyP implementation: https://github.com/djdron/UnrealSpeccyP/blob/master/devices/fdd/wd1793.cpp
+/// </summary>
 internal sealed partial class DiskController
 {
     private readonly IDiskDriveProvider _diskDriveProvider;
