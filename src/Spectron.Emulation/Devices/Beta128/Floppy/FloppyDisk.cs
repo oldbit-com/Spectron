@@ -14,17 +14,17 @@ internal sealed class FloppyDisk
 
     private readonly byte[] _sectorInterleave = [1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15, 8, 16];
 
-    private readonly int _totalCylinders;
-    private readonly int _totalSides;
-
     private readonly Track[][] _tracks;
+
+    internal int TotalCylinders { get; }
+    internal int TotalSides { get; }
 
     internal FloppyDisk(int totalCylinders, int totalSides)
     {
-        _totalCylinders = totalCylinders;
-        _totalSides = totalSides;
+        TotalCylinders = totalCylinders;
+        TotalSides = totalSides;
 
-        _tracks = new Track[_totalCylinders][];
+        _tracks = new Track[TotalCylinders][];
 
         Initialize();
     }
@@ -36,11 +36,11 @@ internal sealed class FloppyDisk
     {
         var size = (byte)Math.Log2(BytesPerSector / 128.0);
 
-        for (byte cylinderNo = 0; cylinderNo < _totalCylinders; cylinderNo++)
+        for (byte cylinderNo = 0; cylinderNo < TotalCylinders; cylinderNo++)
         {
-            _tracks[cylinderNo] = new Track[_totalSides];
+            _tracks[cylinderNo] = new Track[TotalSides];
 
-            for (byte sideNo = 0; sideNo < _totalSides; sideNo++)
+            for (byte sideNo = 0; sideNo < TotalSides; sideNo++)
             {
                 var position = 0;
 
@@ -96,12 +96,12 @@ internal sealed class FloppyDisk
 
     private void AddTrDosDiskInfo()
     {
-        var totalFreeSectors = _totalCylinders * _totalSides * TotalSectors - 16;
+        var totalFreeSectors = TotalCylinders * TotalSides * TotalSectors - 16;
         var sector = _tracks[0][0][9];
 
         sector[0xE1] = 0;
         sector[0xE2] = 1;       // E1:E2 First free sector address sec:track
-        sector[0xE3] = DiskType.GetDiskType(_totalCylinders, _totalSides);
+        sector[0xE3] = DiskType.GetDiskType(TotalCylinders, TotalSides);
         sector[0xE5] = (byte)(totalFreeSectors & 0xFF);
         sector[0xE6] = (byte)(totalFreeSectors >> 8);
         sector[0xE7] = 0x10;    // TR-DOS id

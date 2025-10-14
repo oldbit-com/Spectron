@@ -13,5 +13,7 @@ public partial record DiskDriveState
 
     public DiskImageType DiskImageType { get; init; }
 
+    public bool IsWriteProtected { get; init; }
+
     public byte[] Data { get; init; } = [];
 }

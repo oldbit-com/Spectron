@@ -3,6 +3,7 @@ namespace OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 internal sealed class Track(int totalSectors)
 {
     internal const int DataLength = 6400; // = 5314;
+    internal int TotalSectors { get; } = totalSectors;
 
     private readonly byte[] _data = new byte[DataLength];
     private readonly Sector[] _sectors = new Sector[totalSectors];

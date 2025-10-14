@@ -26,6 +26,8 @@ internal sealed class Sector
         _data = new ArraySegment<byte>(track.Data, dataPosition - 1, 1 + bytesPerSector + 2);
     }
 
+    internal ReadOnlySpan<byte> GetData() => _data[1..^2];
+
     internal byte this[int index]
     {
         get

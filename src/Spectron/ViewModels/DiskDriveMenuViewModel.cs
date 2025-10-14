@@ -61,6 +61,11 @@ public class DiskDriveMenuViewModel : ObservableObject
         {
             EjectCommandHeadings[e.DriveId].Value = "Eject 'New Disk'";
         }
+
+        if (diskDrive.IsWriteProtected != IsWriteProtected[e.DriveId].Value)
+        {
+            ToggleWriteProtect(e.DriveId);
+        }
     }
 
     private async Task Insert(DriveId driveId)

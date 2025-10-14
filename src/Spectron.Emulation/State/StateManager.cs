@@ -235,6 +235,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
                         DriveId = driveId,
                         FilePath = drive.Image!.FilePath,
                         DiskImageType = drive.Image.DiskImageType,
+                        IsWriteProtected = drive.IsWriteProtected,
                         Data = drive.Image.GetData()
                     });
                 }
@@ -432,7 +433,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         foreach (var drive in beta128State.Drives)
         {
             diskDriveManager[drive.DriveId]
-                .InsertDisk(drive.FilePath, drive.DiskImageType, drive.Data);
+                .InsertDisk(drive.FilePath, drive.DiskImageType, drive.IsWriteProtected, drive.Data);
         }
 
         beta128.Enable();

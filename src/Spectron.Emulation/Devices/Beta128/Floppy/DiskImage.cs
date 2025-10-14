@@ -14,11 +14,23 @@ public sealed class DiskImage
         FilePath = filePath;
         DiskImageType = DiskImageType.Trd;
 
-        Floppy = TrdDisk.Read(filePath);
+        Floppy = DiskReader.Read(filePath);
+    }
+
+    internal DiskImage(string? filePath, DiskImageType diskImageType, ReadOnlySpan<byte> data)
+    {
+        FilePath = filePath;
+        DiskImageType = diskImageType;
+
+        Floppy = DiskReader.Read(diskImageType, data);
     }
 
     public byte[] GetData()
     {
-        return [];
+        using var stream = new MemoryStream();
+
+        DiskWriter.Write(this, stream);
+
+        return stream.ToArray();
     }
 }

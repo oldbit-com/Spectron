@@ -31,9 +31,12 @@ public sealed class DiskDrive(DriveId driveId)
         OnDiskChanged();
     }
 
-    internal void InsertDisk(string? filePath, DiskImageType diskImageType, byte[] data)
+    internal void InsertDisk(string? filePath, DiskImageType diskImageType, bool isWriteProtected, ReadOnlySpan<byte> data)
     {
+        Image = new DiskImage(filePath, diskImageType, data);
+        IsWriteProtected = isWriteProtected;
 
+        OnDiskChanged();
     }
 
     public void EjectDisk()
