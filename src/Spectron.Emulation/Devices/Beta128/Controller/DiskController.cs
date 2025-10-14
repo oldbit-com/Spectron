@@ -7,6 +7,7 @@ namespace OldBit.Spectron.Emulation.Devices.Beta128.Controller;
 internal sealed partial class DiskController
 {
     private readonly IDiskDriveProvider _diskDriveProvider;
+
     private const byte ControlDriveSelect = 0b000_0011;
     private const byte ControlDriveSide = 0b0001_0000;
     private const byte ControlResetPulse = 0b0000_0100;
@@ -77,6 +78,7 @@ internal sealed partial class DiskController
 
     internal byte ControlRegister
     {
+        get => _controlRegister;
         set
         {
             _controlRegister = value;
@@ -97,6 +99,12 @@ internal sealed partial class DiskController
 
             _drive.Stop();
         }
+    }
+
+    internal byte CommandRegister
+    {
+        get => _command.CommandRegister;
+        set => _command = new Command(value);
     }
 
     internal byte Status
@@ -221,9 +229,9 @@ internal sealed partial class DiskController
         }
     }
 
-    internal void ProcessCommand(long now, byte commandCode)
+    internal void ProcessCommand(long now, byte commandRegister)
     {
-        var command = new Command(commandCode);
+        var command = new Command(commandRegister);
 
         if (command.IsForceInterrupt)
         {

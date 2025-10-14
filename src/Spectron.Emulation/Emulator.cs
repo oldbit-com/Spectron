@@ -59,6 +59,7 @@ public sealed class Emulator
     public KeyboardState KeyboardState { get; }
     public TapeManager TapeManager { get; }
     public MicrodriveManager MicrodriveManager { get; }
+    public DiskDriveManager DiskDriveManager { get; }
     public JoystickManager JoystickManager { get; }
     public AudioManager AudioManager { get; }
     public GamepadManager GamepadManager { get; }
@@ -101,6 +102,7 @@ public sealed class Emulator
         CommandManager = commandManager;
         TapeManager = tapeManager;
         MicrodriveManager = microdriveManager;
+        DiskDriveManager = diskDriveManager;
         GamepadManager = gamepadManager;
         ComputerType = emulatorArgs.ComputerType;
         RomType = emulatorArgs.RomType;

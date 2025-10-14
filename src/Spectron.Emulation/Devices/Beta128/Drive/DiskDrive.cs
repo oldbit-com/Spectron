@@ -1,5 +1,6 @@
 using OldBit.Spectron.Emulation.Devices.Beta128.Events;
 using OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
+using OldBit.Spectron.Emulation.Devices.Beta128.Image;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Drive;
 
@@ -28,6 +29,11 @@ public sealed class DiskDrive(DriveId driveId)
         Image = new DiskImage(filePath);
 
         OnDiskChanged();
+    }
+
+    internal void InsertDisk(string? filePath, DiskImageType diskImageType, byte[] data)
+    {
+
     }
 
     public void EjectDisk()

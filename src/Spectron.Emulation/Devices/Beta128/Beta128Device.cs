@@ -11,20 +11,18 @@ public class Beta128Device(
     ComputerType computerType,
     IDiskDriveProvider diskDriveProvider) : IDevice
 {
-    private readonly DiskController _controller = new(clockMhz, diskDriveProvider);
-
-    private bool _isPaged;
-
     private long _ticksSinceReset;
     private long Now => _ticksSinceReset + cpu.Clock.FrameTicks;
 
-    public readonly ShadowRom ShadowRom = new(emulatorMemory);
+    private readonly ShadowRom _shadowRom = new(emulatorMemory);
 
     public bool IsEnabled { get; private set; }
+    internal bool IsRomPaged { get; private set; }
+    internal DiskController Controller { get; } = new(clockMhz, diskDriveProvider);
 
     public void WritePort(Word address, byte value)
     {
-        if (!IsEnabled || !_isPaged)
+        if (!IsEnabled || !IsRomPaged)
         {
             return;
         }
@@ -36,35 +34,35 @@ public class Beta128Device(
             return;
         }
 
-        _controller.ProcessState(Now);
+        Controller.ProcessState(Now);
 
         switch (portType)
         {
             case PortType.Command:
-                _controller.ProcessCommand(Now, value);
+                Controller.ProcessCommand(Now, value);
                 break;
 
             case PortType.Track:
-                _controller.TrackRegister = value;
+                Controller.TrackRegister = value;
                 break;
 
             case PortType.Sector:
-                _controller.SectorRegister = value;
+                Controller.SectorRegister = value;
                 break;
 
             case PortType.Data:
-                _controller.DataRegister = value;
+                Controller.DataRegister = value;
                 break;
 
             case PortType.Control:
-                _controller.ControlRegister = value;
+                Controller.ControlRegister = value;
                 break;
         }
     }
 
     public byte? ReadPort(Word address)
     {
-        if (!IsEnabled || !_isPaged)
+        if (!IsEnabled || !IsRomPaged)
         {
             return null;
         }
@@ -76,15 +74,15 @@ public class Beta128Device(
             return null;
         }
 
-        _controller.ProcessState(Now);
+        Controller.ProcessState(Now);
 
         return portType switch
         {
-            PortType.Status => _controller.Status,
-            PortType.Track => _controller.TrackRegister,
-            PortType.Sector => _controller.SectorRegister,
-            PortType.Data => _controller.DataRegister,
-            PortType.Control => (byte)(_controller.Request | ~(RequestStatus.InterruptRequest | RequestStatus.DataRequest)),
+            PortType.Status => Controller.Status,
+            PortType.Track => Controller.TrackRegister,
+            PortType.Sector => Controller.SectorRegister,
+            PortType.Data => Controller.DataRegister,
+            PortType.Control => (byte)(Controller.Request | ~(RequestStatus.InterruptRequest | RequestStatus.DataRequest)),
             _ => null
         };
     }
@@ -107,18 +105,26 @@ public class Beta128Device(
     {
         switch (pc)
         {
-            case >= 0x3D00 and <= 0x3DFF when !_isPaged && CanPageRom:
-                ShadowRom.Page();
-                _isPaged = true;
-
+            case >= 0x3D00 and <= 0x3DFF when !IsRomPaged && CanPageRom:
+                PageRom();
                 break;
 
-            case >= 0x4000 when _isPaged:
-                ShadowRom.UnPage();
-                _isPaged = false;
-
+            case >= 0x4000 when IsRomPaged:
+                UnPageRom();
                 break;
         }
+    }
+
+    internal void PageRom()
+    {
+        _shadowRom.Page();
+        IsRomPaged = true;
+    }
+
+    private void UnPageRom()
+    {
+        _shadowRom.UnPage();
+        IsRomPaged = false;
     }
 
     internal void NewFrame(long ticksSinceReset) => _ticksSinceReset  = ticksSinceReset;
@@ -142,6 +148,4 @@ public class Beta128Device(
         _ticksSinceReset = 0;
         // TODO: Any reset logic
     }
-
-
 }
