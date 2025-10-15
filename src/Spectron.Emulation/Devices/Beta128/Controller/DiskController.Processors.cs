@@ -118,6 +118,7 @@ internal partial class DiskController
             {
                 _controllerState = ControllerState.Idle;
             }
+
             return;
         }
 
@@ -152,7 +153,7 @@ internal partial class DiskController
             _next += _byteTime * 9;
 
             _controllerState = ControllerState.Wait;
-            _nextControllerState =  ControllerState.WriteSector;
+            _nextControllerState = ControllerState.WriteSector;
             return;
         }
 
@@ -164,10 +165,10 @@ internal partial class DiskController
             // 	break;
             // }
 
-            _next += _byteTime*(_currentSector.DataPosition - _currentSector.IdPosition);
+            _next += _byteTime * (_currentSector.DataPosition - _currentSector.IdPosition);
 
             _controllerState = ControllerState.Wait;
-            _nextControllerState =  ControllerState.ReadSector;
+            _nextControllerState = ControllerState.ReadSector;
         }
     }
 
@@ -219,7 +220,7 @@ internal partial class DiskController
 
             _next += _byteTime;
             _controllerState = ControllerState.Wait;
-            _nextControllerState  = ControllerState.Read;
+            _nextControllerState = ControllerState.Read;
         }
         else
         {
@@ -239,12 +240,9 @@ internal partial class DiskController
                 }
             }
 
-            if (_command.IsReadAddress)
+            if (_command.IsReadAddress && !_currentSector.VerifyIdCrc())
             {
-                if (!_currentSector.VerifyIdCrc())
-                {
-                    _controllerStatus |= ControllerStatus.CrcError;
-                }
+                _controllerStatus |= ControllerStatus.CrcError;
             }
 
             _controllerState = ControllerState.Idle;
@@ -297,16 +295,16 @@ internal partial class DiskController
 
         var delay = _command.SteppingRate switch
         {
-           0 => 6,
-           1 => 12,
-           2 => 20,
-           3 => 30,
-           _ => 0,
+            0 => 6,
+            1 => 12,
+            2 => 20,
+            3 => 30,
+            _ => 0,
         };
 
         _next += delay * _millisecond;
 
-        _controllerState =  ControllerState.Wait;
+        _controllerState = ControllerState.Wait;
         _nextControllerState = _command.IsSeek ? ControllerState.Seek : ControllerState.Verify;
     }
 
@@ -329,7 +327,7 @@ internal partial class DiskController
         }
         else
         {
-            _stepIncrement = DataRegister < TrackRegister ? 1 : -1;
+            _stepIncrement = DataRegister < TrackRegister ? -1 : 1;
             _controllerState = ControllerState.Step;
         }
     }

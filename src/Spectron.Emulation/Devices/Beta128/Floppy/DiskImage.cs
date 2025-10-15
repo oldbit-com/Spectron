@@ -14,7 +14,7 @@ public sealed class DiskImage
         FilePath = filePath;
         DiskImageType = DiskImageType.Trd;
 
-        Floppy = DiskReader.Read(filePath);
+        Floppy = DiskImageReader.Read(filePath);
     }
 
     internal DiskImage(string? filePath, DiskImageType diskImageType, ReadOnlySpan<byte> data)
@@ -22,14 +22,14 @@ public sealed class DiskImage
         FilePath = filePath;
         DiskImageType = diskImageType;
 
-        Floppy = DiskReader.Read(diskImageType, data);
+        Floppy = DiskImageReader.Read(diskImageType, data);
     }
 
     public byte[] GetData()
     {
         using var stream = new MemoryStream();
 
-        DiskWriter.Write(this, stream);
+        DiskImageWriter.Write(this, stream);
 
         return stream.ToArray();
     }

@@ -86,7 +86,7 @@ internal sealed partial class DiskController
         {
             _controlRegister = value;
 
-            var driveId = (DriveId)(_controlRegister & ControlDriveSelect + 1);
+            var driveId = (DriveId)((_controlRegister & ControlDriveSelect) + 1);
 
             _drive = _diskDriveProvider.Drives[driveId];
             _sideNo = (byte)((_controlRegister & ControlDriveSide) != 0 ? 0 : 1);
@@ -304,7 +304,7 @@ internal sealed partial class DiskController
 
             wait = int.MaxValue;
 
-            for(var sectorNo = 1; sectorNo <= 16; sectorNo++)
+            for (var sectorNo = 1; sectorNo <= 16; sectorNo++)
             {
                 var sector = _drive.Track[sectorNo];
                 var idPosition = sector.IdPosition;
@@ -357,6 +357,7 @@ internal sealed partial class DiskController
         Request = RequestStatus.DataRequest;
         _controllerStatus |= ControllerStatus.DataRequest;
 
+        _next += _byteTime;
         _controllerState = ControllerState.Wait;
         _nextControllerState = ControllerState.Read;
     }

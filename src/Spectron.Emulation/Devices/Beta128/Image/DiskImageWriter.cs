@@ -2,7 +2,7 @@ using OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Image;
 
-internal static class DiskWriter
+internal static class DiskImageWriter
 {
     internal static void Write(DiskImage image, Stream stream)
     {

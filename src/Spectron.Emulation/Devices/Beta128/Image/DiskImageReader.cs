@@ -2,7 +2,7 @@ using OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Image;
 
-internal static class DiskReader
+internal static class DiskImageReader
 {
     internal static FloppyDisk Read(string filePath)
     {
