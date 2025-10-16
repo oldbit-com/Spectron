@@ -7,7 +7,7 @@ internal enum ControllerState
     CommandType1,
     DelayBeforeCommand,
     CommandReadWrite,
-    FOUND_NEXT_ID,
+    FoundNextId,
     Read,
     ReadSector,
     Write,

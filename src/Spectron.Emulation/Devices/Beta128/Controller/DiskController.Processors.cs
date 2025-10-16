@@ -4,13 +4,13 @@ namespace OldBit.Spectron.Emulation.Devices.Beta128.Controller;
 
 internal partial class DiskController
 {
-    private void ProcessIdleState()
+    private void ProcessIdle()
     {
         _controllerStatus &= ~ControllerStatus.Busy;
         Request = RequestStatus.InterruptRequest;
     }
 
-    private bool ProcessWaitState(long now)
+    private bool ProcessWait(long now)
     {
         if (_next > now)
         {
@@ -22,7 +22,7 @@ internal partial class DiskController
         return true;
     }
 
-    private void ProcessDelayBeforeCommandState()
+    private void ProcessDelayBeforeCommand()
     {
         if (_command.ShouldDelay)
         {
@@ -40,7 +40,7 @@ internal partial class DiskController
         _nextControllerState = ControllerState.CommandReadWrite;
     }
 
-    private void ProcessCommandReadWriteState()
+    private void ProcessCommandReadWrite()
     {
         if ((_command.IsWriteSector || _command.IsWriteTrack) && _drive.IsWriteProtected)
         {
@@ -82,7 +82,7 @@ internal partial class DiskController
         _controllerState = ControllerState.Idle;
     }
 
-    private void ProcessFoundNextIdState()
+    private void ProcessFoundNextId()
     {
         if (!_drive.IsDiskInserted)
         {
@@ -176,7 +176,7 @@ internal partial class DiskController
         }
     }
 
-    private void ProcessReadSectorState()
+    private void ProcessReadSector()
     {
         if (_currentSector == null)
         {
@@ -196,7 +196,7 @@ internal partial class DiskController
         ReadFirstByte();
     }
 
-    private void ProcessReadState()
+    private void ProcessRead()
     {
         if (_currentSector == null)
         {
@@ -253,7 +253,7 @@ internal partial class DiskController
         }
     }
 
-    private void ProcessCommandType1State()
+    private void ProcessCommandType1()
     {
         _controllerStatus = (_controllerStatus | ControllerStatus.Busy)
                             & ~(ControllerStatus.DataRequest | ControllerStatus.CrcError |
@@ -279,7 +279,7 @@ internal partial class DiskController
         _controllerState = ControllerState.Wait;
     }
 
-    private void ProcessStepState()
+    private void ProcessStep()
     {
         if (_command.IsRestore && _drive.CylinderNo == 0)
         {
@@ -313,7 +313,7 @@ internal partial class DiskController
         _nextControllerState = _command.IsSeek ? ControllerState.Seek : ControllerState.Verify;
     }
 
-    private void ProcessSeekStartState()
+    private void ProcessSeekStart()
     {
         if (_command.IsRestore)
         {
@@ -321,10 +321,10 @@ internal partial class DiskController
             _dataRegister = 0;
         }
 
-        ProcessSeekState();
+        ProcessSeek();
     }
 
-    private void ProcessSeekState()
+    private void ProcessSeek()
     {
         if (_dataRegister == TrackRegister)
         {
@@ -337,7 +337,7 @@ internal partial class DiskController
         }
     }
 
-    private void ProcessVerifyState()
+    private void ProcessVerify()
     {
         if (!_command.HasVerifyFlagSet)
         {
@@ -355,7 +355,7 @@ internal partial class DiskController
         FindMarker();
     }
 
-    private void ProcessResetState()
+    private void ProcessReset()
     {
         if (_drive.IsTrackZero)
         {

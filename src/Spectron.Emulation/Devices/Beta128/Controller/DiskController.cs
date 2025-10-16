@@ -162,34 +162,34 @@ internal sealed partial class DiskController
             switch (_controllerState)
             {
                 case ControllerState.Idle:
-                    ProcessIdleState();
+                    ProcessIdle();
                     return;
 
                 case ControllerState.Wait:
-                    if (!ProcessWaitState(now))
+                    if (!ProcessWait(now))
                     {
                         return;
                     }
                     break;
 
                 case ControllerState.DelayBeforeCommand:
-                    ProcessDelayBeforeCommandState();
+                    ProcessDelayBeforeCommand();
                     break;
 
                 case ControllerState.CommandType1:
-                    ProcessCommandType1State();
+                    ProcessCommandType1();
                     break;
 
                 case ControllerState.CommandReadWrite:
-                    ProcessCommandReadWriteState();
+                    ProcessCommandReadWrite();
                     break;
 
                 case ControllerState.ReadSector:
-                    ProcessReadSectorState();
+                    ProcessReadSector();
                     break;
 
                 case ControllerState.Read:
-                    ProcessReadState();
+                    ProcessRead();
                     break;
 
                 case ControllerState.Write:
@@ -208,27 +208,27 @@ internal sealed partial class DiskController
                     break;
 
                 case ControllerState.Step:
-                    ProcessStepState();
+                    ProcessStep();
                     break;
 
                 case ControllerState.SeekStart:
-                    ProcessSeekStartState();
+                    ProcessSeekStart();
                     break;
 
                 case ControllerState.Seek:
-                    ProcessSeekState();
+                    ProcessSeek();
                     break;
 
                 case ControllerState.Verify:
-                    ProcessVerifyState();
+                    ProcessVerify();
                     break;
 
                 case ControllerState.Reset:
-                    ProcessResetState();
+                    ProcessReset();
                     break;
 
-                case ControllerState.FOUND_NEXT_ID:
-                    ProcessFoundNextIdState();
+                case ControllerState.FoundNextId:
+                    ProcessFoundNextId();
                     break;
             }
         }
@@ -340,7 +340,7 @@ internal sealed partial class DiskController
         }
 
         _controllerState = ControllerState.Wait;
-        _nextControllerState = ControllerState.FOUND_NEXT_ID;
+        _nextControllerState = ControllerState.FoundNextId;
     }
 
     private void FindIndex()
