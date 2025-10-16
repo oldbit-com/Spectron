@@ -4,6 +4,11 @@ namespace OldBit.Spectron.Emulation.Devices.Beta128.Controller;
 public enum ControllerStatus
 {
     /// <summary>
+    /// No status flags set.
+    /// </summary>
+    None = 0,
+
+    /// <summary>
     /// Busy.
     /// Type I: When set command is in progress. When reset, no command is in progress.
     /// Type II, III: When set, the command is under execution. When reset, no command is under execution.

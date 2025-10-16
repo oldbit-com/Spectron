@@ -29,12 +29,12 @@ internal partial class DiskController
             _next += 15 * _millisecond;
         }
 
-        _controllerStatus |= ControllerStatus.Busy;
-        _controllerStatus &= ~(ControllerStatus.DataRequest |
-                               ControllerStatus.Lost |
-                               ControllerStatus.NotFound |
-                               ControllerStatus.WriteFault |
-                               ControllerStatus.WriteProtect);
+        _controllerStatus = (_controllerStatus | ControllerStatus.Busy) &
+                            ~(ControllerStatus.DataRequest |
+                              ControllerStatus.Lost |
+                              ControllerStatus.NotFound |
+                              ControllerStatus.RecordType |
+                              ControllerStatus.WriteProtect);
 
         _controllerState = ControllerState.Wait;
         _nextControllerState = ControllerState.CommandReadWrite;
@@ -111,7 +111,6 @@ internal partial class DiskController
             else if (!_currentSector.VerifyIdCrc())
             {
                 _controllerStatus |= ControllerStatus.CrcError;
-
                 FindMarker();
             }
             else
@@ -159,6 +158,11 @@ internal partial class DiskController
 
         if (_command.IsReadSector)
         {
+            if (_currentSector == null)
+            {
+                FindMarker();
+                return;
+            }
             // if(!found_sec->data)
             // {
             // 	FindMarker();
@@ -254,6 +258,7 @@ internal partial class DiskController
         _controllerStatus = (_controllerStatus | ControllerStatus.Busy)
                             & ~(ControllerStatus.DataRequest | ControllerStatus.CrcError |
                                 ControllerStatus.SeekError | ControllerStatus.WriteProtect);
+
         if (_drive.IsWriteProtected)
         {
             _controllerStatus |= ControllerStatus.WriteProtect;
@@ -313,7 +318,7 @@ internal partial class DiskController
         if (_command.IsRestore)
         {
             TrackRegister = 0xFF;
-            DataRegister = 0;
+            _dataRegister = 0;
         }
 
         ProcessSeekState();
@@ -321,13 +326,13 @@ internal partial class DiskController
 
     private void ProcessSeekState()
     {
-        if (DataRegister == TrackRegister)
+        if (_dataRegister == TrackRegister)
         {
             _controllerState = ControllerState.Verify;
         }
         else
         {
-            _stepIncrement = DataRegister < TrackRegister ? -1 : 1;
+            _stepIncrement = _dataRegister < TrackRegister ? -1 : 1;
             _controllerState = ControllerState.Step;
         }
     }

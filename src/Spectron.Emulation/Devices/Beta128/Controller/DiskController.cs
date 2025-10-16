@@ -41,12 +41,12 @@ internal sealed partial class DiskController
 
     private ControllerState _controllerState = ControllerState.Idle;
     private ControllerState _nextControllerState = ControllerState.Idle;
-    private ControllerStatus _controllerStatus = 0;
+    private ControllerStatus _controllerStatus = ControllerStatus.None;
 
     internal byte TrackRegister { get; set; }
     internal byte SectorRegister { get; set; }
 
-    internal RequestStatus Request { get; private set; } = 0;
+    internal RequestStatus Request { get; private set; } = RequestStatus.None;
 
     public DiskController(float clockMhz, IDiskDriveProvider diskDriveProvider)
     {
@@ -65,23 +65,25 @@ internal sealed partial class DiskController
     {
         get
         {
-            _controllerStatus &= ~ControllerStatus.DataRequest;
-            Request &= ~RequestStatus.DataRequest;
-
+            ResetDataRequest();
             return _dataRegister;
         }
         set
         {
             _dataRegister = value;
-
-            _controllerStatus &= ~ControllerStatus.DataRequest;
-            Request &= ~RequestStatus.DataRequest;
+            ResetDataRequest();
         }
     }
 
     internal byte ControlRegister
     {
-        get => _controlRegister;
+        get
+        {
+            var result = Request;
+            Request &= ~(RequestStatus.InterruptRequest);
+
+            return (byte)(result | ~(RequestStatus.InterruptRequest | RequestStatus.DataRequest));
+        }
         set
         {
             _controlRegister = value;
@@ -135,7 +137,7 @@ internal sealed partial class DiskController
             _controllerStatus |= ControllerStatus.NotReady;
         }
 
-        if (_command.Type != CommandType.Type4)
+        if (_command.Type is CommandType.Type1 or CommandType.Type4)
         {
             _controllerStatus &= ~(ControllerStatus.TrackZero | ControllerStatus.Index);
 
@@ -260,6 +262,12 @@ internal sealed partial class DiskController
         }
 
         _controllerState = ControllerState.CommandType1;
+    }
+
+    private void ResetDataRequest()
+    {
+        _controllerStatus &= ~ControllerStatus.DataRequest;
+        Request &= ~RequestStatus.DataRequest;
     }
 
     private void ProcessForceInterruptCommand(long now, Command command)

@@ -82,7 +82,7 @@ public class Beta128Device(
             PortType.Track => Controller.TrackRegister,
             PortType.Sector => Controller.SectorRegister,
             PortType.Data => Controller.DataRegister,
-            PortType.Control => (byte)(Controller.Request | ~(RequestStatus.InterruptRequest | RequestStatus.DataRequest)),
+            PortType.Control => Controller.ControlRegister,
             _ => null
         };
     }
