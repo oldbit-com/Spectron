@@ -31,7 +31,6 @@ public class TrdDiskImageTests
             for (var sideNo = 0; sideNo < 2; sideNo++)
             {
                 var track = disk.GetTrack(trackNo, sideNo);
-                track.TotalSectors.ShouldBe(16);
 
                 for (var sectorNo = 1; sectorNo <= 16; sectorNo++)
                 {

@@ -78,7 +78,7 @@ public class Beta128Device(
 
         return portType switch
         {
-            PortType.Status => Controller.Status,
+            PortType.Status => Controller.StatusRegister,
             PortType.Track => Controller.TrackRegister,
             PortType.Sector => Controller.SectorRegister,
             PortType.Data => Controller.DataRegister,

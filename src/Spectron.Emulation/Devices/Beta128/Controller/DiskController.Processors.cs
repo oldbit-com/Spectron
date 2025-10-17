@@ -4,25 +4,25 @@ namespace OldBit.Spectron.Emulation.Devices.Beta128.Controller;
 
 internal partial class DiskController
 {
-    private void ProcessIdle()
+    private void Idle()
     {
         _controllerStatus &= ~ControllerStatus.Busy;
-        Request = RequestStatus.InterruptRequest;
+        _requestStatus = RequestStatus.InterruptRequest;
     }
 
-    private bool ProcessWait(long now)
+    private bool ShouldWait(long now)
     {
         if (_next > now)
         {
             return false;
         }
 
-        _controllerState = _nextControllerState;
+        _state = _nextState;
 
         return true;
     }
 
-    private void ProcessDelayBeforeCommand()
+    private void DelayBeforeCommand()
     {
         if (_command.ShouldDelay)
         {
@@ -36,16 +36,16 @@ internal partial class DiskController
                               ControllerStatus.RecordType |
                               ControllerStatus.WriteProtect);
 
-        _controllerState = ControllerState.Wait;
-        _nextControllerState = ControllerState.CommandReadWrite;
+        _state = ControllerState.Wait;
+        _nextState = ControllerState.ReadWriteCommand;
     }
 
-    private void ProcessCommandReadWrite()
+    private void ExecuteReadWriteCommand()
     {
         if ((_command.IsWriteSector || _command.IsWriteTrack) && _drive.IsWriteProtected)
         {
             _controllerStatus |= ControllerStatus.WriteProtect;
-            _controllerState = ControllerState.Idle;
+            _state = ControllerState.Idle;
 
             return;
         }
@@ -60,29 +60,29 @@ internal partial class DiskController
 
         if (_command.IsWriteTrack)
         {
-            Request = RequestStatus.DataRequest;
+            _requestStatus = RequestStatus.DataRequest;
             _controllerStatus |= ControllerStatus.DataRequest;
 
             _next += 3 * _byteTime;
-            _controllerState = ControllerState.Write;
-            _nextControllerState = ControllerState.WriteTrack;
+            _state = ControllerState.Write;
+            _nextState = ControllerState.WriteTrack;
 
             return;
         }
 
         if (_command.IsReadTrack)
         {
-            Seek();
+            Load();
             FindIndex();
-            _nextControllerState = ControllerState.Read;
+            _nextState = ControllerState.Read;
 
             return;
         }
 
-        _controllerState = ControllerState.Idle;
+        _state = ControllerState.Idle;
     }
 
-    private void ProcessFoundNextId()
+    private void FoundNextId()
     {
         if (!_drive.IsDiskInserted)
         {
@@ -95,12 +95,12 @@ internal partial class DiskController
         if (_next >= _maxAddressMarkWaitTime || _currentSector == null)
         {
             _controllerStatus |= ControllerStatus.NotFound;
-            _controllerState = ControllerState.Idle;
+            _state = ControllerState.Idle;
             return;
         }
 
         _controllerStatus &= ~ControllerStatus.CrcError;
-        Seek();
+        Load();
 
         if (_command.Type == CommandType.Type1)
         {
@@ -115,7 +115,7 @@ internal partial class DiskController
             }
             else
             {
-                _controllerState = ControllerState.Idle;
+                _state = ControllerState.Idle;
             }
 
             return;
@@ -147,12 +147,12 @@ internal partial class DiskController
 
         if (_command.IsWriteSector)
         {
-            Request = RequestStatus.DataRequest;
+            _requestStatus = RequestStatus.DataRequest;
             _controllerStatus |= ControllerStatus.DataRequest;
             _next += _byteTime * 9;
 
-            _controllerState = ControllerState.Wait;
-            _nextControllerState = ControllerState.WriteSector;
+            _state = ControllerState.Wait;
+            _nextState = ControllerState.WriteSector;
             return;
         }
 
@@ -171,12 +171,12 @@ internal partial class DiskController
 
             _next += _byteTime * (_currentSector.DataPosition - _currentSector.IdPosition);
 
-            _controllerState = ControllerState.Wait;
-            _nextControllerState = ControllerState.ReadSector;
+            _state = ControllerState.Wait;
+            _nextState = ControllerState.ReadSector;
         }
     }
 
-    private void ProcessReadSector()
+    private void ReadSector()
     {
         if (_currentSector == null)
         {
@@ -196,19 +196,19 @@ internal partial class DiskController
         ReadFirstByte();
     }
 
-    private void ProcessRead()
+    private void Read()
     {
         if (_currentSector == null)
         {
-            _controllerState = ControllerState.Idle;
+            _state = ControllerState.Idle;
             return;
         }
 
-        Seek();
+        Load();
 
         if (_readWriteLength > 0)
         {
-            if ((Request & RequestStatus.DataRequest) != 0)
+            if ((_requestStatus & RequestStatus.DataRequest) != 0)
             {
                 _controllerStatus |= ControllerStatus.Lost;
             }
@@ -219,12 +219,12 @@ internal partial class DiskController
             _readWritePosition += 1;
             _readWriteLength -= 1;
 
-            Request = RequestStatus.DataRequest;
+            _requestStatus = RequestStatus.DataRequest;
             _controllerStatus |= ControllerStatus.DataRequest;
 
             _next += _byteTime;
-            _controllerState = ControllerState.Wait;
-            _nextControllerState = ControllerState.Read;
+            _state = ControllerState.Wait;
+            _nextState = ControllerState.Read;
         }
         else
         {
@@ -238,7 +238,7 @@ internal partial class DiskController
                 if (_command.HasMultipleFlagSet)
                 {
                     SectorRegister += 1;
-                    _controllerState = ControllerState.CommandReadWrite;
+                    _state = ControllerState.ReadWriteCommand;
 
                     return;
                 }
@@ -249,11 +249,11 @@ internal partial class DiskController
                 _controllerStatus |= ControllerStatus.CrcError;
             }
 
-            _controllerState = ControllerState.Idle;
+            _state = ControllerState.Idle;
         }
     }
 
-    private void ProcessCommandType1()
+    private void ExecuteCommandType1()
     {
         _controllerStatus = (_controllerStatus | ControllerStatus.Busy)
                             & ~(ControllerStatus.DataRequest | ControllerStatus.CrcError |
@@ -264,27 +264,27 @@ internal partial class DiskController
             _controllerStatus |= ControllerStatus.WriteProtect;
         }
 
-        Request = RequestStatus.None;
+        _requestStatus = RequestStatus.None;
 
         _drive.Spin(_next + 2 * _clockHz);
-        _nextControllerState = ControllerState.SeekStart;
+        _nextState = ControllerState.SeekStart;
 
         if (_command.IsStep || _command.IsStepIn || _command.IsStepOut)
         {
             _stepIncrement = _command.IsStepOut ? -1 : 1;
-            _nextControllerState = ControllerState.Step;
+            _nextState = ControllerState.Step;
         }
 
         _next += 32;
-        _controllerState = ControllerState.Wait;
+        _state = ControllerState.Wait;
     }
 
-    private void ProcessStep()
+    private void Step()
     {
         if (_command.IsRestore && _drive.CylinderNo == 0)
         {
             TrackRegister = 0;
-            _controllerState = ControllerState.Verify;
+            _state = ControllerState.Verify;
 
             return;
         }
@@ -309,11 +309,11 @@ internal partial class DiskController
 
         _next += delay * _millisecond;
 
-        _controllerState = ControllerState.Wait;
-        _nextControllerState = _command.IsSeek ? ControllerState.Seek : ControllerState.Verify;
+        _state = ControllerState.Wait;
+        _nextState = _command.IsSeek ? ControllerState.Seek : ControllerState.Verify;
     }
 
-    private void ProcessSeekStart()
+    private void SeekStart()
     {
         if (_command.IsRestore)
         {
@@ -321,29 +321,29 @@ internal partial class DiskController
             _dataRegister = 0;
         }
 
-        ProcessSeek();
+        Seek();
     }
 
-    private void ProcessSeek()
+    private void Seek()
     {
         if (_dataRegister == TrackRegister)
         {
-            _controllerState = ControllerState.Verify;
+            _state = ControllerState.Verify;
         }
         else
         {
             _stepIncrement = _dataRegister < TrackRegister ? -1 : 1;
-            _controllerState = ControllerState.Step;
+            _state = ControllerState.Step;
         }
     }
 
-    private void ProcessVerify()
+    private void Verify()
     {
         if (!_command.HasVerifyFlagSet)
         {
             _controllerStatus |= ControllerStatus.Busy;
-            _controllerState = ControllerState.Wait;
-            _nextControllerState = ControllerState.Idle;
+            _state = ControllerState.Wait;
+            _nextState = ControllerState.Idle;
             _next += 128;
 
             return;
@@ -351,15 +351,15 @@ internal partial class DiskController
 
         _maxAddressMarkWaitTime = _next + 6 * _rotationTime;
 
-        Seek();
+        Load();
         FindMarker();
     }
 
-    private void ProcessReset()
+    private void Reset()
     {
         if (_drive.IsTrackZero)
         {
-            _controllerState = ControllerState.Idle;
+            _state = ControllerState.Idle;
         }
         else
         {

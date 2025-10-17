@@ -3,6 +3,9 @@ namespace OldBit.Spectron.Emulation.Devices.Beta128.Controller;
 [Flags]
 public enum RequestStatus
 {
+    /// <summary>
+    /// No pending request.
+    /// </summary>
     None = 0,
 
     /// <summary>

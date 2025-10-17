@@ -1,6 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Controller;
 
 [Flags]
+[SuppressMessage("Design", "CA1069:Enums values should not be duplicated")]
 public enum ControllerStatus
 {
     /// <summary>

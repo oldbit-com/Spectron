@@ -57,8 +57,8 @@ public class FloppyDiskTests
 
     private static int CalculateIdPosition(int sectorNo)
     {
-        const int basePos = 152;
-        const int step = 358;
+        const int basePos = 162;
+        const int step = 372;
 
         var block = (sectorNo - 1) / 8;
         var offset = (sectorNo - 1) % 8;

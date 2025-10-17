@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace OldBit.Spectron.Emulation.Devices.Beta128;
 
+[SuppressMessage("Design", "CA1069:Enums values should not be duplicated")]
 internal enum PortType
 {
     None = 0,

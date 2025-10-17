@@ -4,9 +4,9 @@ internal enum ControllerState
 {
     Idle,
     Wait,
-    CommandType1,
+    Type1Command,
     DelayBeforeCommand,
-    CommandReadWrite,
+    ReadWriteCommand,
     FoundNextId,
     Read,
     ReadSector,

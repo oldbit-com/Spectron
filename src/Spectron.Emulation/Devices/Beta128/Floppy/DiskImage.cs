@@ -2,6 +2,10 @@ using OldBit.Spectron.Emulation.Devices.Beta128.Image;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
+/// <summary>
+/// Represents a disk image for a floppy disk, allowing for reading and writing of the image data.
+/// The disk image can be created from a file path or from raw data, and supports specific disk image types.
+/// </summary>
 public sealed class DiskImage
 {
     internal FloppyDisk Floppy { get; }

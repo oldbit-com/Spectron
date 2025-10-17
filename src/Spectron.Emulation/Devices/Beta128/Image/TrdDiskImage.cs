@@ -36,7 +36,7 @@ internal static class TrdDiskImage
             {
                 var track = disk.GetTrack(cylinderNo, sideNo);
 
-                for (var sectorNo = 1; sectorNo <= track.TotalSectors; sectorNo++)
+                for (var sectorNo = 1; sectorNo <= FloppyDisk.TotalSectors; sectorNo++)
                 {
                     var sectorData = track[sectorNo].GetData().ToArray();
 

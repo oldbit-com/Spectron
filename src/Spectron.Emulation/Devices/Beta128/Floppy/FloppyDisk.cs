@@ -1,15 +1,15 @@
 using OldBit.Spectron.Emulation.Devices.Beta128.Controller;
-using OldBit.Spectron.Emulation.Devices.Beta128.Drive;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
 /// <summary>
 /// Represents a floppy disk formatted for TR-DOS. 16 sectors per track, 256 bytes per sector.
 /// Sectors are interleaved. Compatible with 40 or 80 cylinders, 1 or 2 sides.
+/// The supported format is IBM34 MFM.
 /// </summary>
 internal sealed class FloppyDisk
 {
-    private const int TotalSectors = 16;
+    internal const int TotalSectors = 16;
     internal const int BytesPerSector = 256;
 
     private readonly byte[] _sectorInterleave = [1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15, 8, 16];
@@ -31,7 +31,6 @@ internal sealed class FloppyDisk
 
     internal Track GetTrack(int cylinderNo, int sideNo) => _tracks[cylinderNo][sideNo];
 
-    // Use standard IBM track layout for MFM disks
     private void Initialize()
     {
         var size = (byte)Math.Log2(BytesPerSector / 128.0);
@@ -49,17 +48,16 @@ internal sealed class FloppyDisk
 
                 Write(ref position, track, 0x4E, 80);           // GAP 4A
                 Write(ref position, track, 0x00, 12);           // SYNC 1
-                Write(ref position, track, 0xC2, 3, true);      // IAM
+                Write(ref position, track, 0xC2, 3);            // IAM
                 Write(ref position, track, 0xFC);               // IAM
-                //Write(ref position, track, 0x4E, 50);           // GAP 1
+                Write(ref position, track, 0x4E, 50);           // GAP 1
 
                 for (byte sectorNo = 0; sectorNo < TotalSectors; sectorNo++)
                 {
                     var interleaveSectorNo = _sectorInterleave[sectorNo];
 
-                    Write(ref position, track, 0x4E, 40);       // GAP 1 50 fixme: recalculate gap1 only for non standard formats
                     Write(ref position, track, 0x00, 12);       // SYNC
-                    Write(ref position, track, 0xA1, 3, true);  // IDAM
+                    Write(ref position, track, 0xA1, 3);        // IDAM
                     Write(ref position, track, 0xFE);           // IDAM
 
                     var idPosition = position;
@@ -75,7 +73,7 @@ internal sealed class FloppyDisk
                     Write(ref position, track, (byte)crc);              // CRC
                     Write(ref position, track, 0x4E, 22);               // GAP 2
                     Write(ref position, track, 0x00, 12);               // SYNC
-                    Write(ref position, track, 0xA1, 3, true);          // DAM
+                    Write(ref position, track, 0xA1, 3);                // DAM
                     Write(ref position, track, DataAddressMark.Normal); // DAM
 
                     track[interleaveSectorNo] = new Sector(track, idPosition, position, BytesPerSector);
@@ -84,10 +82,9 @@ internal sealed class FloppyDisk
 
                     Write(ref position, track, (byte)(crc >> 8));       // CRC
                     Write(ref position, track, (byte)crc);              // CRC
-                }
 
-                // TODO: This should be part of sector???
-                Write(ref position, track, 0x4E, 80);               // GAP 3
+                    Write(ref position, track, 0x4E, 54);               // GAP 3
+                }
             }
         }
 
@@ -101,7 +98,7 @@ internal sealed class FloppyDisk
 
         sector[0xE1] = 0;
         sector[0xE2] = 1;       // E1:E2 First free sector address sec:track
-        sector[0xE3] = DiskType.GetDiskType(TotalCylinders, TotalSides);
+        sector[0xE3] = DiskGeometry.GetIdentifier(TotalCylinders, TotalSides);
         sector[0xE5] = (byte)(totalFreeSectors & 0xFF);
         sector[0xE6] = (byte)(totalFreeSectors >> 8);
         sector[0xE7] = 0x10;    // TR-DOS id
@@ -121,11 +118,11 @@ internal sealed class FloppyDisk
         sector.UpdateCrc();
     }
 
-    private static void Write(ref int position, Track track, byte value, int count = 1, bool isMarker = false)
+    private static void Write(ref int position, Track track, byte value, int count = 1)
     {
         for (var i = 0; i < count; i++)
         {
-            track.Write(position++, value, isMarker);
+            track.Write(position++, value);
         }
     }
 }
