@@ -16,8 +16,7 @@ public sealed class DiskImage
     internal DiskImage(string filePath)
     {
         FilePath = filePath;
-        DiskImageType = DiskImageType.Trd;
-
+        DiskImageType = DiskImageReader.GetImageType(filePath);
         Floppy = DiskImageReader.Read(filePath);
     }
 

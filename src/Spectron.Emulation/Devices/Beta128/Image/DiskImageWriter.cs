@@ -12,6 +12,10 @@ internal static class DiskImageWriter
                 TrdDiskImage.Write(image.Floppy, stream);
                 break;
 
+            case DiskImageType.Scl:
+                SclDiskImage.Write(image.Floppy, stream);
+                break;
+
             default:
                 throw new NotSupportedException($"Unsupported disk format: {image.DiskImageType}");
         }

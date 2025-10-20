@@ -16,8 +16,41 @@ internal sealed class FloppyDisk
 
     private readonly Track[][] _tracks;
 
+    internal Sector SystemSector { get; private set; } = null!;
     internal int TotalCylinders { get; }
     internal int TotalSides { get; }
+
+    internal int TotalFreeSectors
+    {
+        get => (SystemSector[0xE5] | (SystemSector[0xE6] << 8));
+        set
+        {
+            SystemSector[0xE5] = (byte)value;
+            SystemSector[0xE6] = (byte)(value >> 8);
+        }
+    }
+
+    internal int FirstFreeSector
+    {
+        get => SystemSector[0xE1] | (SystemSector[0xE2] << 4);
+        set
+        {
+            SystemSector[0xE1] = (byte)(value & 0x0F);
+            SystemSector[0xE2] = (byte)(value >> 4);
+        }
+    }
+
+    internal byte TotalFiles
+    {
+        get => SystemSector[0xE4];
+        set => SystemSector[0xE4] = value;
+    }
+
+    internal byte DiskType
+    {
+        get => SystemSector[0xE3];
+        private set => SystemSector[0xE3] = value;
+    }
 
     internal FloppyDisk(int totalCylinders, int totalSides)
     {
@@ -30,6 +63,7 @@ internal sealed class FloppyDisk
     }
 
     internal Track GetTrack(int cylinderNo, int sideNo) => _tracks[cylinderNo][sideNo];
+    internal Sector GetSector(int cylinderNo, int sideNo, int sectorNo) => _tracks[cylinderNo][sideNo][sectorNo];
 
     private void Initialize()
     {
@@ -93,17 +127,17 @@ internal sealed class FloppyDisk
 
     private void AddTrDosDiskInfo()
     {
+        SystemSector = _tracks[0][0][9];
         var totalFreeSectors = TotalCylinders * TotalSides * TotalSectors - 16;
-        var sector = _tracks[0][0][9];
 
-        sector[0xE1] = 0;
-        sector[0xE2] = 1;       // E1:E2 First free sector address sec:track
-        sector[0xE3] = DiskGeometry.GetIdentifier(TotalCylinders, TotalSides);
-        sector[0xE5] = (byte)(totalFreeSectors & 0xFF);
-        sector[0xE6] = (byte)(totalFreeSectors >> 8);
-        sector[0xE7] = 0x10;    // TR-DOS id
+        FirstFreeSector = 0x10;       // H1T0S0
+        DiskType = DiskGeometry.GetIdentifier(TotalCylinders, TotalSides);
+        TotalFreeSectors = totalFreeSectors;
+        SystemSector[0xE7] = 0x10;    // TR-DOS id
+        SystemSector.Write(0xE9, "         "u8);        // unused 9 x 0x20
+        SystemSector.Write(0xF5, "        "u8);         // disk label (8)
 
-        sector.UpdateCrc();
+        SystemSector.UpdateCrc();
     }
 
     internal void WriteSector(int trackNo, int sideNo, int sectorNo, ReadOnlySpan<byte> data)

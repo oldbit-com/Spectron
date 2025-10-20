@@ -52,6 +52,14 @@ internal sealed class Sector
 
     internal bool VerifyIdCrc() => CalculateIdCrc() == IdCrc;
 
+    internal void Write(int position, ReadOnlySpan<byte> data)
+    {
+        for (var i = position; i < position + data.Length; i++)
+        {
+            _data[i + 1] = data[i - position];
+        }
+    }
+
     private Word CalculateIdCrc() => Crc.Calculate(_id[..^2]);
 
     private static void ValidateDataIndex(int index)

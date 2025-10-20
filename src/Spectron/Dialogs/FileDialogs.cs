@@ -56,7 +56,9 @@ public static class FileDialogs
     public static async Task<IReadOnlyList<IStorageFile>> OpenDiskFileAsync() =>
         await OpenFileAsync("Select Disk File",
         [
+            FileTypes.DiskFiles,
             FileTypes.Trd,
+            FileTypes.Scl,
             FileTypes.Any,
         ]);
 

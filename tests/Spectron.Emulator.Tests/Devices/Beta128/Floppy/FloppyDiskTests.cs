@@ -53,6 +53,10 @@ public class FloppyDiskTests
         sector[0xE5].ShouldBe(0xF0);
         sector[0xE6].ShouldBe(0x04);
         sector[0xE7].ShouldBe(0x10);
+
+        disk.TotalFiles.ShouldBe(0);
+        disk.TotalFreeSectors.ShouldBe(1264);
+        disk.DiskType.ShouldBe(0x18);
     }
 
     private static int CalculateIdPosition(int sectorNo)

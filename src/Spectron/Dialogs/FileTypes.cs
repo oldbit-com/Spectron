@@ -89,6 +89,16 @@ public static class FileTypes
         Patterns = ["*.trd"]
     };
 
+    public static FilePickerFileType Scl { get; } = new("SCL Disk File")
+    {
+        Patterns = ["*.scl"]
+    };
+
+    public static FilePickerFileType DiskFiles { get; } = new("Disk Files")
+    {
+        Patterns = ["*.trd", "*.scl"]
+    };
+
     public static FilePickerFileType Any { get; } = new("All Files")
     {
         Patterns = ["*.*"]

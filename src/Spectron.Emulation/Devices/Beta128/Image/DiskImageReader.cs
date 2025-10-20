@@ -6,12 +6,13 @@ internal static class DiskImageReader
 {
     internal static FloppyDisk Read(string filePath)
     {
-        var extension = Path.GetExtension(filePath).ToLowerInvariant();
+        var diskImageType = GetImageType(filePath);
 
-        return extension switch
+        return diskImageType switch
         {
-            ".trd" => TrdDiskImage.Read(filePath),
-            _ => throw new NotSupportedException($"Unsupported disk format: {extension}")
+            DiskImageType.Trd => TrdDiskImage.Read(filePath),
+            DiskImageType.Scl => SclDiskImage.Read(filePath),
+            _ => throw new NotSupportedException($"Unsupported disk format: {diskImageType}")
         };
     }
 
@@ -20,7 +21,20 @@ internal static class DiskImageReader
         return diskImageType switch
         {
             DiskImageType.Trd => TrdDiskImage.Read(data),
+            DiskImageType.Scl => SclDiskImage.Read(data),
             _ => throw new NotSupportedException($"Unsupported disk format: {diskImageType}")
+        };
+    }
+
+    internal static DiskImageType GetImageType(string filePath)
+    {
+        var extension = Path.GetExtension(filePath).ToLowerInvariant();
+
+        return extension switch
+        {
+            ".trd" => DiskImageType.Trd,
+            ".scl" => DiskImageType.Scl,
+            _ => DiskImageType.Unknown,
         };
     }
 }
