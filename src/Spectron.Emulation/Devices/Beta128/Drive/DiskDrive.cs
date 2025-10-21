@@ -9,7 +9,7 @@ public sealed class DiskDrive(DriveId driveId)
     private const int MaxCylinders = 80;
     internal const int Rps = 5;
 
-    public bool IsDiskInserted => Image?.Floppy != null;
+    public bool IsDiskInserted => DiskImage?.Floppy != null;
     internal bool IsTrackZero => CylinderNo == 0;
 
     internal byte CylinderNo { get; private set; }
@@ -18,7 +18,7 @@ public sealed class DiskDrive(DriveId driveId)
     internal bool IsSpinning => SpinTime > 0;
     internal long SpinTime { get; private set; }
 
-    public DiskImage? Image { get; private set; }
+    public DiskFile? DiskImage { get; private set; }
 
     public bool IsWriteProtected { get; set; }
 
@@ -26,14 +26,14 @@ public sealed class DiskDrive(DriveId driveId)
 
     public void InsertDisk(string filePath)
     {
-        Image = new DiskImage(filePath);
+        DiskImage = new DiskFile(filePath);
 
         OnDiskChanged();
     }
 
     internal void InsertDisk(string? filePath, DiskImageType diskImageType, bool isWriteProtected, ReadOnlySpan<byte> data)
     {
-        Image = new DiskImage(filePath, diskImageType, data);
+        DiskImage = new DiskFile(filePath, diskImageType, data);
         IsWriteProtected = isWriteProtected;
 
         OnDiskChanged();
@@ -41,7 +41,7 @@ public sealed class DiskDrive(DriveId driveId)
 
     public void EjectDisk()
     {
-        Image = null;
+        DiskImage = null;
 
         OnDiskChanged();
     }
@@ -53,7 +53,7 @@ public sealed class DiskDrive(DriveId driveId)
     internal void Seek(byte cylinderNo, byte sideNo)
     {
         CylinderNo = cylinderNo;
-        Track = Image?.Floppy.GetTrack(CylinderNo, sideNo);
+        Track = DiskImage?.Floppy.GetTrack(CylinderNo, sideNo);
     }
 
     internal void Step(int stepIncrement)

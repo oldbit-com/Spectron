@@ -100,6 +100,25 @@ public static class FileDialogs
         });
     }
 
+    public static async Task<IStorageFile?> SaveDiskFileAsync(string? suggestedFileName = null)
+    {
+        var topLevel = TopLevel.GetTopLevel(MainWindow);
+
+        if (topLevel == null)
+        {
+            return null;
+        }
+
+        return await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Save Disk File",
+            DefaultExtension = ".trd",
+            SuggestedFileName = suggestedFileName,
+            ShowOverwritePrompt = true,
+            FileTypeChoices = [FileTypes.Trd]
+        });
+    }
+
     public static async Task<IStorageFile?> SaveSnapshotFileAsync(string? suggestedFileName = null)
     {
         var topLevel = TopLevel.GetTopLevel(MainWindow);

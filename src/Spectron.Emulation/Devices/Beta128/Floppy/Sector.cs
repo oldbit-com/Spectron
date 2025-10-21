@@ -28,6 +28,9 @@ internal sealed class Sector
 
     internal ReadOnlySpan<byte> GetData() => _data[1..^2];
 
+    internal ReadOnlySpan<byte> GetData(int startIndex, int count) =>
+        _data[(startIndex + 1)..(startIndex + count + 1)];
+
     internal byte this[int index]
     {
         get

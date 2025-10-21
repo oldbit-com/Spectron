@@ -4,6 +4,8 @@ namespace OldBit.Spectron.Emulator.Tests.Devices.Beta128.Floppy;
 
 public class FloppyDiskTests
 {
+    private const string EightSpaces = "        ";
+
     [Theory]
     [InlineData(80, 2, 0x16)]
     [InlineData(80, 1, 0x18)]
@@ -57,6 +59,7 @@ public class FloppyDiskTests
         disk.TotalFiles.ShouldBe(0);
         disk.TotalFreeSectors.ShouldBe(1264);
         disk.DiskType.ShouldBe(0x18);
+        disk.Label.ShouldBe(EightSpaces);
     }
 
     private static int CalculateIdPosition(int sectorNo)

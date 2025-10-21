@@ -7,8 +7,6 @@ public class DiskDriveManager : IDiskDriveProvider
 {
     public Dictionary<DriveId, DiskDrive> Drives { get; } = new();
 
-    public DiskDrive? ActiveDrive { get; }
-
     public DiskDrive this[DriveId drive] => Drives[drive];
 
     public event DiskChangedEvent? DiskChanged;

@@ -3,7 +3,7 @@ using OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Image;
 
-internal static class SclDiskImage
+internal sealed class SclDiskImage : IDiskImage
 {
     private const int DirEntrySize = 16;
     private const int FileCount = 0x08;
@@ -11,18 +11,18 @@ internal static class SclDiskImage
     private const int StartingSector = 0x0E;
     private const int LogicalTrack = 0x0F;
 
-    //private string _fileName = string.Empty;
+    private string? _fileName;
 
-    internal static FloppyDisk Read(string filePath)
+    public FloppyDisk Read(string filePath)
     {
-        //_fileName = Path.GetFileName(filePath);
+        _fileName = Path.GetFileName(filePath);
 
         var data = File.ReadAllBytes(filePath).AsSpan();
 
         return Read(data);
     }
 
-    internal static FloppyDisk Read(ReadOnlySpan<byte> data)
+    public FloppyDisk Read(ReadOnlySpan<byte> data)
     {
         var signature = Encoding.ASCII.GetString(data[..8]);
 
@@ -58,14 +58,11 @@ internal static class SclDiskImage
         }
 
         disk.TotalFreeSectors = totalFileSectors;
-        // TODO: Write label
+        disk.Label = _fileName ?? "SCL";
+
         disk.SystemSector.UpdateCrc();
 
         return disk;
-    }
-
-    public static void Write(FloppyDisk disk, Stream stream)
-    {
     }
 
     private static void AddEntry(FloppyDisk disk, ReadOnlySpan<byte> header, ReadOnlySpan<byte> data)
@@ -111,5 +108,10 @@ internal static class SclDiskImage
         var fileHeaderEnd = fileHeaderStart + 14;
 
         return data[fileHeaderStart..fileHeaderEnd];
+    }
+
+    public void Write(FloppyDisk disk, Stream stream)
+    {
+        throw new NotImplementedException();
     }
 }

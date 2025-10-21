@@ -1,3 +1,4 @@
+using System.Text;
 using OldBit.Spectron.Emulation.Devices.Beta128.Controller;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
@@ -50,6 +51,12 @@ internal sealed class FloppyDisk
     {
         get => SystemSector[0xE3];
         private set => SystemSector[0xE3] = value;
+    }
+
+    internal string Label
+    {
+        get => Encoding.ASCII.GetString(SystemSector.GetData(0xF5, 8));
+        set => SystemSector.Write(0xF5, Encoding.ASCII.GetBytes(value.PadRight(8)[..8]));
     }
 
     internal FloppyDisk(int totalCylinders, int totalSides)

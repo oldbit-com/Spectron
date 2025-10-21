@@ -2,16 +2,16 @@ using OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Image;
 
-internal static class TrdDiskImage
+internal sealed class TrdDiskImage : IDiskImage
 {
-    internal static FloppyDisk Read(string filePath)
+    public FloppyDisk Read(string filePath)
     {
         var data = File.ReadAllBytes(filePath).AsSpan();
 
         return Read(data);
     }
 
-    internal static FloppyDisk Read(ReadOnlySpan<byte> data)
+    public FloppyDisk Read(ReadOnlySpan<byte> data)
     {
         var disk = new FloppyDisk(80, 2);
 
@@ -28,7 +28,7 @@ internal static class TrdDiskImage
         return disk;
     }
 
-    internal static void Write(FloppyDisk disk, Stream stream)
+    public void Write(FloppyDisk disk, Stream stream)
     {
         for (var cylinderNo = 0; cylinderNo < disk.TotalCylinders; cylinderNo++)
         {

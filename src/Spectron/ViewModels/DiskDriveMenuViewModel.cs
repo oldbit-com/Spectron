@@ -16,6 +16,7 @@ public class DiskDriveMenuViewModel : ObservableObject
 {
     private readonly DiskDriveManager _diskDriveManager;
     public ICommand InsertCommand { get; }
+    public ICommand SaveCommand { get; }
     public ICommand EjectCommand { get; }
     public ICommand ToggleWriteProtectCommand { get; }
 
@@ -34,6 +35,7 @@ public class DiskDriveMenuViewModel : ObservableObject
         _diskDriveManager.DiskChanged += OnDiskChanged;
 
         InsertCommand = new AsyncRelayCommand<DriveId>(execute: Insert);
+        SaveCommand = new AsyncRelayCommand<DriveId>(execute: Save, canExecute: IsDiskInserted);
         EjectCommand = new AsyncRelayCommand<DriveId>(execute: Eject, canExecute: IsDiskInserted);
         ToggleWriteProtectCommand = new RelayCommand<DriveId>(execute: ToggleWriteProtect, canExecute: IsDiskInserted);
     }
@@ -51,9 +53,9 @@ public class DiskDriveMenuViewModel : ObservableObject
         {
             EjectCommandHeadings[e.DriveId].Value = "Eject";
         }
-        else if (diskDrive.Image?.FilePath != null)
+        else if (diskDrive.DiskImage?.FilePath != null)
         {
-            var fileName = Path.GetFileName(diskDrive.Image.FilePath);
+            var fileName = Path.GetFileName(diskDrive.DiskImage.FilePath);
 
             EjectCommandHeadings[e.DriveId].Value = $"Eject '{fileName}'";
         }
@@ -80,6 +82,35 @@ public class DiskDriveMenuViewModel : ObservableObject
             }
 
             _diskDriveManager[driveId].InsertDisk(files[0].Path.LocalPath);
+        }
+        catch (Exception ex)
+        {
+            await MessageDialogs.Error(ex.Message);
+        }
+    }
+
+    private async Task Save(DriveId driveId)
+    {
+        var diskImage = _diskDriveManager[driveId].DiskImage;
+
+        if (diskImage == null)
+        {
+            return;
+        }
+
+        try
+        {
+            var file = await FileDialogs.SaveDiskFileAsync(Path.GetFileNameWithoutExtension(diskImage.FilePath));
+
+            if (file == null)
+            {
+                return;
+            }
+
+            await diskImage.SaveAsync(file.Path.LocalPath);
+
+            var fileName = Path.GetFileName(file.Path.LocalPath);
+            EjectCommandHeadings[driveId].Value = $"Eject '{fileName}'";
         }
         catch (Exception ex)
         {

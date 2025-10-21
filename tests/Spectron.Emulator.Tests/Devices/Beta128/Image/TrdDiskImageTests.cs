@@ -7,6 +7,7 @@ namespace OldBit.Spectron.Emulator.Tests.Devices.Beta128.Image;
 public class TrdDiskImageTests
 {
     private readonly string _testFilePath;
+    private readonly TrdDiskImage _diskImage = new();
 
     public TrdDiskImageTests()
     {
@@ -17,10 +18,14 @@ public class TrdDiskImageTests
     [Fact]
     public void Disk_ShouldLoadFromFile()
     {
-        var disk = TrdDiskImage.Read(_testFilePath);
+        var disk = _diskImage.Read(_testFilePath);
 
         disk.TotalCylinders.ShouldBe(80);
         disk.TotalSides.ShouldBe(2);
+        disk.Label.ShouldBe("Test    ");
+        disk.DiskType.ShouldBe(0x16);
+        disk.TotalFiles.ShouldBe(0);
+        disk.TotalFreeSectors.ShouldBe(2544);
 
         var systemSector = disk.GetTrack(0, 0)[9];
         systemSector[0xE3].ShouldBe(0x16);
@@ -50,13 +55,13 @@ public class TrdDiskImageTests
     }
 
     [Fact]
-    public void Disk_ShouldLWriteToStream()
+    public void Disk_ShouldWriteToStream()
     {
         var data = File.ReadAllBytes(_testFilePath);
-        var disk = TrdDiskImage.Read(data);
+        var disk = _diskImage.Read(data);
 
         using var stream = new MemoryStream();
-        TrdDiskImage.Write(disk, stream);
+        _diskImage.Write(disk, stream);
 
         var writtenData = stream.ToArray();
 
