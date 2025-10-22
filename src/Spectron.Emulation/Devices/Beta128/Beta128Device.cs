@@ -133,7 +133,7 @@ public class Beta128Device(
         (computerType == ComputerType.Spectrum128K && emulatorMemory.RomBank == RomBank.Bank1 ||
          computerType == ComputerType.Spectrum48K);
 
-    private static PortType GetPortType(Word address) => (address & 0xFF) switch
+    private static byte GetPortType(Word address) => (address & 0xFF) switch
     {
         0x1F => PortType.Command,
         0x3F => PortType.Track,

@@ -146,6 +146,9 @@ public partial class MainWindowViewModel : ObservableObject
 
     [ObservableProperty]
     private int _connectedMicrodrivesCount;
+
+    [ObservableProperty]
+    private bool _isBeta128Enabled;
     #endregion
 
     #region Relay commands

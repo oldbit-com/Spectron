@@ -16,6 +16,7 @@ public class DiskDriveMenuViewModel : ObservableObject
 {
     private readonly DiskDriveManager _diskDriveManager;
     public ICommand InsertCommand { get; }
+    public ICommand InsertDefaultDriveCommand { get; }
     public ICommand SaveCommand { get; }
     public ICommand EjectCommand { get; }
     public ICommand ToggleWriteProtectCommand { get; }
@@ -35,6 +36,7 @@ public class DiskDriveMenuViewModel : ObservableObject
         _diskDriveManager.DiskChanged += OnDiskChanged;
 
         InsertCommand = new AsyncRelayCommand<DriveId>(execute: Insert);
+        InsertDefaultDriveCommand = new AsyncRelayCommand(execute: async() => await Insert(DriveId.DriveA));
         SaveCommand = new AsyncRelayCommand<DriveId>(execute: Save, canExecute: IsDiskInserted);
         EjectCommand = new AsyncRelayCommand<DriveId>(execute: Eject, canExecute: IsDiskInserted);
         ToggleWriteProtectCommand = new RelayCommand<DriveId>(execute: ToggleWriteProtect, canExecute: IsDiskInserted);
@@ -53,9 +55,9 @@ public class DiskDriveMenuViewModel : ObservableObject
         {
             EjectCommandHeadings[e.DriveId].Value = "Eject";
         }
-        else if (diskDrive.DiskImage?.FilePath != null)
+        else if (diskDrive.DiskFile?.FilePath != null)
         {
-            var fileName = Path.GetFileName(diskDrive.DiskImage.FilePath);
+            var fileName = Path.GetFileName(diskDrive.DiskFile.FilePath);
 
             EjectCommandHeadings[e.DriveId].Value = $"Eject '{fileName}'";
         }
@@ -91,7 +93,7 @@ public class DiskDriveMenuViewModel : ObservableObject
 
     private async Task Save(DriveId driveId)
     {
-        var diskImage = _diskDriveManager[driveId].DiskImage;
+        var diskImage = _diskDriveManager[driveId].DiskFile;
 
         if (diskImage == null)
         {

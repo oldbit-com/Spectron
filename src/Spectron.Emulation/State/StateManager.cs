@@ -233,10 +233,10 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
                     drives.Add(new DiskDriveState
                     {
                         DriveId = driveId,
-                        FilePath = drive.DiskImage!.FilePath,
-                        DiskImageType = drive.DiskImage.ImageType,
+                        FilePath = drive.DiskFile!.FilePath,
+                        DiskImageType = drive.DiskFile.ImageType,
                         IsWriteProtected = drive.IsWriteProtected,
-                        Data = drive.DiskImage.GetData()
+                        Data = drive.DiskFile.GetData()
                     });
                 }
             }

@@ -327,6 +327,8 @@ partial class MainWindowViewModel
         {
             Emulator?.Beta128.Disable();
         }
+
+        IsBeta128Enabled = isEnabled == true;
     }
 
     private void RefreshAyState(bool? isEnabled, StereoMode? stereoMode)

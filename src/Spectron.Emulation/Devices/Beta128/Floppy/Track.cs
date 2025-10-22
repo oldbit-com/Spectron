@@ -24,9 +24,9 @@ internal sealed class Track(int totalSectors)
 
     internal void Write(int position, byte value) => Data[position] = value;
 
-    private static void ValidateSectorIndex(int index)
+    private static void ValidateSectorIndex(int sectorNo)
     {
-        if (index is < 1 or > 16)
+        if (sectorNo is < 1 or > 16)
         {
             throw new ArgumentException("Sector index must be between 1 and 16");
         }

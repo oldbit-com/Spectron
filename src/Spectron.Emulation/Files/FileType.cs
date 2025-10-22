@@ -18,6 +18,10 @@ public enum FileType
 
     Mdr,
 
+    Trd,
+
+    Scl,
+
     Unsupported
 }
 

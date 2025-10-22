@@ -14,8 +14,8 @@ internal sealed class FloppyDisk
     internal const int BytesPerSector = 256;
 
     private readonly byte[] _sectorInterleave = [1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15, 8, 16];
-
     private readonly Track[][] _tracks;
+    private readonly int _maxLogicalSector;
 
     internal Sector SystemSector { get; private set; } = null!;
     internal int TotalCylinders { get; }
@@ -65,12 +65,28 @@ internal sealed class FloppyDisk
         TotalSides = totalSides;
 
         _tracks = new Track[TotalCylinders][];
+        _maxLogicalSector = (TotalCylinders - 1) << 5 | (TotalSides - 1) << 4 | (TotalSectors - 1);
 
         Initialize();
     }
 
     internal Track GetTrack(int cylinderNo, int sideNo) => _tracks[cylinderNo][sideNo];
+
     internal Sector GetSector(int cylinderNo, int sideNo, int sectorNo) => _tracks[cylinderNo][sideNo][sectorNo];
+
+    internal Sector GetLogicalSector(int logicalSector)
+    {
+        if (logicalSector < 0 || logicalSector > _maxLogicalSector)
+        {
+            throw new ArgumentOutOfRangeException(nameof(logicalSector));
+        }
+
+        var cylinderNo = logicalSector >> 5;
+        var sideNo = (logicalSector >> 4) & 1;
+        var sectorNo = 1 + (logicalSector & 0x0F);
+
+        return _tracks[cylinderNo][sideNo][sectorNo];
+    }
 
     private void Initialize()
     {

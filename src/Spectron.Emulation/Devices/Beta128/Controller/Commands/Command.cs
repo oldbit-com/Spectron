@@ -75,7 +75,7 @@ internal readonly struct Command
     internal bool ShouldDelay => (CommandRegister & 0x04) != 0;
 
     // S flag value for ReadSector/WriteSector
-    internal int SideSelectFlagSet => (CommandRegister & 0x08) >> 3;
+    internal int SideSelectFlag => (CommandRegister & 0x08) >> 3;
 
     // m flag set for ReadSector/WriteSector
     internal bool HasMultipleFlagSet => (CommandRegister & 0x10) == 0x10;

@@ -211,9 +211,9 @@
                 </MenuItem>
             </MenuItem>
 
-            <MenuItem Header="Disk Drive">
+            <MenuItem Header="Disk Drive" IsEnabled="{Binding IsBeta128Enabled}">
                 <MenuItem Header="A:">
-                    <MenuItem Header="Insert..." Command="{Binding DiskDriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveA}"/>
+                    <MenuItem Header="Insert..." InputGesture="Cmd+D" Command="{Binding DiskDriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveA}"/>
                     <MenuItem Header="{Binding DiskDriveMenuViewModel.EjectCommandHeadings[DriveA].Value}" Command="{Binding DiskDriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveA}"/>
                     <MenuItem Header="Save..." Command="{Binding DiskDriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveA}"/>
                     <MenuItem Header="-"/>

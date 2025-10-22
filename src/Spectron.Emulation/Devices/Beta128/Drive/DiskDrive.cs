@@ -9,7 +9,7 @@ public sealed class DiskDrive(DriveId driveId)
     private const int MaxCylinders = 80;
     internal const int Rps = 5;
 
-    public bool IsDiskInserted => DiskImage?.Floppy != null;
+    public bool IsDiskInserted => DiskFile?.Floppy != null;
     internal bool IsTrackZero => CylinderNo == 0;
 
     internal byte CylinderNo { get; private set; }
@@ -18,7 +18,7 @@ public sealed class DiskDrive(DriveId driveId)
     internal bool IsSpinning => SpinTime > 0;
     internal long SpinTime { get; private set; }
 
-    public DiskFile? DiskImage { get; private set; }
+    public DiskFile? DiskFile { get; private set; }
 
     public bool IsWriteProtected { get; set; }
 
@@ -26,14 +26,25 @@ public sealed class DiskDrive(DriveId driveId)
 
     public void InsertDisk(string filePath)
     {
-        DiskImage = new DiskFile(filePath);
+        DiskFile = new DiskFile(filePath);
+
+        OnDiskChanged();
+    }
+
+    public void InsertDisk(string filePath, Stream stream)
+    {
+        using var memoryStream = new MemoryStream();
+        stream.CopyTo(memoryStream);
+
+        var diskImageType = DiskImage.GetImageType(filePath);
+        InsertDisk(filePath, diskImageType, false, memoryStream.ToArray());
 
         OnDiskChanged();
     }
 
     internal void InsertDisk(string? filePath, DiskImageType diskImageType, bool isWriteProtected, ReadOnlySpan<byte> data)
     {
-        DiskImage = new DiskFile(filePath, diskImageType, data);
+        DiskFile = new DiskFile(filePath, diskImageType, data);
         IsWriteProtected = isWriteProtected;
 
         OnDiskChanged();
@@ -41,7 +52,7 @@ public sealed class DiskDrive(DriveId driveId)
 
     public void EjectDisk()
     {
-        DiskImage = null;
+        DiskFile = null;
 
         OnDiskChanged();
     }
@@ -53,7 +64,7 @@ public sealed class DiskDrive(DriveId driveId)
     internal void Seek(byte cylinderNo, byte sideNo)
     {
         CylinderNo = cylinderNo;
-        Track = DiskImage?.Floppy.GetTrack(CylinderNo, sideNo);
+        Track = DiskFile?.Floppy.GetTrack(CylinderNo, sideNo);
     }
 
     internal void Step(int stepIncrement)
@@ -75,5 +86,4 @@ public sealed class DiskDrive(DriveId driveId)
     }
 
     private void OnDiskChanged() => DiskChanged?.Invoke(new DiskChangedEventArgs { DriveId = driveId });
-
 }

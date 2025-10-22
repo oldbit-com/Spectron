@@ -24,8 +24,8 @@ public class TrdDiskImageTests
         disk.TotalSides.ShouldBe(2);
         disk.Label.ShouldBe("Test    ");
         disk.DiskType.ShouldBe(0x16);
-        disk.TotalFiles.ShouldBe(0);
-        disk.TotalFreeSectors.ShouldBe(2544);
+        disk.TotalFiles.ShouldBe(3);
+        disk.TotalFreeSectors.ShouldBe(2515);
 
         var systemSector = disk.GetTrack(0, 0)[9];
         systemSector[0xE3].ShouldBe(0x16);

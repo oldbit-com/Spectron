@@ -131,7 +131,7 @@ internal partial class DiskController
         }
 
         if (_currentSector.CylinderNo != TrackRegister || _currentSector.SectorNo != SectorRegister ||
-            (_command.HasSideCompareFlagSet && (_command.SideSelectFlagSet ^ _currentSector.SideNo) != 0))
+            (_command.HasSideCompareFlagSet && (_command.SideSelectFlag ^ _currentSector.SideNo) != 0))
         {
             FindMarker();
             return;
