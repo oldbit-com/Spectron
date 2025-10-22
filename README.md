@@ -43,7 +43,7 @@ Solution consists of several projects:
 - [x] Emulates classic machines: ZX Spectrum 16K, 48K and 128K
 - [x] Time Machine: rewind and continue from a given time point in the past
 - [x] Emulator state is persisted when emulator is closed
-- [x] Supports SNA, SZX, Z80, TAP, TZX, MDR and TRD file formats (inside zip, too)
+- [x] Supports SNA, SZX, Z80, TAP, TZX, MDR, TRD and SCL file formats (inside zip, too)
 - [x] Supports POK trainer files
 - [x] Tape content viewer
 - [x] Accurate timings, including contented memory and IO
@@ -184,8 +184,15 @@ date and time.
 
 ## Microdrives
 Emulation of microdrives is supported and can be enabled in the emulator settings. 
-Up to eight drives can be emulated, MDR files can be loaded/saved. No other features of Interface 1 are emulated
+Up to eight drives can be emulated, MDR image files can be loaded/saved. No other features of Interface 1 are emulated
 currently.
+
+## Beta 128 (TR-DOS)
+Emulation of Beta 128 Disk Interface is supported and can be enabled in the emulator settings.
+Up to four drives can be emulated, MDR and SCL image files can be loaded/saved. ROM version 5.03 is 
+used.
+
+To invoke TR-DOS, enter `RANDOMIZE USR 15616` from `BASIC`.
 
 ## Time Machine
 Time Machine is a feature that allows you to go back in time and continue from given time point in the past.
