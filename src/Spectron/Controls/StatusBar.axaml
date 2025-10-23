@@ -24,10 +24,10 @@
 
         <Animation x:Key="DiskActivityAnimation" Duration="0:0:.1" Easing="BounceEaseInOut" x:SetterTargetType="material:MaterialIcon">
             <KeyFrame Cue="0%">
-                <Setter Property="Opacity" Value=".8"/>
+                <Setter Property="Opacity" Value=".9"/>
             </KeyFrame>
             <KeyFrame Cue="100%">
-                <Setter Property="Opacity" Value=".3"/>
+                <Setter Property="Opacity" Value=".2"/>
             </KeyFrame>
         </Animation>
     </UserControl.Resources>
@@ -114,7 +114,7 @@
                 IsVisible="{Binding IsFloppyDiskInserted}"
                 ToolTip.Tip="Floppy Disk">
 
-                <material:MaterialIcon Kind="Floppy"/>
+                <material:MaterialIcon Kind="FloppyVariant"/>
             </StackPanel>
 
             <StackPanel

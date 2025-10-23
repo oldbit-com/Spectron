@@ -77,9 +77,12 @@ public class Beta128Device(
             return null;
         }
 
-        DiskActivity?.Invoke(EventArgs.Empty);
-
         Controller.ProcessState(Now);
+
+        if (!Controller.IsIdle)
+        {
+            DiskActivity?.Invoke(EventArgs.Empty);
+        }
 
         return portType switch
         {

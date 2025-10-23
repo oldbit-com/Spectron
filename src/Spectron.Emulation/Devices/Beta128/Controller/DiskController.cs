@@ -65,6 +65,7 @@ internal sealed partial class DiskController
     }
 
     internal byte StatusRegister => GetStatusRegister();
+    internal bool IsIdle => _state is ControllerState.Idle;
 
     public DiskController(float clockMhz, IDiskDriveProvider diskDriveProvider)
     {
