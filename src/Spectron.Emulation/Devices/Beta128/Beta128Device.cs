@@ -1,4 +1,5 @@
 using OldBit.Spectron.Emulation.Devices.Beta128.Controller;
+using OldBit.Spectron.Emulation.Devices.Beta128.Events;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Z80Cpu;
 
@@ -19,6 +20,8 @@ public class Beta128Device(
     public bool IsEnabled { get; private set; }
     internal bool IsRomPaged { get; private set; }
     internal DiskController Controller { get; } = new(clockMhz, diskDriveProvider);
+
+    internal event DiskActivityEvent? DiskActivity;
 
     public void WritePort(Word address, byte value)
     {
@@ -73,6 +76,8 @@ public class Beta128Device(
         {
             return null;
         }
+
+        DiskActivity?.Invoke(EventArgs.Empty);
 
         Controller.ProcessState(Now);
 

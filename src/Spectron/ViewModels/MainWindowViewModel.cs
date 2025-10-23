@@ -316,6 +316,7 @@ public partial class MainWindowViewModel : ObservableObject
         tapeManager.TapeChanged += HandleTapeTapeChanged;
         microdriveManager.CartridgeChanged += HandleCartridgeChanged;
         diskDriveManager.DiskChanged += HandleFloppyDiskChanged;
+        diskDriveManager.DiskActivity += HandleDiskActivity;
 
         _keyboardHook = new KeyboardHook();
         _keyboardHook.SpectrumKeyPressed  += HandleSpectrumKeyPressed;

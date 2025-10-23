@@ -21,6 +21,15 @@
                 <Setter Property="Opacity" Value="0"/>
             </KeyFrame>
         </Animation>
+
+        <Animation x:Key="DiskActivityAnimation" Duration="0:0:.1" Easing="BounceEaseInOut" x:SetterTargetType="material:MaterialIcon">
+            <KeyFrame Cue="0%">
+                <Setter Property="Opacity" Value=".8"/>
+            </KeyFrame>
+            <KeyFrame Cue="100%">
+                <Setter Property="Opacity" Value=".3"/>
+            </KeyFrame>
+        </Animation>
     </UserControl.Resources>
 
     <UserControl.Styles>
@@ -41,6 +50,7 @@
             <Setter Property="Foreground" Value="{DynamicResource SystemBaseMediumLowColor}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
+
         <Style Selector="material|MaterialIcon">
             <Setter Property="Width" Value="20"/>
             <Setter Property="Height" Value="20"/>
@@ -98,6 +108,7 @@
             </StackPanel>
 
             <StackPanel
+                Name="DiskActivityIcon"
                 Orientation="Horizontal"
                 Margin="0 0 10 0"
                 IsVisible="{Binding IsFloppyDiskInserted}"

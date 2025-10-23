@@ -10,6 +10,7 @@ public class DiskDriveManager : IDiskDriveProvider
     public DiskDrive this[DriveId drive] => Drives[drive];
 
     public event DiskChangedEvent? DiskChanged;
+    public event DiskActivityEvent? DiskActivity;
 
     public DiskDriveManager()
     {
@@ -21,4 +22,6 @@ public class DiskDriveManager : IDiskDriveProvider
             diskDrive.DiskChanged += e => DiskChanged?.Invoke(e);
         }
     }
+
+    internal void OnDiskActivity() => DiskActivity?.Invoke(EventArgs.Empty);
 }

@@ -245,7 +245,8 @@ public sealed class Emulator
         };
         Cpu.Clock.TicksAdded += (_, previousFrameTicks, _) => ScreenBuffer.UpdateScreen(previousFrameTicks);
         Cpu.BeforeInstruction += BeforeInstruction;
-        UlaPlus.ActiveChanged += (_) => _invalidateScreen = true;
+        UlaPlus.ActiveChanged += _ => _invalidateScreen = true;
+        Beta128.DiskActivity += _ => DiskDriveManager.OnDiskActivity();
     }
 
     private void SetupUlaAndDevices()

@@ -89,7 +89,8 @@ public partial class StatusBarViewModel : ObservableObject
         _ => "Unknown"
     };
 
-    public Action AnimateQuickSave { get; set; } = () => {};
+    public Action AnimateQuickSave { get; set; } = () => {};      // Body defined in code-behind
+    public Action AnimateDiskActivity { get; set; } = () => {};   // Body defined in code-behind
 
     public StatusBarViewModel()
     {

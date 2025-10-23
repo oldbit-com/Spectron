@@ -1,3 +1,5 @@
+using System;
+using Avalonia.Threading;
 using OldBit.Spectron.Emulation.Devices.Beta128.Events;
 using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives.Events;
 using OldBit.Spectron.Emulation.Tape;
@@ -17,6 +19,11 @@ partial class MainWindowViewModel
         StatusBarViewModel.TapeLoadProgress = string.Empty;
 
         UpdateWindowTitle();
+    }
+
+    private void HandleDiskActivity(EventArgs e)
+    {
+        StatusBarViewModel.AnimateDiskActivity();
     }
 
     private void HandleCartridgeChanged(CartridgeChangedEventArgs e) => RefreshStatusBar();
