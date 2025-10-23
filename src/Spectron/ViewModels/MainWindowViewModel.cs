@@ -17,6 +17,7 @@ using OldBit.Spectron.Debugger.Messages;
 using OldBit.Spectron.Debugger.ViewModels;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
+using OldBit.Spectron.Emulation.Devices.Beta128;
 using OldBit.Spectron.Emulation.Devices.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 using OldBit.Spectron.Emulation.Rom;
@@ -288,6 +289,7 @@ public partial class MainWindowViewModel : ObservableObject
         DebuggerContext debuggerContext,
         TapeManager tapeManager,
         MicrodriveManager microdriveManager,
+        DiskDriveManager diskDriveManager,
         QuickSaveService quickSaveService,
         ILogger<MainWindowViewModel> logger)
     {
@@ -313,6 +315,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         tapeManager.TapeChanged += HandleTapeTapeChanged;
         microdriveManager.CartridgeChanged += HandleCartridgeChanged;
+        diskDriveManager.DiskChanged += HandleFloppyDiskChanged;
 
         _keyboardHook = new KeyboardHook();
         _keyboardHook.SpectrumKeyPressed  += HandleSpectrumKeyPressed;

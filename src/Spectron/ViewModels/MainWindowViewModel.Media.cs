@@ -1,4 +1,4 @@
-using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
+using OldBit.Spectron.Emulation.Devices.Beta128.Events;
 using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives.Events;
 using OldBit.Spectron.Emulation.Tape;
 
@@ -20,6 +20,8 @@ partial class MainWindowViewModel
     }
 
     private void HandleCartridgeChanged(CartridgeChangedEventArgs e) => RefreshStatusBar();
+
+    private void HandleFloppyDiskChanged(DiskChangedEventArgs e) => RefreshStatusBar();
 
     private void HandleSetTapeLoadingSpeed(TapeSpeed tapeSpeed) => TapeLoadSpeed = tapeSpeed;
 }

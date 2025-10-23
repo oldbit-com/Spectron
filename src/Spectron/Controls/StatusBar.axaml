@@ -100,6 +100,15 @@
             <StackPanel
                 Orientation="Horizontal"
                 Margin="0 0 10 0"
+                IsVisible="{Binding IsFloppyDiskInserted}"
+                ToolTip.Tip="Floppy Disk">
+
+                <material:MaterialIcon Kind="Floppy"/>
+            </StackPanel>
+
+            <StackPanel
+                Orientation="Horizontal"
+                Margin="0 0 10 0"
                 ToolTip.Tip="Machine">
 
                 <material:MaterialIcon Kind="Computer"/>

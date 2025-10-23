@@ -52,6 +52,9 @@ public partial class StatusBarViewModel : ObservableObject
     private bool _isMicroDriveCartridgeInserted;
 
     [ObservableProperty]
+    private bool _isFloppyDiskInserted;
+
+    [ObservableProperty]
     private string _tapeLoadProgress = string.Empty;
 
     [ObservableProperty]

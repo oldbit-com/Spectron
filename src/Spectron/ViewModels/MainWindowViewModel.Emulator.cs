@@ -363,7 +363,11 @@ partial class MainWindowViewModel
 
         StatusBarViewModel.IsMicroDriveCartridgeInserted =
             Emulator.Interface1.IsEnabled &&
-            Emulator.MicrodriveManager.Microdrives.Values.Any(microdrive => microdrive.IsCartridgeInserted) == true;
+            Emulator.MicrodriveManager.Microdrives.Values.Any(drive => drive.IsCartridgeInserted);
+
+        StatusBarViewModel.IsFloppyDiskInserted =
+            Emulator.Beta128.IsEnabled &&
+            Emulator.DiskDriveManager.Drives.Values.Any(drive => drive.IsDiskInserted);
 
         StatusBarViewModel.IsAyEnabled = Emulator.AudioManager.IsAyEnabled;
         StatusBarViewModel.StereoMode = Emulator.AudioManager.StereoMode;
