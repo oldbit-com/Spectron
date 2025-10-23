@@ -145,10 +145,13 @@ public partial class MainWindowViewModel : ObservableObject
     private bool _isInterface1Enabled;
 
     [ObservableProperty]
-    private int _connectedMicrodrivesCount;
+    private int _numberOfMicrodrives;
 
     [ObservableProperty]
     private bool _isBeta128Enabled;
+
+    [ObservableProperty]
+    private int _numberOfBeta128Drives;
     #endregion
 
     #region Relay commands

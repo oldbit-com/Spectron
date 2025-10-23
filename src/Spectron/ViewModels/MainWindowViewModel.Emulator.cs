@@ -309,7 +309,7 @@ partial class MainWindowViewModel
         }
 
         IsInterface1Enabled = isEnabled == true;
-        ConnectedMicrodrivesCount = _preferences.Interface1.ConnectedMicrodrivesCount;
+        NumberOfMicrodrives = _preferences.Interface1.NumberOfDrives;
     }
 
     private void RefreshBeta128State(bool? isEnabled)
@@ -329,6 +329,7 @@ partial class MainWindowViewModel
         }
 
         IsBeta128Enabled = isEnabled == true;
+        NumberOfBeta128Drives = _preferences.Beta128.NumberOfDrives;
     }
 
     private void RefreshAyState(bool? isEnabled, StereoMode? stereoMode)

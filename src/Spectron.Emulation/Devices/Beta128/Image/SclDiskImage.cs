@@ -5,6 +5,7 @@ namespace OldBit.Spectron.Emulation.Devices.Beta128.Image;
 
 internal sealed class SclDiskImage : IDiskImage
 {
+    private const string Signature = "SINCLAIR";
     private const int DirEntrySize = 16;
     private const int FileCount = 0x08;
     private const int FileSectors = 0x0D;
@@ -26,7 +27,7 @@ internal sealed class SclDiskImage : IDiskImage
     {
         var signature = Encoding.ASCII.GetString(data[..8]);
 
-        if (!string.Equals(signature, "SINCLAIR", StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(signature, Signature, StringComparison.OrdinalIgnoreCase))
         {
             throw new ArgumentException("Invalid SCL file signature.");
         }
@@ -112,6 +113,36 @@ internal sealed class SclDiskImage : IDiskImage
 
     public void Write(FloppyDisk disk, Stream stream)
     {
-        throw new NotImplementedException();
+        // Signature
+        stream.Write(Encoding.ASCII.GetBytes(Signature));
+        stream.WriteByte(disk.TotalFiles);
+
+        // Directory
+        for (var fileIndex = 0; fileIndex < disk.TotalFiles; fileIndex++)
+        {
+            var dirSector = disk.GetSector(0, 0, 1 + fileIndex / DirEntrySize);
+            var dirIndex = DirEntrySize * (fileIndex % DirEntrySize);
+            var header = dirSector.GetData(dirIndex, DirEntrySize - 2);
+
+            stream.Write(header);
+        }
+
+        // File data
+        for (var fileIndex = 0; fileIndex < disk.TotalFiles; fileIndex++)
+        {
+            var dirSector = disk.GetSector(0, 0, 1 + fileIndex / DirEntrySize);
+            var dirIndex = DirEntrySize * (fileIndex % DirEntrySize);
+            var header = dirSector.GetData(dirIndex, DirEntrySize);
+
+            var fileSectors = header[FileSectors];
+
+            for (var sectorNo = 0; sectorNo < fileSectors; sectorNo++)
+            {
+                var logicalSector = sectorNo + (header[StartingSector] | header[LogicalTrack] << 4);
+                var dataSector = disk.GetLogicalSector(logicalSector);
+
+                stream.Write(dataSector.GetData());
+            }
+        }
     }
 }

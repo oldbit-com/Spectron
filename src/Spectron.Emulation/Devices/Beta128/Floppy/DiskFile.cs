@@ -41,7 +41,14 @@ public sealed class DiskFile
     {
         await using var file = new FileStream(filePath, FileMode.Create, FileAccess.Write);
 
-        DiskImage.Write(ImageType, Floppy, file);
+        var imageType = DiskImage.GetImageType(filePath);
+
+        if (imageType == DiskImageType.Unknown)
+        {
+            imageType = ImageType;
+        }
+
+        DiskImage.Write(imageType, Floppy, file);
 
         FilePath = filePath;
 

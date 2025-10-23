@@ -103,10 +103,11 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         IsDivMmcDriveWriteEnabled = preferences.DivMmc.IsDriveWriteEnabled;
 
         IsBeta128Enabled = preferences.Beta128.IsEnabled;
+        NumberOfBeta128Drives = preferences.Beta128.NumberOfDrives;
 
         IsInterface1Enabled = preferences.Interface1.IsEnabled;
         Interface1RomVersion = preferences.Interface1.RomVersion;
-        ConnectedMicrodrivesCount = preferences.Interface1.ConnectedMicrodrivesCount;
+        NumberOfMicrodrives = preferences.Interface1.NumberOfDrives;
 
         IsZxPrinterEnabled = preferences.Printer.IsZxPrinterEnabled;
     }
@@ -123,6 +124,33 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         GamepadMappingViewModel.UpdateView(value, _gamepadSettings);
 
         _previousGamepadControllerId = value;
+    }
+
+    partial void OnIsInterface1EnabledChanged(bool value)
+    {
+        if (value)
+        {
+            IsBeta128Enabled = false;
+            IsDivMmcEnabled = false;
+        }
+    }
+
+    partial void OnIsBeta128EnabledChanged(bool value)
+    {
+        if (value)
+        {
+            IsInterface1Enabled = false;
+            IsDivMmcEnabled = false;
+        }
+    }
+
+    partial void OnIsDivMmcEnabledChanged(bool value)
+    {
+        if (value)
+        {
+            IsInterface1Enabled = false;
+            IsBeta128Enabled = false;
+        }
     }
 
     [RelayCommand]
@@ -220,13 +248,14 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
             Beta128 = new Beta128Settings
             {
                 IsEnabled = IsBeta128Enabled,
+                NumberOfDrives = NumberOfBeta128Drives
             },
 
             Interface1 = new Interface1Settings
             {
                 IsEnabled = IsInterface1Enabled,
                 RomVersion = Interface1RomVersion,
-                ConnectedMicrodrivesCount = ConnectedMicrodrivesCount,
+                NumberOfDrives = NumberOfMicrodrives,
             },
 
             Printer = new PrinterSettings
@@ -509,6 +538,14 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         new("Eight", 8)
     ];
 
+    public List<NameValuePair<int>> Beta128Drives { get; } =
+    [
+        new("One", 1),
+        new("Two", 2),
+        new("Three", 3),
+        new("Four", 4)
+    ];
+
     public ObservableCollection<GamepadController> GamepadControllers { get; }
 
     [ObservableProperty]
@@ -627,6 +664,9 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
     private bool _isBeta128Enabled;
 
     [ObservableProperty]
+    private int _numberOfBeta128Drives = 2;
+
+    [ObservableProperty]
     private bool _isDivMmcWriteEnabled;
 
     [ObservableProperty]
@@ -650,7 +690,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
     private Interface1RomVersion _interface1RomVersion = Interface1RomVersion.V2;
 
     [ObservableProperty]
-    private int _connectedMicrodrivesCount = 2;
+    private int _numberOfMicrodrives = 2;
 
     [ObservableProperty]
     private bool _isAutoLoadPokeFilesEnabled;

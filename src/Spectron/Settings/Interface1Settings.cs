@@ -8,5 +8,5 @@ public record Interface1Settings
 
     public Interface1RomVersion RomVersion { get; init; } = Interface1RomVersion.V2;
 
-    public int ConnectedMicrodrivesCount { get; init; } = 2;
+    public int NumberOfDrives { get; init; } = 2;
 }
