@@ -59,7 +59,7 @@ internal sealed class FloppyDisk
         set => SystemSector.Write(0xF5, Encoding.ASCII.GetBytes(value.PadRight(8)[..8]));
     }
 
-    internal FloppyDisk(int totalCylinders, int totalSides)
+    internal FloppyDisk(int totalCylinders, int totalSides, string? label = null)
     {
         TotalCylinders = totalCylinders;
         TotalSides = totalSides;
@@ -67,7 +67,7 @@ internal sealed class FloppyDisk
         _tracks = new Track[TotalCylinders][];
         _maxLogicalSector = (TotalCylinders - 1) << 5 | (TotalSides - 1) << 4 | (TotalSectors - 1);
 
-        Initialize();
+        Initialize(label);
     }
 
     internal Track GetTrack(int cylinderNo, int sideNo) => _tracks[cylinderNo][sideNo];
@@ -88,7 +88,7 @@ internal sealed class FloppyDisk
         return _tracks[cylinderNo][sideNo][sectorNo];
     }
 
-    private void Initialize()
+    private void Initialize(string? label)
     {
         var size = (byte)Math.Log2(BytesPerSector / 128.0);
 
@@ -145,11 +145,14 @@ internal sealed class FloppyDisk
             }
         }
 
-        AddTrDosDiskInfo();
+        QuickFormat(label);
     }
 
-    private void AddTrDosDiskInfo()
+    private void QuickFormat(string? label)
     {
+        label ??= "        ";
+        label = label.PadRight(8)[..8];
+
         SystemSector = _tracks[0][0][9];
         var totalFreeSectors = TotalCylinders * TotalSides * TotalSectors - 16;
 
@@ -158,7 +161,7 @@ internal sealed class FloppyDisk
         TotalFreeSectors = totalFreeSectors;
         SystemSector[0xE7] = 0x10;    // TR-DOS id
         SystemSector.Write(0xE9, "         "u8);        // unused 9 x 0x20
-        SystemSector.Write(0xF5, "        "u8);         // disk label (8)
+        SystemSector.Write(0xF5, Encoding.ASCII.GetBytes(label));
 
         SystemSector.UpdateCrc();
     }

@@ -13,6 +13,12 @@ public sealed class DiskFile
 
     public string? FilePath { get; private set; }
 
+    internal DiskFile()
+    {
+        ImageType = DiskImageType.Trd;
+        Floppy = new FloppyDisk(80, 2, "New Disk");
+    }
+
     internal DiskFile(string filePath)
     {
         FilePath = filePath;

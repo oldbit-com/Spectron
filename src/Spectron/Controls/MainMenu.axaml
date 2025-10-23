@@ -211,30 +211,34 @@
 
         <MenuItem Header="Disk" IsVisible="{Binding IsBeta128Enabled}" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="A:">
+                <MenuItem Header="New" Command="{Binding DiskDriveMenuViewModel.NewCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveA}"/>
                 <MenuItem Header="Insert..." InputGesture="Cmd+D" Command="{Binding DiskDriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveA}"/>
-                <MenuItem Header="{Binding DiskDriveMenuViewModel.EjectCommandHeadings[DriveA].Value}" Command="{Binding DiskDriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveA}"/>
                 <MenuItem Header="Save..." Command="{Binding DiskDriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveA}"/>
+                <MenuItem Header="{Binding DiskDriveMenuViewModel.EjectCommandHeadings[DriveA].Value}" Command="{Binding DiskDriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveA}"/>
                 <MenuItem Header="-"/>
                 <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding DiskDriveMenuViewModel.IsWriteProtected[DriveA].Value}" Command="{Binding DiskDriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveA}"/>
             </MenuItem>
             <MenuItem Header="B:" IsVisible="{Binding NumberOfBeta128Drives, Converter={StaticResource GreaterThanConverter}, ConverterParameter=1}">
+                <MenuItem Header="New" Command="{Binding DiskDriveMenuViewModel.NewCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveB}"/>
                 <MenuItem Header="Insert..." Command="{Binding DiskDriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveB}"/>
-                <MenuItem Header="{Binding DiskDriveMenuViewModel.EjectCommandHeadings[DriveB].Value}" Command="{Binding DiskDriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveB}"/>
                 <MenuItem Header="Save..." Command="{Binding DiskDriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveB}"/>
+                <MenuItem Header="{Binding DiskDriveMenuViewModel.EjectCommandHeadings[DriveB].Value}" Command="{Binding DiskDriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveB}"/>
                 <MenuItem Header="-"/>
                 <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding DiskDriveMenuViewModel.IsWriteProtected[DriveB].Value}" Command="{Binding DiskDriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveB}"/>
             </MenuItem>
             <MenuItem Header="C:" IsVisible="{Binding NumberOfBeta128Drives, Converter={StaticResource GreaterThanConverter}, ConverterParameter=2}">
+                <MenuItem Header="New" Command="{Binding DiskDriveMenuViewModel.NewCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveC}"/>
                 <MenuItem Header="Insert..." Command="{Binding DiskDriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveC}"/>
-                <MenuItem Header="{Binding DiskDriveMenuViewModel.EjectCommandHeadings[DriveC].Value}" Command="{Binding DiskDriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveC}"/>
                 <MenuItem Header="Save..." Command="{Binding DiskDriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveC}"/>
+                <MenuItem Header="{Binding DiskDriveMenuViewModel.EjectCommandHeadings[DriveC].Value}" Command="{Binding DiskDriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveC}"/>
                 <MenuItem Header="-"/>
                 <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding DiskDriveMenuViewModel.IsWriteProtected[DriveB].Value}" Command="{Binding DiskDriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveC}"/>
             </MenuItem>
             <MenuItem Header="D:" IsVisible="{Binding NumberOfBeta128Drives, Converter={StaticResource GreaterThanConverter}, ConverterParameter=3}">
+                <MenuItem Header="New" Command="{Binding DiskDriveMenuViewModel.NewCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveD}"/>
                 <MenuItem Header="Insert..." Command="{Binding DiskDriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveD}"/>
-                <MenuItem Header="{Binding DiskDriveMenuViewModel.EjectCommandHeadings[DriveD].Value}" Command="{Binding DiskDriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveD}"/>
                 <MenuItem Header="Save..." Command="{Binding DiskDriveMenuViewModel.SaveCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveD}"/>
+                <MenuItem Header="{Binding DiskDriveMenuViewModel.EjectCommandHeadings[DriveD].Value}" Command="{Binding DiskDriveMenuViewModel.EjectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveD}"/>
                 <MenuItem Header="-"/>
                 <MenuItem Header="Write Protect" ToggleType="CheckBox" IsChecked="{Binding DiskDriveMenuViewModel.IsWriteProtected[DriveB].Value}" Command="{Binding DiskDriveMenuViewModel.ToggleWriteProtectCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveD}"/>
             </MenuItem>

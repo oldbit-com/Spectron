@@ -15,6 +15,7 @@ namespace OldBit.Spectron.ViewModels;
 public class DiskDriveMenuViewModel : ObservableObject
 {
     private readonly DiskDriveManager _diskDriveManager;
+    public ICommand NewCommand { get; }
     public ICommand InsertCommand { get; }
     public ICommand InsertDefaultDriveCommand { get; }
     public ICommand SaveCommand { get; }
@@ -35,6 +36,7 @@ public class DiskDriveMenuViewModel : ObservableObject
         _diskDriveManager = diskDriveManager;
         _diskDriveManager.DiskChanged += OnDiskChanged;
 
+        NewCommand = new RelayCommand<DriveId>(execute: New);
         InsertCommand = new AsyncRelayCommand<DriveId>(execute: Insert);
         InsertDefaultDriveCommand = new AsyncRelayCommand(execute: async() => await Insert(DriveId.DriveA));
         SaveCommand = new AsyncRelayCommand<DriveId>(execute: Save, canExecute: IsDiskInserted);
@@ -70,6 +72,12 @@ public class DiskDriveMenuViewModel : ObservableObject
         {
             ToggleWriteProtect(e.DriveId);
         }
+    }
+
+    private void New(DriveId driveId)
+    {
+        _diskDriveManager[driveId].NewDisk();
+        IsWriteProtected[driveId].Value = false;
     }
 
     private async Task Insert(DriveId driveId)

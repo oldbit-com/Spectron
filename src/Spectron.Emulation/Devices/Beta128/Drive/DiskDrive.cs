@@ -24,6 +24,13 @@ public sealed class DiskDrive(DriveId driveId)
 
     public event DiskChangedEvent? DiskChanged;
 
+    public void NewDisk()
+    {
+        DiskFile = new DiskFile();
+
+        OnDiskChanged();
+    }
+
     public void InsertDisk(string filePath)
     {
         DiskFile = new DiskFile(filePath);
