@@ -14,11 +14,26 @@ internal sealed class Sector
     internal byte CylinderNo => _id[CylinderByte];
     internal byte SectorNo => _id[SectorByte];
     internal byte SideNo => _id[SideByte];
-    internal byte DataAddressMark => _data[0];
+
+    internal byte DataAddressMark
+    {
+        get =>_data[0];
+        set => _data[0] = value;
+    }
+
     internal int Length => _data.Count - 3;
 
     private Word IdCrc => (Word)(_id[^2] << 8 | _id[^1]);
-    internal Word DataCrc => (Word)(_data[^2] << 8 | _data[^1]);
+
+    internal Word DataCrc
+    {
+        get =>(Word)(_data[^2] << 8 | _data[^1]);
+        set
+        {
+            _data[^2]  = (byte)(value >> 8);
+            _data[^1] = (byte)value;
+        }
+    }
 
     internal Sector(Track track, int idPosition, int dataPosition, int bytesPerSector)
     {

@@ -20,6 +20,7 @@ internal sealed partial class DiskController
     private readonly int _rotationTime;     // number of T states in 1 disk rotation
     private readonly int _byteTime;         // number of T states per 1 byte
     private readonly int _clockHz;          // typically ~3.5MHz
+    private readonly int _trackTime;        // number of T states per 1 track
 
     private DiskDrive _drive;
 
@@ -74,8 +75,8 @@ internal sealed partial class DiskController
         _clockHz = (int)(clockMhz * 1_000_000);
         _millisecond = _clockHz / 1000;
         _rotationTime = _clockHz / DiskDrive.Rps;
-
-        _byteTime = _clockHz / (Track.DataLength * DiskDrive.Rps);
+        _byteTime = _clockHz / (Track.MaxDataLength * DiskDrive.Rps);
+        _trackTime = Track.MaxDataLength * _byteTime;
 
         _drive = _diskDriveProvider.Drives[DriveId.DriveA];
     }
@@ -202,19 +203,19 @@ internal sealed partial class DiskController
                     break;
 
                 case ControllerState.Write:
-                    // TODO: Implement WriteSector
+                    Write();
                     break;
 
                 case ControllerState.WriteSector:
-                    // TODO: Implement WriteSector
+                    WriteSector();
                     break;
 
                 case ControllerState.WriteTrack:
-                    // TODO: Implement WriteTrack
+                    WriteTrack();
                     break;
 
                 case ControllerState.WriteTrackData:
-                    // TODO: Implement WriteTrackData
+                    WriteTrackData();
                     break;
 
                 case ControllerState.Step:
@@ -317,8 +318,7 @@ internal sealed partial class DiskController
 
         if (_drive is { IsSpinning: true, IsDiskInserted: true, Track: not null })
         {
-            var trackDuration = _drive.Track.Data.Length * _byteTime; // TODO: This is constant value
-            var position = (int)(_next % trackDuration / _byteTime);
+            var position = (int)(_next % _trackTime / _byteTime);
 
             wait = int.MaxValue;
 
@@ -329,7 +329,7 @@ internal sealed partial class DiskController
 
                 var distance = idPosition > position ?
                     idPosition - position :
-                    _drive.Track.Data.Length + idPosition - position;
+                    _drive.Track.Length + idPosition - position;
 
                 if (distance < wait)
                 {
@@ -355,12 +355,12 @@ internal sealed partial class DiskController
 
     private void FindIndex()
     {
-        var trackDuration = _drive.Track!.Data.Length * _byteTime ;
+        var trackDuration = _drive.Track!.Length * _byteTime ;
         var position = (int)(_next % trackDuration / _byteTime);
 
         _next += trackDuration - position;
         _readWritePosition = 0;
-        _readWriteLength = _drive.Track.Data.Length;
+        _readWriteLength = _drive.Track.Length;
     }
 
     private void ReadFirstByte()

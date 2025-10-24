@@ -113,9 +113,9 @@ internal sealed class FloppyDisk
                 {
                     var interleaveSectorNo = _sectorInterleave[sectorNo];
 
-                    Write(ref position, track, 0x00, 12);       // SYNC
-                    Write(ref position, track, 0xA1, 3);        // IDAM
-                    Write(ref position, track, 0xFE);           // IDAM
+                    Write(ref position, track, 0x00, 12);        // SYNC
+                    Write(ref position, track, 0xA1, 3);         // IDAM
+                    Write(ref position, track, AddressMark.Id);  // IDAM
 
                     var idPosition = position;
 
@@ -131,7 +131,7 @@ internal sealed class FloppyDisk
                     Write(ref position, track, 0x4E, 22);               // GAP 2
                     Write(ref position, track, 0x00, 12);               // SYNC
                     Write(ref position, track, 0xA1, 3);                // DAM
-                    Write(ref position, track, DataAddressMark.Normal); // DAM
+                    Write(ref position, track, AddressMark.Normal);     // DAM
 
                     track[interleaveSectorNo] = new Sector(track, idPosition, position, BytesPerSector);
                     crc = Crc.Calculate(track.Data.AsSpan().Slice(position - 1, BytesPerSector + 1));

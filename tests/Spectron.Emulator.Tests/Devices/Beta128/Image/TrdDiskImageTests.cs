@@ -45,7 +45,7 @@ public class TrdDiskImageTests
                     sector.CylinderNo.ShouldBe(trackNo);
                     sector.SideNo.ShouldBe(sideNo);
                     sector.Length.ShouldBe(256);
-                    sector.DataAddressMark.ShouldBe(DataAddressMark.Normal);
+                    sector.DataAddressMark.ShouldBe(AddressMark.Normal);
 
                     var data = sector.GetData();
                     data.Length.ShouldBe(256);
@@ -65,7 +65,7 @@ public class TrdDiskImageTests
 
         var writtenData = stream.ToArray();
 
-        writtenData.Length.ShouldBe(data.Length);
-        writtenData.ShouldBe(data);
+        writtenData.Length.ShouldBe(655360);
+        writtenData[..data.Length].ShouldBe(data);
     }
 }

@@ -45,7 +45,7 @@ public class SclDiskImageTests
                     sector.CylinderNo.ShouldBe(trackNo);
                     sector.SideNo.ShouldBe(sideNo);
                     sector.Length.ShouldBe(256);
-                    sector.DataAddressMark.ShouldBe(DataAddressMark.Normal);
+                    sector.DataAddressMark.ShouldBe(AddressMark.Normal);
 
                     var data = sector.GetData();
                     data.Length.ShouldBe(256);

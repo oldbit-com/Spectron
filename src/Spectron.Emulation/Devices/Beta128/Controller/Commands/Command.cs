@@ -88,4 +88,7 @@ internal readonly struct Command
 
     // r0 r1 for Restore/Seek/Step/StepIn/StepOut
     internal int SteppingRate => CommandRegister & 0x03;
+
+    // a0 flag set for WriteSector
+    internal bool HasDeletedAddressMarkFlagSet => (CommandRegister & 0x01) == 0x01;
 }
