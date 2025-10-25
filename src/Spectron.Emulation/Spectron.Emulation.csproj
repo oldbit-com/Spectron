@@ -51,4 +51,22 @@
       <PackageReference Include="OldBit.Z80Cpu.Spectron" Version="0.9.3-pre.13" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="Devices\Beta128\Controller\DiskController.Read.cs">
+        <DependentUpon>DiskController.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Devices\Beta128\Controller\DiskController.Command.cs">
+        <DependentUpon>DiskController.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Devices\Beta128\Controller\DiskController.StepSeek.cs">
+        <DependentUpon>DiskController.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Devices\Beta128\Controller\DiskController.Write.cs">
+        <DependentUpon>DiskController.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Devices\Beta128\Controller\DiskController.Control.cs">
+        <DependentUpon>DiskController.cs</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>
