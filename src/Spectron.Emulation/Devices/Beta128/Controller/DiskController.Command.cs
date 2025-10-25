@@ -91,7 +91,7 @@ internal partial class DiskController
         if (_command.IsReadTrack)
         {
             Load();
-            FindIndex();
+            FindTrackIndex();
 
             _nextState = ControllerState.Read;
 

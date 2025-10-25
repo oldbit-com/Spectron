@@ -24,7 +24,7 @@ internal partial class DiskController
         _readWritePosition += 1;
         _readWriteLength -= 1;
 
-        if (_readWritePosition == _drive.Track.Length)
+        if (_readWritePosition == Track.MaxLength)
         {
             _readWritePosition = 0;
         }
@@ -88,7 +88,7 @@ internal partial class DiskController
             return;
         }
 
-        FindIndex();
+        FindTrackIndex();
 
         _maxAddressMarkWaitTime = _next + 5 * _rotationTime;
         // start_crc = -1;

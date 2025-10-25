@@ -1,4 +1,5 @@
 using OldBit.Spectron.Emulation.Devices.Beta128.Controller.Commands;
+using OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Controller;
 
@@ -22,14 +23,13 @@ internal partial class DiskController
         return true;
     }
 
-    private void FindIndex()
+    private void FindTrackIndex()
     {
-        var trackDuration = _drive.Track!.Length * _byteTime ;
-        var position = (int)(_next % trackDuration / _byteTime);
+        var position = (int)(_next % _trackTime / _byteTime);
 
-        _next += trackDuration - position;
+        _next += _trackTime - position;
         _readWritePosition = 0;
-        _readWriteLength = _drive.Track.Length;
+        _readWriteLength = Track.MaxLength;
     }
 
     private void FindMarker()
@@ -52,7 +52,7 @@ internal partial class DiskController
 
                 var distance = idPosition > position ?
                     idPosition - position :
-                    _drive.Track.Length + idPosition - position;
+                    Track.MaxLength + idPosition - position;
 
                 if (distance < wait)
                 {

@@ -75,8 +75,8 @@ internal sealed partial class DiskController
         _clockHz = (int)(clockMhz * 1_000_000);
         _millisecond = _clockHz / 1000;
         _rotationTime = _clockHz / DiskDrive.Rps;
-        _byteTime = _clockHz / (Track.MaxDataLength * DiskDrive.Rps);
-        _trackTime = Track.MaxDataLength * _byteTime;
+        _byteTime = _clockHz / (Track.MaxLength * DiskDrive.Rps);
+        _trackTime = Track.MaxLength * _byteTime;
 
         _drive = _diskDriveProvider.Drives[DriveId.DriveA];
     }
