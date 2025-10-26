@@ -86,14 +86,11 @@ internal partial class DiskController
         FindTrackIndex();
 
         _maxAddressMarkWaitTime = _next + 5 * _rotationTime;
-        _startCrc = -1;
+        _idPosition = null;
 
         _state = ControllerState.Wait;
         _nextState = ControllerState.WriteTrackData;
     }
-
-    // TODO: Try to refactor this logic
-    private int _startCrc = -1;
 
     private void WriteTrackData()
     {
@@ -113,7 +110,7 @@ internal partial class DiskController
             case Track.StartIdDataMarker:
                 data = 0xA1;
                 isMarker = true;
-                _startCrc = _readWritePosition + 1;
+                _idPosition = _readWritePosition + 1;
                 break;
 
             case Track.StartIndexMarker:
@@ -127,13 +124,13 @@ internal partial class DiskController
 
                 _readWritePosition += 1;
                 _readWriteLength -= 1;
-                _startCrc = -1;
+                _idPosition = null;
                 break;
         }
 
-        if (_startCrc >= 0 && _readWritePosition >= _startCrc)
+        if (_readWritePosition >= _idPosition)
         {
-            _crc = _readWritePosition == _startCrc ? Crc.Calculate(data) : Crc.Calculate(data, _crc);
+            _crc = _readWritePosition == _idPosition ? Crc.Calculate(data) : Crc.Calculate(data, _crc);
         }
 
         _drive.Track?.Write(_readWritePosition, data, isMarker);

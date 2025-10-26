@@ -37,6 +37,7 @@ internal sealed partial class DiskController
 
     private int _readWritePosition;
     private int _readWriteLength;
+    private int? _idPosition;
 
     private ControllerState _state = ControllerState.Idle;
     private ControllerState _nextState = ControllerState.Idle;
