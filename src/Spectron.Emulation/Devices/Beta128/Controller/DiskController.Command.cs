@@ -16,7 +16,7 @@ internal partial class DiskController
 
         if (_drive.IsMotorOn)
         {
-            _drive.MotorOn(_next + 10 * _millisecond * 1000);
+            _drive.MotorOn(_next + 2 * _millisecond * 1000);
         }
 
         _state = ControllerState.DelayBeforeCommand;;
@@ -53,7 +53,7 @@ internal partial class DiskController
             _nextState = ControllerState.Step;
         }
 
-        _drive.MotorOn(_next + 10 * _millisecond * 1000);
+        _drive.MotorOn(_next + 2 * _millisecond * 1000);
         _next += 32;
         _state = ControllerState.Wait;
     }
