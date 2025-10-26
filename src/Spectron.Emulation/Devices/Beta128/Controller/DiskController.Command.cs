@@ -14,9 +14,9 @@ internal partial class DiskController
             return;
         }
 
-        if (_drive.IsSpinning)
+        if (_drive.IsMotorOn)
         {
-            _drive.Spin(_next + 2 * _clockHz);
+            _drive.MotorOn(_next + 10 * _millisecond * 1000);
         }
 
         _state = ControllerState.DelayBeforeCommand;;
@@ -45,7 +45,6 @@ internal partial class DiskController
 
         _requestStatus = RequestStatus.None;
 
-        _drive.Spin(_next + 2 * _clockHz);
         _nextState = ControllerState.SeekStart;
 
         if (_command.IsStep || _command.IsStepIn || _command.IsStepOut)
@@ -54,6 +53,7 @@ internal partial class DiskController
             _nextState = ControllerState.Step;
         }
 
+        _drive.MotorOn(_next + 10 * _millisecond * 1000);
         _next += 32;
         _state = ControllerState.Wait;
     }
@@ -82,7 +82,7 @@ internal partial class DiskController
             _controllerStatus |= ControllerStatus.DataRequest;
 
             _next += 3 * _byteTime;
-            _state = ControllerState.Write;
+            _state = ControllerState.Wait;
             _nextState = ControllerState.WriteTrack;
 
             return;
@@ -90,9 +90,10 @@ internal partial class DiskController
 
         if (_command.IsReadTrack)
         {
-            Load();
+            SelectTrack();
             FindTrackIndex();
 
+            _state = ControllerState.Wait;
             _nextState = ControllerState.Read;
 
             return;

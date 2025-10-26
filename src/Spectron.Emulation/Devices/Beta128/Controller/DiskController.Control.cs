@@ -25,7 +25,7 @@ internal partial class DiskController
 
     private void FindTrackIndex()
     {
-        var position = (int)(_next % _trackTime / _byteTime);
+        var position = (int)(_next % _trackTime);
 
         _next += _trackTime - position;
         _readWritePosition = 0;
@@ -34,12 +34,12 @@ internal partial class DiskController
 
     private void FindMarker()
     {
-        Load();
+        SelectTrack();
 
         var wait = 10 * _rotationTime;
         _currentSector = null;
 
-        if (_drive is { IsSpinning: true, IsDiskInserted: true, Track: not null })
+        if (_drive is { IsMotorOn: true, IsDiskInserted: true, Track: not null })
         {
             var position = (int)(_next % _trackTime / _byteTime);
 
@@ -94,7 +94,7 @@ internal partial class DiskController
         }
 
         _controllerStatus &= ~ControllerStatus.CrcError;
-        Load();
+        SelectTrack();
 
         if (_command.Type == CommandType.Type1)
         {
@@ -177,7 +177,7 @@ internal partial class DiskController
 
         _maxAddressMarkWaitTime = _next + 6 * _rotationTime;
 
-        Load();
+        SelectTrack();
         FindMarker();
     }
 

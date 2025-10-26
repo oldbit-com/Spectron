@@ -19,7 +19,6 @@ internal sealed partial class DiskController
     private readonly int _millisecond;      // number of T states in 1 ms
     private readonly int _rotationTime;     // number of T states in 1 disk rotation
     private readonly int _byteTime;         // number of T states per 1 byte
-    private readonly int _clockHz;          // typically ~3.5MHz
     private readonly int _trackTime;        // number of T states per 1 track
 
     private DiskDrive _drive;
@@ -72,10 +71,11 @@ internal sealed partial class DiskController
     {
         _diskDriveProvider = diskDriveProvider;
 
-        _clockHz = (int)(clockMhz * 1_000_000);
-        _millisecond = _clockHz / 1000;
-        _rotationTime = _clockHz / DiskDrive.Rps;
-        _byteTime = _clockHz / (Track.MaxLength * DiskDrive.Rps);
+        var clockHz = (int)(clockMhz * 1_000_000);
+
+        _millisecond = clockHz / 1000;
+        _rotationTime = clockHz / DiskDrive.Rps;
+        _byteTime = clockHz / (Track.MaxLength * DiskDrive.Rps);
         _trackTime = Track.MaxLength * _byteTime;
 
         _drive = _diskDriveProvider.Drives[DriveId.DriveA];
@@ -121,7 +121,7 @@ internal sealed partial class DiskController
         _requestStatus = RequestStatus.InterruptRequest;
         _state = ControllerState.Idle;
 
-        _drive.Stop();
+        _drive.MotorOff();
     }
 
     private byte GetStatusRegister()
@@ -133,16 +133,14 @@ internal sealed partial class DiskController
 
     internal void ProcessState(long now)
     {
-        if (now > _drive.SpinTime && IsHeadLoaded)
+        if (now > _drive.SpinTime && IsHeadLoaded && _drive.IsMotorOn)
         {
-            _drive.Stop();
+            _drive.MotorOff();
         }
 
-        if (_drive.IsDiskInserted)
-        {
-            _controllerStatus &= ~ControllerStatus.NotReady;
-        }
-        else
+        _controllerStatus &= ~ControllerStatus.NotReady;
+
+        if (!_drive.IsDiskInserted)
         {
             _controllerStatus |= ControllerStatus.NotReady;
         }
@@ -151,7 +149,7 @@ internal sealed partial class DiskController
         {
             _controllerStatus &= ~(ControllerStatus.TrackZero | ControllerStatus.Index);
 
-            if (_drive.IsSpinning && IsHeadLoaded)
+            if (_drive.IsMotorOn && IsHeadLoaded)
             {
                 _controllerStatus |= ControllerStatus.HeadLoaded;
             }
@@ -161,7 +159,7 @@ internal sealed partial class DiskController
                 _controllerStatus |= ControllerStatus.TrackZero;
             }
 
-            if (_drive is { IsDiskInserted: true, IsSpinning: true } && IsWithinIndexHole(now))
+            if (_drive is { IsDiskInserted: true, IsMotorOn: true } && IsWithinIndexHole(now))
             {
                 _controllerStatus |= ControllerStatus.Index;
             }
@@ -275,13 +273,35 @@ internal sealed partial class DiskController
         _state = ControllerState.Type1Command;
     }
 
+    internal void ResetController()
+    {
+        _state = ControllerState.Idle;
+        _nextState = ControllerState.Idle;
+        _controllerStatus = ControllerStatus.None;
+        _requestStatus = RequestStatus.None;
+
+        _next = 0;
+        _maxAddressMarkWaitTime = 0;
+        _currentSector = null;
+        _stepIncrement = 1;
+
+        _sideNo = 0;
+        _dataRegister = 0;
+        _controlRegister = 0;
+
+        TrackRegister = 0;
+        SectorRegister = 0;
+
+        _drive.MotorOff();
+    }
+
     private void ResetDataRequest()
     {
         _controllerStatus &= ~ControllerStatus.DataRequest;
         _requestStatus &= ~RequestStatus.DataRequest;
     }
 
-    private void Load() => _drive.Seek(TrackRegister, _sideNo);
+    private void SelectTrack() => _drive.SelectTrack(_sideNo);
 
     private bool IsBusy => (_controllerStatus & ControllerStatus.Busy) != 0;
     private bool IsNotReady => (_controllerStatus & ControllerStatus.NotReady) != 0;

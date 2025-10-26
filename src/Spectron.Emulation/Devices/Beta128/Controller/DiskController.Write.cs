@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Controller;
@@ -6,19 +7,13 @@ internal partial class DiskController
 {
     private void Write()
     {
-        if (_drive.Track == null)
-        {
-            _controllerStatus |= ControllerStatus.Lost;
-            return;
-        }
-
         if ((_requestStatus & RequestStatus.DataRequest) != 0)
         {
             _controllerStatus |= ControllerStatus.Lost;
             _dataRegister = 0;
         }
 
-        _drive.Track.Write(_readWritePosition, _dataRegister);
+        _drive.Track?.Write(_readWritePosition, _dataRegister);
         _crc = Crc.Calculate(_dataRegister, _crc);
 
         _readWritePosition += 1;
@@ -41,8 +36,8 @@ internal partial class DiskController
         }
         else
         {
-            _drive.Track.Write(_readWritePosition++, (byte)(_crc >> 8));
-            _drive.Track.Write(_readWritePosition++, (byte)_crc);
+            _drive.Track?.Write(_readWritePosition++, (byte)(_crc >> 8));
+            _drive.Track?.Write(_readWritePosition++, (byte)_crc);
 
             if (_command.HasMultipleFlagSet)
             {
@@ -58,7 +53,7 @@ internal partial class DiskController
 
     private void WriteSector()
     {
-        Load();
+        SelectTrack();
 
         if (_currentSector == null || (_requestStatus & RequestStatus.DataRequest) != 0)
         {
@@ -80,7 +75,7 @@ internal partial class DiskController
 
     private void WriteTrack()
     {
-        if (_currentSector == null || (_requestStatus & RequestStatus.DataRequest) != 0)
+        if ((_requestStatus & RequestStatus.DataRequest) != 0)
         {
             _controllerStatus |= ControllerStatus.Lost;
             _state = ControllerState.Idle;
@@ -91,29 +86,24 @@ internal partial class DiskController
         FindTrackIndex();
 
         _maxAddressMarkWaitTime = _next + 5 * _rotationTime;
-        // start_crc = -1;
-        // GetIndex();
-        // end_waiting_am = next + 5 * Z80FQ/FDD_RPS;
-        // break;
+        _startCrc = -1;
 
+        _state = ControllerState.Wait;
         _nextState = ControllerState.WriteTrackData;
     }
 
+    // TODO: Try to refactor this logic
+    private int _startCrc = -1;
+
     private void WriteTrackData()
     {
-        if (_drive.Track == null || _currentSector == null)
-        {
-            _controllerStatus |= ControllerStatus.Lost;
-            return;
-        }
-
         if ((_requestStatus & RequestStatus.DataRequest) != 0)
         {
             _controllerStatus |= ControllerStatus.Lost;
             _dataRegister = 0;
         }
 
-        Load();
+        SelectTrack();
 
         var isMarker = false;
         var data = _dataRegister;
@@ -123,6 +113,7 @@ internal partial class DiskController
             case Track.StartIdDataMarker:
                 data = 0xA1;
                 isMarker = true;
+                _startCrc = _readWritePosition + 1;
                 break;
 
             case Track.StartIndexMarker:
@@ -132,14 +123,20 @@ internal partial class DiskController
 
             case Track.WriteCrcMarker:
                 data = (byte)_crc;
-                _drive.Track.Write(_readWritePosition, (byte)(_crc >> 8));
+                _drive.Track?.Write(_readWritePosition, (byte)(_crc >> 8));
 
                 _readWritePosition += 1;
                 _readWriteLength -= 1;
+                _startCrc = -1;
                 break;
         }
 
-        _drive.Track.Write(_readWritePosition, data, isMarker);
+        if (_startCrc >= 0 && _readWritePosition >= _startCrc)
+        {
+            _crc = _readWritePosition == _startCrc ? Crc.Calculate(data) : Crc.Calculate(data, _crc);
+        }
+
+        _drive.Track?.Write(_readWritePosition, data, isMarker);
 
         _readWritePosition += 1;
         _readWriteLength -= 1;
@@ -157,7 +154,7 @@ internal partial class DiskController
             return;
         }
 
-        //_drive.Track.Update();
+        _drive.Track?.UpdateSectors();
 
         _state = ControllerState.Idle;
     }

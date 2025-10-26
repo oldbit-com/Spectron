@@ -10,7 +10,7 @@ internal partial class DiskController
             return;
         }
 
-        Load();
+        SelectTrack();
 
         if (_readWriteLength > 0)
         {

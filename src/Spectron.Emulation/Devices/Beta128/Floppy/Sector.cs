@@ -30,7 +30,7 @@ internal sealed class Sector
         get =>(Word)(_data[^2] << 8 | _data[^1]);
         set
         {
-            _data[^2]  = (byte)(value >> 8);
+            _data[^2] = (byte)(value >> 8);
             _data[^1] = (byte)value;
         }
     }

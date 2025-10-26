@@ -10,6 +10,7 @@ namespace OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 /// </summary>
 internal sealed class FloppyDisk
 {
+    private const byte TrDosId = 0x10;
     internal const int TotalSectors = 16;
     internal const int BytesPerSector = 256;
 
@@ -103,44 +104,43 @@ internal sealed class FloppyDisk
                 var track = new Track(TotalSectors);
                 _tracks[cylinderNo][sideNo] = track;
 
-                Write(ref position, track, 0x4E, 80);           // GAP 4A
-                Write(ref position, track, 0x00, 12);           // SYNC 1
-                Write(ref position, track, 0xC2, 3);            // IAM
-                Write(ref position, track, 0xFC);               // IAM
-                Write(ref position, track, 0x4E, 50);           // GAP 1
+                Write(ref position, track, 0x4E, 80); // GAP 4A
+                Write(ref position, track, 0x00, 12); // SYNC 1
+                Write(ref position, track, 0xC2, 3);  // IAM
+                Write(ref position, track, 0xFC);     // IAM
+                Write(ref position, track, 0x4E, 50); // GAP 1
 
                 for (byte sectorNo = 0; sectorNo < TotalSectors; sectorNo++)
                 {
                     var interleaveSectorNo = _sectorInterleave[sectorNo];
 
-                    Write(ref position, track, 0x00, 12);        // SYNC
-                    Write(ref position, track, 0xA1, 3);         // IDAM
-                    Write(ref position, track, AddressMark.Id);  // IDAM
+                    Write(ref position, track, 0x00, 12);                       // SYNC
+                    Write(ref position, track, 0xA1, 3);                        // IDAM
+                    Write(ref position, track, AddressMark.Id, isMarker: true); // IDAM
 
                     var idPosition = position;
 
-                    Write(ref position, track, cylinderNo);            // C
-                    Write(ref position, track, sideNo);                // H
-                    Write(ref position, track, interleaveSectorNo);    // R
-                    Write(ref position, track, size);                  // N
+                    Write(ref position, track, cylinderNo);         // C
+                    Write(ref position, track, sideNo);             // H
+                    Write(ref position, track, interleaveSectorNo); // R
+                    Write(ref position, track, size);               // N
 
                     var crc = Crc.Calculate(track.Data.AsSpan().Slice(position - 5, 5));
 
-                    Write(ref position, track, (byte)(crc >> 8));       // CRC
-                    Write(ref position, track, (byte)crc);              // CRC
-                    Write(ref position, track, 0x4E, 22);               // GAP 2
-                    Write(ref position, track, 0x00, 12);               // SYNC
-                    Write(ref position, track, 0xA1, 3);                // DAM
-                    Write(ref position, track, AddressMark.Normal);     // DAM
+                    Write(ref position, track, (byte)(crc >> 8));                   // CRC
+                    Write(ref position, track, (byte)crc);                          // CRC
+                    Write(ref position, track, 0x4E, 22);                           // GAP 2
+                    Write(ref position, track, 0x00, 12);                           // SYNC
+                    Write(ref position, track, 0xA1, 3);                            // DAM
+                    Write(ref position, track, AddressMark.Normal, isMarker: true); // DAM
 
                     track[interleaveSectorNo] = new Sector(track, idPosition, position, BytesPerSector);
                     crc = Crc.Calculate(track.Data.AsSpan().Slice(position - 1, BytesPerSector + 1));
                     position += BytesPerSector;
 
-                    Write(ref position, track, (byte)(crc >> 8));       // CRC
-                    Write(ref position, track, (byte)crc);              // CRC
-
-                    Write(ref position, track, 0x4E, 54);               // GAP 3
+                    Write(ref position, track, (byte)(crc >> 8)); // CRC
+                    Write(ref position, track, (byte)crc);        // CRC
+                    Write(ref position, track, 0x4E, 54);         // GAP 3
                 }
             }
         }
@@ -156,11 +156,11 @@ internal sealed class FloppyDisk
         SystemSector = _tracks[0][0][9];
         var totalFreeSectors = TotalCylinders * TotalSides * TotalSectors - 16;
 
-        FirstFreeSector = 0x10;       // H1T0S0
+        FirstFreeSector = 0x10; // H1T0S0
         DiskType = DiskGeometry.GetIdentifier(TotalCylinders, TotalSides);
         TotalFreeSectors = totalFreeSectors;
-        SystemSector[0xE7] = 0x10;    // TR-DOS id
-        SystemSector.Write(0xE9, "         "u8);        // unused 9 x 0x20
+        SystemSector[0xE7] = TrDosId;
+        SystemSector.Write(0xE9, "         "u8); // unused 9 x 0x20
         SystemSector.Write(0xF5, Encoding.ASCII.GetBytes(label));
 
         SystemSector.UpdateCrc();
@@ -177,6 +177,9 @@ internal sealed class FloppyDisk
 
         sector.UpdateCrc();
     }
+
+    private static void Write(ref int position, Track track, byte value, bool isMarker) =>
+        track.Write(position++, value, isMarker);
 
     private static void Write(ref int position, Track track, byte value, int count = 1)
     {

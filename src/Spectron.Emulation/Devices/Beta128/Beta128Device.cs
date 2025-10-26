@@ -154,6 +154,6 @@ public class Beta128Device(
     internal void Reset()
     {
         _ticksSinceReset = 0;
-        // TODO: Any reset logic
+        Controller.ResetController();
     }
 }

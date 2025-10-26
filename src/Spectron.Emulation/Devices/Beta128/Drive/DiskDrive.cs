@@ -15,7 +15,7 @@ public sealed class DiskDrive(DriveId driveId)
     internal byte CylinderNo { get; private set; }
     internal Track? Track { get; private set; }
 
-    internal bool IsSpinning => SpinTime > 0;
+    internal bool IsMotorOn => SpinTime > 0;
     internal long SpinTime { get; private set; }
 
     public DiskFile? DiskFile { get; private set; }
@@ -64,15 +64,11 @@ public sealed class DiskDrive(DriveId driveId)
         OnDiskChanged();
     }
 
-    internal void Spin(long spinTime) => SpinTime = spinTime;
+    internal void MotorOn(long motorTime) => SpinTime = motorTime;
 
-    internal void Stop() => SpinTime = 0;
+    internal void MotorOff() => SpinTime = 0;
 
-    internal void Seek(byte cylinderNo, byte sideNo)
-    {
-        CylinderNo = cylinderNo;
-        Track = DiskFile?.Floppy.GetTrack(CylinderNo, sideNo);
-    }
+    internal void SelectTrack(byte sideNo) => Track = DiskFile?.Floppy.GetTrack(CylinderNo, sideNo);
 
     internal void Step(int stepIncrement)
     {
