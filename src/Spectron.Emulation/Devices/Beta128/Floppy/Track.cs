@@ -5,7 +5,7 @@ namespace OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
 internal sealed class Track(int totalSectors)
 {
-    internal const int MaxLength = 6098;
+    internal const int MaxLength = 6250;
 
     internal const byte StartIdDataMarker = 0xF5;
     internal const byte StartIndexMarker = 0xF6;
