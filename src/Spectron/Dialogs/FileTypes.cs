@@ -6,7 +6,7 @@ public static class FileTypes
 {
     public static FilePickerFileType All { get; } = new("All Files")
     {
-        Patterns = ["*.tap", "*.tzx", "*.sna", "*.szx", "*.z80", "*.zip", "*.pok", "*.mdr", "*trd", "*.scl"]
+        Patterns = ["*.tap", "*.tzx", "*.sna", "*.szx", "*.z80", "*.zip", "*.pok", "*.mdr", "*.trd", "*.scl"]
     };
 
     public static FilePickerFileType TapeFiles { get; } = new("Tape Files")
