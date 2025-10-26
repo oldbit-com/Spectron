@@ -25,7 +25,7 @@ internal partial class DiskController
 
     private void FindTrackIndex()
     {
-        var position = (int)(_next % _trackTime);
+        var position = _next % _trackTime;
 
         _next += _trackTime - position;
         _readWritePosition = 0;
@@ -43,7 +43,7 @@ internal partial class DiskController
         {
             var position = (int)(_next % _trackTime / _byteTime);
 
-            wait = int.MaxValue;
+            wait = long.MaxValue;
 
             for (var sectorNo = 1; sectorNo <= 16; sectorNo++)
             {

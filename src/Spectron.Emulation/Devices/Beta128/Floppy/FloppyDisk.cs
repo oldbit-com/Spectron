@@ -142,6 +142,11 @@ internal sealed class FloppyDisk
                     Write(ref position, track, (byte)crc);        // CRC
                     Write(ref position, track, 0x4E, 54);         // GAP 3
                 }
+
+                if (position < Track.MaxLength)
+                {
+                    Write(ref position, track, 0x4E, Track.MaxLength - position); // GAP 4 (tail)
+                }
             }
         }
 

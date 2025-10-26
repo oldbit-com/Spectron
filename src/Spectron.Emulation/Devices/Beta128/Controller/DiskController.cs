@@ -17,9 +17,9 @@ internal sealed partial class DiskController
     private const byte ControlHeadEnable = 0b0000_1000;
 
     private readonly int _millisecond;      // number of T states in 1 ms
-    private readonly int _rotationTime;     // number of T states in 1 disk rotation
+    private readonly long _rotationTime;    // number of T states in 1 disk rotation
     private readonly int _byteTime;         // number of T states per 1 byte
-    private readonly int _trackTime;        // number of T states per 1 track
+    private readonly long _trackTime;       // number of T states per 1 track
 
     private DiskDrive _drive;
 
@@ -71,12 +71,12 @@ internal sealed partial class DiskController
     {
         _diskDriveProvider = diskDriveProvider;
 
-        var clockHz = (int)(clockMhz * 1_000_000);
+        var clockHz = (long)(clockMhz * 1_000_000);
 
-        _millisecond = clockHz / 1000;
+        _millisecond = (int)(clockHz / 1000);
         _rotationTime = clockHz / DiskDrive.Rps;
-        _byteTime = clockHz / (Track.MaxLength * DiskDrive.Rps);
-        _trackTime = Track.MaxLength * _byteTime;
+        _byteTime = (int)(clockHz / (Track.MaxLength * DiskDrive.Rps));
+        _trackTime = _rotationTime;
 
         _drive = _diskDriveProvider.Drives[DriveId.DriveA];
     }
