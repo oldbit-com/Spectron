@@ -124,6 +124,7 @@ partial class MainWindowViewModel
         RefreshAyState(Emulator?.AudioManager.IsAyEnabled, Emulator?.AudioManager.StereoMode);
         RefreshPrinterState(_preferences.Printer.IsZxPrinterEnabled);
         RefreshInterface1State(_preferences.Interface1.IsEnabled, _preferences.Interface1.RomVersion);
+        RefreshBeta128State(_preferences.Beta128.IsEnabled);
 
         RefreshStatusBar();
     }
@@ -308,7 +309,27 @@ partial class MainWindowViewModel
         }
 
         IsInterface1Enabled = isEnabled == true;
-        ConnectedMicrodrivesCount = _preferences.Interface1.ConnectedMicrodrivesCount;
+        NumberOfMicrodrives = _preferences.Interface1.NumberOfDrives;
+    }
+
+    private void RefreshBeta128State(bool? isEnabled)
+    {
+        if (isEnabled == null)
+        {
+            return;
+        }
+
+        if (isEnabled.Value)
+        {
+            Emulator?.Beta128.Enable();
+        }
+        else
+        {
+            Emulator?.Beta128.Disable();
+        }
+
+        IsBeta128Enabled = isEnabled == true;
+        NumberOfBeta128Drives = _preferences.Beta128.NumberOfDrives;
     }
 
     private void RefreshAyState(bool? isEnabled, StereoMode? stereoMode)
@@ -342,7 +363,11 @@ partial class MainWindowViewModel
 
         StatusBarViewModel.IsMicroDriveCartridgeInserted =
             Emulator.Interface1.IsEnabled &&
-            Emulator.MicrodriveManager.Microdrives.Values.Any(microdrive => microdrive.IsCartridgeInserted) == true;
+            Emulator.MicrodriveManager.Microdrives.Values.Any(drive => drive.IsCartridgeInserted);
+
+        StatusBarViewModel.IsFloppyDiskInserted =
+            Emulator.Beta128.IsEnabled &&
+            Emulator.DiskDriveManager.Drives.Values.Any(drive => drive.IsDiskInserted);
 
         StatusBarViewModel.IsAyEnabled = Emulator.AudioManager.IsAyEnabled;
         StatusBarViewModel.StereoMode = Emulator.AudioManager.StereoMode;

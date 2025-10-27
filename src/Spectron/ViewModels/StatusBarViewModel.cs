@@ -52,6 +52,9 @@ public partial class StatusBarViewModel : ObservableObject
     private bool _isMicroDriveCartridgeInserted;
 
     [ObservableProperty]
+    private bool _isFloppyDiskInserted;
+
+    [ObservableProperty]
     private string _tapeLoadProgress = string.Empty;
 
     [ObservableProperty]
@@ -86,7 +89,8 @@ public partial class StatusBarViewModel : ObservableObject
         _ => "Unknown"
     };
 
-    public Action AnimateQuickSave { get; set; } = () => {};
+    public Action AnimateQuickSave { get; set; } = () => {};      // Body defined in code-behind
+    public Action AnimateDiskActivity { get; set; } = () => {};   // Body defined in code-behind
 
     public StatusBarViewModel()
     {

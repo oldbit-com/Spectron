@@ -26,6 +26,9 @@ public partial class MainWindow : Window
         WeakReferenceMessenger.Default.Register<MainWindow, ShowAboutViewMessage>(this, (window, _) =>
             ShowDialog<AboutView>(window));
 
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowDiskViewMessage>(this, (window, message) =>
+            ShowDialog<DiskView>(window, new DiskViewModel(message.DiskDriveManager, message.DriveId)));
+
         WeakReferenceMessenger.Default.Register<MainWindow, ShowDebuggerViewMessage>(this, (window, m) =>
             Show<DebuggerView>(window, m.ViewModel!));
 

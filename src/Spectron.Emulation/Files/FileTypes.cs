@@ -12,6 +12,8 @@ public static class FileTypes
         ".zip" => FileType.Zip,
         ".pok" => FileType.Pok,
         ".mdr" => FileType.Mdr,
+        ".trd" => FileType.Trd,
+        ".scl" => FileType.Scl,
         _ => FileType.Unsupported
     };
 }

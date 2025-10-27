@@ -1,5 +1,6 @@
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Audio;
+using OldBit.Spectron.Emulation.Devices.Beta128;
 using OldBit.Spectron.Emulation.Devices.DivMmc;
 using OldBit.Spectron.Emulation.Devices.Interface1;
 using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
@@ -31,6 +32,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         LoadAy(emulator.AudioManager, snapshot.Ay);
         LoadDivMmc(emulator.DivMmc, snapshot.DivMmc);
         LoadInterface1(emulator.Interface1, emulator.MicrodriveManager, snapshot.Interface1);
+        LoadBeta128(emulator.Beta128, emulator.DiskDriveManager, snapshot.Beta128);
         LoadOther(emulator, snapshot);
 
         return emulator;
@@ -52,6 +54,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         SaveAy(emulator.AudioManager, snapshot);
         SaveDivMmc(emulator.DivMmc, snapshot);
         SaveInterface1(emulator.Interface1, emulator.MicrodriveManager, isTimeMachine, snapshot);
+        SaveBeta128(emulator.Beta128, emulator.DiskDriveManager, isTimeMachine, snapshot);
         SaveOther(emulator, snapshot);
 
         if (emulator.RomType.IsCustomRom())
@@ -212,6 +215,45 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         };
     }
 
+    private static void SaveBeta128(Beta128Device beta128, DiskDriveManager diskDriveManager, bool isTimeMachine, StateSnapshot stateSnapshot)
+    {
+        if (!beta128.IsEnabled)
+        {
+            return;
+        }
+
+        var drives = new List<DiskDriveState>();
+
+        if (!isTimeMachine)
+        {
+            foreach (var (driveId, drive) in diskDriveManager.Drives)
+            {
+                if (drive.IsDiskInserted)
+                {
+                    drives.Add(new DiskDriveState
+                    {
+                        DriveId = driveId,
+                        FilePath = drive.DiskFile!.FilePath,
+                        DiskImageType = drive.DiskFile.ImageType,
+                        IsWriteProtected = drive.IsWriteProtected,
+                        Data = drive.DiskFile.GetData()
+                    });
+                }
+            }
+        }
+
+        stateSnapshot.Beta128 = new Beta128State
+        {
+            CommandRegister = beta128.Controller.CommandRegister,
+            ControlRegister = beta128.Controller.ControlRegister,
+            DataRegister = beta128.Controller.DataRegister,
+            SectorRegister = beta128.Controller.SectorRegister,
+            TrackRegister = beta128.Controller.TrackRegister,
+            IsRomPaged = beta128.IsRomPaged,
+            Drives = drives.ToArray(),
+        };
+    }
+
     private static void SaveOther(Emulator emulator, StateSnapshot stateSnapshot) =>
         stateSnapshot.BorderColor = emulator.ScreenBuffer.LastBorderColor;
 
@@ -270,12 +312,10 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         {
             case Memory16K memory16K:
                 memoryState.Banks[0].CopyTo(memory16K.Ram);
-
                 break;
 
             case Memory48K memory48K:
                 memoryState.Banks[0].CopyTo(memory48K.Ram);
-
                 break;
 
             case Memory128K memory128:
@@ -285,7 +325,6 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
                 }
 
                 memory128.SetPagingMode(memoryState.PagingMode);
-
                 break;
         }
     }
@@ -371,5 +410,32 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         }
 
         interface1.Enable();
+    }
+
+    private static void LoadBeta128(Beta128Device beta128, DiskDriveManager diskDriveManager, Beta128State? beta128State)
+    {
+        if (beta128State == null)
+        {
+            return;
+        }
+
+        beta128.Controller.ControlRegister = beta128State.ControlRegister;
+        beta128.Controller.CommandRegister = beta128State.CommandRegister;
+        beta128.Controller.DataRegister = beta128State.DataRegister;
+        beta128.Controller.TrackRegister = beta128State.TrackRegister;
+        beta128.Controller.SectorRegister = beta128State.SectorRegister;
+
+        if (beta128.IsRomPaged)
+        {
+            beta128.PageRom();
+        }
+
+        foreach (var drive in beta128State.Drives)
+        {
+            diskDriveManager[drive.DriveId]
+                .InsertDisk(drive.FilePath, drive.DiskImageType, drive.IsWriteProtected, drive.Data);
+        }
+
+        beta128.Enable();
     }
 }

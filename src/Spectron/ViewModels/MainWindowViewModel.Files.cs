@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Messaging;
 using OldBit.Spectron.Dialogs;
+using OldBit.Spectron.Emulation.Devices.Beta128.Drive;
 using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Snapshot;
@@ -57,6 +58,12 @@ partial class MainWindowViewModel
 
                 case FileType.Mdr:
                     LoadMicrodriveFile(filePath, stream);
+                    RecentFilesViewModel.Add(filePath);
+                    return;
+
+                case FileType.Trd:
+                case FileType.Scl:
+                    LoadDiskFile(filePath, stream);
                     RecentFilesViewModel.Add(filePath);
                     return;
 
@@ -138,10 +145,18 @@ partial class MainWindowViewModel
         OpenTrainersWindow();
     }
 
-    private void LoadMicrodriveFile(string? filePath, Stream stream)
+    private void LoadMicrodriveFile(string filePath, Stream stream)
     {
         Emulator?.Interface1.Enable();
+        Emulator?.Beta128.Disable();
         Emulator?.MicrodriveManager.Microdrives[MicrodriveId.Drive1].InsertCartridge(filePath, stream);
+    }
+
+    private void LoadDiskFile(string filePath, Stream stream)
+    {
+        Emulator?.Beta128.Enable();
+        Emulator?.Interface1.Disable();
+        Emulator?.DiskDriveManager.Drives[DriveId.DriveA].InsertDisk(filePath, stream);
     }
 
     private void TryAutoLoadPokeFile(string filePath, FileType fileType)

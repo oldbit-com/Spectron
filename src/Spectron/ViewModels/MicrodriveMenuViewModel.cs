@@ -33,7 +33,6 @@ public class MicrodriveMenuViewModel : ObservableObject
         }
 
         _microdriveManager = microdriveManager;
-
         _microdriveManager.CartridgeChanged += OnCartridgeChanged;
 
         NewCommand = new RelayCommand<MicrodriveId>(execute: New);

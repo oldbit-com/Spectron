@@ -6,12 +6,17 @@ public static class FileTypes
 {
     public static FilePickerFileType All { get; } = new("All Files")
     {
-        Patterns = ["*.tap", "*.tzx", "*.sna", "*.szx", "*.z80", "*.zip", "*.pok", "*.mdr"]
+        Patterns = ["*.tap", "*.tzx", "*.sna", "*.szx", "*.z80", "*.zip", "*.pok", "*.mdr", "*.trd", "*.scl"]
     };
 
     public static FilePickerFileType TapeFiles { get; } = new("Tape Files")
     {
         Patterns = ["*.tap", "*.tzx"]
+    };
+
+    public static FilePickerFileType SnapshotFiles { get; } = new("Snapshot Files")
+    {
+        Patterns = ["*.sna", "*.szx", "*.z80"]
     };
 
     public static FilePickerFileType Tap { get; } = new("TAP File")
@@ -82,6 +87,21 @@ public static class FileTypes
     public static FilePickerFileType Mdr { get; } = new("Microdrive File")
     {
         Patterns = ["*.mdr"]
+    };
+
+    public static FilePickerFileType Trd { get; } = new("TRD Disk File")
+    {
+        Patterns = ["*.trd"]
+    };
+
+    public static FilePickerFileType Scl { get; } = new("SCL Disk File")
+    {
+        Patterns = ["*.scl"]
+    };
+
+    public static FilePickerFileType DiskFiles { get; } = new("Disk Files")
+    {
+        Patterns = ["*.trd", "*.scl"]
     };
 
     public static FilePickerFileType Any { get; } = new("All Files")

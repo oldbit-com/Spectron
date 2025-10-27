@@ -153,31 +153,47 @@
                                 </Grid>
                             </StackPanel>
                         </TabItem>
-                        
+
+                        <TabItem Header="Beta 128">
+                            <StackPanel>
+                                <CheckBox x:Name="Beta128Enabled" Content="Disk Interface enabled" Classes="Center" IsChecked="{Binding IsBeta128Enabled}"/>
+
+                                <StackPanel IsEnabled="{Binding #Beta128Enabled.IsChecked}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Number of drives:" Padding="0 0 10 0" VerticalAlignment="Center" Classes="Center"/>
+                                        <ComboBox Width="150" ItemsSource="{Binding Beta128Drives}" SelectedValue="{Binding NumberOfBeta128Drives}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                            </StackPanel>
+                        </TabItem>
+
                         <TabItem Header="Interface 1">
                             <StackPanel>
                                 <CheckBox x:Name="Interface1Enabled" Content="Interface 1 enabled" Classes="Center" IsChecked="{Binding IsInterface1Enabled}"/>
-                                
-                                <StackPanel Orientation="Horizontal" IsEnabled="{Binding #Interface1Enabled.IsChecked}">
-                                    <RadioButton
-                                        Content="ROM Version 1"
-                                        ToolTip.Tip="Use first revision of shadow ROM"
-                                        IsChecked="{Binding Interface1RomVersion, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static if1:Interface1RomVersion.V1}}"
-                                        Classes="Center"/>
 
-                                    <RadioButton
-                                        Content="ROM Version 2"
-                                        ToolTip.Tip="Use second revision of shadow ROM"
-                                        IsChecked="{Binding Interface1RomVersion, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static if1:Interface1RomVersion.V2}}"
-                                        Classes="Center"
-                                        Margin="10 0 0 0"/>
+                                <StackPanel IsEnabled="{Binding #Interface1Enabled.IsChecked}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <RadioButton
+                                            Content="ROM Version 1"
+                                            ToolTip.Tip="Use first revision of shadow ROM"
+                                            IsChecked="{Binding Interface1RomVersion, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static if1:Interface1RomVersion.V1}}"
+                                            Classes="Center"/>
+
+                                        <RadioButton
+                                            Content="ROM Version 2"
+                                            ToolTip.Tip="Use second revision of shadow ROM"
+                                            IsChecked="{Binding Interface1RomVersion, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static if1:Interface1RomVersion.V2}}"
+                                            Classes="Center"
+                                            Margin="10 0 0 0"/>
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Number of microdrives:" Padding="0 0 10 0" VerticalAlignment="Center" Classes="Center"/>
+                                        <ComboBox Width="150" ItemsSource="{Binding Microdrives}" SelectedValue="{Binding NumberOfMicrodrives}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}"/>
+                                    </StackPanel>
+
                                 </StackPanel>
-                                
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Connected microdrives:" Padding="0 0 10 0" VerticalAlignment="Center" Classes="Center"/>
-                                    <ComboBox Width="150" ItemsSource="{Binding Microdrives}" SelectedValue="{Binding ConnectedMicrodrivesCount}" DisplayMemberBinding="{Binding Name}" SelectedValueBinding="{Binding Value}" IsEnabled="{Binding #Interface1Enabled.IsChecked}"/>
-                                </StackPanel>
-                                
                             </StackPanel>
                         </TabItem>
                     </TabControl>

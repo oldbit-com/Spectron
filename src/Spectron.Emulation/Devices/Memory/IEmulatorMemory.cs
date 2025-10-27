@@ -14,5 +14,7 @@ public interface IEmulatorMemory : IMemory, IDevice
 
     IRomMemory OriginalRom { get; }
 
+    RomBank RomBank => RomBank.Bank0;
+
     event MemoryUpdatedEvent? MemoryUpdated;
 }

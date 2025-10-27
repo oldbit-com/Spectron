@@ -31,6 +31,8 @@ public sealed partial class StateSnapshot
 
     public Interface1State? Interface1 { get; set; }
 
+    public Beta128State? Beta128 { get; set; }
+
     public byte[] Serialize() => MemoryPackSerializer.Serialize(this);
 
     public static StateSnapshot? Load(string filePath)

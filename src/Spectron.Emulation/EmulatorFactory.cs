@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation.Commands;
+using OldBit.Spectron.Emulation.Devices.Beta128;
 using OldBit.Spectron.Emulation.Devices.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
@@ -20,6 +21,7 @@ public sealed class EmulatorFactory(
     TimeMachine timeMachine,
     TapeManager tapeManager,
     MicrodriveManager microdriveManager,
+    DiskDriveManager diskDriveManager,
     GamepadManager gamepadManager,
     KeyboardState keyboardState,
     CommandManager commandManager,
@@ -71,6 +73,7 @@ public sealed class EmulatorFactory(
             Hardware.Spectrum128K,
             tapeManager,
             microdriveManager,
+            diskDriveManager,
             gamepadManager,
             keyboardState,
             timeMachine,
@@ -95,6 +98,7 @@ public sealed class EmulatorFactory(
             Hardware.Spectrum48K,
             tapeManager,
             microdriveManager,
+            diskDriveManager,
             gamepadManager,
             keyboardState,
             timeMachine,

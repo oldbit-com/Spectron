@@ -63,7 +63,7 @@ public sealed class Microdrive(MicrodriveId driveId)
         OnCartridgeChanged();
     }
 
-    public void InsertCartridge(string? filePath, Stream stream)
+    public void InsertCartridge(string filePath, Stream stream)
     {
         using var memoryStream = new MemoryStream();
         stream.CopyTo(memoryStream);

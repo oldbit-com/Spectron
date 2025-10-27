@@ -26,6 +26,7 @@
       <EmbeddedResource Include="Rom\Files\ESXMMC.0.8.9.BIN" />
       <EmbeddedResource Include="Rom\Files\interface1-v1.rom" />
       <EmbeddedResource Include="Rom\Files\interface1-v2.rom" />
+      <EmbeddedResource Include="Rom\Files\trdos-503.rom" />
     </ItemGroup>
 
     <ItemGroup>
@@ -48,6 +49,24 @@
       <PackageReference Include="OldBit.Joypad" Version="0.0.2-rc.3" />
       <PackageReference Include="OldBit.Spectron.Files" Version="0.9.3-pre.100" />
       <PackageReference Include="OldBit.Z80Cpu.Spectron" Version="0.9.3-pre.13" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Devices\Beta128\Controller\DiskController.Read.cs">
+        <DependentUpon>DiskController.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Devices\Beta128\Controller\DiskController.Command.cs">
+        <DependentUpon>DiskController.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Devices\Beta128\Controller\DiskController.StepSeek.cs">
+        <DependentUpon>DiskController.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Devices\Beta128\Controller\DiskController.Write.cs">
+        <DependentUpon>DiskController.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Devices\Beta128\Controller\DiskController.Control.cs">
+        <DependentUpon>DiskController.cs</DependentUpon>
+      </Compile>
     </ItemGroup>
 
 </Project>

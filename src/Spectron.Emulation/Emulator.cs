@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation.Commands;
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Audio;
+using OldBit.Spectron.Emulation.Devices.Beta128;
 using OldBit.Spectron.Emulation.Devices.DivMmc;
 using OldBit.Spectron.Emulation.Devices.DivMmc.RTC;
 using OldBit.Spectron.Emulation.Devices.Gamepad;
@@ -36,6 +37,7 @@ public sealed class Emulator
     private bool _isAcceleratedTapeSpeed;
     private bool _isNmiRequested;
     private bool _isDebuggerBreak;
+    private long _ticksSinceReset;
     private FloatingBus _floatingBus = null!;
 
     public delegate void FrameEvent(FrameBuffer frameBuffer, AudioBuffer audioBuffer);
@@ -57,6 +59,7 @@ public sealed class Emulator
     public KeyboardState KeyboardState { get; }
     public TapeManager TapeManager { get; }
     public MicrodriveManager MicrodriveManager { get; }
+    public DiskDriveManager DiskDriveManager { get; }
     public JoystickManager JoystickManager { get; }
     public AudioManager AudioManager { get; }
     public GamepadManager GamepadManager { get; }
@@ -70,6 +73,7 @@ public sealed class Emulator
     public IEmulatorMemory Memory => _memory;
     public IBus Bus => _spectrumBus;
     public DivMmcDevice DivMmc { get; }
+    public Beta128Device Beta128 { get; }
     public Interface1Device Interface1 { get; }
     public ZxPrinter Printer { get; }
 
@@ -83,6 +87,7 @@ public sealed class Emulator
         HardwareSettings hardware,
         TapeManager tapeManager,
         MicrodriveManager microdriveManager,
+        DiskDriveManager diskDriveManager,
         GamepadManager gamepadManager,
         KeyboardState keyboardState,
         TimeMachine timeMachine,
@@ -97,6 +102,7 @@ public sealed class Emulator
         CommandManager = commandManager;
         TapeManager = tapeManager;
         MicrodriveManager = microdriveManager;
+        DiskDriveManager = diskDriveManager;
         GamepadManager = gamepadManager;
         ComputerType = emulatorArgs.ComputerType;
         RomType = emulatorArgs.RomType;
@@ -122,6 +128,7 @@ public sealed class Emulator
         AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware);
 
         DivMmc = new DivMmcDevice(Cpu, _memory, logger);
+        Beta128 = new Beta128Device(Cpu, _hardware.ClockMhz, _memory, ComputerType, diskDriveManager);
         Interface1 = microdriveManager.CreateDevice(Cpu, _memory);
         Printer = new ZxPrinter();
 
@@ -178,6 +185,7 @@ public sealed class Emulator
     public void Reset()
     {
         _isDebuggerBreak = false;
+        _ticksSinceReset = 0;
 
         AudioManager.ResetAudio();
         _memory.Reset();
@@ -187,6 +195,7 @@ public sealed class Emulator
         KeyboardState.Reset();
         Interface1.Reset();
         DivMmc.Reset();
+        Beta128.Reset();
 
         if (IsPaused)
         {
@@ -236,12 +245,13 @@ public sealed class Emulator
         };
         Cpu.Clock.TicksAdded += (_, previousFrameTicks, _) => ScreenBuffer.UpdateScreen(previousFrameTicks);
         Cpu.BeforeInstruction += BeforeInstruction;
-        UlaPlus.ActiveChanged += (_) => _invalidateScreen = true;
+        UlaPlus.ActiveChanged += _ => _invalidateScreen = true;
+        Beta128.DiskActivity += _ => DiskDriveManager.OnDiskActivity();
     }
 
     private void SetupUlaAndDevices()
     {
-        var ula = new Ula(KeyboardState, ScreenBuffer, Cpu.Clock, TapeManager?.CassettePlayer);
+        var ula = new Ula(KeyboardState, ScreenBuffer, Cpu.Clock, TapeManager.CassettePlayer);
 
         _spectrumBus.AddDevice(ula);
         _spectrumBus.AddDevice(UlaPlus);
@@ -251,6 +261,7 @@ public sealed class Emulator
         _spectrumBus.AddDevice(Printer);
         _spectrumBus.AddDevice(Interface1);
         _spectrumBus.AddDevice(DivMmc);
+        _spectrumBus.AddDevice(Beta128);
         _spectrumBus.AddDevice(new RtcDevice(DivMmc));
 
         _floatingBus = new FloatingBus(_hardware, Memory, Cpu.Clock);
@@ -274,11 +285,13 @@ public sealed class Emulator
 
         EndFrame();
 
-        if (_invalidateScreen)
+        if (!_invalidateScreen)
         {
-            ScreenBuffer.Invalidate();
-            _invalidateScreen = false;
+            return;
         }
+
+        ScreenBuffer.Invalidate();
+        _invalidateScreen = false;
     }
 
     private void StartFrame()
@@ -293,10 +306,13 @@ public sealed class Emulator
         Cpu.Clock.NewFrame(_hardware.TicksPerFrame);
         ScreenBuffer.NewFrame();
         AudioManager.NewFrame();
+        Beta128.NewFrame(_ticksSinceReset);
     }
 
     private void EndFrame()
     {
+        _ticksSinceReset += Cpu.Clock.FrameTicks;
+
         var audioBuffer = AudioManager.EndFrame();
 
         ScreenBuffer.EndFrame(Cpu.Clock.FrameTicks);
