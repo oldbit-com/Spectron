@@ -42,10 +42,9 @@ Solution consists of several projects:
 # Features
 - [x] Emulates classic machines: ZX Spectrum 16K, 48K and 128K
 - [x] Time Machine: rewind and continue from a given time point in the past
-- [x] Emulator state is persisted when emulator is closed
+- [x] Emulator state is persisted and restored when application is re-started
 - [x] Supports SNA, SZX, Z80, TAP, TZX, MDR, TRD and SCL file formats (inside zip, too)
 - [x] Supports POK trainer files
-- [x] Tape content viewer
 - [x] Accurate timings, including contented memory and IO
 - [x] Floating bus support
 - [x] Multicolor screen effects work, timings are quite accurate
@@ -56,6 +55,8 @@ Solution consists of several projects:
 - [x] Microdrive emulation
 - [x] Kempston mouse emulation
 - [x] ZX Printer emulation
+- [x] Tape viewer
+- [x] Disk viewer
 - [x] Adjustable emulator speed
 - [x] Debugger
 - [x] Keyboard joystick emulation: Kempston, Sinclair, Cursor & Fuller.
