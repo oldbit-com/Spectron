@@ -36,5 +36,5 @@ Options:
   --no-resume                                                                         Do not resume emulator state
   --if1, --interface1                                                                 Enables Interface 1 emulation
   --no-if1, --no-interface1                                                           Disables Interface 1 emulation
-  --interface1-rom <V1|V2>                                                            Specifies ROM version to use for Interface 1 emulation                                                                       Do not resume emulator state
+  --interface1-rom <V1|V2>                                                            Specifies ROM version to use for Interface 1 emulation 
 ```
