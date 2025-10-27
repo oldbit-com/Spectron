@@ -76,39 +76,8 @@ dotnet run --project ./src/Spectron
 ```
 
 ### Command line options
-Command lines allow overriding most of the default options and loading specified file.
-```
-Options:
-  -?, -h, --help                                                                      Show help and usage information
-  --version                                                                           Show version information
-  -f, --file                                                                          Specifies the file to load. This can be any supported file type: TAP | TZX | Z80 | SNA | 
-                                                                                      SZX | POK | ZIP
-  -ts, --tape-load-speed <Accelerated|Instant|Normal>                                 Specifies the tape loading speed
-  -c, --computer <Spectrum128K|Spectrum16K|Spectrum48K>                               Specifies the computer to emulate
-  -r, --rom <BrendanAlford|BusySoft|Custom|GoshWonderful|Harston|Original|Retroleum>  Specifies the ROM to load
-  -rf, --rom-file                                                                     Specifies the custom ROM file
-  -j, --joystick <Cursor|Fuller|Kempston|None|Sinclair1|Sinclair2>                    Specifies the emulated joystick type
-  -m, --mouse <Kempston|None>                                                         Specifies the emulated mouse type
-  -t, --theme <Dark|Light>                                                            Specifies the application theme
-  -b, --border <Full|Large|Medium|None|Small>                                         Specifies the border size
-  -m, --mute                                                                          Mutes the audio playback [default: False]
-  --ay                                                                                Enables AY sound emulation
-  --no-ay                                                                             Disables AY sound emulation
-  --ay-mode <Mono|StereoABC|StereoACB>                                                Specifies AY mono or stereo mode
-  --zx-printer                                                                        Enables ZX Printer emulation
-  --no-zx-printer                                                                     Disables ZX Printer emulation
-  --ula-plus                                                                          Enables ULA+ emulation
-  --no-ula-plus                                                                       Disables ULA+ emulation
-  --divmmc                                                                            Enables divMMC emulation, --divmmc-image is required
-  --no-divmmc                                                                         Disables divMMC emulation
-  --divmmc-image                                                                      Specifies the SD card image to use with divMMC
-  --divmmc-readonly                                                                   Specifies the SD card image is readonly, SD card writes will be cached in-memory only
-  --divmmc-writable                                                                   Specifies the SD card image is writable, SD card writes will persisted
-  --time-machine                                                                      Enables Time Machine
-  --no-time-machine                                                                   Disables Time Machine
-  --resume                                                                            Resume emulator state assuming there is a previously saved state
-  --no-resume                                                                         Do not resume emulator state
-```
+Command lines allow overriding most of the default options and loading a specified file. Full list of available 
+commands is [here](docs/CommandLine.md).
 
 ## Testing and compatibility
 - [x] Passes floatspy v0.33 (RAMSOFT) floating bus test in both 48k and 128k mode
@@ -221,62 +190,7 @@ done in the background by converting static frames to a video stream with audio,
 ## Debugger
 Debugger is available in the emulator. It is a simple debugger that allows you to inspect the CPU registers, 
 memory and disassembly. You can step through the code, set breakpoints.
-
-### Shortcuts
-- **Step Over** - `F10` \
-  For `CALL`, `JR cc`, `JP cc`, `DJNZ`, `LDIR` or `LDDR` instructions, debugger will try to step over the subroutine.
-- **Step Into** - `F11` \
-  Debugger will step into the subroutine call or conditional jump.
-- **Step Out** - `Shift + F11` \
-  Debugger will step out of the subroutine using the current return address on the stack. 
-  So this will only work if the value on the stack contains return address.
-
-### Breakpoints
-
-Two types of breakpoints are supported: on register value change or on memory write
-
-#### Register breakpoints
-Typical scenario is use a condition for PC register, for example `PC==32768`. This would break execution
-at the specified address. However any register can be used, for example `HL==16384`, `A==0x79`etc. 
-
-#### Memory breakpoints
-Memory breakpoints can have two forms: trigger when specific value is written to e memory cell or more generic
-when memory cell is written. For example `16384==32` will break when value `32` has been written to `16384` memory address.
-If condition is just `16384`, execution will break when any value  has been written to that address.
-
-### Immediate window instructions, case insensitive:
-- `HELP` - print help information
-- `PRINT [expression]` or `? [expression]` - prints a value of the expression
-- `GOTO address` - sets the program counter to the address, equivalent of `PC=address`
-- `LIST [address]` - disassembles the code, if no address is provided, it will disassemble the current PC
-- `POKE address,value` - writes a value to the memory
-- `PEEK address` - reads a value from the memory
-- `OUT `port,value` - writes a value to the IO port
-- `IN port` - reads a value from the IO port
-- `SAVE "filename" [address [,length]]` - saves a memory to a file in binary format starting from the optional address optional length
-- `R=value` - sets a register value
-
-#### Register arguments:
-`A B C D E H L F IXH IXL IYH IYL AF BC DE HL IX IY SP PC I R AF' BC' DE' HL'`
-
-#### Number arguments:
-- Decimal: `16384`
-- Hexadecimal: `0x4000` or `$4000` or `4000h`
-- Binary: `0b1010` or `1010b`
-
-#### Examples:
-- `PRINT HL`
-- `GOTO PC`, `GOTO 32768`
-- `LIST`, `LIST 32768`
-- `POKE 16384,0x3E`
-- `PEEK 16384`
-- `OUT 0xFE,$3E`
-- `IN 254`
-- `SAVE "screen.bin" 16384,6912`
-- `A=10h`, `IXH=A` `HL'=DE`, `IX=0x4000`, `SP=0x8000`, etc.
-
-> [!NOTE]  
-> All instructions and operands are case-insensitive.
+More information can be found [here](docs/Debugger.md).
 
 ### Resources
 - [Avalonia UI](https://avaloniaui.net/)
