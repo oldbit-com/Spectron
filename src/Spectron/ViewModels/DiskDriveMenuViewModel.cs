@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation.Devices.Beta128;
 using OldBit.Spectron.Emulation.Devices.Beta128.Drive;
 using OldBit.Spectron.Emulation.Devices.Beta128.Events;
+using OldBit.Spectron.Messages;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -20,6 +22,7 @@ public class DiskDriveMenuViewModel : ObservableObject
     public ICommand InsertDefaultDriveCommand { get; }
     public ICommand SaveCommand { get; }
     public ICommand EjectCommand { get; }
+    public ICommand ViewCommand { get; }
     public ICommand ToggleWriteProtectCommand { get; }
 
     public Dictionary<DriveId, Observable<string>> EjectCommandHeadings { get; } = new();
@@ -41,6 +44,7 @@ public class DiskDriveMenuViewModel : ObservableObject
         InsertDefaultDriveCommand = new AsyncRelayCommand(execute: async() => await Insert(DriveId.DriveA));
         SaveCommand = new AsyncRelayCommand<DriveId>(execute: Save, canExecute: IsDiskInserted);
         EjectCommand = new AsyncRelayCommand<DriveId>(execute: Eject, canExecute: IsDiskInserted);
+        ViewCommand = new RelayCommand<DriveId>(execute: View, canExecute: IsDiskInserted);
         ToggleWriteProtectCommand = new RelayCommand<DriveId>(execute: ToggleWriteProtect, canExecute: IsDiskInserted);
     }
 
@@ -135,6 +139,9 @@ public class DiskDriveMenuViewModel : ObservableObject
 
         await Task.CompletedTask;
     }
+
+    private void View(DriveId driveId) =>
+        WeakReferenceMessenger.Default.Send(new ShowDiskViewMessage(_diskDriveManager, driveId));
 
     private void ToggleWriteProtect(DriveId driveId)
     {

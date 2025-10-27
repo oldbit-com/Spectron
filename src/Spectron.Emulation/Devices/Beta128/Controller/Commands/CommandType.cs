@@ -3,6 +3,11 @@ namespace OldBit.Spectron.Emulation.Devices.Beta128.Controller.Commands;
 internal enum CommandType
 {
     /// <summary>
+    /// No command has been supplied.
+    /// </summary>
+    None,
+
+    /// <summary>
     /// Restore:     0  0  0  0  h  V r1 r0
     /// Seek:        0  0  0  1  h  V r1 r0
     /// Step:        0  0  1  T  h  V r1 r0

@@ -8,7 +8,7 @@ namespace OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 /// Sectors are interleaved. Compatible with 40 or 80 cylinders, 1 or 2 sides.
 /// The supported format is IBM34 MFM.
 /// </summary>
-internal sealed class FloppyDisk
+public sealed class FloppyDisk
 {
     private const byte TrDosId = 0x10;
     internal const int TotalSectors = 16;
@@ -18,14 +18,14 @@ internal sealed class FloppyDisk
     private readonly Track[][] _tracks;
     private readonly int _maxLogicalSector;
 
-    internal Sector SystemSector { get; private set; } = null!;
-    internal int TotalCylinders { get; }
-    internal int TotalSides { get; }
+    public Sector SystemSector { get; private set; } = null!;
+    public int TotalCylinders { get; }
+    public int TotalSides { get; }
 
-    internal int TotalFreeSectors
+    public int TotalFreeSectors
     {
         get => (SystemSector[0xE5] | (SystemSector[0xE6] << 8));
-        set
+        internal set
         {
             SystemSector[0xE5] = (byte)value;
             SystemSector[0xE6] = (byte)(value >> 8);
@@ -54,10 +54,10 @@ internal sealed class FloppyDisk
         private set => SystemSector[0xE3] = value;
     }
 
-    internal string Label
+    public string Label
     {
         get => Encoding.ASCII.GetString(SystemSector.GetData(0xF5, 8));
-        set => SystemSector.Write(0xF5, Encoding.ASCII.GetBytes(value.PadRight(8)[..8]));
+        internal set => SystemSector.Write(0xF5, Encoding.ASCII.GetBytes(value.PadRight(8)[..8]));
     }
 
     internal FloppyDisk(int totalCylinders, int totalSides, string? label = null)
@@ -73,7 +73,7 @@ internal sealed class FloppyDisk
 
     internal Track GetTrack(int cylinderNo, int sideNo) => _tracks[cylinderNo][sideNo];
 
-    internal Sector GetSector(int cylinderNo, int sideNo, int sectorNo) => _tracks[cylinderNo][sideNo][sectorNo];
+    public Sector GetSector(int cylinderNo, int sideNo, int sectorNo) => _tracks[cylinderNo][sideNo][sectorNo];
 
     internal Sector GetLogicalSector(int logicalSector)
     {

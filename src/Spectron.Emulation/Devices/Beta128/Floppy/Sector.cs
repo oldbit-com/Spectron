@@ -1,6 +1,6 @@
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
-internal sealed class Sector
+public sealed class Sector
 {
     private const int CylinderByte = 1;
     private const int SideByte = 2;
@@ -41,7 +41,7 @@ internal sealed class Sector
         _data = new ArraySegment<byte>(track.Data, dataPosition - 1, 1 + bytesPerSector + 2);
     }
 
-    internal ReadOnlySpan<byte> GetData() => _data[1..^2];
+    public ReadOnlySpan<byte> GetData() => _data[1..^2];
 
     internal ReadOnlySpan<byte> GetData(int startIndex, int count) =>
         _data[(startIndex + 1)..(startIndex + count + 1)];

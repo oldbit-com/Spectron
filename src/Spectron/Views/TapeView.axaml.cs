@@ -23,7 +23,7 @@ public partial class TapeView : Window
         Close();
     }
 
-    private void CancelButton_OnClick(object? sender, RoutedEventArgs e) => Close();
+    private void CloseButton_OnClick(object? sender, RoutedEventArgs e) => Close();
 
     private void InputElement_OnDoubleTapped(object? sender, TappedEventArgs e)
     {

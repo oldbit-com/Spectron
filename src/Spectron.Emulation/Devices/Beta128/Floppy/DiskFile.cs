@@ -8,9 +8,9 @@ namespace OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 /// </summary>
 public sealed class DiskFile
 {
-    internal FloppyDisk Floppy { get; }
     internal DiskImageType ImageType { get; }
 
+    public FloppyDisk Floppy { get; }
     public string? FilePath { get; private set; }
 
     internal DiskFile()

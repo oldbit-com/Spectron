@@ -6,7 +6,6 @@ namespace OldBit.Spectron.Emulator.Tests.Fixtures;
 public class TestDiskDriveProvider : IDiskDriveProvider
 {
     public Dictionary<DriveId, DiskDrive> Drives { get; } = new();
-    public DiskDrive? ActiveDrive => Drives[DriveId.DriveA];
 
     public TestDiskDriveProvider()
     {

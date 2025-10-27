@@ -108,7 +108,7 @@
                     <material:MaterialIcon Kind="Eject" Classes.IsDisabled="{Binding !$parent.IsEnabled}"/>
                 </Button>
             </StackPanel>
-            <Button Grid.Column="1" Content="Close" HorizontalAlignment="Right" HorizontalContentAlignment="Center" Margin="0 0 20 20" Width="100" Click="CancelButton_OnClick"/>
+            <Button Grid.Column="1" Content="Close" HorizontalAlignment="Right" HorizontalContentAlignment="Center" Margin="0 0 20 20" Width="100" Click="CloseButton_OnClick"/>
         </Grid>
     </Grid>
 </Window>
