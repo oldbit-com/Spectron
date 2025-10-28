@@ -1,7 +1,7 @@
 ![Build and Test](https://github.com/oldbit-com/Spectron/actions/workflows/build.yml/badge.svg)
 
-# Spectron (ZX Spectrum emulator)
-My own ZX Spectrum emulator written in C# and Avalonia UI. It emulates classic ZX Spectrum 16K, 48K and 
+# Spectron ― ZX Spectrum 16/48/128 Emulator ☺
+Here is my own ZX Spectrum emulator written in C# and Avalonia UI. It emulates classic ZX Spectrum 16K, 48K and 
 128K computers.
 
 It is quite accurate and stable, it can run most of the games and demos without any issues, load protected
@@ -10,12 +10,37 @@ tapes, etc.
 It's a cross-platform emulator that runs on Windows, Linux and macOS. Developed on macOS, so generally well tested
 on this platform. Needs some more testing on Linux, seems to be running fine on Windows.
 
-This is my hobby project which I always wanted to do. It has been a lot of fun, and quite a challenge.
-There are other emulators out there, but my focus was on making it better structured, easier to understand.
-It is written all by hand, no AI generated code :).
+This is purely my hobby project which I always wanted to do. It has been a lot of fun, and quite a challenge.
+There are many other emulators available, but this one is my attempt. It is written all by hand, no AI generated code ☺.
 
 ZX Spectrum was my first computer and I still love it. I am planning to keep this project alive since 
 I have created it for my personal use to play games and demos. It is a lot of fun.
+
+![Main Window](docs/default.png?raw=true "Main Window")
+
+## Features
+- [x] Emulates classic machines: ZX Spectrum 16K, 48K and 128K
+- [x] Time Machine: rewind and continue from a given time point in the past
+- [x] Emulator state is persisted and restored when application is re-started
+- [x] Supports SNA, SZX, Z80, TAP, TZX, MDR, TRD and SCL file formats (inside zip, too)
+- [x] Supports POK trainer files
+- [x] Accurate timings, including contented memory and IO
+- [x] Floating bus support
+- [x] Multicolor screen effects work, timings are quite accurate
+- [x] ULA+ support
+- [x] AY-3-8912 sound chip emulation
+- [x] DivMMC emulation
+- [x] Beta 128 Disk emulation
+- [x] Microdrive emulation
+- [x] Kempston mouse emulation
+- [x] ZX Printer emulation
+- [x] Tape viewer
+- [x] Disk viewer
+- [x] Adjustable emulator speed
+- [x] Debugger
+- [x] Keyboard joystick emulation: Kempston, Sinclair, Cursor & Fuller.
+- [x] Audio and video recording
+- [x] And more features in progress...
 
 It uses several of my own libraries that I created for this project:
 
@@ -36,37 +61,10 @@ Solution consists of several projects:
 | **Spectron.Emulation** | This is the core of the emulator, e.g. the main thing  |
 | Spectron.Recorder      | Audio and Video recording helper                       |
 
-
-![Main Window](docs/default.png?raw=true "Main Window")
-
-# Features
-- [x] Emulates classic machines: ZX Spectrum 16K, 48K and 128K
-- [x] Time Machine: rewind and continue from a given time point in the past
-- [x] Emulator state is persisted and restored when application is re-started
-- [x] Supports SNA, SZX, Z80, TAP, TZX, MDR, TRD and SCL file formats (inside zip, too)
-- [x] Supports POK trainer files
-- [x] Accurate timings, including contented memory and IO
-- [x] Floating bus support
-- [x] Multicolor screen effects work, timings are quite accurate
-- [x] ULA+ support
-- [x] AY-3-8912 sound chip emulation
-- [x] DivMMC emulation
-- [x] Beta 128 Disk support
-- [x] Microdrive emulation
-- [x] Kempston mouse emulation
-- [x] ZX Printer emulation
-- [x] Tape viewer
-- [x] Disk viewer
-- [x] Adjustable emulator speed
-- [x] Debugger
-- [x] Keyboard joystick emulation: Kempston, Sinclair, Cursor & Fuller.
-- [x] Audio and video recording
-- [x] And more features in progress...
-
-# Quick demo
+## Quick demo
 [![Spectron](https://img.youtube.com/vi/Oz70N0VY_2w/default.jpg)](https://youtu.be/Oz70N0VY_2w "Quick demo")
 
-# Running the emulator
+## Running the emulator
 Requires .NET 9 to build and run the emulator.
 Grab the latest code from the repository, build and run the emulator:
 
