@@ -73,6 +73,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         IsResumeEnabled = preferences.Resume.IsResumeEnabled;
         ShouldIncludeTapeInResume = preferences.Resume.ShouldIncludeTape;
         ShouldIncludeTimeMachineInResume = preferences.Resume.ShouldIncludeTimeMachine;
+        ShouldAutoSuspendResume = preferences.Resume.ShouldAutoSuspendResume;
 
         IsBeeperEnabled = preferences.Audio.IsBeeperEnabled;
         IsAyEnabled = preferences.Audio.IsAyAudioEnabled;
@@ -196,7 +197,8 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
             {
                 IsResumeEnabled = IsResumeEnabled,
                 ShouldIncludeTape = ShouldIncludeTapeInResume,
-                ShouldIncludeTimeMachine = ShouldIncludeTimeMachineInResume
+                ShouldIncludeTimeMachine = ShouldIncludeTimeMachineInResume,
+                ShouldAutoSuspendResume = ShouldAutoSuspendResume,
             },
 
             Audio = new AudioSettings
@@ -697,6 +699,9 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
 
     [ObservableProperty]
     private string _validationSummary = string.Empty;
+
+    [ObservableProperty]
+    private bool _shouldAutoSuspendResume = true;
 
     public void Dispose()
     {

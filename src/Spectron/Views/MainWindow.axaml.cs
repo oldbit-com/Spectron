@@ -155,6 +155,9 @@ public partial class MainWindow : Window
             return;
         }
 
+        Activated += (_, __) => viewModel.WindowActivated();
+        Deactivated += (_, __) => viewModel.WindowDeactivated();
+
         _mainViewModel = viewModel;
         _mainViewModel.ScreenControl = ScreenImage;
 

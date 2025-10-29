@@ -7,6 +7,30 @@ namespace OldBit.Spectron.ViewModels;
 
 partial class MainWindowViewModel
 {
+    private bool _shouldResume;
+
+    internal void WindowActivated()
+    {
+        if (!_preferences.Resume.ShouldAutoSuspendResume || !_shouldResume || !IsPaused)
+        {
+            return;
+        }
+
+        Resume();
+        _shouldResume = false;
+    }
+
+    internal void WindowDeactivated()
+    {
+        if (!_preferences.Resume.ShouldAutoSuspendResume || IsPaused)
+        {
+            return;
+        }
+
+        Pause();
+        _shouldResume = true;
+    }
+
     private async Task WindowOpenedAsync()
     {
         _preferences = await _preferencesService.LoadAsync();
