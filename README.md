@@ -21,7 +21,7 @@ I have created it for my personal use to play games and demos. It is a lot of fu
 ## Features
 - [x] Emulates classic machines: ZX Spectrum 16K, 48K and 128K
 - [x] Time Machine: rewind and continue from a given time point in the past
-- [x] Emulator state is persisted and restored when application is re-started
+- [x] Emulator state is persisted and restored when the application is re-started
 - [x] Supports SNA, SZX, Z80, TAP, TZX, MDR, TRD and SCL file formats (inside zip, too)
 - [x] Supports POK trainer files
 - [x] Accurate timings, including contented memory and IO
@@ -37,10 +37,10 @@ I have created it for my personal use to play games and demos. It is a lot of fu
 - [x] Tape viewer
 - [x] Disk viewer
 - [x] Adjustable emulator speed
-- [x] Debugger
 - [x] Keyboard joystick emulation: Kempston, Sinclair, Cursor & Fuller.
 - [x] Audio and video recording
-- [x] And more features in progress...
+- [x] Debugger
+- [x] And more...
 
 It uses several of my own libraries that I created for this project:
 
@@ -114,11 +114,12 @@ You can browse the blocks, their types and some basic block information.
 You can select a block and load it using standard `LOAD` command.
 
 ## Snapshots
-Emulator supports saving and loading snapshots in **SNA**, **SZX** and **Z80** formats (can be inside zip file).
-It is recommended to use **SZX** format when saving a snapshot since it is the most robust and supports nearly all features of the emulator.
+Emulator supports saving and loading snapshots in **SNA**, **SZX**, **Z80** and custom format.
+It is recommended to use a custom **\*.spectron** format when saving a snapshot. This format covers
+most of the emulator settings.
 
 ## Screen
-Multicolor screen effects are supported, as well as border effects. Border size can be adjusted.
+Multicolour screen effects are supported, as well as border effects. Border size can be adjusted.
 
 ## Floating bus
 Floating bus is emulated and supported by both 48K and 128K modes. Only a handful of games require this feature.
@@ -173,7 +174,7 @@ You can pause emulator during the recording, however changing emulator settings 
 unexpected results.
 
 ### Audio
-Audio can be recorded to a file in **WAV** format. The format is PCM 16-bit, 44100 Hz, mono or stereo depending on the 
+Audio can be recorded to a file in **WAV** format. The format is PCM 16-bit, 44,100 Hz, mono or stereo depending on the 
 current AY mode. No external dependencies are required for audio recording.
 
 ### Video
@@ -182,7 +183,7 @@ Video recording requires **[FFmpeg](https://www.ffmpeg.org)** to be installed on
 Video is generated as **MP4** using **H.264** codec at **50 FPS**. Some video rendering options like scaling, border size
 can be adjusted in the emulator settings. Raw frame buffer data is used internally during the recording.
 
-Processing of the recorded data starts after the recording is stopped and it can take some time. This is 
+Processing of the recorded data starts after the recording is stopped, and it can take some time. This is 
 done in the background by converting static frames to a video stream with audio, leveraging FFmpeg.
 
 ## Debugger

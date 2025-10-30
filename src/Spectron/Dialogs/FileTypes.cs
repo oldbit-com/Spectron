@@ -6,7 +6,7 @@ public static class FileTypes
 {
     public static FilePickerFileType All { get; } = new("All Files")
     {
-        Patterns = ["*.tap", "*.tzx", "*.sna", "*.szx", "*.z80", "*.zip", "*.pok", "*.mdr", "*.trd", "*.scl"]
+        Patterns = ["*.tap", "*.tzx", "*.sna", "*.szx", "*.z80", "*.zip", "*.pok", "*.mdr", "*.trd", "*.spectron"]
     };
 
     public static FilePickerFileType TapeFiles { get; } = new("Tape Files")
@@ -16,7 +16,7 @@ public static class FileTypes
 
     public static FilePickerFileType SnapshotFiles { get; } = new("Snapshot Files")
     {
-        Patterns = ["*.sna", "*.szx", "*.z80"]
+        Patterns = ["*.sna", "*.szx", "*.z80", "*.sps"]
     };
 
     public static FilePickerFileType Tap { get; } = new("TAP File")
@@ -42,6 +42,11 @@ public static class FileTypes
     public static FilePickerFileType Z80 { get; } = new("Z80 File")
     {
         Patterns = ["*.z80"]
+    };
+
+    public static FilePickerFileType Spectron { get; } = new("Spectron File")
+    {
+        Patterns = ["*.spectron"]
     };
 
     public static FilePickerFileType Zip { get; } = new("ZIP File")

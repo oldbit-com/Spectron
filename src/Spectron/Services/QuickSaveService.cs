@@ -29,9 +29,7 @@ public class QuickSaveService(ILogger<QuickSaveService> logger)
         try
         {
             var quickSaveFilePath = GetQuickSaveFilePath();
-            var snapshot = StateManager.CreateSnapshot(emulator);
-
-            snapshot.Save(quickSaveFilePath);
+            StateManager.CreateSnapshot(emulator).Save(quickSaveFilePath);
 
             return true;
         }

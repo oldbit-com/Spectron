@@ -16,6 +16,7 @@ public static class FileDialogs
             FileTypes.TapeFiles,
             FileTypes.SnapshotFiles,
             FileTypes.DiskFiles,
+            FileTypes.Spectron,
             FileTypes.Sna,
             FileTypes.Szx,
             FileTypes.Tap,
@@ -136,10 +137,10 @@ public static class FileDialogs
         return await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
             Title = "Save Snapshot File",
-            DefaultExtension = ".szx",
+            DefaultExtension = ".spectron",
             SuggestedFileName = suggestedFileName,
             ShowOverwritePrompt = true,
-            FileTypeChoices = [FileTypes.Szx, FileTypes.Z80, FileTypes.Sna],
+            FileTypeChoices = [FileTypes.Spectron, FileTypes.Szx, FileTypes.Z80, FileTypes.Sna],
         });
     }
 

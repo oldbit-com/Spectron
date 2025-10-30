@@ -62,7 +62,7 @@
                         <CheckBox Content="Include current tape" ToolTip.Tip="When saving current state, tape contents will be also saved and restored" Classes="Center" Margin="35 0 0 0" IsEnabled="{Binding #SaveState.IsChecked}" IsChecked="{Binding ShouldIncludeTapeInResume}"/>
                         <CheckBox Content="Include time machine state" ToolTip.Tip="When saving current state, time machine state will be also saved and restored" Classes="Center" Margin="35 0 0 0" IsEnabled="{Binding #SaveState.IsChecked}" IsChecked="{Binding ShouldIncludeTimeMachineInResume}"/>
 
-                        <controls:HeaderSeparator Text="Misc"/>
+                        <controls:HeaderSeparator Text="Miscellaneous"/>
                         <CheckBox Content="Automatically load trainer .POK file" ToolTip.Tip="If matching .POK file is present, it will be loaded automatically" Classes="Center" Margin="10 0 0 0" IsChecked="{Binding IsAutoLoadPokeFilesEnabled}"/>
                         <CheckBox Content="Automatically pause when window is deactivated" ToolTip.Tip="When window is not active, emulator will pause and resume when window is active again" Classes="Center" Margin="10 0 0 0" IsChecked="{Binding ShouldAutoSuspendResume}"/>
                     </StackPanel>

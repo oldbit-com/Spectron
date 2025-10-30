@@ -14,6 +14,7 @@ public static class FileTypes
         ".mdr" => FileType.Mdr,
         ".trd" => FileType.Trd,
         ".scl" => FileType.Scl,
+        ".spectron" => FileType.Spectron,
         _ => FileType.Unsupported
     };
 }
