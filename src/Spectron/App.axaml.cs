@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Debugger.Extensions;
@@ -35,7 +36,7 @@ public class App : Application
 
         _serviceProvider = services.BuildServiceProvider();
 
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        if (ApplicationLifetime is ClassicDesktopStyleApplicationLifetime desktop)
         {
             MainWindowViewModel = _serviceProvider.GetRequiredService<MainWindowViewModel>();
 
@@ -43,6 +44,13 @@ public class App : Application
             {
                 DataContext = MainWindowViewModel,
             };
+
+            var activatableLifetime = Current?.TryGetFeature<IActivatableLifetime>();
+            if (activatableLifetime != null)
+            {
+                activatableLifetime.Activated += (_, _) => MainWindowViewModel.WindowActivated();
+                activatableLifetime.Deactivated += (_, _) => MainWindowViewModel.WindowDeactivated();
+            }
         }
 
         base.OnFrameworkInitializationCompleted();
