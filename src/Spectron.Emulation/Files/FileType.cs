@@ -22,13 +22,15 @@ public enum FileType
 
     Scl,
 
+    Spectron,
+
     Unsupported
 }
 
 public static class FileTypeExtensions
 {
     public static bool IsSnapshot(this FileType fileType) =>
-        fileType is FileType.Sna or FileType.Z80 or FileType.Szx;
+        fileType is FileType.Sna or FileType.Z80 or FileType.Szx or FileType.Spectron;
 
     public static bool IsTape(this FileType fileType) =>
         fileType is FileType.Tap or FileType.Tzx;

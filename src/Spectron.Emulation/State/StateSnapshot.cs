@@ -53,9 +53,9 @@ public sealed partial class StateSnapshot
         return MemoryPackSerializer.Deserialize<StateSnapshot>(memoryStream.ToArray());
     }
 
-    public void Save(string fileName)
+    public void Save(string filePath)
     {
-        using var stream = File.Create(fileName);
+        using var stream = File.Create(filePath);
 
         var data = Serialize();
 
