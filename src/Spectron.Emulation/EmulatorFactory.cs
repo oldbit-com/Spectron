@@ -106,9 +106,16 @@ public sealed class EmulatorFactory(
             logger);
     }
 
-    private static byte[] GetSpectrum48KRom(RomType romType) =>
-        RomReader.ReadRom(romType is RomType.Original or RomType.Custom ? RomType.Original48 : romType);
+    private static byte[] GetSpectrum48KRom(RomType romType) => romType switch
+    {
+        RomType.Original or RomType.Custom => RomReader.ReadRom(RomType.Original48),
+        _ => RomReader.ReadRom(romType)
+    };
 
-    private static byte[] GetSpectrum128KRom(RomType romType) =>
-        RomReader.ReadRom(romType is RomType.Original or RomType.Custom ? RomType.Original128Bank0 : romType);
+    private static byte[] GetSpectrum128KRom(RomType romType) => romType switch
+    {
+        RomType.Pentagon128 => RomReader.ReadRom(RomType.Pentagon128),
+        RomType.Original or RomType.Custom => RomReader.ReadRom(RomType.Original128Bank0),
+        _ => RomReader.ReadRom(romType)
+    };
 }

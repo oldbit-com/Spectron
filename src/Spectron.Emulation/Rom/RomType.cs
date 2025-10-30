@@ -31,6 +31,8 @@ public enum RomType
     Interface1V2,
 
     TrDos,
+
+    Pentagon128,
 }
 
 internal static class RomTypeExtensions

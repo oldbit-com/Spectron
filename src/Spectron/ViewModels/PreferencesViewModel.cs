@@ -387,6 +387,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
     public List<NameValuePair<RomType>> RomTypes { get; } =
     [
         new("Original", RomType.Original),
+        new("Pentagon 128", RomType.Pentagon128),
         new("Gosh Wonderful", RomType.GoshWonderful),
         new("Busy Soft v1.40", RomType.BusySoft),
         new("J.G. Harston v0.77", RomType.Harston),
