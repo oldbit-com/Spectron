@@ -33,6 +33,12 @@ public enum RomType
     TrDos,
 
     Pentagon128,
+
+    HtrSuperBasic,
+
+    PrettyBasic,
+
+    BbcBasic,
 }
 
 internal static class RomTypeExtensions

@@ -27,8 +27,10 @@
       <EmbeddedResource Include="Rom\Files\interface1-v1.rom" />
       <EmbeddedResource Include="Rom\Files\interface1-v2.rom" />
       <EmbeddedResource Include="Rom\Files\trdos-503.rom" />
-      <None Remove="Rom\Files\pentagon128.rom" />
       <EmbeddedResource Include="Rom\Files\pentagon128.rom" />
+      <EmbeddedResource Include="Rom\Files\HTR.rom" />
+      <EmbeddedResource Include="Rom\Files\pretty.rom" />
+      <EmbeddedResource Include="Rom\Files\BBCBasic.rom" />
     </ItemGroup>
 
     <ItemGroup>

@@ -14,6 +14,9 @@ internal static class RomReader
     private const string GoshWonderfulRomResourceName = "OldBit.Spectron.Emulation.Rom.Files.gw03.rom";
     private const string BusySoftRomResourceName = "OldBit.Spectron.Emulation.Rom.Files.bsrom140.rom";
     private const string HarstonRomResourceName = "OldBit.Spectron.Emulation.Rom.Files.JGH077.ROM";
+    private const string HtrSuperBasicRomResourceName = "OldBit.Spectron.Emulation.Rom.Files.HTR.rom";
+    private const string PrettyBasicRomResourceName = "OldBit.Spectron.Emulation.Rom.Files.pretty.rom";
+    private const string BbcBasicRomResourceName = "OldBit.Spectron.Emulation.Rom.Files.BBCBasic.rom";
 
     // Diagnostic ROMs
     private const string RetroleumRomResourceName = "OldBit.Spectron.Emulation.Rom.Files.DiagROMv.171";
@@ -50,6 +53,9 @@ internal static class RomReader
             RomType.Interface1V2 => Interface1V2RomResourceName,
             RomType.TrDos => TrDosRomResourceName,
             RomType.Pentagon128 => Pentagon128RomResourceName,
+            RomType.HtrSuperBasic => HtrSuperBasicRomResourceName,
+            RomType.PrettyBasic => PrettyBasicRomResourceName,
+            RomType.BbcBasic  => BbcBasicRomResourceName,
             _ => throw new ArgumentOutOfRangeException(nameof(romType), romType, null)
         };
 
