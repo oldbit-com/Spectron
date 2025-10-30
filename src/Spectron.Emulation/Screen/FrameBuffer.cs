@@ -1,7 +1,8 @@
 namespace OldBit.Spectron.Emulation.Screen;
 
 /// <summary>
-/// Represents a frame buffer for the ZX Spectrum screen.
+/// Represents a buffer for the ZX Spectrum screen with predefined dimensions
+/// that includes all pixels for both content and border areas.
 /// </summary>
 public sealed class FrameBuffer(Color fillColor)
 {

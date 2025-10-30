@@ -14,17 +14,22 @@ internal static class FastLookup
     internal static readonly byte[] BitMasks = [0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01];
 
     /// <summary>
-    /// Attribute colors indexed by attribute value (0-255).
+    /// A lookup table that provides all precomputed mappings of screen attribute value
+    /// to their corresponding paper, ink colors, and flash state.
     /// </summary>
     internal static readonly AttributeColor[] AttributeData = BuildAttributeColorLookupTable();
 
     /// <summary>
-    /// Address of the first screen byte for each attribute address.
+    /// A lookup table that maps attribute memory addresses to the corresponding
+    /// starting screen memory address of their associated 8-pixel-high line.
+    /// This table is used to efficiently determine the area of the screen affected
+    /// by attribute changes.
     /// </summary>
     internal static readonly Word[] LineAddressForAttrAddress = BuildScreenAddressLookupTable();
 
     /// <summary>
-    /// List of events used to render the screen. Each event occurs at 8 ticks intervals and updates 2 bytes of the screen.
+    /// List of events used to render the screen. Each event occurs at 8 ticks intervals and updates 2
+    /// bytes of the screen.
     /// </summary>
     /// <param name="hardware">The hardware settings.</param>
     /// <returns>A list of <see cref="ScreenRenderEvent"/> events.</returns>
