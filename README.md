@@ -26,7 +26,7 @@ I have created it for my personal use to play games and demos. It is a lot of fu
 - [x] Supports POK trainer files
 - [x] Accurate timings, including contented memory and IO
 - [x] Floating bus support
-- [x] Multicolor screen effects work, timings are quite accurate
+- [x] Multicolour screen effects work, timings are quite accurate
 - [x] ULA+ support
 - [x] AY-3-8912 sound chip emulation
 - [x] DivMMC emulation
@@ -39,6 +39,7 @@ I have created it for my personal use to play games and demos. It is a lot of fu
 - [x] Adjustable emulator speed
 - [x] Keyboard joystick emulation: Kempston, Sinclair, Cursor & Fuller.
 - [x] Audio and video recording
+- [x] Selection of alternative ROMs or use custom
 - [x] Debugger
 - [x] And more...
 
@@ -124,6 +125,10 @@ Multicolour screen effects are supported, as well as border effects. Border size
 ## Floating bus
 Floating bus is emulated and supported by both 48K and 128K modes. Only a handful of games require this feature.
 
+## Alternative ROMs
+Emulator allows selecting an alternative ROM. There are many such ROMs built-in and ready to play with. 
+Some of them require 128K mode: TR-DOS and BBC Basic. Additionally, custom ROM files can be loaded.
+
 ## Audio
 Standard beeper audio is supported, as well as AY audio (mono / stereo ABC or ACB mode).
 AY is by default enabled in 48K mode, but can be disabled in the settings.
@@ -161,7 +166,8 @@ Emulation of Beta 128 Disk Interface is supported and can be enabled in the emul
 Up to four drives can be emulated, MDR and SCL image files can be loaded/saved. ROM version 5.03 is 
 used.
 
-To invoke TR-DOS, enter `RANDOMIZE USR 15616` from `BASIC`.
+To invoke TR-DOS, enter `RANDOMIZE USR 15616` from `BASIC`. Or select Pentagon 128 ROM which provides
+easy access to TR-DOS.
 
 ## Time Machine
 Time Machine is a feature that allows you to go back in time and continue from given time point in the past.

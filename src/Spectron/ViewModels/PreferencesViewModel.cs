@@ -387,9 +387,13 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
     public List<NameValuePair<RomType>> RomTypes { get; } =
     [
         new("Original", RomType.Original),
+        new("Pentagon (128 mode only)", RomType.Pentagon128),
         new("Gosh Wonderful", RomType.GoshWonderful),
         new("Busy Soft v1.40", RomType.BusySoft),
         new("J.G. Harston v0.77", RomType.Harston),
+        new("H.T.R. SuperBasic", RomType.HtrSuperBasic),
+        new("Pretty Basic", RomType.PrettyBasic),
+        new("BBC Basic (128 mode only)", RomType.BbcBasic),
         new("Diagnostic: Retroleum v1.71", RomType.Retroleum),
         new("Diagnostic: B. Alford v1.37", RomType.BrendanAlford),
     ];

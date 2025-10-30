@@ -18,6 +18,10 @@ public class RomReaderTests
     [InlineData(RomType.Interface1V2, "5cfb6bca4177c45fefd571734576b55e3a127c08")]
     [InlineData(RomType.DivMmc, "b6f3f5f381d67eed24ab214698cb2b3b7d6091da")]
     [InlineData(RomType.TrDos, "c9d69cf3a0219f6e37e7eb5046961fa8fa8eb2c6")]
+    [InlineData(RomType.Pentagon128, "d07fcdeca892ee80494d286ea9ea5bf3928a1aca")]
+    [InlineData(RomType.HtrSuperBasic, "3fb66055677d22b227097619eda7f2312e39e55d")]
+    [InlineData(RomType.PrettyBasic, "3e7f0290b8a4ccf3b2ebab940948a84f0c8a151d")]
+    [InlineData(RomType.BbcBasic, "3e68e7621a034c4ccae805a868b7f19e6208a703")]
     public void Rom_ShouldHaveCorrectChecksum(RomType romType, string expectedSha1)
     {
         var rom = RomReader.ReadRom(romType);
