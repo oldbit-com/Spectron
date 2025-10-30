@@ -125,6 +125,10 @@ Multicolour screen effects are supported, as well as border effects. Border size
 ## Floating bus
 Floating bus is emulated and supported by both 48K and 128K modes. Only a handful of games require this feature.
 
+## Alternative ROMs
+Emulator allows selecting an alternative ROM. There are many such ROMs built-in and ready to play with. 
+Some of them require 128K mode: TR-DOS and BBC Basic. Additionally, custom ROM files can be loaded.
+
 ## Audio
 Standard beeper audio is supported, as well as AY audio (mono / stereo ABC or ACB mode).
 AY is by default enabled in 48K mode, but can be disabled in the settings.
