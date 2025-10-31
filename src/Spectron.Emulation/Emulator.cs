@@ -251,7 +251,7 @@ public sealed class Emulator
 
     private void SetupUlaAndDevices()
     {
-        var ula = new Ula(KeyboardState, ScreenBuffer, Cpu.Clock, TapeManager.CassettePlayer);
+        var ula = new Ula(KeyboardState, ScreenBuffer, Cpu.Clock, TapeManager);
 
         _spectrumBus.AddDevice(ula);
         _spectrumBus.AddDevice(UlaPlus);

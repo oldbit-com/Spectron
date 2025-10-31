@@ -25,6 +25,8 @@ public sealed class Cassette
 
     public bool IsEmpty => Content.Blocks.Count == 0;
 
+    internal bool IsEndOfTape => Position >= Content.Blocks.Count;
+
     internal byte[] ContentBytes => GetContentBytes();
 
     public delegate void BlockSelectedEvent(BlockSelectedEventArgs e);
@@ -99,6 +101,16 @@ public sealed class Cassette
         Position += 1;
 
         return block;
+    }
+
+    internal byte? GetNextBlockCode()
+    {
+        if (Position >= Content.Blocks.Count)
+        {
+            return null;
+        }
+
+        return Content.Blocks[Position].BlockId;
     }
 
     internal void Rewind()

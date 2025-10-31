@@ -9,7 +9,7 @@ internal sealed class Ula(
     KeyboardState keyboardState,
     ScreenBuffer screenBuffer,
     Clock clock,
-    CassettePlayer? cassettePlayer) : IDevice
+    TapeManager tapeManager) : IDevice
 {
     public byte? ReadPort(Word address)
     {
@@ -37,14 +37,25 @@ internal sealed class Ula(
 
     internal static bool IsUlaPort(Word address) => (address & 0x01) == 0x00;
 
+    private int _last;
+
     private void UpdateEarBit(ref byte value)
     {
-        if (cassettePlayer is not { IsPlaying: true })
+        tapeManager.DetectLoader(clock.FrameTicks);
+        if (tapeManager.CassettePlayer?.IsPlaying == false)
+        {
+            var diff = clock.FrameTicks - _last;
+            _last = clock.FrameTicks;
+            // Try to detect
+         //   Console.WriteLine($"TRY DETECT : {diff}");
+        }
+
+        if (tapeManager.CassettePlayer?.IsPlaying != true)
         {
             value = (byte)(value & 0xBF);
             return;
         }
 
-        value = cassettePlayer.EarBit ? (byte)(value | 0x40) : (byte)(value & 0xBF);
+        value = tapeManager.CassettePlayer.EarBit ? (byte)(value | 0x40) : (byte)(value & 0xBF);
     }
 }

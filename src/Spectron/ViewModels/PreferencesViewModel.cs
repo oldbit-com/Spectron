@@ -86,6 +86,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         TimeMachineCountdownSeconds = preferences.TimeMachine.CountdownSeconds;
 
         IsAutoPlayEnabled = preferences.Tape.IsAutoPlayEnabled;
+        IsCustomLoaderDetectionEnabled = preferences.Tape.IsCustomLoaderDetectionEnabled;
         IsTapeSaveEnabled = preferences.Tape.IsSaveEnabled;
         TapeSaveSpeed = preferences.Tape.SaveSpeed;
         TapeLoadSpeed = preferences.Tape.LoadSpeed;
@@ -220,6 +221,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
             Tape = new TapeSettings
             {
                 IsAutoPlayEnabled = IsAutoPlayEnabled,
+                IsCustomLoaderDetectionEnabled = IsCustomLoaderDetectionEnabled,
                 IsSaveEnabled = IsTapeSaveEnabled,
                 SaveSpeed = TapeSaveSpeed,
                 LoadSpeed = TapeLoadSpeed
@@ -617,6 +619,9 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
 
     [ObservableProperty]
     private bool _isAutoPlayEnabled;
+
+    [ObservableProperty]
+    private bool _isCustomLoaderDetectionEnabled;
 
     [ObservableProperty]
     private bool _isTapeSaveEnabled;

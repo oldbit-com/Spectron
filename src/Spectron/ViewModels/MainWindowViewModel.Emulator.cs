@@ -424,8 +424,13 @@ partial class MainWindowViewModel
         return result;
     }
 
-    partial void OnTapeLoadSpeedChanged(TapeSpeed value) =>
-        Emulator?.SetTapeLoadingSpeed(TapeLoadSpeed);
+    partial void OnTapeLoadSpeedChanged(TapeSpeed value)
+    {
+        if (Emulator != null)
+        {
+            Emulator.TapeManager.TapeLoadSpeed = TapeLoadSpeed;
+        }
+    }
 
     partial void OnIsTimeMachineEnabledChanged(bool value)
     {
