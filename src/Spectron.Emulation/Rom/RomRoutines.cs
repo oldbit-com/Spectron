@@ -47,6 +47,11 @@ internal static class RomRoutines
     internal const Word LD_BYTES_RET = 0x05E2;
 
     /// <summary>
+    /// Used by the routine at LD_BYTES.
+    /// </summary>
+    internal const Word LD_EDGE_2 = 0x05E3;
+
+    /// <summary>
     /// The 'SAVE, LOAD, VERIFY and MERGE' command routine.
     /// </summary>
     internal const Word SAVE_ETC = 0x0605;

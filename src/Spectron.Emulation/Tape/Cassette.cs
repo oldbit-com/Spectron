@@ -103,16 +103,6 @@ public sealed class Cassette
         return block;
     }
 
-    internal byte? GetNextBlockCode()
-    {
-        if (Position >= Content.Blocks.Count)
-        {
-            return null;
-        }
-
-        return Content.Blocks[Position].BlockId;
-    }
-
     internal void Rewind()
     {
         Position = 0;

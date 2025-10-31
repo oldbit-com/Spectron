@@ -1,4 +1,5 @@
 using OldBit.Spectron.Emulation.Files;
+using OldBit.Spectron.Emulation.Rom;
 using OldBit.Z80Cpu;
 using OldBit.Spectron.Files.Tzx;
 
@@ -13,6 +14,7 @@ public sealed class TapeManager
 {
     private readonly LoaderDetector _loaderDetector = new();
     private DirectAccess? _directAccess;
+    private bool _isFastLoading;
 
     public Cassette Cassette { get; private set; } = new();
 
@@ -38,17 +40,17 @@ public sealed class TapeManager
         _directAccess = new DirectAccess(cpu, memory);
     }
 
-    internal void DetectLoader(int ticks)
+    internal void DetectLoader(int ticks, Word pc)
     {
-        if (!IsCustomLoaderDetectionEnabled || IsPlaying)
+        if (!IsCustomLoaderDetectionEnabled || IsPlaying ||
+            !_isFastLoading || Cassette.IsEndOfTape || pc < RomRoutines.LD_EDGE_2)
         {
             return;
         }
 
-        if (Cassette.GetNextBlockCode() != BlockCode.StandardSpeedData &&
-            !Cassette.IsEndOfTape &&
-            _loaderDetector.Process(ticks))
+        if (_loaderDetector.Process(ticks))
         {
+            _isFastLoading = false;
             PlayTape();
         }
     }
@@ -62,7 +64,11 @@ public sealed class TapeManager
         IsTapeLoaded = true;
     }
 
-    public void FastLoad() => _directAccess?.FastLoad(Cassette);
+    public void FastLoad()
+    {
+        _directAccess?.FastLoad(Cassette);
+        _isFastLoading = true;
+    }
 
     public void FastSave()
     {
