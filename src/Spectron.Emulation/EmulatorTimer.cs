@@ -25,7 +25,7 @@ internal sealed class EmulatorTimer
         _worker = new Thread(Worker)
         {
             IsBackground = true,
-            Priority = ThreadPriority.Lowest,
+            Priority = ThreadPriority.AboveNormal,
         };
     }
 
@@ -82,15 +82,15 @@ internal sealed class EmulatorTimer
                 switch (timeToWait.TotalMilliseconds)
                 {
                     case < 1:
-                        Thread.SpinWait(1);
+                        Thread.SpinWait(5);
                         break;
 
                     case < 5:
-                        Thread.SpinWait(2);
+                        Thread.SpinWait(10);
                         break;
 
                     case < 10:
-                        Thread.SpinWait(5);
+                        Thread.SpinWait(25);
                         break;
                 }
             }
