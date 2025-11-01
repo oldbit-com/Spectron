@@ -19,7 +19,7 @@
       <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
       <PackageReference Include="Material.Icons.Avalonia" Version="2.4.1" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />
-      <PackageReference Include="OldBit.Z80Cpu.Spectron" Version="0.9.3-pre.13" />
+      <PackageReference Include="OldBit.Z80Cpu.Spectron" Version="0.9.3" />
     </ItemGroup>
 
     <ItemGroup>
