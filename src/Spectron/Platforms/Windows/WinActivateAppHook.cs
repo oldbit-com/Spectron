@@ -16,6 +16,9 @@ internal sealed class WinActivateAppHook : IDisposable
 {
     private IntPtr _hwnd;
     private IntPtr _oldWndProc;
+    private WndProcDelegate? _wndProcDelegate; // root delegate to prevent GC
+
+    private delegate IntPtr WndProcDelegate(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
     public event EventHandler? AppActivated;
     public event EventHandler? AppDeactivated;
@@ -37,8 +40,9 @@ internal sealed class WinActivateAppHook : IDisposable
             }
 
             _hwnd = handle.Handle;
+            _wndProcDelegate = WndProc;
 
-            var newProcPtr = Marshal.GetFunctionPointerForDelegate(WndProc);
+            var newProcPtr = Marshal.GetFunctionPointerForDelegate(_wndProcDelegate);
             _oldWndProc = SetWindowLongPtr(_hwnd, GWLP_WNDPROC, newProcPtr);
         };
 
