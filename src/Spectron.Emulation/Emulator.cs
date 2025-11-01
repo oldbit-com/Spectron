@@ -196,11 +196,6 @@ public sealed class Emulator
         Interface1.Reset();
         DivMmc.Reset();
         Beta128.Reset();
-
-        if (IsPaused)
-        {
-            Resume();
-        }
     }
 
     public void Break()

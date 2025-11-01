@@ -166,7 +166,7 @@ public partial class MainWindowViewModel : ObservableObject
     private void KeyDown(KeyEventArgs e) => HandleKeyDown(e);
 
     [RelayCommand]
-    private void TimeMachineResumeEmulator() => HandleTimeMachineResumeEmulator();
+    private void TimeMachineResumeEmulator() => Resume();
 
     // File
     [RelayCommand]

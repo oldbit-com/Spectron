@@ -81,15 +81,14 @@ partial class MainWindowViewModel
 
             IsTimeMachineCountdownVisible = true;
 
-            CreateEmulator(snapshot);
+            CreateEmulator(snapshot, shouldResume: !IsTimeMachineCountdownVisible);
         }
-
-        _isTimeMachineOpen = false;
-
-        if (!IsTimeMachineCountdownVisible)
+        else
         {
             Resume();
         }
+
+        _isTimeMachineOpen = false;
     }
 
     private static void OpenAboutWindow() =>
