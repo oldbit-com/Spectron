@@ -8,8 +8,8 @@ namespace OldBit.Spectron.Emulation.Devices;
 internal sealed class Ula(
     KeyboardState keyboardState,
     ScreenBuffer screenBuffer,
-    Clock clock,
-    CassettePlayer? cassettePlayer) : IDevice
+    Z80 cpu,
+    TapeManager tapeManager) : IDevice
 {
     public byte? ReadPort(Word address)
     {
@@ -32,19 +32,21 @@ internal sealed class Ula(
         }
 
         var color = SpectrumPalette.GetBorderColor(value);
-        screenBuffer.UpdateBorder(color, clock.FrameTicks);
+        screenBuffer.UpdateBorder(color, cpu.Clock.FrameTicks);
     }
 
     internal static bool IsUlaPort(Word address) => (address & 0x01) == 0x00;
 
     private void UpdateEarBit(ref byte value)
     {
-        if (cassettePlayer is not { IsPlaying: true })
+        tapeManager.DetectLoader(cpu.Clock.FrameTicks, cpu.Registers.PC);
+
+        if (tapeManager.CassettePlayer?.IsPlaying != true)
         {
             value = (byte)(value & 0xBF);
             return;
         }
 
-        value = cassettePlayer.EarBit ? (byte)(value | 0x40) : (byte)(value & 0xBF);
+        value = tapeManager.CassettePlayer.EarBit ? (byte)(value | 0x40) : (byte)(value & 0xBF);
     }
 }

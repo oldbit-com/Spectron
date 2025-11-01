@@ -1,4 +1,5 @@
 using OldBit.Spectron.Emulation.Files;
+using OldBit.Spectron.Emulation.Rom;
 using OldBit.Z80Cpu;
 using OldBit.Spectron.Files.Tzx;
 
@@ -11,12 +12,15 @@ public class TapeChangedEventArgs(TapeAction action) : EventArgs
 
 public sealed class TapeManager
 {
+    private readonly LoaderDetector _loaderDetector = new();
     private DirectAccess? _directAccess;
+    private bool _isFastLoading;
 
-    public Cassette Cassette { get; private set; }
+    public Cassette Cassette { get; private set; } = new();
 
     public bool IsTapeLoaded { get; private set; }
     public bool IsTapeSaveEnabled { get; set; }
+    public bool IsCustomLoaderDetectionEnabled  { get; set; }
 
     public TapeSpeed TapeLoadSpeed { get; set; }
     public TapeSpeed TapeSaveSpeed { get; set; }
@@ -25,10 +29,10 @@ public sealed class TapeManager
 
     internal CassettePlayer? CassettePlayer { get; private set; }
 
+    public bool IsPlaying => CassettePlayer?.IsPlaying ?? false;
+
     public delegate void TapeChangedEvent(TapeChangedEventArgs e);
     public event TapeChangedEvent? TapeChanged;
-
-    public TapeManager() => Cassette = CreateCassette();
 
     internal void Attach(Z80 cpu, IMemory memory, HardwareSettings hardware)
     {
@@ -36,18 +40,35 @@ public sealed class TapeManager
         _directAccess = new DirectAccess(cpu, memory);
     }
 
-    public bool IsPlaying => CassettePlayer?.IsPlaying ?? false;
+    internal void DetectLoader(int ticks, Word pc)
+    {
+        if (!IsCustomLoaderDetectionEnabled || IsPlaying ||
+            !_isFastLoading || Cassette.IsEndOfTape || pc < RomRoutines.LD_EDGE_2)
+        {
+            return;
+        }
+
+        if (_loaderDetector.Process(ticks))
+        {
+            _isFastLoading = false;
+            PlayTape();
+        }
+    }
 
     public void NewTape()
     {
-        Cassette = CreateCassette();
+        Cassette = new Cassette();
 
         TapeChanged?.Invoke(new TapeChangedEventArgs(TapeAction.Inserted));
 
         IsTapeLoaded = true;
     }
 
-    public void FastLoad() => _directAccess?.FastLoad(Cassette);
+    public void FastLoad()
+    {
+        _directAccess?.FastLoad(Cassette);
+        _isFastLoading = true;
+    }
 
     public void FastSave()
     {
@@ -116,37 +137,9 @@ public sealed class TapeManager
         StopTape();
         TapeChanged?.Invoke(new TapeChangedEventArgs(TapeAction.Ejected));
 
-        Cassette = CreateCassette();
+        Cassette = new Cassette();
         IsTapeLoaded = false;
     }
 
     public void RewindTape() => CassettePlayer?.Rewind();
-
-    private Cassette CreateCassette()
-    {
-        var cassette = new Cassette();
-
-        cassette.BlockSelected += CassetteOnBlockSelected;
-
-        return cassette;
-    }
-
-    // TODO: Auto play if turbo block
-    private void CassetteOnBlockSelected(BlockSelectedEventArgs e)
-    {
-        if (CassettePlayer?.IsPlaying == true)
-        {
-            return;
-        }
-
-        if (e.Position == Cassette.Content.Blocks.Count - 1)
-        {
-            return;
-        }
-
-        if (Cassette.Content.Blocks[e.Position + 1].BlockId == BlockCode.TurboSpeedData)
-        {
-            //PlayTape();
-        }
-    }
 }

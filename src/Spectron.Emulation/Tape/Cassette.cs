@@ -25,6 +25,8 @@ public sealed class Cassette
 
     public bool IsEmpty => Content.Blocks.Count == 0;
 
+    internal bool IsEndOfTape => Position >= Content.Blocks.Count;
+
     internal byte[] ContentBytes => GetContentBytes();
 
     public delegate void BlockSelectedEvent(BlockSelectedEventArgs e);

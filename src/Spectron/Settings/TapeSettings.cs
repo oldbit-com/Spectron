@@ -6,6 +6,8 @@ public record TapeSettings
 {
     public bool IsAutoPlayEnabled { get; init; } = true;
 
+    public bool IsCustomLoaderDetectionEnabled { get; init; } = true;
+
     public bool IsSaveEnabled { get; init; } = true;
 
     public TapeSpeed SaveSpeed { get; init; } = TapeSpeed.Normal;

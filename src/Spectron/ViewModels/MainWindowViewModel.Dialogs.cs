@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
-using OldBit.Spectron.Debugger.ViewModels;
 using OldBit.Spectron.Extensions;
 using OldBit.Spectron.Messages;
 using OldBit.Spectron.Theming;

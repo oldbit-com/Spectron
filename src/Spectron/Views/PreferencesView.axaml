@@ -471,6 +471,13 @@
                             ToolTip.Tip="If enabled, tape files will be automatically loaded and played. If disabled, you need to press play button."
                             Margin="0 10 0 0"
                             Classes="Center"
+                            IsChecked="{Binding IsCustomLoaderDetectionEnabled}"/>
+
+                        <CheckBox
+                            Content="Detect custom loaders"
+                            ToolTip.Tip="If enabled, and instant tape loading is selected, tape will play automatically if non standard blocks are used."
+                            Margin="0 10 0 0"
+                            Classes="Center"
                             IsChecked="{Binding IsAutoPlayEnabled}"/>
 
                         <controls:HeaderSeparator Text="Tape saving"/>

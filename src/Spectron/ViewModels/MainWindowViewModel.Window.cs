@@ -53,6 +53,7 @@ partial class MainWindowViewModel
 
         if (await ResumeEmulatorSession())
         {
+            Emulator.SetTapeSettings(_preferences.Tape);
             ApplyCommandLineArguments();
 
             return;
@@ -120,6 +121,11 @@ partial class MainWindowViewModel
             {
                 Emulator.DivMmc.Disable();
             }
+        }
+
+        if (CommandLineArgs?.TapeLoadSpeed != null)
+        {
+            TapeLoadSpeed = CommandLineArgs.TapeLoadSpeed.Value;
         }
 
         RefreshAyState(CommandLineArgs?.IsAyEnabled, CommandLineArgs?.AyStereoMode);
