@@ -30,7 +30,7 @@ internal sealed class BeeperAudio
         _clock = clock;
         _statesPerSample = (int)(Multiplier * statesPerSample);
 
-        _lowPassFilter = new LowPassFilter(statesPerSample, clockMhz);
+        _lowPassFilter = new LowPassFilter(statesPerSample, clockMhz * 1_000_000);
     }
 
     internal void NewFrame() => Samples.Clear();
