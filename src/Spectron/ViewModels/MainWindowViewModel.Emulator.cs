@@ -23,7 +23,9 @@ partial class MainWindowViewModel
     {
         var emulator = _emulatorFactory.Create(computerType, romType, customRom);
 
-        RefreshUlaPlusState(_preferences.IsUlaPlusEnabled);
+        emulator.IsUlaPlusEnabled = _preferences.IsUlaPlusEnabled;
+        IsUlaPlusEnabled = _preferences.IsUlaPlusEnabled;
+
         emulator.MouseManager.SetupMouse(_preferences.Mouse.MouseType);
         _mouseHelper = new MouseHelper(emulator.MouseManager);
         emulator.JoystickManager.SetupJoystick(_preferences.Joystick.JoystickType);
