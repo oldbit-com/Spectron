@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Debugger.Extensions;
 using OldBit.Spectron.Emulation.DependencyInjection;
+using OldBit.Spectron.Platforms;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.ViewModels;
 using OldBit.Spectron.Views;
@@ -39,18 +40,12 @@ public class App : Application
         if (ApplicationLifetime is ClassicDesktopStyleApplicationLifetime desktop)
         {
             MainWindowViewModel = _serviceProvider.GetRequiredService<MainWindowViewModel>();
+            desktop.MainWindow = new MainWindow { DataContext = MainWindowViewModel };
 
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = MainWindowViewModel,
-            };
+            var lifetime = new ApplicationLifetimeHelper(this, desktop.MainWindow);
 
-            var activatableLifetime = Current?.TryGetFeature<IActivatableLifetime>();
-            if (activatableLifetime != null)
-            {
-                activatableLifetime.Activated += (_, _) => MainWindowViewModel.WindowActivated();
-                activatableLifetime.Deactivated += (_, _) => MainWindowViewModel.WindowDeactivated();
-            }
+            lifetime.AppActivated += (_, _) => MainWindowViewModel.WindowActivated();
+            lifetime.AppDeactivated += (_, _) => MainWindowViewModel.WindowDeactivated();
         }
 
         base.OnFrameworkInitializationCompleted();
