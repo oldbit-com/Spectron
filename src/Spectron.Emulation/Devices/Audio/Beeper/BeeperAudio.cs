@@ -4,18 +4,17 @@ namespace OldBit.Spectron.Emulation.Devices.Audio.Beeper;
 
 internal sealed class BeeperAudio
 {
-    private const float Alpha = 0.6f;
     private const int Multiplier = 1000;  // Used to avoid floating point arithmetic and rounding errors
 
     private byte _lastEarMic;
-    private short _previousSample;
     private int _remainingTicks;
 
     private readonly Clock _clock;
     private readonly int _statesPerSample;
     private readonly BeeperStates _beeperStates = new();
+    private readonly LowPassFilter _lowPassFilter;
 
-    private const int Volume = 24000;
+    private const int Volume = 10_000;
     private readonly short[] _volumeLevels =
     [
         0,         // -Volume,
@@ -26,10 +25,12 @@ internal sealed class BeeperAudio
 
     internal AudioSamples Samples { get; } = new();
 
-    internal BeeperAudio(Clock clock, double statesPerSample)
+    internal BeeperAudio(Clock clock, double statesPerSample, float clockMhz)
     {
         _clock = clock;
         _statesPerSample = (int)(Multiplier * statesPerSample);
+
+        _lowPassFilter = new LowPassFilter(statesPerSample, clockMhz);
     }
 
     internal void NewFrame() => Samples.Clear();
@@ -52,8 +53,9 @@ internal sealed class BeeperAudio
 
                 // Get sample and apply simple low-pass filter to make edges smoother
                 var sample = i < _beeperStates.Count ? _volumeLevels[_beeperStates[i].EarMic] : _volumeLevels[_lastEarMic];
-                sample = (short)(Alpha * sample + (1 - Alpha) * _previousSample);
-                _previousSample = sample;
+
+                // Apply biquad low-pass filter
+                _lowPassFilter.Apply(ref sample);
 
                 Samples.Add(sample);
             }
@@ -89,6 +91,6 @@ internal sealed class BeeperAudio
         _beeperStates.Reset();
         _remainingTicks = 0;
         _lastEarMic = 0;
-        _previousSample = 0;
+        _lowPassFilter.Reset();
     }
 }

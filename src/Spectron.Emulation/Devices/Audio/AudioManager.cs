@@ -90,7 +90,7 @@ public sealed class AudioManager
 
         var statesPerSample = (double)hardware.TicksPerFrame / SamplesPerFrame;
 
-        _beeperAudio = new BeeperAudio(clock, statesPerSample);
+        _beeperAudio = new BeeperAudio(clock, statesPerSample, hardware.ClockMhz);
 
         Beeper = new BeeperDevice(cassettePlayer)
         {
