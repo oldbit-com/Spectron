@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.TimeTravel;
 
 namespace OldBit.Spectron.Services;
 

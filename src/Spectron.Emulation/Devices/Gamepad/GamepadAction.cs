@@ -16,7 +16,7 @@ public enum GamepadAction
 
     // Emulator actions
     Pause,
-    TimeTravel,
+    Rewind,
     QuickSave,
     QuickLoad,
     NMI,
@@ -84,7 +84,7 @@ public static class GamepadActionExtensions
         SymbolShift => "Symbol Shift",
 
         Pause => "Pause",
-        TimeTravel => "Time Travel",
+        Rewind => "Rewind",
         QuickSave => "Quick Save",
         QuickLoad => "Quick Load",
         NMI => "NMI",

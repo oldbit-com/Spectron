@@ -119,7 +119,7 @@ partial class MainWindowViewModel
                 HandleTogglePause();
                 break;
 
-            case GamepadAction.TimeTravel:
+            case GamepadAction.Rewind:
                 Dispatcher.UIThread.InvokeAsync(async () => await OpenTimeMachineWindow());
                 break;
 

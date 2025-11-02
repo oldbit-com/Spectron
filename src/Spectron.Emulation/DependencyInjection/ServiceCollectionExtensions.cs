@@ -8,6 +8,7 @@ using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Emulation.Tape.Loader;
+using OldBit.Spectron.Emulation.TimeTravel;
 
 namespace OldBit.Spectron.Emulation.DependencyInjection;
 
