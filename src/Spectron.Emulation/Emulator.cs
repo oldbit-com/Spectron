@@ -16,7 +16,6 @@ using OldBit.Spectron.Emulation.Devices.Printer;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Tape;
-using OldBit.Spectron.Emulation.Timer;
 using OldBit.Spectron.Emulation.TimeTravel;
 using OldBit.Z80Cpu;
 
