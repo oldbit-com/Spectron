@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace OldBit.Spectron.Emulation;
+namespace OldBit.Spectron.Emulation.Timer;
 
 /// <summary>
 /// Custom timer that supports more accurate timing than the built-in .NET timer.
