@@ -149,6 +149,7 @@ public sealed class Emulator
     {
         AudioManager.Stop();
         _emulationTimer.Stop();
+        _emulationTimer.Dispose();
 
         if (isAppClosing)
         {
@@ -212,7 +213,7 @@ public sealed class Emulator
             TimeSpan.Zero :
             TimeSpan.FromMilliseconds(20 * (100f / emulationSpeedPercentage));
 
-    private void OnTimerElapsed(EventArgs e)
+    private void OnTimerElapsed(object? sender, EventArgs e)
     {
         if (_isDebuggerBreak)
         {
