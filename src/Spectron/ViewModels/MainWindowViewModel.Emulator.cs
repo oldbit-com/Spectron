@@ -33,7 +33,7 @@ partial class MainWindowViewModel
         InitializeEmulator(emulator);
     }
 
-    private bool CreateEmulator(StateSnapshot snapshot)
+    private bool CreateEmulator(StateSnapshot snapshot, bool shouldResume = true)
     {
         Emulator?.Reset();
 
@@ -42,7 +42,7 @@ partial class MainWindowViewModel
             var emulator = _stateManager.CreateEmulator(snapshot);
             _mouseHelper = new MouseHelper(emulator.MouseManager);
 
-            InitializeEmulator(emulator);
+            InitializeEmulator(emulator, shouldResume);
 
             return true;
         }
@@ -81,12 +81,16 @@ partial class MainWindowViewModel
         return emulator != null;
     }
 
-    private void InitializeEmulator(Emulator emulator)
+    private void InitializeEmulator(Emulator emulator, bool shouldResume = true)
     {
         ShutdownEmulator();
 
         Emulator = emulator;
-        IsPaused = false;
+
+        if (IsPaused)
+        {
+            Emulator.Pause();
+        }
 
         ComputerType = Emulator.ComputerType;
         RomType = Emulator.RomType;
@@ -113,6 +117,11 @@ partial class MainWindowViewModel
         _debuggerViewModel?.ConfigureEmulator(Emulator);
 
         Emulator.Start();
+
+        if (shouldResume)
+        {
+            Resume();
+        }
     }
 
     private void ConfigureEmulatorSettings()
@@ -178,21 +187,13 @@ partial class MainWindowViewModel
         else if (Emulator != null)
         {
             Emulator.Reset();
-            IsPaused = Emulator.IsPaused;
+            Resume();
 
             ConfigureDebugging(Emulator);
         }
 
         RecentFilesViewModel.CurrentFileName = string.Empty;
         UpdateWindowTitle();
-    }
-
-    private void HandleTimeMachineResumeEmulator()
-    {
-        IsPauseOverlayVisible = false;
-        IsTimeMachineCountdownVisible = false;
-
-        Emulator?.Resume();
     }
 
     private void HandleSetEmulationSpeed(string emulationSpeed)
@@ -396,6 +397,7 @@ partial class MainWindowViewModel
         Emulator?.Resume(isDebuggerResume);
         IsPaused = false;
         IsPauseOverlayVisible = false;
+        IsTimeMachineCountdownVisible = false;
     }
 
     private void HandleTogglePause()

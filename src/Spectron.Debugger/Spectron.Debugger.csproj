@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
@@ -10,16 +10,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
-      <PackageReference Include="Avalonia" Version="11.3.8" />
-      <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.8" />
-      <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5" />
-      <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.3.0.6" />
-      <PackageReference Include="Avalonia.Xaml.Interactivity" Version="11.3.0.6" />
-      <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-      <PackageReference Include="Material.Icons.Avalonia" Version="2.4.1" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />
-      <PackageReference Include="OldBit.Z80Cpu.Spectron" Version="0.9.3" />
+      <PackageReference Include="Antlr4.Runtime.Standard" />
+      <PackageReference Include="Avalonia" />
+      <PackageReference Include="Avalonia.Controls.DataGrid" />
+      <PackageReference Include="Avalonia.Controls.ItemsRepeater" />
+      <PackageReference Include="Avalonia.Xaml.Interactions" />
+      <PackageReference Include="Avalonia.Xaml.Interactivity" />
+      <PackageReference Include="CommunityToolkit.Mvvm" />
+      <PackageReference Include="Material.Icons.Avalonia" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+      <PackageReference Include="OldBit.Z80Cpu.Spectron" />
     </ItemGroup>
 
     <ItemGroup>
