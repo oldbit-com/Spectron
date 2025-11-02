@@ -251,7 +251,7 @@ public sealed class GamepadManager
 
     private static bool IsCommandAction(GamepadAction action) => action is
         GamepadAction.Pause or
-        GamepadAction.TimeTravel or
+        GamepadAction.Rewind or
         GamepadAction.QuickSave or
         GamepadAction.QuickLoad or
         GamepadAction.NMI;

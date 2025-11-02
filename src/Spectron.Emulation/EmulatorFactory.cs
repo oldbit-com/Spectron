@@ -7,6 +7,7 @@ using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
+using OldBit.Spectron.Emulation.TimeTravel;
 using OldBit.Z80Cpu.Contention;
 
 namespace OldBit.Spectron.Emulation;

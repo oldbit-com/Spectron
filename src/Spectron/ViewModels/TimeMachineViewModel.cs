@@ -15,6 +15,7 @@ using OldBit.Spectron.Emulation.Commands;
 using OldBit.Spectron.Emulation.Devices.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Extensions;
+using OldBit.Spectron.Emulation.TimeTravel;
 using OldBit.Spectron.Messages;
 
 namespace OldBit.Spectron.ViewModels;
@@ -105,7 +106,7 @@ public partial class TimeMachineViewModel : ObservableObject, IDisposable
             return;
         }
 
-        if (gamepadCommand.Action == GamepadAction.TimeTravel)
+        if (gamepadCommand.Action == GamepadAction.Rewind)
         {
             Dispatcher.UIThread.Post(() => Close.Invoke());
         }
