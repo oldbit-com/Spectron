@@ -33,8 +33,8 @@ internal sealed class Border(HardwareSettings hardwareSettings, FrameBuffer fram
             {
                 if (frameTicks < tickRange.EndTick)
                 {
-                    var startPixel = tickRange.StartPixel + 2 * _offset;
-                    var count = 2 * (frameTicks - (tickRange.StartTick + _offset) + 1);
+                    var startPixel = tickRange.StartPixel + (_offset << 1);
+                    var count = (frameTicks - (tickRange.StartTick + _offset) + 1) << 1;
 
                     frameBuffer.Fill(startPixel, count, _lastColor);
 
@@ -45,8 +45,8 @@ internal sealed class Border(HardwareSettings hardwareSettings, FrameBuffer fram
                 }
                 else
                 {
-                    var startPixel = tickRange.StartPixel + 2 * _offset;
-                    var count = 2 * (tickRange.EndTick - (tickRange.StartTick + _offset) + 1);
+                    var startPixel = tickRange.StartPixel + (_offset << 1);
+                    var count = (tickRange.EndTick - (tickRange.StartTick + _offset) + 1) << 1;
 
                     frameBuffer.Fill(startPixel, count, _lastColor);
 

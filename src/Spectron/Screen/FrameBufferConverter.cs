@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
@@ -7,10 +8,13 @@ using OldBit.Spectron.Emulation.Screen;
 namespace OldBit.Spectron.Screen;
 
 /// <summary>
-/// Converts and writes the frame buffer to a WriteableBitmap which can be displayed by Avalonia.
+/// Converts and writes the frame buffer to a WriteableBitmap which Avalonia can display.
 /// </summary>
 internal sealed class FrameBufferConverter : IDisposable
 {
+    private const int ZoomX = 4;      // Number of horizontal pixels, check the below code if changing value
+    private const int ZoomY = 4;      // Number of vertical pixels
+
     private Border _border = BorderSizes.Full;
 
     private int _startFrameBufferRow;
@@ -18,16 +22,10 @@ internal sealed class FrameBufferConverter : IDisposable
     private int _startFrameBufferCol;
     private int _endFrameBufferCol;
 
-    private readonly int _zoomX;
-    private readonly int _zoomY;
-
     internal WriteableBitmap ScreenBitmap { get; private set; }
 
-    internal FrameBufferConverter(int zoomX, int zoomY)
+    internal FrameBufferConverter()
     {
-        _zoomX = zoomX;
-        _zoomY = zoomY;
-
         SetBorderSize(BorderSize.Full);
         ScreenBitmap = CreateBitmap();
     }
@@ -35,7 +33,9 @@ internal sealed class FrameBufferConverter : IDisposable
     internal void UpdateBitmap(FrameBuffer frameBuffer)
     {
         using var lockedBitmap = ScreenBitmap.Lock();
+
         var targetAddress = lockedBitmap.Address;
+        var rowBytes = lockedBitmap.RowBytes;
 
         for (var frameBufferRow = _startFrameBufferRow; frameBufferRow <= _endFrameBufferRow; frameBufferRow++)
         {
@@ -45,32 +45,35 @@ internal sealed class FrameBufferConverter : IDisposable
             {
                 var pixelIndex = rowOffset + frameBufferCol;
 
-                // Duplicate pixels horizontally
-                for (var x = 0; x < _zoomX; x++)
+                unsafe
                 {
-                    unsafe
+                    fixed (Color* color = &frameBuffer.Pixels[pixelIndex])
                     {
-                        fixed (Color* color = &frameBuffer.Pixels[pixelIndex])
-                        {
-                            *(uint*)targetAddress = *(uint*)color;
-                        }
-                    }
+                        var pixelColor = *(uint*)color;
 
-                    targetAddress += 4;
+                        // Replicate pixels horizontally, unrolled loop for better performance.
+                        // IMPORTANT: This needs to be in sync with ZoomX value
+                        *(uint*)targetAddress = pixelColor;
+                        *(uint*)(targetAddress + 4) = pixelColor;
+                        *(uint*)(targetAddress + 8) = pixelColor;
+                        *(uint*)(targetAddress + 12) = pixelColor;
+
+                        targetAddress += 4 * ZoomX;
+                    }
                 }
             }
 
-            // Duplicate previous line vertically based on zoom factor
-            var previousLine = targetAddress - lockedBitmap.RowBytes;
+            var previousLine = targetAddress - rowBytes;
 
-            for (var y = 0; y < _zoomY - 1; y++)
+            // Replicate the previous line vertically, no need to unroll this loop
+            for (var y = 0; y < ZoomY - 1; y++)
             {
                 unsafe
                 {
-                    Buffer.MemoryCopy(previousLine.ToPointer(), targetAddress.ToPointer(), lockedBitmap.RowBytes, lockedBitmap.RowBytes);
+                    Buffer.MemoryCopy(previousLine.ToPointer(), targetAddress.ToPointer(), rowBytes, rowBytes);
                 }
 
-                targetAddress += lockedBitmap.RowBytes;
+                targetAddress += rowBytes;
             }
         }
     }
@@ -101,8 +104,8 @@ internal sealed class FrameBufferConverter : IDisposable
 
         return new WriteableBitmap(
             new PixelSize(
-                width * _zoomX,
-                height * _zoomY),
+                width * ZoomX,
+                height * ZoomY),
             new Vector(96, 96),
             PixelFormats.Rgba8888);
     }

@@ -57,7 +57,7 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly DebuggerContext _debuggerContext;
     private readonly QuickSaveService _quickSaveService;
     private readonly ILogger _logger;
-    private readonly FrameBufferConverter _frameBufferConverter = new(4, 4);
+    private readonly FrameBufferConverter _frameBufferConverter = new();
     private readonly KeyboardHook _keyboardHook;
     private readonly Stopwatch _renderStopwatch = new();
     private readonly FrameRateCalculator _frameRateCalculator = new();
