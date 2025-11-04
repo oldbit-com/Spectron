@@ -4,40 +4,34 @@ namespace OldBit.Spectron.Emulation;
 
 /// <summary>
 /// Custom timer that supports more accurate timing than the built-in .NET timer.
-/// Standard timer does not have enough accuracy for the emulator. Stopwatch
-/// is most accurate and used to calculate the time between each tick.
+/// Standard timer does not have enough accuracy for the emulator.
 /// </summary>
-internal sealed class EmulatorTimer
+internal sealed class EmulatorTimer : IDisposable
 {
     private readonly Thread _worker;
-    private bool _isRunning;
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
 
     internal bool IsPaused { get; private set; }
     internal bool IsStopped { get; private set; }
+    internal ThreadPriority Priority { get; set; } = ThreadPriority.AboveNormal;
 
     internal TimeSpan Interval { get; set; } = TimeSpan.FromMilliseconds(20);
 
-    internal delegate void ElapsedEvent(EventArgs e);
-    internal event ElapsedEvent? Elapsed;
+    internal event EventHandler? Elapsed;
 
-    internal EmulatorTimer()
+    internal EmulatorTimer() => _worker = new Thread(Worker)
     {
-        _worker = new Thread(Worker)
-        {
-            IsBackground = true,
-            Priority = ThreadPriority.Lowest,
-        };
-    }
+        IsBackground = true,
+        Priority = Priority,
+        Name = "Emulator Timer"
+    };
 
-    internal void Start()
-    {
-        _isRunning = true;
-        _worker.Start();
-    }
+    internal void Start() => _worker.Start();
 
     internal void Stop()
     {
-        _isRunning = false;
+        _cancellationTokenSource.Cancel();
+
         _worker.Join();
     }
 
@@ -49,31 +43,31 @@ internal sealed class EmulatorTimer
     {
         IsStopped = false;
 
-        var timer = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
         var nextTrigger = TimeSpan.Zero;
 
-        while (_isRunning)
+        while (!_cancellationTokenSource.IsCancellationRequested)
         {
             if (IsPaused)
             {
                 Thread.Sleep(250);
+
+                stopwatch.Restart();
                 nextTrigger = Interval;
-                timer.Restart();
 
                 continue;
             }
 
-            while (_isRunning)
+            while (!_cancellationTokenSource.IsCancellationRequested)
             {
-                var elapsed = timer.Elapsed;
+                var elapsed = stopwatch.Elapsed;
 
                 if (elapsed >= nextTrigger)
                 {
-                    timer.Restart();
+                    stopwatch.Restart();
                     nextTrigger = Interval;
 
-                    Elapsed?.Invoke(EventArgs.Empty);
-
+                    Elapsed?.Invoke(this, EventArgs.Empty);
                     break;
                 }
 
@@ -82,21 +76,23 @@ internal sealed class EmulatorTimer
                 switch (timeToWait.TotalMilliseconds)
                 {
                     case < 1:
-                        Thread.SpinWait(1);
+                        Thread.SpinWait(5);
                         break;
 
                     case < 5:
-                        Thread.SpinWait(2);
+                        Thread.SpinWait(10);
                         break;
 
                     case < 10:
-                        Thread.SpinWait(5);
+                        Thread.SpinWait(25);
                         break;
                 }
             }
         }
 
         IsStopped = true;
-        timer.Stop();
+        stopwatch.Stop();
     }
+
+    public void Dispose() => _cancellationTokenSource.Dispose();
 }

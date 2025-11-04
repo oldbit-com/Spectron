@@ -6,7 +6,7 @@ namespace OldBit.Spectron.Emulation.Screen;
 internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer, IEmulatorMemory memory, UlaPlus ulaPlus)
 {
     private readonly ScreenRenderEvent[] _screenRenderEvents = FastLookup.GetScreenRenderEvents(hardware);
-    private readonly bool[] _bitmapDirty = new bool[32 * 24 * 8];
+    private readonly bool[] _dirtyAddresses = new bool[32 * 24 * 8];
 
     private int _frameCount = 1;
     private bool _isFlashOnFrame;
@@ -35,7 +35,8 @@ internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer
             }
 
             // First byte and attribute
-            UpdateFrameBuffer(fetchCycleData.FrameBufferIndex, fetchCycleData.BitmapAddress, fetchCycleData.AttributeAddress);
+            UpdateFrameBuffer(fetchCycleData.FrameBufferIndex, fetchCycleData.BitmapAddress,
+                fetchCycleData.AttributeAddress);
 
             // Second byte and attribute
             UpdateFrameBuffer(fetchCycleData.FrameBufferIndex + 8, (Word)(fetchCycleData.BitmapAddress + 1),
@@ -72,13 +73,13 @@ internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer
         Invalidate();
     }
 
-    internal void Invalidate() => _bitmapDirty.AsSpan().Fill(true);
+    internal void Invalidate() => Array.Fill(_dirtyAddresses, true);
 
-    internal void MakeDirty(Word address) => MakeDirty(address - 0x4000);
+    internal void SetDirty(Word address) => SetDirty(address - 0x4000);
 
     private void UpdateFrameBuffer(int frameBufferIndex, Word bitmapAddress, Word attributeAddress)
     {
-        if (!_bitmapDirty[bitmapAddress])
+        if (!_dirtyAddresses[bitmapAddress])
         {
             return;
         }
@@ -105,29 +106,29 @@ internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer
             frameBuffer.Pixels[frameBufferIndex + bit] = color;
         }
 
-        _bitmapDirty[bitmapAddress] = false;
+        _dirtyAddresses[bitmapAddress] = false;
     }
 
-    private void MakeDirty(int address)
+    private void SetDirty(int address)
     {
         if (address < 0x1800)
         {
             // Single screen byte
-            _bitmapDirty[address] = true;
+            _dirtyAddresses[address] = true;
         }
         else
         {
             // Attribute byte affecting 8 screen bytes, unrolled for performance (~7x faster than a for loop)
             var screenAddress = FastLookup.LineAddressForAttrAddress[address - 0x1800];
 
-            _bitmapDirty[screenAddress] = true;
-            _bitmapDirty[screenAddress + 256] = true;
-            _bitmapDirty[screenAddress + 512] = true;
-            _bitmapDirty[screenAddress + 768] = true;
-            _bitmapDirty[screenAddress + 1024] = true;
-            _bitmapDirty[screenAddress + 1280] = true;
-            _bitmapDirty[screenAddress + 1536] = true;
-            _bitmapDirty[screenAddress + 1792] = true;
+            _dirtyAddresses[screenAddress] = true;
+            _dirtyAddresses[screenAddress + 256] = true;
+            _dirtyAddresses[screenAddress + 512] = true;
+            _dirtyAddresses[screenAddress + 768] = true;
+            _dirtyAddresses[screenAddress + 1024] = true;
+            _dirtyAddresses[screenAddress + 1280] = true;
+            _dirtyAddresses[screenAddress + 1536] = true;
+            _dirtyAddresses[screenAddress + 1792] = true;
         }
     }
 
@@ -139,7 +140,7 @@ internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer
         {
             if ((memory.ReadScreen(attrAddress) & 0x80) != 0)
             {
-                MakeDirty((int)attrAddress);
+                SetDirty((int)attrAddress);
             }
         }
     }
