@@ -189,7 +189,7 @@ public sealed class AudioManager
             channelCount: StereoMode == StereoMode.Mono ? 1 : 2,
             new PlayerOptions
             {
-                BufferSizeInBytes = 32768,
+                BufferSizeInBytes = 65536,
                 BufferQueueSize = NumberOfBuffers
             });
 
