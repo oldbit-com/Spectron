@@ -28,7 +28,7 @@ internal static class Hardware
         InterruptFrequency: 50,
         RetraceTicks: 48,
         BorderTop: 64,
-        ContentionStartTicks: 14335,
+        ContentionStartTicks: 14336,
         FloatingBusStartTicks: 14338,
         InterruptDuration: 32,
         FirstPixelTicks: 14336,
@@ -42,25 +42,11 @@ internal static class Hardware
         InterruptFrequency: 50,
         RetraceTicks: 52,
         BorderTop: 63,
-        ContentionStartTicks: 14361,
+        ContentionStartTicks: 14362,
         FloatingBusStartTicks: 14364,
         InterruptDuration: 36,
         FirstPixelTicks: 14362,
         LastPixelTicks: 14362 + (ScreenSize.ContentHeight - 1) * 228 + ContentLineTicks,
         TicksPerLine: 228,
         HasAyChip: true);
-
-    internal static HardwareSettings Timex2048 { get; } = new(
-        ClockMhz: 3.5f,
-        ComputerType: ComputerType.Timex2048,
-        TicksPerFrame: 69888,
-        InterruptFrequency: 50,
-        RetraceTicks: 48,
-        BorderTop: 64,
-        ContentionStartTicks: 14361,
-        FloatingBusStartTicks: 14338,
-        InterruptDuration: 32,
-        FirstPixelTicks: 14336,
-        LastPixelTicks: 14336 + (ScreenSize.ContentHeight - 1) * 224 + ContentLineTicks,
-        TicksPerLine: 224);
 }

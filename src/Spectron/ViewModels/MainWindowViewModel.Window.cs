@@ -8,6 +8,7 @@ namespace OldBit.Spectron.ViewModels;
 partial class MainWindowViewModel
 {
     private bool _shouldResume;
+    private bool IsDebuggerOpen => _debuggerViewModel != null;
 
     internal void WindowActivated()
     {
@@ -22,7 +23,7 @@ partial class MainWindowViewModel
 
     internal void WindowDeactivated()
     {
-        if (!_preferences.Resume.ShouldAutoSuspendResume || IsPaused)
+        if (!_preferences.Resume.ShouldAutoSuspendResume || IsPaused || IsDebuggerOpen)
         {
             return;
         }
