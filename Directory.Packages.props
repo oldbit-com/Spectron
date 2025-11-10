@@ -19,7 +19,7 @@
     <PackageVersion Include="FFMpegCore" Version="5.4.0" />
     <PackageVersion Include="Material.Icons.Avalonia" Version="2.4.1" />
     <PackageVersion Include="MemoryPack" Version="1.21.4" />
-    <PackageVersion Include="MessageBox.Avalonia" Version="3.2.0" />
+    <PackageVersion Include="MessageBox.Avalonia" Version="3.3.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.10" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.10" />
