@@ -400,3 +400,5 @@ FodyWeavers.xsd
 .idea/
 .DS_Store
 .vscode/
+dist/
+
