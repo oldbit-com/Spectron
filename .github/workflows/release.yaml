@@ -70,7 +70,7 @@ jobs:
         run: |
           VERSION="${{ github.ref_name }}"
           NAME="Spectron-${VERSION}-win-arm64.zip"
-          cd ./dist/wwin-arm64
+          cd ./dist/win-arm64
           zip -r ../../${NAME} .
 
       - name: Package linux-x64
