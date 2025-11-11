@@ -8,6 +8,8 @@
 	<string>1.0.0</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0.0</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>CFBundleExecutable</key>

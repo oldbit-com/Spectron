@@ -42,9 +42,9 @@ jobs:
         run: |
           VERSION="${{ github.ref_name }}"
           NAME="Spectron-${VERSION}-osx-arm64.zip"
-          mkdir -p ./dist/osx-arm64/Spectron.app/Resources
-          cp ./src/Spectron/Assets/spectron.icns ./dist/osx-arm64/Spectron.app/Resources/
-          cp ./src/Spectron/Info.plist ./dist/osx-arm64/Spectron.app/
+          mkdir -p ./dist/osx-arm64/Spectron.app/Contents/Resources
+          cp ./src/Spectron/Assets/spectron.icns ./dist/osx-arm64/Spectron.app/Contents/Resources/
+          cp ./src/Spectron/Info.plist ./dist/osx-arm64/Spectron.app/Contents/
           cd ./dist/osx-arm64
           zip -r ../../${NAME} .
 
@@ -53,9 +53,9 @@ jobs:
         run: |
           VERSION="${{ github.ref_name }}"
           NAME="Spectron-${VERSION}-osx-x64.zip"
-          mkdir -p ./dist/osx-x64/Spectron.app/Resources
-          cp ./src/Spectron/Assets/spectron.icns ./dist/osx-x64/Spectron.app/Resources/
-          cp ./src/Spectron/Info.plist ./dist/osx-x64/Spectron.app/
+          mkdir -p ./dist/osx-x64/Spectron.app/Contents/Resources
+          cp ./src/Spectron/Assets/spectron.icns ./dist/osx-x64/Spectron.app/Contents/Resources/
+          cp ./src/Spectron/Info.plist ./dist/osx-x64/Spectron.app/Contents/
           cd ./dist/osx-x64
           zip -r ../../${NAME} .
 
