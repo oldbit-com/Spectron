@@ -1,0 +1,94 @@
+name: Release
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build and publish Spectron for all supported platforms
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Publish osx-arm64
+        run: dotnet publish -r osx-arm64 -o ./dist/osx-arm64/Spectron.app/Contents/MacOS ./src/Spectron/Spectron.csproj
+
+      - name: Publish osx-x64
+        run: dotnet publish -r osx-x64 -o ./dist/osx-x64/Spectron.app/Contents/MacOS ./src/Spectron/Spectron.csproj
+
+      - name: Publish win-x64
+        run: dotnet publish -r win-x64 -o ./dist/win-x64 ./src/Spectron/Spectron.csproj
+
+      - name: Publish win-arm64
+        run: dotnet publish -r win-arm64 -o ./dist/win-arm64 ./src/Spectron/Spectron.csproj
+
+      - name: Publish linux-x64
+        run: dotnet publish -r linux-x64 -o ./dist/linux-x64 ./src/Spectron/Spectron.csproj
+
+      ## TODO: Create app package and dmg file
+      - name: Package osx-arm64
+        run: |
+          VERSION="${{ github.ref_name }}"
+          NAME="Spectron-${VERSION}-osx-arm64.zip"
+          mkdir -p ./dist/osx-arm64/Spectron.app/Resources
+          cp ./src/Spectron/Assets/spectron.icns ./dist/osx-arm64/Spectron.app/Resources/
+          cp ./src/Spectron/Info.plist ./dist/osx-arm64/Spectron.app/
+          cd ./dist/osx-arm64
+          zip -r ../../${NAME} .
+
+      ## TODO: Create app package and dmg file
+      - name: Package osx-x64
+        run: |
+          VERSION="${{ github.ref_name }}"
+          NAME="Spectron-${VERSION}-osx-x64.zip"
+          mkdir -p ./dist/osx-x64/Spectron.app/Resources
+          cp ./src/Spectron/Assets/spectron.icns ./dist/osx-x64/Spectron.app/Resources/
+          cp ./src/Spectron/Info.plist ./dist/osx-x64/Spectron.app/
+          cd ./dist/osx-x64
+          zip -r ../../${NAME} .
+
+      - name: Package win-x64
+        run: |
+          VERSION="${{ github.ref_name }}"
+          NAME="Spectron-${VERSION}-win-x64.zip"
+          cd ./dist/win-x64
+          zip -r ../../${NAME} .
+
+      - name: Package win-arm64
+        run: |
+          VERSION="${{ github.ref_name }}"
+          NAME="Spectron-${VERSION}-win-arm64.zip"
+          cd ./dist/wwin-arm64
+          zip -r ../../${NAME} .
+
+      - name: Package linux-x64
+        run: |
+          VERSION="${{ github.ref_name }}"
+          NAME="Spectron-${VERSION}-linux-x64.zip"
+          cd ./dist/linux-x64
+          zip -r ../../${NAME} .
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          files: |
+            Spectron-${{ github.ref_name }}-win-x64.zip
+            Spectron-${{ github.ref_name }}-win-arm64.zip
+            Spectron-${{ github.ref_name }}-linux-x64.zip
+            Spectron-${{ github.ref_name }}-osx-x64.zip
+            Spectron-${{ github.ref_name }}-osx-arm64.zip
+          
