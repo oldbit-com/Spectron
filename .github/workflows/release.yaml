@@ -38,24 +38,42 @@ jobs:
         run: dotnet publish -r linux-x64 -o ./dist/linux-x64 ./src/Spectron/Spectron.csproj
 
       ## TODO: Create app package and dmg file
+      - name: Copy osx-arm64 files
+        run: |
+          mkdir -p ./dist/osx-arm64/Spectron.app/Contents/Resources
+          cp ./src/Spectron/Assets/spectron.icns ./dist/osx-arm64/Spectron.app/Contents/Resources/
+          cp ./src/Spectron/Info.plist ./dist/osx-arm64/Spectron.app/Contents/
+          chmod +x ./dist/osx-arm64/Spectron.app/Contents/MacOS/Spectron
+
+      - name: Sign/Notarize with rcodesign
+        uses: indygreg/apple-code-sign-action@v1
+        with:
+          input_path: ./dist/osx-arm64/Spectron.app
+
       - name: Package osx-arm64
         run: |
           VERSION="${{ github.ref_name }}"
           NAME="Spectron-${VERSION}-osx-arm64.zip"
-          mkdir -p ./dist/osx-arm64/Spectron.app/Contents/Resources
-          cp ./src/Spectron/Assets/spectron.icns ./dist/osx-arm64/Spectron.app/Contents/Resources/
-          cp ./src/Spectron/Info.plist ./dist/osx-arm64/Spectron.app/Contents/
           cd ./dist/osx-arm64
           zip -r ../../${NAME} .
 
       ## TODO: Create app package and dmg file
+      - name: Copy osx-x64 files
+        run: |
+          mkdir -p ./dist/osx-x64/Spectron.app/Contents/Resources
+          cp ./src/Spectron/Assets/spectron.icns ./dist/osx-x64/Spectron.app/Contents/Resources/
+          cp ./src/Spectron/Info.plist ./dist/osx-x64/Spectron.app/Contents/
+          chmod +x ./dist/osx-x64/Spectron.app/Contents/MacOS/Spectron
+
+      - name: Sign/Notarize with rcodesign
+        uses: indygreg/apple-code-sign-action@v1
+        with:
+          input_path: ./dist/osx-x64/Spectron.app
+
       - name: Package osx-x64
         run: |
           VERSION="${{ github.ref_name }}"
           NAME="Spectron-${VERSION}-osx-x64.zip"
-          mkdir -p ./dist/osx-x64/Spectron.app/Contents/Resources
-          cp ./src/Spectron/Assets/spectron.icns ./dist/osx-x64/Spectron.app/Contents/Resources/
-          cp ./src/Spectron/Info.plist ./dist/osx-x64/Spectron.app/Contents/
           cd ./dist/osx-x64
           zip -r ../../${NAME} .
 
