@@ -44,8 +44,8 @@ public class App : Application
 
             var lifetime = new ApplicationLifetimeHelper(this, desktop.MainWindow);
 
-            lifetime.AppActivated += (_, _) => MainWindowViewModel.WindowActivated();
-            lifetime.AppDeactivated += (_, _) => MainWindowViewModel.WindowDeactivated();
+            lifetime.AppActivated += (_, e) => MainWindowViewModel.WindowActivated(e);
+            lifetime.AppDeactivated += (_, e) => MainWindowViewModel.WindowDeactivated(e);
         }
 
         base.OnFrameworkInitializationCompleted();

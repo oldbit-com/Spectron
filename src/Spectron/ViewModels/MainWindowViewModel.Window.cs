@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using OldBit.Spectron.Extensions;
 using OldBit.Spectron.Theming;
 
@@ -10,8 +11,14 @@ partial class MainWindowViewModel
     private bool _shouldResume;
     private bool IsDebuggerOpen => _debuggerViewModel != null;
 
-    internal void WindowActivated()
+    internal void WindowActivated(ActivatedEventArgs args)
     {
+        if (args.Kind == ActivationKind.File && args is FileActivatedEventArgs { Files.Count: > 0 } fileArgs)
+        {
+            _ = HandleLoadFileAsync(fileArgs.Files[0].Path.LocalPath);
+            return;
+        }
+
         if (!_preferences.Resume.ShouldAutoSuspendResume || !_shouldResume || !IsPaused)
         {
             return;
@@ -21,7 +28,7 @@ partial class MainWindowViewModel
         _shouldResume = false;
     }
 
-    internal void WindowDeactivated()
+    internal void WindowDeactivated(ActivatedEventArgs args)
     {
         if (!_preferences.Resume.ShouldAutoSuspendResume || IsPaused || IsDebuggerOpen)
         {

@@ -14,8 +14,8 @@ public sealed class ApplicationLifetimeHelper : IDisposable
 {
     private readonly WinActivateAppHook? _winActivateAppHook;
 
-    public event EventHandler? AppActivated;
-    public event EventHandler? AppDeactivated;
+    public event EventHandler<ActivatedEventArgs>? AppActivated;
+    public event EventHandler<ActivatedEventArgs>? AppDeactivated;
 
     public ApplicationLifetimeHelper(Application application, Window mainWindow)
     {
@@ -23,15 +23,15 @@ public sealed class ApplicationLifetimeHelper : IDisposable
 
         if (activatableLifetime != null)
         {
-            activatableLifetime.Activated += (_, _) => AppActivated?.Invoke(this, EventArgs.Empty);
-            activatableLifetime.Deactivated += (_, _) => AppDeactivated?.Invoke(this, EventArgs.Empty);
+            activatableLifetime.Activated += (_, e) => AppActivated?.Invoke(this, e);
+            activatableLifetime.Deactivated += (_, e) => AppDeactivated?.Invoke(this, e);
         }
         else if (OperatingSystem.IsWindows())
         {
             _winActivateAppHook = new WinActivateAppHook(mainWindow);
 
-            _winActivateAppHook.AppActivated += (_, _) => AppActivated?.Invoke(this, EventArgs.Empty);
-            _winActivateAppHook.AppDeactivated += (_, _) => AppDeactivated?.Invoke(this, EventArgs.Empty);
+            _winActivateAppHook.AppActivated += (_, _) => AppActivated?.Invoke(this, new ActivatedEventArgs(ActivationKind.Reopen));
+            _winActivateAppHook.AppDeactivated += (_, _) => AppDeactivated?.Invoke(this, new ActivatedEventArgs(ActivationKind.Background));
         }
     }
 
