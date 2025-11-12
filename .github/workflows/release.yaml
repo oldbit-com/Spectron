@@ -46,7 +46,6 @@ jobs:
           mkdir -p ./dist/osx-arm64/Spectron.app/Contents/Resources
           cp ./src/Spectron/Assets/spectron.icns ./dist/osx-arm64/Spectron.app/Contents/Resources/
           cp ./src/Spectron/Info.plist ./dist/osx-arm64/Spectron.app/Contents/
-          chmod +x ./dist/osx-arm64/Spectron.app/Contents/MacOS/Spectron
 
 #      - name: Sign
 #        uses: indygreg/apple-code-sign-action@v1
@@ -58,6 +57,7 @@ jobs:
           VERSION="${{ github.ref_name }}"
           NAME="Spectron-${VERSION}-osx-arm64.tar.gz"
           cd ./dist/osx-arm64
+          chmod +x ./Spectron.app/Contents/MacOS/Spectron
           tar czf ../../${NAME} .
 
       ## TODO: Create app package and dmg file
@@ -66,7 +66,6 @@ jobs:
           mkdir -p ./dist/osx-x64/Spectron.app/Contents/Resources
           cp ./src/Spectron/Assets/spectron.icns ./dist/osx-x64/Spectron.app/Contents/Resources/
           cp ./src/Spectron/Info.plist ./dist/osx-x64/Spectron.app/Contents/
-          chmod +x ./dist/osx-x64/Spectron.app/Contents/MacOS/Spectron
 
 #      - name: Sign
 #        uses: indygreg/apple-code-sign-action@v1
@@ -78,6 +77,7 @@ jobs:
           VERSION="${{ github.ref_name }}"
           NAME="Spectron-${VERSION}-osx-x64.tar.gz"
           cd ./dist/osx-x64
+          chmod +x ./Spectron.app/Contents/MacOS/Spectron
           tar czf ../../${NAME} .
 
       - name: Package win-x64
@@ -92,7 +92,6 @@ jobs:
           VERSION="${{ github.ref_name }}"
           NAME="Spectron-${VERSION}-win-arm64.zip"
           cd ./dist/win-arm64
-          chmod +x Spectron
           zip -r ../../${NAME} .
 
       - name: Package linux-x64
