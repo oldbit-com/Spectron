@@ -98,7 +98,6 @@ internal sealed class Memory128K : IEmulatorMemory
         }
 
         SetPagingMode(data);
-        LastPagingModeValue = data;
     }
 
     public void Reset()
@@ -124,6 +123,8 @@ internal sealed class Memory128K : IEmulatorMemory
         {
             return;
         }
+
+        LastPagingModeValue = pagingMode;
 
         _isPagingDisabledUntilReset = (pagingMode & PagingDisableBit) != 0;
 
