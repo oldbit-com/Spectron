@@ -60,7 +60,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         snapshot.Save(fileName);
     }
 
-    public static SzxFile CreateSnapshot(Emulator emulator, CompressionLevel compressionLevel = CompressionLevel.SmallestSize)
+    private static SzxFile CreateSnapshot(Emulator emulator, CompressionLevel compressionLevel = CompressionLevel.SmallestSize)
     {
         var snapshot = new SzxFile
         {
@@ -208,7 +208,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         });
     }
 
-    private void LoadTape(TapeManager tapeManager, TapeBlock? tapeBlock)
+    private static void LoadTape(TapeManager tapeManager, TapeBlock? tapeBlock)
     {
         if (tapeBlock == null)
         {
@@ -229,7 +229,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         }
     }
 
-    private void LoadAyRegisters(AudioManager audioManager, AyBlock? ay)
+    private static void LoadAyRegisters(AudioManager audioManager, AyBlock? ay)
     {
         if (ay == null  || !audioManager.IsAySupported)
         {
