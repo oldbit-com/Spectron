@@ -8,7 +8,6 @@
         <ApplicationIcon>./Assets/spectron.ico</ApplicationIcon>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <RootNamespace>OldBit.Spectron</RootNamespace>
-        <LangVersion>13</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <PublishSingleFile>true</PublishSingleFile>
         <SelfContained>true</SelfContained>

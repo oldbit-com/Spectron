@@ -32,10 +32,7 @@ public partial class LoggingViewModel : ObservableObject, IDisposable
 
     partial void OnShouldLogTicksChanged(bool value)
     {
-        if (_instructionLogger != null)
-        {
-            _instructionLogger.ShouldLogTicks = value;
-        }
+        _instructionLogger?.ShouldLogTicks = value;
     }
 
     partial void OnLogFilePathChanged(string value) => OnPropertyChanged(nameof(CanClearLogFile));
