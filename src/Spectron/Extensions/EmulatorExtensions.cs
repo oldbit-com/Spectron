@@ -8,74 +8,64 @@ namespace OldBit.Spectron.Extensions;
 
 public static class EmulatorExtensions
 {
-    public static void SetTapeSettings(this Emulator? emulator, TapeSettings tapeSettings)
+    extension(Emulator? emulator)
     {
-        if (emulator == null)
+        public void SetTapeSettings(TapeSettings tapeSettings)
         {
-            return;
+            emulator?.TapeManager.IsTapeSaveEnabled = tapeSettings.IsSaveEnabled;
+            emulator?.TapeManager.IsCustomLoaderDetectionEnabled = tapeSettings.IsCustomLoaderDetectionEnabled;
+            emulator?.TapeManager.TapeSaveSpeed = tapeSettings.SaveSpeed;
+            emulator?.TapeManager.TapeLoadSpeed = tapeSettings.LoadSpeed;
         }
 
-        emulator.TapeManager.IsTapeSaveEnabled = tapeSettings.IsSaveEnabled;
-        emulator.TapeManager.IsCustomLoaderDetectionEnabled = tapeSettings.IsCustomLoaderDetectionEnabled;
-        emulator.TapeManager.TapeSaveSpeed = tapeSettings.SaveSpeed;
-        emulator.TapeManager.TapeLoadSpeed = tapeSettings.LoadSpeed;
-    }
-
-    public static void SetAudioSettings(this Emulator? emulator, AudioSettings audioSettings)
-    {
-        if (emulator == null)
+        public void SetAudioSettings(AudioSettings audioSettings)
         {
-            return;
+            emulator?.AudioManager.IsBeeperEnabled = audioSettings.IsBeeperEnabled;
+            emulator?.AudioManager.IsAyEnabled = audioSettings.IsAyAudioEnabled;
+            emulator?.AudioManager.IsAySupportedStandardSpectrum = audioSettings.IsAySupportedStandardSpectrum;
+            emulator?.AudioManager.StereoMode = audioSettings.StereoMode;
         }
 
-        emulator.AudioManager.IsBeeperEnabled = audioSettings.IsBeeperEnabled;
-        emulator.AudioManager.IsAyEnabled = audioSettings.IsAyAudioEnabled;
-        emulator.AudioManager.IsAySupportedStandardSpectrum = audioSettings.IsAySupportedStandardSpectrum;
-        emulator.AudioManager.StereoMode = audioSettings.StereoMode;
-    }
-
-    public static void SetFloatingBusSupport(this Emulator? emulator, bool isFloatingBusEnabled)
-    {
-        if (emulator != null)
+        public void SetFloatingBusSupport(bool isFloatingBusEnabled)
         {
-            emulator.IsFloatingBusEnabled = isFloatingBusEnabled;
-        }
-    }
-
-    public static void SetGamepad(this Emulator? emulator, JoystickSettings joystickSettings) =>
-        emulator?.GamepadManager.Setup(
-            new GamepadPreferences(
-                joystickSettings.GamepadControllerId,
-                joystickSettings.JoystickType,
-                joystickSettings.GamepadSettings.Mappings.GetValueOrDefault(joystickSettings.GamepadControllerId, [])));
-
-    public static void SetDivMMc(this Emulator? emulator, DivMmcSettings divMmcSettings)
-    {
-        if (emulator == null)
-        {
-            return;
+            emulator?.IsFloatingBusEnabled = isFloatingBusEnabled;
         }
 
-        if (divMmcSettings.IsEnabled)
+        public void SetGamepad(JoystickSettings joystickSettings) =>
+            emulator?.GamepadManager.Setup(
+                new GamepadPreferences(
+                    joystickSettings.GamepadControllerId,
+                    joystickSettings.JoystickType,
+                    joystickSettings.GamepadSettings.Mappings.GetValueOrDefault(joystickSettings.GamepadControllerId, [])));
+
+        public void SetDivMMc(DivMmcSettings divMmcSettings)
         {
-            if (!string.IsNullOrWhiteSpace(divMmcSettings.Card0FileName))
+            if (emulator == null)
             {
-                emulator.DivMmc.InsertCard(divMmcSettings.Card0FileName, slotNumber: 0);
+                return;
             }
 
-            if (!string.IsNullOrWhiteSpace(divMmcSettings.Card1FileName))
+            if (divMmcSettings.IsEnabled)
             {
-                emulator.DivMmc.InsertCard(divMmcSettings.Card1FileName, slotNumber: 1);
+                if (!string.IsNullOrWhiteSpace(divMmcSettings.Card0FileName))
+                {
+                    emulator.DivMmc.InsertCard(divMmcSettings.Card0FileName, slotNumber: 0);
+                }
+
+                if (!string.IsNullOrWhiteSpace(divMmcSettings.Card1FileName))
+                {
+                    emulator.DivMmc.InsertCard(divMmcSettings.Card1FileName, slotNumber: 1);
+                }
+
+                emulator.DivMmc.Enable();
+            }
+            else
+            {
+                emulator.DivMmc.Disable();
             }
 
-            emulator.DivMmc.Enable();
+            emulator.DivMmc.Memory.IsEepromWriteEnabled = divMmcSettings.IsEepromWriteEnabled;
+            emulator.DivMmc.IsDriveWriteEnabled = divMmcSettings.IsDriveWriteEnabled;
         }
-        else
-        {
-            emulator.DivMmc.Disable();
-        }
-
-        emulator.DivMmc.Memory.IsEepromWriteEnabled = divMmcSettings.IsEepromWriteEnabled;
-        emulator.DivMmc.IsDriveWriteEnabled = divMmcSettings.IsDriveWriteEnabled;
     }
 }

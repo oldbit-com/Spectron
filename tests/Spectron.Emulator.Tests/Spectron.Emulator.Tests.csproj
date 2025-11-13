@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
 
@@ -9,7 +9,6 @@
         <IsTestProject>true</IsTestProject>
         <AssemblyName>OldBit.Spectron.Emulator.Tests</AssemblyName>
         <RootNamespace>OldBit.Spectron.Emulator.Tests</RootNamespace>
-        <LangVersion>13</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
