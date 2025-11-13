@@ -52,7 +52,7 @@ public partial class FlagsRegister : UserControl
 
     private static void UpdateFlag(FlagsRegister control, TextBlock textBlock, Flags value, Flags flag)
     {
-        var text = value.IsSet(flag) ? FlagSet : FlagUnset;
+        var text = (value & flag) == flag ? FlagSet : FlagUnset;
 
         if (textBlock.Text == text)
         {
