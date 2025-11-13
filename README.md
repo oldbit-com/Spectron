@@ -66,7 +66,7 @@ Solution consists of several projects:
 [![Spectron](https://img.youtube.com/vi/Oz70N0VY_2w/default.jpg)](https://youtu.be/Oz70N0VY_2w "Quick demo")
 
 ## Running the emulator
-Requires .NET 9 to build and run the emulator.
+Requires .NET 10 to build and run the emulator.
 Grab the latest code from the repository, build and run the emulator:
 
 ```shell
