@@ -54,7 +54,7 @@ partial class MainWindowViewModel
 
         await RecentFilesViewModel.LoadAsync();
 
-        UpdateShiftKeys(_preferences.Keyboard);
+        ConfigureShiftKeys(_preferences.Keyboard);
         HandleChangeBorderSize(CommandLineArgs?.BorderSize ?? _preferences.BorderSize);
 
         TapeLoadSpeed = CommandLineArgs?.TapeLoadSpeed ?? _preferences.Tape.LoadSpeed;

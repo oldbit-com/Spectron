@@ -39,10 +39,10 @@ partial class MainWindowViewModel
 
             JoystickType = _preferences.Joystick.JoystickType;
             MouseType = _preferences.Mouse.MouseType;
-            SetMouseCursor();
+            ConfigureMouseCursor();
 
-            UpdateShiftKeys(_preferences.Keyboard);
-            ConfigureEmulatorSettings();
+            ConfigureShiftKeys(_preferences.Keyboard);
+            ConfigureEmulator();
         }
 
         if (resumeAfter)

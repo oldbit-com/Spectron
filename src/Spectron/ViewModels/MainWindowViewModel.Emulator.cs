@@ -101,7 +101,9 @@ partial class MainWindowViewModel
         Emulator.TapeManager.TapeLoadSpeed = TapeLoadSpeed;
         Emulator.FrameCompleted += EmulatorFrameCompleted;
 
-        ConfigureEmulatorSettings();
+        RefreshUlaPlusState(Emulator.IsUlaPlusEnabled);
+
+        ConfigureEmulator();
         ConfigureDebugging(Emulator);
 
         if (IsAudioMuted)
@@ -124,14 +126,13 @@ partial class MainWindowViewModel
         }
     }
 
-    private void ConfigureEmulatorSettings()
+    private void ConfigureEmulator()
     {
         Emulator.SetFloatingBusSupport(_preferences.IsFloatingBusEnabled);
         Emulator.SetAudioSettings(_preferences.Audio);
         Emulator.SetGamepad(_preferences.Joystick);
         Emulator.SetDivMMc(_preferences.DivMmc);
 
-        RefreshUlaPlusState(_preferences.IsUlaPlusEnabled);
         RefreshAyState(Emulator?.AudioManager.IsAyEnabled, Emulator?.AudioManager.StereoMode);
         RefreshPrinterState(_preferences.Printer.IsZxPrinterEnabled);
         RefreshInterface1State(_preferences.Interface1.IsEnabled, _preferences.Interface1.RomVersion);
@@ -266,28 +267,24 @@ partial class MainWindowViewModel
 
     private void RefreshUlaPlusState(bool? isEnabled)
     {
-        if (isEnabled == null)
+        if (isEnabled == null || Emulator == null)
         {
             return;
         }
 
-        if (Emulator != null)
-        {
-            Emulator.IsUlaPlusEnabled = isEnabled.Value;
-        }
+        Emulator.IsUlaPlusEnabled = isEnabled.Value;
+        StatusBarViewModel.IsUlaPlusEnabled = Emulator.IsUlaPlusEnabled;
     }
 
     private void RefreshPrinterState(bool? isEnabled)
     {
-        if (isEnabled == null)
+        if (isEnabled == null || Emulator == null)
         {
             return;
         }
 
-        if (Emulator != null)
-        {
-            Emulator.Printer.IsEnabled = isEnabled.Value;
-        }
+        Emulator.Printer.IsEnabled = isEnabled.Value;
+        StatusBarViewModel.IsPrinterEnabled = Emulator.Printer.IsEnabled;
     }
 
     private void RefreshInterface1State(bool? isEnabled, Interface1RomVersion? romVersion = null)
@@ -360,9 +357,6 @@ partial class MainWindowViewModel
         StatusBarViewModel.IsDivMmcEnabled = Emulator.DivMmc.IsEnabled;
         StatusBarViewModel.IsTapeInserted = Emulator.TapeManager.IsTapeLoaded;
         StatusBarViewModel.TapeLoadProgress = string.Empty;
-
-        StatusBarViewModel.IsUlaPlusEnabled = Emulator.IsUlaPlusEnabled;
-        StatusBarViewModel.IsPrinterEnabled = Emulator.Printer.IsEnabled;
 
         StatusBarViewModel.IsMicroDriveCartridgeInserted =
             Emulator.Interface1.IsEnabled &&

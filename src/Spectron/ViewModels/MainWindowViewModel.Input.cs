@@ -68,7 +68,7 @@ partial class MainWindowViewModel
         Emulator?.KeyboardState.KeyUp(e.Keys);
     }
 
-    private void UpdateShiftKeys(KeyboardSettings settings) => _keyboardHook.UpdateSettings(settings);
+    private void ConfigureShiftKeys(KeyboardSettings settings) => _keyboardHook.UpdateSettings(settings);
 
     private bool JoystickHandled(SpectrumKeyEventArgs e)
     {
@@ -147,7 +147,7 @@ partial class MainWindowViewModel
     {
         StatusBarViewModel.IsMouseEnabled = value != MouseType.None;
 
-        SetMouseCursor();
+        ConfigureMouseCursor();
 
         if (Emulator == null)
         {
@@ -167,7 +167,7 @@ partial class MainWindowViewModel
     public void HandleMouseButtonStateChanged(PointerPoint point, Rect bounds) =>
         _mouseHelper?.ButtonsStateChanged(point);
 
-    private void SetMouseCursor() => MouseCursor = MouseType != MouseType.None && _preferences.Mouse.IsStandardMousePointerHidden
+    private void ConfigureMouseCursor() => MouseCursor = MouseType != MouseType.None && _preferences.Mouse.IsStandardMousePointerHidden
         ? Cursor.Parse("None")
         : Cursor.Default;
 }
