@@ -6,7 +6,7 @@ namespace OldBit.Spectron.Emulation.Tape;
 /// </summary>
 internal sealed class LoaderDetector
 {
-    private const int MaxTicksBetweenRead = 100;
+    private const int MaxTicksBetweenReads = 60;
     private const int MaxReadCount = 50;
 
     private int _lastTicks;
@@ -14,7 +14,7 @@ internal sealed class LoaderDetector
 
     internal bool Process(int ticks)
     {
-        if (ticks - _lastTicks < MaxTicksBetweenRead)
+        if (ticks - _lastTicks is > 0 and < MaxTicksBetweenReads)
         {
             _counter += 1;
         }

@@ -43,7 +43,7 @@ public sealed class TapeManager
     internal void DetectLoader(int ticks, Word pc)
     {
         if (!IsCustomLoaderDetectionEnabled || IsPlaying ||
-            !_isFastLoading || Cassette.IsEndOfTape || pc < RomRoutines.LD_EDGE_2)
+            !_isFastLoading || Cassette.IsEndOfTape || pc < 0x8000)
         {
             return;
         }
