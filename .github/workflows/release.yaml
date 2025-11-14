@@ -98,15 +98,31 @@ jobs:
 
       - name: Package macOS
         if: startsWith(matrix.rid, 'osx-')
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          TEAM_ID: ${{ secrets.APPLE_PASSWORD }}
         run: |
           VERSION="${{ github.ref_name }}"
           NAME="Spectron-${VERSION}-${{ matrix.rid }}.zip"
           mkdir -p ./dist/${{ matrix.rid }}/Spectron.app/Contents/Resources
           cp ./src/Spectron/Assets/spectron.icns ./dist/${{ matrix.rid }}/Spectron.app/Contents/Resources/
           cp ./src/Spectron/Info.plist ./dist/${{ matrix.rid }}/Spectron.app/Contents/
+          
+          # Sign
           codesign --force --deep --options=runtime --sign "Developer ID Application" "./dist/${{ matrix.rid }}/Spectron.app" --entitlements ./src/Spectron/entitlements.plist
+          
           cd ./dist/${{ matrix.rid }}
           zip -r ../../${NAME} .
+          
+          # Notarize & stamp
+          xcrun notarytool submit ../../${NAME} --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APPLE_PASSWORD" --wait
+          xcrun stapler staple ../../${NAME}
+          
+          # Generate new zip
+          rm ../../${NAME}
+          zip -r ../../${NAME} .
+          
           echo "ASSET_NAME=$NAME" >> $GITHUB_ENV
 
       - name: Upload artifact
