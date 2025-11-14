@@ -9,8 +9,36 @@ permissions:
 
 jobs:
   build:
-    name: Build and publish Spectron for all supported platforms
-    runs-on: ubuntu-latest
+    name: Build ${{ matrix.name }} (${{ matrix.rid }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: Windows x64
+            rid: win-x64
+            bin: /
+          - os: ubuntu-latest
+            name: Windows ARM64
+            rid: win-arm64
+            bin: /
+          - os: ubuntu-latest
+            name: Linux x64
+            rid: linux-x64
+            bin: /
+          - os: ubuntu-latest
+            name: Linux ARM64
+            rid: linux-arm64
+            bin: /
+          - os: macos-latest
+            name: macOS x64
+            rid: macOS-x64
+            bin: /Spectron.app/Contents/MacOS/
+          - os: macos-latest
+            name: macOS ARM64
+            rid: macos-arm64
+            bin: /Spectron.app/Contents/MacOS/
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,104 +50,44 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Publish osx-arm64
-        run: dotnet publish -r osx-arm64 -p:DebugType=embedded -o ./dist/osx-arm64/Spectron.app/Contents/MacOS ./src/Spectron/Spectron.csproj
-
-      - name: Publish osx-x64
-        run: dotnet publish -r osx-x64 -p:DebugType=embedded -o ./dist/osx-x64/Spectron.app/Contents/MacOS ./src/Spectron/Spectron.csproj
-
-      - name: Publish win-x64
-        run: dotnet publish -r win-x64 -p:DebugType=embedded -o ./dist/win-x64 ./src/Spectron/Spectron.csproj
-
-      - name: Publish win-arm64
-        run: dotnet publish -r win-arm64 -p:DebugType=embedded -o ./dist/win-arm64 ./src/Spectron/Spectron.csproj
-
-      - name: Publish linux-x64
-        run: dotnet publish -r linux-x64 -p:DebugType=embedded -o ./dist/linux-x64 ./src/Spectron/Spectron.csproj
-
-      - name: Publish linux-arm64
-        run: dotnet publish -r linux-arm64 -p:DebugType=embedded -o ./dist/linux-arm64 ./src/Spectron/Spectron.csproj
-
-      ## TODO: Create app package and dmg file
-      - name: Copy osx-arm64 files
+      - name: Publish
         run: |
-          mkdir -p ./dist/osx-arm64/Spectron.app/Contents/Resources
-          cp ./src/Spectron/Assets/spectron.icns ./dist/osx-arm64/Spectron.app/Contents/Resources/
-          cp ./src/Spectron/Info.plist ./dist/osx-arm64/Spectron.app/Contents/
+          dotnet publish -r ${{ matrix.rid }} -p:DebugType=embedded -o ./dist/${{ matrix.rid }}${{ matrix.bin }} ./src/Spectron/Spectron.csproj
 
-#      - name: Sign
-#        uses: indygreg/apple-code-sign-action@v1
-#        with:
-#          input_path: ./dist/osx-arm64/Spectron.app
-
-      - name: Package osx-arm64
+      - name: Package Windows
+        if: startsWith(matrix.rid, 'win-')
         run: |
           VERSION="${{ github.ref_name }}"
-          NAME="Spectron-${VERSION}-osx-arm64.tar.gz"
-          cd ./dist/osx-arm64
-          chmod +x ./Spectron.app/Contents/MacOS/Spectron
-          tar czf ../../${NAME} .
-
-      ## TODO: Create app package and dmg file
-      - name: Copy osx-x64 files
-        run: |
-          mkdir -p ./dist/osx-x64/Spectron.app/Contents/Resources
-          cp ./src/Spectron/Assets/spectron.icns ./dist/osx-x64/Spectron.app/Contents/Resources/
-          cp ./src/Spectron/Info.plist ./dist/osx-x64/Spectron.app/Contents/
-
-#      - name: Sign
-#        uses: indygreg/apple-code-sign-action@v1
-#        with:
-#          input_path: ./dist/osx-x64/Spectron.app
-
-      - name: Package osx-x64
-        run: |
-          VERSION="${{ github.ref_name }}"
-          NAME="Spectron-${VERSION}-osx-x64.tar.gz"
-          cd ./dist/osx-x64
-          chmod +x ./Spectron.app/Contents/MacOS/Spectron
-          tar czf ../../${NAME} .
-
-      - name: Package win-x64
-        run: |
-          VERSION="${{ github.ref_name }}"
-          NAME="Spectron-${VERSION}-win-x64.zip"
-          cd ./dist/win-x64
+          NAME="Spectron-${VERSION}-${{ matrix.rid }}.zip"
+          cd ./dist/${{ matrix.rid }}
           zip -r ../../${NAME} .
+          echo "ASSET_NAME=$NAME" >> $GITHUB_ENV
 
-      - name: Package win-arm64
+      - name: Package Linux
+        if: startsWith(matrix.rid, 'linux-')
         run: |
           VERSION="${{ github.ref_name }}"
-          NAME="Spectron-${VERSION}-win-arm64.zip"
-          cd ./dist/win-arm64
-          zip -r ../../${NAME} .
-
-      - name: Package linux-x64
-        run: |
-          VERSION="${{ github.ref_name }}"
-          NAME="Spectron-${VERSION}-linux-x64.tar.gz"
-          cd ./dist/linux-x64
+          NAME="Spectron-${VERSION}-${{ matrix.rid }}.tar.gz"
+          cd ./dist/${{ matrix.rid }}
           chmod +x Spectron
           tar czf ../../${NAME} .
+          echo "ASSET_NAME=$NAME" >> $GITHUB_ENV
 
-      - name: Package linux-arm64
+      - name: Package macOS
+        if: startsWith(matrix.rid, 'macos-')
         run: |
           VERSION="${{ github.ref_name }}"
-          NAME="Spectron-${VERSION}-linux-arm64.tar.gz"
-          cd ./dist/linux-arm64
-          chmod +x Spectron
-          tar czf ../../${NAME} .
+          NAME="Spectron-${VERSION}-${{ matrix.rid }}.zip"
+          mkdir -p ./dist/${{ matrix.rid }}/Spectron.app/Contents/Resources
+          cp ./src/Spectron/Assets/spectron.icns ./dist/${{ matrix.rid }}/Spectron.app/Contents/Resources/
+          cp ./src/Spectron/Info.plist ./dist/${{ matrix.rid }}/Spectron.app/Contents/
+          cd ./dist/${{ matrix.rid }}
+          zip -r ../../${NAME} .
 
-      - name: Upload to release
-        uses: softprops/action-gh-release@v1
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          files: |
-            Spectron-${{ github.ref_name }}-win-x64.zip
-            Spectron-${{ github.ref_name }}-win-arm64.zip
-            Spectron-${{ github.ref_name }}-linux-x64.tar.gz
-            Spectron-${{ github.ref_name }}-linux-arm64.tar.gz
-            Spectron-${{ github.ref_name }}-osx-x64.tar.gz
-            Spectron-${{ github.ref_name }}-osx-arm64.tar.gz
-          
+          name: ${{ env.ASSET_NAME }}
+          path: ./dist/${{ matrix.rid }}
+
+
