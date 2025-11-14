@@ -117,7 +117,7 @@ jobs:
           
           # Notarize & stamp
           xcrun notarytool submit ../../${NAME} --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APPLE_PASSWORD" --wait
-          xcrun stapler staple ../../${NAME}
+          xcrun stapler staple ./Spectron.app
           
           # Generate new zip
           rm ../../${NAME}
