@@ -33,11 +33,11 @@ jobs:
             bin: /
           - os: macos-latest
             name: macOS x64
-            rid: macOS-x64
+            rid: osx-x64
             bin: /Spectron.app/Contents/MacOS/
           - os: macos-latest
             name: macOS ARM64
-            rid: macos-arm64
+            rid: osx-arm64
             bin: /Spectron.app/Contents/MacOS/
     steps:
       - name: Checkout
@@ -74,7 +74,7 @@ jobs:
           echo "ASSET_NAME=$NAME" >> $GITHUB_ENV
 
       - name: Package macOS
-        if: startsWith(matrix.rid, 'macos-')
+        if: startsWith(matrix.rid, 'osx-')
         run: |
           VERSION="${{ github.ref_name }}"
           NAME="Spectron-${VERSION}-${{ matrix.rid }}.zip"
