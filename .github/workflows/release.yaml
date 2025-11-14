@@ -139,7 +139,7 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          path: ./spectron_artifacts
+          path: ./artifacts
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -149,5 +149,6 @@ jobs:
           body: |
             Spectron release ${{ github.ref_name }}.
           files: |
-            ./spectron_artifacts/*
+            ./artifacts/**/*.zip
+            ./artifacts/**/*.tar.gz
 
