@@ -60,7 +60,7 @@ jobs:
           VERSION="${{ github.ref_name }}"
           NAME="Spectron-${VERSION}-${{ matrix.rid }}.zip"
           cd ./dist/${{ matrix.rid }}
-          zip -r ../../${NAME} .
+          zip -r ../${NAME} .
           echo "ASSET_NAME=$NAME" >> $GITHUB_ENV
 
       - name: Package Linux
@@ -70,7 +70,7 @@ jobs:
           NAME="Spectron-${VERSION}-${{ matrix.rid }}.tar.gz"
           cd ./dist/${{ matrix.rid }}
           chmod +x Spectron
-          tar czf ../../${NAME} .
+          tar czf ../${NAME} .
           echo "ASSET_NAME=$NAME" >> $GITHUB_ENV
 
       - name: Install certificate
@@ -113,15 +113,15 @@ jobs:
           codesign --force --deep --options=runtime --sign "Developer ID Application" "./dist/${{ matrix.rid }}/Spectron.app" --entitlements ./src/Spectron/entitlements.plist
           
           cd ./dist/${{ matrix.rid }}
-          zip -r ../../${NAME} .
+          zip -r ../${NAME} .
           
           # Notarize & stamp
-          xcrun notarytool submit ../../${NAME} --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APPLE_PASSWORD" --wait
+          xcrun notarytool submit ../${NAME} --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APPLE_PASSWORD" --wait
           xcrun stapler staple ./Spectron.app
           
           # Generate new zip
-          rm ../../${NAME}
-          zip -r ../../${NAME} .
+          rm ../${NAME}
+          zip -r ../${NAME} .
           
           echo "ASSET_NAME=$NAME" >> $GITHUB_ENV
 
@@ -129,7 +129,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ASSET_NAME }}
-          path: ./dist/${{ matrix.rid }}
+          path: ./dist/${{ env.ASSET_NAME }}
 
   release:
     name: Create Release
@@ -149,6 +149,6 @@ jobs:
           body: |
             Spectron release ${{ github.ref_name }}.
           files: |
-            ./artifacts/**/*.zip
-            ./artifacts/**/*.tar.gz
+            ./artifacts/*.zip
+            ./artifacts/*.tar.gz
 
