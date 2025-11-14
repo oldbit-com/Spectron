@@ -150,6 +150,6 @@ jobs:
           body: |
             Spectron release ${{ github.ref_name }}.
           files: |
-            ./artifacts/*.zip
-            ./artifacts/*.tar.gz
+            ./artifacts/**/*.zip
+            ./artifacts/**/*.tar.gz
 
