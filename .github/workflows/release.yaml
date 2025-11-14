@@ -104,6 +104,7 @@ jobs:
           mkdir -p ./dist/${{ matrix.rid }}/Spectron.app/Contents/Resources
           cp ./src/Spectron/Assets/spectron.icns ./dist/${{ matrix.rid }}/Spectron.app/Contents/Resources/
           cp ./src/Spectron/Info.plist ./dist/${{ matrix.rid }}/Spectron.app/Contents/
+          codesign --force --deep --options=runtime --sign "Developer ID Application" "./dist/${{ matrix.rid }}/Spectron.app" --entitlements ./src/Spectron/entitlements.plist
           cd ./dist/${{ matrix.rid }}
           zip -r ../../${NAME} .
           echo "ASSET_NAME=$NAME" >> $GITHUB_ENV
