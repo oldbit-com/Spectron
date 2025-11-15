@@ -376,9 +376,6 @@ partial class MainWindowViewModel
     partial void OnTapeLoadSpeedChanged(TapeSpeed value) =>
         Emulator?.TapeManager.TapeLoadSpeed = TapeLoadSpeed;
 
-    partial void OnIsTimeMachineEnabledChanged(bool value)
-    {
+    partial void OnIsTimeMachineEnabledChanged(bool value) =>
         _timeMachine.IsEnabled = value;
-        NotifyCanExecuteChanged(nameof(ShowTimeMachineViewCommand));
-    }
 }

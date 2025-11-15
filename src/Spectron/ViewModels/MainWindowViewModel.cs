@@ -383,13 +383,6 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    // TODO: This needs to be updated
-    private void NotifyCanExecuteChanged(string commandName)
-    {
-        var command = GetType().GetProperty(commandName)?.GetValue(this) as IRelayCommand;
-        command?.NotifyCanExecuteChanged();
-    }
-
     public void OnViewClosed(Type? viewModel)
     {
         if (viewModel == typeof(DebuggerViewModel))
