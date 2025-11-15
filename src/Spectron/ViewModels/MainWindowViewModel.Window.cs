@@ -61,7 +61,7 @@ partial class MainWindowViewModel
 
         if (await ResumeEmulatorSession())
         {
-            Emulator.SetTapeSettings(_preferences.Tape);
+            Emulator.ConfigureTape(_preferences.Tape);
             ApplyCommandLineArguments();
 
             return;
@@ -86,7 +86,7 @@ partial class MainWindowViewModel
                 CommandLineArgs?.RomType ?? _preferences.RomType,
                 customRom);
 
-            Emulator.SetTapeSettings(_preferences.Tape);
+            Emulator.ConfigureTape(_preferences.Tape);
         }
 
         ApplyCommandLineArguments();
@@ -131,17 +131,45 @@ partial class MainWindowViewModel
             }
         }
 
+        if (CommandLineArgs?.IsInterface1Enabled != null)
+        {
+            if (CommandLineArgs.IsInterface1Enabled.Value)
+            {
+                Emulator.Interface1.Enable();
+            }
+            else
+            {
+                Emulator.Interface1.Disable();
+            }
+
+            if (CommandLineArgs?.Interface1RomVersion != null)
+            {
+                Emulator.Interface1.ShadowRom.Version = CommandLineArgs.Interface1RomVersion.Value;
+            }
+        }
+
         if (CommandLineArgs?.TapeLoadSpeed != null)
         {
             TapeLoadSpeed = CommandLineArgs.TapeLoadSpeed.Value;
         }
 
-        RefreshAyState(CommandLineArgs?.IsAyEnabled, CommandLineArgs?.AyStereoMode);
-        RefreshPrinterState(CommandLineArgs?.IsZxPrinterEnabled);
-        RefreshUlaPlusState(CommandLineArgs?.IsUlaPlusEnabled);
-        RefreshInterface1State(CommandLineArgs?.IsInterface1Enabled, CommandLineArgs?.Interface1RomVersion);
+        if (CommandLineArgs?.IsUlaPlusEnabled != null)
+        {
+            OnIsUlaPlusEnabledChanged(CommandLineArgs.IsUlaPlusEnabled.Value);
+        }
 
-        RefreshStatusBar();
+        if (CommandLineArgs?.IsAyEnabled != null)
+        {
+            Emulator.AudioManager.IsAyEnabled = CommandLineArgs.IsAyEnabled.Value;
+            Emulator.AudioManager.StereoMode = CommandLineArgs?.AyStereoMode ?? Emulator.AudioManager.StereoMode;
+        }
+
+        if (CommandLineArgs?.IsZxPrinterEnabled != null)
+        {
+            Emulator.Printer.IsEnabled = CommandLineArgs.IsZxPrinterEnabled.Value;
+        }
+
+        RefreshControls();
     }
 
     private async Task WindowClosingAsync(WindowClosingEventArgs args)

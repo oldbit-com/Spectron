@@ -197,7 +197,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
             return;
         }
 
-        joystickManager.SetupJoystick(joystickBlock.JoystickTypePlayer1 switch
+        joystickManager.Configure(joystickBlock.JoystickTypePlayer1 switch
         {
             JoystickBlock.JoystickKempston => JoystickType.Kempston,
             JoystickBlock.JoystickSinclair1 => JoystickType.Sinclair1,

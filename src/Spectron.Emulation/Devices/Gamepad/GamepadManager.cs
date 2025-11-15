@@ -59,7 +59,7 @@ public sealed class GamepadManager
         _joypadManager.Dispose();
     }
 
-    public void Setup(GamepadPreferences gamepad)
+    public void Configure(GamepadPreferences gamepad)
     {
         if (gamepad.ControllerId == Guid.Empty || gamepad.JoystickType == JoystickType.None)
         {

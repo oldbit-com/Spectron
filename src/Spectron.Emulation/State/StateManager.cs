@@ -7,6 +7,7 @@ using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Devices.Mouse;
+using OldBit.Spectron.Emulation.Devices.Printer;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.State.Components;
 using OldBit.Spectron.Emulation.Tape;
@@ -33,6 +34,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         LoadDivMmc(emulator.DivMmc, snapshot.DivMmc);
         LoadInterface1(emulator.Interface1, emulator.MicrodriveManager, snapshot.Interface1);
         LoadBeta128(emulator.Beta128, emulator.DiskDriveManager, snapshot.Beta128);
+        LoadPrinter(emulator.Printer, snapshot.Printer);
         LoadOther(emulator, snapshot);
 
         return emulator;
@@ -55,6 +57,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         SaveDivMmc(emulator.DivMmc, snapshot);
         SaveInterface1(emulator.Interface1, emulator.MicrodriveManager, isTimeMachine, snapshot);
         SaveBeta128(emulator.Beta128, emulator.DiskDriveManager, isTimeMachine, snapshot);
+        SavePrinter(emulator.Printer, snapshot);
         SaveOther(emulator, snapshot);
 
         if (emulator.RomType.IsCustomRom())
@@ -254,6 +257,9 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         };
     }
 
+    private static void SavePrinter(ZxPrinter printer, StateSnapshot stateSnapshot) =>
+        stateSnapshot.Printer = new PrinterState(printer.IsEnabled);
+
     private static void SaveOther(Emulator emulator, StateSnapshot stateSnapshot) =>
         stateSnapshot.BorderColor = emulator.ScreenBuffer.LastBorderColor;
 
@@ -343,10 +349,10 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
     }
 
     private static void LoadJoystick(JoystickManager joystickManager, JoystickState joystickState) =>
-        joystickManager.SetupJoystick(joystickState.JoystickType);
+        joystickManager.Configure(joystickState.JoystickType);
 
     private static void LoadMouse(MouseManager mouseManager, MouseState mouseState) =>
-        mouseManager.SetupMouse(mouseState.MouseType);
+        mouseManager.Configure(mouseState.MouseType);
 
     private static void LoadTape(TapeManager tapeManager, TapeState? tapeState)
     {
@@ -437,5 +443,15 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         }
 
         beta128.Enable();
+    }
+
+    private static void LoadPrinter(ZxPrinter printer, PrinterState? printerState)
+    {
+        if (printerState == null)
+        {
+            return;
+        }
+
+        printer.IsEnabled = printerState.IsZxPrinterEnabled;
     }
 }

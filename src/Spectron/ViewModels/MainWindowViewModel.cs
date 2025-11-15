@@ -407,4 +407,12 @@ public partial class MainWindowViewModel : ObservableObject
             Emulator?.AudioManager.UnMute();
         }
     }
+
+    private void ConfigureTimeMachine(TimeMachineSettings timeMachineSettings)
+    {
+        IsTimeMachineEnabled = timeMachineSettings.IsEnabled;
+        _timeMachine.SnapshotInterval = timeMachineSettings.SnapshotInterval;
+        _timeMachine.MaxDuration = timeMachineSettings.MaxDuration;
+        TimeMachineCountdownSeconds = timeMachineSettings.CountdownSeconds;
+    }
 }

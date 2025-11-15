@@ -215,23 +215,23 @@ public sealed class Z80Snapshot(EmulatorFactory emulatorFactory)
         switch (snapshot.Header.Flags2.JoystickType)
         {
             case JoystickType.Cursor:
-                emulator.JoystickManager.SetupJoystick(Devices.Joystick.JoystickType.Cursor);
+                emulator.JoystickManager.Configure(Devices.Joystick.JoystickType.Cursor);
                 break;
 
             case JoystickType.Kempston:
-                emulator.JoystickManager.SetupJoystick(Devices.Joystick.JoystickType.Kempston);
+                emulator.JoystickManager.Configure(Devices.Joystick.JoystickType.Kempston);
                 break;
 
             case JoystickType.Sinclair1:
-                emulator.JoystickManager.SetupJoystick(Devices.Joystick.JoystickType.Sinclair1);
+                emulator.JoystickManager.Configure(Devices.Joystick.JoystickType.Sinclair1);
                 break;
 
             case JoystickType.Sinclair2:
-                emulator.JoystickManager.SetupJoystick(Devices.Joystick.JoystickType.Sinclair2);
+                emulator.JoystickManager.Configure(Devices.Joystick.JoystickType.Sinclair2);
                 break;
 
             default:
-                emulator.JoystickManager.SetupJoystick(Devices.Joystick.JoystickType.None);
+                emulator.JoystickManager.Configure(Devices.Joystick.JoystickType.None);
                 break;
         }
     }

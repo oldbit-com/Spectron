@@ -27,22 +27,49 @@ partial class MainWindowViewModel
         {
             _preferences = preferences;
 
-            IsUlaPlusEnabled = _preferences.IsUlaPlusEnabled;
+            Emulator?.IsUlaPlusEnabled = _preferences.IsUlaPlusEnabled;
+            Emulator?.IsFloatingBusEnabled = _preferences.IsFloatingBusEnabled;
+            Emulator?.JoystickManager.Configure(JoystickType);
+            Emulator?.Printer.IsEnabled = _preferences.Printer.IsZxPrinterEnabled;
+            Emulator?.MouseManager.Configure(MouseType);
+            Emulator?.ConfigureTape(_preferences.Tape);
+            Emulator?.ConfigureGamepad(_preferences.Joystick);
+            Emulator.ConfigureAudio(preferences.Audio);
 
-            TapeLoadSpeed = preferences.Tape.LoadSpeed;
-            Emulator.SetTapeSettings(_preferences.Tape);
+            if (_preferences.DivMmc.IsEnabled)
+            {
+                Emulator?.DivMmc.Enable();
+                Emulator.ConfigureDivMMc(_preferences.DivMmc);
+            }
+            else
+            {
+                Emulator?.DivMmc.Disable();
+            }
 
-            IsTimeMachineEnabled = _preferences.TimeMachine.IsEnabled;
-            _timeMachine.SnapshotInterval = _preferences.TimeMachine.SnapshotInterval;
-            _timeMachine.MaxDuration = _preferences.TimeMachine.MaxDuration;
-            TimeMachineCountdownSeconds = _preferences.TimeMachine.CountdownSeconds;
+            if (_preferences.Beta128.IsEnabled)
+            {
+                Emulator?.Beta128.Enable();
+            }
+            else
+            {
+                Emulator?.Beta128.Disable();
+            }
 
-            JoystickType = _preferences.Joystick.JoystickType;
-            MouseType = _preferences.Mouse.MouseType;
+            if (_preferences.Interface1.IsEnabled)
+            {
+                Emulator?.Interface1.Enable();
+                Emulator?.Interface1.ShadowRom.Version = _preferences.Interface1.RomVersion;
+            }
+            else
+            {
+                Emulator?.Interface1.Disable();
+            }
+
+            ConfigureTimeMachine(_preferences.TimeMachine);
             ConfigureMouseCursor();
-
             ConfigureShiftKeys(_preferences.Keyboard);
-            ConfigureEmulator();
+
+            RefreshControls();
         }
 
         if (resumeAfter)

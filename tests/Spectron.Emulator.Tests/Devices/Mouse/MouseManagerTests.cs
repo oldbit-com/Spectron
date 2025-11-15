@@ -10,7 +10,7 @@ public class MouseManagerTests
     {
         var bus = new SpectrumBus();
         var manager = new MouseManager(bus);
-        manager.SetupMouse(MouseType.Kempston);
+        manager.Configure(MouseType.Kempston);
 
         manager.UpdateMouseButtons(MouseButtons.Right);
         manager.UpdatePosition(0x12, 0x34);
