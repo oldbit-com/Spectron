@@ -240,7 +240,11 @@ public partial class MainWindowViewModel : ObservableObject
     public void ShowScreenshotViewer() => OpenScreenshotViewer();
 
     [RelayCommand]
-    private void TakeScreenshot() => _screenshotViewModel.AddScreenshot(SpectrumScreen);
+    private void TakeScreenshot()
+    {
+        _screenshotViewModel.AddScreenshot(SpectrumScreen);
+        NotificationManager.Show("Screenshot Taken", NotificationType.Success, TimeSpan.FromSeconds(.75));
+    }
 
     // View
     [RelayCommand]
