@@ -30,7 +30,7 @@ public sealed class MouseManager
         Mouse.Buttons = pressedButtons;
     }
 
-    public void SetupMouse(MouseType mouseType)
+    public void Configure(MouseType mouseType)
     {
         MouseType = mouseType;
         _spectrumBus.RemoveDevice(Mouse);

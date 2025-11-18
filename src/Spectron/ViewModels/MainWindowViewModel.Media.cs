@@ -26,9 +26,9 @@ partial class MainWindowViewModel
         StatusBarViewModel.AnimateDiskActivity();
     }
 
-    private void HandleCartridgeChanged(CartridgeChangedEventArgs e) => RefreshStatusBar();
+    private void HandleCartridgeChanged(CartridgeChangedEventArgs e) => RefreshControls();
 
-    private void HandleFloppyDiskChanged(DiskChangedEventArgs e) => RefreshStatusBar();
+    private void HandleFloppyDiskChanged(DiskChangedEventArgs e) => RefreshControls();
 
     private void HandleSetTapeLoadingSpeed(TapeSpeed tapeSpeed) => TapeLoadSpeed = tapeSpeed;
 }

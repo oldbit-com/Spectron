@@ -240,7 +240,11 @@ public partial class MainWindowViewModel : ObservableObject
     public void ShowScreenshotViewer() => OpenScreenshotViewer();
 
     [RelayCommand]
-    private void TakeScreenshot() => _screenshotViewModel.AddScreenshot(SpectrumScreen);
+    private void TakeScreenshot()
+    {
+        _screenshotViewModel.AddScreenshot(SpectrumScreen);
+        NotificationManager.Show("Screenshot Taken", NotificationType.Success, TimeSpan.FromSeconds(.75));
+    }
 
     // View
     [RelayCommand]
@@ -379,13 +383,6 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    // TODO: This needs to be updated
-    private void NotifyCanExecuteChanged(string commandName)
-    {
-        var command = GetType().GetProperty(commandName)?.GetValue(this) as IRelayCommand;
-        command?.NotifyCanExecuteChanged();
-    }
-
     public void OnViewClosed(Type? viewModel)
     {
         if (viewModel == typeof(DebuggerViewModel))
@@ -406,5 +403,13 @@ public partial class MainWindowViewModel : ObservableObject
         {
             Emulator?.AudioManager.UnMute();
         }
+    }
+
+    private void ConfigureTimeMachine(TimeMachineSettings timeMachineSettings)
+    {
+        IsTimeMachineEnabled = timeMachineSettings.IsEnabled;
+        _timeMachine.SnapshotInterval = timeMachineSettings.SnapshotInterval;
+        _timeMachine.MaxDuration = timeMachineSettings.MaxDuration;
+        TimeMachineCountdownSeconds = timeMachineSettings.CountdownSeconds;
     }
 }

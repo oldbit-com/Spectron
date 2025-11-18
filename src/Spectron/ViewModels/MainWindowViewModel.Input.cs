@@ -140,7 +140,7 @@ partial class MainWindowViewModel
     partial void OnJoystickTypeChanged(JoystickType value)
     {
         StatusBarViewModel.JoystickType = value;
-        Emulator?.JoystickManager.SetupJoystick(value);
+        Emulator?.JoystickManager.Configure(value);
     }
 
     partial void OnMouseTypeChanged(MouseType value)
@@ -154,7 +154,7 @@ partial class MainWindowViewModel
             return;
         }
 
-        Emulator.MouseManager.SetupMouse(value);
+        Emulator.MouseManager.Configure(value);
         _mouseHelper = new MouseHelper(Emulator.MouseManager);
     }
 

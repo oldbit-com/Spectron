@@ -43,7 +43,7 @@ public sealed class JoystickManager
         _gamepadUpdateTimer.Elapsed += GamepadUpdateJoystickState;
     }
 
-    public void SetupJoystick(JoystickType joystickType)
+    public void Configure(JoystickType joystickType)
     {
         _gamepadUpdateTimer.Stop();
 
