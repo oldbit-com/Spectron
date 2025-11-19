@@ -1,12 +1,12 @@
-using SharpHook.Data;
+using Avalonia.Input;
 
 namespace OldBit.Spectron.Settings;
 
 public record KeyboardSettings
 {
-    public KeyCode CapsShiftKey { get; init; } = KeyCode.VcLeftShift;
+    public Key CapsShiftKey { get; init; } = Key.LeftShift;
 
-    public KeyCode SymbolShiftKey { get; init; } = KeyCode.VcRightAlt;
+    public Key SymbolShiftKey { get; init; } = Key.RightAlt;
 
     public bool ShouldHandleExtendedKeys  { get; init; } = true;
 }
