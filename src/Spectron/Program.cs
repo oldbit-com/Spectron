@@ -1,13 +1,16 @@
 ﻿using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using OldBit.Spectron.CommandLine;
 using OldBit.Spectron.Extensions;
 using OldBit.Spectron.ViewModels;
 
 namespace OldBit.Spectron;
 
-class Program
+public class Program
 {
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
@@ -15,13 +18,16 @@ class Program
     [STAThread]
     public static int Main(string[] args)
     {
-        Console.WriteLine("Starting Spectron...");
+        using var host = CreateHost(args);
+        var logger = host.Services.GetRequiredService<ILogger<Program>>();
+
+        logger.LogInformation("Starting Spectron...");
 
         return CommandLineParser.Parse(commandLineArgs =>
         {
             try
             {
-                BuildAvaloniaApp().StartWithClassicDesktopLifetime(args, builder =>
+                BuildAvaloniaApp(logger).StartWithClassicDesktopLifetime(args, builder =>
                 {
                     builder.Startup += (sender, e) =>
                     {
@@ -32,18 +38,29 @@ class Program
                     };
                 });
 
-                Console.WriteLine("Terminated Spectron...");
+                logger.LogInformation("Terminated Spectron...");
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                logger.LogError(ex, "Unhandled exception occurred during startup");
             }
         }, args);
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.
-    private static AppBuilder BuildAvaloniaApp()
+    private static AppBuilder BuildAvaloniaApp(ILogger<Program> logger)
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            .LogToConsole();
+            .LogToConsole(logger);
+
+    private static IHost CreateHost(string[] args)
+    {
+        var builder = Host.CreateApplicationBuilder(args);
+
+        builder.Logging.ClearProviders();
+        builder.Logging.AddConsole();
+        builder.Logging.SetMinimumLevel(LogLevel.Trace);
+
+        return builder.Build();
+    }
 }
