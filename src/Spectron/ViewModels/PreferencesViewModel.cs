@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Input;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -26,7 +27,6 @@ using OldBit.Spectron.Recorder;
 using OldBit.Spectron.Screen;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.Theming;
-using SharpHook.Data;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -336,7 +336,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         return new ValidationResult(errorMessage, [context.MemberName ?? string.Empty]);
     }
 
-    public static ValidationResult? ValidateKeyboardMapping(KeyCode keyCode, ValidationContext context)
+    public static ValidationResult? ValidateKeyboardMapping(Key key, ValidationContext context)
     {
         if (context.ObjectInstance is not PreferencesViewModel preferences)
         {
@@ -352,12 +352,12 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         }
 
         if (preferences is
-            { CapsShiftKey: KeyCode.VcLeftShift, SymbolShiftKey: KeyCode.VcRightShift } or
-            { CapsShiftKey: KeyCode.VcRightShift, SymbolShiftKey: KeyCode.VcLeftShift } or
-            { CapsShiftKey: KeyCode.VcLeftAlt, SymbolShiftKey: KeyCode.VcRightAlt } or
-            { CapsShiftKey: KeyCode.VcRightAlt, SymbolShiftKey: KeyCode.VcLeftAlt } or
-            { CapsShiftKey: KeyCode.VcLeftControl, SymbolShiftKey: KeyCode.VcRightControl } or
-            { CapsShiftKey: KeyCode.VcRightControl, SymbolShiftKey: KeyCode.VcLeftControl })
+            { CapsShiftKey: Key.LeftShift, SymbolShiftKey: Key.RightShift } or
+            { CapsShiftKey: Key.RightShift, SymbolShiftKey: Key.LeftShift } or
+            { CapsShiftKey: Key.LeftAlt, SymbolShiftKey: Key.RightAlt } or
+            { CapsShiftKey: Key.RightAlt, SymbolShiftKey: Key.LeftAlt } or
+            { CapsShiftKey: Key.LeftCtrl, SymbolShiftKey: Key.RightCtrl } or
+            { CapsShiftKey: Key.RightCtrl, SymbolShiftKey: Key.LeftCtrl })
         {
             var altKeyName = OperatingSystem.IsMacOS() ? "Option" : "Alt";
 
@@ -416,14 +416,14 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         new("Kempston", MouseType.Kempston),
     ];
 
-    public List<NameValuePair<KeyCode>> ShiftKeys { get; } =
+    public List<NameValuePair<Key>> ShiftKeys { get; } =
     [
-        new("Left Shift", KeyCode.VcLeftShift),
-        new("Right Shift", KeyCode.VcRightShift),
-        new(OperatingSystem.IsMacOS() ? "Left Option" : "Left Alt", KeyCode.VcLeftAlt),
-        new(OperatingSystem.IsMacOS() ? "Right Option" : "Right Alt", KeyCode.VcRightAlt),
-        new("Left Control", KeyCode.VcLeftControl),
-        new("Right Control", KeyCode.VcRightControl),
+        new("Left Shift", Key.LeftShift),
+        new("Right Shift", Key.RightShift),
+        new(OperatingSystem.IsMacOS() ? "Left Option" : "Left Alt", Key.LeftAlt),
+        new(OperatingSystem.IsMacOS() ? "Right Option" : "Right Alt", Key.RightAlt),
+        new("Left Control", Key.LeftCtrl),
+        new("Right Control", Key.RightCtrl),
     ];
 
     public List<NameValuePair<StereoMode>> StereoModes { get; } =
@@ -433,53 +433,53 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         new("Stereo ACB", StereoMode.StereoACB),
     ];
 
-    public List<NameValuePair<KeyCode>> FireKeys { get; } =
+    public List<NameValuePair<Key>> FireKeys { get; } =
     [
-        new("Left Shift", KeyCode.VcLeftShift),
-        new("Right Shift", KeyCode.VcRightShift),
-        new("Left Control", KeyCode.VcLeftControl),
-        new("Right Control", KeyCode.VcRightControl),
-        new(OperatingSystem.IsMacOS() ? "Left Option" : "Left Alt", KeyCode.VcLeftAlt),
-        new(OperatingSystem.IsMacOS() ? "Right Option" : "Right Alt", KeyCode.VcRightAlt),
-        new("Space", KeyCode.VcSpace),
-        new("Tab", KeyCode.VcTab),
-        new("Enter", KeyCode.VcEnter),
-        new("A", KeyCode.VcA),
-        new("B", KeyCode.VcB),
-        new("C", KeyCode.VcC),
-        new("D", KeyCode.VcD),
-        new("E", KeyCode.VcE),
-        new("F", KeyCode.VcF),
-        new("G", KeyCode.VcG),
-        new("H", KeyCode.VcH),
-        new("I", KeyCode.VcI),
-        new("J", KeyCode.VcJ),
-        new("K", KeyCode.VcK),
-        new("L", KeyCode.VcL),
-        new("M", KeyCode.VcM),
-        new("N", KeyCode.VcN),
-        new("O", KeyCode.VcO),
-        new("P", KeyCode.VcP),
-        new("Q", KeyCode.VcQ),
-        new("R", KeyCode.VcR),
-        new("S", KeyCode.VcS),
-        new("T", KeyCode.VcT),
-        new("U", KeyCode.VcU),
-        new("V", KeyCode.VcV),
-        new("W", KeyCode.VcW),
-        new("X", KeyCode.VcX),
-        new("Y", KeyCode.VcY),
-        new("Z", KeyCode.VcZ),
-        new("0", KeyCode.Vc0),
-        new("1", KeyCode.Vc1),
-        new("2", KeyCode.Vc2),
-        new("3", KeyCode.Vc3),
-        new("4", KeyCode.Vc4),
-        new("5", KeyCode.Vc5),
-        new("6", KeyCode.Vc6),
-        new("7", KeyCode.Vc7),
-        new("8", KeyCode.Vc8),
-        new("9", KeyCode.Vc9),
+        new("Left Shift", Key.LeftShift),
+        new("Right Shift", Key.RightShift),
+        new("Left Control", Key.LeftCtrl),
+        new("Right Control", Key.RightCtrl),
+        new(OperatingSystem.IsMacOS() ? "Left Option" : "Left Alt", Key.LeftAlt),
+        new(OperatingSystem.IsMacOS() ? "Right Option" : "Right Alt", Key.RightAlt),
+        new("Space", Key.Space),
+        new("Tab", Key.Tab),
+        new("Enter", Key.Enter),
+        new("A", Key.A),
+        new("B", Key.B),
+        new("C", Key.C),
+        new("D", Key.D),
+        new("E", Key.E),
+        new("F", Key.F),
+        new("G", Key.G),
+        new("H", Key.H),
+        new("I", Key.I),
+        new("J", Key.J),
+        new("K", Key.K),
+        new("L", Key.L),
+        new("M", Key.M),
+        new("N", Key.N),
+        new("O", Key.O),
+        new("P", Key.P),
+        new("Q", Key.Q),
+        new("R", Key.R),
+        new("S", Key.S),
+        new("T", Key.T),
+        new("U", Key.U),
+        new("V", Key.V),
+        new("W", Key.W),
+        new("X", Key.X),
+        new("Y", Key.Y),
+        new("Z", Key.Z),
+        new("0", Key.D0),
+        new("1", Key.D1),
+        new("2", Key.D2),
+        new("3", Key.D3),
+        new("4", Key.D4),
+        new("5", Key.D5),
+        new("6", Key.D6),
+        new("7", Key.D7),
+        new("8", Key.D8),
+        new("9", Key.D9),
     ];
 
     public List<NameValuePair<BorderSize>> BorderSizes { get; } =
@@ -580,18 +580,18 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [CustomValidation(typeof(PreferencesViewModel), nameof(ValidateKeyboardMapping))]
-    private KeyCode _symbolShiftKey = KeyCode.VcRightAlt;
+    private Key _symbolShiftKey = Key.RightAlt;
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [CustomValidation(typeof(PreferencesViewModel), nameof(ValidateKeyboardMapping))]
-    private KeyCode _capsShiftKey = KeyCode.VcLeftShift;
+    private Key _capsShiftKey = Key.LeftShift;
 
     [ObservableProperty]
     private bool _shouldHandleExtendedKeys = true;
 
     [ObservableProperty]
-    private KeyCode _fireKey = KeyCode.VcSpace;
+    private Key _fireKey = Key.Space;
 
     [ObservableProperty]
     private Guid _gamepadControllerId = GamepadController.None.ControllerId;
