@@ -18,28 +18,16 @@ namespace OldBit.Spectron;
 
 public class App : Application
 {
-    private ServiceProvider? _serviceProvider;
+    internal IServiceProvider? ServiceProvider { get; set; }
     private MainWindowViewModel? MainWindowViewModel { get; set; }
 
-    public override void Initialize()
-    {
-        AvaloniaXamlLoader.Load(this);
-    }
+    public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
     public override void OnFrameworkInitializationCompleted()
     {
-        var services = new ServiceCollection();
-        services.AddEmulation();
-        services.AddServices();
-        services.AddDebugging();
-        services.AddViewModels();
-        services.AddLogging(builder => builder.AddConsole());
-
-        _serviceProvider = services.BuildServiceProvider();
-
         if (ApplicationLifetime is ClassicDesktopStyleApplicationLifetime desktop)
         {
-            MainWindowViewModel = _serviceProvider.GetRequiredService<MainWindowViewModel>();
+            MainWindowViewModel = ServiceProvider!.GetRequiredService<MainWindowViewModel>();
             desktop.MainWindow = new MainWindow { DataContext = MainWindowViewModel };
 
             var lifetime = new ApplicationLifetimeHelper(this, desktop.MainWindow);
