@@ -58,7 +58,7 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly QuickSaveService _quickSaveService;
     private readonly ILogger _logger;
     private readonly FrameBufferConverter _frameBufferConverter = new();
-    private readonly KeyboardHook _keyboardHook;
+    private readonly KeyboardHandler _keyboardHandler;
     private readonly Stopwatch _renderStopwatch = new();
     private readonly FrameRateCalculator _frameRateCalculator = new();
     private readonly ScreenshotViewModel _screenshotViewModel = new();
@@ -165,6 +165,9 @@ public partial class MainWindowViewModel : ObservableObject
 
     [RelayCommand]
     private void KeyDown(KeyEventArgs e) => HandleKeyDown(e);
+
+    [RelayCommand]
+    private void KeyUp(KeyEventArgs e) => HandleKeyUp(e);
 
     [RelayCommand]
     private void TimeMachineResumeEmulator() => Resume();
@@ -323,10 +326,9 @@ public partial class MainWindowViewModel : ObservableObject
         diskDriveManager.DiskChanged += HandleFloppyDiskChanged;
         diskDriveManager.DiskActivity += HandleDiskActivity;
 
-        _keyboardHook = new KeyboardHook();
-        _keyboardHook.SpectrumKeyPressed  += HandleSpectrumKeyPressed;
-        _keyboardHook.SpectrumKeyReleased += HandleSpectrumKeyReleased;
-        _keyboardHook.Run();
+        _keyboardHandler = new KeyboardHandler();
+        _keyboardHandler.SpectrumKeyPressed += HandleSpectrumKeyPressed;
+        _keyboardHandler.SpectrumKeyReleased += HandleSpectrumKeyReleased;
 
         WeakReferenceMessenger.Default.Register<ResetEmulatorMessage>(this, (_, message) =>
             HandleMachineReset(message.HardReset));

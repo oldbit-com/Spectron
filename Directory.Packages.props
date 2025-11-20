@@ -31,7 +31,6 @@
     <PackageVersion Include="OldBit.Joypad" Version="0.0.2-rc.3" />
     <PackageVersion Include="OldBit.Spectron.Files" Version="1.0.2" />
     <PackageVersion Include="OldBit.Z80Cpu.Spectron" Version="1.0.1" />
-    <PackageVersion Include="SharpHook.Reactive" Version="7.0.3" />
     <PackageVersion Include="Shouldly" Version="4.3.0" />
     <PackageVersion Include="SkiaSharp" Version="3.116.1" />
     <PackageVersion Include="SkiaSharp.NativeAssets.Linux" Version="3.116.1" />

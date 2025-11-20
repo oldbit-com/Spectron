@@ -19,6 +19,8 @@ partial class MainWindowViewModel
             return;
         }
 
+        _keyboardHandler.KeyPressed(e);
+
         switch (e)
         {
             case { Key: Key.Escape }:
@@ -36,6 +38,16 @@ partial class MainWindowViewModel
                 HandleMachineReset(hardReset: true);
                 return;
         }
+    }
+
+    private void HandleKeyUp(KeyEventArgs e)
+    {
+        if (MainWindow?.IsActive != true)
+        {
+            return;
+        }
+
+        _keyboardHandler.KeyReleased(e);
     }
 
     private void HandleSpectrumKeyPressed(object? sender, SpectrumKeyEventArgs e)
@@ -68,7 +80,7 @@ partial class MainWindowViewModel
         Emulator?.KeyboardState.KeyUp(e.Keys);
     }
 
-    private void ConfigureShiftKeys(KeyboardSettings settings) => _keyboardHook.UpdateSettings(settings);
+    private void ConfigureShiftKeys(KeyboardSettings settings) => _keyboardHandler.UpdateSettings(settings);
 
     private bool JoystickHandled(SpectrumKeyEventArgs e)
     {
@@ -77,7 +89,7 @@ partial class MainWindowViewModel
             return false;
         }
 
-        var joystickInput = KeyboardHook.ToJoystickAction(e.KeyCode, _preferences.Joystick.FireKey);
+        var joystickInput = KeyboardHandler.ToJoystickAction(e.Key, _preferences.Joystick.FireKey);
 
         if (joystickInput == JoystickInput.None)
         {

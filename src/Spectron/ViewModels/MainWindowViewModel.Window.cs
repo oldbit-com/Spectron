@@ -182,7 +182,6 @@ partial class MainWindowViewModel
         args.Cancel = true;
 
         Emulator?.Shutdown(isAppClosing: true);
-        _keyboardHook?.Dispose();
         _frameRateCalculator.Dispose();
 
         _preferences.Audio.IsMuted = IsAudioMuted;

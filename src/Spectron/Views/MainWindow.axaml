@@ -28,6 +28,9 @@
         <EventTriggerBehavior EventName="KeyDown" SourceObject="Window">
             <InvokeCommandAction Command="{Binding KeyDownCommand}" PassEventArgsToCommand="True"/>
         </EventTriggerBehavior>
+        <EventTriggerBehavior EventName="KeyUp" SourceObject="Window">
+            <InvokeCommandAction Command="{Binding KeyUpCommand}" PassEventArgsToCommand="True"/>
+        </EventTriggerBehavior>
     </i:Interaction.Behaviors>
 
     <Window.Resources>
