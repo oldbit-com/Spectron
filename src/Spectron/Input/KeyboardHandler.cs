@@ -14,38 +14,26 @@ internal sealed class KeyboardHandler
     private Key _symbolShift = Key.RightAlt;
     private bool _shouldHandleExtendedKeys;
 
-    private bool _isShiftPressed;
-    private bool _isMetaKeyPressed;
-
     public event EventHandler<SpectrumKeyEventArgs>? SpectrumKeyPressed;
     public event EventHandler<SpectrumKeyEventArgs>? SpectrumKeyReleased;
 
-    internal void KeyPressed(KeyEventArgs e, bool isSimulated = false)
+    internal void KeyPressed(KeyEventArgs e)
     {
-        if (_isMetaKeyPressed)
+        if ((e.KeyModifiers & KeyModifiers.Meta) == KeyModifiers.Meta)
         {
             return;
         }
 
-        if (IsMetaKey(e.PhysicalKey))
-        {
-            _isMetaKeyPressed = true;
-            return;
-        }
-
-        HandleShiftState(e, isPressed: true, isSimulated);
         HandleKeyEvent(e, isPressed: true);
     }
 
-    internal void KeyReleased(KeyEventArgs e, bool isSimulated = false)
+    internal void KeyReleased(KeyEventArgs e)
     {
-        if (IsMetaKey(e.PhysicalKey))
+        if ((e.KeyModifiers & KeyModifiers.Meta) == KeyModifiers.Meta)
         {
-            _isMetaKeyPressed = false;
             return;
         }
 
-        HandleShiftState(e, isPressed: false, isSimulated);
         HandleKeyEvent(e, isPressed: false);
     }
 
@@ -67,7 +55,7 @@ internal sealed class KeyboardHandler
 
     private void HandleKeyEvent(KeyEventArgs e, bool isPressed)
     {
-        var spectrumKeys = ToSpectrumKeySequence(e.Key, e.PhysicalKey);
+        var spectrumKeys = ToSpectrumKeySequence(e);
 
         if (spectrumKeys.Count > 0)
         {
@@ -197,27 +185,19 @@ internal sealed class KeyboardHandler
         });
     }
 
-    private void HandleShiftState(KeyEventArgs e, bool isPressed, bool isSimulated)
+    private List<SpectrumKey> ToSpectrumKeySequence(KeyEventArgs e)
     {
-        if (!isSimulated && e is { PhysicalKey: PhysicalKey.ShiftLeft or PhysicalKey.ShiftRight })
-        {
-            _isShiftPressed = isPressed;
-        }
-    }
-
-    private List<SpectrumKey> ToSpectrumKeySequence(Key key, PhysicalKey? physicalKey = null)
-    {
-        if (key == _capsShift)
+        if (e.Key == _capsShift)
         {
             return [SpectrumKey.CapsShift];
         }
 
-        if (key == _symbolShift)
+        if (e.Key == _symbolShift)
         {
             return [SpectrumKey.SymbolShift];
         }
 
-        List<SpectrumKey> keys = key switch
+        List<SpectrumKey> keys = e.Key switch
         {
             Key.D0 => [SpectrumKey.D0],
             Key.D1 => [SpectrumKey.D1],
@@ -260,47 +240,48 @@ internal sealed class KeyboardHandler
             _ => []
         };
 
-        if (keys.Count == 0 && _shouldHandleExtendedKeys)
+        if (keys.Count > 0 || !_shouldHandleExtendedKeys)
         {
-            keys = physicalKey switch
-            {
-                PhysicalKey.Backspace => [SpectrumKey.None, SpectrumKey.CapsShift, SpectrumKey.D0],
-                PhysicalKey.Escape => [SpectrumKey.None],
-                PhysicalKey.Comma => !_isShiftPressed
-                    ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.N]
-                    : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.R],
-                PhysicalKey.Period => !_isShiftPressed
-                    ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.M]
-                    : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.T],
-                PhysicalKey.Semicolon => !_isShiftPressed
-                    ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.O]
-                    : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.Z],
-                PhysicalKey.Slash => !_isShiftPressed
-                    ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.V]
-                    : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.C],
-                PhysicalKey.Quote => !_isShiftPressed
-                    ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.D7]
-                    : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.P],
-                PhysicalKey.Equal => !_isShiftPressed
-                    ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.L]
-                    : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.K],
-                PhysicalKey.Minus => !_isShiftPressed
-                    ? [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.J]
-                    : [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.D0],
-                PhysicalKey.ArrowLeft => [SpectrumKey.CapsShift, SpectrumKey.D5],
-                PhysicalKey.ArrowDown => [SpectrumKey.CapsShift, SpectrumKey.D6],
-                PhysicalKey.ArrowUp => [SpectrumKey.CapsShift, SpectrumKey.D7],
-                PhysicalKey.ArrowRight => [SpectrumKey.CapsShift, SpectrumKey.D8],
-                _ => []
-            };
+            return keys;
         }
 
-        return keys;
+        keys = e.KeySymbol switch
+        {
+            "," => [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.N],
+            "<" => [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.R],
+            "." => [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.M],
+            ">" => [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.T],
+            ";" => [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.O],
+            ":" => [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.Z],
+            "/" => [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.V],
+            "?" => [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.C],
+            "'" => [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.D7],
+            "\"" => [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.P],
+            "=" => [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.L],
+            "+" => [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.K],
+            "-" => [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.J],
+            "_" => [SpectrumKey.None, SpectrumKey.SymbolShift, SpectrumKey.D0],
+            _ => []
+        };
+
+        if (keys.Count > 0)
+        {
+            return keys;
+        }
+
+        return e.Key switch
+        {
+            Key.Back => [SpectrumKey.None, SpectrumKey.CapsShift, SpectrumKey.D0],
+            Key.Escape => [SpectrumKey.None],
+            Key.Left => [SpectrumKey.CapsShift, SpectrumKey.D5],
+            Key.Down => [SpectrumKey.CapsShift, SpectrumKey.D6],
+            Key.Up => [SpectrumKey.CapsShift, SpectrumKey.D7],
+            Key.Right => [SpectrumKey.CapsShift, SpectrumKey.D8],
+            _ => []
+        };
     }
 
-    private void SimulateKeyPress(KeyEventArgs e) => Task.Delay(5).ContinueWith(_ => KeyPressed(e, isSimulated: true));
+    private void SimulateKeyPress(KeyEventArgs e) => KeyPressed(e);
 
-    private void SimulateKeyRelease(KeyEventArgs e) => Task.Delay(5).ContinueWith( _ => KeyReleased(e, isSimulated: true));
-
-    private static bool IsMetaKey(PhysicalKey keyCode) => keyCode is PhysicalKey.MetaLeft or PhysicalKey.MetaRight;
+    private void SimulateKeyRelease(KeyEventArgs e) => KeyReleased(e);
 }
