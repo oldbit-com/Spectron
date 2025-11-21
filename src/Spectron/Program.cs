@@ -8,6 +8,7 @@ using OldBit.Spectron.CommandLine;
 using OldBit.Spectron.Debugger.Extensions;
 using OldBit.Spectron.Emulation.DependencyInjection;
 using OldBit.Spectron.Extensions;
+using OldBit.Spectron.Logging;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.ViewModels;
 
@@ -65,10 +66,15 @@ public class Program
         builder.Services.AddServices();
         builder.Services.AddDebugging();
         builder.Services.AddViewModels();
-
         builder.Logging.ClearProviders();
-        builder.Logging.AddConsole();
         builder.Logging.SetMinimumLevel(LogLevel.Trace);
+        builder.Logging.AddMemory();
+
+        if (builder.Environment.IsDevelopment())
+        {
+            builder.Logging.AddConsole();
+            builder.Logging.AddDebug();
+        }
 
         return builder.Build();
     }
