@@ -1,15 +1,10 @@
 using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 
 namespace OldBit.Spectron.Logging;
 
-public sealed class MemoryLogger(string name) : ILogger
+public sealed class InMemoryLogger(string name, ILogStore logStore) : ILogger
 {
-    private const int Capacity = 2000;
-
-    private readonly List<string> _log = [];
-
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
         var formatted = formatter(state, exception);
@@ -19,11 +14,10 @@ public sealed class MemoryLogger(string name) : ILogger
             return;
         }
 
-        var message = string.Empty;
+        string message;
 
         if (string.IsNullOrEmpty(formatted))
         {
-            System.Diagnostics.Debug.Assert(exception != null);
             message = $"{logLevel}: {exception}";
         }
         else if (exception == null)
@@ -35,7 +29,7 @@ public sealed class MemoryLogger(string name) : ILogger
             message = $"{logLevel}: {formatted}{Environment.NewLine}{Environment.NewLine}{exception}";
         }
 
-        _log.Add(message);
+        logStore.Add(message);
     }
 
     public bool IsEnabled(LogLevel logLevel) => logLevel != LogLevel.None;

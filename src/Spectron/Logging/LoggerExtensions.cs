@@ -6,9 +6,10 @@ namespace OldBit.Spectron.Logging;
 
 public static class MemoryLoggerExtensions
 {
-    public static ILoggingBuilder AddMemory(this ILoggingBuilder builder)
+    public static ILoggingBuilder AddInMemory(this ILoggingBuilder builder)
     {
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, MemoryLoggerProvider>());
+        builder.Services.AddSingleton<InMemoryLogStore>();
+        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, InMemoryLoggerProvider>());
 
         return builder;
     }

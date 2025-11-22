@@ -68,7 +68,7 @@ public class Program
         builder.Services.AddViewModels();
         builder.Logging.ClearProviders();
         builder.Logging.SetMinimumLevel(LogLevel.Trace);
-        builder.Logging.AddMemory();
+        builder.Logging.AddInMemory();
 
         if (builder.Environment.IsDevelopment())
         {
