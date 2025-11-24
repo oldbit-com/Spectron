@@ -24,9 +24,9 @@ I have created it for my personal use to play games and demos. It is a lot of fu
 - [x] Emulator state is persisted and restored when the application is re-started
 - [x] Supports SNA, SZX, Z80, TAP, TZX, MDR, TRD and SCL file formats (inside zip, too)
 - [x] Supports POK trainer files
-- [x] Accurate timings, including contented memory and IO
+- [x] Pretty accurate timings; including memory and IO contention
 - [x] Floating bus support
-- [x] Multicolour screen effects work, timings are quite accurate
+- [x] Supports multicolour screen effects
 - [x] ULA+ support
 - [x] AY-3-8912 sound chip emulation
 - [x] DivMMC emulation
@@ -37,13 +37,13 @@ I have created it for my personal use to play games and demos. It is a lot of fu
 - [x] Tape viewer
 - [x] Disk viewer
 - [x] Adjustable emulator speed
-- [x] Keyboard joystick emulation: Kempston, Sinclair, Cursor & Fuller.
+- [x] Keyboard joystick emulation: Kempston, Sinclair, Cursor & Fuller
 - [x] Audio and video recording
-- [x] Selection of alternative ROMs or use custom
-- [x] Debugger
-- [x] And more...
+- [x] Selection of alternative ROMs, custom ROM can also be loaded
+- [x] Built-in debugger
+- [x] And more features will come
 
-It uses several of my own libraries that I created for this project:
+Spectron relies on several custom libraries that I created for this project:
 
 | Library                                                | Description                                  |
 |--------------------------------------------------------|----------------------------------------------|
@@ -65,6 +65,10 @@ Solution consists of several projects:
 ## Quick demo
 [![Spectron](https://img.youtube.com/vi/Oz70N0VY_2w/default.jpg)](https://youtu.be/Oz70N0VY_2w "Quick demo")
 
+## Releases
+There are some test releases that can be found in the project [Releases](https://github.com/oldbit-com/Spectron/releases)
+if you don't want to build the project. These are self-contained and do not need .NET Framework to be installed separetely.
+
 ## Running the emulator
 Requires .NET 10 to build and run the emulator.
 Grab the latest code from the repository, build and run the emulator:
@@ -84,9 +88,10 @@ commands is [here](docs/CommandLine.md).
 - [x] Passes EIHALT (Mark Woodmass) test in both 48k and 128k mode
 - [x] Passes Super HALT Invaders (Mark Woodmass) test
 - [x] Passes btime (Jan Bobrowski) test
+- [x] Passes ptime (Patrik Rak) test
 
 Test results can be found in the [Results](tests/Results) directory.
-Test files can be found in the [Tests](tests/Files) directory.
+Test programs can be found in the [Tests](tests/Files) directory.
 
 ## CPU emulation
 I have created my own [Z80 CPU](https://github.com/oldbit-com/Z80/tree/spectron) emulator library for this project. 
