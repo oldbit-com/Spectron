@@ -158,7 +158,7 @@ Sample disk images can be found [here](https://1drv.ms/u/c/7fd2cf29d9a4c5e1/EdUL
 
 Two SD card images are supported. Write changes can be persisted.
 
-You can use [RTC.SYS](src/Spectron.Emulation/Devices/DivMmc/RTC) file to enable RTC support. This is not required, but it will enable DivMMC to use current 
+You can use [RTC.SYS](https://github.com/oldbit-com/Spectron/tree/main/src/Spectron.Emulation/Devices/DivMmc/RTC) file to enable RTC support. This is not required, but it will enable DivMMC to use current 
 date and time.
 
 ## Microdrives
