@@ -90,8 +90,8 @@ commands is [here](docs/CommandLine.md).
 - [x] Passes btime (Jan Bobrowski) test
 - [x] Passes ptime (Patrik Rak) test
 
-Test results can be found in the [Results](tests/Results) directory.
-Test programs can be found in the [Tests](tests/Files) directory.
+Test results can be found in the [Results](https://github.com/oldbit-com/Spectron/tree/main/tests/Results) directory.
+Test programs can be found in the [Tests](https://github.com/oldbit-com/Spectron/tree/main/tests/Files) directory.
 
 ## CPU emulation
 I have created my own [Z80 CPU](https://github.com/oldbit-com/Z80/tree/spectron) emulator library for this project. 
