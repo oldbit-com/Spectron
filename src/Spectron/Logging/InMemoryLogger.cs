@@ -18,18 +18,18 @@ public sealed class InMemoryLogger(string name, ILogStore logStore) : ILogger
 
         if (string.IsNullOrEmpty(formatted))
         {
-            message = $"{logLevel}: {exception}";
+            message = $"{exception}";
         }
         else if (exception == null)
         {
-            message = $"{logLevel}: {formatted}";
+            message = $"{formatted}";
         }
         else
         {
-            message = $"{logLevel}: {formatted}{Environment.NewLine}{Environment.NewLine}{exception}";
+            message = $"{formatted}{Environment.NewLine}{Environment.NewLine}{exception}";
         }
 
-        logStore.Add(message);
+        logStore.Add(logLevel, message);
     }
 
     public bool IsEnabled(LogLevel logLevel) => logLevel != LogLevel.None;

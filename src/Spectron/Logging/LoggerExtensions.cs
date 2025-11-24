@@ -8,7 +8,7 @@ public static class MemoryLoggerExtensions
 {
     public static ILoggingBuilder AddInMemory(this ILoggingBuilder builder)
     {
-        builder.Services.AddSingleton<InMemoryLogStore>();
+        builder.Services.AddSingleton<ILogStore, InMemoryLogStore>();
         builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, InMemoryLoggerProvider>());
 
         return builder;

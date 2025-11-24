@@ -8,7 +8,6 @@
         Height="280"
         Width="350"
         WindowStartupLocation="CenterOwner"
-        Focusable="True"
         CanResize="False">
 
     <Window.Styles>

@@ -1,5 +1,6 @@
 ﻿using System;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -33,6 +34,8 @@ public class Program
             {
                 BuildAvaloniaApp(host.Services).StartWithClassicDesktopLifetime(args, builder =>
                 {
+                    builder.ShutdownMode = ShutdownMode.OnMainWindowClose;
+
                     builder.Startup += (sender, e) =>
                     {
                         if (sender is ClassicDesktopStyleApplicationLifetime { MainWindow.DataContext: MainWindowViewModel viewModel })
@@ -73,7 +76,6 @@ public class Program
         if (builder.Environment.IsDevelopment())
         {
             builder.Logging.AddConsole();
-            builder.Logging.AddDebug();
         }
 
         return builder.Build();

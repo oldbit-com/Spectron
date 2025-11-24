@@ -4,6 +4,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.LogView"
-        Title="Log Viewer">
+        xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+        x:DataType="viewModels:LogViewModel"
+        Height="600"
+        Width="800"
+        WindowStartupLocation="CenterOwner"
+        Title="Log">
 
 </Window>

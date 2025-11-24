@@ -124,6 +124,9 @@ partial class MainWindowViewModel
     private static void ShowKeyboardHelpWindow() =>
         WeakReferenceMessenger.Default.Send(new ShowKeyboardViewMessage());
 
+    private void ShowLogViewWindow() =>
+        WeakReferenceMessenger.Default.Send(new ShowLogViewMessage(new LogViewModel(_logStore)));
+
     private void OpenScreenshotViewer() =>
         WeakReferenceMessenger.Default.Send(new ShowScreenshotViewMessage(_screenshotViewModel));
 

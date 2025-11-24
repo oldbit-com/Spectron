@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace OldBit.Spectron.Logging;
 
-public class ConsoleLogSink(ILogger<Program> logger, LogEventLevel minimumLevel, IList<string>? areas = null) : ILogSink
+public sealed class ConsoleLogSink(ILogger<Program> logger, LogEventLevel minimumLevel, IList<string>? areas = null) : ILogSink
 {
     private readonly IList<string>? _areas = areas?.Count > 0 ? areas : null;
 
