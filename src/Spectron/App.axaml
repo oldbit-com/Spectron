@@ -22,6 +22,7 @@
         <StyleInclude Source="avares://Spectron/Controls/PauseOverlay.axaml" />
         <StyleInclude Source="avares://Spectron/Controls/HeaderSeparator.axaml" />
         <StyleInclude Source="avares://OldBit.Spectron.Debugger/Controls/HexViewer.axaml" />
+        <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
         <materialIcons:MaterialIconStyles />
 
         <Style Selector="ToolTip">

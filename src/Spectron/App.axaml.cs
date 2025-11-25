@@ -21,7 +21,14 @@ public class App : Application
     internal IServiceProvider? ServiceProvider { get; set; }
     private MainWindowViewModel? MainWindowViewModel { get; set; }
 
-    public override void Initialize() => AvaloniaXamlLoader.Load(this);
+    public override void Initialize()
+    {
+        AvaloniaXamlLoader.Load(this);
+
+#if DEBUG
+        this.AttachDeveloperTools();
+#endif
+    }
 
     public override void OnFrameworkInitializationCompleted()
     {
