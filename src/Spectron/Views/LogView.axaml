@@ -1,0 +1,37 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="OldBit.Spectron.Views.LogView"
+        xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+        xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+        x:DataType="viewModels:LogViewModel"
+        KeyDown="OnKeyDown"
+        Height="600"
+        Width="800"
+        WindowStartupLocation="CenterOwner"
+        Title="Log">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key='VT220Brush'>Black</SolidColorBrush>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key='VT220Brush'>Chartreuse</SolidColorBrush>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid Margin="10">
+        <avaloniaEdit:TextEditor
+            x:Name="Editor"
+            Document="{Binding Document}"
+            IsReadOnly="True"
+            Foreground="{DynamicResource VT220Brush}"
+            FontFamily="{StaticResource VT220}"/>
+    </Grid>
+</Window>

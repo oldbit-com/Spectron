@@ -264,6 +264,8 @@
         <MenuItem Header="Help" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="Keyboard" InputGesture="F1" Command="{Binding ShowKeyboardHelpViewCommand}"/>
             <MenuItem Header="About" Command="{Binding ShowAboutViewCommand}"/>
+            <MenuItem Header="-"/>
+            <MenuItem Header="Log" Command="{Binding ShowLogViewCommand}"/>
         </MenuItem>
     </Menu>
 </UserControl>

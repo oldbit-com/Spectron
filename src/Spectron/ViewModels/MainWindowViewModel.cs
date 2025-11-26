@@ -29,6 +29,7 @@ using OldBit.Spectron.Emulation.Tape.Loader;
 using OldBit.Spectron.Emulation.TimeTravel;
 using OldBit.Spectron.Files.Pok;
 using OldBit.Spectron.Input;
+using OldBit.Spectron.Logging;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
@@ -56,6 +57,7 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly SessionService _sessionService;
     private readonly DebuggerContext _debuggerContext;
     private readonly QuickSaveService _quickSaveService;
+    private readonly ILogStore _logStore;
     private readonly ILogger _logger;
     private readonly FrameBufferConverter _frameBufferConverter = new();
     private readonly KeyboardHandler _keyboardHandler;
@@ -279,6 +281,10 @@ public partial class MainWindowViewModel : ObservableObject
 
     [RelayCommand]
     private static void ShowKeyboardHelpView() => ShowKeyboardHelpWindow();
+
+    [RelayCommand]
+    private void ShowLogView() => ShowLogViewWindow();
+
     #endregion
 
     public MainWindowViewModel(
@@ -299,6 +305,7 @@ public partial class MainWindowViewModel : ObservableObject
         MicrodriveManager microdriveManager,
         DiskDriveManager diskDriveManager,
         QuickSaveService quickSaveService,
+        ILogStore logStore,
         ILogger<MainWindowViewModel> logger)
     {
         _emulatorFactory = emulatorFactory;
@@ -311,6 +318,7 @@ public partial class MainWindowViewModel : ObservableObject
         _sessionService = sessionService;
         _debuggerContext = debuggerContext;
         _quickSaveService = quickSaveService;
+        _logStore = logStore;
         _logger = logger;
 
         RecentFilesViewModel = recentFilesViewModel;

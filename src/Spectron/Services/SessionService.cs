@@ -15,8 +15,6 @@ public class SessionService(
     TimeMachine timeMachine,
     ILogger<SessionService> logger)
 {
-    private readonly ILogger _logger = logger;
-
     public async Task SaveAsync(Emulator? emulator, ResumeSettings resumeSettings)
     {
         if (emulator is null)
@@ -70,7 +68,7 @@ public class SessionService(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to load emulator state");
+            logger.LogError(ex, "Failed to load emulator state");
         }
 
         return null;

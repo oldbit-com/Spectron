@@ -25,17 +25,19 @@
 
     <ItemGroup>
         <PackageReference Include="Avalonia" />
+        <PackageReference Include="Avalonia.AvaloniaEdit" />
         <PackageReference Include="Avalonia.Controls.DataGrid" />
         <PackageReference Include="Avalonia.Desktop" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" />
         <PackageReference Include="Avalonia.Themes.Fluent" />
         <PackageReference Include="Avalonia.Xaml.Behaviors" />
         <PackageReference Include="Avalonia.Xaml.Interactions" />
         <PackageReference Include="Avalonia.Xaml.Interactivity" />
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="AvaloniaUI.DiagnosticsSupport" />
         <PackageReference Include="CommunityToolkit.Mvvm" />
         <PackageReference Include="Material.Icons.Avalonia" />
         <PackageReference Include="MessageBox.Avalonia" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" />
         <PackageReference Include="Microsoft.Extensions.Logging" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
         <PackageReference Include="Microsoft.Extensions.Logging.Console" />

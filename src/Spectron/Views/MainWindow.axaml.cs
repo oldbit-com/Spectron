@@ -8,6 +8,7 @@ using OldBit.Spectron.Debugger.Views;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.TimeTravel;
+using OldBit.Spectron.Extensions;
 using OldBit.Spectron.Messages;
 using OldBit.Spectron.Settings;
 using OldBit.Spectron.ViewModels;
@@ -34,6 +35,9 @@ public partial class MainWindow : Window
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowKeyboardViewMessage>(this, (window, _) =>
             Show<HelpKeyboardView>(window));
+
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowLogViewMessage>(this, (_, m) =>
+            Show<LogView>(null, m.ViewModel));
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowPreferencesViewMessage>(this, (window, message) =>
         {
@@ -107,7 +111,7 @@ public partial class MainWindow : Window
         return result;
     }
 
-    private void Show<TView>(Window owner, object? viewModel = null) where TView : Window, new()
+    private void Show<TView>(Window? owner, object? viewModel = null) where TView : Window, new()
     {
         var viewType = typeof(TView).Name;
 
@@ -119,15 +123,15 @@ public partial class MainWindow : Window
             }
             else
             {
-                window.Show(owner);
+                window.Open(owner);
             }
 
             return;
         }
 
-        var view = new TView { DataContext = viewModel };
+        window = new TView { DataContext = viewModel };
 
-        view.Closed += (_, _) =>
+        window.Closed += (_, _) =>
         {
             if (!_windows.TryGetValue(viewType, out var closedWindow))
             {
@@ -143,9 +147,9 @@ public partial class MainWindow : Window
             _mainViewModel?.OnViewClosed(viewModelType);
         };
 
-        _windows.Add(viewType, view);
+        _windows.Add(viewType, window);
 
-        view.Show(this);
+        window.Open(owner);
     }
 
     protected override void OnDataContextChanged(EventArgs e)
