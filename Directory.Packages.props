@@ -5,7 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Antlr4.Runtime.Standard" Version="4.13.1" />
-    <PackageVersion Include="Avalonia" Version="11.3.8" />
+    <PackageVersion Include="Avalonia" Version="11.3.9" />
     <PackageVersion Include="Avalonia.AvaloniaEdit" Version="11.3.0" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="11.3.9" />
     <PackageVersion Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5" />
