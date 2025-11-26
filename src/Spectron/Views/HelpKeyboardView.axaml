@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="945" d:DesignHeight="400"
+        mc:Ignorable="d" d:DesignWidth="472" d:DesignHeight="200"
         x:Class="OldBit.Spectron.Views.HelpKeyboardView"
         Background="Transparent"
         Width="945"
@@ -11,5 +11,17 @@
         WindowStartupLocation="CenterOwner"
         SystemDecorations="BorderOnly"
         Title="ZX Spectrum Keyboard">
-    <Image Source="../Assets/Keyboard.png" />
+    <Grid>
+        <Image Source="../Assets/Keyboard.png"/>
+        <TextBlock
+            Text="Spectron Emulator"
+            FontFamily="{StaticResource SpectrumStrictFont}"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Left"
+            Opacity=".7"
+            Margin="30,0,0,5"
+            FontSize="20"
+            Foreground="{StaticResource SpectrumBrightCyan}"
+            Background="Transparent"/>
+    </Grid>
 </Window>
