@@ -60,8 +60,8 @@ public class Program
         .AfterSetup(app => ((App?)app.Instance)?.ServiceProvider = services)
         .LogToConsole(services.GetRequiredService<ILogger<Program>>());
 
-    // Avalonia configuration, don't remove; used by visual designer.
 #if DEBUG
+    // Avalonia configuration, don't remove; used by visual designer.
     private static AppBuilder BuildAvaloniaApp() => AppBuilder
         .Configure<App>()
         .UsePlatformDetect();
