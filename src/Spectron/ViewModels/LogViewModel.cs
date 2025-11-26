@@ -1,4 +1,4 @@
-using System;
+using System.Text;
 using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
 using OldBit.Spectron.Logging;
@@ -12,6 +12,15 @@ public partial class LogViewModel : ObservableObject
 
     public LogViewModel(ILogStore logStore)
     {
-        _document.Text = string.Join(Environment.NewLine, logStore.Entries);
+        var text = new StringBuilder();
+
+        foreach (var entry in logStore.Entries)
+        {
+            text.Append(entry.Level.ToString());
+            text.Append(": ");
+            text.AppendLine(entry.Message);
+        }
+
+        _document.Text = text.ToString();
     }
 }

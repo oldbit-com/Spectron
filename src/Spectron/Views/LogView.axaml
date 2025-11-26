@@ -7,6 +7,7 @@
         xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
         xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
         x:DataType="viewModels:LogViewModel"
+        KeyDown="OnKeyDown"
         Height="600"
         Width="800"
         WindowStartupLocation="CenterOwner"
@@ -27,6 +28,7 @@
 
     <Grid Margin="10">
         <avaloniaEdit:TextEditor
+            x:Name="Editor"
             Document="{Binding Document}"
             IsReadOnly="True"
             Foreground="{DynamicResource VT220Brush}"
