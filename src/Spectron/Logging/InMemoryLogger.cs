@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace OldBit.Spectron.Logging;
 
-public sealed class InMemoryLogger(string name, ILogStore logStore) : ILogger
+public sealed class InMemoryLogger(ILogStore logStore) : ILogger
 {
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {

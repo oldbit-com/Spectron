@@ -54,12 +54,18 @@ public class Program
         }, args);
     }
 
-    // Avalonia configuration, don't remove; also used by visual designer.
     private static AppBuilder BuildAvaloniaApp(IServiceProvider services) => AppBuilder
         .Configure<App>()
         .UsePlatformDetect()
         .AfterSetup(app => ((App?)app.Instance)?.ServiceProvider = services)
         .LogToConsole(services.GetRequiredService<ILogger<Program>>());
+
+    // Avalonia configuration, don't remove; used by visual designer.
+#if DEBUG
+    private static AppBuilder BuildAvaloniaApp() => AppBuilder
+        .Configure<App>()
+        .UsePlatformDetect();
+#endif
 
     private static IHost CreateHost(string[] args)
     {
