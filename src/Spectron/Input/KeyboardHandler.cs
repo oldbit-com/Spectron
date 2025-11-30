@@ -8,7 +8,7 @@ using OldBit.Spectron.Settings;
 
 namespace OldBit.Spectron.Input;
 
-internal sealed class KeyboardHandler
+public sealed class KeyboardHandler
 {
     private Key _capsShift = Key.LeftShift;
     private Key _symbolShift = Key.RightAlt;
@@ -43,6 +43,12 @@ internal sealed class KeyboardHandler
         _symbolShift = keyboardSettings.SymbolShiftKey;
         _shouldHandleExtendedKeys = keyboardSettings.ShouldHandleExtendedKeys;
     }
+
+    internal void SimulatePressKey(SpectrumKey key) =>
+        SpectrumKeyPressed?.Invoke(this, new SpectrumKeyEventArgs([key], Key.None, isKeyPressed: true, isSimulated: true));
+
+    internal void SimulateReleaseKey(SpectrumKey key) =>
+        SpectrumKeyReleased?.Invoke(this, new SpectrumKeyEventArgs([key], Key.None, isKeyPressed: false, isSimulated: true));
 
     internal static JoystickInput ToJoystickAction(Key key, Key fireKey) => key switch
     {

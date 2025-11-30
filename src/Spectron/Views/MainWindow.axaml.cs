@@ -33,8 +33,8 @@ public partial class MainWindow : Window
         WeakReferenceMessenger.Default.Register<MainWindow, ShowDebuggerViewMessage>(this, (window, m) =>
             Show<DebuggerView>(window, m.ViewModel!));
 
-        WeakReferenceMessenger.Default.Register<MainWindow, ShowKeyboardViewMessage>(this, (window, _) =>
-            Show<HelpKeyboardView>(window));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowKeyboardViewMessage>(this, (window, m) =>
+            Show<KeyboardView>(window, m.ViewModel));
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowLogViewMessage>(this, (_, m) =>
             Show<LogView>(null, m.ViewModel));
@@ -117,7 +117,7 @@ public partial class MainWindow : Window
 
         if (_windows.TryGetValue(viewType, out var window))
         {
-            if (viewType == nameof(HelpKeyboardView))
+            if (viewType == nameof(KeyboardView))
             {
                 window.Close();
             }

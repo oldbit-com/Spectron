@@ -280,7 +280,7 @@ public partial class MainWindowViewModel : ObservableObject
     private static void ShowAboutView() => OpenAboutWindow();
 
     [RelayCommand]
-    private static void ShowKeyboardHelpView() => ShowKeyboardHelpWindow();
+    private void ShowKeyboardHelpView() => ShowKeyboardHelpWindow();
 
     [RelayCommand]
     private void ShowLogView() => ShowLogViewWindow();
