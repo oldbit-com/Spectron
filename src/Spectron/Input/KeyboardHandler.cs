@@ -44,10 +44,10 @@ public sealed class KeyboardHandler
         _shouldHandleExtendedKeys = keyboardSettings.ShouldHandleExtendedKeys;
     }
 
-    internal void SimulatePressKey(SpectrumKey key) =>
+    internal void SimulateKeyPress(SpectrumKey key) =>
         SpectrumKeyPressed?.Invoke(this, new SpectrumKeyEventArgs([key], Key.None, isKeyPressed: true, isSimulated: true));
 
-    internal void SimulateReleaseKey(SpectrumKey key) =>
+    internal void SimulateKeyRelease(SpectrumKey key) =>
         SpectrumKeyReleased?.Invoke(this, new SpectrumKeyEventArgs([key], Key.None, isKeyPressed: false, isSimulated: true));
 
     internal static JoystickInput ToJoystickAction(Key key, Key fireKey) => key switch
