@@ -52,7 +52,7 @@ partial class MainWindowViewModel
 
     private void HandleSpectrumKeyPressed(object? sender, SpectrumKeyEventArgs e)
     {
-        if (MainWindow?.IsActive != true)
+        if (MainWindow?.IsActive != true && !e.IsSimulated)
         {
             return;
         }
@@ -67,7 +67,7 @@ partial class MainWindowViewModel
 
     private void HandleSpectrumKeyReleased(object? sender, SpectrumKeyEventArgs e)
     {
-        if (MainWindow?.IsActive != true || IsPaused)
+        if (MainWindow?.IsActive != true && !e.IsSimulated || IsPaused)
         {
             return;
         }
