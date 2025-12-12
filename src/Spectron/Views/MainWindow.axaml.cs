@@ -39,6 +39,9 @@ public partial class MainWindow : Window
         WeakReferenceMessenger.Default.Register<MainWindow, ShowLogViewMessage>(this, (_, m) =>
             Show<LogView>(null, m.ViewModel));
 
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowMemoryViewMessage>(this, (window, m) =>
+            Show<MemoryView>(window, m.ViewModel!));
+
         WeakReferenceMessenger.Default.Register<MainWindow, ShowPreferencesViewMessage>(this, (window, message) =>
         {
             var result = ShowDialog<PreferencesView, Preferences?>(window, new PreferencesViewModel(message.Preferences, message.GamepadManager));
@@ -124,6 +127,7 @@ public partial class MainWindow : Window
             else
             {
                 window.Open(owner);
+                window.Activate();
             }
 
             return;

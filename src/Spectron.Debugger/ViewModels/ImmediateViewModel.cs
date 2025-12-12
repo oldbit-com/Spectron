@@ -173,7 +173,7 @@ public partial class ImmediateViewModel(
 
     private void Save(SaveAction save)
     {
-        var memory = emulator.Memory.GetBytes();
+        var memory = emulator.Memory.ToBytes();
         var length = save.Length ?? memory.Length - save.Address;
 
         if (length > memory.Length)

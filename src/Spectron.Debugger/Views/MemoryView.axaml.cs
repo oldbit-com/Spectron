@@ -1,12 +1,13 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 using OldBit.Spectron.Debugger.ViewModels;
 
-namespace OldBit.Spectron.Debugger.Controls;
+namespace OldBit.Spectron.Debugger.Views;
 
-public partial class Memory : UserControl
+public partial class MemoryView : Window
 {
-    public Memory() => InitializeComponent();
+    public MemoryView() => InitializeComponent();
 
     protected override void OnDataContextChanged(EventArgs e)
     {
@@ -17,7 +18,7 @@ public partial class Memory : UserControl
 
         viewModel.OnMemoryUpdated = (address, value) =>
         {
-            Dispatcher.UIThread.Post(() => MemoryView.UpdateValues(address, value));
+            Dispatcher.UIThread.Post(() => MemoryViewer.UpdateValues(address, value));
         };
     }
 }

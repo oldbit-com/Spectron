@@ -257,8 +257,11 @@
         </MenuItem>
 
         <MenuItem Header="Debug" Padding="10 0 10 0" Focusable="False">
-            <MenuItem Header="Open Debugger" InputGesture="F11" Command="{Binding ShowDebuggerViewCommand}"/>
+            <MenuItem Header="Debugger" InputGesture="F11" Command="{Binding ShowDebuggerViewCommand}"/>
             <MenuItem Header="Breakpoints Enabled" ToggleType="CheckBox" IsChecked="{Binding BreakpointsEnabled}" Command="{Binding ToggleBreakpointsCommand}"/>
+            <MenuItem Header="-"/>
+            <MenuItem Header="Memory" Command="{Binding ShowMemoryViewCommand}"/>
+
         </MenuItem>
 
         <MenuItem Header="Help" Padding="10 0 10 0" Focusable="False">

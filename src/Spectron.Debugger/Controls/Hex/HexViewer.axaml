@@ -1,0 +1,27 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:hex="clr-namespace:OldBit.Spectron.Debugger.Controls.Hex">
+    <Styles.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Dark"/>
+                <ResourceDictionary x:Key="Default"/>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Styles.Resources>
+
+    <Style Selector="hex|HexViewer">
+        <Setter Property="Foreground" Value="{DynamicResource SystemBaseMediumHighColor}"/>
+        <Setter Property="FontFamily" Value="Menlo, Consolas, Courier New, DejaVu Sans Mono"/>
+        <Setter Property="FontSize" Value="14"/>
+    </Style>
+
+    <Style Selector="hex|HexViewerRow">
+        <Setter Property="SelectedBackground" Value="{DynamicResource SystemAccentColor}"/>
+        <Setter Property="OffsetForeground" Value="{DynamicResource SystemAccentColor}"/>
+    </Style>
+
+    <Style Selector="hex|HexViewerHeader">
+        <Setter Property="Foreground" Value="{DynamicResource SystemAccentColor}"/>
+    </Style>
+</Styles>

@@ -32,6 +32,17 @@ partial class MainWindowViewModel
         WeakReferenceMessenger.Default.Send(new ShowDebuggerViewMessage(_debuggerViewModel));
     }
 
+    private void OpenMemoryWindow()
+    {
+        if (Emulator == null)
+        {
+            return;
+        }
+
+        var memoryViewModel = new MemoryViewModel(Emulator);
+        WeakReferenceMessenger.Default.Send(new ShowMemoryViewMessage(memoryViewModel));
+    }
+
     private void ConfigureDebugging(Emulator emulator)
     {
         if (_breakpointHandler == null)

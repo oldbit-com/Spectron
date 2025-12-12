@@ -19,7 +19,7 @@ public class CodeListViewModel(BreakpointManager breakpointManager) : Observable
         var startAddress = DetermineStartAddress(address, breakpointHitEventArgs);
 
         var disassembly = new Disassembler(
-            memory.GetBytes(),
+            memory.ToBytes(),
             startAddress,
             maxCount: 25,
             new DisassemblerOptions { NumberFormat = debuggerSettings.NumberFormat });
