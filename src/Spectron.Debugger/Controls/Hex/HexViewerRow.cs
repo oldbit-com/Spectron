@@ -26,16 +26,16 @@ public sealed class HexViewerRow : Control
         AvaloniaProperty.Register<HexViewerRow, int>(nameof(SelectedIndex), -1);
 
     private static readonly StyledProperty<int> BytesPerRowProperty =
-        Spectron.Debugger.Controls.Hex.HexViewer.BytesPerRowProperty.AddOwner<HexViewerRow>();
+        HexViewer.BytesPerRowProperty.AddOwner<HexViewerRow>();
 
     private static readonly StyledProperty<double> FontSizeProperty =
         TemplatedControl.FontSizeProperty.AddOwner<HexViewerRow>();
 
     private static readonly StyledProperty<Typeface> TypefaceProperty =
-        Spectron.Debugger.Controls.Hex.HexViewer.TypefaceProperty.AddOwner<HexViewerRow>();
+        HexViewer.TypefaceProperty.AddOwner<HexViewerRow>();
 
     private static readonly StyledProperty<RowTextBuilder> RowTextBuilderProperty =
-        Spectron.Debugger.Controls.Hex.HexViewer.RowTextBuilderProperty.AddOwner<HexViewerRow>();
+        HexViewer.RowTextBuilderProperty.AddOwner<HexViewerRow>();
 
     public IBrush? AlternatingRowBackground
     {
