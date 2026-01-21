@@ -3,7 +3,7 @@ using Avalonia.Controls;
 
 namespace OldBit.Spectron.Debugger.Controls.Hex;
 
-internal class HexViewerPanel(Spectron.Debugger.Controls.Hex.HexViewer parent) : Panel
+internal class HexViewerPanel(HexViewer viewer) : Panel
 {
     private readonly Dictionary<int, HexViewerRow> _visibleRows = [];
 
@@ -34,19 +34,42 @@ internal class HexViewerPanel(Spectron.Debugger.Controls.Hex.HexViewer parent) :
         }
     }
 
-    internal void UpdateSelected(int rowIndex, int position)
+    internal void UpdateSelected(Selection selection)
     {
-        foreach (var visibleRow in _visibleRows.Values)
+        var selections = new Dictionary<int, List<int>>();
+
+        for (var index = selection.Start; index <= selection.End; index++)
         {
-            visibleRow.SelectedIndex = -1;
+            var rowIndex = index / viewer.BytesPerRow;
+
+            if (!selections.TryGetValue(rowIndex, out var cells))
+            {
+                cells = [];
+                selections.Add(rowIndex, cells);
+            }
+
+            cells.Add(index % viewer.BytesPerRow);
         }
 
-        if (!_visibleRows.TryGetValue(rowIndex, out var  row))
+        // Select new range
+        foreach (var (rowIndex, cells) in selections)
         {
-            return;
+            _visibleRows.GetValueOrDefault(rowIndex)?.SelectedIndexes = cells.ToArray();
         }
 
-        row.SelectedIndex = position;
+        // Unselect previous selection
+        foreach (var row in _visibleRows.Values)
+        {
+            if (selections.ContainsKey(row.RowIndex))
+            {
+                continue;
+            }
+
+            if (row.SelectedIndexes.Length > 0)
+            {
+                row.SelectedIndexes = [];
+            }
+        }
     }
 
     internal new void InvalidateVisual()
@@ -69,17 +92,17 @@ internal class HexViewerPanel(Spectron.Debugger.Controls.Hex.HexViewer parent) :
 
     protected override Size MeasureOverride(Size availableSize)
     {
-        var rowCount = (parent.Data.Length + parent.BytesPerRow - 1) / parent.BytesPerRow;
-        double totalHeight = rowCount * parent.RowHeight;
+        var rowCount = (viewer.Data.Length + viewer.BytesPerRow - 1) / viewer.BytesPerRow;
+        double totalHeight = rowCount * viewer.RowHeight;
 
-        return new Size(parent.RowWidth, totalHeight);
+        return new Size(viewer.RowWidth, totalHeight);
     }
 
     protected override Size ArrangeOverride(Size finalSize)
     {
         foreach (var (rowIndex, row) in _visibleRows)
         {
-            var rect = new Rect(0, rowIndex * parent.RowHeight, finalSize.Width, parent.RowHeight);
+            var rect = new Rect(0, rowIndex * viewer.RowHeight, finalSize.Width, viewer.RowHeight);
             row.Arrange(rect);
         }
 

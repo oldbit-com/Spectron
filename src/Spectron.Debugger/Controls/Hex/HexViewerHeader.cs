@@ -14,10 +14,10 @@ internal sealed class HexViewerHeader : Control
         TemplatedControl.FontSizeProperty.AddOwner<HexViewerHeader>();
 
     private static readonly StyledProperty<Typeface> TypefaceProperty =
-        Spectron.Debugger.Controls.Hex.HexViewer.TypefaceProperty.AddOwner<HexViewerHeader>();
+        HexViewer.TypefaceProperty.AddOwner<HexViewerHeader>();
 
     private static readonly StyledProperty<RowTextBuilder> RowTextBuilderProperty =
-        Spectron.Debugger.Controls.Hex.HexViewer.RowTextBuilderProperty.AddOwner<HexViewerHeader>();
+        HexViewer.RowTextBuilderProperty.AddOwner<HexViewerHeader>();
 
     internal IBrush? Foreground
     {

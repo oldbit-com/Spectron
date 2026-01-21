@@ -22,8 +22,8 @@ public sealed class HexViewerRow : Control
     public static readonly StyledProperty<IBrush?> OffsetForegroundProperty =
         AvaloniaProperty.Register<HexViewerRow, IBrush?>(nameof(OffsetForeground));
 
-    public static readonly StyledProperty<int> SelectedIndexProperty =
-        AvaloniaProperty.Register<HexViewerRow, int>(nameof(SelectedIndex), -1);
+    public static readonly StyledProperty<int[]> SelectedIndexesProperty =
+        AvaloniaProperty.Register<HexViewerRow, int[]>(nameof(SelectedIndexes), []);
 
     private static readonly StyledProperty<int> BytesPerRowProperty =
         HexViewer.BytesPerRowProperty.AddOwner<HexViewerRow>();
@@ -61,10 +61,10 @@ public sealed class HexViewerRow : Control
         set => SetValue(OffsetForegroundProperty, value);
     }
 
-    public int SelectedIndex
+    public int[] SelectedIndexes
     {
-        get => GetValue(SelectedIndexProperty);
-        set => SetValue(SelectedIndexProperty, value);
+        get => GetValue(SelectedIndexesProperty);
+        set => SetValue(SelectedIndexesProperty, value);
     }
 
     private int BytesPerRow => GetValue(BytesPerRowProperty);
@@ -79,13 +79,13 @@ public sealed class HexViewerRow : Control
     public required int Offset { get; init; }
     public required ArraySegment<byte> Data { get; init; }
 
-    internal event EventHandler<HexCellSelectedEventArgs>? CellSelected;
+    internal event EventHandler<HexCellClickedEventArgs>? CellClicked;
 
     internal HexViewerRow()
     {
         HorizontalAlignment = HorizontalAlignment.Left;
 
-        this.GetObservable(SelectedIndexProperty).Subscribe(_ => InvalidateVisual());
+        this.GetObservable(SelectedIndexesProperty).Subscribe(_ => InvalidateVisual());
         this.GetObservable(TypefaceProperty).Subscribe(_ => InvalidateVisual());
 
         VerticalAlignment = VerticalAlignment.Center;
@@ -99,13 +99,13 @@ public sealed class HexViewerRow : Control
 
         context.FillRectangle(background ?? Brushes.Transparent, rect);
 
-        if (SelectedIndex != -1)
+        foreach (var selectedIndex in SelectedIndexes)
         {
-            var layout = RowTextBuilder.GetLayout(SelectedIndex);
+            var layout = RowTextBuilder.GetLayout(selectedIndex);
             rect = new Rect(layout.Position * RowTextBuilder.CharWidth - 4, 1, layout.Width * RowTextBuilder.CharWidth + 8, Height - 2);
             context.DrawRectangle(SelectedBackground, null, rect);
 
-            layout = RowTextBuilder.GetLayout(SelectedIndex + BytesPerRow);
+            layout = RowTextBuilder.GetLayout(selectedIndex + BytesPerRow);
             rect = new Rect(layout.Position * RowTextBuilder.CharWidth, 1, layout.Width * RowTextBuilder.CharWidth, Height - 2);
             context.DrawRectangle(SelectedBackground, null, rect);
         }
@@ -126,7 +126,7 @@ public sealed class HexViewerRow : Control
 
         if (cellIndex != null)
         {
-            CellSelected?.Invoke(this, new HexCellSelectedEventArgs(RowIndex, cellIndex.Value));
+            CellClicked?.Invoke(this, new HexCellClickedEventArgs(RowIndex, cellIndex.Value));
         }
 
         base.OnPointerPressed(e);

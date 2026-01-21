@@ -10,19 +10,19 @@ namespace OldBit.Spectron.Debugger.Controls.Hex;
 public class HexViewer : ContentControl
 {
     public static readonly StyledProperty<int> RowHeightProperty =
-        AvaloniaProperty.Register<HexViewer, int>(nameof(RowHeight), 20);
+        AvaloniaProperty.Register<HexViewer, int>(nameof(RowHeight), defaultValue: 20);
 
     public static readonly StyledProperty<int> BytesPerRowProperty =
-        AvaloniaProperty.Register<HexViewer, int>(nameof(BytesPerRow), 16, inherits: true);
+        AvaloniaProperty.Register<HexViewer, int>(nameof(BytesPerRow), defaultValue: 16, inherits: true);
 
     public static readonly StyledProperty<bool> IsOffsetVisibleProperty =
         AvaloniaProperty.Register<HexViewer, bool>(nameof(IsOffsetVisible), true, inherits: true);
 
     public static readonly StyledProperty<bool> IsHeaderVisibleProperty =
-        AvaloniaProperty.Register<HexViewer, bool>(nameof(IsHeaderVisible), true);
+        AvaloniaProperty.Register<HexViewer, bool>(nameof(IsHeaderVisible), defaultValue: true);
 
     public static readonly StyledProperty<int> GroupSizeProperty =
-        AvaloniaProperty.Register<HexViewer, int>(nameof(GroupSize), 8);
+        AvaloniaProperty.Register<HexViewer, int>(nameof(GroupSize), defaultValue: 8);
 
     public static readonly DirectProperty<HexViewer, byte[]> DataProperty =
         AvaloniaProperty.RegisterDirect<HexViewer, byte[]>(
@@ -31,14 +31,17 @@ public class HexViewer : ContentControl
             setter: (o, v) => o.Data = v,
             unsetValue: []);
 
-    public static readonly StyledProperty<int> SelectedIndexProperty =
-        AvaloniaProperty.Register<HexViewer, int>(nameof(SelectedIndex), -1);
+    public static readonly StyledProperty<int[]> SelectedIndexesProperty =
+        AvaloniaProperty.Register<HexViewer, int[]>(nameof(SelectedIndexes), []);
 
     internal static readonly StyledProperty<Typeface> TypefaceProperty =
         AvaloniaProperty.Register<HexViewer, Typeface>(nameof(Typeface), inherits: true);
 
     internal static readonly StyledProperty<RowTextBuilder> RowTextBuilderProperty =
         AvaloniaProperty.Register<HexViewer, RowTextBuilder>(nameof(RowTextBuilder), inherits: true);
+
+    public static readonly StyledProperty<bool> IsMultiSelectProperty =
+        AvaloniaProperty.Register<HexViewer, bool>(nameof(IsMultiSelect), defaultValue: true);
 
     public int RowHeight
     {
@@ -70,6 +73,12 @@ public class HexViewer : ContentControl
         set => SetValue(GroupSizeProperty, value);
     }
 
+    public bool IsMultiSelect
+    {
+        get => GetValue(IsMultiSelectProperty);
+        set => SetValue(IsMultiSelectProperty, value);
+    }
+
     public byte[] Data
     {
         get;
@@ -87,7 +96,7 @@ public class HexViewer : ContentControl
                     return;
                 }
 
-                SelectedIndex = -1;
+                SelectedIndexes = [];
                 _hexPanel.Clear();
                 UpdateView();
             }
@@ -106,19 +115,24 @@ public class HexViewer : ContentControl
         set => SetValue(RowTextBuilderProperty, value);
     }
 
-    public int SelectedIndex
+    public int[] SelectedIndexes
     {
-        get => GetValue(SelectedIndexProperty);
-        set => SetValue(SelectedIndexProperty, value);
+        get => GetValue(SelectedIndexesProperty);
+        set => SetValue(SelectedIndexesProperty, value);
     }
 
     private readonly HexViewerHeader _header;
     private readonly ScrollViewer _scrollViewer;
     private readonly HexViewerPanel _hexPanel;
 
-    private int CurrentRowIndex => SelectedIndex / BytesPerRow;
+    private readonly Selection _selection = new();
+    private int _cursorPosition = -1;
+
+    private int CurrentRowIndex => _selection.Start / BytesPerRow;
     private int VisibleRowCount => (int)(_scrollViewer.Viewport.Height / RowHeight);
+
     private int PageHeight => VisibleRowCount * RowHeight;
+    private int PageSize => VisibleRowCount * BytesPerRow;
 
     internal double RowWidth { get; private set; }
 
@@ -163,7 +177,7 @@ public class HexViewer : ContentControl
         this.GetObservable(IsOffsetVisibleProperty).Subscribe(_ => Invalidate());
         this.GetObservable(BytesPerRowProperty).Subscribe(_ => Invalidate());
         this.GetObservable(IsHeaderVisibleProperty).Subscribe(_ => _header.IsVisible = IsHeaderVisible);
-        this.GetObservable(SelectedIndexProperty).Subscribe(_ => UpdateSelected());
+        this.GetObservable(SelectedIndexesProperty).Subscribe(_ => _hexPanel.UpdateSelected(_selection));
 
         _scrollViewer.GetObservable(ScrollViewer.OffsetProperty).Subscribe(offset =>
         {
@@ -203,24 +217,28 @@ public class HexViewer : ContentControl
         switch (e.Key)
         {
             case Key.Left:
-                UpdateSelectedIndex(-1);
+                MoveLeft(e.KeyModifiers.HasFlag(KeyModifiers.Shift), offset: 1);
+                RefreshSelection();
                 break;
 
             case Key.Right:
-                UpdateSelectedIndex(1);
+                MoveRight(e.KeyModifiers.HasFlag(KeyModifiers.Shift), offset: 1);
+                RefreshSelection();
                 break;
 
             case Key.Up:
-                UpdateSelectedIndex(-BytesPerRow);
+                MoveLeft(e.KeyModifiers.HasFlag(KeyModifiers.Shift), offset: BytesPerRow);
 
                 if (!IsRowVisible(CurrentRowIndex))
                 {
                     _scrollViewer.Offset = new Vector(_scrollViewer.Offset.X, CurrentRowIndex * RowHeight);
                 }
+
+                RefreshSelection();
                 break;
 
             case Key.Down:
-                UpdateSelectedIndex(BytesPerRow);
+                MoveRight(e.KeyModifiers.HasFlag(KeyModifiers.Shift), offset: BytesPerRow);
 
                 if (!IsRowVisible(CurrentRowIndex))
                 {
@@ -229,35 +247,105 @@ public class HexViewer : ContentControl
 
                     _scrollViewer.Offset = new Vector(_scrollViewer.Offset.X, targetTopRow * RowHeight);
                 }
+
+                RefreshSelection();
                 break;
 
             case Key.Home:
-                SelectedIndex = 0;
+                _cursorPosition = 0;
+                _selection.Start = _cursorPosition;
+
+                if (!e.KeyModifiers.HasFlag(KeyModifiers.Shift))
+                {
+                    _selection.End = _selection.Start;
+                }
 
                 _scrollViewer.ScrollToHome();
+                RefreshSelection();
                 break;
 
             case Key.End:
-                SelectedIndex = Data.Length - 1;
+                _cursorPosition = Data.Length - 1;
+                _selection.End = _cursorPosition;
+
+                if (!e.KeyModifiers.HasFlag(KeyModifiers.Shift))
+                {
+                    _selection.Start = _selection.End;
+                }
 
                 _scrollViewer.ScrollToEnd();
+                RefreshSelection();
                 break;
 
             case Key.PageUp:
-                UpdateSelectedIndex(-VisibleRowCount * BytesPerRow);
+                MoveLeft(e.KeyModifiers.HasFlag(KeyModifiers.Shift), offset: PageSize);
 
                 _scrollViewer.Offset = new Vector(_scrollViewer.Offset.X, _scrollViewer.Offset.Y - PageHeight);
+                RefreshSelection();
                 break;
 
             case Key.PageDown:
-                UpdateSelectedIndex(VisibleRowCount * BytesPerRow);
+                MoveRight(e.KeyModifiers.HasFlag(KeyModifiers.Shift), offset: PageSize);
 
                 _scrollViewer.Offset = new Vector(_scrollViewer.Offset.X, _scrollViewer.Offset.Y + PageHeight);
+                RefreshSelection();
                 break;
         }
 
         base.OnKeyDown(e);
     }
+
+    private void MoveLeft(bool isShiftPressed, int offset)
+    {
+        if (_cursorPosition == 0)
+        {
+            return;
+        }
+
+        _cursorPosition = _cursorPosition >= offset ? _cursorPosition - offset : 0;
+
+        if (!IsMultiSelect || !isShiftPressed)
+        {
+            _selection.Start = _cursorPosition;
+            _selection.End = _cursorPosition;
+        }
+        else
+        {
+            if (_cursorPosition == _selection.End - offset && _selection.Length > 1)
+            {
+                _selection.End = _cursorPosition;
+            }
+
+            if (_cursorPosition < _selection.Start)
+            {
+                _selection.Start = _cursorPosition;
+            }
+        }
+    }
+
+    private void MoveRight(bool isShiftPressed, int offset)
+    {
+        _cursorPosition = _cursorPosition < Data.Length - offset ? _cursorPosition + offset : Data.Length - 1;
+
+        if (!IsMultiSelect || !isShiftPressed)
+        {
+            _selection.Start = _cursorPosition;
+            _selection.End = _cursorPosition;
+        }
+        else
+        {
+            if (_cursorPosition == _selection.Start + offset && _selection.Length > 1)
+            {
+                _selection.Start = _cursorPosition;
+            }
+
+            if (_cursorPosition > _selection.End)
+            {
+                _selection.End = _cursorPosition;
+            }
+        }
+    }
+
 
     private HexViewerRow CreateRow(int rowIndex)
     {
@@ -276,12 +364,29 @@ public class HexViewer : ContentControl
             Data = new ArraySegment<byte>(Data, startOffset, endOffset - startOffset),
             Height = RowHeight,
             Width = RowWidth,
-            SelectedIndex = CurrentRowIndex == rowIndex ? SelectedIndex % BytesPerRow : -1
+            SelectedIndexes = GetRowSelectedIndexes(rowIndex).ToArray()
         };
 
-        row.CellSelected += (_, e) => SelectedIndex = e.RowIndex * BytesPerRow + e.Position;
+        row.CellClicked += (_, e) =>
+        {
+            _cursorPosition = e.RowIndex * BytesPerRow + e.Position;
+            _selection.Start = _cursorPosition;
+            _selection.End = _cursorPosition;
+            SelectedIndexes = [_cursorPosition];
+        };
 
         return row;
+    }
+
+    private IEnumerable<int> GetRowSelectedIndexes(int rowIndex)
+    {
+        foreach (var selectedIndex in SelectedIndexes)
+        {
+            if (selectedIndex / BytesPerRow == rowIndex)
+            {
+                yield return selectedIndex % BytesPerRow;
+            }
+        }
     }
 
     private void UpdateView()
@@ -316,10 +421,6 @@ public class HexViewer : ContentControl
         _hexPanel.InvalidateArrange();
     }
 
-    private void UpdateSelected() => _hexPanel.UpdateSelected(
-        SelectedIndex == -1 ? -1 : CurrentRowIndex,
-        SelectedIndex == -1 ? -1 : SelectedIndex % BytesPerRow);
-
     private bool IsRowVisible(int rowIndex)
     {
         var rowTop = rowIndex * RowHeight;
@@ -350,17 +451,5 @@ public class HexViewer : ContentControl
         _header.InvalidateVisual();
     }
 
-    private void UpdateSelectedIndex(int amount)
-    {
-        SelectedIndex += amount;
-
-        if (SelectedIndex < 0)
-        {
-            SelectedIndex = 0;
-        }
-        else if (SelectedIndex > Data.Length - 1)
-        {
-            SelectedIndex = Data.Length - 1;
-        }
-    }
+    private void RefreshSelection() => SelectedIndexes = Enumerable.Range(_selection.Start, _selection.Length).ToArray();
 }
