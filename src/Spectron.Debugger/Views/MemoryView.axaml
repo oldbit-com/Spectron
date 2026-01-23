@@ -14,23 +14,33 @@
         Title="Memory">
 
     <Window.KeyBindings>
-        <KeyBinding Gesture="{OnPlatform Ctrl+G, macOS=Cmd+G}" Command="{Binding GoToAddressCommand}"/>
+        <KeyBinding Gesture="{OnPlatform Ctrl+G, macOS=Cmd+G}" Command="{Binding ShowGoToOverlayCommand}"/>
     </Window.KeyBindings>
 
-    <Grid Margin="5" RowDefinitions="30,*">
+    <Grid Margin="5" RowDefinitions="40,*">
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <TextBlock Text="Address" VerticalAlignment="Center"/>
+            <TextBox
+                BorderBrush="{x:Null}"
+                Height="20"
+                Padding="10 8 0 10"
+                Text="23232"
+                Width="100"  />
+        </StackPanel>
+
         <hex:HexViewer
             Grid.Row="1"
             Name="MemoryViewer"
             BytesPerRow="32"
             GroupSize="8"
-            Data="{Binding Memory}"
-        />
+            Data="{Binding Memory}"/>
 
-    <overlays:GoToAddressOverlay
-        DataContext="{Binding GoToAddressOverlay}"
-        Name="GoToAddressOverlay"
-        Grid.Row="1"
-        />
+        <overlays:GoToAddressOverlay
+            DataContext="{Binding GoToAddressOverlay}"
+            Name="GoToAddressOverlay"
+            Grid.Row="1"
+            />
 
     </Grid>
 </Window>

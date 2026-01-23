@@ -13,7 +13,8 @@ public sealed partial class MemoryViewModel : ObservableObject, IDisposable
 
     public GoToAddressOverlayViewModel GoToAddressOverlay { get; } = new();
 
-    public Action<Word, byte> OnMemoryUpdated{ get; set; } = (_, _) => { };
+    public Action<Word, byte> OnMemoryUpdated { get; set; } = (_, _) => { };
+    public Action<Word> GoTo { get; set; } = _ => { };
 
     [ObservableProperty]
     private byte[] _memory = [];
@@ -31,11 +32,9 @@ public sealed partial class MemoryViewModel : ObservableObject, IDisposable
     public void Update(IMemory memory) => Memory = memory.ToBytes();
 
     [RelayCommand]
-    private void GoToAddress() => GoToAddressOverlay.Show();
+    private void ShowGoToOverlay() => GoToAddressOverlay.Show();
 
-    private void GoToAddress(Word address)
-    {
-    }
+    private void GoToAddress(Word address) => GoTo(address);
 
     private void MemoryUpdated(Word address, byte value) =>
         OnMemoryUpdated.Invoke(address, value);

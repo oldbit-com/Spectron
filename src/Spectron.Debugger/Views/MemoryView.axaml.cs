@@ -16,6 +16,8 @@ public partial class MemoryView : Window
             return;
         }
 
+        viewModel.GoTo = address => Dispatcher.UIThread.Post(() => MemoryViewer.Select(address));
+
         viewModel.OnMemoryUpdated = (address, value) =>
         {
             Dispatcher.UIThread.Post(() => MemoryViewer.UpdateValues(address, value));

@@ -6,6 +6,8 @@ namespace OldBit.Spectron.Debugger.Controls.Overlays;
 
 public partial class GoToAddressOverlay : UserControl
 {
+    private GoToAddressOverlayViewModel? _viewModel;
+
     public GoToAddressOverlay() => InitializeComponent();
 
     protected override void OnDataContextChanged(EventArgs e)
@@ -15,8 +17,10 @@ public partial class GoToAddressOverlay : UserControl
             return;
         }
 
-        viewModel.Show = SHow;
-        viewModel.Hide = Hide;
+        _viewModel = viewModel;
+
+        _viewModel.Show = SHow;
+        _viewModel.Hide = Hide;
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -29,6 +33,12 @@ public partial class GoToAddressOverlay : UserControl
         if (e.Key == Key.Escape)
         {
             Hide();
+            e.Handled = true;
+        }
+
+        if (e.Key == Key.Enter && _viewModel?.HasErrors == false)
+        {
+            _viewModel.OnGoTo();
             e.Handled = true;
         }
 

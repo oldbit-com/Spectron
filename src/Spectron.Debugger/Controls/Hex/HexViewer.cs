@@ -127,6 +127,7 @@ public class HexViewer : ContentControl
 
     private readonly Selection _selection = new();
     private int _cursorPosition = -1;
+    private int _selectionAnchor = -1;
 
     private int CurrentRowIndex => _selection.Start / BytesPerRow;
     private int VisibleRowCount => (int)(_scrollViewer.Viewport.Height / RowHeight);
@@ -212,18 +213,32 @@ public class HexViewer : ContentControl
         }
     }
 
+    public void Select(int start, int length = 1)
+    {
+        _selection.Start = start;
+        _selection.End = start + length - 1;
+        _cursorPosition = _selection.End;
+        _selectionAnchor = _selection.Start;
+
+        var rowIndex = _selection.Start / BytesPerRow;
+        if (!IsRowVisible(rowIndex))
+        {
+            ScrollToRow(rowIndex);
+        }
+
+        RefreshSelection();
+    }
+
     protected override void OnKeyDown(KeyEventArgs e)
     {
         switch (e.Key)
         {
             case Key.Left:
                 MoveLeft(e.KeyModifiers.HasFlag(KeyModifiers.Shift), offset: 1);
-                RefreshSelection();
                 break;
 
             case Key.Right:
                 MoveRight(e.KeyModifiers.HasFlag(KeyModifiers.Shift), offset: 1);
-                RefreshSelection();
                 break;
 
             case Key.Up:
@@ -231,10 +246,8 @@ public class HexViewer : ContentControl
 
                 if (!IsRowVisible(CurrentRowIndex))
                 {
-                    _scrollViewer.Offset = new Vector(_scrollViewer.Offset.X, CurrentRowIndex * RowHeight);
+                    ScrollToRow(CurrentRowIndex);
                 }
-
-                RefreshSelection();
                 break;
 
             case Key.Down:
@@ -245,10 +258,8 @@ public class HexViewer : ContentControl
                     var viewportRows = (int)(_scrollViewer.Viewport.Height / RowHeight);
                     var targetTopRow = CurrentRowIndex - Math.Max(0, viewportRows) + 1;
 
-                    _scrollViewer.Offset = new Vector(_scrollViewer.Offset.X, targetTopRow * RowHeight);
+                    ScrollToRow(targetTopRow);
                 }
-
-                RefreshSelection();
                 break;
 
             case Key.Home:
@@ -258,10 +269,10 @@ public class HexViewer : ContentControl
                 if (!e.KeyModifiers.HasFlag(KeyModifiers.Shift))
                 {
                     _selection.End = _selection.Start;
+                    _selectionAnchor = _cursorPosition;
                 }
 
                 _scrollViewer.ScrollToHome();
-                RefreshSelection();
                 break;
 
             case Key.End:
@@ -271,28 +282,29 @@ public class HexViewer : ContentControl
                 if (!e.KeyModifiers.HasFlag(KeyModifiers.Shift))
                 {
                     _selection.Start = _selection.End;
+                    _selectionAnchor = _cursorPosition;
                 }
 
                 _scrollViewer.ScrollToEnd();
-                RefreshSelection();
                 break;
 
             case Key.PageUp:
                 MoveLeft(e.KeyModifiers.HasFlag(KeyModifiers.Shift), offset: PageSize);
 
                 _scrollViewer.Offset = new Vector(_scrollViewer.Offset.X, _scrollViewer.Offset.Y - PageHeight);
-                RefreshSelection();
                 break;
 
             case Key.PageDown:
                 MoveRight(e.KeyModifiers.HasFlag(KeyModifiers.Shift), offset: PageSize);
 
                 _scrollViewer.Offset = new Vector(_scrollViewer.Offset.X, _scrollViewer.Offset.Y + PageHeight);
-                RefreshSelection();
                 break;
+
+            default:
+                return;
         }
 
-        base.OnKeyDown(e);
+        RefreshSelection();
     }
 
     private void MoveLeft(bool isShiftPressed, int offset)
@@ -308,6 +320,7 @@ public class HexViewer : ContentControl
         {
             _selection.Start = _cursorPosition;
             _selection.End = _cursorPosition;
+            _selectionAnchor = _cursorPosition;
         }
         else
         {
@@ -331,6 +344,7 @@ public class HexViewer : ContentControl
         {
             _selection.Start = _cursorPosition;
             _selection.End = _cursorPosition;
+            _selectionAnchor = _cursorPosition;
         }
         else
         {
@@ -367,15 +381,52 @@ public class HexViewer : ContentControl
             SelectedIndexes = GetRowSelectedIndexes(rowIndex).ToArray()
         };
 
-        row.CellClicked += (_, e) =>
-        {
-            _cursorPosition = e.RowIndex * BytesPerRow + e.Position;
-            _selection.Start = _cursorPosition;
-            _selection.End = _cursorPosition;
-            SelectedIndexes = [_cursorPosition];
-        };
+        row.CellClicked += (_, e) => { HandleCellClicked(e); };
 
         return row;
+    }
+
+    private void HandleCellClicked(HexCellClickedEventArgs e)
+    {
+        var targetPosition = e.RowIndex * BytesPerRow + e.Position;
+
+        if (!IsMultiSelect || !e.IsShiftPressed || _cursorPosition < 0)
+        {
+            _cursorPosition = targetPosition;
+            _selection.Start = _cursorPosition;
+            _selection.End = _cursorPosition;
+            _selectionAnchor = _cursorPosition;
+        }
+        else
+        {
+            int selectionAnchor;
+
+            if (_selection.Length > 0)
+            {
+                if (targetPosition < _selection.Start)
+                {
+                    selectionAnchor = _selection.End;
+                }
+                else if (targetPosition > _selection.End)
+                {
+                    selectionAnchor = _selection.Start;
+                }
+                else
+                {
+                    selectionAnchor = _selectionAnchor >= 0 ? _selectionAnchor : _cursorPosition;
+                }
+            }
+            else
+            {
+                selectionAnchor = _selectionAnchor >= 0 ? _selectionAnchor : _cursorPosition;
+            }
+
+            _cursorPosition = targetPosition;
+            _selection.Start = Math.Min(selectionAnchor, targetPosition);
+            _selection.End = Math.Max(selectionAnchor, targetPosition);
+        }
+
+        RefreshSelection();
     }
 
     private IEnumerable<int> GetRowSelectedIndexes(int rowIndex)
@@ -450,6 +501,9 @@ public class HexViewer : ContentControl
         _hexPanel.InvalidateVisual();
         _header.InvalidateVisual();
     }
+
+    private void ScrollToRow(int rowIndex) => _scrollViewer.Offset =
+        new Vector(_scrollViewer.Offset.X, rowIndex * RowHeight);
 
     private void RefreshSelection() => SelectedIndexes = Enumerable.Range(_selection.Start, _selection.Length).ToArray();
 }

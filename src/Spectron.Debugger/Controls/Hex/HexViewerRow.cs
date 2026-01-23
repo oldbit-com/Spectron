@@ -121,15 +121,21 @@ public sealed class HexViewerRow : Control
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
-        var x = e.GetPosition(this).X;
-        var cellIndex = RowTextBuilder?.GetIndexFromPosition(x);
-
-        if (cellIndex != null)
+        if (!e.Properties.IsLeftButtonPressed)
         {
-            CellClicked?.Invoke(this, new HexCellClickedEventArgs(RowIndex, cellIndex.Value));
+            return;
         }
 
-        base.OnPointerPressed(e);
+        var x = e.GetPosition(this).X;
+        var cellIndex = RowTextBuilder.GetIndexFromPosition(x);
+
+        if (cellIndex == null)
+        {
+            return;
+        }
+
+        var isShiftPressed = e.KeyModifiers.HasFlag(KeyModifiers.Shift);
+        CellClicked?.Invoke(this, new HexCellClickedEventArgs(RowIndex, cellIndex.Value, isShiftPressed));
     }
 
     internal static FormattedText CreateFormattedText(string text, Typeface typeface, double fontSize, IBrush? foreground) => new(
