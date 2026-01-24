@@ -6,6 +6,7 @@ internal record RowTextLayout(int Position, int Width);
 
 internal sealed class RowTextBuilder
 {
+    private readonly IAsciiFormatter _asciiFormatter;
     private readonly int _groupSize;
     private readonly int _bytesPerRow;
     private readonly RowTextLayout[] _layout;
@@ -13,9 +14,15 @@ internal sealed class RowTextBuilder
     internal double CharWidth { get; }
     internal bool IsOffsetVisible { get; }
 
-    public RowTextBuilder(bool isOffsetVisible, int groupSize, int bytesPerRow, double charWidth)
+    public RowTextBuilder(
+        IAsciiFormatter asciiFormatter,
+        bool isOffsetVisible,
+        int groupSize,
+        int bytesPerRow,
+        double charWidth)
     {
         IsOffsetVisible = isOffsetVisible;
+        _asciiFormatter = asciiFormatter;
         _groupSize = groupSize;
         _bytesPerRow = bytesPerRow;
         CharWidth = charWidth;
@@ -44,7 +51,7 @@ internal sealed class RowTextBuilder
             }
 
             hex.Append(i >= data.Length ? "  " : data[i].ToString("X2"));
-            ascii.Append(i >= data.Length ? ' ' : AsciiFormatter(data[i]));
+            ascii.Append(i >= data.Length ? ' ' : _asciiFormatter.Format(data[i]));
         }
 
         hex.Append("  ");
@@ -138,6 +145,4 @@ internal sealed class RowTextBuilder
     }
 
     private bool IsGroupSpacer(int index) => _groupSize > 0 & index > 0 && index % _groupSize == 0;
-
-    private Func<byte, char> AsciiFormatter { get; set; } = b => b is >= 32 and <= 126 ? (char)b : '.';
 }

@@ -9,7 +9,7 @@
         x:Class="OldBit.Spectron.Debugger.Views.MemoryView"
         x:DataType="viewModels:MemoryViewModel"
         WindowStartupLocation="CenterOwner"
-        Width="1200"
+        Width="900"
         Height="700"
         Title="Memory">
 
@@ -18,11 +18,13 @@
         <KeyBinding Gesture="{OnPlatform Ctrl+F, macOS=Cmd+F}" Command="{Binding ShowFindOverlayCommand}"/>
     </Window.KeyBindings>
 
-    <Grid Margin="5" RowDefinitions="10,*">
+    <Grid Margin="8" RowDefinitions="10,*">
         <hex:HexViewer
             Grid.Row="1"
             Name="MemoryViewer"
-            BytesPerRow="32"
+            FontFamily="{StaticResource SpectrumFont}"
+            FontSize="10"
+            BytesPerRow="16"
             GroupSize="8"
             Data="{Binding Memory}">
 

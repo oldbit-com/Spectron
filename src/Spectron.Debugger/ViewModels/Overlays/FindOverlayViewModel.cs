@@ -10,8 +10,11 @@ public partial class FindOverlayViewModel : BaseOverlayViewModel
     [NotifyDataErrorInfo]
     private string _text = "?";
 
+    public Action<string> Find { get; set; } = _ => { };
+
     public override void OnExecute()
     {
+        Find(Text);
         Hide();
     }
 }

@@ -1,12 +1,17 @@
 using Avalonia.Controls;
 using Avalonia.Threading;
+using OldBit.Spectron.Debugger.Converters;
 using OldBit.Spectron.Debugger.ViewModels;
 
 namespace OldBit.Spectron.Debugger.Views;
 
 public partial class MemoryView : Window
 {
-    public MemoryView() => InitializeComponent();
+    public MemoryView()
+    {
+        InitializeComponent();
+        MemoryViewer.AsciiFormatter = new ZxAsciiConverter();
+    }
 
     protected override void OnDataContextChanged(EventArgs e)
     {

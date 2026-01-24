@@ -43,6 +43,9 @@ public class HexViewer : ContentControl
     public static readonly StyledProperty<bool> IsMultiSelectProperty =
         AvaloniaProperty.Register<HexViewer, bool>(nameof(IsMultiSelect), defaultValue: true);
 
+    public static readonly StyledProperty<IAsciiFormatter> AsciiFormatterProperty =
+        AvaloniaProperty.Register<HexViewer, IAsciiFormatter>(nameof(AsciiFormatter), new DefaultAsciiFormatter());
+
     public int RowHeight
     {
         get => GetValue(RowHeightProperty);
@@ -77,6 +80,12 @@ public class HexViewer : ContentControl
     {
         get => GetValue(IsMultiSelectProperty);
         set => SetValue(IsMultiSelectProperty, value);
+    }
+
+    public IAsciiFormatter AsciiFormatter
+    {
+        get => GetValue(AsciiFormatterProperty);
+        set => SetValue(AsciiFormatterProperty, value);
     }
 
     public byte[] Data
@@ -126,7 +135,7 @@ public class HexViewer : ContentControl
     private readonly HexViewerPanel _hexPanel;
 
     private readonly Selection _selection = new();
-    private int _cursorPosition = -1;
+    private int _caretPosition = -1;
     private int _selectionAnchor = -1;
 
     private int CurrentRowIndex => _selection.Start / BytesPerRow;
@@ -177,6 +186,7 @@ public class HexViewer : ContentControl
         this.GetObservable(FontStretchProperty).Subscribe(_ => Invalidate());
         this.GetObservable(IsOffsetVisibleProperty).Subscribe(_ => Invalidate());
         this.GetObservable(BytesPerRowProperty).Subscribe(_ => Invalidate());
+        this.GetObservable(AsciiFormatterProperty).Subscribe(_ => Invalidate());
         this.GetObservable(IsHeaderVisibleProperty).Subscribe(_ => _header.IsVisible = IsHeaderVisible);
         this.GetObservable(SelectedIndexesProperty).Subscribe(_ => _hexPanel.UpdateSelected(_selection));
 
@@ -217,7 +227,7 @@ public class HexViewer : ContentControl
     {
         _selection.Start = start;
         _selection.End = start + length - 1;
-        _cursorPosition = _selection.End;
+        _caretPosition = _selection.End;
         _selectionAnchor = _selection.Start;
 
         var rowIndex = _selection.Start / BytesPerRow;
@@ -263,26 +273,26 @@ public class HexViewer : ContentControl
                 break;
 
             case Key.Home:
-                _cursorPosition = 0;
-                _selection.Start = _cursorPosition;
+                _caretPosition = 0;
+                _selection.Start = _caretPosition;
 
                 if (!e.KeyModifiers.HasFlag(KeyModifiers.Shift))
                 {
                     _selection.End = _selection.Start;
-                    _selectionAnchor = _cursorPosition;
+                    _selectionAnchor = _caretPosition;
                 }
 
                 _scrollViewer.ScrollToHome();
                 break;
 
             case Key.End:
-                _cursorPosition = Data.Length - 1;
-                _selection.End = _cursorPosition;
+                _caretPosition = Data.Length - 1;
+                _selection.End = _caretPosition;
 
                 if (!e.KeyModifiers.HasFlag(KeyModifiers.Shift))
                 {
                     _selection.Start = _selection.End;
-                    _selectionAnchor = _cursorPosition;
+                    _selectionAnchor = _caretPosition;
                 }
 
                 _scrollViewer.ScrollToEnd();
@@ -309,53 +319,53 @@ public class HexViewer : ContentControl
 
     private void MoveLeft(bool isShiftPressed, int offset)
     {
-        if (_cursorPosition == 0)
+        if (_caretPosition == 0)
         {
             return;
         }
 
-        _cursorPosition = _cursorPosition >= offset ? _cursorPosition - offset : 0;
+        _caretPosition = _caretPosition >= offset ? _caretPosition - offset : 0;
 
         if (!IsMultiSelect || !isShiftPressed)
         {
-            _selection.Start = _cursorPosition;
-            _selection.End = _cursorPosition;
-            _selectionAnchor = _cursorPosition;
+            _selection.Start = _caretPosition;
+            _selection.End = _caretPosition;
+            _selectionAnchor = _caretPosition;
         }
         else
         {
-            if (_cursorPosition == _selection.End - offset && _selection.Length > 1)
+            if (_caretPosition == _selection.End - offset && _selection.Length > 1)
             {
-                _selection.End = _cursorPosition;
+                _selection.End = _caretPosition;
             }
 
-            if (_cursorPosition < _selection.Start)
+            if (_caretPosition < _selection.Start)
             {
-                _selection.Start = _cursorPosition;
+                _selection.Start = _caretPosition;
             }
         }
     }
 
     private void MoveRight(bool isShiftPressed, int offset)
     {
-        _cursorPosition = _cursorPosition < Data.Length - offset ? _cursorPosition + offset : Data.Length - 1;
+        _caretPosition = _caretPosition < Data.Length - offset ? _caretPosition + offset : Data.Length - 1;
 
         if (!IsMultiSelect || !isShiftPressed)
         {
-            _selection.Start = _cursorPosition;
-            _selection.End = _cursorPosition;
-            _selectionAnchor = _cursorPosition;
+            _selection.Start = _caretPosition;
+            _selection.End = _caretPosition;
+            _selectionAnchor = _caretPosition;
         }
         else
         {
-            if (_cursorPosition == _selection.Start + offset && _selection.Length > 1)
+            if (_caretPosition == _selection.Start + offset && _selection.Length > 1)
             {
-                _selection.Start = _cursorPosition;
+                _selection.Start = _caretPosition;
             }
 
-            if (_cursorPosition > _selection.End)
+            if (_caretPosition > _selection.End)
             {
-                _selection.End = _cursorPosition;
+                _selection.End = _caretPosition;
             }
         }
     }
@@ -390,12 +400,12 @@ public class HexViewer : ContentControl
     {
         var targetPosition = e.RowIndex * BytesPerRow + e.Position;
 
-        if (!IsMultiSelect || !e.IsShiftPressed || _cursorPosition < 0)
+        if (!IsMultiSelect || !e.IsShiftPressed || _caretPosition < 0)
         {
-            _cursorPosition = targetPosition;
-            _selection.Start = _cursorPosition;
-            _selection.End = _cursorPosition;
-            _selectionAnchor = _cursorPosition;
+            _caretPosition = targetPosition;
+            _selection.Start = _caretPosition;
+            _selection.End = _caretPosition;
+            _selectionAnchor = _caretPosition;
         }
         else
         {
@@ -413,15 +423,15 @@ public class HexViewer : ContentControl
                 }
                 else
                 {
-                    selectionAnchor = _selectionAnchor >= 0 ? _selectionAnchor : _cursorPosition;
+                    selectionAnchor = _selectionAnchor >= 0 ? _selectionAnchor : _caretPosition;
                 }
             }
             else
             {
-                selectionAnchor = _selectionAnchor >= 0 ? _selectionAnchor : _cursorPosition;
+                selectionAnchor = _selectionAnchor >= 0 ? _selectionAnchor : _caretPosition;
             }
 
-            _cursorPosition = targetPosition;
+            _caretPosition = targetPosition;
             _selection.Start = Math.Min(selectionAnchor, targetPosition);
             _selection.End = Math.Max(selectionAnchor, targetPosition);
         }
@@ -491,7 +501,7 @@ public class HexViewer : ContentControl
         var formattedText = HexViewerRow.CreateFormattedText("X", Typeface, FontSize, Foreground);
 
         RowWidth = textLength * formattedText.Width;
-        RowTextBuilder = new RowTextBuilder(IsOffsetVisible, GroupSize, BytesPerRow, formattedText.Width);
+        RowTextBuilder = new RowTextBuilder(AsciiFormatter, IsOffsetVisible, GroupSize, BytesPerRow, formattedText.Width);
     }
 
     private void Invalidate()

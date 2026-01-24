@@ -35,6 +35,7 @@ public sealed partial class MemoryViewModel : ObservableObject, IDisposable
         emulator.Memory.MemoryUpdated += MemoryUpdated;
 
         GoToOverlay.GoTo = GoToAddress;
+        FindOverlay.Find = FindText;
     }
 
     public void Update(IMemory memory) => Memory = memory.ToBytes();
@@ -106,6 +107,11 @@ public sealed partial class MemoryViewModel : ObservableObject, IDisposable
     }
 
     private void GoToAddress(Word address) => GoTo(address);
+
+    private void FindText(string text)
+    {
+
+    }
 
     private void MemoryUpdated(Word address, byte value) => OnMemoryUpdated.Invoke(address, value);
 

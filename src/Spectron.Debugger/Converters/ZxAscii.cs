@@ -7,15 +7,17 @@ namespace OldBit.Spectron.Debugger.Converters;
 /// </summary>
 public static class ZxAscii
 {
-    public static string ToString(byte value, char nonPrintChar = '.')
+    public static char ToChar(byte value, char nonPrintChar = '.')
     {
         if (value >= 0x20 & value <= 0x8F)
         {
-            return ToSpectrumCharCode(value).ToString();
+            return ToSpectrumCharCode(value);
         }
 
-        return nonPrintChar.ToString();
+        return nonPrintChar;
     }
+
+    public static string ToString(byte value, char nonPrintChar = '.') => ToChar(value, nonPrintChar).ToString();
 
     public static string ToString(ReadOnlySpan<byte> values, char nonPrintChar = '.')
     {
@@ -23,7 +25,7 @@ public static class ZxAscii
 
         foreach (var value in values)
         {
-            s.Append(ToString(value, nonPrintChar));
+            s.Append(ToChar(value, nonPrintChar));
         }
 
         return s.ToString();
