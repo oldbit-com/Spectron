@@ -10,4 +10,7 @@ public partial class BaseOverlayViewModel : ObservableValidator
 
     [RelayCommand]
     public void OnHide() => Hide();
+
+    [RelayCommand]
+    public virtual void OnExecute() { }
 }

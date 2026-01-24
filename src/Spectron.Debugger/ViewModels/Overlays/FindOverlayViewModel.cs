@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 
 namespace OldBit.Spectron.Debugger.ViewModels.Overlays;
 
@@ -11,15 +10,8 @@ public partial class FindOverlayViewModel : BaseOverlayViewModel
     [NotifyDataErrorInfo]
     private string _text = "?";
 
-    [RelayCommand]
-    public void OnFind()
+    public override void OnExecute()
     {
-        // if (!HexNumberParser.TryParse(Address, out var address))
-        // {
-        //     return;
-        // }
-        //
-        // GoTo((Word)address);
         Hide();
     }
 }

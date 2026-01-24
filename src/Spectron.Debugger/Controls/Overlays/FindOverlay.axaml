@@ -5,21 +5,31 @@
              xmlns:viewModels="clr-namespace:OldBit.Spectron.Debugger.ViewModels.Overlays"
              x:DataType="viewModels:FindOverlayViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="OldBit.Spectron.Debugger.Controls.Overlays.FindOverlay">
+             x:Class="OldBit.Spectron.Debugger.Controls.Overlays.FindOverlay"
+             IsVisible="False">
 
-    <Border Name="Overlay" IsVisible="False" Background="#80000000" ZIndex="1000">
+    <Border Name="OverlayControl" Background="#80000000" ZIndex="1000">
         <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
 
-            <Border Width="250"
+            <Border Name="Dialog"
+                    Width="250"
                     Padding="16"
                     CornerRadius="10"
                     Background="{DynamicResource ThemeBackgroundBrush}"
                     BorderBrush="{DynamicResource ThemeBorderMidBrush}"
                     BorderThickness="1">
+
                 <StackPanel Spacing="10">
-                    <TextBlock Text="Find"
-                               Opacity="2"
-                               FontWeight="Bold"/>
+                    <Border Name="DragHandleControl"
+                            Background="Transparent"
+                            Cursor="SizeAll"
+                            PointerPressed="DragHandle_OnPointerPressed"
+                            PointerMoved="DragHandle_OnPointerMoved"
+                            PointerReleased="DragHandle_OnPointerReleased">
+                        <TextBlock Text="Find"
+                                   Opacity="2"
+                                   FontWeight="Bold"/>
+                    </Border>
 
                     <TextBox Name="FindBox"
                              Padding="10 8 10 0"
@@ -31,7 +41,7 @@
                         <Button Content="Cancel"
                                 Command="{Binding HideCommand}"/>
                         <Button Content="Find"
-                                Command="{Binding FindCommand}"
+                                Command="{Binding ExecuteCommand}"
                                 IsEnabled="{Binding ElementName=FindBox, Path=!(DataValidationErrors.HasErrors)}"/>
                     </StackPanel>
                 </StackPanel>

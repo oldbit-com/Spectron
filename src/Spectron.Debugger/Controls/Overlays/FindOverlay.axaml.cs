@@ -1,54 +1,24 @@
 using Avalonia.Controls;
-using Avalonia.Input;
-using OldBit.Spectron.Debugger.ViewModels.Overlays;
 
 namespace OldBit.Spectron.Debugger.Controls.Overlays;
 
-public partial class FindOverlay : UserControl
+public partial class FindOverlay : BaseOverlay
 {
-    private FindOverlayViewModel? _viewModel;
-
-    public FindOverlay() => InitializeComponent();
-
-    protected override void OnDataContextChanged(EventArgs e)
+    public FindOverlay()
     {
-        if (DataContext is not FindOverlayViewModel viewModel)
-        {
-            return;
-        }
+        InitializeComponent();
+        Dialog.RenderTransform = DialogTransform;
 
-        _viewModel = viewModel;
-
-        _viewModel.Show = Show;
-        _viewModel.Hide = Hide;
+        DragHandle = DragHandleControl;
+        Overlay = OverlayControl;
     }
 
-    protected override void OnKeyDown(KeyEventArgs e)
+    protected override void Focus()
     {
-        if (!Overlay.IsVisible)
-        {
-            return;
-        }
-
-        if (e.Key == Key.Escape)
-        {
-            Hide();
-            e.Handled = true;
-        }
-
-        if (e.Key == Key.Enter && _viewModel?.HasErrors == false)
-        {
-            //_viewModel.OnGoTo();
-            e.Handled = true;
-        }
-    }
-
-    private void Show()
-    {
-        Overlay.IsVisible = true;
         FindBox.Focus();
         FindBox.SelectAll();
     }
 
-    private void Hide() => Overlay.IsVisible = false;
+    protected override Control DragHandle { get; }
+    protected override Control Overlay { get; }
 }

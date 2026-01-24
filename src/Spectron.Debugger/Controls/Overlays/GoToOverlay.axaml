@@ -5,20 +5,30 @@
              xmlns:viewModels="clr-namespace:OldBit.Spectron.Debugger.ViewModels.Overlays"
              x:DataType="viewModels:GoToOverlayViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="OldBit.Spectron.Debugger.Controls.Overlays.GoToOverlay">
+             x:Class="OldBit.Spectron.Debugger.Controls.Overlays.GoToOverlay"
+             IsVisible="False">
 
-    <Border Name="Overlay" IsVisible="False" Background="#80000000" ZIndex="1000">
+    <Border Name="OverlayControl" Background="#80000000" ZIndex="1000">
         <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
 
-            <Border Width="200"
+            <Border Name="Dialog"
+                    Width="200"
                     Padding="16"
                     CornerRadius="10"
                     Background="{DynamicResource ThemeBackgroundBrush}"
                     BorderBrush="{DynamicResource ThemeBorderMidBrush}"
                     BorderThickness="1">
+
                 <StackPanel Spacing="10">
-                    <TextBlock Text="Go to Address"
-                               FontWeight="Bold"/>
+                    <Border Name="DragHandleControl"
+                            Background="Transparent"
+                            Cursor="SizeAll"
+                            PointerPressed="DragHandle_OnPointerPressed"
+                            PointerMoved="DragHandle_OnPointerMoved"
+                            PointerReleased="DragHandle_OnPointerReleased">
+                        <TextBlock Text="Go to Address"
+                                   FontWeight="Bold"/>
+                    </Border>
 
                     <TextBox Name="AddressBox"
                              Opacity="2"
@@ -32,7 +42,7 @@
                         <Button Content="Cancel"
                                 Command="{Binding HideCommand}"/>
                         <Button Content="Go"
-                                Command="{Binding GoToCommand}"
+                                Command="{Binding ExecuteCommand}"
                                 IsEnabled="{Binding ElementName=AddressBox, Path=!(DataValidationErrors.HasErrors)}"/>
                     </StackPanel>
                 </StackPanel>

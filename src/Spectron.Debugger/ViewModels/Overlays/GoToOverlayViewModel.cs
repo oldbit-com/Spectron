@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using OldBit.Spectron.Debugger.Parser;
 
 namespace OldBit.Spectron.Debugger.ViewModels.Overlays;
@@ -15,8 +14,7 @@ public partial class GoToOverlayViewModel : BaseOverlayViewModel
 
     public Action<Word> GoTo { get; set; } = _ => { };
 
-    [RelayCommand]
-    public void OnGoTo()
+    public override void OnExecute()
     {
         if (!HexNumberParser.TryParse(Address, out var address))
         {
