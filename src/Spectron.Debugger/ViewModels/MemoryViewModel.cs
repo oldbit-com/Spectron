@@ -3,6 +3,7 @@ using Avalonia.Input.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OldBit.Spectron.Debugger.Controls.Hex;
+using OldBit.Spectron.Debugger.Converters;
 using OldBit.Spectron.Debugger.ViewModels.Overlays;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Extensions;
@@ -59,7 +60,7 @@ public sealed partial class MemoryViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private void CopyHex()
+    private async Task CopyHex()
     {
         if (Clipboard is null)
         {
@@ -67,12 +68,13 @@ public sealed partial class MemoryViewModel : ObservableObject, IDisposable
         }
 
         var bytes = GetSelectedBytes();
+        var hex = BitConverter.ToString(bytes).Replace("-", " ");
 
-        Console.WriteLine("Copy hex");
+        await Clipboard.SetTextAsync(hex);
     }
 
     [RelayCommand]
-    private void CopyAscii()
+    private async Task CopyAscii()
     {
         if (Clipboard is null)
         {
@@ -80,8 +82,9 @@ public sealed partial class MemoryViewModel : ObservableObject, IDisposable
         }
 
         var bytes = GetSelectedBytes();
+        var ascii = ZxAscii.ToString(bytes);
 
-        Console.WriteLine("Copy ascii");
+        await Clipboard.SetTextAsync(ascii);
     }
 
     private byte[] GetSelectedBytes()
@@ -91,14 +94,15 @@ public sealed partial class MemoryViewModel : ObservableObject, IDisposable
             return [];
         }
 
-        var bytes = new byte[Viewer.SelectedIndexes.Length];
+        var selectedBytes = new byte[Viewer.SelectedIndexes.Length];
+        var index = 0;
 
-        foreach (var index in Viewer.SelectedIndexes)
+        foreach (var selected in Viewer.SelectedIndexes)
         {
-            bytes[index] = Memory[index];
+            selectedBytes[index++] = Memory[selected];
         }
 
-        return bytes;
+        return selectedBytes;
     }
 
     private void GoToAddress(Word address) => GoTo(address);
