@@ -5,7 +5,7 @@ using Avalonia.Media;
 
 namespace OldBit.Spectron.Debugger.Controls.Hex;
 
-internal sealed class HexViewerHeader : Control
+public sealed class HexViewerHeader : Control
 {
     internal static readonly StyledProperty<IBrush?> ForegroundProperty =
         TemplatedControl.ForegroundProperty.AddOwner<HexViewerHeader>();
@@ -19,7 +19,7 @@ internal sealed class HexViewerHeader : Control
     private static readonly StyledProperty<RowTextBuilder> RowTextBuilderProperty =
         HexViewer.RowTextBuilderProperty.AddOwner<HexViewerHeader>();
 
-    internal IBrush? Foreground
+    public IBrush? Foreground
     {
         get => GetValue(ForegroundProperty);
         set => SetValue(ForegroundProperty, value);
