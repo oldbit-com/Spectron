@@ -1,0 +1,55 @@
+using System.Text;
+
+namespace OldBit.Spectron.Debugger.Converters;
+
+/// <summary>
+/// Converts ZX Spectrum ASCII codes to their Unicode equivalents.
+/// </summary>
+public static class ZxAscii
+{
+    public static string ToString(byte value, char nonPrintChar = '.')
+    {
+        if (value > 0x20 & value < 0x90)
+        {
+            return ToSpectrumCharCode(value).ToString();
+        }
+
+        return nonPrintChar.ToString();
+    }
+
+    public static string ToString(ReadOnlySpan<byte> values, char nonPrintChar = '.')
+    {
+        var s = new StringBuilder(values.Length);
+
+        foreach (var value in values)
+        {
+            s.Append(ToString(value, nonPrintChar));
+        }
+
+        return s.ToString();
+    }
+
+    private static char ToSpectrumCharCode(byte code) => code switch
+    {
+        0x5E => '\x2191', // "↑"
+        0x60 => '\x00A3', // "£"
+        0x7F => '\x00A9', // "©"
+        0x80 => '\x0020', // " "
+        0x81 => '\x259D', // "▝"
+        0x82 => '\x2598', // "▘"
+        0x83 => '\x2580', // "▀"
+        0x84 => '\x2597', // "▗"
+        0x85 => '\x2590', // "▐"
+        0x86 => '\x259A', // "▚"
+        0x87 => '\x259C', // "▜"
+        0x88 => '\x2596', // "▖"
+        0x89 => '\x259E', // "▞"
+        0x8A => '\x258C', // "▌"
+        0x8B => '\x259B', // "▛"
+        0x8C => '\x2584', // "▄"
+        0x8D => '\x259F', // "▟"
+        0x8E => '\x2599', // "▙"
+        0x8F => '\x2588', // "█"
+        _ => Convert.ToChar(code)
+    };
+}
