@@ -17,16 +17,16 @@
 
     <UserControl.Styles>
         <Style Selector="TextBox.Register">
-            <Setter Property="FontFamily" Value="{StaticResource SpectrumStrictFont}"/>
+            <Setter Property="FontFamily" Value="{StaticResource SpectrumFont}"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontSize" Value="9"/>
             <Setter Property="Padding" Value="8 0 8 0"/>
             <Setter Property="Height" Value="30"/>
         </Style>
         <Style Selector="TextBlock.Register">
-            <Setter Property="FontFamily" Value="{StaticResource SpectrumStrictFont}"/>
+            <Setter Property="FontFamily" Value="{StaticResource SpectrumFont}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontSize" Value="9"/>
         </Style>
     </UserControl.Styles>
 

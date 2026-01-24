@@ -17,8 +17,8 @@
                 Text="Stack"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                FontFamily="{StaticResource SpectrumStrictFont}"
-                FontSize="20"/>
+                FontFamily="{StaticResource SpectrumFont}"
+                FontSize="9"/>
         </Border>
 
         <ListBox Grid.Row="1" ItemsSource="{Binding Items}">
@@ -50,17 +50,19 @@
 
                         <TextBlock
                             Grid.Column="1"
-                            FontFamily="{StaticResource SpectrumStrictFont}"
+                            FontFamily="{StaticResource SpectrumFont}"
+                            VerticalAlignment="Center"
                             TextAlignment="Left"
-                            FontSize="20"
-                            Margin="0 -4 0 0"
+                            FontSize="9"
+                            Margin="0 0 0 0"
                             Text="{Binding Address}"/>
                         <TextBlock
                             Grid.Column="2"
-                            FontFamily="{StaticResource SpectrumStrictFont}"
+                            FontFamily="{StaticResource SpectrumFont}"
+                            VerticalAlignment="Center"
                             TextAlignment="Right"
-                            FontSize="20"
-                            Margin="0 -4 8 0"
+                            FontSize="9"
+                            Margin="0 0 8 0"
                             Text="{Binding Value}"/>
                     </Grid>
                 </DataTemplate>
