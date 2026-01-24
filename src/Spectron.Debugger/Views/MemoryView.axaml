@@ -15,32 +15,40 @@
 
     <Window.KeyBindings>
         <KeyBinding Gesture="{OnPlatform Ctrl+G, macOS=Cmd+G}" Command="{Binding ShowGoToOverlayCommand}"/>
+        <KeyBinding Gesture="{OnPlatform Ctrl+F, macOS=Cmd+F}" Command="{Binding ShowFindOverlayCommand}"/>
     </Window.KeyBindings>
 
-    <Grid Margin="5" RowDefinitions="40,*">
-
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <TextBlock Text="Address" VerticalAlignment="Center"/>
-            <TextBox
-                BorderBrush="{x:Null}"
-                Height="20"
-                Padding="10 8 0 10"
-                Text="23232"
-                Width="100"  />
-        </StackPanel>
-
+    <Grid Margin="5" RowDefinitions="10,*">
         <hex:HexViewer
             Grid.Row="1"
             Name="MemoryViewer"
             BytesPerRow="32"
             GroupSize="8"
-            Data="{Binding Memory}"/>
+            Data="{Binding Memory}">
+
+            <hex:HexViewer.KeyBindings>
+                <KeyBinding Gesture="{OnPlatform Ctrl+C, macOS=Cmd+C}" Command="{Binding CopyHexCommand}"/>
+                <KeyBinding Gesture="{OnPlatform Ctrl+Shift+C, macOS=Cmd+Shift+C}" Command="{Binding CopyAsciiCommand}"/>
+                <KeyBinding Gesture="{OnPlatform Ctrl+Shift+F, macOS=Cmd+Shift+F}" Command="{Binding FindNextCommand}"/>
+            </hex:HexViewer.KeyBindings>
+
+            <hex:HexViewer.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Copy HEX" Padding="7" InputGesture="{OnPlatform Ctrl+C, macOS=Cmd+C}" Command="{Binding CopyHexCommand}"/>
+                    <MenuItem Header="Copy ASCII" Padding="7" InputGesture="{OnPlatform Ctrl+Shift+C, macOS=Cmd+Shift+C}" Command="{Binding CopyAsciiCommand}"/>
+                    <MenuItem Header="-" />
+                    <MenuItem Header="Go to Address" Padding="7" InputGesture="{OnPlatform Ctrl+G, macOS=Cmd+G}" Command="{Binding ShowGoToOverlayCommand}"/>
+                    <MenuItem Header="Find" Padding="7" InputGesture="{OnPlatform Ctrl+F, macOS=Cmd+F}" Command="{Binding ShowFindOverlayCommand}"/>
+                    <MenuItem Header="Find Next" Padding="7" InputGesture="{OnPlatform Ctrl+Shift+F, macOS=Cmd+Shift+F}" Command="{Binding FindNextCommand}"/>
+                </ContextMenu>
+            </hex:HexViewer.ContextMenu>
+
+        </hex:HexViewer>
 
         <overlays:GoToAddressOverlay
             DataContext="{Binding GoToAddressOverlay}"
             Name="GoToAddressOverlay"
-            Grid.Row="1"
-            />
+            Grid.Row="1"/>
 
     </Grid>
 </Window>

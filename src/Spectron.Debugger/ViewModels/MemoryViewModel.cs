@@ -34,6 +34,30 @@ public sealed partial class MemoryViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void ShowGoToOverlay() => GoToAddressOverlay.Show();
 
+    [RelayCommand]
+    private void ShowFindOverlay()
+    {
+        Console.WriteLine("Find overlay");
+    }
+
+    [RelayCommand]
+    private void FindNext()
+    {
+        Console.WriteLine("Find next");
+    }
+
+    [RelayCommand]
+    private void CopyHex()
+    {
+        Console.WriteLine("Copy hex");
+    }
+
+    [RelayCommand]
+    private void CopyAscii()
+    {
+        Console.WriteLine("Copy ascii");
+    }
+
     private void GoToAddress(Word address) => GoTo(address);
 
     private void MemoryUpdated(Word address, byte value) =>
