@@ -1,5 +1,8 @@
+using System.Text;
+using Avalonia.Input.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using OldBit.Spectron.Debugger.Controls.Hex;
 using OldBit.Spectron.Debugger.ViewModels.Overlays;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Extensions;
@@ -13,6 +16,9 @@ public sealed partial class MemoryViewModel : ObservableObject, IDisposable
 
     public GoToOverlayViewModel GoToOverlay { get; } = new();
     public FindOverlayViewModel FindOverlay { get; } = new();
+
+    public HexViewer? Viewer { get; set; }
+    public IClipboard? Clipboard { get; set; }
 
     public Action<Word, byte> OnMemoryUpdated { get; set; } = (_, _) => { };
     public Action<Word> GoTo { get; set; } = _ => { };
@@ -55,13 +61,44 @@ public sealed partial class MemoryViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void CopyHex()
     {
+        if (Clipboard is null)
+        {
+            return;
+        }
+
+        var bytes = GetSelectedBytes();
+
         Console.WriteLine("Copy hex");
     }
 
     [RelayCommand]
     private void CopyAscii()
     {
+        if (Clipboard is null)
+        {
+            return;
+        }
+
+        var bytes = GetSelectedBytes();
+
         Console.WriteLine("Copy ascii");
+    }
+
+    private byte[] GetSelectedBytes()
+    {
+        if (Viewer is null)
+        {
+            return [];
+        }
+
+        var bytes = new byte[Viewer.SelectedIndexes.Length];
+
+        foreach (var index in Viewer.SelectedIndexes)
+        {
+            bytes[index] = Memory[index];
+        }
+
+        return bytes;
     }
 
     private void GoToAddress(Word address) => GoTo(address);

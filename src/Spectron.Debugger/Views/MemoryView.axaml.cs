@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Avalonia.Threading;
 using OldBit.Spectron.Debugger.ViewModels;
 
@@ -16,11 +15,13 @@ public partial class MemoryView : Window
             return;
         }
 
-        viewModel.GoTo = address => Dispatcher.UIThread.Post(() => MemoryViewer.Select(address));
+        viewModel.Clipboard = Clipboard;
+        viewModel.Viewer = MemoryViewer;
+
+        viewModel.GoTo = address =>
+            Dispatcher.UIThread.Post(() => MemoryViewer.Select(address));
 
         viewModel.OnMemoryUpdated = (address, value) =>
-        {
             Dispatcher.UIThread.Post(() => MemoryViewer.UpdateValues(address, value));
-        };
     }
 }
