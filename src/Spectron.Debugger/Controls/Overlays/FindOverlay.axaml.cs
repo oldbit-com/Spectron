@@ -7,8 +7,8 @@ public partial class FindOverlay : BaseOverlay
     public FindOverlay()
     {
         InitializeComponent();
-        Dialog.RenderTransform = DialogTransform;
 
+        Dialog.RenderTransform = DialogTransform;
         DragHandle = DragHandleControl;
         Overlay = OverlayControl;
     }

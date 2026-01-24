@@ -19,15 +19,16 @@ public abstract class BaseOverlay : UserControl
     protected abstract void Focus();
     protected abstract Control DragHandle { get; }
     protected abstract Control Overlay { get; }
-    protected BaseOverlayViewModel? ViewModel { get; private set; }
 
-    protected void Show()
+    private BaseOverlayViewModel? ViewModel { get; set; }
+
+    private void Show()
     {
         IsVisible = true;
         Dispatcher.UIThread.Post(Focus, DispatcherPriority.Input);
     }
 
-    protected void Hide() => IsVisible = false;
+    private void Hide() => IsVisible = false;
 
     protected override void OnDataContextChanged(EventArgs e)
     {

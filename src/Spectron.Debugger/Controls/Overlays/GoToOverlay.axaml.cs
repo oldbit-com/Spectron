@@ -7,8 +7,8 @@ public partial class GoToOverlay : BaseOverlay
     public GoToOverlay()
     {
         InitializeComponent();
-        Dialog.RenderTransform = DialogTransform;
 
+        Dialog.RenderTransform = DialogTransform;
         DragHandle = DragHandleControl;
         Overlay = OverlayControl;
     }
