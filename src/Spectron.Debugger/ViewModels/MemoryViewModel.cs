@@ -107,8 +107,7 @@ public sealed partial class MemoryViewModel : ObservableObject, IDisposable
 
     private void GoToAddress(Word address) => GoTo(address);
 
-    private void MemoryUpdated(Word address, byte value) =>
-        OnMemoryUpdated.Invoke(address, value);
+    private void MemoryUpdated(Word address, byte value) => OnMemoryUpdated.Invoke(address, value);
 
     public void Dispose() => _emulator.Memory.MemoryUpdated -= MemoryUpdated;
 }
