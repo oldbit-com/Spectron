@@ -9,7 +9,7 @@ public static class ZxAscii
 {
     public static string ToString(byte value, char nonPrintChar = '.')
     {
-        if (value > 0x20 & value < 0x90)
+        if (value >= 0x20 & value <= 0x8F)
         {
             return ToSpectrumCharCode(value).ToString();
         }
