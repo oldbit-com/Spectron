@@ -7,7 +7,7 @@ namespace OldBit.Spectron.Debugger.ViewModels.Overlays;
 public partial class FindOverlayViewModel : BaseOverlayViewModel
 {
     [ObservableProperty]
-    [Required(ErrorMessage = "Enter text to search for")]
+    [Required(ErrorMessage = "Enter text")]
     [NotifyDataErrorInfo]
     private string _text = "?";
 

@@ -8,7 +8,7 @@ namespace OldBit.Spectron.Debugger.ViewModels.Overlays;
 public partial class GoToOverlayViewModel : BaseOverlayViewModel
 {
     [ObservableProperty]
-    [Required(ErrorMessage = "Enter address to go to")]
+    [Required(ErrorMessage = "Enter address")]
     [CustomValidation(typeof(GoToOverlayViewModel), nameof(ValidateAddress))]
     [NotifyDataErrorInfo]
     private string _address = "0";

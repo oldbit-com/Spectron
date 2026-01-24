@@ -18,6 +18,7 @@
                     BorderThickness="1">
                 <StackPanel Spacing="10">
                     <TextBlock Text="Find"
+                               Opacity="2"
                                FontWeight="Bold"/>
 
                     <TextBox Name="FindBox"

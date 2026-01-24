@@ -33,10 +33,18 @@ public sealed partial class MemoryViewModel : ObservableObject, IDisposable
     public void Update(IMemory memory) => Memory = memory.ToBytes();
 
     [RelayCommand]
-    private void ShowGoToOverlay() => GoToOverlay.Show();
+    private void ShowGoToOverlay()
+    {
+        FindOverlay.Hide();
+        GoToOverlay.Show();
+    }
 
     [RelayCommand]
-    private void ShowFindOverlay() => FindOverlay.Show();
+    private void ShowFindOverlay()
+    {
+        GoToOverlay.Hide();
+        FindOverlay.Show();
+    }
 
     [RelayCommand]
     private void FindNext()

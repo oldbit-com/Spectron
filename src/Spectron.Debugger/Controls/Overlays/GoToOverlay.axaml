@@ -21,7 +21,9 @@
                                FontWeight="Bold"/>
 
                     <TextBox Name="AddressBox"
+                             Opacity="2"
                              Padding="10 8 10 0"
+                             Watermark="Hex or Decimal"
                              Text="{Binding Address}"/>
 
                     <StackPanel Orientation="Horizontal"
