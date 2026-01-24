@@ -3,16 +3,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:OldBit.Spectron.Debugger.ViewModels.Overlays"
-             x:DataType="viewModels:GoToAddressOverlayViewModel"
+             x:DataType="viewModels:GoToOverlayViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="OldBit.Spectron.Debugger.Controls.Overlays.GoToAddressOverlay">
+             x:Class="OldBit.Spectron.Debugger.Controls.Overlays.GoToOverlay">
 
-    <Border Name="Overlay"
-            IsVisible="False"
-            Background="#80000000"
-            ZIndex="1000">
-        <Grid HorizontalAlignment="Center"
-              VerticalAlignment="Center">
+    <Border Name="Overlay" IsVisible="False" Background="#80000000" ZIndex="1000">
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
 
             <Border Width="200"
                     Padding="16"
@@ -25,6 +21,7 @@
                                FontWeight="Bold"/>
 
                     <TextBox Name="AddressBox"
+                             Padding="10 8 10 0"
                              Text="{Binding Address}"/>
 
                     <StackPanel Orientation="Horizontal"

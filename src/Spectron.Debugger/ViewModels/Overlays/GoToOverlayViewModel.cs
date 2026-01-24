@@ -5,20 +5,15 @@ using OldBit.Spectron.Debugger.Parser;
 
 namespace OldBit.Spectron.Debugger.ViewModels.Overlays;
 
-public partial class GoToAddressOverlayViewModel : ObservableValidator
+public partial class GoToOverlayViewModel : BaseOverlayViewModel
 {
     [ObservableProperty]
-    [Required(ErrorMessage = "Address is required.")]
-    [CustomValidation(typeof(GoToAddressOverlayViewModel), nameof(ValidateAddress))]
+    [Required(ErrorMessage = "Enter address to go to")]
+    [CustomValidation(typeof(GoToOverlayViewModel), nameof(ValidateAddress))]
     [NotifyDataErrorInfo]
     private string _address = "0";
 
-    public Action Show { get; set; } = () => { };
-    public Action Hide { get; set; } = () => { };
     public Action<Word> GoTo { get; set; } = _ => { };
-
-    [RelayCommand]
-    public void OnHide() => Hide();
 
     [RelayCommand]
     public void OnGoTo()
@@ -36,14 +31,9 @@ public partial class GoToAddressOverlayViewModel : ObservableValidator
     {
         if (!HexNumberParser.TryParse(s, out var address))
         {
-            return new ValidationResult("Invalid address format.");
+            return new ValidationResult("Invalid address.");
         }
 
-        if (address is < 0 or > 0xFFFF)
-        {
-            return new ValidationResult("Address out of range.");
-        }
-
-        return null;
+        return address is < 0 or > 0xFFFF ? new ValidationResult("Address out of range.") : null;
     }
 }

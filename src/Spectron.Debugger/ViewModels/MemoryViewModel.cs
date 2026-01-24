@@ -11,7 +11,8 @@ public sealed partial class MemoryViewModel : ObservableObject, IDisposable
 {
     private readonly Emulator _emulator;
 
-    public GoToAddressOverlayViewModel GoToAddressOverlay { get; } = new();
+    public GoToOverlayViewModel GoToOverlay { get; } = new();
+    public FindOverlayViewModel FindOverlay { get; } = new();
 
     public Action<Word, byte> OnMemoryUpdated { get; set; } = (_, _) => { };
     public Action<Word> GoTo { get; set; } = _ => { };
@@ -26,19 +27,16 @@ public sealed partial class MemoryViewModel : ObservableObject, IDisposable
         Memory = emulator.Memory.ToBytes();
         emulator.Memory.MemoryUpdated += MemoryUpdated;
 
-        GoToAddressOverlay.GoTo = GoToAddress;
+        GoToOverlay.GoTo = GoToAddress;
     }
 
     public void Update(IMemory memory) => Memory = memory.ToBytes();
 
     [RelayCommand]
-    private void ShowGoToOverlay() => GoToAddressOverlay.Show();
+    private void ShowGoToOverlay() => GoToOverlay.Show();
 
     [RelayCommand]
-    private void ShowFindOverlay()
-    {
-        Console.WriteLine("Find overlay");
-    }
+    private void ShowFindOverlay() => FindOverlay.Show();
 
     [RelayCommand]
     private void FindNext()

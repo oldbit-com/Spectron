@@ -45,9 +45,14 @@
 
         </hex:HexViewer>
 
-        <overlays:GoToAddressOverlay
-            DataContext="{Binding GoToAddressOverlay}"
-            Name="GoToAddressOverlay"
+        <overlays:GoToOverlay
+            DataContext="{Binding GoToOverlay}"
+            Name="GoToOverlay"
+            Grid.Row="1"/>
+
+        <overlays:FindOverlay
+            DataContext="{Binding FindOverlay}"
+            Name="FindOverlay"
             Grid.Row="1"/>
 
     </Grid>

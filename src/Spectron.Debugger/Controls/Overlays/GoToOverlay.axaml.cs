@@ -4,22 +4,22 @@ using OldBit.Spectron.Debugger.ViewModels.Overlays;
 
 namespace OldBit.Spectron.Debugger.Controls.Overlays;
 
-public partial class GoToAddressOverlay : UserControl
+public partial class GoToOverlay : UserControl
 {
-    private GoToAddressOverlayViewModel? _viewModel;
+    private GoToOverlayViewModel? _viewModel;
 
-    public GoToAddressOverlay() => InitializeComponent();
+    public GoToOverlay() => InitializeComponent();
 
     protected override void OnDataContextChanged(EventArgs e)
     {
-        if (DataContext is not GoToAddressOverlayViewModel viewModel)
+        if (DataContext is not GoToOverlayViewModel viewModel)
         {
             return;
         }
 
         _viewModel = viewModel;
 
-        _viewModel.Show = SHow;
+        _viewModel.Show = Show;
         _viewModel.Hide = Hide;
     }
 
@@ -41,14 +41,13 @@ public partial class GoToAddressOverlay : UserControl
             _viewModel.OnGoTo();
             e.Handled = true;
         }
-
-        base.OnKeyDown(e);
     }
 
-    private void SHow()
+    private void Show()
     {
         Overlay.IsVisible = true;
         AddressBox.Focus();
+        AddressBox.SelectAll();
     }
 
     private void Hide() => Overlay.IsVisible = false;
