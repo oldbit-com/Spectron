@@ -6,8 +6,8 @@
              x:Class="OldBit.Spectron.Controls.TimeMachineTimer">
     <TextBlock
         Name="Countdown"
-        FontFamily="{StaticResource SpectrumExpandedFont}"
-        FontSize="512"
+        FontFamily="{StaticResource SpectrumFont}"
+        FontSize="230"
         Opacity=".8"
         Foreground="{StaticResource SpectrumBrightMagenta}"
         HorizontalAlignment="Center"

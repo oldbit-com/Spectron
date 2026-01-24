@@ -603,8 +603,8 @@
                                 VerticalAlignment="Center"/>
                             <ComboBox
                                 Grid.Column="1"
-                                FontFamily="{StaticResource SpectrumStrictFont}"
-                                FontSize="22"
+                                FontFamily="{StaticResource SpectrumFont}"
+                                FontSize="10"
                                 Width="130"
                                 ItemsSource="{Binding HexNumberFormats}"
                                 SelectedValue="{Binding DebuggerNumberFormat}"

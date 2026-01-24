@@ -3,7 +3,7 @@
         xmlns:controls="clr-namespace:OldBit.Spectron.Controls">
 
     <Design.PreviewWith>
-        <controls:PauseOverlay FontSize="60" />
+        <controls:PauseOverlay FontSize="27" />
     </Design.PreviewWith>
 
     <Style Selector="controls|PauseOverlay">
@@ -12,32 +12,32 @@
                 <StackPanel Orientation="Horizontal" Opacity="{Binding Opacity, RelativeSource={RelativeSource AncestorType={x:Type controls:PauseOverlay}}}" >
                     <TextBlock Text="P" x:Name="PART_LetterP" Opacity="1"
                                FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:PauseOverlay}}}"
-                               FontFamily="{StaticResource SpectrumStrictFont}"
+                               FontFamily="{StaticResource SpectrumFont}"
                                Foreground="{StaticResource SpectrumBlack}"
                     />
                     <TextBlock Text="A" x:Name="PART_LetterA" Opacity="1"
                                FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:PauseOverlay}}}"
-                               FontFamily="{StaticResource SpectrumStrictFont}"
+                               FontFamily="{StaticResource SpectrumFont}"
                                Foreground="{StaticResource SpectrumBrightRed}"
                     />
                     <TextBlock Text="U" x:Name="PART_LetterU" Opacity="1"
                                FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:PauseOverlay}}}"
-                               FontFamily="{StaticResource SpectrumStrictFont}"
+                               FontFamily="{StaticResource SpectrumFont}"
                                Foreground="{StaticResource SpectrumBrightGreen}"
                     />
                     <TextBlock Text="S" x:Name="PART_LetterS" Opacity="1"
                                FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:PauseOverlay}}}"
-                               FontFamily="{StaticResource SpectrumStrictFont}"
+                               FontFamily="{StaticResource SpectrumFont}"
                                Foreground="{StaticResource SpectrumBrightYellow}"
                     />
                     <TextBlock Text="E" x:Name="PART_LetterE" Opacity="1"
                                FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:PauseOverlay}}}"
-                               FontFamily="{StaticResource SpectrumStrictFont}"
+                               FontFamily="{StaticResource SpectrumFont}"
                                Foreground="{StaticResource SpectrumBrightMagenta}"
                     />
                     <TextBlock Text="D" x:Name="PART_LetterD" Opacity="1"
                                FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType={x:Type controls:PauseOverlay}}}"
-                               FontFamily="{StaticResource SpectrumStrictFont}"
+                               FontFamily="{StaticResource SpectrumFont}"
                                Foreground="{StaticResource SpectrumBrightBlue}"
                     />
                 </StackPanel>
