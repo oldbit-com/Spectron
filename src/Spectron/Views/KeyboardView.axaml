@@ -19,12 +19,12 @@
         <Image Source="../Assets/Keyboard.png"/>
         <TextBlock
             Text="Spectron Emulator"
-            FontFamily="{StaticResource SpectrumStrictFont}"
+            FontFamily="{StaticResource SpectrumFont}"
             VerticalAlignment="Bottom"
             HorizontalAlignment="Left"
             Opacity=".7"
             Margin="30,0,0,5"
-            FontSize="20"
+            FontSize="9"
             Foreground="{StaticResource SpectrumBrightCyan}"
             Background="Transparent"/>
     </Grid>

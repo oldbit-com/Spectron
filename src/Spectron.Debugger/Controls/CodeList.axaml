@@ -14,8 +14,8 @@
                 Text="Code"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                FontFamily="{StaticResource SpectrumStrictFont}"
-                FontSize="20"/>
+                FontFamily="{StaticResource SpectrumFont}"
+                FontSize="9"/>
         </Border>
 
         <ListBox Grid.Row="1" ItemsSource="{Binding CodeLines}" Name="ListBox" DoubleTapped="ListBox_OnDoubleTapped">

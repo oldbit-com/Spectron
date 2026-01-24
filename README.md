@@ -207,6 +207,6 @@ More information can be found [here](docs/Debugger.md).
 - [FFmpeg wrapper](https://github.com/rosenbjerg/FFMpegCore)
 - [SkiaSharp](https://github.com/mono/SkiaSharp)
 - [Material Icons](https://github.com/SKProCH/Material.Icons)
-- [ZX Spectrum Font](https://github.com/comptic/zx-spectrum-font)
+- [ZX Spectrum Font by Patrick H. Lauke](https://fontstruct.com/fontstructions/show/1398596)
 - [Hack Font](https://sourcefoundry.org/hack/)
 - [VT220 Font](https://github.com/svofski/glasstty/blob/master/Glass_TTY_VT220.ttf)

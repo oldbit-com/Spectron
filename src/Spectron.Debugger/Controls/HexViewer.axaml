@@ -90,8 +90,8 @@
                                                     <Grid x:DataType="controls:HexViewerCell" Height="{TemplateBinding CellHeight}">
                                                         <TextBlock Name="AsciiCell"
                                                             Text="{Binding Value, Converter={StaticResource AsciiConverter}}"
-                                                            FontFamily="{StaticResource SpectrumStrictFont}"
-                                                            FontSize="15"
+                                                            FontFamily="{StaticResource SpectrumFont}"
+                                                            FontSize="7"
                                                             VerticalAlignment="Center"
                                                             TextAlignment="Center"
                                                             Width="14"/>

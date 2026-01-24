@@ -14,7 +14,7 @@
 
     <Window.Styles>
         <Style Selector="TextBlock.ZX">
-            <Setter Property="FontFamily" Value="{StaticResource SpectrumStrictFont}"/>
+            <Setter Property="FontFamily" Value="{StaticResource SpectrumFont}"/>
         </Style>
     </Window.Styles>
 
@@ -29,11 +29,11 @@
             <Slider Name="Slider" TickPlacement="None" FocusAdorner="{x:Null}" Height="35" Padding="20 0 20 0" Minimum="0" Maximum="{Binding EntriesCount}" Value="{Binding CurrentEntryIndex}" TickFrequency="1" IsSnapToTickEnabled="True"/>
 
             <Grid ColumnDefinitions="*,*" Margin="20 0 20 0">
-                <TextBlock Grid.Column="0" Text="past" Classes="ZX" FontSize="15" Foreground="{StaticResource SpectrumWhite}"/>
-                <TextBlock Grid.Column="1" Text="now" TextAlignment="Right" Classes="ZX" FontSize="15" Foreground="{StaticResource SpectrumWhite}"/>
+                <TextBlock Grid.Column="0" Text="past" Classes="ZX" FontSize="8" Foreground="{StaticResource SpectrumWhite}"/>
+                <TextBlock Grid.Column="1" Text="now" TextAlignment="Right" Classes="ZX" FontSize="8" Foreground="{StaticResource SpectrumWhite}"/>
             </Grid>
 
-            <Button HotKey="Enter" HorizontalAlignment="Center" Content="Time Travel" Command="{Binding TimeTravelCommand}" FontFamily="{StaticResource SpectrumStrictFont}" FontSize="20" CornerRadius="10"/>
+            <Button HotKey="Enter" HorizontalAlignment="Center" Content="Time Travel" Command="{Binding TimeTravelCommand}" FontFamily="{StaticResource SpectrumFont}" FontSize="9" CornerRadius="10"/>
         </StackPanel>
     </Grid>
 </Window>
