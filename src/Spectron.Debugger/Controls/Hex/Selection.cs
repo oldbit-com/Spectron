@@ -1,9 +1,11 @@
 namespace OldBit.Spectron.Debugger.Controls.Hex;
 
-internal sealed class Selection
+public sealed record Selection(int Start, int End)
 {
-    public int Start { get; set; } = -1;
-    public int End { get; set; } = -1;
+    public static Selection Empty { get; } = new(-1, -1);
+
+    public int Start { get; } = Start;
+    public int End { get; } = End;
 
     public int Length => End - Start + 1;
 }

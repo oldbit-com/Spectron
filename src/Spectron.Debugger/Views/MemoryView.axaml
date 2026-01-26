@@ -13,15 +13,29 @@
         Height="700"
         Title="Memory">
 
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key='VT220Brush'>Black</SolidColorBrush>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key='VT220Brush'>Chartreuse</SolidColorBrush>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
     <Window.KeyBindings>
         <KeyBinding Gesture="{OnPlatform Ctrl+G, macOS=Cmd+G}" Command="{Binding ShowGoToOverlayCommand}"/>
         <KeyBinding Gesture="{OnPlatform Ctrl+F, macOS=Cmd+F}" Command="{Binding ShowFindOverlayCommand}"/>
     </Window.KeyBindings>
 
-    <Grid Margin="8" RowDefinitions="10,*">
+    <Grid Margin="8" RowDefinitions="*,30">
         <hex:HexViewer
-            Grid.Row="1"
+            Grid.Row="0"
             Name="MemoryViewer"
+            Margin="0 0 0 10"
             FontFamily="{StaticResource SpectrumFont}"
             FontSize="10"
             BytesPerRow="16"
@@ -56,6 +70,16 @@
             DataContext="{Binding FindOverlay}"
             Name="FindOverlay"
             Grid.Row="1"/>
+
+        <TextBox Grid.Row="1"
+                 Name="ImmediateTextBox"
+                 Watermark="g addr | w addr,v | f text | f -b hex"
+                 FontFamily="{StaticResource VT220}"
+                 Foreground="{DynamicResource VT220Brush}"
+                 FontSize="15"
+                 HorizontalAlignment="Stretch"
+                 Height="30"
+                 VerticalAlignment="Bottom"/>
 
     </Grid>
 </Window>

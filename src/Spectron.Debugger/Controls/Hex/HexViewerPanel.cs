@@ -34,44 +34,6 @@ internal class HexViewerPanel(HexViewer viewer) : Panel
         }
     }
 
-    internal void UpdateSelected(Selection selection)
-    {
-        var selections = new Dictionary<int, List<int>>();
-
-        for (var index = selection.Start; index <= selection.End; index++)
-        {
-            var rowIndex = index / viewer.BytesPerRow;
-
-            if (!selections.TryGetValue(rowIndex, out var cells))
-            {
-                cells = [];
-                selections.Add(rowIndex, cells);
-            }
-
-            cells.Add(index % viewer.BytesPerRow);
-        }
-
-        // Select new range
-        foreach (var (rowIndex, cells) in selections)
-        {
-            _visibleRows.GetValueOrDefault(rowIndex)?.SelectedIndexes = cells.ToArray();
-        }
-
-        // Unselect previous selection
-        foreach (var row in _visibleRows.Values)
-        {
-            if (selections.ContainsKey(row.RowIndex))
-            {
-                continue;
-            }
-
-            if (row.SelectedIndexes.Length > 0)
-            {
-                row.SelectedIndexes = [];
-            }
-        }
-    }
-
     internal new void InvalidateVisual()
     {
         foreach (var row in _visibleRows.Values)

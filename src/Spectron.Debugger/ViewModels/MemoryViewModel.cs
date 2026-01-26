@@ -90,15 +90,15 @@ public sealed partial class MemoryViewModel : ObservableObject, IDisposable
 
     private byte[] GetSelectedBytes()
     {
-        if (Viewer is null)
+        if (Viewer is null || Viewer.Selection.Length == 0)
         {
             return [];
         }
 
-        var selectedBytes = new byte[Viewer.SelectedIndexes.Length];
+        var selectedBytes = new byte[Viewer.Selection.Length];
         var index = 0;
 
-        foreach (var selected in Viewer.SelectedIndexes)
+        for (var selected = Viewer.Selection.Start; selected <= Viewer.Selection.End; selected++)
         {
             selectedBytes[index++] = Memory[selected];
         }
