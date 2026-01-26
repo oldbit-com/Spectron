@@ -14,11 +14,11 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
         <PackageReference Include="NSubstitute" />
         <PackageReference Include="Shouldly" />
-        <PackageReference Include="xunit" />
         <PackageReference Include="xunit.runner.visualstudio">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="xunit.v3" />
     </ItemGroup>
 
     <ItemGroup>
@@ -27,7 +27,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\Spectron.Debugger\Spectron.Debugger.csproj" />
-      <ProjectReference Include="..\..\src\Spectron\Spectron.csproj" />
     </ItemGroup>
 
 </Project>
