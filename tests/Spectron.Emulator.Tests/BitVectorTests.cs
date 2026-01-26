@@ -1,5 +1,4 @@
 using OldBit.Spectron.Emulation.Utilities;
-using Shouldly;
 
 namespace OldBit.Spectron.Emulator.Tests;
 
