@@ -1,0 +1,72 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+        xmlns:viewModels="clr-namespace:OldBit.Spectron.Debugger.ViewModels"
+        xmlns:hex="clr-namespace:OldBit.Spectron.Debugger.Controls.Hex"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="OldBit.Spectron.Debugger.Views.MemoryView"
+        x:DataType="viewModels:MemoryViewModel"
+        WindowStartupLocation="CenterOwner"
+        Width="900"
+        Height="700"
+        Title="Memory View">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key='VT220Brush'>Black</SolidColorBrush>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key='VT220Brush'>Chartreuse</SolidColorBrush>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <i:Interaction.Behaviors>
+        <EventTriggerBehavior EventName="KeyDown" SourceObject="ImmediateTextBox">
+            <InvokeCommandAction Command="{Binding ImmediateCommand}" PassEventArgsToCommand="True" />
+        </EventTriggerBehavior>
+    </i:Interaction.Behaviors>
+
+    <Grid Margin="8" RowDefinitions="*,30">
+        <hex:HexViewer
+            Grid.Row="0"
+            Name="MemoryViewer"
+            Margin="0 0 0 10"
+            FontFamily="{StaticResource SpectrumFont}"
+            FontSize="10"
+            BytesPerRow="16"
+            GroupSize="8"
+            Data="{Binding Memory}">
+
+            <hex:HexViewer.KeyBindings>
+                <KeyBinding Gesture="{OnPlatform Ctrl+C, macOS=Cmd+C}" Command="{Binding CopyHexCommand}"/>
+                <KeyBinding Gesture="{OnPlatform Ctrl+Shift+C, macOS=Cmd+Shift+C}" Command="{Binding CopyAsciiCommand}"/>
+            </hex:HexViewer.KeyBindings>
+
+            <hex:HexViewer.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Copy HEX" Padding="7" InputGesture="{OnPlatform Ctrl+C, macOS=Cmd+C}" Command="{Binding CopyHexCommand}"/>
+                    <MenuItem Header="Copy ASCII" Padding="7" InputGesture="{OnPlatform Ctrl+Shift+C, macOS=Cmd+Shift+C}" Command="{Binding CopyAsciiCommand}"/>
+                </ContextMenu>
+            </hex:HexViewer.ContextMenu>
+
+        </hex:HexViewer>
+
+        <TextBox Grid.Row="1"
+                 Name="ImmediateTextBox"
+                 Text="{Binding CommandText}"
+                 Watermark="g addr | w addr,v | f &quot;text&quot; | f hex_1 hex_2 ... hex_n"
+                 FontFamily="{StaticResource VT220}"
+                 Foreground="{DynamicResource VT220Brush}"
+                 FontSize="15"
+                 HorizontalAlignment="Stretch"
+                 Height="30"
+                 VerticalAlignment="Bottom"/>
+
+    </Grid>
+</Window>

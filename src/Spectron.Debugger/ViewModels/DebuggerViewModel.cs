@@ -20,7 +20,7 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
 
     public StackViewModel StackViewModel { get; } = new();
     public CpuViewModel CpuViewModel { get; } = new();
-    public MemoryViewModel MemoryViewModel { get; } = new();
+    public MemoryViewModel MemoryViewModel { get; private set; } = null!;
 
     [ObservableProperty]
     private CodeListViewModel _codeListViewModel = null!;
@@ -58,6 +58,7 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
         _breakpointHandler.BreakpointHit -= OnBreakpointHit;
         _breakpointHandler.BreakpointHit += OnBreakpointHit;
 
+        MemoryViewModel = new MemoryViewModel(Emulator);
         BreakpointListViewModel = new BreakpointListViewModel(_breakpointHandler.BreakpointManager, _debuggerSettings.NumberFormat);
         CodeListViewModel = new CodeListViewModel(_breakpointHandler.BreakpointManager);
         ImmediateViewModel = new ImmediateViewModel(_debuggerContext, _debuggerSettings.NumberFormat, emulator,
@@ -178,6 +179,7 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
     private void Close()
     {
         LoggingViewModel.Dispose();
+        MemoryViewModel.Dispose();
 
         _breakpointHandler.BreakpointHit -= OnBreakpointHit;
     }

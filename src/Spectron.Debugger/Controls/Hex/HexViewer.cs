@@ -1,0 +1,513 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Input;
+using Avalonia.Layout;
+using Avalonia.Media;
+
+namespace OldBit.Spectron.Debugger.Controls.Hex;
+
+public class HexViewer : ContentControl
+{
+    public static readonly StyledProperty<int> RowHeightProperty =
+        AvaloniaProperty.Register<HexViewer, int>(nameof(RowHeight), defaultValue: 20);
+
+    public static readonly StyledProperty<int> BytesPerRowProperty =
+        AvaloniaProperty.Register<HexViewer, int>(nameof(BytesPerRow), defaultValue: 16, inherits: true);
+
+    public static readonly StyledProperty<bool> IsOffsetVisibleProperty =
+        AvaloniaProperty.Register<HexViewer, bool>(nameof(IsOffsetVisible), true, inherits: true);
+
+    public static readonly StyledProperty<bool> IsHeaderVisibleProperty =
+        AvaloniaProperty.Register<HexViewer, bool>(nameof(IsHeaderVisible), defaultValue: true);
+
+    public static readonly StyledProperty<int> GroupSizeProperty =
+        AvaloniaProperty.Register<HexViewer, int>(nameof(GroupSize), defaultValue: 8);
+
+    public static readonly DirectProperty<HexViewer, byte[]> DataProperty =
+        AvaloniaProperty.RegisterDirect<HexViewer, byte[]>(
+            nameof(Data),
+            getter: o => o.Data,
+            setter: (o, v) => o.Data = v,
+            unsetValue: []);
+
+    internal static readonly StyledProperty<Typeface> TypefaceProperty =
+        AvaloniaProperty.Register<HexViewer, Typeface>(nameof(Typeface), inherits: true);
+
+    internal static readonly StyledProperty<RowTextBuilder> RowTextBuilderProperty =
+        AvaloniaProperty.Register<HexViewer, RowTextBuilder>(nameof(RowTextBuilder), inherits: true);
+
+    public static readonly StyledProperty<bool> IsMultiSelectProperty =
+        AvaloniaProperty.Register<HexViewer, bool>(nameof(IsMultiSelect), defaultValue: true);
+
+    public static readonly StyledProperty<IAsciiFormatter> AsciiFormatterProperty =
+        AvaloniaProperty.Register<HexViewer, IAsciiFormatter>(nameof(AsciiFormatter), new DefaultAsciiFormatter());
+
+    public static readonly StyledProperty<Selection> SelectionProperty =
+        AvaloniaProperty.Register<HexViewer, Selection>(nameof(Selection), Selection.Empty, inherits: true);
+
+    public int RowHeight
+    {
+        get => GetValue(RowHeightProperty);
+        set => SetValue(RowHeightProperty, value);
+    }
+
+    public int BytesPerRow
+    {
+        get => GetValue(BytesPerRowProperty);
+        set => SetValue(BytesPerRowProperty, value);
+    }
+
+    public bool IsOffsetVisible
+    {
+        get => GetValue(IsOffsetVisibleProperty);
+        set => SetValue(IsOffsetVisibleProperty, value);
+    }
+
+    public bool IsHeaderVisible
+    {
+        get => GetValue(IsHeaderVisibleProperty);
+        set => SetValue(IsHeaderVisibleProperty, value);
+    }
+
+    public int GroupSize
+    {
+        get => GetValue(GroupSizeProperty);
+        set => SetValue(GroupSizeProperty, value);
+    }
+
+    public bool IsMultiSelect
+    {
+        get => GetValue(IsMultiSelectProperty);
+        set => SetValue(IsMultiSelectProperty, value);
+    }
+
+    public IAsciiFormatter AsciiFormatter
+    {
+        get => GetValue(AsciiFormatterProperty);
+        set => SetValue(AsciiFormatterProperty, value);
+    }
+
+    public Selection Selection
+    {
+        get => GetValue(SelectionProperty);
+        set => SetValue(SelectionProperty, value);
+    }
+
+    public byte[] Data
+    {
+        get;
+        set
+        {
+            if (value.Length == Data.Length)
+            {
+                Array.Copy(value, Data, value.Length);
+                _hexPanel.InvalidateVisual();
+            }
+            else
+            {
+                if (!SetAndRaise(DataProperty, ref field, value))
+                {
+                    return;
+                }
+
+                Selection = Selection.Empty;
+                _hexPanel.Clear();
+
+                UpdateView();
+            }
+        }
+    } = [];
+
+    internal Typeface Typeface
+    {
+        get => GetValue(TypefaceProperty);
+        private set => SetValue(TypefaceProperty, value);
+    }
+
+    internal RowTextBuilder RowTextBuilder
+    {
+        get => GetValue(RowTextBuilderProperty);
+        set => SetValue(RowTextBuilderProperty, value);
+    }
+
+    private readonly HexViewerHeader _header;
+    private readonly ScrollViewer _scrollViewer;
+    private readonly HexViewerPanel _hexPanel;
+
+    private int _caretPosition = -1;
+    private int _selectionAnchor = -1;
+
+    private int CurrentRowIndex => Selection.Start / BytesPerRow;
+    private int VisibleRowCount => (int)(_scrollViewer.Viewport.Height / RowHeight);
+
+    private int PageHeight => VisibleRowCount * RowHeight;
+    private int PageSize => VisibleRowCount * BytesPerRow;
+
+    internal double RowWidth { get; private set; }
+
+    public HexViewer()
+    {
+        Focusable = true;
+
+        AffectsMeasure<HexViewer>(RowHeightProperty);
+        AffectsMeasure<HexViewer>(BytesPerRowProperty);
+
+        _header = new HexViewerHeader()
+        {
+            Height = RowHeight,
+        };
+        _hexPanel = new HexViewerPanel(this);
+
+        _scrollViewer = new ScrollViewer()
+        {
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            Content = _hexPanel,
+        };
+
+        HorizontalContentAlignment = HorizontalAlignment.Stretch;
+        VerticalContentAlignment = VerticalAlignment.Stretch;
+
+        var headerHost = new Border
+        {
+            ClipToBounds = true,
+            Child = _header
+        };
+
+        var dockPanel = new DockPanel();
+        dockPanel.Children.Add(headerHost);
+        dockPanel.Children.Add(_scrollViewer);
+        DockPanel.SetDock(headerHost, Dock.Top);
+
+        this.GetObservable(FontFamilyProperty).Subscribe(_ => Invalidate());
+        this.GetObservable(FontSizeProperty).Subscribe(_ => Invalidate());
+        this.GetObservable(FontStyleProperty).Subscribe(_ => Invalidate());
+        this.GetObservable(FontStretchProperty).Subscribe(_ => Invalidate());
+        this.GetObservable(IsOffsetVisibleProperty).Subscribe(_ => Invalidate());
+        this.GetObservable(BytesPerRowProperty).Subscribe(_ => Invalidate());
+        this.GetObservable(AsciiFormatterProperty).Subscribe(_ => Invalidate());
+        this.GetObservable(IsHeaderVisibleProperty).Subscribe(_ => _header.IsVisible = IsHeaderVisible);
+
+        _scrollViewer.GetObservable(ScrollViewer.OffsetProperty).Subscribe(offset =>
+        {
+            _header.RenderTransform = new TranslateTransform(-offset.X, 0);
+            UpdateView();
+        });
+        _scrollViewer.GetObservable(ScrollViewer.ViewportProperty).Subscribe(_ => UpdateView());
+
+        Content = dockPanel;
+    }
+
+    public void UpdateValues(int offset, params byte[] values)
+    {
+        var rowIndices = new HashSet<int>();
+
+        for (var i = 0; i < values.Length; i++)
+        {
+            if (offset + i >= Data.Length)
+            {
+                break;
+            }
+
+            Data[offset + i] = values[i];
+
+            var rowIndex = offset / BytesPerRow;
+            rowIndices.Add(rowIndex);
+        }
+
+        foreach (var rowIndex in rowIndices)
+        {
+            _hexPanel.InvalidateRow(rowIndex);
+        }
+    }
+
+    public void Select(int start, int length = 1)
+    {
+        Selection = new Selection(start, start + length - 1);
+
+        _caretPosition = Selection.End;
+        _selectionAnchor = Selection.Start;
+
+        var rowIndex = Selection.Start / BytesPerRow;
+
+        if (!IsRowVisible(rowIndex))
+        {
+            ScrollToRow(rowIndex);
+        }
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case Key.Left:
+                MoveLeft(e.KeyModifiers.HasFlag(KeyModifiers.Shift), offset: 1);
+                break;
+
+            case Key.Right:
+                MoveRight(e.KeyModifiers.HasFlag(KeyModifiers.Shift), offset: 1);
+                break;
+
+            case Key.Up:
+                MoveLeft(e.KeyModifiers.HasFlag(KeyModifiers.Shift), offset: BytesPerRow);
+
+                if (!IsRowVisible(CurrentRowIndex))
+                {
+                    ScrollToRow(CurrentRowIndex);
+                }
+                break;
+
+            case Key.Down:
+                MoveRight(e.KeyModifiers.HasFlag(KeyModifiers.Shift), offset: BytesPerRow);
+
+                if (!IsRowVisible(CurrentRowIndex))
+                {
+                    var viewportRows = (int)(_scrollViewer.Viewport.Height / RowHeight);
+                    var targetTopRow = CurrentRowIndex - Math.Max(0, viewportRows) + 1;
+
+                    ScrollToRow(targetTopRow);
+                }
+                break;
+
+            case Key.Home:
+                _caretPosition = 0;
+
+                if (!e.KeyModifiers.HasFlag(KeyModifiers.Shift))
+                {
+                    Selection = new Selection(_caretPosition, _caretPosition);
+                    _selectionAnchor = _caretPosition;
+                }
+                else
+                {
+                    Selection = new Selection(_caretPosition, Selection.End);
+                }
+
+                _scrollViewer.ScrollToHome();
+                break;
+
+            case Key.End:
+                _caretPosition = Data.Length - 1;
+
+                if (!e.KeyModifiers.HasFlag(KeyModifiers.Shift))
+                {
+                    Selection = new Selection(_caretPosition, _caretPosition);
+                    _selectionAnchor = _caretPosition;
+                }
+                else
+                {
+                    Selection = new Selection(Selection.Start, _caretPosition);
+                }
+
+                _scrollViewer.ScrollToEnd();
+                break;
+
+            case Key.PageUp:
+                MoveLeft(e.KeyModifiers.HasFlag(KeyModifiers.Shift), offset: PageSize);
+
+                _scrollViewer.Offset = new Vector(_scrollViewer.Offset.X, _scrollViewer.Offset.Y - PageHeight);
+                break;
+
+            case Key.PageDown:
+                MoveRight(e.KeyModifiers.HasFlag(KeyModifiers.Shift), offset: PageSize);
+
+                _scrollViewer.Offset = new Vector(_scrollViewer.Offset.X, _scrollViewer.Offset.Y + PageHeight);
+                break;
+
+            default:
+                return;
+        }
+    }
+
+    private void MoveLeft(bool isShiftPressed, int offset)
+    {
+        if (_caretPosition == 0)
+        {
+            return;
+        }
+
+        _caretPosition = _caretPosition >= offset ? _caretPosition - offset : 0;
+
+        if (!IsMultiSelect || !isShiftPressed)
+        {
+            Selection = new Selection(_caretPosition, _caretPosition);
+            _selectionAnchor = _caretPosition;
+        }
+        else
+        {
+            var start = Selection.Start;
+            var end = Selection.End;
+
+            if (_caretPosition == Selection.End - offset && Selection.Length > 1)
+            {
+                end = _caretPosition;
+            }
+
+            if (_caretPosition < Selection.Start)
+            {
+                start = _caretPosition;
+            }
+
+            Selection = new Selection(start, end);
+        }
+    }
+
+    private void MoveRight(bool isShiftPressed, int offset)
+    {
+        _caretPosition = _caretPosition < Data.Length - offset ? _caretPosition + offset : Data.Length - 1;
+
+        if (!IsMultiSelect || !isShiftPressed)
+        {
+            Selection = new Selection(_caretPosition, _caretPosition);
+            _selectionAnchor = _caretPosition;
+        }
+        else
+        {
+            var start = Selection.Start;
+            var end = Selection.End;
+
+            if (_caretPosition == Selection.Start + offset && Selection.Length > 1)
+            {
+                start = _caretPosition;
+            }
+
+            if (_caretPosition > Selection.End)
+            {
+                end = _caretPosition;
+            }
+
+            Selection = new Selection(start, end);
+        }
+    }
+
+
+    private HexViewerRow CreateRow(int rowIndex)
+    {
+        var startOffset = rowIndex * BytesPerRow;
+        var endOffset = startOffset + BytesPerRow;
+
+        if (endOffset > Data.Length)
+        {
+            endOffset = Data.Length;
+        }
+
+        var row = new HexViewerRow
+        {
+            RowIndex = rowIndex,
+            Offset = startOffset,
+            Data = new ArraySegment<byte>(Data, startOffset, endOffset - startOffset),
+            Height = RowHeight,
+            Width = RowWidth
+        };
+
+        row.CellClicked += (_, e) => { HandleCellClicked(e); };
+
+        return row;
+    }
+
+    private void HandleCellClicked(HexCellClickedEventArgs e)
+    {
+        var targetPosition = e.RowIndex * BytesPerRow + e.Position;
+
+        if (!IsMultiSelect || !e.IsShiftPressed || _caretPosition < 0)
+        {
+            _caretPosition = targetPosition;
+            Selection = new Selection(_caretPosition, _caretPosition);
+            _selectionAnchor = _caretPosition;
+        }
+        else
+        {
+            int selectionAnchor;
+
+            if (Selection.Length > 0)
+            {
+                if (targetPosition < Selection.Start)
+                {
+                    selectionAnchor = Selection.End;
+                }
+                else if (targetPosition > Selection.End)
+                {
+                    selectionAnchor = Selection.Start;
+                }
+                else
+                {
+                    selectionAnchor = _selectionAnchor >= 0 ? _selectionAnchor : _caretPosition;
+                }
+            }
+            else
+            {
+                selectionAnchor = _selectionAnchor >= 0 ? _selectionAnchor : _caretPosition;
+            }
+
+            _caretPosition = targetPosition;
+            Selection = new Selection(
+                Math.Min(selectionAnchor, targetPosition),
+                Math.Max(selectionAnchor, targetPosition));
+        }
+    }
+
+    private void UpdateView()
+    {
+        var offset = _scrollViewer.Offset.Y;
+        var viewportHeight = _scrollViewer.Viewport.Height;
+
+        var startIndex = Math.Max(0, (int)(offset/ RowHeight));
+        var endIndex = Math.Min(
+            (Data.Length + BytesPerRow - 1) / BytesPerRow,
+            (int)((offset + viewportHeight) / RowHeight) + 2);
+
+        if (Data.Length == 0)
+        {
+            _hexPanel.Clear();
+            return;
+        }
+
+        _hexPanel.RemoveNotVisibleRows(startIndex, endIndex);
+
+        for (var rowIndex = startIndex; rowIndex < endIndex; rowIndex++)
+        {
+            if (_hexPanel.ContainsRow(rowIndex))
+            {
+                continue;
+            }
+
+            var row = CreateRow(rowIndex);
+            _hexPanel.Add(row);
+        }
+
+        _hexPanel.InvalidateArrange();
+    }
+
+    private bool IsRowVisible(int rowIndex)
+    {
+        var rowTop = rowIndex * RowHeight;
+        var rowBottom = rowTop + RowHeight;
+
+        var viewportTop = _scrollViewer.Offset.Y;
+        var viewportBottom = viewportTop + _scrollViewer.Viewport.Height;
+
+        return rowTop >= viewportTop && rowBottom <= viewportBottom;
+    }
+
+    private void UpdateTypeface()
+    {
+        Typeface = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
+
+        var textLength = RowTextBuilder.CalculateTotalLength(IsOffsetVisible, GroupSize, BytesPerRow);
+        var formattedText = HexViewerRow.CreateFormattedText("X", Typeface, FontSize, Foreground);
+
+        RowWidth = textLength * formattedText.Width;
+        RowTextBuilder = new RowTextBuilder(AsciiFormatter, IsOffsetVisible, GroupSize, BytesPerRow, formattedText.Width);
+    }
+
+    private void Invalidate()
+    {
+        UpdateTypeface();
+
+        _hexPanel.InvalidateVisual();
+        _header.InvalidateVisual();
+    }
+
+    private void ScrollToRow(int rowIndex) => _scrollViewer.Offset =
+        new Vector(_scrollViewer.Offset.X, rowIndex * RowHeight);
+}

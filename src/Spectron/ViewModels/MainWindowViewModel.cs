@@ -275,6 +275,9 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void ToggleBreakpoints() => BreakpointsEnabled = !BreakpointsEnabled;
 
+    [RelayCommand]
+    private void ShowMemoryView() => OpenMemoryWindow();
+
     // Help
     [RelayCommand]
     private static void ShowAboutView() => OpenAboutWindow();
