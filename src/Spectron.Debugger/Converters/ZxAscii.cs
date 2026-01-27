@@ -11,7 +11,7 @@ public static class ZxAscii
     {
         if (value >= 0x20 & value <= 0x8F)
         {
-            return ToSpectrumCharCode(value);
+            return ToSpectrumChar(value);
         }
 
         return nonPrintChar;
@@ -31,7 +31,19 @@ public static class ZxAscii
         return s.ToString();
     }
 
-    private static char ToSpectrumCharCode(byte code) => code switch
+    public static byte[] FromString(ReadOnlySpan<char> s)
+    {
+        var bytes = new byte[s.Length];
+
+        for (var i = 0; i < s.Length; i++)
+        {
+            bytes[i] = FromSpectrumChar(s[i]);
+        }
+
+        return bytes;
+    }
+
+    private static char ToSpectrumChar(byte code) => code switch
     {
         0x5E => '\x2191', // "↑"
         0x60 => '\x00A3', // "£"
@@ -53,5 +65,28 @@ public static class ZxAscii
         0x8E => '\x2599', // "▙"
         0x8F => '\x2588', // "█"
         _ => Convert.ToChar(code)
+    };
+
+    public static byte FromSpectrumChar(char value) => value switch
+    {
+        '\u2191' => 0x5E, // "↑"
+        '\u00A3' => 0x60, // "£"
+        '\u00A9' => 0x7F, // "©"
+        '\u259D' => 0x81, // "▝"
+        '\u2598' => 0x82, // "▘"
+        '\u2580' => 0x83, // "▀"
+        '\u2597' => 0x84, // "▗"
+        '\u2590' => 0x85, // "▐"
+        '\u259A' => 0x86, // "▚"
+        '\u259C' => 0x87, // "▜"
+        '\u2596' => 0x88, // "▖"
+        '\u259E' => 0x89, // "▞"
+        '\u258C' => 0x8A, // "▌"
+        '\u259B' => 0x8B, // "▛"
+        '\u2584' => 0x8C, // "▄"
+        '\u259F' => 0x8D, // "▟"
+        '\u2599' => 0x8E, // "▙"
+        '\u2588' => 0x8F, // "█"
+        _ => (byte)value        // Only works for ASCII characters
     };
 }

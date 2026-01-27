@@ -2,8 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
         xmlns:viewModels="clr-namespace:OldBit.Spectron.Debugger.ViewModels"
-        xmlns:overlays="clr-namespace:OldBit.Spectron.Debugger.Controls.Overlays"
         xmlns:hex="clr-namespace:OldBit.Spectron.Debugger.Controls.Hex"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Debugger.Views.MemoryView"
@@ -11,7 +11,7 @@
         WindowStartupLocation="CenterOwner"
         Width="900"
         Height="700"
-        Title="Memory">
+        Title="Memory View">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -26,10 +26,11 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Window.KeyBindings>
-        <KeyBinding Gesture="{OnPlatform Ctrl+G, macOS=Cmd+G}" Command="{Binding ShowGoToOverlayCommand}"/>
-        <KeyBinding Gesture="{OnPlatform Ctrl+F, macOS=Cmd+F}" Command="{Binding ShowFindOverlayCommand}"/>
-    </Window.KeyBindings>
+    <i:Interaction.Behaviors>
+        <EventTriggerBehavior EventName="KeyDown" SourceObject="ImmediateTextBox">
+            <InvokeCommandAction Command="{Binding ImmediateCommand}" PassEventArgsToCommand="True" />
+        </EventTriggerBehavior>
+    </i:Interaction.Behaviors>
 
     <Grid Margin="8" RowDefinitions="*,30">
         <hex:HexViewer
@@ -45,35 +46,21 @@
             <hex:HexViewer.KeyBindings>
                 <KeyBinding Gesture="{OnPlatform Ctrl+C, macOS=Cmd+C}" Command="{Binding CopyHexCommand}"/>
                 <KeyBinding Gesture="{OnPlatform Ctrl+Shift+C, macOS=Cmd+Shift+C}" Command="{Binding CopyAsciiCommand}"/>
-                <KeyBinding Gesture="{OnPlatform Ctrl+Shift+F, macOS=Cmd+Shift+F}" Command="{Binding FindNextCommand}"/>
             </hex:HexViewer.KeyBindings>
 
             <hex:HexViewer.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Copy HEX" Padding="7" InputGesture="{OnPlatform Ctrl+C, macOS=Cmd+C}" Command="{Binding CopyHexCommand}"/>
                     <MenuItem Header="Copy ASCII" Padding="7" InputGesture="{OnPlatform Ctrl+Shift+C, macOS=Cmd+Shift+C}" Command="{Binding CopyAsciiCommand}"/>
-                    <MenuItem Header="-" />
-                    <MenuItem Header="Go to Address" Padding="7" InputGesture="{OnPlatform Ctrl+G, macOS=Cmd+G}" Command="{Binding ShowGoToOverlayCommand}"/>
-                    <MenuItem Header="Find" Padding="7" InputGesture="{OnPlatform Ctrl+F, macOS=Cmd+F}" Command="{Binding ShowFindOverlayCommand}"/>
-                    <MenuItem Header="Find Next" Padding="7" InputGesture="{OnPlatform Ctrl+Shift+F, macOS=Cmd+Shift+F}" Command="{Binding FindNextCommand}"/>
                 </ContextMenu>
             </hex:HexViewer.ContextMenu>
 
         </hex:HexViewer>
 
-        <overlays:GoToOverlay
-            DataContext="{Binding GoToOverlay}"
-            Name="GoToOverlay"
-            Grid.Row="1"/>
-
-        <overlays:FindOverlay
-            DataContext="{Binding FindOverlay}"
-            Name="FindOverlay"
-            Grid.Row="1"/>
-
         <TextBox Grid.Row="1"
                  Name="ImmediateTextBox"
-                 Watermark="g addr | w addr,v | f text | f -b hex"
+                 Text="{Binding CommandText}"
+                 Watermark="g addr | w addr,v | f text | f hex"
                  FontFamily="{StaticResource VT220}"
                  Foreground="{DynamicResource VT220Brush}"
                  FontSize="15"

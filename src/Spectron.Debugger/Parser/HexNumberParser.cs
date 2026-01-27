@@ -1,23 +1,35 @@
 using System.Globalization;
+using System.Numerics;
 
 namespace OldBit.Spectron.Debugger.Parser;
 
 internal static class HexNumberParser
 {
-    internal static bool TryParse(string input, out int value)
+    internal static bool TryParse<T>(string input, out T value) where T : IBinaryInteger<T>
     {
-        if (int.TryParse(input, out value))
+        if (T.TryParse(input, NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite,
+                CultureInfo.InvariantCulture, out var result))
         {
+            value = result;
             return true;
         }
 
-        var hex = input
-            .Replace("0x", string.Empty, StringComparison.OrdinalIgnoreCase)
-            .Replace("h", string.Empty, StringComparison.OrdinalIgnoreCase)
-            .Replace("$", string.Empty)
-            .Replace("#", string.Empty);
+        var hex = RemoveHexPrefixes(input);
 
-        return int.TryParse(hex, NumberStyles.AllowHexSpecifier,
-            CultureInfo.InvariantCulture, out value);
+        if (T.TryParse(hex, NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite | NumberStyles.AllowHexSpecifier,
+                CultureInfo.InvariantCulture, out result))
+        {
+            value = result;
+            return true;
+        }
+
+        value = T.Zero;
+        return false;
     }
+
+    private static string RemoveHexPrefixes(string input) => input
+        .Replace("0x", string.Empty, StringComparison.OrdinalIgnoreCase)
+        .Replace("h", string.Empty, StringComparison.OrdinalIgnoreCase)
+        .Replace("$", string.Empty)
+        .Replace("#", string.Empty);
 }

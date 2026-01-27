@@ -1,31 +1,44 @@
-using System.Text;
+using System.ComponentModel.DataAnnotations;
+using Avalonia.Input;
 using Avalonia.Input.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OldBit.Spectron.Debugger.Controls.Hex;
 using OldBit.Spectron.Debugger.Converters;
-using OldBit.Spectron.Debugger.ViewModels.Overlays;
+using OldBit.Spectron.Debugger.Extensions;
+using OldBit.Spectron.Debugger.Parser;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
-public sealed partial class MemoryViewModel : ObservableObject, IDisposable
+public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
 {
-    private readonly Emulator _emulator;
+    private interface ICommand;
+    private record WriteCommand (Word Address, byte Value) : ICommand;
+    private record GoToCommand (Word Address) : ICommand;
+    private record FindCommand (string Text) : ICommand;
+    private record InvalidCommand (string Error) : ICommand;
 
-    public GoToOverlayViewModel GoToOverlay { get; } = new();
-    public FindOverlayViewModel FindOverlay { get; } = new();
+    private readonly Emulator _emulator;
 
     public HexViewer? Viewer { get; set; }
     public IClipboard? Clipboard { get; set; }
 
     public Action<Word, byte> OnMemoryUpdated { get; set; } = (_, _) => { };
     public Action<Word> GoTo { get; set; } = _ => { };
+    public Action<Word, int> Select { get; set; } = (_, _) => { };
+
+    private int _lastFindInex = 0;
 
     [ObservableProperty]
     private byte[] _memory = [];
+
+    [ObservableProperty]
+    [CustomValidation(typeof(MemoryViewModel), nameof(ValidateCommand))]
+    [NotifyDataErrorInfo]
+    private string _commandText = string.Empty;
 
     public MemoryViewModel(Emulator emulator)
     {
@@ -33,32 +46,9 @@ public sealed partial class MemoryViewModel : ObservableObject, IDisposable
 
         Memory = emulator.Memory.ToBytes();
         emulator.Memory.MemoryUpdated += MemoryUpdated;
-
-        GoToOverlay.GoTo = GoToAddress;
-        FindOverlay.Find = FindText;
     }
 
     public void Update(IMemory memory) => Memory = memory.ToBytes();
-
-    [RelayCommand]
-    private void ShowGoToOverlay()
-    {
-        FindOverlay.Hide();
-        GoToOverlay.Show();
-    }
-
-    [RelayCommand]
-    private void ShowFindOverlay()
-    {
-        GoToOverlay.Hide();
-        FindOverlay.Show();
-    }
-
-    [RelayCommand]
-    private void FindNext()
-    {
-        Console.WriteLine("Find next");
-    }
 
     [RelayCommand]
     private async Task CopyHex()
@@ -88,6 +78,52 @@ public sealed partial class MemoryViewModel : ObservableObject, IDisposable
         await Clipboard.SetTextAsync(ascii);
     }
 
+    [RelayCommand]
+    private void Immediate(KeyEventArgs e)
+    {
+        if (e.Key != Key.Enter || string.IsNullOrWhiteSpace(CommandText))
+        {
+            return;
+        }
+
+        var command = ParseCommand(CommandText);
+
+        switch (command)
+        {
+            case GoToCommand goToCommand:
+                GoTo(goToCommand.Address);
+                break;
+
+            case WriteCommand memoryCommand:
+                _emulator.Memory.Write(memoryCommand.Address, memoryCommand.Value);
+                break;
+
+            case FindCommand findCommand:
+            {
+                var ascii = ZxAscii.FromString(findCommand.Text).AsSpan();
+                var memory = Memory.AsSpan();
+
+                var index = memory.IndexOfSequence(ascii, _lastFindInex);
+                _lastFindInex = 0;
+
+                if (index < 0)
+                {
+                    return;
+                }
+
+                Select((Word)index, ascii.Length);
+
+                _lastFindInex = index + ascii.Length;
+
+                if (_lastFindInex >= Memory.Length)
+                {
+                    _lastFindInex = 0;
+                }
+                break;
+            }
+        }
+    }
+
     private byte[] GetSelectedBytes()
     {
         if (Viewer is null || Viewer.Selection.Length == 0)
@@ -106,14 +142,75 @@ public sealed partial class MemoryViewModel : ObservableObject, IDisposable
         return selectedBytes;
     }
 
-    private void GoToAddress(Word address) => GoTo(address);
-
-    private void FindText(string text)
-    {
-
-    }
-
     private void MemoryUpdated(Word address, byte value) => OnMemoryUpdated.Invoke(address, value);
 
     public void Dispose() => _emulator.Memory.MemoryUpdated -= MemoryUpdated;
+
+    public static ValidationResult? ValidateCommand(string s, ValidationContext context)
+    {
+        var command = ParseCommand(s);
+
+        if (command is InvalidCommand invalidCommand)
+        {
+            return new ValidationResult(invalidCommand.Error);
+        }
+
+        return ValidationResult.Success;;
+    }
+
+    private static ICommand? ParseCommand(string command)
+    {
+        command = command.Trim();
+
+        if (string.IsNullOrWhiteSpace(command))
+        {
+            return null;
+        }
+
+        if (command.StartsWith("g", StringComparison.OrdinalIgnoreCase))
+        {
+            if (HexNumberParser.TryParse<Word>(command[1..].Trim(), out var address))
+            {
+                return new GoToCommand(address);
+            }
+
+            return new InvalidCommand("Invalid address");
+        }
+
+        if (command.StartsWith("f", StringComparison.OrdinalIgnoreCase))
+        {
+            var text = command[1..].Trim();
+
+            return text.Length switch
+            {
+                0 => new InvalidCommand("Empty search text"),
+                > 2 when text[0] == '"' && text[^1] == '"' => new FindCommand(text[1..^1]),
+                _ => new FindCommand(text)
+            };
+        }
+
+        if (command.StartsWith("w", StringComparison.OrdinalIgnoreCase))
+        {
+            var args = command[1..].Trim().Split(',');
+
+            if (args.Length != 2)
+            {
+                return new InvalidCommand("Invalid arguments");
+            }
+
+            if (!HexNumberParser.TryParse<Word>(args[0].Trim(), out var address))
+            {
+                return new InvalidCommand("Invalid address");
+            }
+
+            if (!HexNumberParser.TryParse<byte>(args[1].Trim(), out var value))
+            {
+                return new InvalidCommand("Invalid value");
+            }
+
+            return new WriteCommand(address, value);
+        }
+
+        return new InvalidCommand("Invalid command");
+    }
 }
