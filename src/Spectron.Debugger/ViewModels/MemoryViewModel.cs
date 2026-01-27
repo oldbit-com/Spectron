@@ -18,7 +18,7 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
     private interface ICommand;
     private record WriteCommand (Word Address, byte Value) : ICommand;
     private record GoToCommand (Word Address) : ICommand;
-    private record FindCommand (string Text) : ICommand;
+    private record FindCommand (string Text, bool ForceText = false) : ICommand;
     private record InvalidCommand (string Error) : ICommand;
 
     private readonly Emulator _emulator;
@@ -30,7 +30,7 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
     public Action<Word> GoTo { get; set; } = _ => { };
     public Action<Word, int> Select { get; set; } = (_, _) => { };
 
-    private int _lastFindInex = 0;
+    private int _lastFindInex;
 
     [ObservableProperty]
     private byte[] _memory = [];
@@ -100,10 +100,31 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
 
             case FindCommand findCommand:
             {
-                var ascii = ZxAscii.FromString(findCommand.Text).AsSpan();
-                var memory = Memory.AsSpan();
+                byte[] find = [];
 
-                var index = memory.IndexOfSequence(ascii, _lastFindInex);
+                if (findCommand.ForceText)
+                {
+                    find = ZxAscii.FromString(findCommand.Text);
+                }
+                else
+                {
+                    var hexes = findCommand.Text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (var hex in hexes)
+                    {
+                        if (HexNumberParser.TryParse<byte>(hex, out var value, allowDecimalNumber: false))
+                        {
+                            find = find.Concat([value]).ToArray();
+                        }
+                        else
+                        {
+                            find = ZxAscii.FromString(findCommand.Text);
+                            break;
+                        }
+                    }
+                }
+
+                var index = Memory.IndexOfSequence(find, _lastFindInex);
                 _lastFindInex = 0;
 
                 if (index < 0)
@@ -111,9 +132,9 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
                     return;
                 }
 
-                Select((Word)index, ascii.Length);
+                Select((Word)index, find.Length);
 
-                _lastFindInex = index + ascii.Length;
+                _lastFindInex = index + find.Length;
 
                 if (_lastFindInex >= Memory.Length)
                 {
@@ -184,7 +205,7 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
             return text.Length switch
             {
                 0 => new InvalidCommand("Empty search text"),
-                > 2 when text[0] == '"' && text[^1] == '"' => new FindCommand(text[1..^1]),
+                > 2 when text[0] == '"' && text[^1] == '"' => new FindCommand(text[1..^1], ForceText: true),
                 _ => new FindCommand(text)
             };
         }

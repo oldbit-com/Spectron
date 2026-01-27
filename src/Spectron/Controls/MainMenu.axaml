@@ -260,7 +260,7 @@
             <MenuItem Header="Debugger" InputGesture="F11" Command="{Binding ShowDebuggerViewCommand}"/>
             <MenuItem Header="Breakpoints Enabled" ToggleType="CheckBox" IsChecked="{Binding BreakpointsEnabled}" Command="{Binding ToggleBreakpointsCommand}"/>
             <MenuItem Header="-"/>
-            <MenuItem Header="Memory" Command="{Binding ShowMemoryViewCommand}"/>
+            <MenuItem Header="Memory View" Command="{Binding ShowMemoryViewCommand}"/>
 
         </MenuItem>
 

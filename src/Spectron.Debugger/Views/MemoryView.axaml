@@ -60,7 +60,7 @@
         <TextBox Grid.Row="1"
                  Name="ImmediateTextBox"
                  Text="{Binding CommandText}"
-                 Watermark="g addr | w addr,v | f text | f hex"
+                 Watermark="g addr | w addr,v | f &quot;text&quot; | f hex_1 hex_2 ... hex_n"
                  FontFamily="{StaticResource VT220}"
                  Foreground="{DynamicResource VT220Brush}"
                  FontSize="15"

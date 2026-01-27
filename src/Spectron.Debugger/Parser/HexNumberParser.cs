@@ -5,9 +5,9 @@ namespace OldBit.Spectron.Debugger.Parser;
 
 internal static class HexNumberParser
 {
-    internal static bool TryParse<T>(string input, out T value) where T : IBinaryInteger<T>
+    internal static bool TryParse<T>(string input, out T value, bool allowDecimalNumber = false) where T : IBinaryInteger<T>
     {
-        if (T.TryParse(input, NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite,
+        if (allowDecimalNumber && T.TryParse(input, NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite,
                 CultureInfo.InvariantCulture, out var result))
         {
             value = result;
