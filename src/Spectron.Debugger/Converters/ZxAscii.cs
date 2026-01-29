@@ -3,7 +3,7 @@ using System.Text;
 namespace OldBit.Spectron.Debugger.Converters;
 
 /// <summary>
-/// Converts ZX Spectrum ASCII codes to their Unicode equivalents.
+/// Provides conversion methods between byte values and their corresponding ZX Spectrum ASCII representations.
 /// </summary>
 public static class ZxAscii
 {
