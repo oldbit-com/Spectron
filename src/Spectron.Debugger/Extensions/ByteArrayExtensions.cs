@@ -2,23 +2,28 @@ namespace OldBit.Spectron.Debugger.Extensions;
 
 public static class ByteArrayExtensions
 {
-    public static List<byte[]> ToChunks(this byte[] byteArray, int chunkSize)
+    public static int IndexOfSequence(this ReadOnlySpan<byte> buffer, ReadOnlySpan<byte> pattern, int startIndex)
     {
-        var chunks = new List<byte[]>();
-        var arrayLength = byteArray.Length;
-        var numChunks = (int)Math.Ceiling((double)arrayLength / chunkSize);
-
-        for (var i = 0; i < numChunks; i++)
+        if (startIndex < 0 || startIndex > buffer.Length)
         {
-            var startIdx = i * chunkSize;
-            var endIdx = Math.Min(startIdx + chunkSize, arrayLength);
-            var chunkLength = endIdx - startIdx;
-
-            var chunk = new byte[chunkLength];
-            Array.Copy(byteArray, startIdx, chunk, 0, chunkLength);
-            chunks.Add(chunk);
+            throw new ArgumentOutOfRangeException(nameof(startIndex));
         }
 
-        return chunks;
+        if (pattern.IsEmpty || buffer.Length - startIndex < pattern.Length)
+        {
+            return -1;
+        }
+
+        var search = buffer[startIndex..];
+
+        for (var i = 0; i <= search.Length - pattern.Length; i++)
+        {
+            if (search.Slice(i, pattern.Length).SequenceEqual(pattern))
+            {
+                return startIndex + i;
+            }
+        }
+
+        return -1;
     }
 }

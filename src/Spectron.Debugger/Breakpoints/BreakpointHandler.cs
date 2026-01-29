@@ -69,7 +69,7 @@ public class BreakpointHandler : IDisposable
         BreakpointHit?.Invoke(this, new BreakpointHitEventArgs(_previousAddress));
     }
 
-    private void MemoryOnMemoryUpdated(Word address)
+    private void MemoryOnMemoryUpdated(Word address, byte value)
     {
         IsBreakpointHit = BreakpointManager.IsMemoryBreakpointHit(address, _emulator.Memory);
 

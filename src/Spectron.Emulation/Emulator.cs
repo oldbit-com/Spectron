@@ -233,7 +233,7 @@ public sealed class Emulator
 
     private void SetupEventHandlers()
     {
-        _memory.MemoryUpdated += address =>
+        _memory.MemoryUpdated += (address, _) =>
         {
             if (address < 0x5B00)
             {

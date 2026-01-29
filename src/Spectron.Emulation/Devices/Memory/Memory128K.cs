@@ -78,7 +78,7 @@ internal sealed class Memory128K : IEmulatorMemory
 
         bank[relativeAddress] = data;
 
-        MemoryUpdated?.Invoke(address);
+        MemoryUpdated?.Invoke(address, data);
     }
 
     public void ShadowRom(IRomMemory? shadowRom)

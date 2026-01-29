@@ -39,7 +39,7 @@ internal sealed class Memory48K : IEmulatorMemory
 
         _memory[address] = data;
 
-        MemoryUpdated?.Invoke(address);
+        MemoryUpdated?.Invoke(address, data);
     }
 
     public void ShadowRom(IRomMemory? shadowRom) => _activeRom = shadowRom ?? OriginalRom;
