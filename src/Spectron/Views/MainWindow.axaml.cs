@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using OldBit.Spectron.Basic.Views;
 using OldBit.Spectron.Debugger.Views;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation.Files;
@@ -27,6 +28,9 @@ public partial class MainWindow : Window
         WeakReferenceMessenger.Default.Register<MainWindow, ShowAboutViewMessage>(this, (window, _) =>
             ShowDialog<AboutView>(window));
 
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowBasicViewMessage>(this, (window, m) =>
+            Show<BasicView>(window, m.ViewModel));
+
         WeakReferenceMessenger.Default.Register<MainWindow, ShowDiskViewMessage>(this, (window, message) =>
             ShowDialog<DiskView>(window, new DiskViewModel(message.DiskDriveManager, message.DriveId)));
 
@@ -40,7 +44,7 @@ public partial class MainWindow : Window
             Show<LogView>(null, m.ViewModel));
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowMemoryViewMessage>(this, (window, m) =>
-            Show<MemoryView>(window, m.ViewModel!));
+            Show<MemoryView>(window, m.ViewModel));
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowPreferencesViewMessage>(this, (window, message) =>
         {

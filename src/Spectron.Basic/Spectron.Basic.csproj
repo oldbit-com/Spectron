@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>OldBit.Spectron.Basic</AssemblyName>
+        <RootNamespace>OldBit.Spectron.Basic</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Spectron.Emulation\Spectron.Emulation.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Program\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Avalonia" />
+      <PackageReference Include="Avalonia.AvaloniaEdit" />
+      <PackageReference Include="CommunityToolkit.Mvvm" />
+    </ItemGroup>
+
+</Project>

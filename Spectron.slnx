@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/Spectron.Basic/Spectron.Basic.csproj" />
     <Project Path="src/Spectron.Debugger/Spectron.Debugger.csproj" />
     <Project Path="src/Spectron.Disassembly/Spectron.Disassembly.csproj" />
     <Project Path="src/Spectron.Emulation/Spectron.Emulation.csproj" />

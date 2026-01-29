@@ -2,6 +2,7 @@ using System;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
+using OldBit.Spectron.Basic.ViewModels;
 using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Debugger.ViewModels;
 using OldBit.Spectron.Emulation;
@@ -41,6 +42,17 @@ partial class MainWindowViewModel
 
         var memoryViewModel = new MemoryViewModel(Emulator);
         WeakReferenceMessenger.Default.Send(new ShowMemoryViewMessage(memoryViewModel));
+    }
+
+    private void OpenBasicWindow()
+    {
+        if (Emulator == null)
+        {
+            return;
+        }
+
+        var basicViewModel = new BasicViewModel();
+        WeakReferenceMessenger.Default.Send(new ShowBasicViewMessage(basicViewModel));
     }
 
     private void ConfigureDebugging(Emulator emulator)

@@ -278,6 +278,9 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void ShowMemoryView() => OpenMemoryWindow();
 
+    [RelayCommand]
+    private void ShowBasicView() => OpenBasicWindow();
+
     // Help
     [RelayCommand]
     private static void ShowAboutView() => OpenAboutWindow();
