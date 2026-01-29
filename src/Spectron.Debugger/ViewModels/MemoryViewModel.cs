@@ -112,7 +112,7 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
 
                     foreach (var hex in hexes)
                     {
-                        if (HexNumberParser.TryParse<byte>(hex, out var value, allowDecimalNumber: false))
+                        if (Hex.TryParse<byte>(hex, out var value, preferDecimal: false))
                         {
                             find = find.Concat([value]).ToArray();
                         }
@@ -190,7 +190,7 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
 
         if (command.StartsWith("g", StringComparison.OrdinalIgnoreCase))
         {
-            if (HexNumberParser.TryParse<Word>(command[1..].Trim(), out var address))
+            if (Hex.TryParse<Word>(command[1..].Trim(), out var address))
             {
                 return new GoToCommand(address);
             }
@@ -219,12 +219,12 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
                 return new InvalidCommand("Invalid arguments");
             }
 
-            if (!HexNumberParser.TryParse<Word>(args[0].Trim(), out var address))
+            if (!Hex.TryParse<Word>(args[0].Trim(), out var address))
             {
                 return new InvalidCommand("Invalid address");
             }
 
-            if (!HexNumberParser.TryParse<byte>(args[1].Trim(), out var value))
+            if (!Hex.TryParse<byte>(args[1].Trim(), out var value))
             {
                 return new InvalidCommand("Invalid value");
             }
