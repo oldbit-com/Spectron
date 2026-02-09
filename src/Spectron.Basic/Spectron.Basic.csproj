@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Spectron.Debugger\Spectron.Debugger.csproj" />
       <ProjectReference Include="..\Spectron.Emulation\Spectron.Emulation.csproj" />
     </ItemGroup>
 
@@ -19,6 +20,7 @@
     <ItemGroup>
       <PackageReference Include="Avalonia" />
       <PackageReference Include="Avalonia.AvaloniaEdit" />
+      <PackageReference Include="AvaloniaEdit.TextMate" />
       <PackageReference Include="CommunityToolkit.Mvvm" />
     </ItemGroup>
 

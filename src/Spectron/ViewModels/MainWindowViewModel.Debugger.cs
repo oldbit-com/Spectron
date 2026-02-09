@@ -51,7 +51,7 @@ partial class MainWindowViewModel
             return;
         }
 
-        var basicViewModel = new BasicViewModel();
+        var basicViewModel = new BasicViewModel(Emulator.Memory);
         WeakReferenceMessenger.Default.Send(new ShowBasicViewMessage(basicViewModel));
     }
 

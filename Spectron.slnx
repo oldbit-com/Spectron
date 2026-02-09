@@ -8,6 +8,7 @@
     <Project Path="src/Spectron/Spectron.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Spectron.Basic.Tests/Spectron.Basic.Tests.csproj" />
     <Project Path="tests/Spectron.Debugger.Tests/Spectron.Debugger.Tests.csproj" />
     <Project Path="tests/Spectron.Disassembly.Tests/Spectron.Disassembly.Tests.csproj" />
     <Project Path="tests/Spectron.Emulator.Tests/Spectron.Emulator.Tests.csproj" />
