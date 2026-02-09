@@ -186,7 +186,8 @@ partial class MainWindowViewModel
         {
             Pause();
 
-            var file = await FileDialogs.SaveSnapshotFileAsync();
+            var suggestedFileName = GetSuggestedFileName();
+            var file = await FileDialogs.SaveSnapshotFileAsync(suggestedFileName);
 
             if (file != null && Emulator != null)
             {
@@ -205,6 +206,10 @@ partial class MainWindowViewModel
             }
         }
     }
+
+    private string? GetSuggestedFileName() => string.IsNullOrWhiteSpace(RecentFilesViewModel.CurrentFileName)
+        ? null
+        : Path.GetFileNameWithoutExtension(RecentFilesViewModel.CurrentFileName);
 
     private void HandleQuickSave()
     {
