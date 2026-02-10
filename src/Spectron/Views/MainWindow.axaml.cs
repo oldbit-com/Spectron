@@ -33,6 +33,9 @@ public partial class MainWindow : Window
         WeakReferenceMessenger.Default.Register<MainWindow, ShowDebuggerViewMessage>(this, (window, m) =>
             Show<DebuggerView>(window, m.ViewModel!));
 
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowFavoritesViewMessage>(this, (window, m) =>
+            Show<FavoritesView>(window, new FavoritesViewModel()));
+
         WeakReferenceMessenger.Default.Register<MainWindow, ShowKeyboardViewMessage>(this, (window, m) =>
             Show<KeyboardView>(window, m.ViewModel));
 

@@ -279,6 +279,10 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void ShowPrintOutput() => OpenPrintOutputViewer();
 
+    // Favorites
+    [RelayCommand]
+    private void ShowFavoritesView() => OpenFavoritesWindow();
+
     // Tape
     [RelayCommand]
     private void SetTapeLoadSpeed(TapeSpeed tapeSpeed) => HandleSetTapeLoadingSpeed(tapeSpeed);

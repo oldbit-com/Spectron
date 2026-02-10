@@ -136,4 +136,7 @@ partial class MainWindowViewModel
 
     private void OpenPrintOutputViewer() =>
         WeakReferenceMessenger.Default.Send(new ShowPrintOutputViewMessage(Emulator!.Printer));
+
+    private void OpenFavoritesWindow() =>
+        WeakReferenceMessenger.Default.Send(new ShowFavoritesViewMessage());
 }
