@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -245,10 +246,24 @@ public partial class MainWindowViewModel : ObservableObject
     public void ShowScreenshotViewer() => OpenScreenshotViewer();
 
     [RelayCommand]
-    private void TakeScreenshot()
+    private async Task TakeScreenshot()
     {
-        _screenshotViewModel.AddScreenshot(SpectrumScreen);
-        NotificationManager.Show("Screenshot Taken", NotificationType.Success, TimeSpan.FromSeconds(.75));
+        try
+        {
+            _screenshotViewModel.AddScreenshot(SpectrumScreen);
+
+            if (MainWindow?.Clipboard is not null)
+            {
+                await MainWindow.Clipboard.SetBitmapAsync(SpectrumScreen);
+            }
+
+            NotificationManager.Show("Screenshot Taken", NotificationType.Success, TimeSpan.FromSeconds(.75));
+        }
+        catch (Exception ex)
+        {
+            NotificationManager.Show($"Error: {ex.Message}", NotificationType.Error, TimeSpan.FromSeconds(1.5));
+            _logger.LogError(ex, "Failed to take screenshot");
+        }
     }
 
     // View
