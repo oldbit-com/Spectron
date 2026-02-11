@@ -2,11 +2,79 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+        xmlns:material="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.FavoritesView"
+        x:DataType="viewModels:FavoritesViewModel"
         WindowStartupLocation="CenterOwner"
         Title="Manage Favourites">
-    <Grid>
+
+    <Window.Styles>
+    </Window.Styles>
+
+    <Grid ColumnDefinitions="300,4,*" Margin="10">
+        <TreeView
+            Grid.Column="0"
+            Margin="0 0 10 0"
+            ItemsSource="{Binding Items}"
+            SelectedItem="{Binding SelectedItem}"
+            SelectionMode="AlwaysSelected">
+
+            <TreeView.KeyBindings>
+
+            </TreeView.KeyBindings>
+
+            <TreeView.Styles>
+                <Style Selector="TreeViewItem">
+                    <Setter Property="IsExpanded" Value="True" />
+                </Style>
+            </TreeView.Styles>
+
+            <TreeView.ItemTemplate>
+                <TreeDataTemplate ItemsSource="{Binding Nodes}">
+                    <Border HorizontalAlignment="Left"
+                            BorderBrush="Gray" BorderThickness="1"
+                            CornerRadius="5" Padding="15 3">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal">
+                                <material:MaterialIcon Kind="FolderOutline" IsVisible="{Binding IsFolder}"/>
+                                <TextBlock
+                                    Text="{Binding Title}"
+                                    Padding="4 2 0 0"
+                                    VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </TreeDataTemplate>
+            </TreeView.ItemTemplate>
+
+            <TreeView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Insert Item" Padding="7"/>
+                    <MenuItem Header="Insert Folder" Padding="7"/>
+                    <MenuItem Header="Remove" Padding="7"/>
+                    <MenuItem Header="-"/>
+                    <MenuItem Header="Cut" Padding="7" InputGesture="{OnPlatform Ctrl+X, macOS=Cmd+X}"/>
+                    <MenuItem Header="Copy" Padding="7" InputGesture="{OnPlatform Ctrl+C, macOS=Cmd+C}"/>
+                    <MenuItem Header="Paste" Padding="7" InputGesture="{OnPlatform Ctrl+V, macOS=Cmd+V}"/>
+                </ContextMenu>
+            </TreeView.ContextMenu>
+
+        </TreeView>
+
+        <GridSplitter Grid.Column="1" Background="{DynamicResource SystemChromeLowColor}" Margin="2" ResizeDirection="Columns"/>
+
+        <Grid Grid.Column="2" Margin="15">
+            <StackPanel Orientation="Vertical">
+                <TextBox
+                    VerticalContentAlignment="Center"
+                    Text="{Binding SelectedItem.Title, FallbackValue=''}"
+                    Height="30" />
+            </StackPanel>
+
+        </Grid>
 
     </Grid>
 </Window>

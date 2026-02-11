@@ -5,20 +5,18 @@ namespace OldBit.Spectron.ViewModels;
 
 public class Observable<T>(T value) : INotifyPropertyChanged
 {
-    private T _value = value;
-
     public T Value
     {
-        get => _value;
+        get;
         set
         {
-            if (!Equals(value, _value))
+            if (!Equals(value, field))
             {
-                _value = value;
+                field = value;
                 OnPropertyChanged();
             }
         }
-    }
+    } = value;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
