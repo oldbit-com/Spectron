@@ -9,6 +9,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<ApplicationDataService>();
         services.AddSingleton<PreferencesService>();
+        services.AddSingleton<FavoritesService>();
         services.AddSingleton<SessionService>();
         services.AddSingleton<RecentFilesService>();
         services.AddSingleton<TimeMachine>();

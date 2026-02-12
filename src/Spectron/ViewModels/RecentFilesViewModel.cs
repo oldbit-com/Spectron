@@ -9,9 +9,8 @@ using OldBit.Spectron.Settings;
 
 namespace OldBit.Spectron.ViewModels;
 
-public partial class RecentFilesViewModel : ObservableObject
+public partial class RecentFilesViewModel(RecentFilesService recentFilesService) : ObservableObject
 {
-    private readonly RecentFilesService _recentFilesService;
     private RecentFilesSettings _recentFilesSettings = new();
 
     public string CurrentFileName
@@ -22,11 +21,6 @@ public partial class RecentFilesViewModel : ObservableObject
 
     public Func<string, Task>? OpenRecentFileAsync;
 
-    public RecentFilesViewModel(RecentFilesService recentFilesService)
-    {
-        _recentFilesService = recentFilesService;
-    }
-
     [RelayCommand]
     private async Task OpenRecentFile(string fileName)
     {
@@ -36,9 +30,9 @@ public partial class RecentFilesViewModel : ObservableObject
         }
     }
 
-    public async Task LoadAsync() => _recentFilesSettings = await _recentFilesService.LoadAsync();
+    public async Task LoadAsync() => _recentFilesSettings = await recentFilesService.LoadAsync();
 
-    public async Task SaveAsync() => await _recentFilesService.SaveAsync(_recentFilesSettings);
+    public async Task SaveAsync() => await recentFilesService.SaveAsync(_recentFilesSettings);
 
     public void Opening(ItemCollection items)
     {

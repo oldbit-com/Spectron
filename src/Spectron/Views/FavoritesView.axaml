@@ -12,15 +12,23 @@
         Title="Manage Favourites">
 
     <Window.Styles>
+        <Style Selector="TextBlock.Label">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="TextBox.Label">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Height" Value="30"/>
+        </Style>
     </Window.Styles>
 
     <Grid ColumnDefinitions="300,4,*" Margin="10">
         <TreeView
             Grid.Column="0"
             Margin="0 0 10 0"
-            ItemsSource="{Binding Items}"
+            ItemsSource="{Binding Nodes}"
             SelectedItem="{Binding SelectedItem}"
-            SelectionMode="AlwaysSelected">
+            SelectionMode="AlwaysSelected"
+            DragDrop.AllowDrop="True">
 
             <TreeView.KeyBindings>
 
@@ -66,14 +74,24 @@
 
         <GridSplitter Grid.Column="1" Background="{DynamicResource SystemChromeLowColor}" Margin="2" ResizeDirection="Columns"/>
 
-        <Grid Grid.Column="2" Margin="15">
-            <StackPanel Orientation="Vertical">
-                <TextBox
-                    VerticalContentAlignment="Center"
-                    Text="{Binding SelectedItem.Title, FallbackValue=''}"
-                    Height="30" />
-            </StackPanel>
+        <Grid Grid.Column="2" Margin="15"
+              DragDrop.AllowDrop="True"
+              DragDrop.DragOver="OnFileDragOver"
+              DragDrop.Drop="OnFileDrop">
 
+            <StackPanel Orientation="Vertical">
+                <Grid ColumnDefinitions="100,*" RowDefinitions="40">
+                    <TextBlock Grid.Column="0" Text="Title" Classes="Label"/>
+                    <TextBox Grid.Column="1" Classes="Label"
+                             Text="{Binding SelectedItem.Title, FallbackValue=''}"
+                             IsReadOnly="{Binding !!SelectedItem.IsReadOnly}"/>
+                </Grid>
+                <Grid ColumnDefinitions="100,*" RowDefinitions="40" IsVisible="{Binding !SelectedItem.IsReadOnly}">
+                    <TextBlock Grid.Column="0" Text="Path" Classes="Label"/>
+                    <TextBox Grid.Column="1"
+                             Text="{Binding SelectedItem.Path, FallbackValue=''}" Classes="Label"/>
+                </Grid>
+            </StackPanel>
         </Grid>
 
     </Grid>

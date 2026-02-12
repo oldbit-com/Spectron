@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using OldBit.Spectron.Extensions;
+using OldBit.Spectron.Settings;
 using OldBit.Spectron.Theming;
 
 namespace OldBit.Spectron.ViewModels;
@@ -39,9 +40,34 @@ partial class MainWindowViewModel
         _shouldResume = true;
     }
 
+    private FavoritePrograms TestFavorites()
+    {
+        var programs = new FavoritePrograms();
+        programs.Favorites.Add(new FavoriteProgram { Title = "Games", IsFolder = true });
+        programs.Favorites[0].Favorites.Add(new FavoriteProgram { Title = "Manic Miner" });
+        programs.Favorites[0].Favorites.Add(new FavoriteProgram { Title = "The Prize" });
+        programs.Favorites[0].Favorites.Add(new FavoriteProgram { Title = "Bruce Lee" });
+
+        programs.Favorites.Add(new FavoriteProgram { Title = "Demos", IsFolder = true });
+        programs.Favorites[1].Favorites.Add(new FavoriteProgram { Title = "Demo 1" });
+        programs.Favorites[1].Favorites.Add(new FavoriteProgram { Title = "Demo 2" });
+        programs.Favorites[1].Favorites.Add(new FavoriteProgram { Title = "Demo 3" });
+
+        programs.Favorites.Add(new FavoriteProgram { Title = "Some other item 1" });
+        programs.Favorites.Add(new FavoriteProgram { Title = "Some other item 2" });
+        programs.Favorites.Add(new FavoriteProgram { Title = "Some other item 3" });
+
+        return programs;
+    }
+
     private async Task WindowOpenedAsync()
     {
         _preferences = await _preferencesService.LoadAsync();
+
+        // TODO: Temporary data
+        //var programs = await _favoritesService.LoadAsync();
+        var programs = TestFavorites();
+        FavoritesViewModel.Favorites = programs.Favorites;
 
         ThemeManager.SelectTheme(CommandLineArgs?.Theme ?? _preferences.Theme);
 

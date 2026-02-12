@@ -31,10 +31,10 @@ public partial class MainWindow : Window
             ShowDialog<DiskView>(window, new DiskViewModel(message.DiskDriveManager, message.DriveId)));
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowDebuggerViewMessage>(this, (window, m) =>
-            Show<DebuggerView>(window, m.ViewModel!));
+            Show<DebuggerView>(window, m.ViewModel));
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowFavoritesViewMessage>(this, (window, m) =>
-            Show<FavoritesView>(window, new FavoritesViewModel()));
+            Show<FavoritesView>(window, m.ViewModel));
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowKeyboardViewMessage>(this, (window, m) =>
             Show<KeyboardView>(window, m.ViewModel));
@@ -43,7 +43,7 @@ public partial class MainWindow : Window
             Show<LogView>(null, m.ViewModel));
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowMemoryViewMessage>(this, (window, m) =>
-            Show<MemoryView>(window, m.ViewModel!));
+            Show<MemoryView>(window, m.ViewModel));
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowPreferencesViewMessage>(this, (window, message) =>
         {

@@ -23,11 +23,21 @@ public partial class MainMenu : UserControl
 
     private void RecentFilesSubmenuOpened(object? sender, RoutedEventArgs e)
     {
-        if (sender is not MenuItem menuItem)
+        if (sender is not MenuItem menuItem || !ReferenceEquals(sender, e.Source))
         {
             return;
         }
 
         _viewModel?.RecentFilesViewModel.Opening(menuItem.Items);
+    }
+
+    private void FavoritesSubmenuOpened(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem menuItem || !ReferenceEquals(sender, e.Source))
+        {
+            return;
+        }
+
+        _viewModel?.FavoritesViewModel.Opening(menuItem.Items);
     }
 }

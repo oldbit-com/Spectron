@@ -55,6 +55,7 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly Loader _loader;
 
     private readonly PreferencesService _preferencesService;
+    private readonly FavoritesService _favoritesService;
     private readonly SessionService _sessionService;
     private readonly DebuggerContext _debuggerContext;
     private readonly QuickSaveService _quickSaveService;
@@ -87,6 +88,7 @@ public partial class MainWindowViewModel : ObservableObject
     public MicrodriveMenuViewModel MicrodriveMenuViewModel { get; }
     public DiskDriveMenuViewModel DiskDriveMenuViewModel { get; }
     public RecentFilesViewModel RecentFilesViewModel { get; }
+    public FavoritesViewModel FavoritesViewModel { get; }
 
     #region Observable properties
     [ObservableProperty]
@@ -317,8 +319,10 @@ public partial class MainWindowViewModel : ObservableObject
         StateManager stateManager,
         Loader loader,
         PreferencesService preferencesService,
+        FavoritesService favoritesService,
         SessionService sessionService,
         RecentFilesViewModel recentFilesViewModel,
+        FavoritesViewModel favoritesViewModel,
         TapeMenuViewModel tapeMenuViewModel,
         MicrodriveMenuViewModel microdriveMenuViewModel,
         DiskDriveMenuViewModel diskDriveMenuViewModel,
@@ -337,6 +341,7 @@ public partial class MainWindowViewModel : ObservableObject
         _stateManager = stateManager;
         _loader = loader;
         _preferencesService = preferencesService;
+        _favoritesService = favoritesService;
         _sessionService = sessionService;
         _debuggerContext = debuggerContext;
         _quickSaveService = quickSaveService;
@@ -344,6 +349,7 @@ public partial class MainWindowViewModel : ObservableObject
         _logger = logger;
 
         RecentFilesViewModel = recentFilesViewModel;
+        FavoritesViewModel = favoritesViewModel;
         TapeMenuViewModel = tapeMenuViewModel;
         MicrodriveMenuViewModel = microdriveMenuViewModel;
         DiskDriveMenuViewModel = diskDriveMenuViewModel;
