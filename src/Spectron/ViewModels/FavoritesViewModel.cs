@@ -65,7 +65,7 @@ public partial class FavoritesViewModel : ObservableObject
                 continue;
             }
 
-            parent.Nodes.Add(new FavoriteItemViewModel { Title = favorite.Title });
+            parent.Nodes.Add(new FavoriteItemViewModel { Title = favorite.Title, IsFile = true });
         }
     }
 

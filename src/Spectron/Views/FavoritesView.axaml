@@ -86,7 +86,7 @@
                              Text="{Binding SelectedItem.Title, FallbackValue=''}"
                              IsReadOnly="{Binding !!SelectedItem.IsReadOnly}"/>
                 </Grid>
-                <Grid ColumnDefinitions="100,*" RowDefinitions="40" IsVisible="{Binding !SelectedItem.IsReadOnly}">
+                <Grid ColumnDefinitions="100,*" RowDefinitions="40" IsVisible="{Binding !!SelectedItem.IsFile}">
                     <TextBlock Grid.Column="0" Text="Path" Classes="Label"/>
                     <TextBox Grid.Column="1"
                              Text="{Binding SelectedItem.Path, FallbackValue=''}" Classes="Label"/>

@@ -17,5 +17,8 @@ public partial class FavoriteItemViewModel : ObservableObject
     private bool _isFolder;
 
     [ObservableProperty]
+    private bool _isFile;
+
+    [ObservableProperty]
     private bool _isReadOnly;
 }
