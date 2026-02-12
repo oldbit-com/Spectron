@@ -46,7 +46,7 @@ public partial class FavoritesViewModel : ObservableObject
     private void UpdateFavorites()
     {
         Nodes.Clear();
-        Nodes.Add(new FavoriteItemViewModel { Title = "Favorites", IsFolder = true, IsReadOnly = true });
+        Nodes.Add(new FavoriteItemViewModel { Title = "Favorites", IsFolder = true, IsRoot = true });
 
         AddFavorites(Favorites, Nodes[0]);
     }
@@ -145,6 +145,6 @@ public partial class FavoritesViewModel : ObservableObject
         }
     }
 
-    private bool CanExecuteRemove => SelectedItem is not null && !SelectedItem.IsReadOnly;
-    private bool CanExecuteInsert => SelectedItem is not null && SelectedItem.IsFolder;
+    private bool CanExecuteRemove => SelectedItem is not null && !SelectedItem.IsRoot;
+    private bool CanExecuteInsert => SelectedItem is not null && (SelectedItem.IsFolder || SelectedItem.IsRoot);
 }

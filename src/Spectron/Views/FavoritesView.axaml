@@ -42,19 +42,32 @@
 
             <TreeView.ItemTemplate>
                 <TreeDataTemplate ItemsSource="{Binding Nodes}">
-                    <Border HorizontalAlignment="Left"
-                            BorderBrush="Gray" BorderThickness="1"
-                            CornerRadius="5" Padding="15 3">
-                        <Grid>
-                            <StackPanel Orientation="Horizontal">
-                                <material:MaterialIcon Kind="FolderOutline" IsVisible="{Binding IsFolder}"/>
-                                <TextBlock
-                                    Text="{Binding Title}"
-                                    Padding="4 2 0 0"
-                                    VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Grid>
-                    </Border>
+                    <Grid>
+                        <StackPanel Orientation="Horizontal">
+                            <material:MaterialIcon Kind="FolderOutline">
+                                <material:MaterialIcon.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="IsFolder"/>
+                                        <Binding Path="!IsRoot"/>
+                                    </MultiBinding>
+                                </material:MaterialIcon.IsVisible>
+                            </material:MaterialIcon>
+
+                            <material:MaterialIcon Kind="Favorite">
+                                <material:MaterialIcon.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="IsFolder"/>
+                                        <Binding Path="IsRoot"/>
+                                    </MultiBinding>
+                                </material:MaterialIcon.IsVisible>
+                            </material:MaterialIcon>
+
+                            <TextBlock
+                                Text="{Binding Title}"
+                                Padding="4 2 0 0"
+                                VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
                 </TreeDataTemplate>
             </TreeView.ItemTemplate>
 
@@ -90,7 +103,7 @@
                     <TextBlock Grid.Column="0" Text="Title" Classes="Label"/>
                     <TextBox Grid.Column="1" Classes="Label"
                              Text="{Binding Title}"
-                             IsReadOnly="{Binding IsReadOnly}"/>
+                             IsReadOnly="{Binding IsRoot}"/>
                 </Grid>
                 <Grid ColumnDefinitions="100,*" RowDefinitions="40" IsVisible="{Binding IsFile}">
                     <TextBlock Grid.Column="0" Text="Path" Classes="Label"/>
