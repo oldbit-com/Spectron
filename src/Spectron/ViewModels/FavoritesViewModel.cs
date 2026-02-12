@@ -16,6 +16,7 @@ public partial class FavoritesViewModel : ObservableObject
 
     public ObservableCollection<FavoriteItemViewModel> Nodes { get; } = [];
 
+
     public List<FavoriteProgram> Favorites
     {
         get;
@@ -75,6 +76,29 @@ public partial class FavoritesViewModel : ObservableObject
         Console.WriteLine("Opening: " + favorite.Title);
     }
 
+    [RelayCommand(CanExecute = nameof(CanExecuteRemove))]
+    private void RemoveItem()
+    {
+        if (SelectedItem is null)
+        {
+            return;
+        }
+
+        Remove(Nodes, SelectedItem);
+    }
+
+    [RelayCommand]
+    private void InsertFolder()
+    {
+
+    }
+
+    [RelayCommand]
+    private void InsertItem()
+    {
+
+    }
+
     private void AddFavoriteItems(ItemCollection menuItems, IEnumerable<FavoriteItemViewModel> favorites)
     {
         foreach (var favorite in favorites)
@@ -97,4 +121,19 @@ public partial class FavoritesViewModel : ObservableObject
             menuItems.Add(favoriteMenuItem);
         }
     }
+
+    private void Remove(ObservableCollection<FavoriteItemViewModel> nodes, FavoriteItemViewModel item)
+    {
+        if (nodes.Remove(item))
+        {
+            return;
+        }
+
+        foreach (var node in nodes)
+        {
+            Remove(node.Nodes, item);
+        }
+    }
+
+    private bool CanExecuteRemove() => SelectedItem is not null && !SelectedItem.IsReadOnly;
 }

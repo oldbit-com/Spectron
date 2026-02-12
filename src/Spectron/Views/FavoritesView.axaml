@@ -31,7 +31,7 @@
             DragDrop.AllowDrop="True">
 
             <TreeView.KeyBindings>
-
+                <KeyBinding Gesture="{OnPlatform Delete, macOS=Meta+Back}" Command="{Binding RemoveItemCommand}"/>
             </TreeView.KeyBindings>
 
             <TreeView.Styles>
@@ -60,9 +60,13 @@
 
             <TreeView.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Insert Item" Padding="7"/>
-                    <MenuItem Header="Insert Folder" Padding="7"/>
-                    <MenuItem Header="Remove" Padding="7"/>
+                    <MenuItem Header="Insert Item" Padding="7"
+                              Command="{Binding $parent[Window].((viewModels:FavoritesViewModel)DataContext).InsertItemCommand, FallbackValue={x:Null}}"/>
+                    <MenuItem Header="Insert Folder" Padding="7"
+                              Command="{Binding $parent[Window].((viewModels:FavoritesViewModel)DataContext).InsertFolderCommand, FallbackValue={x:Null}}"/>
+                    <MenuItem Header="Remove" Padding="7"
+                              InputGesture="{OnPlatform Delete, macOS=Meta+Back}"
+                              Command="{Binding $parent[Window].((viewModels:FavoritesViewModel)DataContext).RemoveItemCommand, FallbackValue={x:Null}}"/>
                     <MenuItem Header="-"/>
                     <MenuItem Header="Cut" Padding="7" InputGesture="{OnPlatform Ctrl+X, macOS=Cmd+X}"/>
                     <MenuItem Header="Copy" Padding="7" InputGesture="{OnPlatform Ctrl+C, macOS=Cmd+C}"/>
@@ -75,6 +79,8 @@
         <GridSplitter Grid.Column="1" Background="{DynamicResource SystemChromeLowColor}" Margin="2" ResizeDirection="Columns"/>
 
         <Grid Grid.Column="2" Margin="15"
+              IsVisible="{Binding Converter={x:Static ObjectConverters.IsNotNull}}"
+              DataContext="{Binding Path=SelectedItem}"
               DragDrop.AllowDrop="True"
               DragDrop.DragOver="OnFileDragOver"
               DragDrop.Drop="OnFileDrop">
@@ -83,13 +89,13 @@
                 <Grid ColumnDefinitions="100,*" RowDefinitions="40">
                     <TextBlock Grid.Column="0" Text="Title" Classes="Label"/>
                     <TextBox Grid.Column="1" Classes="Label"
-                             Text="{Binding SelectedItem.Title, FallbackValue=''}"
-                             IsReadOnly="{Binding !!SelectedItem.IsReadOnly}"/>
+                             Text="{Binding Title}"
+                             IsReadOnly="{Binding IsReadOnly}"/>
                 </Grid>
-                <Grid ColumnDefinitions="100,*" RowDefinitions="40" IsVisible="{Binding !!SelectedItem.IsFile}">
+                <Grid ColumnDefinitions="100,*" RowDefinitions="40" IsVisible="{Binding IsFile}">
                     <TextBlock Grid.Column="0" Text="Path" Classes="Label"/>
                     <TextBox Grid.Column="1"
-                             Text="{Binding SelectedItem.Path, FallbackValue=''}" Classes="Label"/>
+                             Text="{Binding Path, FallbackValue=''}" Classes="Label"/>
                 </Grid>
             </StackPanel>
         </Grid>
