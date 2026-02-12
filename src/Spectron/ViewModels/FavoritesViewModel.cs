@@ -16,7 +16,6 @@ public partial class FavoritesViewModel : ObservableObject
 
     public ObservableCollection<FavoriteItemViewModel> Nodes { get; } = [];
 
-
     public List<FavoriteProgram> Favorites
     {
         get;
@@ -52,7 +51,7 @@ public partial class FavoritesViewModel : ObservableObject
         AddFavorites(Favorites, Nodes[0]);
     }
 
-    private void AddFavorites(List<FavoriteProgram> favorites, FavoriteItemViewModel parent)
+    private static void AddFavorites(List<FavoriteProgram> favorites, FavoriteItemViewModel parent)
     {
         foreach (var favorite in favorites)
         {
@@ -87,16 +86,22 @@ public partial class FavoritesViewModel : ObservableObject
         Remove(Nodes, SelectedItem);
     }
 
-    [RelayCommand]
-    private void InsertFolder()
+    [RelayCommand(CanExecute = nameof(CanExecuteInsert))]
+    private void InsertFolder() => InsertItem(new FavoriteItemViewModel { Title = "New Folder", IsFolder = true });
+
+    [RelayCommand(CanExecute = nameof(CanExecuteInsert))]
+    private void InsertItem() => InsertItem(new FavoriteItemViewModel { Title = "New File", IsFile = true });
+
+    private void InsertItem(FavoriteItemViewModel item)
     {
+        if (SelectedItem is null || !SelectedItem.IsFolder)
+        {
+            return;
+        }
 
-    }
+        SelectedItem.Nodes.Add(item);
 
-    [RelayCommand]
-    private void InsertItem()
-    {
-
+        SelectedItem = item;
     }
 
     private void AddFavoriteItems(ItemCollection menuItems, IEnumerable<FavoriteItemViewModel> favorites)
@@ -108,8 +113,13 @@ public partial class FavoritesViewModel : ObservableObject
                 Header = favorite.Title,
             };
 
-            if (favorite is { IsFolder: true, Nodes.Count: > 0 })
+            if (favorite.IsFolder)
             {
+                if (favorite.Nodes.Count == 0)
+                {
+                    continue;
+                }
+
                 AddFavoriteItems(favoriteMenuItem.Items, favorite.Nodes);
             }
             else
@@ -122,7 +132,7 @@ public partial class FavoritesViewModel : ObservableObject
         }
     }
 
-    private void Remove(ObservableCollection<FavoriteItemViewModel> nodes, FavoriteItemViewModel item)
+    private static void Remove(ObservableCollection<FavoriteItemViewModel> nodes, FavoriteItemViewModel item)
     {
         if (nodes.Remove(item))
         {
@@ -135,5 +145,6 @@ public partial class FavoritesViewModel : ObservableObject
         }
     }
 
-    private bool CanExecuteRemove() => SelectedItem is not null && !SelectedItem.IsReadOnly;
+    private bool CanExecuteRemove => SelectedItem is not null && !SelectedItem.IsReadOnly;
+    private bool CanExecuteInsert => SelectedItem is not null && SelectedItem.IsFolder;
 }

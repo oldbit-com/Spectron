@@ -59,14 +59,14 @@
             </TreeView.ItemTemplate>
 
             <TreeView.ContextMenu>
-                <ContextMenu>
+                <ContextMenu DataContext="{Binding $parent[Window].((viewModels:FavoritesViewModel)DataContext)}">
                     <MenuItem Header="Insert Item" Padding="7"
-                              Command="{Binding $parent[Window].((viewModels:FavoritesViewModel)DataContext).InsertItemCommand, FallbackValue={x:Null}}"/>
+                              Command="{Binding InsertItemCommand}"/>
                     <MenuItem Header="Insert Folder" Padding="7"
-                              Command="{Binding $parent[Window].((viewModels:FavoritesViewModel)DataContext).InsertFolderCommand, FallbackValue={x:Null}}"/>
+                              Command="{Binding InsertFolderCommand}"/>
                     <MenuItem Header="Remove" Padding="7"
                               InputGesture="{OnPlatform Delete, macOS=Meta+Back}"
-                              Command="{Binding $parent[Window].((viewModels:FavoritesViewModel)DataContext).RemoveItemCommand, FallbackValue={x:Null}}"/>
+                              Command="{Binding RemoveItemCommand}"/>
                     <MenuItem Header="-"/>
                     <MenuItem Header="Cut" Padding="7" InputGesture="{OnPlatform Ctrl+X, macOS=Cmd+X}"/>
                     <MenuItem Header="Copy" Padding="7" InputGesture="{OnPlatform Ctrl+C, macOS=Cmd+C}"/>
