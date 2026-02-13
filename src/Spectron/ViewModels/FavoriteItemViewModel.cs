@@ -21,4 +21,26 @@ public partial class FavoriteItemViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _isRoot;
+
+    public FavoriteItemViewModel Clone()
+    {
+        var copy = new FavoriteItemViewModel
+        {
+            Title = Title,
+            Path = Path,
+            IsFile = IsFile,
+            IsRoot = IsRoot,
+            IsFolder = IsFolder
+        };
+
+        if (IsFolder)
+        {
+            foreach (var node in Nodes)
+            {
+                copy.Nodes.Add(node.Clone());
+            }
+        }
+
+        return copy;
+    }
 }

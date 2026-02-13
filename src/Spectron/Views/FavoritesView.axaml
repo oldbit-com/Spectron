@@ -32,6 +32,9 @@
 
             <TreeView.KeyBindings>
                 <KeyBinding Gesture="{OnPlatform Delete, macOS=Meta+Back}" Command="{Binding RemoveItemCommand}"/>
+                <KeyBinding Gesture="{OnPlatform Ctrl+X, macOS=Cmd+X}" Command="{Binding CutSelectedItemCommand}"/>
+                <KeyBinding Gesture="{OnPlatform Ctrl+C, macOS=Cmd+C}" Command="{Binding CopySelectedItemCommand}"/>
+                <KeyBinding Gesture="{OnPlatform Ctrl+V, macOS=Cmd+V}" Command="{Binding PasteItemCommand}"/>
             </TreeView.KeyBindings>
 
             <TreeView.Styles>
@@ -81,9 +84,12 @@
                               InputGesture="{OnPlatform Delete, macOS=Meta+Back}"
                               Command="{Binding RemoveItemCommand}"/>
                     <MenuItem Header="-"/>
-                    <MenuItem Header="Cut" Padding="7" InputGesture="{OnPlatform Ctrl+X, macOS=Cmd+X}"/>
-                    <MenuItem Header="Copy" Padding="7" InputGesture="{OnPlatform Ctrl+C, macOS=Cmd+C}"/>
-                    <MenuItem Header="Paste" Padding="7" InputGesture="{OnPlatform Ctrl+V, macOS=Cmd+V}"/>
+                    <MenuItem Header="Cut" Padding="7" InputGesture="{OnPlatform Ctrl+X, macOS=Cmd+X}"
+                              Command="{Binding CutSelectedItemCommand}"/>
+                    <MenuItem Header="Copy" Padding="7" InputGesture="{OnPlatform Ctrl+C, macOS=Cmd+C}"
+                              Command="{Binding CopySelectedItemCommand}"/>
+                    <MenuItem Header="Paste" Padding="7" InputGesture="{OnPlatform Ctrl+V, macOS=Cmd+V}"
+                              Command="{Binding PasteItemCommand}"/>
                 </ContextMenu>
             </TreeView.ContextMenu>
 
