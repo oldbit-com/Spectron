@@ -22,6 +22,9 @@ public partial class FavoriteItemViewModel : ObservableObject
     [ObservableProperty]
     private bool _isRoot;
 
+    [ObservableProperty]
+    private bool _isCutItem;
+
     public FavoriteItemViewModel Clone()
     {
         var copy = new FavoriteItemViewModel

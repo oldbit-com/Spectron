@@ -98,13 +98,16 @@ public partial class FavoritesViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanExecuteCutCopy))]
     private void CutSelectedItem()
     {
+        _cutItem?.IsCutItem = false;
         _cutItem = SelectedItem;
+        _cutItem?.IsCutItem = true;
         _copyItem = null;
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteCutCopy))]
     private void CopySelectedItem()
     {
+        _cutItem?.IsCutItem = false;
         _cutItem = null;
         _copyItem = SelectedItem;
     }
@@ -191,6 +194,8 @@ public partial class FavoritesViewModel : ObservableObject
         }
 
         SelectedItem = cutItem;
+
+        _cutItem?.IsCutItem = false;
         _cutItem = null;
     }
 

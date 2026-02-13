@@ -65,7 +65,17 @@
                                 </material:MaterialIcon.IsVisible>
                             </material:MaterialIcon>
 
+                            <Interaction.Behaviors>
+                                <DataTriggerBehavior Binding="{Binding IsCutItem}" Value="{x:True}">
+                                    <ChangePropertyAction TargetObject="TreeItem" PropertyName="Opacity" Value="0.5"/>
+                                </DataTriggerBehavior>
+                                <DataTriggerBehavior Binding="{Binding IsCutItem}" Value="{x:False}">
+                                    <ChangePropertyAction TargetObject="TreeItem" PropertyName="Opacity" Value="1"/>
+                                </DataTriggerBehavior>
+                            </Interaction.Behaviors>
+
                             <TextBlock
+                                Name="TreeItem"
                                 Text="{Binding Title}"
                                 Padding="4 2 0 0"
                                 VerticalAlignment="Center"/>
