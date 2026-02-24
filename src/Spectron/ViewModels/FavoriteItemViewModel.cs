@@ -1,9 +1,14 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using OldBit.Spectron.Dialogs;
+using OldBit.Spectron.Emulation.Files;
 
 namespace OldBit.Spectron.ViewModels;
 
-public partial class FavoriteItemViewModel : ObservableObject
+public partial class FavoriteItemViewModel : ObservableValidator
 {
     public ObservableCollection<FavoriteItemViewModel> Nodes { get; } = [];
 
@@ -11,6 +16,9 @@ public partial class FavoriteItemViewModel : ObservableObject
     private string _title = string.Empty;
 
     [ObservableProperty]
+    [Required]
+    [CustomValidation(typeof(FavoriteItemViewModel), nameof(ValidatePath))]
+    [NotifyDataErrorInfo]
     private string _path = string.Empty;
 
     [ObservableProperty]
@@ -45,5 +53,45 @@ public partial class FavoriteItemViewModel : ObservableObject
         }
 
         return copy;
+    }
+
+    [RelayCommand]
+    private async Task GetFile()
+    {
+        var files = await FileDialogs.OpenEmulatorFileAsync();
+
+        if (files.Count <= 0)
+        {
+            return;
+        }
+
+        var filePath = files[0].Path.LocalPath;
+
+        var fileType = FileTypeResolver.FromPath(filePath);
+
+        if (fileType == FileType.Unsupported)
+        {
+            await MessageDialogs.Warning($"Unsupported file type: {fileType}.");
+            return;
+        }
+
+        Path = filePath;
+    }
+
+    public static ValidationResult? ValidatePath(string s, ValidationContext context)
+    {
+        var fileType = FileTypeResolver.FromPath(s);
+
+        if (fileType == FileType.Unsupported)
+        {
+            return new ValidationResult("Unsupported file type.");
+        }
+
+        if (!System.IO.File.Exists(s))
+        {
+            return new ValidationResult("File does not exist.");
+        }
+
+        return ValidationResult.Success;;
     }
 }

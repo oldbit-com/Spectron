@@ -2,7 +2,7 @@ using Avalonia.Platform.Storage;
 
 namespace OldBit.Spectron.Dialogs;
 
-public static class FileTypes
+public static class FilePickerType
 {
     public static FilePickerFileType All { get; } = new("All Files")
     {

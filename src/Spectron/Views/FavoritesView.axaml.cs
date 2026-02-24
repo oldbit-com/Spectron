@@ -72,7 +72,7 @@ public partial class FavoritesView : Window
             return false;
         }
 
-        var fileType = FileTypes.GetFileType(filePath);
+        var fileType = FileTypeResolver.FromPath(filePath);
 
         return fileType != FileType.Unsupported;
     }

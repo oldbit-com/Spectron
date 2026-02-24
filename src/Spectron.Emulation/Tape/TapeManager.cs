@@ -1,5 +1,4 @@
 using OldBit.Spectron.Emulation.Files;
-using OldBit.Spectron.Emulation.Rom;
 using OldBit.Z80Cpu;
 using OldBit.Spectron.Files.Tzx;
 
@@ -100,7 +99,7 @@ public sealed class TapeManager
 
     public void InsertTape(string fileName)
     {
-        var fileType = FileTypes.GetFileType(fileName);
+        var fileType = FileTypeResolver.FromPath(fileName);
         var stream = File.OpenRead(fileName);
 
         InsertTape(stream, fileType);
