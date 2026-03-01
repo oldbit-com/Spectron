@@ -31,6 +31,7 @@ using OldBit.Spectron.Emulation.TimeTravel;
 using OldBit.Spectron.Files.Pok;
 using OldBit.Spectron.Input;
 using OldBit.Spectron.Logging;
+using OldBit.Spectron.Messages;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
@@ -69,6 +70,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     private Emulator? Emulator { get; set; }
     private Preferences _preferences = new();
+    private FavoritePrograms _favorites = new();
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
     private MediaRecorder? _mediaRecorder;
     private bool _canClose;
@@ -374,6 +376,12 @@ public partial class MainWindowViewModel : ObservableObject
 
         WeakReferenceMessenger.Default.Register<PauseForDebugMessage>(this, (_, _) =>
             PauseForDebug());
+
+        WeakReferenceMessenger.Default.Register<UpdateFavoritesMessage>(this, async (_, message) =>
+        {
+            _favorites = message.Favorites;
+            await _favoritesService.SaveAsync(_favorites);
+        });
 
         _frameRateCalculator.FrameRateChanged = fps =>
         {

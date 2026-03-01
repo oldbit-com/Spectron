@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using OldBit.Spectron.Messages;
 using OldBit.Spectron.Settings;
 
 namespace OldBit.Spectron.ViewModels;
@@ -19,15 +21,15 @@ public partial class FavoritesViewModel : ObservableObject
 
     public ObservableCollection<FavoriteItemViewModel> Nodes { get; } = [];
 
-    public List<FavoriteProgram> Favorites
+    public FavoritePrograms Favorites
     {
-        get;
+        private get;
         set
         {
             field = value;
-            UpdateFavorites();
+            RefreshFavorites();
         }
-    } = [];
+    } = new();
 
     public void Opening(ItemCollection menuItems)
     {
@@ -46,12 +48,56 @@ public partial class FavoritesViewModel : ObservableObject
         AddFavoriteItems(menuItems, Nodes[0].Nodes!);
     }
 
-    private void UpdateFavorites()
+    public FavoritePrograms GetFavorites()
+    {
+        return new FavoritePrograms
+        {
+            Items = Convert(Nodes[0].Nodes)
+        };
+
+        static List<FavoriteProgram> Convert(IEnumerable<FavoriteItemViewModel> nodes)
+        {
+            var result = new List<FavoriteProgram>();
+
+            foreach (var node in nodes)
+            {
+                if (node.IsFolder)
+                {
+                    var folder = new FavoriteProgram
+                    {
+                        Title = node.Title,
+                        IsFolder = true
+                    };
+
+                    folder.Items.AddRange(Convert(node.Nodes));
+                    result.Add(folder);
+                }
+                else
+                {
+                    result.Add(new FavoriteProgram
+                    {
+                        Title = node.Title,
+                        Path = node.Path
+                    });
+                }
+            }
+
+            return result;
+        }
+    }
+
+    public void UpdateFavorites()
+    {
+        var favorites = GetFavorites();
+        WeakReferenceMessenger.Default.Send(new UpdateFavoritesMessage(favorites));
+    }
+
+    private void RefreshFavorites()
     {
         Nodes.Clear();
         Nodes.Add(new FavoriteItemViewModel { Title = "Favorites", IsFolder = true, IsRoot = true });
 
-        AddFavorites(Favorites, Nodes[0]);
+        AddFavorites(Favorites.Items, Nodes[0]);
     }
 
     private static void AddFavorites(List<FavoriteProgram> favorites, FavoriteItemViewModel parent)
@@ -63,12 +109,12 @@ public partial class FavoritesViewModel : ObservableObject
                 var folder = new FavoriteItemViewModel { Title = favorite.Title, IsFolder = true };
                 parent.Nodes.Add(folder);
 
-                AddFavorites(favorite.Favorites, folder);
+                AddFavorites(favorite.Items, folder);
 
                 continue;
             }
 
-            parent.Nodes.Add(new FavoriteItemViewModel { Title = favorite.Title, IsFile = true });
+            parent.Nodes.Add(new FavoriteItemViewModel { Title = favorite.Title, Path = favorite.Path, IsFile = true });
         }
     }
 

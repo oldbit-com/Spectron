@@ -30,20 +30,20 @@ public partial class MainWindow : Window
         WeakReferenceMessenger.Default.Register<MainWindow, ShowDiskViewMessage>(this, (window, message) =>
             ShowDialog<DiskView>(window, new DiskViewModel(message.DiskDriveManager, message.DriveId)));
 
-        WeakReferenceMessenger.Default.Register<MainWindow, ShowDebuggerViewMessage>(this, (window, m) =>
-            Show<DebuggerView>(window, m.ViewModel));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowDebuggerViewMessage>(this, (window, message) =>
+            Show<DebuggerView>(window, message.ViewModel));
 
-        WeakReferenceMessenger.Default.Register<MainWindow, ShowFavoritesViewMessage>(this, (window, m) =>
-            Show<FavoritesView>(window, m.ViewModel));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowFavoritesViewMessage>(this, (window, message) =>
+            Show<FavoritesView>(window, message.ViewModel));
 
-        WeakReferenceMessenger.Default.Register<MainWindow, ShowKeyboardViewMessage>(this, (window, m) =>
-            Show<KeyboardView>(window, m.ViewModel));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowKeyboardViewMessage>(this, (window, message) =>
+            Show<KeyboardView>(window, message.ViewModel));
 
-        WeakReferenceMessenger.Default.Register<MainWindow, ShowLogViewMessage>(this, (_, m) =>
-            Show<LogView>(null, m.ViewModel));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowLogViewMessage>(this, (_, message) =>
+            Show<LogView>(null, message.ViewModel));
 
-        WeakReferenceMessenger.Default.Register<MainWindow, ShowMemoryViewMessage>(this, (window, m) =>
-            Show<MemoryView>(window, m.ViewModel));
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowMemoryViewMessage>(this, (window, message) =>
+            Show<MemoryView>(window, message.ViewModel));
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowPreferencesViewMessage>(this, (window, message) =>
         {

@@ -43,19 +43,19 @@ partial class MainWindowViewModel
     private FavoritePrograms TestFavorites()
     {
         var programs = new FavoritePrograms();
-        programs.Favorites.Add(new FavoriteProgram { Title = "Games", IsFolder = true });
-        programs.Favorites[0].Favorites.Add(new FavoriteProgram { Title = "Manic Miner" });
-        programs.Favorites[0].Favorites.Add(new FavoriteProgram { Title = "The Prize" });
-        programs.Favorites[0].Favorites.Add(new FavoriteProgram { Title = "Bruce Lee" });
+        programs.Items.Add(new FavoriteProgram { Title = "Games", IsFolder = true });
+        programs.Items[0].Items.Add(new FavoriteProgram { Title = "Manic Miner" });
+        programs.Items[0].Items.Add(new FavoriteProgram { Title = "The Prize" });
+        programs.Items[0].Items.Add(new FavoriteProgram { Title = "Bruce Lee" });
 
-        programs.Favorites.Add(new FavoriteProgram { Title = "Demos", IsFolder = true });
-        programs.Favorites[1].Favorites.Add(new FavoriteProgram { Title = "Demo 1" });
-        programs.Favorites[1].Favorites.Add(new FavoriteProgram { Title = "Demo 2" });
-        programs.Favorites[1].Favorites.Add(new FavoriteProgram { Title = "Demo 3" });
+        programs.Items.Add(new FavoriteProgram { Title = "Demos", IsFolder = true });
+        programs.Items[1].Items.Add(new FavoriteProgram { Title = "Demo 1" });
+        programs.Items[1].Items.Add(new FavoriteProgram { Title = "Demo 2" });
+        programs.Items[1].Items.Add(new FavoriteProgram { Title = "Demo 3" });
 
-        programs.Favorites.Add(new FavoriteProgram { Title = "Some other item 1" });
-        programs.Favorites.Add(new FavoriteProgram { Title = "Some other item 2" });
-        programs.Favorites.Add(new FavoriteProgram { Title = "Some other item 3" });
+        programs.Items.Add(new FavoriteProgram { Title = "Some other item 1" });
+        programs.Items.Add(new FavoriteProgram { Title = "Some other item 2" });
+        programs.Items.Add(new FavoriteProgram { Title = "Some other item 3" });
 
         return programs;
     }
@@ -63,11 +63,11 @@ partial class MainWindowViewModel
     private async Task WindowOpenedAsync()
     {
         _preferences = await _preferencesService.LoadAsync();
+        _favorites = await _favoritesService.LoadAsync();
 
         // TODO: Temporary data
-        //var programs = await _favoritesService.LoadAsync();
-        var programs = TestFavorites();
-        FavoritesViewModel.Favorites = programs.Favorites;
+        // _favorites = TestFavorites();
+        FavoritesViewModel.Favorites = _favorites;
 
         ThemeManager.SelectTheme(CommandLineArgs?.Theme ?? _preferences.Theme);
 
@@ -215,6 +215,7 @@ partial class MainWindowViewModel
 
         await Task.WhenAll(
             _preferencesService.SaveAsync(_preferences),
+            _favoritesService.SaveAsync(_favorites),
             RecentFilesViewModel.SaveAsync(),
             _sessionService.SaveAsync(Emulator, _preferences.Resume));
 

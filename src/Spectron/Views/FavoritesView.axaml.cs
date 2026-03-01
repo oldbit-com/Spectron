@@ -24,6 +24,12 @@ public partial class FavoritesView : Window
         _viewModel.SelectedItem = viewModel.Nodes.FirstOrDefault();
     }
 
+    protected override void OnClosed(EventArgs e)
+    {
+        _viewModel?.UpdateFavorites();
+        base.OnClosed(e);
+    }
+
     private void OnFileDragOver(object? sender, DragEventArgs e)
     {
         e.DragEffects = DragDropEffects.None;
