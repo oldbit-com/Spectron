@@ -124,6 +124,7 @@
                 <Grid ColumnDefinitions="100,*,30" RowDefinitions="40" IsVisible="{Binding IsFile}">
                     <TextBlock Grid.Column="0" Text="Path" Classes="Label"/>
                     <TextBox Grid.Column="1"
+                             IsVisible="{Binding IsFile}"
                              Text="{Binding Path, FallbackValue=''}" Classes="Label"/>
                     <Button Grid.Column="2"
                             Command="{Binding GetFileCommand}"

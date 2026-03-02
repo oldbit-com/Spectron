@@ -21,8 +21,14 @@
                             <local:AdornerAnchorPanel
                                 x:DataType="DataValidationErrors"
                                 AdornerLayer.IsClipEnabled="False"
-                                IsVisible="{Binding (DataValidationErrors.HasErrors)}"
                                 DataContext="{Binding #OwnerPanel.DataContext}">
+
+                                <local:AdornerAnchorPanel.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="(DataValidationErrors.HasErrors)"/>
+                                        <Binding Path="IsVisible" />
+                                    </MultiBinding>
+                                </local:AdornerAnchorPanel.IsVisible>
 
                                 <Ellipse
                                     x:DataType="DataValidationErrors"
