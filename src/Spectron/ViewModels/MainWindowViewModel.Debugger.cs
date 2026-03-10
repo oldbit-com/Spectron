@@ -77,8 +77,5 @@ partial class MainWindowViewModel
 
     private void PauseForDebug() => Pause(showOverlay: false);
 
-    partial void OnBreakpointsEnabledChanged(bool value)
-    {
-        _breakpointHandler?.IsEnabled = value;
-    }
+    partial void OnBreakpointsEnabledChanged(bool value) => _breakpointHandler?.IsEnabled = value;
 }
