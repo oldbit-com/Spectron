@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -119,10 +117,8 @@ public partial class FavoritesViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task OpenFavorite(FavoriteItemViewModel favorite)
-    {
-        Console.WriteLine("Opening: " + favorite.Title);
-    }
+    private static void OpenFavorite(FavoriteItemViewModel favorite) =>
+        WeakReferenceMessenger.Default.Send(new OpenFavoriteMessage(favorite));
 
     [RelayCommand(CanExecute = nameof(CanExecuteRemove))]
     private void RemoveItem()

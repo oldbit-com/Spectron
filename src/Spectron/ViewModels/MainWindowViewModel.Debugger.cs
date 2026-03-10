@@ -1,4 +1,3 @@
-using System;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
@@ -80,11 +79,6 @@ partial class MainWindowViewModel
 
     partial void OnBreakpointsEnabledChanged(bool value)
     {
-        if (_breakpointHandler == null)
-        {
-            return;
-        }
-
-        _breakpointHandler.IsEnabled = value;
+        _breakpointHandler?.IsEnabled = value;
     }
 }

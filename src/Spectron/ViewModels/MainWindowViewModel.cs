@@ -377,10 +377,29 @@ public partial class MainWindowViewModel : ObservableObject
         WeakReferenceMessenger.Default.Register<PauseForDebugMessage>(this, (_, _) =>
             PauseForDebug());
 
-        WeakReferenceMessenger.Default.Register<UpdateFavoritesMessage>(this, async (_, message) =>
+        WeakReferenceMessenger.Default.Register<UpdateFavoritesMessage>(this, async void (_, message) =>
         {
-            _favorites = message.Favorites;
-            await _favoritesService.SaveAsync(_favorites);
+            try
+            {
+                _favorites = message.Favorites;
+                await _favoritesService.SaveAsync(_favorites);
+            }
+            catch
+            {
+                // Ignore
+            }
+        });
+
+        WeakReferenceMessenger.Default.Register<OpenFavoriteMessage>(this, async void (_, message) =>
+        {
+            try
+            {
+                await OpenFavorite(message.Favorite);
+            }
+            catch
+            {
+                // Ignore
+            }
         });
 
         _frameRateCalculator.FrameRateChanged = fps =>
