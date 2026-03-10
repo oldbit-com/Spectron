@@ -100,7 +100,10 @@ partial class MainWindowViewModel
 
     private async Task OpenFavorite(FavoriteItemViewModel favorite)
     {
-        Console.WriteLine("Opening: " + favorite.Path);
+        if (!string.IsNullOrWhiteSpace(favorite.Path))
+        {
+            await HandleLoadFileAsync(favorite.Path);
+        }
     }
 
     private static async Task<(Stream? Stream, FileType FileType)> LoadFileAsync(string filePath, FileType fileType)
