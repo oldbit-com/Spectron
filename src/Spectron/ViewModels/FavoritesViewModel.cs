@@ -150,12 +150,7 @@ public partial class FavoritesViewModel : ObservableObject
 
         if (nodes is not null && index > 0)
         {
-            var node = nodes[index.Value];
-
-            nodes.RemoveAt(index.Value);
-            nodes.Insert(index.Value - 1, node);
-
-            SelectedItem = node;
+            nodes.Move(index.Value, index.Value - 1);
         }
     }
 
@@ -172,12 +167,7 @@ public partial class FavoritesViewModel : ObservableObject
 
         if (nodes is not null && index < nodes.Count - 1)
         {
-            var node = nodes[index.Value];
-
-            nodes.RemoveAt(index.Value);
-            nodes.Insert(index.Value + 1, node);
-
-            SelectedItem = node;
+            nodes.Move(index.Value, index.Value + 1);
         }
     }
 
