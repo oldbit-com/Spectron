@@ -40,33 +40,11 @@ partial class MainWindowViewModel
         _shouldResume = true;
     }
 
-    private FavoritePrograms TestFavorites()
-    {
-        var programs = new FavoritePrograms();
-        programs.Items.Add(new FavoriteProgram { Title = "Games", IsFolder = true });
-        programs.Items[0].Items.Add(new FavoriteProgram { Title = "Manic Miner" });
-        programs.Items[0].Items.Add(new FavoriteProgram { Title = "The Prize" });
-        programs.Items[0].Items.Add(new FavoriteProgram { Title = "Bruce Lee" });
-
-        programs.Items.Add(new FavoriteProgram { Title = "Demos", IsFolder = true });
-        programs.Items[1].Items.Add(new FavoriteProgram { Title = "Demo 1" });
-        programs.Items[1].Items.Add(new FavoriteProgram { Title = "Demo 2" });
-        programs.Items[1].Items.Add(new FavoriteProgram { Title = "Demo 3" });
-
-        programs.Items.Add(new FavoriteProgram { Title = "Some other item 1" });
-        programs.Items.Add(new FavoriteProgram { Title = "Some other item 2" });
-        programs.Items.Add(new FavoriteProgram { Title = "Some other item 3" });
-
-        return programs;
-    }
-
     private async Task WindowOpenedAsync()
     {
         _preferences = await _preferencesService.LoadAsync();
         _favorites = await _favoritesService.LoadAsync();
 
-        // TODO: Temporary data
-        // _favorites = TestFavorites();
         FavoritesViewModel.Favorites = _favorites;
 
         ThemeManager.SelectTheme(CommandLineArgs?.Theme ?? _preferences.Theme);

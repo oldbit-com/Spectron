@@ -46,7 +46,7 @@ public partial class FavoritesViewModel : ObservableObject
         AddFavoriteItems(menuItems, Nodes[0].Nodes!);
     }
 
-    public FavoritePrograms GetFavorites()
+    private FavoritePrograms GetFavorites()
     {
         return new FavoritePrograms
         {
@@ -137,6 +137,50 @@ public partial class FavoritesViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanExecuteInsert))]
     private void InsertItem() => InsertItem(new FavoriteItemViewModel { Title = "New File", IsFile = true });
 
+    [RelayCommand(CanExecute = nameof(CanMoveItemUp))]
+    private void MoveItemUp()
+    {
+        if (SelectedItem is null)
+        {
+            return;
+        }
+
+        var nodes = FindParent(Nodes, SelectedItem)?.Nodes;
+        var index = nodes?.IndexOf(SelectedItem);
+
+        if (nodes is not null && index > 0)
+        {
+            var node = nodes[index.Value];
+
+            nodes.RemoveAt(index.Value);
+            nodes.Insert(index.Value - 1, node);
+
+            SelectedItem = node;
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanMoveItemDown))]
+    private void MoveItemDown()
+    {
+        if (SelectedItem is null)
+        {
+            return;
+        }
+
+        var nodes = FindParent(Nodes, SelectedItem)?.Nodes;
+        var index = nodes?.IndexOf(SelectedItem);
+
+        if (nodes is not null && index < nodes.Count - 1)
+        {
+            var node = nodes[index.Value];
+
+            nodes.RemoveAt(index.Value);
+            nodes.Insert(index.Value + 1, node);
+
+            SelectedItem = node;
+        }
+    }
+
     [RelayCommand(CanExecute = nameof(CanExecuteCutCopy))]
     private void CutSelectedItem()
     {
@@ -162,11 +206,11 @@ public partial class FavoritesViewModel : ObservableObject
             return;
         }
 
-        if (_cutItem != null)
+        if (_cutItem is not null)
         {
             CutItem(_cutItem, SelectedItem);
         }
-        else if (_copyItem != null)
+        else if (_copyItem is not null)
         {
             CopyItem(_copyItem, SelectedItem);
         }
@@ -196,7 +240,7 @@ public partial class FavoritesViewModel : ObservableObject
         {
             var parent = FindParent(Nodes, selectedItem);
 
-            if (parent == null)
+            if (parent is null)
             {
                 return;
             }
@@ -213,12 +257,12 @@ public partial class FavoritesViewModel : ObservableObject
         var cutItemParent = FindParent(Nodes, cutItem);
         var selectedItemParent = FindParent(Nodes, selectedItem);
 
-        if (cutItemParent == null || selectedItem.IsFile && cutItemParent == selectedItemParent)
+        if (cutItemParent is null || selectedItem.IsFile && cutItemParent == selectedItemParent)
         {
             return;
         }
 
-        if (IsChildOfAny(selectedItem, cutItem.Nodes))
+        if (IsDescendantOf(cutItem.Nodes, selectedItem))
         {
             return;
         }
@@ -293,7 +337,7 @@ public partial class FavoritesViewModel : ObservableObject
 
             var parent = FindParent(node.Nodes, item);
 
-            if (parent != null)
+            if (parent is not null)
             {
                 return parent;
             }
@@ -302,7 +346,7 @@ public partial class FavoritesViewModel : ObservableObject
         return null;
     }
 
-    private static bool IsChildOfAny(FavoriteItemViewModel item, IEnumerable<FavoriteItemViewModel> nodes)
+    private static bool IsDescendantOf(IEnumerable<FavoriteItemViewModel> nodes, FavoriteItemViewModel item)
     {
         foreach (var node in nodes)
         {
@@ -311,7 +355,7 @@ public partial class FavoritesViewModel : ObservableObject
                 return true;
             }
 
-            if (IsChildOfAny(item, node.Nodes))
+            if (IsDescendantOf(node.Nodes, item))
             {
                 return true;
             }
@@ -323,5 +367,9 @@ public partial class FavoritesViewModel : ObservableObject
     private bool CanExecuteRemove => SelectedItem is not null && !SelectedItem.IsRoot;
     private bool CanExecuteInsert => SelectedItem is not null && (SelectedItem.IsFolder || SelectedItem.IsRoot);
     private bool CanExecuteCutCopy => SelectedItem is not null && !SelectedItem.IsRoot;
-    private bool CanExecutePaste => SelectedItem is not null && (_cutItem != null || _copyItem != null);
+    private bool CanExecutePaste => SelectedItem is not null && (_cutItem is not null || _copyItem is not null);
+    private bool CanMoveItemUp => SelectedItem is not null && !SelectedItem.IsRoot &&
+                                  FindParent(Nodes, SelectedItem)?.Nodes.IndexOf(SelectedItem) > 0;
+    private bool CanMoveItemDown => SelectedItem is not null && !SelectedItem.IsRoot &&
+                                  FindParent(Nodes, SelectedItem)?.Nodes.IndexOf(SelectedItem) < FindParent(Nodes, SelectedItem)?.Nodes.Count - 1;
 }
