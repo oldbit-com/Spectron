@@ -148,14 +148,16 @@
                         <material:MaterialIcon Kind="FolderStar" />
                     </Button>
                 </Grid>
-                <Grid DataContext="{Binding SettingsViewModel}">
-                    <StackPanel>
-                        <controls:HeaderSeparator Text="Settings" />
-                        <Grid ColumnDefinitions="100,*" RowDefinitions="40,40">
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Machine" VerticalAlignment="Center" Classes="Center"/>
-                            <ComboBox  Grid.Row="0" Grid.Column="1" Width="180" ItemsSource="{Binding ComputerTypes}" SelectedItem="{Binding ComputerType}" DisplayMemberBinding="{Binding Name}"/>
-                        </Grid>
-                    </StackPanel>
+                <Grid IsVisible="{Binding IsTapeFile}">
+                    <Grid DataContext="{Binding SettingsViewModel}">
+                        <StackPanel>
+                            <controls:HeaderSeparator Text="Settings" />
+                            <Grid ColumnDefinitions="100,*" RowDefinitions="40,40">
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Machine" VerticalAlignment="Center" Classes="Center"/>
+                                <ComboBox  Grid.Row="0" Grid.Column="1" Width="180" ItemsSource="{Binding ComputerTypes}" SelectedItem="{Binding ComputerType}" DisplayMemberBinding="{Binding Name}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
             </StackPanel>
         </Grid>

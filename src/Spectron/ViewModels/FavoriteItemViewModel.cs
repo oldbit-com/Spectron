@@ -22,12 +22,14 @@ public partial class FavoriteItemViewModel : ObservableValidator
     [Required]
     [CustomValidation(typeof(FavoriteItemViewModel), nameof(ValidatePath))]
     [NotifyDataErrorInfo]
+    [NotifyPropertyChangedFor(nameof(IsTapeFile))]
     private string _path = string.Empty;
 
     [ObservableProperty]
     private bool _isFolder;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsTapeFile))]
     private bool _isFile;
 
     [ObservableProperty]
@@ -35,6 +37,21 @@ public partial class FavoriteItemViewModel : ObservableValidator
 
     [ObservableProperty]
     private bool _isCutItem;
+
+    public bool IsTapeFile
+    {
+        get
+        {
+            if (!IsFile)
+            {
+                return false;
+            }
+
+            var fileType = FileTypeResolver.FromPath(Path);
+
+            return fileType is FileType.Tap or FileType.Tzx;
+        }
+    }
 
     public FavoriteItemViewModel Clone()
     {
