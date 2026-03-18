@@ -5,12 +5,15 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation.Files;
+using OldBit.Spectron.Settings;
 
 namespace OldBit.Spectron.ViewModels;
 
 public partial class FavoriteItemViewModel : ObservableValidator
 {
     public ObservableCollection<FavoriteItemViewModel> Nodes { get; } = [];
+
+    public FavoriteSettingsViewModel SettingsViewModel { get; set; } = new();
 
     [ObservableProperty]
     private string _title = string.Empty;
@@ -93,5 +96,24 @@ public partial class FavoriteItemViewModel : ObservableValidator
         }
 
         return ValidationResult.Success;;
+    }
+
+    public FavoriteProgram ToFavoriteProgram()
+    {
+        if (IsFolder)
+        {
+            return new FavoriteProgram
+            {
+                Title = Title,
+                IsFolder = true
+            };
+        }
+
+        return new FavoriteProgram
+        {
+            Title = Title,
+            Path = Path,
+            ComputerType = SettingsViewModel.ComputerType.Value
+        };
     }
 }

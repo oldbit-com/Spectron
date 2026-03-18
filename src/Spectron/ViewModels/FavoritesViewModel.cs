@@ -62,25 +62,14 @@ public partial class FavoritesViewModel : ObservableObject
 
             foreach (var node in nodes)
             {
+                var favorite = node.ToFavoriteProgram();
+
                 if (node.IsFolder)
                 {
-                    var folder = new FavoriteProgram
-                    {
-                        Title = node.Title,
-                        IsFolder = true
-                    };
+                    favorite.Items.AddRange(Convert(node.Nodes));
+                }
 
-                    folder.Items.AddRange(Convert(node.Nodes));
-                    result.Add(folder);
-                }
-                else
-                {
-                    result.Add(new FavoriteProgram
-                    {
-                        Title = node.Title,
-                        Path = node.Path
-                    });
-                }
+                result.Add(favorite);
             }
 
             return result;
@@ -115,13 +104,22 @@ public partial class FavoritesViewModel : ObservableObject
                 continue;
             }
 
-            parent.Nodes.Add(new FavoriteItemViewModel { Title = favorite.Title, Path = favorite.Path, IsFile = true });
+            parent.Nodes.Add(new FavoriteItemViewModel
+            {
+                Title = favorite.Title,
+                Path = favorite.Path,
+                IsFile = true,
+                SettingsViewModel = new FavoriteSettingsViewModel
+                (
+                    favorite.ComputerType
+                )
+            });
         }
     }
 
     [RelayCommand]
     private static void OpenFavorite(FavoriteItemViewModel favorite) =>
-        WeakReferenceMessenger.Default.Send(new OpenFavoriteMessage(favorite));
+        WeakReferenceMessenger.Default.Send(new OpenFavoriteMessage(favorite.ToFavoriteProgram()));
 
     [RelayCommand(CanExecute = nameof(CanExecuteRemove))]
     private void RemoveItem()

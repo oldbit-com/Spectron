@@ -10,6 +10,7 @@ using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Files.Pok;
 using OldBit.Spectron.Messages;
+using OldBit.Spectron.Settings;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -17,7 +18,7 @@ partial class MainWindowViewModel
 {
     private async Task HandleLoadFileAsync() => await HandleLoadFileAsync(null);
 
-    private async Task HandleLoadFileAsync(string? filePath)
+    private async Task HandleLoadFileAsync(string? filePath, FavoriteProgram? favorite = null)
     {
         Stream? stream = null;
         var shouldResume = !IsPaused;
@@ -76,7 +77,7 @@ partial class MainWindowViewModel
                     break;
             }
 
-            if (CreateEmulator(stream, fileType))
+            if (CreateEmulator(stream, fileType, favorite))
             {
                 RecentFilesViewModel.Add(filePath);
                 Title = $"{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
@@ -98,11 +99,11 @@ partial class MainWindowViewModel
         }
     }
 
-    private async Task OpenFavorite(FavoriteItemViewModel favorite)
+    private async Task OpenFavorite(FavoriteProgram favorite)
     {
         if (!string.IsNullOrWhiteSpace(favorite.Path))
         {
-            await HandleLoadFileAsync(favorite.Path);
+            await HandleLoadFileAsync(favorite.Path, favorite);
         }
     }
 

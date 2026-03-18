@@ -79,7 +79,7 @@ partial class MainWindowViewModel
         return false;
     }
 
-    private bool CreateEmulator(Stream stream, FileType fileType)
+    private bool CreateEmulator(Stream stream, FileType fileType, FavoriteProgram? favorite)
     {
         Emulator? emulator = null;
 
@@ -89,7 +89,7 @@ partial class MainWindowViewModel
         }
         else if (fileType.IsTape())
         {
-            emulator = _loader.EnterLoadCommand(ComputerType);
+            emulator = _loader.EnterLoadCommand(favorite?.ComputerType ?? ComputerType);
             emulator.TapeManager.InsertTape(stream, fileType,
                 _preferences.Tape.IsAutoPlayEnabled && TapeLoadSpeed != TapeSpeed.Instant);
 

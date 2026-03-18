@@ -1,5 +1,5 @@
-using OldBit.Spectron.ViewModels;
+using OldBit.Spectron.Settings;
 
 namespace OldBit.Spectron.Messages;
 
-public record OpenFavoriteMessage(FavoriteItemViewModel Favorite);
+public record OpenFavoriteMessage(FavoriteProgram Favorite);

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using OldBit.Spectron.Emulation;
 
 namespace OldBit.Spectron.Settings;
 
@@ -8,6 +9,7 @@ public class FavoriteProgram
     public string Title { get; init; } = string.Empty;
     public bool IsFolder { get; init; }
     public List<FavoriteProgram> Items { get; init; } = [];
+    public ComputerType? ComputerType { get; init; }
 }
 
 public class FavoritePrograms
