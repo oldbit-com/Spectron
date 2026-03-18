@@ -10,6 +10,7 @@ public class FavoriteProgram
     public bool IsFolder { get; init; }
     public List<FavoriteProgram> Items { get; init; } = [];
     public ComputerType? ComputerType { get; init; }
+    public bool? IsUlaPlusEnabled { get; init; }
 }
 
 public class FavoritePrograms

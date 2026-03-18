@@ -130,7 +130,8 @@ public partial class FavoriteItemViewModel : ObservableValidator
         {
             Title = Title,
             Path = Path,
-            ComputerType = SettingsViewModel.ComputerType.Value
+            ComputerType = SettingsViewModel.ComputerType.Value,
+            IsUlaPlusEnabled = SettingsViewModel.IsUlaPlusEnabled,
         };
     }
 }

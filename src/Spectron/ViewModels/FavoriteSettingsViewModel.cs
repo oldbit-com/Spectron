@@ -10,9 +10,15 @@ public partial class FavoriteSettingsViewModel : ObservableObject
     [ObservableProperty]
     private NameValuePair<ComputerType?> _computerType;
 
-    public FavoriteSettingsViewModel(ComputerType? computerType = null)
+    [ObservableProperty]
+    private bool? _isUlaPlusEnabled;
+
+    public FavoriteSettingsViewModel(
+        ComputerType? computerType = null,
+        bool? isUlaPlusEnabled = null)
     {
         ComputerType = ComputerTypes.FirstOrDefault(x => x.Value == computerType, ComputerTypes[0]);
+        IsUlaPlusEnabled = isUlaPlusEnabled;
     }
 
     public List<NameValuePair<ComputerType?>> ComputerTypes { get; } =

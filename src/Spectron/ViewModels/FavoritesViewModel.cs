@@ -111,7 +111,8 @@ public partial class FavoritesViewModel : ObservableObject
                 IsFile = true,
                 SettingsViewModel = new FavoriteSettingsViewModel
                 (
-                    favorite.ComputerType
+                    favorite.ComputerType,
+                    favorite.IsUlaPlusEnabled
                 )
             });
         }

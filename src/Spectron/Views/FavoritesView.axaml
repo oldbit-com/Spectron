@@ -27,6 +27,9 @@
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Padding" Value="10 2 0 0"/>
         </Style>
+        <Style Selector="CheckBox.Center">
+            <Setter Property="Padding" Value="8 2 0 0" />
+        </Style>
     </Window.Styles>
 
     <Grid ColumnDefinitions="300,4,*" Margin="10">
@@ -155,6 +158,8 @@
                             <Grid ColumnDefinitions="100,*" RowDefinitions="40,40">
                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Machine" VerticalAlignment="Center" Classes="Center"/>
                                 <ComboBox  Grid.Row="0" Grid.Column="1" Width="180" ItemsSource="{Binding ComputerTypes}" SelectedItem="{Binding ComputerType}" DisplayMemberBinding="{Binding Name}"/>
+
+                                <CheckBox Grid.Row="1" Grid.Column="1" Content="ULA+ enabled" Classes="Center" IsThreeState="True" IsChecked="{Binding IsUlaPlusEnabled}"/>
                             </Grid>
                         </StackPanel>
                     </Grid>

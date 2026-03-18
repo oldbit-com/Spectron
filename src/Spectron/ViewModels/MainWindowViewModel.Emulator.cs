@@ -27,9 +27,9 @@ partial class MainWindowViewModel
         Initialize(emulator);
     }
 
-    private void ApplyEmulatorDefaults(Emulator emulator, bool hardReset = false)
+    private void ApplyEmulatorDefaults(Emulator emulator, bool hardReset = false, FavoriteProgram? favorite = null)
     {
-        emulator.IsUlaPlusEnabled = hardReset ? _preferences.IsUlaPlusEnabled : IsUlaPlusEnabled;
+        emulator.IsUlaPlusEnabled = hardReset ? _preferences.IsUlaPlusEnabled : favorite?.IsUlaPlusEnabled ?? IsUlaPlusEnabled;
         emulator.IsFloatingBusEnabled = _preferences.IsFloatingBusEnabled;
         emulator.JoystickManager.Configure(hardReset ? _preferences.Joystick.JoystickType : JoystickType);
         emulator.Printer.IsEnabled = _preferences.Printer.IsZxPrinterEnabled;
@@ -93,7 +93,7 @@ partial class MainWindowViewModel
             emulator.TapeManager.InsertTape(stream, fileType,
                 _preferences.Tape.IsAutoPlayEnabled && TapeLoadSpeed != TapeSpeed.Instant);
 
-            ApplyEmulatorDefaults(emulator);
+            ApplyEmulatorDefaults(emulator, favorite: favorite);
         }
 
         if (emulator != null)
