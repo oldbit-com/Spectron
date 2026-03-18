@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using OldBit.Spectron.Extensions;
 using OldBit.Spectron.Messages;
 using OldBit.Spectron.Settings;
 
@@ -18,6 +19,8 @@ public partial class FavoritesViewModel : ObservableObject
     private FavoriteItemViewModel? _selectedItem;
 
     public ObservableCollection<FavoriteItemViewModel> Nodes { get; } = [];
+
+    public TreeView? FavoritesTreeView { get; set; }
 
     public FavoritePrograms Favorites
     {
@@ -145,13 +148,16 @@ public partial class FavoritesViewModel : ObservableObject
             return;
         }
 
-        var nodes = FindParent(Nodes, SelectedItem)?.Nodes;
-        var index = nodes?.IndexOf(SelectedItem);
+        var parentNode = FindParent(Nodes, SelectedItem)?.Nodes;
+        var nodeIndex = parentNode?.IndexOf(SelectedItem) ?? - 1;
 
-        if (nodes is not null && index > 0)
+        if (parentNode is null || nodeIndex < 0)
         {
-            nodes.Move(index.Value, index.Value - 1);
+            return;
         }
+
+        parentNode.Move(nodeIndex, nodeIndex - 1);
+        FavoritesTreeView?.FindContainer(SelectedItem)?.Focus();
     }
 
     [RelayCommand(CanExecute = nameof(CanMoveItemDown))]
@@ -162,13 +168,16 @@ public partial class FavoritesViewModel : ObservableObject
             return;
         }
 
-        var nodes = FindParent(Nodes, SelectedItem)?.Nodes;
-        var index = nodes?.IndexOf(SelectedItem);
+        var parentNode = FindParent(Nodes, SelectedItem)?.Nodes;
+        var nodeIndex = parentNode?.IndexOf(SelectedItem) ?? -1;
 
-        if (nodes is not null && index < nodes.Count - 1)
+        if (parentNode is null || nodeIndex < 0 || nodeIndex >= parentNode.Count - 1)
         {
-            nodes.Move(index.Value, index.Value + 1);
+            return;
         }
+
+        parentNode.Move(nodeIndex, nodeIndex + 1);
+        FavoritesTreeView?.FindContainer(SelectedItem)?.Focus();
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteCutCopy))]

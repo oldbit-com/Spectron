@@ -23,6 +23,7 @@
 
     <Grid ColumnDefinitions="300,4,*" Margin="10">
         <TreeView
+            Name="FavoritesTreeView"
             Grid.Column="0"
             Margin="0 0 10 0"
             ItemsSource="{Binding Nodes}"
@@ -35,8 +36,8 @@
                 <KeyBinding Gesture="{OnPlatform Ctrl+X, macOS=Cmd+X}" Command="{Binding CutSelectedItemCommand}"/>
                 <KeyBinding Gesture="{OnPlatform Ctrl+C, macOS=Cmd+C}" Command="{Binding CopySelectedItemCommand}"/>
                 <KeyBinding Gesture="{OnPlatform Ctrl+V, macOS=Cmd+V}" Command="{Binding PasteItemCommand}"/>
-                <KeyBinding Gesture="{OnPlatform Ctrl+U, macOS=Cmd+U}" Command="{Binding MoveItemUpCommand}"/>
-                <KeyBinding Gesture="{OnPlatform Ctrl+D, macOS=Cmd+D}" Command="{Binding MoveItemDownCommand}"/>
+                <KeyBinding Gesture="{OnPlatform Ctrl+Up, macOS=Cmd+Up}" Command="{Binding MoveItemUpCommand}"/>
+                <KeyBinding Gesture="{OnPlatform Ctrl+Down, macOS=Cmd+Down}" Command="{Binding MoveItemDownCommand}"/>
             </TreeView.KeyBindings>
 
             <TreeView.Styles>
@@ -96,9 +97,9 @@
                               InputGesture="{OnPlatform Delete, macOS=Meta+Back}"
                               Command="{Binding RemoveItemCommand}"/>
                     <MenuItem Header="-"/>
-                    <MenuItem Header="Move Up" Padding="7" InputGesture="{OnPlatform Ctrl+U, macOS=Cmd+U}"
+                    <MenuItem Header="Move Up" Padding="7" InputGesture="{OnPlatform Ctrl+Up, macOS=Cmd+Up}"
                               Command="{Binding MoveItemUpCommand}"/>
-                    <MenuItem Header="Move Down" Padding="7" InputGesture="{OnPlatform Ctrl+D, macOS=Cmd+D}"
+                    <MenuItem Header="Move Down" Padding="7" InputGesture="{OnPlatform Ctrl+Down, macOS=Cmd+Down}"
                               Command="{Binding MoveItemDownCommand}"/>
                     <MenuItem Header="-"/>
                     <MenuItem Header="Cut" Padding="7" InputGesture="{OnPlatform Ctrl+X, macOS=Cmd+X}"

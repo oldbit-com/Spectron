@@ -22,6 +22,7 @@ public partial class FavoritesView : Window
 
         _viewModel = viewModel;
         _viewModel.SelectedItem = viewModel.Nodes.FirstOrDefault();
+        _viewModel.FavoritesTreeView = FavoritesTreeView;
     }
 
     protected override void OnClosed(EventArgs e)
