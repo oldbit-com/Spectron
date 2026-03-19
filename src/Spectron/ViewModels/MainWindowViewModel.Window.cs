@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using OldBit.Spectron.Extensions;
+using OldBit.Spectron.Settings;
 using OldBit.Spectron.Theming;
 
 namespace OldBit.Spectron.ViewModels;
@@ -42,6 +43,9 @@ partial class MainWindowViewModel
     private async Task WindowOpenedAsync()
     {
         _preferences = await _preferencesService.LoadAsync();
+        _favorites = await _favoritesService.LoadAsync();
+
+        FavoritesViewModel.Favorites = _favorites;
 
         ThemeManager.SelectTheme(CommandLineArgs?.Theme ?? _preferences.Theme);
 
@@ -189,6 +193,7 @@ partial class MainWindowViewModel
 
         await Task.WhenAll(
             _preferencesService.SaveAsync(_preferences),
+            _favoritesService.SaveAsync(_favorites),
             RecentFilesViewModel.SaveAsync(),
             _sessionService.SaveAsync(Emulator, _preferences.Resume));
 

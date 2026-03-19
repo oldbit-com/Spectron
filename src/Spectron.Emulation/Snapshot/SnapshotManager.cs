@@ -23,7 +23,7 @@ public sealed class SnapshotManager(
 
     public static void Save(string filePath, Emulator emulator)
     {
-        var fileType = FileTypes.GetFileType(filePath);
+        var fileType = FileTypeResolver.FromPath(filePath);
 
         switch (fileType)
         {

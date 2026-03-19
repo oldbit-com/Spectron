@@ -5,11 +5,12 @@ using CommunityToolkit.Mvvm.Messaging;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation.Devices.Beta128.Drive;
 using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
+using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Files.Pok;
 using OldBit.Spectron.Messages;
-using FileTypes = OldBit.Spectron.Emulation.Files.FileTypes;
+using OldBit.Spectron.Settings;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -17,7 +18,7 @@ partial class MainWindowViewModel
 {
     private async Task HandleLoadFileAsync() => await HandleLoadFileAsync(null);
 
-    private async Task HandleLoadFileAsync(string? filePath)
+    private async Task HandleLoadFileAsync(string? filePath, FavoriteProgram? favorite = null)
     {
         Stream? stream = null;
         var shouldResume = !IsPaused;
@@ -37,7 +38,7 @@ partial class MainWindowViewModel
                 filePath = files[0].Path.LocalPath;
             }
 
-            var fileType = FileTypes.GetFileType(filePath);
+            var fileType = FileTypeResolver.FromPath(filePath);
             if (fileType == FileType.Unsupported)
             {
                 await MessageDialogs.Warning($"Unsupported file type: {fileType}.");
@@ -76,7 +77,7 @@ partial class MainWindowViewModel
                     break;
             }
 
-            if (CreateEmulator(stream, fileType))
+            if (CreateEmulator(stream, fileType, favorite))
             {
                 RecentFilesViewModel.Add(filePath);
                 Title = $"{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
@@ -98,14 +99,22 @@ partial class MainWindowViewModel
         }
     }
 
+    private async Task OpenFavorite(FavoriteProgram favorite)
+    {
+        if (!string.IsNullOrWhiteSpace(favorite.Path))
+        {
+            await HandleLoadFileAsync(favorite.Path, favorite);
+        }
+    }
+
     private static async Task<(Stream? Stream, FileType FileType)> LoadFileAsync(string filePath, FileType fileType)
     {
         Stream? stream = null;
 
         if (fileType.IsArchive())
         {
-            var archive = new ZipFileReader(filePath);
-            var files = archive.GetFiles();
+            var archive = new ZipArchiveReader(filePath);
+            var files = archive.GetSupportedFiles();
 
             switch (files.Count)
             {

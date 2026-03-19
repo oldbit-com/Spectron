@@ -128,6 +128,10 @@
             <MenuItem Header="Enter Full Screen" InputGesture="Shift+Alt+Enter" Command="{Binding ToggleFullScreenCommand}"/>
         </MenuItem>
 
+        <MenuItem Header="Favourites" Padding="10 0 10 0" Focusable="False" SubmenuOpened="FavoritesSubmenuOpened">
+            <MenuItem Header="Edit Favourites" Command="{Binding ShowFavoritesViewCommand}"/>
+        </MenuItem>
+
         <MenuItem Header="Tape" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="New" Command="{Binding TapeMenuViewModel.NewCommand}"/>
             <MenuItem Header="Insert..." InputGesture="Cmd+T" Command="{Binding TapeMenuViewModel.InsertCommand}"/>

@@ -12,60 +12,60 @@ public static class FileDialogs
     public static async Task<IReadOnlyList<IStorageFile>> OpenEmulatorFileAsync() =>
         await OpenFileAsync("Select File",
         [
-            FileTypes.All,
-            FileTypes.TapeFiles,
-            FileTypes.SnapshotFiles,
-            FileTypes.DiskFiles,
-            FileTypes.Spectron,
-            FileTypes.Sna,
-            FileTypes.Szx,
-            FileTypes.Tap,
-            FileTypes.Tzx,
-            FileTypes.Z80,
-            FileTypes.Zip,
-            FileTypes.Pok,
-            FileTypes.Mdr,
-            FileTypes.Trd,
-            FileTypes.Scl,
+            FilePickerType.All,
+            FilePickerType.TapeFiles,
+            FilePickerType.SnapshotFiles,
+            FilePickerType.DiskFiles,
+            FilePickerType.Spectron,
+            FilePickerType.Sna,
+            FilePickerType.Szx,
+            FilePickerType.Tap,
+            FilePickerType.Tzx,
+            FilePickerType.Z80,
+            FilePickerType.Zip,
+            FilePickerType.Pok,
+            FilePickerType.Mdr,
+            FilePickerType.Trd,
+            FilePickerType.Scl,
         ]);
 
     public static async Task<IReadOnlyList<IStorageFile>> OpenTapeFileAsync() =>
         await OpenFileAsync("Select Tape File",
         [
-            FileTypes.TapeFiles,
-            FileTypes.Tap,
-            FileTypes.Tzx
+            FilePickerType.TapeFiles,
+            FilePickerType.Tap,
+            FilePickerType.Tzx
         ]);
 
     public static async Task<IReadOnlyList<IStorageFile>> OpenCustomRomFileAsync() =>
         await OpenFileAsync("Select Custom ROM File",
         [
-            FileTypes.Rom,
-            FileTypes.Bin,
-            FileTypes.Any,
+            FilePickerType.Rom,
+            FilePickerType.Bin,
+            FilePickerType.Any,
         ]);
 
     public static async Task<IReadOnlyList<IStorageFile>> OpenDiskImageFileAsync() =>
         await OpenFileAsync("Select Disk Image",
         [
-            FileTypes.Img,
-            FileTypes.Any,
+            FilePickerType.Img,
+            FilePickerType.Any,
         ]);
 
     public static async Task<IReadOnlyList<IStorageFile>> OpenMicrodriveFileAsync() =>
         await OpenFileAsync("Select Microdrive File",
         [
-            FileTypes.Mdr,
-            FileTypes.Any,
+            FilePickerType.Mdr,
+            FilePickerType.Any,
         ]);
 
     public static async Task<IReadOnlyList<IStorageFile>> OpenDiskFileAsync() =>
         await OpenFileAsync("Select Disk File",
         [
-            FileTypes.DiskFiles,
-            FileTypes.Trd,
-            FileTypes.Scl,
-            FileTypes.Any,
+            FilePickerType.DiskFiles,
+            FilePickerType.Trd,
+            FilePickerType.Scl,
+            FilePickerType.Any,
         ]);
 
     public static async Task<IStorageFile?> SaveTapeFileAsync(string? suggestedFileName = null)
@@ -83,7 +83,7 @@ public static class FileDialogs
             DefaultExtension = ".tzx",
             SuggestedFileName = suggestedFileName,
             ShowOverwritePrompt = true,
-            FileTypeChoices = [FileTypes.Tzx, FileTypes.Tap]
+            FileTypeChoices = [FilePickerType.Tzx, FilePickerType.Tap]
         });
     }
 
@@ -102,7 +102,7 @@ public static class FileDialogs
             DefaultExtension = ".mdr",
             SuggestedFileName = suggestedFileName,
             ShowOverwritePrompt = true,
-            FileTypeChoices = [FileTypes.Mdr]
+            FileTypeChoices = [FilePickerType.Mdr]
         });
     }
 
@@ -121,7 +121,7 @@ public static class FileDialogs
             DefaultExtension = ".trd",
             SuggestedFileName = suggestedFileName,
             ShowOverwritePrompt = true,
-            FileTypeChoices = [FileTypes.Trd, FileTypes.Scl]
+            FileTypeChoices = [FilePickerType.Trd, FilePickerType.Scl]
         });
     }
 
@@ -140,7 +140,7 @@ public static class FileDialogs
             DefaultExtension = ".spectron",
             SuggestedFileName = suggestedFileName,
             ShowOverwritePrompt = true,
-            FileTypeChoices = [FileTypes.Spectron, FileTypes.Szx, FileTypes.Z80, FileTypes.Sna],
+            FileTypeChoices = [FilePickerType.Spectron, FilePickerType.Szx, FilePickerType.Z80, FilePickerType.Sna],
         });
     }
 
@@ -159,7 +159,7 @@ public static class FileDialogs
             DefaultExtension = ".wav",
             SuggestedFileName = suggestedFileName,
             ShowOverwritePrompt = true,
-            FileTypeChoices = [FileTypes.Wav],
+            FileTypeChoices = [FilePickerType.Wav],
         });
     }
 
@@ -178,7 +178,7 @@ public static class FileDialogs
             DefaultExtension = ".mp4",
             SuggestedFileName = suggestedFileName,
             ShowOverwritePrompt = true,
-            FileTypeChoices = [FileTypes.Mp4],
+            FileTypeChoices = [FilePickerType.Mp4],
         });
     }
 
@@ -197,7 +197,7 @@ public static class FileDialogs
             DefaultExtension = ".png",
             SuggestedFileName = suggestedFileName,
             ShowOverwritePrompt = true,
-            FileTypeChoices = [FileTypes.Png],
+            FileTypeChoices = [FilePickerType.Png],
         });
     }
 

@@ -1,0 +1,190 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="using:OldBit.Spectron.Controls"
+        xmlns:material="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="OldBit.Spectron.Views.FavoritesView"
+        x:DataType="viewModels:FavoritesViewModel"
+        WindowStartupLocation="CenterOwner"
+        Title="Manage Favourites">
+
+    <Window.Styles>
+        <Style Selector="TextBlock.Label">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="TextBox.Label">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Height" Value="30"/>
+        </Style>
+        <Style Selector="TextBlock.Center">
+            <Setter Property="Padding" Value="8 4 0 0" />
+        </Style>
+        <Style Selector="ComboBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="10 2 0 0"/>
+        </Style>
+        <Style Selector="CheckBox.Center">
+            <Setter Property="Padding" Value="8 2 0 0" />
+        </Style>
+    </Window.Styles>
+
+    <Grid ColumnDefinitions="300,4,*" Margin="10">
+        <TreeView
+            Name="FavoritesTreeView"
+            Grid.Column="0"
+            Margin="0 0 10 0"
+            ItemsSource="{Binding Nodes}"
+            SelectedItem="{Binding SelectedItem}"
+            SelectionMode="AlwaysSelected"
+            DragDrop.AllowDrop="True">
+
+            <TreeView.KeyBindings>
+                <KeyBinding Gesture="{OnPlatform Delete, macOS=Meta+Back}" Command="{Binding RemoveItemCommand}"/>
+                <KeyBinding Gesture="{OnPlatform Ctrl+X, macOS=Cmd+X}" Command="{Binding CutSelectedItemCommand}"/>
+                <KeyBinding Gesture="{OnPlatform Ctrl+C, macOS=Cmd+C}" Command="{Binding CopySelectedItemCommand}"/>
+                <KeyBinding Gesture="{OnPlatform Ctrl+V, macOS=Cmd+V}" Command="{Binding PasteItemCommand}"/>
+                <KeyBinding Gesture="{OnPlatform Ctrl+Up, macOS=Cmd+Up}" Command="{Binding MoveItemUpCommand}"/>
+                <KeyBinding Gesture="{OnPlatform Ctrl+Down, macOS=Cmd+Down}" Command="{Binding MoveItemDownCommand}"/>
+            </TreeView.KeyBindings>
+
+            <TreeView.Styles>
+                <Style Selector="TreeViewItem">
+                    <Setter Property="IsExpanded" Value="True" />
+                </Style>
+            </TreeView.Styles>
+
+            <TreeView.ItemTemplate>
+                <TreeDataTemplate ItemsSource="{Binding Nodes}">
+                    <Grid>
+                        <StackPanel Orientation="Horizontal">
+                            <material:MaterialIcon Kind="FolderOutline">
+                                <material:MaterialIcon.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="IsFolder"/>
+                                        <Binding Path="!IsRoot"/>
+                                    </MultiBinding>
+                                </material:MaterialIcon.IsVisible>
+                            </material:MaterialIcon>
+
+                            <material:MaterialIcon Kind="Favorite">
+                                <material:MaterialIcon.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="IsFolder"/>
+                                        <Binding Path="IsRoot"/>
+                                    </MultiBinding>
+                                </material:MaterialIcon.IsVisible>
+                            </material:MaterialIcon>
+
+                            <Interaction.Behaviors>
+                                <DataTriggerBehavior Binding="{Binding IsCutItem}" Value="{x:True}">
+                                    <ChangePropertyAction TargetObject="TreeItem" PropertyName="Opacity" Value="0.5"/>
+                                </DataTriggerBehavior>
+                                <DataTriggerBehavior Binding="{Binding IsCutItem}" Value="{x:False}">
+                                    <ChangePropertyAction TargetObject="TreeItem" PropertyName="Opacity" Value="1"/>
+                                </DataTriggerBehavior>
+                            </Interaction.Behaviors>
+
+                            <TextBlock
+                                Name="TreeItem"
+                                Text="{Binding Title}"
+                                Padding="4 2 0 0"
+                                VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+                </TreeDataTemplate>
+            </TreeView.ItemTemplate>
+
+            <TreeView.ContextMenu>
+                <ContextMenu DataContext="{Binding $parent[Window].((viewModels:FavoritesViewModel)DataContext)}">
+                    <MenuItem Header="Insert Item" Padding="7"
+                              Command="{Binding InsertItemCommand}"/>
+                    <MenuItem Header="Insert Folder" Padding="7"
+                              Command="{Binding InsertFolderCommand}"/>
+                    <MenuItem Header="Remove" Padding="7"
+                              InputGesture="{OnPlatform Delete, macOS=Meta+Back}"
+                              Command="{Binding RemoveItemCommand}"/>
+                    <MenuItem Header="-"/>
+                    <MenuItem Header="Move Up" Padding="7" InputGesture="{OnPlatform Ctrl+Up, macOS=Cmd+Up}"
+                              Command="{Binding MoveItemUpCommand}"/>
+                    <MenuItem Header="Move Down" Padding="7" InputGesture="{OnPlatform Ctrl+Down, macOS=Cmd+Down}"
+                              Command="{Binding MoveItemDownCommand}"/>
+                    <MenuItem Header="-"/>
+                    <MenuItem Header="Cut" Padding="7" InputGesture="{OnPlatform Ctrl+X, macOS=Cmd+X}"
+                              Command="{Binding CutSelectedItemCommand}"/>
+                    <MenuItem Header="Copy" Padding="7" InputGesture="{OnPlatform Ctrl+C, macOS=Cmd+C}"
+                              Command="{Binding CopySelectedItemCommand}"/>
+                    <MenuItem Header="Paste" Padding="7" InputGesture="{OnPlatform Ctrl+V, macOS=Cmd+V}"
+                              Command="{Binding PasteItemCommand}"/>
+                </ContextMenu>
+            </TreeView.ContextMenu>
+
+        </TreeView>
+
+        <GridSplitter Grid.Column="1" Background="{DynamicResource SystemChromeLowColor}" Margin="2" ResizeDirection="Columns"/>
+
+        <Grid Grid.Column="2" Margin="15"
+              IsVisible="{Binding Converter={x:Static ObjectConverters.IsNotNull}}"
+              DataContext="{Binding SelectedItem}"
+              DragDrop.AllowDrop="True"
+              DragDrop.DragOver="OnFileDragOver"
+              DragDrop.Drop="OnFileDrop">
+
+            <StackPanel Orientation="Vertical">
+                <Grid ColumnDefinitions="100,*" RowDefinitions="40">
+                    <TextBlock Grid.Column="0" Text="Title" Classes="Label"/>
+                    <TextBox Grid.Column="1" Classes="Label"
+                             Text="{Binding Title}"
+                             IsReadOnly="{Binding IsRoot}"/>
+                </Grid>
+                <Grid ColumnDefinitions="100,*,30" RowDefinitions="40" IsVisible="{Binding IsFile}">
+                    <TextBlock Grid.Column="0" Text="Path" Classes="Label"/>
+                    <TextBox Grid.Column="1"
+                             IsVisible="{Binding IsFile}"
+                             Text="{Binding Path, FallbackValue=''}" Classes="Label"/>
+                    <Button Grid.Column="2"
+                            Command="{Binding GetFileCommand}"
+                            Height="30" Width="30" Margin="5 0 0 0">
+                        <material:MaterialIcon Kind="FolderStar"/>
+                    </Button>
+                </Grid>
+                <Grid IsVisible="{Binding IsTapeFile}">
+                    <Grid DataContext="{Binding SettingsViewModel}">
+                        <StackPanel Grid.Column="0" Margin="0 20 0 0">
+                            <controls:HeaderSeparator Text="Override Emulator Settings" />
+
+                            <Grid ColumnDefinitions="*,*">
+                                <Grid Grid.Column="0" ColumnDefinitions="100,*" RowDefinitions="40,40,40,40">
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Machine" VerticalAlignment="Center" Classes="Center"/>
+                                    <ComboBox  Grid.Row="0" Grid.Column="1" Width="180" ItemsSource="{Binding ComputerTypes}" SelectedItem="{Binding ComputerType}" DisplayMemberBinding="{Binding Name}"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Joystick" VerticalAlignment="Center" Classes="Center"/>
+                                    <ComboBox  Grid.Row="1" Grid.Column="1" Width="180" ItemsSource="{Binding JoystickTypes}" SelectedItem="{Binding JoystickType}" DisplayMemberBinding="{Binding Name}"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Mouse" VerticalAlignment="Center" Classes="Center"/>
+                                    <ComboBox  Grid.Row="2" Grid.Column="1" Width="180" ItemsSource="{Binding MouseTypes}" SelectedItem="{Binding MouseType}" DisplayMemberBinding="{Binding Name}"/>
+
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Tape Speed" VerticalAlignment="Center" Classes="Center"/>
+                                    <ComboBox  Grid.Row="3" Grid.Column="1" Width="180" ItemsSource="{Binding TapeLoadSpeeds}" SelectedItem="{Binding TapeLoadSpeed}" DisplayMemberBinding="{Binding Name}"/>
+                                </Grid>
+
+                                <Grid Grid.Column="1"  RowDefinitions="40,40,40,40,40">
+                                    <CheckBox Grid.Row="0" Content="ULA+ enabled" Classes="Center" IsThreeState="True" IsChecked="{Binding IsUlaPlusEnabled}"/>
+                                    <CheckBox Grid.Row="1" Content="AY enabled" Classes="Center" IsThreeState="True" IsChecked="{Binding IsAyEnabled}"/>
+                                    <CheckBox Grid.Row="2" Content="Interface I enabled" Classes="Center" IsThreeState="True" IsChecked="{Binding IsInterface1Enabled}"/>
+                                    <CheckBox Grid.Row="3" Content="Beta 128 enabled" Classes="Center" IsThreeState="True" IsChecked="{Binding IsBeta128Enabled}"/>
+                                    <CheckBox Grid.Row="4" Content="DivMMC enabled" Classes="Center" IsThreeState="True" IsChecked="{Binding IsDivMmcEnabled}"/>
+                                </Grid>
+                            </Grid>
+
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</Window>

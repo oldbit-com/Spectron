@@ -8,5 +8,5 @@ public class RecentFilesSettings
 
     public string CurrentFileName { get; set; } = string.Empty;
 
-    public int MaxRecentFiles { get; set; } = 10;
+    public int MaxRecentFiles { get; set; } = 15;
 }

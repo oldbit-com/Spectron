@@ -25,6 +25,8 @@ partial class MainWindowViewModel
 
         if (preferences != null)
         {
+            await _preferencesService.SaveAsync(preferences);
+
             _preferences = preferences;
 
             Emulator?.IsUlaPlusEnabled = _preferences.IsUlaPlusEnabled;
@@ -136,4 +138,10 @@ partial class MainWindowViewModel
 
     private void OpenPrintOutputViewer() =>
         WeakReferenceMessenger.Default.Send(new ShowPrintOutputViewMessage(Emulator!.Printer));
+
+    private async Task OpenFavoritesWindow()
+    {
+        FavoritesViewModel.Favorites = _favorites;
+        await WeakReferenceMessenger.Default.Send(new ShowFavoritesViewMessage(FavoritesViewModel));
+    }
 }

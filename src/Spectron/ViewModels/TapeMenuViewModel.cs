@@ -5,11 +5,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using OldBit.Spectron.Dialogs;
+using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Files.Extensions;
 using OldBit.Spectron.Messages;
-using FileTypes = OldBit.Spectron.Emulation.Files.FileTypes;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -59,7 +59,7 @@ public partial class TapeMenuViewModel : ObservableObject
     {
         var fileName = string.Empty;
 
-        var fileType = FileTypes.GetFileType(_recentFilesViewModel.CurrentFileName);
+        var fileType = FileTypeResolver.FromPath(_recentFilesViewModel.CurrentFileName);
 
         if (fileType.IsTape())
         {
@@ -73,7 +73,7 @@ public partial class TapeMenuViewModel : ObservableObject
             return;
         }
 
-        fileType = FileTypes.GetFileType(file.Path.LocalPath);
+        fileType = FileTypeResolver.FromPath(file.Path.LocalPath);
 
         if (fileType == FileType.Tap)
         {

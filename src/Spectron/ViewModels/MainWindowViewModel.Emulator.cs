@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
-using OldBit.Spectron.Emulation.Devices.Interface1;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Rom;
@@ -28,33 +27,33 @@ partial class MainWindowViewModel
         Initialize(emulator);
     }
 
-    private void ApplyEmulatorDefaults(Emulator emulator, bool hardReset = false)
+    private void ApplyEmulatorDefaults(Emulator emulator, bool hardReset = false, FavoriteProgram? favorite = null)
     {
-        emulator.IsUlaPlusEnabled = hardReset ? _preferences.IsUlaPlusEnabled : IsUlaPlusEnabled;
+        emulator.IsUlaPlusEnabled = hardReset ? _preferences.IsUlaPlusEnabled : favorite?.IsUlaPlusEnabled ?? IsUlaPlusEnabled;
         emulator.IsFloatingBusEnabled = _preferences.IsFloatingBusEnabled;
-        emulator.JoystickManager.Configure(hardReset ? _preferences.Joystick.JoystickType : JoystickType);
+        emulator.JoystickManager.Configure(hardReset ? _preferences.Joystick.JoystickType : favorite?.JoystickType ?? JoystickType);
         emulator.Printer.IsEnabled = _preferences.Printer.IsZxPrinterEnabled;
-        emulator.MouseManager.Configure(hardReset ? _preferences.Mouse.MouseType : MouseType);
-        emulator.TapeManager.TapeLoadSpeed = hardReset ? _preferences.Tape.LoadSpeed : TapeLoadSpeed;
+        emulator.MouseManager.Configure(hardReset ? _preferences.Mouse.MouseType : favorite?.MouseType ?? MouseType);
+        emulator.TapeManager.TapeLoadSpeed = hardReset ? _preferences.Tape.LoadSpeed : favorite?.TapeLoadSpeed ?? TapeLoadSpeed;
         emulator.TapeManager.TapeSaveSpeed = _preferences.Tape.SaveSpeed;
 
-        if (_preferences.DivMmc.IsEnabled)
+        if (favorite?.IsDivMmcEnabled ?? _preferences.DivMmc.IsEnabled)
         {
             emulator.DivMmc.Enable();
             emulator.ConfigureDivMMc(_preferences.DivMmc);
         }
 
-        if (_preferences.Beta128.IsEnabled)
+        if (favorite?.IsBeta128Enabled ?? _preferences.Beta128.IsEnabled)
         {
             emulator.Beta128.Enable();
         }
 
-        if (_preferences.Interface1.IsEnabled)
+        if (favorite?.IsInterface1Enabled ?? _preferences.Interface1.IsEnabled)
         {
             emulator.Interface1.Enable();
         }
 
-        emulator.ConfigureAudio(_preferences.Audio);
+        emulator.ConfigureAudio(_preferences.Audio, favorite);
 
        _mouseHelper = new MouseHelper(emulator.MouseManager);
     }
@@ -80,7 +79,7 @@ partial class MainWindowViewModel
         return false;
     }
 
-    private bool CreateEmulator(Stream stream, FileType fileType)
+    private bool CreateEmulator(Stream stream, FileType fileType, FavoriteProgram? favorite)
     {
         Emulator? emulator = null;
 
@@ -90,11 +89,11 @@ partial class MainWindowViewModel
         }
         else if (fileType.IsTape())
         {
-            emulator = _loader.EnterLoadCommand(ComputerType);
+            emulator = _loader.EnterLoadCommand(favorite?.ComputerType ?? ComputerType);
             emulator.TapeManager.InsertTape(stream, fileType,
-                _preferences.Tape.IsAutoPlayEnabled && TapeLoadSpeed != TapeSpeed.Instant);
+                _preferences.Tape.IsAutoPlayEnabled && (favorite?.TapeLoadSpeed ?? TapeLoadSpeed) != TapeSpeed.Instant);
 
-            ApplyEmulatorDefaults(emulator);
+            ApplyEmulatorDefaults(emulator, favorite: favorite);
         }
 
         if (emulator != null)
