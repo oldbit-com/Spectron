@@ -3,7 +3,7 @@
 Favourites manager allows you to organise your favourite games, demos and other files.
 You can group them by category.
 
-[Favourites Manager](FavoritesEditor.png?raw=true "Favourites Manager")
+![Favourites Manager](./FavoritesEditor.png "Favourites Manager")
 
 Favourites are easily accessible from the main menu.
 
@@ -11,7 +11,7 @@ Favourites are easily accessible from the main menu.
 
 All available actions are available from the context menu.
 
-[Context Menu](FavoritesContextMenu.png?raw=true "Context Menu")
+![Context Menu](./FavoritesContextMenu.png "Context Menu")
 
 ## Settings Overrides
 
