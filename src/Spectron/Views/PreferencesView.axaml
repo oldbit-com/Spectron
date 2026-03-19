@@ -448,19 +448,19 @@
                         <controls:HeaderSeparator Text="Tape loading"/>
                         <StackPanel>
                             <RadioButton
-                                Content="Normal tape loading speed"
+                                Content="Normal → Like original ZX Spectrum"
                                 ToolTip.Tip="Should be able to load any tape file"
                                 IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Normal}}"
                                 Classes="Center"/>
 
                             <RadioButton
-                                Content="Accelerated tape loading"
+                                Content="Accelerated → Normal, but at maximum emulator speed"
                                 ToolTip.Tip="Runs emulator at maximum speed during tape loading"
                                 IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Accelerated}}"
                                 Classes="Center"/>
 
                             <RadioButton
-                                Content="Instant tape loading"
+                                Content="Instant → Directly into memory"
                                 ToolTip.Tip="Loads tape instantly into memory, only compatible with standard tape blocks"
                                 IsChecked="{Binding TapeLoadSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Instant}}"
                                 Classes="Center"/>
@@ -489,14 +489,14 @@
 
                         <StackPanel Margin="20 0 0 0">
                             <RadioButton
-                                Content="Normal tape saving speed"
+                                Content="Normal → Like original ZX Spectrum"
                                 ToolTip.Tip="Normal tape saving with all border and audio effects"
                                 IsEnabled="{Binding #IsTapeSaveEnabled.IsChecked}"
                                 IsChecked="{Binding TapeSaveSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Normal}}"
                                 Classes="Center"/>
 
                             <RadioButton
-                                Content="Instant tape saving"
+                                Content="Instant → Directly from memory"
                                 ToolTip.Tip="Saves tape data instantly capturing memory contents"
                                 IsEnabled="{Binding #IsTapeSaveEnabled.IsChecked}"
                                 IsChecked="{Binding TapeSaveSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static tape:TapeSpeed.Instant}}"

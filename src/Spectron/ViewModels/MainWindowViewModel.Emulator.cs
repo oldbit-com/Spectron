@@ -31,10 +31,10 @@ partial class MainWindowViewModel
     {
         emulator.IsUlaPlusEnabled = hardReset ? _preferences.IsUlaPlusEnabled : favorite?.IsUlaPlusEnabled ?? IsUlaPlusEnabled;
         emulator.IsFloatingBusEnabled = _preferences.IsFloatingBusEnabled;
-        emulator.JoystickManager.Configure(hardReset ? _preferences.Joystick.JoystickType : JoystickType);
+        emulator.JoystickManager.Configure(hardReset ? _preferences.Joystick.JoystickType : favorite?.JoystickType ?? JoystickType);
         emulator.Printer.IsEnabled = _preferences.Printer.IsZxPrinterEnabled;
-        emulator.MouseManager.Configure(hardReset ? _preferences.Mouse.MouseType : MouseType);
-        emulator.TapeManager.TapeLoadSpeed = hardReset ? _preferences.Tape.LoadSpeed : TapeLoadSpeed;
+        emulator.MouseManager.Configure(hardReset ? _preferences.Mouse.MouseType : favorite?.MouseType ?? MouseType);
+        emulator.TapeManager.TapeLoadSpeed = hardReset ? _preferences.Tape.LoadSpeed : favorite?.TapeLoadSpeed ?? TapeLoadSpeed;
         emulator.TapeManager.TapeSaveSpeed = _preferences.Tape.SaveSpeed;
 
         if (_preferences.DivMmc.IsEnabled)
@@ -53,7 +53,7 @@ partial class MainWindowViewModel
             emulator.Interface1.Enable();
         }
 
-        emulator.ConfigureAudio(_preferences.Audio);
+        emulator.ConfigureAudio(_preferences.Audio, favorite);
 
        _mouseHelper = new MouseHelper(emulator.MouseManager);
     }

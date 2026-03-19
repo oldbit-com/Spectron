@@ -148,19 +148,35 @@
                     <Button Grid.Column="2"
                             Command="{Binding GetFileCommand}"
                             Height="30" Width="30" Margin="5 0 0 0">
-                        <material:MaterialIcon Kind="FolderStar" />
+                        <material:MaterialIcon Kind="FolderStar"/>
                     </Button>
                 </Grid>
                 <Grid IsVisible="{Binding IsTapeFile}">
                     <Grid DataContext="{Binding SettingsViewModel}">
-                        <StackPanel>
-                            <controls:HeaderSeparator Text="Settings" />
-                            <Grid ColumnDefinitions="100,*" RowDefinitions="40,40">
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Machine" VerticalAlignment="Center" Classes="Center"/>
-                                <ComboBox  Grid.Row="0" Grid.Column="1" Width="180" ItemsSource="{Binding ComputerTypes}" SelectedItem="{Binding ComputerType}" DisplayMemberBinding="{Binding Name}"/>
+                        <StackPanel Grid.Column="0" Margin="0 20 0 0">
+                            <controls:HeaderSeparator Text="Override Emulator Settings" />
 
-                                <CheckBox Grid.Row="1" Grid.Column="1" Content="ULA+ enabled" Classes="Center" IsThreeState="True" IsChecked="{Binding IsUlaPlusEnabled}"/>
+                            <Grid ColumnDefinitions="*,*">
+                                <Grid Grid.Column="0" ColumnDefinitions="100,*" RowDefinitions="40,40,40,40">
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Machine" VerticalAlignment="Center" Classes="Center"/>
+                                    <ComboBox  Grid.Row="0" Grid.Column="1" Width="180" ItemsSource="{Binding ComputerTypes}" SelectedItem="{Binding ComputerType}" DisplayMemberBinding="{Binding Name}"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Joystick" VerticalAlignment="Center" Classes="Center"/>
+                                    <ComboBox  Grid.Row="1" Grid.Column="1" Width="180" ItemsSource="{Binding JoystickTypes}" SelectedItem="{Binding JoystickType}" DisplayMemberBinding="{Binding Name}"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Mouse" VerticalAlignment="Center" Classes="Center"/>
+                                    <ComboBox  Grid.Row="2" Grid.Column="1" Width="180" ItemsSource="{Binding MouseTypes}" SelectedItem="{Binding MouseType}" DisplayMemberBinding="{Binding Name}"/>
+
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Tape Speed" VerticalAlignment="Center" Classes="Center"/>
+                                    <ComboBox  Grid.Row="3" Grid.Column="1" Width="180" ItemsSource="{Binding TapeLoadSpeeds}" SelectedItem="{Binding TapeLoadSpeed}" DisplayMemberBinding="{Binding Name}"/>
+                                </Grid>
+
+                                <Grid Grid.Column="1"  RowDefinitions="40,40">
+                                    <CheckBox Grid.Row="0" Content="ULA+ enabled" Classes="Center" IsThreeState="True" IsChecked="{Binding IsUlaPlusEnabled}"/>
+                                    <CheckBox Grid.Row="1" Content="AY enabled" Classes="Center" IsThreeState="True" IsChecked="{Binding IsAyEnabled}"/>
+                                </Grid>
                             </Grid>
+
                         </StackPanel>
                     </Grid>
                 </Grid>

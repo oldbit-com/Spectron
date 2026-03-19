@@ -17,10 +17,10 @@ public static class EmulatorExtensions
             emulator?.TapeManager.TapeLoadSpeed = tapeSettings.LoadSpeed;
         }
 
-        public void ConfigureAudio(AudioSettings audioSettings)
+        public void ConfigureAudio(AudioSettings audioSettings, FavoriteProgram? favorite = null)
         {
             emulator?.AudioManager.IsBeeperEnabled = audioSettings.IsBeeperEnabled;
-            emulator?.AudioManager.IsAyEnabled = audioSettings.IsAyAudioEnabled;
+            emulator?.AudioManager.IsAyEnabled = favorite?.IsAyEnabled ?? audioSettings.IsAyAudioEnabled;
             emulator?.AudioManager.IsAySupportedStandardSpectrum = audioSettings.IsAySupportedStandardSpectrum;
             emulator?.AudioManager.StereoMode = audioSettings.StereoMode;
         }

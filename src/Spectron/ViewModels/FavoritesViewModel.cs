@@ -112,7 +112,11 @@ public partial class FavoritesViewModel : ObservableObject
                 SettingsViewModel = new FavoriteSettingsViewModel
                 (
                     favorite.ComputerType,
-                    favorite.IsUlaPlusEnabled
+                    favorite.JoystickType,
+                    favorite.MouseType,
+                    favorite.TapeLoadSpeed,
+                    favorite.IsUlaPlusEnabled,
+                    favorite.IsAyEnabled
                 )
             });
         }
@@ -292,6 +296,11 @@ public partial class FavoritesViewModel : ObservableObject
                 Header = favorite.Title,
             };
 
+            if (string.IsNullOrWhiteSpace(favorite.Title))
+            {
+                continue;
+            }
+
             if (favorite.IsFolder)
             {
                 if (favorite.Nodes.Count == 0)
@@ -303,6 +312,11 @@ public partial class FavoritesViewModel : ObservableObject
             }
             else
             {
+                if (string.IsNullOrWhiteSpace(favorite.Path))
+                {
+                    continue;
+                }
+
                 favoriteMenuItem.Command = OpenFavoriteCommand;
                 favoriteMenuItem.CommandParameter = favorite;
             }

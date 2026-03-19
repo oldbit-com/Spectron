@@ -16,6 +16,8 @@ public partial class FavoriteItemViewModel : ObservableValidator
     public FavoriteSettingsViewModel SettingsViewModel { get; set; } = new();
 
     [ObservableProperty]
+    [Required]
+    [NotifyDataErrorInfo]
     private string _title = string.Empty;
 
     [ObservableProperty]
@@ -131,7 +133,11 @@ public partial class FavoriteItemViewModel : ObservableValidator
             Title = Title,
             Path = Path,
             ComputerType = SettingsViewModel.ComputerType.Value,
+            JoystickType = SettingsViewModel.JoystickType.Value,
+            MouseType = SettingsViewModel.MouseType.Value,
+            TapeLoadSpeed = SettingsViewModel.TapeLoadSpeed.Value,
             IsUlaPlusEnabled = SettingsViewModel.IsUlaPlusEnabled,
+            IsAyEnabled = SettingsViewModel.IsAyEnabled
         };
     }
 }
