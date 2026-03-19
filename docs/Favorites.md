@@ -5,9 +5,11 @@ You can group them by category.
 
 [Favourites Manager](FavoritesEditor.png?raw=true "Favourites Manager")
 
-Favourites are accessible from the main menu.
+Favourites are easily accessible from the main menu.
 
 ## Context menu
+
+All available actions are available from the context menu.
 
 [Context Menu](FavoritesContextMenu.png?raw=true "Context Menu")
 
