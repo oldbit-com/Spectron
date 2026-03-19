@@ -41,6 +41,7 @@ I have created it for my personal use to play games and demos. It is a lot of fu
 - [x] Audio and video recording
 - [x] Selection of alternative ROMs, custom ROM can also be loaded
 - [x] Built-in debugger
+- [x] Favourites manager
 - [x] And more features will come
 
 Spectron relies on several custom libraries that I created for this project:
@@ -201,6 +202,11 @@ done in the background by converting static frames to a video stream with audio,
 Debugger is available in the emulator. It is a simple debugger that allows you to inspect the CPU registers, 
 memory and disassembly. You can step through the code, set breakpoints.
 More information can be found [here](docs/Debugger.md).
+
+## Favourites Manager
+Favourites manager allows you to organise your favourite games, demos and other files.
+You can access it from the main menu.
+More information can be found [here](docs/Favorites.md).
 
 ### Resources
 - [Avalonia UI](https://avaloniaui.net/)

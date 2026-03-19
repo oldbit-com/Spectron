@@ -51,6 +51,20 @@ public partial class FavoriteItemViewModel : ObservableValidator
 
             var fileType = FileTypeResolver.FromPath(Path);
 
+            if (fileType == FileType.Zip)
+            {
+                try
+                {
+                    using var archive = new ZipArchiveReader(Path);
+
+                    return archive.ContainsTapeFile();
+                }
+                catch
+                {
+                   return false;
+                }
+            }
+
             return fileType is FileType.Tap or FileType.Tzx;
         }
     }

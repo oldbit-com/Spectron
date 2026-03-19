@@ -26,6 +26,8 @@ public sealed class ZipArchiveReader(string filePath) : IDisposable
         return entries;
     }
 
+    public bool ContainsTapeFile() => _zip.Entries.Any(file => FileTypeResolver.FromPath(file.FullName).IsTape());
+
     public Stream? GetFile(string fullName) =>
         _zip.Entries.FirstOrDefault(e => e.FullName == fullName)?.Open();
 
