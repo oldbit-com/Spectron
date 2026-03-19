@@ -18,6 +18,9 @@ public class FavoriteProgram
     public TapeSpeed? TapeLoadSpeed { get; init; }
     public bool? IsUlaPlusEnabled { get; init; }
     public bool? IsAyEnabled { get; init; }
+    public bool? IsInterface1Enabled { get; init; }
+    public bool? IsBeta128Enabled { get; init; }
+    public bool? IsDivMmcEnabled { get; init; }
 }
 
 public class FavoritePrograms

@@ -171,9 +171,12 @@
                                     <ComboBox  Grid.Row="3" Grid.Column="1" Width="180" ItemsSource="{Binding TapeLoadSpeeds}" SelectedItem="{Binding TapeLoadSpeed}" DisplayMemberBinding="{Binding Name}"/>
                                 </Grid>
 
-                                <Grid Grid.Column="1"  RowDefinitions="40,40">
+                                <Grid Grid.Column="1"  RowDefinitions="40,40,40,40,40">
                                     <CheckBox Grid.Row="0" Content="ULA+ enabled" Classes="Center" IsThreeState="True" IsChecked="{Binding IsUlaPlusEnabled}"/>
                                     <CheckBox Grid.Row="1" Content="AY enabled" Classes="Center" IsThreeState="True" IsChecked="{Binding IsAyEnabled}"/>
+                                    <CheckBox Grid.Row="2" Content="Interface I enabled" Classes="Center" IsThreeState="True" IsChecked="{Binding IsInterface1Enabled}"/>
+                                    <CheckBox Grid.Row="3" Content="Beta 128 enabled" Classes="Center" IsThreeState="True" IsChecked="{Binding IsBeta128Enabled}"/>
+                                    <CheckBox Grid.Row="4" Content="DivMMC enabled" Classes="Center" IsThreeState="True" IsChecked="{Binding IsDivMmcEnabled}"/>
                                 </Grid>
                             </Grid>
 

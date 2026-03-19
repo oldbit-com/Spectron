@@ -28,13 +28,25 @@ public partial class FavoriteSettingsViewModel : ObservableObject
     [ObservableProperty]
     private bool? _isAyEnabled;
 
+    [ObservableProperty]
+    private bool? _isInterface1Enabled;
+
+    [ObservableProperty]
+    private bool? _isBeta128Enabled;
+
+    [ObservableProperty]
+    private bool? _isDivMmcEnabled;
+
     public FavoriteSettingsViewModel(
         ComputerType? computerType = null,
         JoystickType? joystickType = null,
         MouseType? mouseType = null,
         TapeSpeed? tapeLoadingSpeed = null,
         bool? isUlaPlusEnabled = null,
-        bool? isAyEnabled = null)
+        bool? isAyEnabled = null,
+        bool? isInterface1Enabled = null,
+        bool? isBeta128Enabled = null,
+        bool? isDivMmcEnabled = null)
     {
         ComputerType = ComputerTypes.FirstOrDefault(x => x.Value == computerType, ComputerTypes[0]);
         JoystickType = JoystickTypes.FirstOrDefault(x => x.Value == joystickType, JoystickTypes[0]);
@@ -42,6 +54,9 @@ public partial class FavoriteSettingsViewModel : ObservableObject
         TapeLoadSpeed = TapeLoadSpeeds.FirstOrDefault(x => x.Value == tapeLoadingSpeed, TapeLoadSpeeds[0]);
         IsUlaPlusEnabled = isUlaPlusEnabled;
         IsAyEnabled = isAyEnabled;
+        IsInterface1Enabled = isInterface1Enabled;
+        IsBeta128Enabled = isBeta128Enabled;
+        IsDivMmcEnabled = isDivMmcEnabled;
     }
 
     public List<NameValuePair<ComputerType?>> ComputerTypes { get; } =
@@ -75,6 +90,6 @@ public partial class FavoriteSettingsViewModel : ObservableObject
         new("Default", null),
         new("Normal", TapeSpeed.Normal),
         new("Instant", TapeSpeed.Instant),
-        new("Instant", TapeSpeed.Accelerated),
+        new("Accelerated", TapeSpeed.Accelerated),
     ];
 }

@@ -116,7 +116,10 @@ public partial class FavoritesViewModel : ObservableObject
                     favorite.MouseType,
                     favorite.TapeLoadSpeed,
                     favorite.IsUlaPlusEnabled,
-                    favorite.IsAyEnabled
+                    favorite.IsAyEnabled,
+                    favorite.IsInterface1Enabled,
+                    favorite.IsBeta128Enabled,
+                    favorite.IsDivMmcEnabled
                 )
             });
         }

@@ -137,7 +137,10 @@ public partial class FavoriteItemViewModel : ObservableValidator
             MouseType = SettingsViewModel.MouseType.Value,
             TapeLoadSpeed = SettingsViewModel.TapeLoadSpeed.Value,
             IsUlaPlusEnabled = SettingsViewModel.IsUlaPlusEnabled,
-            IsAyEnabled = SettingsViewModel.IsAyEnabled
+            IsAyEnabled = SettingsViewModel.IsAyEnabled,
+            IsInterface1Enabled = SettingsViewModel.IsInterface1Enabled,
+            IsBeta128Enabled = SettingsViewModel.IsBeta128Enabled,
+            IsDivMmcEnabled = SettingsViewModel.IsDivMmcEnabled
         };
     }
 }

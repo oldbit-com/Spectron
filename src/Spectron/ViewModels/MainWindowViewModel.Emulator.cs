@@ -37,18 +37,18 @@ partial class MainWindowViewModel
         emulator.TapeManager.TapeLoadSpeed = hardReset ? _preferences.Tape.LoadSpeed : favorite?.TapeLoadSpeed ?? TapeLoadSpeed;
         emulator.TapeManager.TapeSaveSpeed = _preferences.Tape.SaveSpeed;
 
-        if (_preferences.DivMmc.IsEnabled)
+        if (favorite?.IsDivMmcEnabled ?? _preferences.DivMmc.IsEnabled)
         {
             emulator.DivMmc.Enable();
             emulator.ConfigureDivMMc(_preferences.DivMmc);
         }
 
-        if (_preferences.Beta128.IsEnabled)
+        if (favorite?.IsBeta128Enabled ?? _preferences.Beta128.IsEnabled)
         {
             emulator.Beta128.Enable();
         }
 
-        if (_preferences.Interface1.IsEnabled)
+        if (favorite?.IsInterface1Enabled ?? _preferences.Interface1.IsEnabled)
         {
             emulator.Interface1.Enable();
         }
@@ -91,7 +91,7 @@ partial class MainWindowViewModel
         {
             emulator = _loader.EnterLoadCommand(favorite?.ComputerType ?? ComputerType);
             emulator.TapeManager.InsertTape(stream, fileType,
-                _preferences.Tape.IsAutoPlayEnabled && TapeLoadSpeed != TapeSpeed.Instant);
+                _preferences.Tape.IsAutoPlayEnabled && (favorite?.TapeLoadSpeed ?? TapeLoadSpeed) != TapeSpeed.Instant);
 
             ApplyEmulatorDefaults(emulator, favorite: favorite);
         }
