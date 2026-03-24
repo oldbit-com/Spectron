@@ -28,10 +28,20 @@ partial class MainWindowViewModel
                 {
                     HandleTogglePause();
                 }
+                else if (IsMenuVisible && WindowState == Avalonia.Controls.WindowState.FullScreen)
+                {
+                    IsMenuVisible = false;
+                }
                 break;
 
             case { Key: Key.F1, KeyModifiers: KeyModifiers.None }:
                 ShowKeyboardHelpWindow();
+                return;
+
+            case { Key: Key.F10, KeyModifiers: KeyModifiers.None } when WindowState == Avalonia.Controls.WindowState.FullScreen:
+                IsMenuVisible = true;
+                MainMenu?.Focus();
+                e.Handled = true;
                 return;
 
             case { Key: Key.F5, KeyModifiers: KeyModifiers.Control }:

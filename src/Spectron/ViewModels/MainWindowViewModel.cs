@@ -12,6 +12,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.CommandLine;
+using OldBit.Spectron.Controls;
 using OldBit.Spectron.Debugger;
 using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Debugger.Messages;
@@ -82,6 +83,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     public Control ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }
+    public MainMenu? MainMenu { get; set; }
     public CommandLineArgs? CommandLineArgs { get; set; }
     public WindowNotificationManager NotificationManager { get; set; } = null!;
 
@@ -128,6 +130,9 @@ public partial class MainWindowViewModel : ObservableObject
 
     [ObservableProperty]
     private WindowState _windowState = WindowState.Normal;
+
+    [ObservableProperty]
+    private bool _isMenuVisible = true;
 
     [ObservableProperty]
     private TapeSpeed _tapeLoadSpeed = TapeSpeed.Normal;

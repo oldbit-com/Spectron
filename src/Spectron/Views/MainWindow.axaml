@@ -57,8 +57,11 @@
 
     <DockPanel>
         <controls:MainMenu
+            Name="MainMenu"
             DockPanel.Dock="Top"
-            IsVisible="{Binding $parent[Window].WindowState, Converter={StaticResource ValueInequalityConverter}, ConverterParameter={x:Static WindowState.FullScreen}}"/>
+            Focusable="True"
+            FocusAdorner="{x:Null}"
+            IsVisible="{Binding IsMenuVisible}"/>
 
         <Grid ColumnDefinitions="40,*,40"
             RowDefinitions="*,Auto"

@@ -27,8 +27,8 @@
         </Style>
     </UserControl.Styles>
 
-    <Menu Focusable="False">
-        <MenuItem Header="File" Padding="10 0 10 0" IsTabStop="False" Focusable="False">
+    <Menu x:Name="Menu">
+        <MenuItem Header="_File" Padding="10 0 10 0" IsTabStop="False" Focusable="False">
             <MenuItem Header="Load..." InputGesture="{OnPlatform Ctrl+O, macOS=Cmd+O}" Command="{Binding LoadFileCommand}"/>
             <MenuItem Header="Recent..." SubmenuOpened="RecentFilesSubmenuOpened">
                 <MenuItem/>
@@ -42,7 +42,7 @@
             <MenuItem Header="Exit" Command="{Binding ExitApplicationCommand}" InputGesture="{OnPlatform Ctrl+F4, macOS=Cmd+Q}"/>
         </MenuItem>
 
-        <MenuItem Header="Emulator" Padding="10 0 10 0" Focusable="False">
+        <MenuItem Header="_Emulator" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="Machine">
                 <MenuItem Header="ZX Spectrum 16" ToggleType="Radio" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum16K}" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum16K}}"/>
                 <MenuItem Header="ZX Spectrum 48" ToggleType="Radio" Command="{Binding ChangeComputerType}" CommandParameter="{x:Static emu:ComputerType.Spectrum48K}" IsChecked="{Binding ComputerType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static emu:ComputerType.Spectrum48K}}"/>
@@ -78,7 +78,7 @@
             <MenuItem Header="Enable ULA+" ToggleType="CheckBox" Command="{Binding ToggleUlaPlus}" IsChecked="{Binding IsUlaPlusEnabled}"/>
         </MenuItem>
 
-        <MenuItem Header="Control" Padding="10 0 10 0" Focusable="False">
+        <MenuItem Header="_Control" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="Speed">
                 <MenuItem Header="25%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="25" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='25'}"/>
                 <MenuItem Header="50%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="50" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='50'}"/>
@@ -105,7 +105,7 @@
             <MenuItem Header="Hard Reset" Command="{Binding HardResetCommand}"/>
         </MenuItem>
 
-        <MenuItem Header="Tools" Padding="10 0 10 0" Focusable="False">
+        <MenuItem Header="_Tools" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="Record Audio..." Command="{Binding StartAudioRecordingCommand}" IsEnabled="{Binding !RecordingStatus}"/>
             <MenuItem Header="Record Video..." Command="{Binding StartVideoRecordingCommand}" IsEnabled="{Binding !RecordingStatus}"/>
             <MenuItem Header="Stop Recording" Command="{Binding StopRecordingCommand}" IsEnabled="{Binding !!RecordingStatus}"/>
@@ -114,7 +114,7 @@
             <MenuItem Header="View Screenshots" Command="{Binding ShowScreenshotViewerCommand}" InputGesture="{OnPlatform Ctrl+Shift+S, macOS=Cmd+Shift+S}"/>
         </MenuItem>
 
-        <MenuItem Header="View" Padding="10 0 10 0" Focusable="False">
+        <MenuItem Header="_View" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="Border">
                 <MenuItem Header="None" ToggleType="Radio" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static screen:BorderSize.None}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static screen:BorderSize.None}}"/>
                 <MenuItem Header="Small" ToggleType="Radio" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static screen:BorderSize.Small}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static screen:BorderSize.Small}}"/>
@@ -128,11 +128,11 @@
             <MenuItem Header="Enter Full Screen" InputGesture="Shift+Alt+Enter" Command="{Binding ToggleFullScreenCommand}"/>
         </MenuItem>
 
-        <MenuItem Header="Favourites" Padding="10 0 10 0" Focusable="False" SubmenuOpened="FavoritesSubmenuOpened">
+        <MenuItem Header="Fa_vourites" Padding="10 0 10 0" Focusable="False" SubmenuOpened="FavoritesSubmenuOpened">
             <MenuItem Header="Edit Favourites" Command="{Binding ShowFavoritesViewCommand}"/>
         </MenuItem>
 
-        <MenuItem Header="Tape" Padding="10 0 10 0" Focusable="False">
+        <MenuItem Header="Ta_pe" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="New" Command="{Binding TapeMenuViewModel.NewCommand}"/>
             <MenuItem Header="Insert..." InputGesture="Cmd+T" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
             <MenuItem Header="Save..." Command="{Binding TapeMenuViewModel.SaveCommand}"/>
@@ -150,7 +150,7 @@
             </MenuItem>
         </MenuItem>
 
-        <MenuItem Header="Microdrive" IsVisible="{Binding IsInterface1Enabled}" Padding="10 0 10 0" Focusable="False">
+        <MenuItem Header="_Microdrive" IsVisible="{Binding IsInterface1Enabled}" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="Drive 1">
                 <MenuItem Header="New" Command="{Binding MicrodriveMenuViewModel.NewCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive1}"/>
                 <MenuItem Header="Insert..." Command="{Binding MicrodriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static microdrive:MicrodriveId.Drive1}"/>
@@ -217,7 +217,7 @@
             </MenuItem>
         </MenuItem>
 
-        <MenuItem Header="Disk" IsVisible="{Binding IsBeta128Enabled}" Padding="10 0 10 0" Focusable="False">
+        <MenuItem Header="Dis_k" IsVisible="{Binding IsBeta128Enabled}" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="A:">
                 <MenuItem Header="New" Command="{Binding DiskDriveMenuViewModel.NewCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveA}"/>
                 <MenuItem Header="Insert..." InputGesture="Cmd+D" Command="{Binding DiskDriveMenuViewModel.InsertCommand}" CommandParameter="{x:Static diskDrive:DriveId.DriveA}"/>
@@ -260,7 +260,7 @@
             </MenuItem>
         </MenuItem>
 
-        <MenuItem Header="Debug" Padding="10 0 10 0" Focusable="False">
+        <MenuItem Header="_Debug" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="Debugger" InputGesture="F11" Command="{Binding ShowDebuggerViewCommand}"/>
             <MenuItem Header="Breakpoints Enabled" ToggleType="CheckBox" IsChecked="{Binding BreakpointsEnabled}" Command="{Binding ToggleBreakpointsCommand}"/>
             <MenuItem Header="-"/>
@@ -268,7 +268,7 @@
 
         </MenuItem>
 
-        <MenuItem Header="Help" Padding="10 0 10 0" Focusable="False">
+        <MenuItem Header="_Help" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="Keyboard" InputGesture="F1" Command="{Binding ShowKeyboardHelpViewCommand}"/>
             <MenuItem Header="About" Command="{Binding ShowAboutViewCommand}"/>
             <MenuItem Header="-"/>

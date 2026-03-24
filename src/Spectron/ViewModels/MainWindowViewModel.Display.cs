@@ -15,4 +15,7 @@ partial class MainWindowViewModel
 
     private void HandleToggleFullScreen() =>
         WindowState = WindowState == WindowState.FullScreen ? WindowState.Normal : WindowState.FullScreen;
+
+    partial void OnWindowStateChanged(WindowState value) =>
+        IsMenuVisible = value != WindowState.FullScreen;
 }
