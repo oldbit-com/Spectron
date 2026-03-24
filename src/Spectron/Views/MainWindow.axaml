@@ -15,7 +15,7 @@
         MinWidth="650"
         Width="1024" Height="768"
         WindowStartupLocation="CenterScreen"
-        WindowState="{Binding WindowState}"
+        WindowState="{Binding WindowState, Mode=TwoWay}"
         Name="Window">
 
     <i:Interaction.Behaviors>
