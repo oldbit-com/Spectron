@@ -37,7 +37,7 @@
             <MenuItem Header="Quick Save" InputGesture="F5" Command="{Binding QuickSaveCommand}"/>
             <MenuItem Header="Quick Load" InputGesture="F6" Command="{Binding QuickLoadCommand}"/>
             <MenuItem Header="-"/>
-            <MenuItem Header="Settings" InputGesture="{OnPlatform Ctrl+S, macOS=Cmd+OemComma}" Command="{Binding ShowPreferencesViewCommand}"/>
+            <MenuItem Header="Settings" InputGesture="{OnPlatform Ctrl+E, macOS=Cmd+OemComma}" Command="{Binding ShowPreferencesViewCommand}"/>
             <MenuItem Header="-"/>
             <MenuItem Header="Exit" Command="{Binding ExitApplicationCommand}" InputGesture="{OnPlatform Ctrl+F4, macOS=Cmd+Q}"/>
         </MenuItem>

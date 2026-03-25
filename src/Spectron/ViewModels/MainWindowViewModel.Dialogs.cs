@@ -9,7 +9,7 @@ namespace OldBit.Spectron.ViewModels;
 
 partial class MainWindowViewModel
 {
-    private async Task OpenPreferencesWindow()
+    public async Task OpenPreferencesWindow()
     {
         var resumeAfter = false;
 
