@@ -13,19 +13,19 @@ public partial class DiskViewModel : ObservableObject
     public record DiskFile(string FileName, string FileType, string Length, string Address);
 
     [ObservableProperty]
-    private string _name = string.Empty;
+    public partial string Name { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _numberOfTracks = string.Empty;
+    public partial string NumberOfTracks { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _numberOfSides = string.Empty;
+    public partial string NumberOfSides { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _numberOfFiles = string.Empty;
+    public partial string NumberOfFiles { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _numberOfDeletedFiles = string.Empty;
+    public partial string NumberOfDeletedFiles { get; set; } = string.Empty;
 
     public ObservableCollection<DiskFile> Files { get; } = [];
 

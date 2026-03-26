@@ -19,7 +19,7 @@ public partial class GamepadMappingViewModel : ObservableObject, IDisposable
     private readonly GamepadManager _gamepadManager;
 
     [ObservableProperty]
-    private GamepadButtonMappingViewModel? _selectedMapping;
+    public partial GamepadButtonMappingViewModel? SelectedMapping { get; set; }
 
     private GamepadController _controller = GamepadController.None;
 

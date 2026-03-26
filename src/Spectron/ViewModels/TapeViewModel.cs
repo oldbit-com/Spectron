@@ -17,19 +17,19 @@ public partial class TapeViewModel : ObservableObject, IDisposable
     private readonly Timer _tapeProgressTimer;
 
     [ObservableProperty]
-    private bool _canStop;
+    public partial bool CanStop { get; set; }
 
     [ObservableProperty]
-    private bool _canPlay;
+    public partial bool CanPlay { get; set; }
 
     [ObservableProperty]
-    private bool _canRewind;
+    public partial bool CanRewind { get; set; }
 
     [ObservableProperty]
-    private bool _canEject;
+    public partial bool CanEject { get; set; }
 
     [ObservableProperty]
-    private double _progress;
+    public partial double Progress { get; set; }
 
     public ObservableCollection<TapeBlockViewModel> Blocks { get; } = [];
 

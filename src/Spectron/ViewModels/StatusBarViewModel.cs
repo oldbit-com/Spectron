@@ -13,58 +13,58 @@ namespace OldBit.Spectron.ViewModels;
 public partial class StatusBarViewModel : ObservableObject
 {
     [ObservableProperty]
-    private RecordingStatus _recordingStatus = RecordingStatus.None;
+    public partial RecordingStatus RecordingStatus { get; set; } = RecordingStatus.None;
 
     [ObservableProperty]
-    private string _framesPerSecond = "0";
+    public partial string FramesPerSecond { get; set; } = "0";
 
     [ObservableProperty]
-    private string _message = string.Empty;
+    public partial string Message { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _timeElapsed = "";
+    public partial string TimeElapsed { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private ComputerType _computerType;
+    public partial ComputerType ComputerType { get; set; }
 
     [ObservableProperty]
-    private JoystickType _joystickType;
+    public partial JoystickType JoystickType { get; set; }
 
     [ObservableProperty]
-    private string _speed = "100";
+    public partial string Speed { get; set; } = "100";
 
     [ObservableProperty]
-    private bool _isDivMmcEnabled;
+    public partial bool IsDivMmcEnabled { get; set; }
 
     [ObservableProperty]
-    private bool _isMouseEnabled;
+    public partial bool IsMouseEnabled { get; set; }
 
     [ObservableProperty]
-    private bool _isPrinterEnabled;
+    public partial bool IsPrinterEnabled { get; set; }
 
     [ObservableProperty]
-    private bool _isUlaPlusEnabled;
+    public partial bool IsUlaPlusEnabled { get; set; }
 
     [ObservableProperty]
-    private bool _isTapeInserted;
+    public partial bool IsTapeInserted { get; set; }
 
     [ObservableProperty]
-    private bool _isMicroDriveCartridgeInserted;
+    public partial bool IsMicroDriveCartridgeInserted { get; set; }
 
     [ObservableProperty]
-    private bool _isFloppyDiskInserted;
+    public partial bool IsFloppyDiskInserted { get; set; }
 
     [ObservableProperty]
-    private string _tapeLoadProgress = string.Empty;
+    public partial string TapeLoadProgress { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private bool _isAyEnabled;
+    public partial bool IsAyEnabled { get; set; }
 
     [ObservableProperty]
-    private StereoMode _stereoMode;
+    public partial StereoMode StereoMode { get; set; }
 
     [ObservableProperty]
-    private string _toolTipAy = string.Empty;
+    public partial string ToolTipAy { get; set; } = string.Empty;
 
     private readonly Timer _timer;
     private readonly Stopwatch _stopwatch = new();

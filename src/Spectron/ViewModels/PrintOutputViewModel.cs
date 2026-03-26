@@ -23,7 +23,7 @@ public partial class PrintOutputViewModel : ObservableObject
     private int _height;
 
     [ObservableProperty]
-    private WriteableBitmap _outputImage = null!;
+    public partial WriteableBitmap OutputImage { get; set; } = null!;
 
     public Control? PreviewControl { get; set; }
 

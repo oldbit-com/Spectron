@@ -11,16 +11,16 @@ public partial class CodeLineViewModel : ObservableObject,
     IRecipient<BreakpointUpdatedMessage>
 {
     [ObservableProperty]
-    private Word _address;
+    public partial Word Address { get; set; }
 
     [ObservableProperty]
-    private string _code = string.Empty;
+    public partial string Code { get; set; }
 
     [ObservableProperty]
-    private bool _isCurrent;
+    public partial bool IsCurrent { get; set; }
 
     [ObservableProperty]
-    private bool _isBreakpoint;
+    public partial bool IsBreakpoint { get; set; }
 
     public CodeLineViewModel(
         Word address,

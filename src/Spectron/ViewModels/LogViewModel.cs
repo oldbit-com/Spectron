@@ -8,7 +8,7 @@ namespace OldBit.Spectron.ViewModels;
 public partial class LogViewModel : ObservableObject
 {
     [ObservableProperty]
-    private TextDocument _document = new();
+    public partial TextDocument Document { get; set; } = new();
 
     public LogViewModel(ILogStore logStore)
     {
@@ -21,6 +21,6 @@ public partial class LogViewModel : ObservableObject
             text.AppendLine(entry.Message);
         }
 
-        _document.Text = text.ToString();
+        Document.Text = text.ToString();
     }
 }

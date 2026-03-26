@@ -14,7 +14,7 @@ public partial class GamepadButtonMappingViewModel(
     List<GamepadActionMappingItem> actions) : ObservableObject
 {
     [ObservableProperty]
-    private GamepadActionMappingItem _selectedAction = selectedAction;
+    public partial GamepadActionMappingItem SelectedAction { get; set; } = selectedAction;
 
     public GamepadButton Button { get; } = button;
 
