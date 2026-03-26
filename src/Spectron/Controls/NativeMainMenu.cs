@@ -125,6 +125,7 @@ public class NativeMainMenu
             CreateControlMenuItem(),
             CreateToolsMenuItem(),
             CreateViewMenuItem(),
+            CreateFavoritesMenuItem(),
         };
 
         return menu;
@@ -422,12 +423,32 @@ public class NativeMainMenu
         return viewItem;
     }
 
+    private NativeMenuItem CreateFavoritesMenuItem()
+    {
+        var viewItem = new NativeMenuItem("Favourites");
+
+        var itemsMenu = new NativeMenu
+        {
+            new NativeMenuItem("Edit...")
+            {
+                Command = _viewModel.ShowFavoritesViewCommand,
+            },
+        };
+
+        itemsMenu.Opening += (_, _) => _viewModel.FavoritesViewModel.Opening(itemsMenu);
+
+        viewItem.Menu = itemsMenu;
+
+        return viewItem;
+    }
+
     private NativeMenuItem CreateRecentMenuItem()
     {
         var recentItem = new NativeMenuItem("Recent...");
 
         var itemsMenu = new NativeMenu();
-        itemsMenu.Opening += (_, _) => _viewModel?.RecentFilesViewModel.Opening(itemsMenu);
+        itemsMenu.Opening += (_, _) => _viewModel.RecentFilesViewModel.Opening(itemsMenu);
+
         recentItem.Menu = itemsMenu;
 
         return recentItem;

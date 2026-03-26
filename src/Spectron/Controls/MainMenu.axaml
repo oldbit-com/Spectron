@@ -130,7 +130,7 @@
         </MenuItem>
 
         <MenuItem Header="Fa_vourites" Padding="10 0 10 0" Focusable="False" SubmenuOpened="FavoritesSubmenuOpened">
-            <MenuItem Header="Edit Favourites" Command="{Binding ShowFavoritesViewCommand}"/>
+            <MenuItem Header="Edit..." Command="{Binding ShowFavoritesViewCommand}"/>
         </MenuItem>
 
         <MenuItem Header="Ta_pe" Padding="10 0 10 0" Focusable="False">

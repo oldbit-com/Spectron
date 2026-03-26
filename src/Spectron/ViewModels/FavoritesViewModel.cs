@@ -49,6 +49,23 @@ public partial class FavoritesViewModel : ObservableObject
         AddFavoriteItems(menuItems, Nodes[0].Nodes!);
     }
 
+    public void Opening(NativeMenu favoritesMenu)
+    {
+        while (favoritesMenu.Items.Count > 1)
+        {
+            favoritesMenu.Items.RemoveAt(1);
+        }
+
+        if (Nodes.Count == 0 || Nodes[0].Nodes is { Count: 0 })
+        {
+            return;
+        }
+
+        favoritesMenu.Items.Add(new NativeMenuItemSeparator());
+
+        AddFavoriteItems(favoritesMenu.Items, Nodes[0].Nodes!);
+    }
+
     private FavoritePrograms GetFavorites()
     {
         return new FavoritePrograms
@@ -294,15 +311,15 @@ public partial class FavoritesViewModel : ObservableObject
     {
         foreach (var favorite in favorites)
         {
-            var favoriteMenuItem = new MenuItem
-            {
-                Header = favorite.Title,
-            };
-
             if (string.IsNullOrWhiteSpace(favorite.Title))
             {
                 continue;
             }
+
+            var favoriteMenuItem = new MenuItem
+            {
+                Header = favorite.Title,
+            };
 
             if (favorite.IsFolder)
             {
@@ -312,6 +329,47 @@ public partial class FavoritesViewModel : ObservableObject
                 }
 
                 AddFavoriteItems(favoriteMenuItem.Items, favorite.Nodes);
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(favorite.Path))
+                {
+                    continue;
+                }
+
+                favoriteMenuItem.Command = OpenFavoriteCommand;
+                favoriteMenuItem.CommandParameter = favorite;
+            }
+
+            menuItems.Add(favoriteMenuItem);
+        }
+    }
+
+    private void AddFavoriteItems(IList<NativeMenuItemBase> menuItems, IEnumerable<FavoriteItemViewModel> favorites)
+    {
+        foreach (var favorite in favorites)
+        {
+            if (string.IsNullOrWhiteSpace(favorite.Title))
+            {
+                continue;
+            }
+
+            var favoriteMenuItem = new NativeMenuItem
+            {
+                Header = favorite.Title,
+            };
+
+            if (favorite.IsFolder)
+            {
+                if (favorite.Nodes.Count == 0)
+                {
+                    continue;
+                }
+
+                var menuItem = new NativeMenu();
+                favoriteMenuItem.Menu = menuItem;
+
+                AddFavoriteItems(menuItem.Items, favorite.Nodes);
             }
             else
             {
