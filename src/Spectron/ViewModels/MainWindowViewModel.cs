@@ -147,6 +147,9 @@ public partial class MainWindowViewModel : ObservableObject
     private string _title = DefaultTitle;
 
     [ObservableProperty]
+    private bool _isFullScreen;
+
+    [ObservableProperty]
     private RecordingStatus _recordingStatus = RecordingStatus.None;
 
     [ObservableProperty]

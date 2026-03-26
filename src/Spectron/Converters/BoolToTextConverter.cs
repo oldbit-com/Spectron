@@ -4,16 +4,18 @@ using Avalonia.Data.Converters;
 
 namespace OldBit.Spectron.Converters;
 
-public class TypeMatchConverter : IValueConverter
+public class BoolToTextConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value == null || parameter == null)
+        if (value is not bool b || parameter is not string text)
         {
-            return false;
+            return string.Empty;
         }
 
-        return value.GetType().Equals(parameter);
+        var items = text.Split('|');
+
+        return b ? items[0] : items[1];
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
