@@ -144,6 +144,7 @@ public partial class MainWindowViewModel : ObservableObject
     public partial bool IsAudioMuted { get; set; }
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ShowTimeMachineViewCommand))]
     public partial bool IsTimeMachineEnabled { get; set; }
 
     [ObservableProperty]
