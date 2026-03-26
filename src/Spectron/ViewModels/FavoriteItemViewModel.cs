@@ -18,27 +18,27 @@ public partial class FavoriteItemViewModel : ObservableValidator
     [ObservableProperty]
     [Required]
     [NotifyDataErrorInfo]
-    private string _title = string.Empty;
+    public partial string Title { get; set; } = string.Empty;
 
     [ObservableProperty]
     [Required]
     [CustomValidation(typeof(FavoriteItemViewModel), nameof(ValidatePath))]
     [NotifyDataErrorInfo]
     [NotifyPropertyChangedFor(nameof(IsTapeFile))]
-    private string _path = string.Empty;
+    public partial string Path { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private bool _isFolder;
+    public partial bool IsFolder { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsTapeFile))]
-    private bool _isFile;
+    public partial bool IsFile { get; set; }
 
     [ObservableProperty]
-    private bool _isRoot;
+    public partial bool IsRoot { get; set; }
 
     [ObservableProperty]
-    private bool _isCutItem;
+    public partial bool IsCutItem { get; set; }
 
     public bool IsTapeFile
     {

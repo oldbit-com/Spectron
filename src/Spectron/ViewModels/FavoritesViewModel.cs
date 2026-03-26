@@ -16,7 +16,7 @@ public partial class FavoritesViewModel : ObservableObject
     private FavoriteItemViewModel? _copyItem;
 
     [ObservableProperty]
-    private FavoriteItemViewModel? _selectedItem;
+    public partial FavoriteItemViewModel? SelectedItem { get; set; }
 
     public ObservableCollection<FavoriteItemViewModel> Nodes { get; } = [];
 
