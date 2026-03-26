@@ -126,6 +126,7 @@ public class NativeMainMenu
             CreateToolsMenuItem(),
             CreateViewMenuItem(),
             CreateFavoritesMenuItem(),
+            CreateTapeMenuItem(),
         };
 
         return menu;
@@ -421,6 +422,63 @@ public class NativeMainMenu
         viewItem.Menu = viewSubMenu;
 
         return viewItem;
+    }
+
+    private NativeMenuItem CreateTapeMenuItem()
+    {
+        var tapeItem = new NativeMenuItem("Tape");
+
+        var tapeSubMenu = new NativeMenu
+        {
+            new NativeMenuItem("New")
+            {
+                Command = _viewModel.TapeMenuViewModel.NewCommand,
+            },
+
+            new NativeMenuItem("Insert...")
+            {
+                Command = _viewModel.TapeMenuViewModel.InsertCommand,
+                Gesture = OperatingSystem.IsMacOS()
+                    ? new KeyGesture(Key.T, KeyModifiers.Meta)
+                    : new KeyGesture(Key.T, KeyModifiers.Control)
+            },
+
+            new NativeMenuItem("Save...")
+            {
+                Command = _viewModel.TapeMenuViewModel.SaveCommand,
+            },
+
+            new NativeMenuItemSeparator(),
+
+            new NativeMenuItem("Play")
+            {
+                Command = _viewModel.TapeMenuViewModel.PlayCommand,
+            },
+
+            new NativeMenuItem("Stop")
+            {
+                Command = _viewModel.TapeMenuViewModel.StopCommand,
+            },
+
+            new NativeMenuItem("Rewind")
+            {
+                Command = _viewModel.TapeMenuViewModel.RewindCommand,
+            },
+
+            new NativeMenuItem("Eject")
+            {
+                Command = _viewModel.TapeMenuViewModel.EjectCommand,
+            },
+
+            new NativeMenuItem("View")
+            {
+                Command = _viewModel.TapeMenuViewModel.ViewCommand,
+            },
+        };
+
+        tapeItem.Menu = tapeSubMenu;
+
+        return tapeItem;
     }
 
     private NativeMenuItem CreateFavoritesMenuItem()

@@ -135,7 +135,7 @@
 
         <MenuItem Header="Ta_pe" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="New" Command="{Binding TapeMenuViewModel.NewCommand}"/>
-            <MenuItem Header="Insert..." InputGesture="Cmd+T" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
+            <MenuItem Header="Insert..."  InputGesture="{OnPlatform Ctrl+T, macOS=Cmd+T}" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
             <MenuItem Header="Save..." Command="{Binding TapeMenuViewModel.SaveCommand}"/>
             <MenuItem Header="-"/>
             <MenuItem Header="Play" Command="{Binding TapeMenuViewModel.PlayCommand}"/>

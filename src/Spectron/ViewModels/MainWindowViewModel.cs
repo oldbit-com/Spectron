@@ -96,79 +96,79 @@ public partial class MainWindowViewModel : ObservableObject
 
     #region Observable properties
     [ObservableProperty]
-    private BorderSize _borderSize = BorderSize.Medium;
+    public partial BorderSize BorderSize { get; set; } = BorderSize.Medium;
 
     [ObservableProperty]
-    private RomType _romType = RomType.Original;
+    public partial RomType RomType { get; set; } = RomType.Original;
 
     [ObservableProperty]
-    private ComputerType _computerType = ComputerType.Spectrum48K;
+    public partial ComputerType ComputerType { get; set; } = ComputerType.Spectrum48K;
 
     [ObservableProperty]
-    private JoystickType _joystickType = JoystickType.None;
+    public partial JoystickType JoystickType { get; set; } = JoystickType.None;
 
     [ObservableProperty]
-    private MouseType _mouseType = MouseType.None;
+    public partial MouseType MouseType { get; set; } = MouseType.None;
 
     [ObservableProperty]
-    private bool _isUlaPlusEnabled;
+    public partial bool IsUlaPlusEnabled { get; set; }
 
     [ObservableProperty]
-    private WriteableBitmap? _spectrumScreen;
+    public partial WriteableBitmap? SpectrumScreen { get; set; }
 
     [ObservableProperty]
-    private bool _isPaused;
+    public partial bool IsPaused { get; set; }
 
     [ObservableProperty]
-    private bool _isPauseOverlayVisible;
+    public partial bool IsPauseOverlayVisible { get; set; }
 
     [ObservableProperty]
-    private bool _isTimeMachineCountdownVisible;
+    public partial bool IsTimeMachineCountdownVisible { get; set; }
 
     [ObservableProperty]
-    private string _emulationSpeed = "100";
+    public partial string EmulationSpeed { get; set; } = "100";
 
     [ObservableProperty]
-    private WindowState _windowState = WindowState.Normal;
+    [NotifyPropertyChangedFor(nameof(IsFullScreen))]
+    public partial WindowState WindowState { get; set; } = WindowState.Normal;
+
+    public bool IsFullScreen => WindowState == WindowState.FullScreen;
 
     [ObservableProperty]
-    private bool _isMenuVisible = true;
+    public partial bool IsMenuVisible { get; set; } = true;
 
     [ObservableProperty]
-    private TapeSpeed _tapeLoadSpeed = TapeSpeed.Normal;
+    public partial TapeSpeed TapeLoadSpeed { get; set; } = TapeSpeed.Normal;
 
     [ObservableProperty]
-    private bool _isAudioMuted;
+    public partial bool IsAudioMuted { get; set; }
 
     [ObservableProperty]
-    private bool _isTimeMachineEnabled;
+    public partial bool IsTimeMachineEnabled { get; set; }
 
     [ObservableProperty]
-    private string _title = DefaultTitle;
+    public partial string Title { get; set; } = DefaultTitle;
 
     [ObservableProperty]
-    private bool _isFullScreen;
+    public partial RecordingStatus RecordingStatus { get; set; } = RecordingStatus.None;
 
     [ObservableProperty]
-    private RecordingStatus _recordingStatus = RecordingStatus.None;
+    public partial int TimeMachineCountdownSeconds { get; set; }
 
     [ObservableProperty]
-    private int _timeMachineCountdownSeconds;
+    public partial Cursor MouseCursor { get; set; } = Cursor.Default;
 
     [ObservableProperty]
-    private Cursor _mouseCursor = Cursor.Default;
+    public partial bool IsInterface1Enabled { get; set; }
 
     [ObservableProperty]
-    private bool _isInterface1Enabled;
+    public partial int NumberOfMicrodrives { get; set; }
 
     [ObservableProperty]
-    private int _numberOfMicrodrives;
+    public partial bool IsBeta128Enabled { get; set; }
 
     [ObservableProperty]
-    private bool _isBeta128Enabled;
-
-    [ObservableProperty]
-    private int _numberOfBeta128Drives;
+    public partial int NumberOfBeta128Drives { get; set; }
     #endregion
 
     #region Relay commands
