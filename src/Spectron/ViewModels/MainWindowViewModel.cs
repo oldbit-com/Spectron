@@ -150,7 +150,16 @@ public partial class MainWindowViewModel : ObservableObject
     public partial string Title { get; set; } = DefaultTitle;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanStartRecording))]
+    [NotifyPropertyChangedFor(nameof(CanStopRecording))]
+    [NotifyCanExecuteChangedFor(nameof(StartAudioRecordingCommand))]
+    [NotifyCanExecuteChangedFor(nameof(StartVideoRecordingCommand))]
+    [NotifyCanExecuteChangedFor(nameof(StopRecordingCommand))]
     public partial RecordingStatus RecordingStatus { get; set; } = RecordingStatus.None;
+
+    public bool CanStartRecording => RecordingStatus == RecordingStatus.None;
+
+    public bool CanStopRecording => RecordingStatus != RecordingStatus.None;
 
     [ObservableProperty]
     public partial int TimeMachineCountdownSeconds { get; set; }
@@ -245,13 +254,13 @@ public partial class MainWindowViewModel : ObservableObject
     private void HardReset() => HandleMachineReset(hardReset: true);
 
     // Tools
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanStartRecording))]
     private async Task StartAudioRecording() => await HandleStartAudioRecordingAsync();
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanStartRecording))]
     private async Task StartVideoRecording() => await HandleStartVideoRecordingAsync();
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanStopRecording))]
     private void StopRecording() => HandleStopRecording();
 
     [RelayCommand]

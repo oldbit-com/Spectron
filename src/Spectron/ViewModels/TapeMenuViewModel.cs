@@ -16,16 +16,22 @@ namespace OldBit.Spectron.ViewModels;
 public partial class TapeMenuViewModel : ObservableObject
 {
     [ObservableProperty]
-    private bool _canStop;
+    [NotifyCanExecuteChangedFor(nameof(StopCommand))]
+    public partial bool CanStop { get; set; }
 
     [ObservableProperty]
-    private bool _canPlay;
+    [NotifyCanExecuteChangedFor(nameof(PlayCommand))]
+    public partial bool CanPlay { get; set; }
 
     [ObservableProperty]
-    private bool _canRewind;
+    [NotifyCanExecuteChangedFor(nameof(RewindCommand))]
+    public partial bool CanRewind { get; set; }
 
     [ObservableProperty]
-    private bool _canEject;
+    [NotifyCanExecuteChangedFor(nameof(EjectCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ViewCommand))]
+    [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
+    public partial bool CanEject { get; set; }
 
     private readonly TapeManager _tapeManager;
     private readonly RecentFilesViewModel _recentFilesViewModel;
@@ -120,12 +126,6 @@ public partial class TapeMenuViewModel : ObservableObject
             switch (args.Action)
             {
                 case TapeAction.Inserted:
-                    CanRewind = true;
-                    CanPlay = true;
-                    CanStop = false;
-                    CanEject = true;
-                    break;
-
                 case TapeAction.Stopped:
                     CanRewind = true;
                     CanPlay = true;

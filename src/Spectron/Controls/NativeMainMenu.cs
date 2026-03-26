@@ -6,7 +6,7 @@ using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Rom;
-using OldBit.Spectron.Models;
+using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Screen;
 using OldBit.Spectron.ViewModels;
 
@@ -22,13 +22,11 @@ public class NativeMainMenu
     private readonly Dictionary<MouseType, NativeMenuItem> _mouseTypes = new();
     private readonly Dictionary<string, NativeMenuItem> _emulationSpeeds = new();
     private readonly Dictionary<BorderSize, NativeMenuItem> _borderSizes = new();
+    private readonly Dictionary<TapeSpeed, NativeMenuItem> _tapeLoadingSpeeds = new();
 
     private NativeMenuItem? _ulaPlusMenuItem;
     private NativeMenuItem? _pauseMenuItem;
     private NativeMenuItem? _muteMenuItem;
-    private NativeMenuItem? _recordAudioMenuItem;
-    private NativeMenuItem? _recordVideoMenuItem;
-    private NativeMenuItem? _stopRecordingMenuItem;
     private NativeMenuItem? _fullScreenMenuItem;
 
     public NativeMainMenu(MainWindowViewModel viewModel)
@@ -41,6 +39,7 @@ public class NativeMainMenu
         AddMouseTypes();
         AddSpeedOptions();
         AddBorderSizes();
+        AddTapeLoadingSpeeds();
 
         _viewModel.PropertyChanged += (_, e) =>
         {
@@ -93,13 +92,6 @@ public class NativeMainMenu
 
                     break;
 
-                case nameof(MainWindowViewModel.RecordingStatus):
-                    _recordAudioMenuItem?.IsEnabled = _viewModel.RecordingStatus == RecordingStatus.None;
-                    _recordVideoMenuItem?.IsEnabled = _viewModel.RecordingStatus == RecordingStatus.None;
-                    _stopRecordingMenuItem?.IsEnabled = _viewModel.RecordingStatus != RecordingStatus.None;
-
-                    break;
-
                 case nameof(MainWindowViewModel.BorderSize):
                     foreach (var border in _borderSizes.Keys)
                     {
@@ -110,6 +102,14 @@ public class NativeMainMenu
 
                 case nameof(MainWindowViewModel.IsFullScreen):
                     _fullScreenMenuItem?.Header = _viewModel.IsFullScreen ? "Exit Full Screen" : "Full Screen";
+
+                    break;
+
+                case nameof(MainWindowViewModel.TapeLoadSpeed):
+                    foreach (var speed in _tapeLoadingSpeeds.Keys)
+                    {
+                        _tapeLoadingSpeeds[speed].IsChecked = _viewModel.TapeLoadSpeed == speed;
+                    }
 
                     break;
             }
@@ -332,29 +332,22 @@ public class NativeMainMenu
     {
         var toolsItem = new NativeMenuItem("Tools");
 
-        _recordAudioMenuItem = new NativeMenuItem("Record Audio...")
-        {
-            Command = _viewModel.StartAudioRecordingCommand,
-            IsEnabled = _viewModel.RecordingStatus == RecordingStatus.None
-        };
-
-        _recordVideoMenuItem = new NativeMenuItem("Record Video...")
-        {
-            Command = _viewModel.StartVideoRecordingCommand,
-            IsEnabled = _viewModel.RecordingStatus == RecordingStatus.None
-        };
-
-        _stopRecordingMenuItem = new NativeMenuItem("Stop Recording")
-        {
-            Command = _viewModel.StopRecordingCommand,
-            IsEnabled = _viewModel.RecordingStatus != RecordingStatus.None
-        };
-
         var toolsSubMenu = new NativeMenu
         {
-            _recordAudioMenuItem,
-            _recordVideoMenuItem,
-            _stopRecordingMenuItem,
+            new NativeMenuItem("Record Audio...")
+            {
+                Command = _viewModel.StartAudioRecordingCommand
+            },
+
+            new NativeMenuItem("Record Video...")
+            {
+                Command = _viewModel.StartVideoRecordingCommand,
+            },
+
+            new NativeMenuItem("Stop Recording")
+            {
+                Command = _viewModel.StopRecordingCommand,
+            },
 
             new NativeMenuItemSeparator(),
 
@@ -453,27 +446,44 @@ public class NativeMainMenu
             new NativeMenuItem("Play")
             {
                 Command = _viewModel.TapeMenuViewModel.PlayCommand,
+                IsEnabled = _viewModel.TapeMenuViewModel.PlayCommand.CanExecute(null),
             },
 
             new NativeMenuItem("Stop")
             {
                 Command = _viewModel.TapeMenuViewModel.StopCommand,
+                IsEnabled = _viewModel.TapeMenuViewModel.StopCommand.CanExecute(null),
             },
 
             new NativeMenuItem("Rewind")
             {
                 Command = _viewModel.TapeMenuViewModel.RewindCommand,
+                IsEnabled = _viewModel.TapeMenuViewModel.RewindCommand.CanExecute(null),
             },
 
             new NativeMenuItem("Eject")
             {
                 Command = _viewModel.TapeMenuViewModel.EjectCommand,
+                IsEnabled = _viewModel.TapeMenuViewModel.EjectCommand.CanExecute(null),
             },
 
             new NativeMenuItem("View")
             {
                 Command = _viewModel.TapeMenuViewModel.ViewCommand,
+                IsEnabled = _viewModel.TapeMenuViewModel.ViewCommand.CanExecute(null),
             },
+
+            new NativeMenuItemSeparator(),
+
+            new NativeMenuItem("Loading Speed")
+            {
+                Menu =
+                [
+                    _tapeLoadingSpeeds[TapeSpeed.Normal],
+                    _tapeLoadingSpeeds[TapeSpeed.Instant],
+                    _tapeLoadingSpeeds[TapeSpeed.Accelerated],
+                ]
+            }
         };
 
         tapeItem.Menu = tapeSubMenu;
@@ -516,19 +526,19 @@ public class NativeMainMenu
     {
         var computers = new[]
         {
-            new { ComputerType = ComputerType.Spectrum16K, DisplayName = "ZX Spectrum 16" },
-            new { ComputerType = ComputerType.Spectrum48K, DisplayName = "ZX Spectrum 48" },
-            new { ComputerType = ComputerType.Spectrum128K, DisplayName = "ZX Spectrum 128" },
+            new { Type = ComputerType.Spectrum16K, DisplayName = "ZX Spectrum 16" },
+            new { Type = ComputerType.Spectrum48K, DisplayName = "ZX Spectrum 48" },
+            new { Type = ComputerType.Spectrum128K, DisplayName = "ZX Spectrum 128" },
         };
 
         foreach (var computer in computers)
         {
-            _computerTypes[computer.ComputerType] = new NativeMenuItem(computer.DisplayName)
+            _computerTypes[computer.Type] = new NativeMenuItem(computer.DisplayName)
             {
                 ToggleType = NativeMenuItemToggleType.Radio,
                 Command = _viewModel.ChangeComputerTypeCommand,
-                CommandParameter = computer.ComputerType,
-                IsChecked = _viewModel.ComputerType == computer.ComputerType,
+                CommandParameter = computer.Type,
+                IsChecked = _viewModel.ComputerType == computer.Type,
                 IsEnabled = true,
             };
         }
@@ -538,27 +548,27 @@ public class NativeMainMenu
     {
         var roms = new[]
         {
-            new { RomType = RomType.Original, DisplayName = "Original" },
-            new { RomType = RomType.Pentagon128, DisplayName = "Pentagon (128 mode only)" },
-            new { RomType = RomType.GoshWonderful, DisplayName = "Gosh Wonderful" },
-            new { RomType = RomType.BusySoft, DisplayName = "Busy Soft v1.40" },
-            new { RomType = RomType.Harston, DisplayName = "J.G. Harston v0.77" },
-            new { RomType = RomType.HtrSuperBasic, DisplayName = "H.T.R. SuperBasic" },
-            new { RomType = RomType.PrettyBasic, DisplayName = "Pretty Basic" },
-            new { RomType = RomType.BbcBasic, DisplayName = "BBC Basic (128 mode only)" },
-            new { RomType = RomType.Retroleum, DisplayName = "Retroleum v1.71" },
-            new { RomType = RomType.BrendanAlford, DisplayName = "B. Alford v1.37" },
-            new { RomType = RomType.Custom, DisplayName = "Custom" },
+            new { Type = RomType.Original, DisplayName = "Original" },
+            new { Type = RomType.Pentagon128, DisplayName = "Pentagon (128 mode only)" },
+            new { Type = RomType.GoshWonderful, DisplayName = "Gosh Wonderful" },
+            new { Type = RomType.BusySoft, DisplayName = "Busy Soft v1.40" },
+            new { Type = RomType.Harston, DisplayName = "J.G. Harston v0.77" },
+            new { Type = RomType.HtrSuperBasic, DisplayName = "H.T.R. SuperBasic" },
+            new { Type = RomType.PrettyBasic, DisplayName = "Pretty Basic" },
+            new { Type = RomType.BbcBasic, DisplayName = "BBC Basic (128 mode only)" },
+            new { Type = RomType.Retroleum, DisplayName = "Retroleum v1.71" },
+            new { Type = RomType.BrendanAlford, DisplayName = "B. Alford v1.37" },
+            new { Type = RomType.Custom, DisplayName = "Custom" },
         };
 
         foreach (var rom in roms)
         {
-            _romTypes[rom.RomType] = new NativeMenuItem(rom.DisplayName)
+            _romTypes[rom.Type] = new NativeMenuItem(rom.DisplayName)
             {
                 ToggleType = NativeMenuItemToggleType.Radio,
                 Command = _viewModel.ChangeRomCommand,
-                CommandParameter = rom.RomType,
-                IsChecked = _viewModel.RomType == rom.RomType,
+                CommandParameter = rom.Type,
+                IsChecked = _viewModel.RomType == rom.Type,
                 IsEnabled = true
             };
         }
@@ -568,22 +578,22 @@ public class NativeMainMenu
     {
         var joysticks = new[]
         {
-            new { JoystickType = JoystickType.None, DisplayName = "None" },
-            new { JoystickType = JoystickType.Kempston, DisplayName = "Kempston" },
-            new { JoystickType = JoystickType.Sinclair1, DisplayName = "Sinclair 1" },
-            new { JoystickType = JoystickType.Sinclair2, DisplayName = "Sinclair 2" },
-            new { JoystickType = JoystickType.Cursor, DisplayName = "Cursor" },
-            new { JoystickType = JoystickType.Fuller, DisplayName = "Fuller" },
+            new { Type = JoystickType.None, DisplayName = "None" },
+            new { Type = JoystickType.Kempston, DisplayName = "Kempston" },
+            new { Type = JoystickType.Sinclair1, DisplayName = "Sinclair 1" },
+            new { Type = JoystickType.Sinclair2, DisplayName = "Sinclair 2" },
+            new { Type = JoystickType.Cursor, DisplayName = "Cursor" },
+            new { Type = JoystickType.Fuller, DisplayName = "Fuller" },
         };
 
         foreach (var joystick in joysticks)
         {
-            _joystickTypes[joystick.JoystickType] = new NativeMenuItem(joystick.DisplayName)
+            _joystickTypes[joystick.Type] = new NativeMenuItem(joystick.DisplayName)
             {
                 ToggleType = NativeMenuItemToggleType.Radio,
                 Command = _viewModel.ChangeJoystickTypeCommand,
-                CommandParameter = joystick.JoystickType,
-                IsChecked = _viewModel.JoystickType == joystick.JoystickType,
+                CommandParameter = joystick.Type,
+                IsChecked = _viewModel.JoystickType == joystick.Type,
                 IsEnabled = true
             };
         }
@@ -593,18 +603,18 @@ public class NativeMainMenu
     {
         var mice = new[]
         {
-            new { MouseType = MouseType.None, DisplayName = "None" },
-            new { MouseType = MouseType.Kempston, DisplayName = "Kempston" },
+            new { Type = MouseType.None, DisplayName = "None" },
+            new { Type = MouseType.Kempston, DisplayName = "Kempston" },
         };
 
         foreach (var mouse in mice)
         {
-            _mouseTypes[mouse.MouseType] = new NativeMenuItem(mouse.DisplayName)
+            _mouseTypes[mouse.Type] = new NativeMenuItem(mouse.DisplayName)
             {
                 ToggleType = NativeMenuItemToggleType.Radio,
                 Command = _viewModel.ChangeJoystickTypeCommand,
-                CommandParameter = mouse.MouseType,
-                IsChecked = _viewModel.MouseType == mouse.MouseType,
+                CommandParameter = mouse.Type,
+                IsChecked = _viewModel.MouseType == mouse.Type,
                 IsEnabled = true
             };
         }
@@ -660,6 +670,28 @@ public class NativeMainMenu
                 Command = _viewModel.ChangeBorderSizeCommand,
                 CommandParameter = border.Size,
                 IsChecked = _viewModel.BorderSize == border.Size,
+                IsEnabled = true
+            };
+        }
+    }
+
+    private void AddTapeLoadingSpeeds()
+    {
+        var speeds = new[]
+        {
+            new { Value = TapeSpeed.Normal, DisplayName = "Normal" },
+            new { Value = TapeSpeed.Instant, DisplayName = "Instant" },
+            new { Value = TapeSpeed.Accelerated, DisplayName = "Accelerated" },
+        };
+
+        foreach (var speed in speeds)
+        {
+            _tapeLoadingSpeeds[speed.Value] = new NativeMenuItem(speed.DisplayName)
+            {
+                ToggleType = NativeMenuItemToggleType.Radio,
+                Command = _viewModel.SetTapeLoadSpeedCommand,
+                CommandParameter = speed.Value,
+                IsChecked = _viewModel.TapeLoadSpeed == speed.Value,
                 IsEnabled = true
             };
         }

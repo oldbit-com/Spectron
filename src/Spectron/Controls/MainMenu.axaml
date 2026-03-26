@@ -107,9 +107,9 @@
         </MenuItem>
 
         <MenuItem Header="_Tools" Padding="10 0 10 0" Focusable="False">
-            <MenuItem Header="Record Audio..." Command="{Binding StartAudioRecordingCommand}" IsEnabled="{Binding !RecordingStatus}"/>
-            <MenuItem Header="Record Video..." Command="{Binding StartVideoRecordingCommand}" IsEnabled="{Binding !RecordingStatus}"/>
-            <MenuItem Header="Stop Recording" Command="{Binding StopRecordingCommand}" IsEnabled="{Binding !!RecordingStatus}"/>
+            <MenuItem Header="Record Audio..." Command="{Binding StartAudioRecordingCommand}"/>
+            <MenuItem Header="Record Video..." Command="{Binding StartVideoRecordingCommand}"/>
+            <MenuItem Header="Stop Recording" Command="{Binding StopRecordingCommand}"/>
             <MenuItem Header="-"/>
             <MenuItem Header="Take Screenshot" Command="{Binding TakeScreenshotCommand}" InputGesture="{OnPlatform Ctrl+C, macOS=Cmd+C}"/>
             <MenuItem Header="View Screenshots" Command="{Binding ShowScreenshotViewerCommand}" InputGesture="{OnPlatform Ctrl+Shift+S, macOS=Cmd+Shift+S}"/>
