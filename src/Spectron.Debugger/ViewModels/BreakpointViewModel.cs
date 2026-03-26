@@ -9,10 +9,10 @@ public partial class BreakpointViewModel : ObservableValidator
     [ObservableProperty]
     [Required(ErrorMessage = "Condition is required.")]
     [CustomValidation(typeof(BreakpointViewModel), nameof(ValidateCondition))]
-    private string _condition = string.Empty;
+    public partial string Condition { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private bool _isEnabled;
+    public partial bool IsEnabled { get; set; }
 
     private Breakpoint _breakpoint = null!;
 

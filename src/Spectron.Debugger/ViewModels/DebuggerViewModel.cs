@@ -23,19 +23,19 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
     public MemoryViewModel MemoryViewModel { get; private set; } = null!;
 
     [ObservableProperty]
-    private CodeListViewModel _codeListViewModel = null!;
+    public partial CodeListViewModel CodeListViewModel { get; set; } = null!;
 
     [ObservableProperty]
-    private ImmediateViewModel _immediateViewModel = null!;
+    public partial ImmediateViewModel ImmediateViewModel { get; set; } = null!;
 
     [ObservableProperty]
-    private BreakpointListViewModel _breakpointListViewModel = null!;
+    public partial BreakpointListViewModel BreakpointListViewModel { get; set; } = null!;
 
     [ObservableProperty]
-    private LoggingViewModel _loggingViewModel = new();
+    public partial LoggingViewModel LoggingViewModel { get; set; } = new();
 
     [ObservableProperty]
-    private bool _isPaused;
+    public partial bool IsPaused { get; set; }
 
     public DebuggerViewModel(
         Emulator emulator,
