@@ -24,10 +24,10 @@ public partial class ImmediateViewModel(
     public Action ScrollToEnd { get; set; } = () => { };
 
     [ObservableProperty]
-    private string _commandText = string.Empty;
+    public partial string CommandText { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _outputText = string.Empty;
+    public partial string OutputText { get; set; } = string.Empty;
 
     [RelayCommand]
     private void Immediate(KeyEventArgs e)

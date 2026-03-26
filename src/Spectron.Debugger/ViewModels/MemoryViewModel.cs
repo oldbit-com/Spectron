@@ -33,12 +33,12 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
     private int _lastFindInex;
 
     [ObservableProperty]
-    private byte[] _memory = [];
+    public partial byte[] Memory { get; set; } = [];
 
     [ObservableProperty]
     [CustomValidation(typeof(MemoryViewModel), nameof(ValidateCommand))]
     [NotifyDataErrorInfo]
-    private string _commandText = string.Empty;
+    public partial string CommandText { get; set; } = string.Empty;
 
     public MemoryViewModel(Emulator emulator)
     {

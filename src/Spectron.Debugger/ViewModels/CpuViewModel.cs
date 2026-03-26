@@ -8,61 +8,61 @@ namespace OldBit.Spectron.Debugger.ViewModels;
 public partial class CpuViewModel : ObservableObject
 {
     [ObservableProperty]
-    private Word _AF;
+    public partial Word AF { get; set; }
 
     [ObservableProperty]
-    private Word _AFPrime;
+    public partial Word AFPrime { get; set; }
 
     [ObservableProperty]
-    private Word _BC;
+    public partial Word BC { get; set; }
 
     [ObservableProperty]
-    private Word _BCPrime;
+    public partial Word BCPrime { get; set; }
 
     [ObservableProperty]
-    private Word _DE;
+    public partial Word DE { get; set; }
 
     [ObservableProperty]
-    private Word _DEPrime;
+    public partial Word DEPrime { get; set; }
 
     [ObservableProperty]
-    private Word _HL;
+    public partial Word HL { get; set; }
 
     [ObservableProperty]
-    private Word _HLPrime;
+    public partial Word HLPrime { get; set; }
 
     [ObservableProperty]
-    private Word _IX;
+    public partial Word IX { get; set; }
 
     [ObservableProperty]
-    private Word _IY;
+    public partial Word IY { get; set; }
 
     [ObservableProperty]
-    private Word _PC;
+    public partial Word PC { get; set; }
 
     [ObservableProperty]
-    private Word _SP;
+    public partial Word SP { get; set; }
 
     [ObservableProperty]
-    private byte _I;
+    public partial byte I { get; set; }
 
     [ObservableProperty]
-    private Flags _F;
+    public partial Flags F { get; set; }
 
     [ObservableProperty]
-    private byte _R;
+    public partial byte R { get; set; }
 
     [ObservableProperty]
-    private string _IFF1 = string.Empty;
+    public partial string IFF1 { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _IFF2 = string.Empty;
+    public partial string IFF2 { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _IM = string.Empty;
+    public partial string IM { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private int _T;
+    public partial int T { get; set; }
 
     public void Update(Z80 cpu)
     {
