@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Input;
 using AvaloniaEdit.Utils;
@@ -51,9 +52,44 @@ public sealed class NativeMainMenu
         CreateBorderSizeMenu();
         CreateTapeLoadingSpeedMenu();
 
-        _viewModel.PropertyChanged += (_, e) =>
+        _viewModel.PropertyChanged += (_, e) => ViewModelPropertyChanged(e.PropertyName);
+    }
+
+    public NativeMenu Create()
+    {
+        if (_rootItems.Length == 0)
         {
-            switch (e.PropertyName)
+            _rootItems =
+            [
+                CreateFileMenu(),
+                CreateEmulatorMenu(),
+                CreateControlMenu(),
+                CreateToolsMenu(),
+                CreateViewMenu(),
+                CreateFavoritesMenu(),
+                CreateTapeMenu(),
+                CreateMicrodriveMenu(),
+                CreateDiskDriveMenu(),
+                CreateDebugMenu(),
+                CreateHelpMenu(),
+            ];
+        }
+
+        _nativeMenu.Items.AddRange(_rootItems);
+
+        return _nativeMenu;
+    }
+
+    public NativeMenu Empty()
+    {
+        _nativeMenu.Items.Clear();
+
+        return _nativeMenu;
+    }
+
+    private void ViewModelPropertyChanged(string? propertyName)
+    {
+        switch (propertyName)
             {
                 case nameof(MainWindowViewModel.ComputerType):
                     foreach (var computerType in _computerTypes.Keys)
@@ -154,39 +190,6 @@ public sealed class NativeMainMenu
 
                     break;
             }
-        };
-    }
-
-    public NativeMenu Create()
-    {
-        if (_rootItems.Length == 0)
-        {
-            _rootItems =
-            [
-                CreateFileMenu(),
-                CreateEmulatorMenu(),
-                CreateControlMenu(),
-                CreateToolsMenu(),
-                CreateViewMenu(),
-                CreateFavoritesMenu(),
-                CreateTapeMenu(),
-                CreateMicrodriveMenu(),
-                CreateDiskDriveMenu(),
-                CreateDebugMenu(),
-                CreateHelpMenu(),
-            ];
-        }
-
-        _nativeMenu.Items.AddRange(_rootItems);
-
-        return _nativeMenu;
-    }
-
-    public NativeMenu Empty()
-    {
-        _nativeMenu.Items.Clear();
-
-        return _nativeMenu;
     }
 
     private NativeMenuItem CreateFileMenu()
