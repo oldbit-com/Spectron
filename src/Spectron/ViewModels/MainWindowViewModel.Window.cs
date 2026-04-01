@@ -46,6 +46,7 @@ partial class MainWindowViewModel
         _favorites = await _favoritesService.LoadAsync();
 
         FavoritesViewModel.Favorites = _favorites;
+        FavoritesViewModel.RefreshMenu();
 
         ThemeManager.SelectTheme(CommandLineArgs?.Theme ?? _preferences.Theme);
         IsNativeMenuEnabled = _preferences.IsNativeMenuEnabled;

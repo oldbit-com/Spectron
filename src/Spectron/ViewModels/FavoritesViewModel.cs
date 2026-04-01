@@ -15,6 +15,9 @@ public partial class FavoritesViewModel : ObservableObject
     private FavoriteItemViewModel? _cutItem;
     private FavoriteItemViewModel? _copyItem;
 
+    public NativeMenu? NativeFavoriteMenu { get; set; }
+    public MenuItem? WindowFavoritesMenu { get; set; }
+
     [ObservableProperty]
     public partial FavoriteItemViewModel? SelectedItem { get; set; }
 
@@ -32,28 +35,22 @@ public partial class FavoritesViewModel : ObservableObject
         }
     } = new();
 
-    public void Opening(ItemCollection menuItems)
+    public void RefreshMenu()
     {
-        while (menuItems.Count > 1)
-        {
-            menuItems.RemoveAt(1);
-        }
-
-        if (Nodes.Count == 0 || Nodes[0].Nodes is { Count: 0 })
-        {
-            return;
-        }
-
-        menuItems.Add(new Separator());
-
-        AddFavoriteItems(menuItems, Nodes[0].Nodes!);
+        RefreshWindowMenu();
+        RefreshNativeMenu();
     }
 
-    public void Opening(NativeMenu favoritesMenu)
+    private void RefreshWindowMenu()
     {
-        while (favoritesMenu.Items.Count > 1)
+        if (WindowFavoritesMenu is null)
         {
-            favoritesMenu.Items.RemoveAt(1);
+            return;
+        }
+
+        while (WindowFavoritesMenu.Items.Count > 1)
+        {
+            WindowFavoritesMenu.Items.RemoveAt(1);
         }
 
         if (Nodes.Count == 0 || Nodes[0].Nodes is { Count: 0 })
@@ -61,9 +58,31 @@ public partial class FavoritesViewModel : ObservableObject
             return;
         }
 
-        favoritesMenu.Items.Add(new NativeMenuItemSeparator());
+        WindowFavoritesMenu.Items.Add(new Separator());
 
-        AddFavoriteItems(favoritesMenu.Items, Nodes[0].Nodes!);
+        AddFavoriteItems(WindowFavoritesMenu.Items, Nodes[0].Nodes!);
+    }
+
+    private void RefreshNativeMenu()
+    {
+        if (NativeFavoriteMenu is null)
+        {
+            return;
+        }
+
+        while (NativeFavoriteMenu.Items.Count > 1)
+        {
+            NativeFavoriteMenu.Items.RemoveAt(1);
+        }
+
+        if (Nodes.Count == 0 || Nodes[0].Nodes is { Count: 0 })
+        {
+            return;
+        }
+
+        NativeFavoriteMenu.Items.Add(new NativeMenuItemSeparator());
+
+        AddFavoriteItems(NativeFavoriteMenu.Items, Nodes[0].Nodes!);
     }
 
     private FavoritePrograms GetFavorites()
@@ -95,6 +114,8 @@ public partial class FavoritesViewModel : ObservableObject
 
     public void UpdateFavorites()
     {
+        RefreshMenu();
+
         var favorites = GetFavorites();
         WeakReferenceMessenger.Default.Send(new UpdateFavoritesMessage(favorites));
     }

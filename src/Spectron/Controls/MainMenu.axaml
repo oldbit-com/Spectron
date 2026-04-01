@@ -129,7 +129,7 @@
             <MenuItem Header="{Binding IsFullScreen, Converter={StaticResource BoolToTextConverter}, ConverterParameter='Exit Full Screen|Full Screen'}" InputGesture="Shift+Alt+Enter" Command="{Binding ToggleFullScreenCommand}"/>
         </MenuItem>
 
-        <MenuItem Header="Fa_vourites" Padding="10 0 10 0" Focusable="False" SubmenuOpened="FavoritesSubmenuOpened">
+        <MenuItem Name="FavoritesMenu" Header="Fa_vourites" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="Edit..." Command="{Binding ShowFavoritesViewCommand}"/>
         </MenuItem>
 

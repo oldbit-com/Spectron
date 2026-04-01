@@ -202,7 +202,9 @@ public sealed class NativeMainMenu
                     ? new KeyGesture(Key.O, KeyModifiers.Meta)
                     : new KeyGesture(Key.O, KeyModifiers.Control)
             },
+
             CreateRecentMenuItem(),
+
             new NativeMenuItem("Save Snapshot...")
             {
                 Command = _viewModel.SaveFileCommand,
@@ -210,11 +212,13 @@ public sealed class NativeMainMenu
                     ? new KeyGesture(Key.S, KeyModifiers.Meta)
                     : new KeyGesture(Key.S, KeyModifiers.Control)
             },
+
             new NativeMenuItem("Quick Save")
             {
                 Command = _viewModel.QuickSaveCommand,
                 Gesture = new KeyGesture(Key.F5)
             },
+
             new NativeMenuItem("Quick Load")
             {
                 Command = _viewModel.QuickLoadCommand,
@@ -734,7 +738,7 @@ public sealed class NativeMainMenu
 
     private NativeMenuItem CreateFavoritesMenu()
     {
-        var viewItem = new NativeMenuItem("Favourites");
+        var favoritesItem = new NativeMenuItem("Favourites");
 
         var itemsMenu = new NativeMenu
         {
@@ -744,11 +748,12 @@ public sealed class NativeMainMenu
             },
         };
 
-        itemsMenu.Opening += (_, _) => _viewModel.FavoritesViewModel.Opening(itemsMenu);
+        _viewModel.FavoritesViewModel.NativeFavoriteMenu = itemsMenu;
+        _viewModel.FavoritesViewModel.RefreshMenu();
 
-        viewItem.Menu = itemsMenu;
+        favoritesItem.Menu = itemsMenu;
 
-        return viewItem;
+        return favoritesItem;
     }
 
     private NativeMenuItem CreateRecentMenuItem()
