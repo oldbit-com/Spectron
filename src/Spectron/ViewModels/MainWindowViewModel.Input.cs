@@ -39,7 +39,7 @@ partial class MainWindowViewModel
                 return;
 
             case { Key: Key.F10, KeyModifiers: KeyModifiers.None } when WindowState == Avalonia.Controls.WindowState.FullScreen:
-                IsMenuVisible = true;
+                IsMenuVisible = !IsNativeMenuEnabled;
                 MainMenu?.Focus();
                 e.Handled = true;
                 return;

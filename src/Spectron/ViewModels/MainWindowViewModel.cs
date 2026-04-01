@@ -96,6 +96,12 @@ public partial class MainWindowViewModel : ObservableObject
 
     #region Observable properties
     [ObservableProperty]
+    public partial bool IsNativeMenuEnabled { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsMenuVisible { get; set; } = true;
+
+    [ObservableProperty]
     public partial BorderSize BorderSize { get; set; } = BorderSize.Medium;
 
     [ObservableProperty]
@@ -133,9 +139,6 @@ public partial class MainWindowViewModel : ObservableObject
     public partial WindowState WindowState { get; set; } = WindowState.Normal;
 
     public bool IsFullScreen => WindowState == WindowState.FullScreen;
-
-    [ObservableProperty]
-    public partial bool IsMenuVisible { get; set; } = true;
 
     [ObservableProperty]
     public partial TapeSpeed TapeLoadSpeed { get; set; } = TapeSpeed.Normal;

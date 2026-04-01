@@ -49,6 +49,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         _gamepadManager.ControllerChanged += GamepadManagerOnControllerChanged;
 
         Theme = preferences.Theme;
+        IsNativeMenuEnabled = preferences.IsNativeMenuEnabled;
 
         ComputerType = preferences.ComputerType;
         IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
@@ -166,6 +167,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         var preferences = new Preferences
         {
             Theme = Theme,
+            IsNativeMenuEnabled = IsNativeMenuEnabled,
             ComputerType = ComputerType,
             IsUlaPlusEnabled = IsUlaPlusEnabled,
             IsFloatingBusEnabled = IsFloatingBusEnabled,
@@ -560,6 +562,11 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
     public partial Theme Theme { get; set; }
 
     [ObservableProperty]
+    public partial bool IsNativeMenuEnabled { get; set; }
+
+    public bool IsNativeMenuSupported => OperatingSystem.IsMacOS();
+
+    [ObservableProperty]
     public partial ComputerType ComputerType { get; set; }
 
     [ObservableProperty]
@@ -663,7 +670,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
     public partial string FfmpegMessage { get; set; } = string.Empty;
 
     [ObservableProperty]
-    public partial int TimeMachineCountdownSeconds { get; set; } = 3;
+    public partial int TimeMachineCountdownSeconds { get; set; }
 
     [ObservableProperty]
     public partial NumberFormat DebuggerNumberFormat { get; set; } = NumberFormat.HexPrefixDollar;

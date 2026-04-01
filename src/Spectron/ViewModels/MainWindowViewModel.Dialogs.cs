@@ -29,6 +29,8 @@ partial class MainWindowViewModel
 
             _preferences = preferences;
 
+            IsNativeMenuEnabled = _preferences.IsNativeMenuEnabled;
+
             Emulator?.IsUlaPlusEnabled = _preferences.IsUlaPlusEnabled;
             Emulator?.IsFloatingBusEnabled = _preferences.IsFloatingBusEnabled;
             Emulator?.JoystickManager.Configure(JoystickType);

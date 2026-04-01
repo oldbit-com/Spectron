@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OldBit.Spectron.Dialogs;
@@ -11,15 +10,9 @@ using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives.Events;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class MicrodriveMenuViewModel : ObservableObject
+public partial class MicrodriveMenuViewModel : ObservableObject
 {
     private readonly MicrodriveManager _microdriveManager;
-
-    public ICommand NewCommand { get; }
-    public ICommand InsertCommand { get; }
-    public ICommand SaveCommand { get; }
-    public ICommand EjectCommand { get; }
-    public ICommand ToggleWriteProtectCommand { get; }
 
     public Dictionary<MicrodriveId, Observable<string>> EjectCommandHeadings { get; } = new();
     public Dictionary<MicrodriveId, Observable<bool>> IsWriteProtected { get; } = new();
@@ -34,12 +27,6 @@ public class MicrodriveMenuViewModel : ObservableObject
 
         _microdriveManager = microdriveManager;
         _microdriveManager.CartridgeChanged += OnCartridgeChanged;
-
-        NewCommand = new RelayCommand<MicrodriveId>(execute: New);
-        InsertCommand = new AsyncRelayCommand<MicrodriveId>(execute: Insert);
-        SaveCommand = new AsyncRelayCommand<MicrodriveId>(execute: Save, canExecute: IsCartridgeInserted);
-        EjectCommand = new AsyncRelayCommand<MicrodriveId>(execute: Eject, canExecute: IsCartridgeInserted);
-        ToggleWriteProtectCommand = new RelayCommand<MicrodriveId>(execute: ToggleWriteProtect, canExecute: IsCartridgeInserted);
     }
 
     private void OnCartridgeChanged(CartridgeChangedEventArgs e)
@@ -65,14 +52,20 @@ public class MicrodriveMenuViewModel : ObservableObject
         {
             EjectCommandHeadings[e.DriveId].Value = "Eject 'New Cartridge'";
         }
+
+        NotifyCanExecuteChanged();
     }
 
+    [RelayCommand]
     private void New(MicrodriveId driveId)
     {
         _microdriveManager[driveId].NewCartridge();
         IsWriteProtected[driveId].Value = false;
+
+        NotifyCanExecuteChanged();
     }
 
+    [RelayCommand]
     private async Task Insert(MicrodriveId driveId)
     {
         try
@@ -86,6 +79,8 @@ public class MicrodriveMenuViewModel : ObservableObject
 
             _microdriveManager[driveId].InsertCartridge(files[0].Path.LocalPath);
             IsWriteProtected[driveId].Value = _microdriveManager[driveId].IsCartridgeWriteProtected;
+
+            NotifyCanExecuteChanged();
         }
         catch (Exception ex)
         {
@@ -93,6 +88,7 @@ public class MicrodriveMenuViewModel : ObservableObject
         }
     }
 
+    [RelayCommand(CanExecute = nameof(IsCartridgeInserted))]
     private async Task Save(MicrodriveId driveId)
     {
         var cartridge = _microdriveManager[driveId].Cartridge;
@@ -122,20 +118,30 @@ public class MicrodriveMenuViewModel : ObservableObject
         }
     }
 
+    [RelayCommand(CanExecute = nameof(IsCartridgeInserted))]
     private async Task Eject(MicrodriveId driveId)
     {
         _microdriveManager[driveId].EjectCartridge();
         IsWriteProtected[driveId].Value = false;
 
+        NotifyCanExecuteChanged();
+
         await Task.CompletedTask;
     }
 
+    [RelayCommand(CanExecute = nameof(IsCartridgeInserted))]
     private void ToggleWriteProtect(MicrodriveId driveId)
     {
         IsWriteProtected[driveId].Value = !IsWriteProtected[driveId].Value;
         _microdriveManager[driveId].IsCartridgeWriteProtected = IsWriteProtected[driveId].Value;
     }
 
-    private bool IsCartridgeInserted(MicrodriveId driveId) =>
-        _microdriveManager[driveId].IsCartridgeInserted;
+    private void NotifyCanExecuteChanged()
+    {
+        SaveCommand.NotifyCanExecuteChanged();
+        EjectCommand.NotifyCanExecuteChanged();
+        ToggleWriteProtectCommand.NotifyCanExecuteChanged();
+    }
+
+    private bool IsCartridgeInserted(MicrodriveId driveId) => _microdriveManager[driveId].IsCartridgeInserted;
 }

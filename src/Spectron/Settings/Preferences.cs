@@ -10,6 +10,8 @@ public class Preferences
 {
     public Theme Theme { get; init; } = Theme.Dark;
 
+    public bool IsNativeMenuEnabled { get; init; } = true;
+
     public ResumeSettings Resume { get; init; } = new();
 
     public bool IsUlaPlusEnabled { get; init; }

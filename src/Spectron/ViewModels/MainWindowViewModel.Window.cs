@@ -48,6 +48,7 @@ partial class MainWindowViewModel
         FavoritesViewModel.Favorites = _favorites;
 
         ThemeManager.SelectTheme(CommandLineArgs?.Theme ?? _preferences.Theme);
+        IsNativeMenuEnabled = _preferences.IsNativeMenuEnabled;
 
         IsAudioMuted = CommandLineArgs?.IsAudioMuted ?? _preferences.Audio.IsMuted;
 

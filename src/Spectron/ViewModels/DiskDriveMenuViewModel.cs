@@ -14,16 +14,9 @@ using OldBit.Spectron.Messages;
 
 namespace OldBit.Spectron.ViewModels;
 
-public class DiskDriveMenuViewModel : ObservableObject
+public partial class DiskDriveMenuViewModel : ObservableObject
 {
     private readonly DiskDriveManager _diskDriveManager;
-    public ICommand NewCommand { get; }
-    public ICommand InsertCommand { get; }
-    public ICommand InsertDefaultDriveCommand { get; }
-    public ICommand SaveCommand { get; }
-    public ICommand EjectCommand { get; }
-    public ICommand ViewCommand { get; }
-    public ICommand ToggleWriteProtectCommand { get; }
 
     public Dictionary<DriveId, Observable<string>> EjectCommandHeadings { get; } = new();
     public Dictionary<DriveId, Observable<bool>> IsWriteProtected { get; } = new();
@@ -38,14 +31,6 @@ public class DiskDriveMenuViewModel : ObservableObject
 
         _diskDriveManager = diskDriveManager;
         _diskDriveManager.DiskChanged += OnDiskChanged;
-
-        NewCommand = new RelayCommand<DriveId>(execute: New);
-        InsertCommand = new AsyncRelayCommand<DriveId>(execute: Insert);
-        InsertDefaultDriveCommand = new AsyncRelayCommand(execute: async() => await Insert(DriveId.DriveA));
-        SaveCommand = new AsyncRelayCommand<DriveId>(execute: Save, canExecute: IsDiskInserted);
-        EjectCommand = new AsyncRelayCommand<DriveId>(execute: Eject, canExecute: IsDiskInserted);
-        ViewCommand = new RelayCommand<DriveId>(execute: View, canExecute: IsDiskInserted);
-        ToggleWriteProtectCommand = new RelayCommand<DriveId>(execute: ToggleWriteProtect, canExecute: IsDiskInserted);
     }
 
     private void OnDiskChanged(DiskChangedEventArgs e)
@@ -76,14 +61,23 @@ public class DiskDriveMenuViewModel : ObservableObject
         {
             ToggleWriteProtect(e.DriveId);
         }
+
+        NotifyCanExecuteChanged();
     }
 
+    [RelayCommand]
     private void New(DriveId driveId)
     {
         _diskDriveManager[driveId].NewDisk();
         IsWriteProtected[driveId].Value = false;
+
+        NotifyCanExecuteChanged();
     }
 
+    [RelayCommand]
+    private async Task InsertDriveA() => await Insert(DriveId.DriveA);
+
+    [RelayCommand]
     private async Task Insert(DriveId driveId)
     {
         try
@@ -101,8 +95,11 @@ public class DiskDriveMenuViewModel : ObservableObject
         {
             await MessageDialogs.Error(ex.Message);
         }
+
+        NotifyCanExecuteChanged();
     }
 
+    [RelayCommand(CanExecute = nameof(IsDiskInserted))]
     private async Task Save(DriveId driveId)
     {
         var diskImage = _diskDriveManager[driveId].DiskFile;
@@ -132,23 +129,35 @@ public class DiskDriveMenuViewModel : ObservableObject
         }
     }
 
+    [RelayCommand(CanExecute = nameof(IsDiskInserted))]
     private async Task Eject(DriveId driveId)
     {
         _diskDriveManager[driveId].EjectDisk();
         IsWriteProtected[driveId].Value = false;
 
+        NotifyCanExecuteChanged();
+
         await Task.CompletedTask;
     }
 
+    [RelayCommand(CanExecute = nameof(IsDiskInserted))]
     private void View(DriveId driveId) =>
         WeakReferenceMessenger.Default.Send(new ShowDiskViewMessage(_diskDriveManager, driveId));
 
+    [RelayCommand(CanExecute = nameof(IsDiskInserted))]
     private void ToggleWriteProtect(DriveId driveId)
     {
         IsWriteProtected[driveId].Value = !IsWriteProtected[driveId].Value;
         _diskDriveManager[driveId].IsWriteProtected = IsWriteProtected[driveId].Value;
     }
 
-    private bool IsDiskInserted(DriveId driveId) =>
-        _diskDriveManager[driveId].IsDiskInserted;
+    private void NotifyCanExecuteChanged()
+    {
+        SaveCommand.NotifyCanExecuteChanged();
+        EjectCommand.NotifyCanExecuteChanged();
+        ViewCommand.NotifyCanExecuteChanged();
+        ToggleWriteProtectCommand.NotifyCanExecuteChanged();
+    }
+
+    private bool IsDiskInserted(DriveId driveId) => _diskDriveManager[driveId].IsDiskInserted;
 }

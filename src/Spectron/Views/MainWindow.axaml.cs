@@ -175,10 +175,6 @@ public partial class MainWindow : Window
         MessageDialogs.MainWindow = this;
         viewModel.MainWindow = this;
         viewModel.NotificationManager = NotificationManager;
-
-        // TODO: Make this a setting (default on macOS) and other menu not visible
-        var nativeMenu = new NativeMainMenu(viewModel);
-        NativeMenu.SetMenu(this, nativeMenu.Create());
     }
 
     private void Screen_OnPointerMoved(object? sender, PointerEventArgs e)

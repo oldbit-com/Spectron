@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Input;
+using AvaloniaEdit.Utils;
 using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.Devices.Beta128.Drive;
+using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Rom;
@@ -12,9 +15,11 @@ using OldBit.Spectron.ViewModels;
 
 namespace OldBit.Spectron.Controls;
 
-public class NativeMainMenu
+public sealed class NativeMainMenu
 {
     private readonly MainWindowViewModel _viewModel;
+    private readonly NativeMenu _nativeMenu = [];
+    private NativeMenuItem[] _rootItems = [];
 
     private readonly Dictionary<ComputerType, NativeMenuItem> _computerTypes = new();
     private readonly Dictionary<RomType, NativeMenuItem> _romTypes = new();
@@ -23,23 +28,28 @@ public class NativeMainMenu
     private readonly Dictionary<string, NativeMenuItem> _emulationSpeeds = new();
     private readonly Dictionary<BorderSize, NativeMenuItem> _borderSizes = new();
     private readonly Dictionary<TapeSpeed, NativeMenuItem> _tapeLoadingSpeeds = new();
+    private readonly Dictionary<MicrodriveId, NativeMenuItem> _microdrives = new();
+    private readonly Dictionary<DriveId, NativeMenuItem> _diskDrives = new();
 
     private NativeMenuItem? _ulaPlusMenuItem;
     private NativeMenuItem? _pauseMenuItem;
     private NativeMenuItem? _muteMenuItem;
     private NativeMenuItem? _fullScreenMenuItem;
+    private NativeMenuItem? _microdriveMenuItem;
+    private NativeMenuItem? _diskDriveMenuItem;
+    private NativeMenuItem? _debuggerBreakpointMenuItem;
 
     public NativeMainMenu(MainWindowViewModel viewModel)
     {
         _viewModel = viewModel;
 
-        AddComputerTypes();
-        AddRomTypes();
-        AddJoystickTypes();
-        AddMouseTypes();
-        AddSpeedOptions();
-        AddBorderSizes();
-        AddTapeLoadingSpeeds();
+        CreateComputerTypeMenu();
+        CreateRomTypeMenu();
+        CreateJoystickTypeMenu();
+        CreateMouseTypeMenu();
+        CreateSpeedOptionMenu();
+        CreateBorderSizeMenu();
+        CreateTapeLoadingSpeedMenu();
 
         _viewModel.PropertyChanged += (_, e) =>
         {
@@ -112,27 +122,74 @@ public class NativeMainMenu
                     }
 
                     break;
+
+                case nameof(MainWindowViewModel.IsInterface1Enabled):
+                    _microdriveMenuItem?.IsVisible = _viewModel.IsInterface1Enabled;
+
+                    break;
+
+                case nameof(MainWindowViewModel.NumberOfMicrodrives):
+                    foreach (var driveId in _microdrives.Keys)
+                    {
+                        _microdrives[driveId].IsVisible = _viewModel.NumberOfMicrodrives >= (int)driveId;
+                    }
+
+                    break;
+
+                case nameof(MainWindowViewModel.IsBeta128Enabled):
+                    _diskDriveMenuItem?.IsVisible = _viewModel.IsBeta128Enabled;
+
+                    break;
+
+                case nameof(MainWindowViewModel.NumberOfBeta128Drives):
+                    foreach (var driveId in _diskDrives.Keys)
+                    {
+                        _diskDrives[driveId].IsVisible = _viewModel.NumberOfBeta128Drives >= (int)driveId;
+                    }
+
+                    break;
+
+                case nameof(MainWindowViewModel.BreakpointsEnabled):
+                    _debuggerBreakpointMenuItem?.IsChecked = _viewModel.BreakpointsEnabled;
+
+                    break;
             }
         };
     }
 
     public NativeMenu Create()
     {
-        var menu = new NativeMenu
+        if (_rootItems.Length == 0)
         {
-            CreateFileMenuItem(),
-            CreateEmulatorMenuItem(),
-            CreateControlMenuItem(),
-            CreateToolsMenuItem(),
-            CreateViewMenuItem(),
-            CreateFavoritesMenuItem(),
-            CreateTapeMenuItem(),
-        };
+            _rootItems =
+            [
+                CreateFileMenu(),
+                CreateEmulatorMenu(),
+                CreateControlMenu(),
+                CreateToolsMenu(),
+                CreateViewMenu(),
+                CreateFavoritesMenu(),
+                CreateTapeMenu(),
+                CreateMicrodriveMenu(),
+                CreateDiskDriveMenu(),
+                CreateDebugMenu(),
+                CreateHelpMenu(),
+            ];
+        }
 
-        return menu;
+        _nativeMenu.Items.AddRange(_rootItems);
+
+        return _nativeMenu;
     }
 
-    private NativeMenuItem CreateFileMenuItem()
+    public NativeMenu Empty()
+    {
+        _nativeMenu.Items.Clear();
+
+        return _nativeMenu;
+    }
+
+    private NativeMenuItem CreateFileMenu()
     {
         var fileItem = new NativeMenuItem("_File");
 
@@ -170,7 +227,7 @@ public class NativeMainMenu
         return fileItem;
     }
 
-    private NativeMenuItem CreateEmulatorMenuItem()
+    private NativeMenuItem CreateEmulatorMenu()
     {
         var emulatorItem = new NativeMenuItem("_Emulator");
 
@@ -251,7 +308,7 @@ public class NativeMainMenu
         return emulatorItem;
     }
 
-    private NativeMenuItem CreateControlMenuItem()
+    private NativeMenuItem CreateControlMenu()
     {
         var controlItem = new NativeMenuItem("Control");
 
@@ -328,7 +385,7 @@ public class NativeMainMenu
         return controlItem;
     }
 
-    private NativeMenuItem CreateToolsMenuItem()
+    private NativeMenuItem CreateToolsMenu()
     {
         var toolsItem = new NativeMenuItem("Tools");
 
@@ -373,7 +430,7 @@ public class NativeMainMenu
         return toolsItem;
     }
 
-    private NativeMenuItem CreateViewMenuItem()
+    private NativeMenuItem CreateViewMenu()
     {
         var viewItem = new NativeMenuItem("View");
 
@@ -417,7 +474,7 @@ public class NativeMainMenu
         return viewItem;
     }
 
-    private NativeMenuItem CreateTapeMenuItem()
+    private NativeMenuItem CreateTapeMenu()
     {
         var tapeItem = new NativeMenuItem("Tape");
 
@@ -491,7 +548,191 @@ public class NativeMainMenu
         return tapeItem;
     }
 
-    private NativeMenuItem CreateFavoritesMenuItem()
+    private NativeMenuItem CreateMicrodriveMenu()
+    {
+        _microdriveMenuItem = new NativeMenuItem("Microdrive")
+        {
+            IsVisible = _viewModel.IsInterface1Enabled
+        };
+
+        var microdriveSubMenu = new NativeMenu();
+
+        for (var i = 0; i < 8; i++)
+        {
+            var driveId = (MicrodriveId)(i + 1);
+
+            var driveItem = new NativeMenuItem($"Drive {i + 1}")
+            {
+                Menu =
+                [
+                    new NativeMenuItem("New")
+                    {
+                        Command = _viewModel.MicrodriveMenuViewModel.NewCommand,
+                        CommandParameter = driveId,
+                        IsEnabled = true,
+                    },
+
+                    new NativeMenuItem("Insert...")
+                    {
+                        Command = _viewModel.MicrodriveMenuViewModel.InsertCommand,
+                        CommandParameter = driveId,
+                        IsEnabled = true,
+                    },
+
+                    new NativeMenuItem("Save...")
+                    {
+                        Command = _viewModel.MicrodriveMenuViewModel.SaveCommand,
+                        CommandParameter = driveId,
+                        IsEnabled = _viewModel.MicrodriveMenuViewModel.SaveCommand.CanExecute(null),
+                    },
+
+                    CreateMicrodriveEjectMenuItem(driveId),
+
+                    new NativeMenuItemSeparator(),
+
+                    CreateMicrodriveWriteProtectMenuItem(driveId),
+                ],
+
+                IsVisible = _viewModel.NumberOfMicrodrives > (int)driveId
+            };
+
+            _microdrives[driveId] = driveItem;
+
+            microdriveSubMenu.Items.Add(driveItem);
+        }
+
+        _microdriveMenuItem.Menu = microdriveSubMenu;
+
+        return _microdriveMenuItem;
+    }
+
+    private NativeMenuItem CreateDiskDriveMenu()
+    {
+        _diskDriveMenuItem = new NativeMenuItem("Disk")
+        {
+            IsVisible = _viewModel.IsBeta128Enabled
+        };
+
+        var diskSubMenu = new NativeMenu();
+
+        var driveLetters = new[] { "A:", "B:", "C:", "D:"};
+
+        for (var i = 0; i < 4; i++)
+        {
+            var driveId = (DriveId)(i + 1);
+
+            var diskItem = new NativeMenuItem(driveLetters[i])
+            {
+                Menu =
+                [
+                    new NativeMenuItem("New")
+                    {
+                        Command = _viewModel.DiskDriveMenuViewModel.NewCommand,
+                        CommandParameter = driveId,
+                        IsEnabled = true,
+                    },
+
+                    new NativeMenuItem("Insert...")
+                    {
+                        Command = _viewModel.DiskDriveMenuViewModel.InsertCommand,
+                        CommandParameter = driveId,
+                        IsEnabled = true,
+                    },
+
+                    new NativeMenuItem("Save...")
+                    {
+                        Command = _viewModel.DiskDriveMenuViewModel.SaveCommand,
+                        CommandParameter = driveId,
+                        IsEnabled = _viewModel.DiskDriveMenuViewModel.SaveCommand.CanExecute(null),
+                    },
+
+                    new NativeMenuItemSeparator(),
+
+                    new NativeMenuItem("View")
+                    {
+                        Command = _viewModel.DiskDriveMenuViewModel.ViewCommand,
+                        CommandParameter = driveId,
+                        IsEnabled = _viewModel.DiskDriveMenuViewModel.ViewCommand.CanExecute(null),
+                    },
+
+                    CreateDiskDriveEjectMenuItem(driveId),
+
+                    new NativeMenuItemSeparator(),
+
+                    CreateDiskDriveWriteProtectMenuItem(driveId),
+                ]
+            };
+
+            _diskDrives[driveId] = diskItem;
+
+            diskSubMenu.Items.Add(diskItem);
+        }
+
+        _diskDriveMenuItem.Menu = diskSubMenu;
+
+        return _diskDriveMenuItem;
+    }
+
+    private NativeMenuItem CreateDebugMenu()
+    {
+        var debugItem = new NativeMenuItem("Debug");
+
+        _debuggerBreakpointMenuItem = new NativeMenuItem("Breakpoints Enabled")
+        {
+            ToggleType = NativeMenuItemToggleType.CheckBox,
+            Command = _viewModel.ToggleBreakpointsCommand,
+            IsChecked = _viewModel.BreakpointsEnabled,
+        };
+
+        var debugSubMenu = new NativeMenu
+        {
+            new NativeMenuItem("Debugger")
+            {
+                Command = _viewModel.ShowDebuggerViewCommand,
+                Gesture = new KeyGesture(Key.F11)
+            },
+
+            _debuggerBreakpointMenuItem,
+
+            new NativeMenuItemSeparator(),
+
+            new NativeMenuItem("Memory View")
+            {
+                Command = _viewModel.ShowMemoryViewCommand,
+            },
+        };
+
+        debugItem.Menu = debugSubMenu;
+
+        return debugItem;
+    }
+
+    private NativeMenuItem CreateHelpMenu()
+    {
+        var helpItem = new NativeMenuItem("Help");
+
+        var helpSubMenu = new NativeMenu
+        {
+            new NativeMenuItem("Keyboard")
+            {
+                Command = _viewModel.ShowKeyboardHelpViewCommand,
+                Gesture = new KeyGesture(Key.F1),
+            },
+
+            new NativeMenuItemSeparator(),
+
+            new NativeMenuItem("Log")
+            {
+                Command = _viewModel.ShowLogViewCommand,
+            },
+        };
+
+        helpItem.Menu = helpSubMenu;
+
+        return helpItem;
+    }
+
+    private NativeMenuItem CreateFavoritesMenu()
     {
         var viewItem = new NativeMenuItem("Favourites");
 
@@ -522,7 +763,7 @@ public class NativeMainMenu
         return recentItem;
     }
 
-    private void AddComputerTypes()
+    private void CreateComputerTypeMenu()
     {
         var computers = new[]
         {
@@ -544,7 +785,7 @@ public class NativeMainMenu
         }
     }
 
-    private void AddRomTypes()
+    private void CreateRomTypeMenu()
     {
         var roms = new[]
         {
@@ -574,7 +815,7 @@ public class NativeMainMenu
         }
     }
 
-    private void AddJoystickTypes()
+    private void CreateJoystickTypeMenu()
     {
         var joysticks = new[]
         {
@@ -599,7 +840,7 @@ public class NativeMainMenu
         }
     }
 
-    private void AddMouseTypes()
+    private void CreateMouseTypeMenu()
     {
         var mice = new[]
         {
@@ -620,7 +861,7 @@ public class NativeMainMenu
         }
     }
 
-    private void AddSpeedOptions()
+    private void CreateSpeedOptionMenu()
     {
         var speeds = new[]
         {
@@ -651,7 +892,7 @@ public class NativeMainMenu
         }
     }
 
-    private void AddBorderSizes()
+    private void CreateBorderSizeMenu()
     {
         var borders = new[]
         {
@@ -675,7 +916,7 @@ public class NativeMainMenu
         }
     }
 
-    private void AddTapeLoadingSpeeds()
+    private void CreateTapeLoadingSpeedMenu()
     {
         var speeds = new[]
         {
@@ -695,5 +936,69 @@ public class NativeMainMenu
                 IsEnabled = true
             };
         }
+    }
+
+    private NativeMenuItem CreateMicrodriveEjectMenuItem(MicrodriveId driveId)
+    {
+        var menuItem = new NativeMenuItem(_viewModel.MicrodriveMenuViewModel.EjectCommandHeadings[driveId].Value)
+        {
+            Command = _viewModel.MicrodriveMenuViewModel.EjectCommand,
+            CommandParameter = driveId,
+            IsEnabled = _viewModel.MicrodriveMenuViewModel.EjectCommand.CanExecute(null),
+        };
+
+        _viewModel.MicrodriveMenuViewModel.EjectCommandHeadings[driveId].PropertyChanged += (_, _) =>
+            menuItem.Header = _viewModel.MicrodriveMenuViewModel.EjectCommandHeadings[driveId].Value;
+
+        return menuItem;
+    }
+
+    private NativeMenuItem CreateMicrodriveWriteProtectMenuItem(MicrodriveId driveId)
+    {
+        var menuItem = new NativeMenuItem("Write Protect")
+        {
+            ToggleType = NativeMenuItemToggleType.CheckBox,
+            Command = _viewModel.MicrodriveMenuViewModel.ToggleWriteProtectCommand,
+            CommandParameter = driveId,
+            IsEnabled = _viewModel.MicrodriveMenuViewModel.ToggleWriteProtectCommand.CanExecute(null),
+            IsChecked = _viewModel.MicrodriveMenuViewModel.IsWriteProtected[driveId].Value,
+        };
+
+        _viewModel.MicrodriveMenuViewModel.IsWriteProtected[driveId].PropertyChanged += (_, _) =>
+            menuItem.IsChecked = _viewModel.MicrodriveMenuViewModel.IsWriteProtected[driveId].Value;
+
+        return menuItem;
+    }
+
+    private NativeMenuItem CreateDiskDriveEjectMenuItem(DriveId driveId)
+    {
+        var menuItem = new NativeMenuItem(_viewModel.DiskDriveMenuViewModel.EjectCommandHeadings[driveId].Value)
+        {
+            Command = _viewModel.DiskDriveMenuViewModel.EjectCommand,
+            CommandParameter = driveId,
+            IsEnabled = _viewModel.DiskDriveMenuViewModel.EjectCommand.CanExecute(null),
+        };
+
+        _viewModel.DiskDriveMenuViewModel.EjectCommandHeadings[driveId].PropertyChanged += (_, _) =>
+            menuItem.Header = _viewModel.DiskDriveMenuViewModel.EjectCommandHeadings[driveId].Value;
+
+        return menuItem;
+    }
+
+    private NativeMenuItem CreateDiskDriveWriteProtectMenuItem(DriveId driveId)
+    {
+        var menuItem = new NativeMenuItem("Write Protect")
+        {
+            ToggleType = NativeMenuItemToggleType.CheckBox,
+            Command = _viewModel.DiskDriveMenuViewModel.ToggleWriteProtectCommand,
+            CommandParameter = driveId,
+            IsEnabled = _viewModel.DiskDriveMenuViewModel.ToggleWriteProtectCommand.CanExecute(null),
+            IsChecked = _viewModel.DiskDriveMenuViewModel.IsWriteProtected[driveId].Value,
+        };
+
+        _viewModel.DiskDriveMenuViewModel.IsWriteProtected[driveId].PropertyChanged += (_, _) =>
+            menuItem.IsChecked = _viewModel.DiskDriveMenuViewModel.IsWriteProtected[driveId].Value;
+
+        return menuItem;
     }
 }

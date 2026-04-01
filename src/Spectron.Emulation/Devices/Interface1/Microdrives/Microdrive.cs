@@ -7,7 +7,6 @@ public sealed class Microdrive(MicrodriveId driveId)
     private const int GapStart = 15;
     private const int GapEnd = 30;
 
-    private bool _isMotorOn;
     private int _position;
     private int _gapSyncCounter;
 
@@ -16,12 +15,12 @@ public sealed class Microdrive(MicrodriveId driveId)
 
     internal bool IsMotorOn
     {
-        get => _isMotorOn;
+        get;
         set
         {
-            if (_isMotorOn != value)
+            if (field != value)
             {
-                _isMotorOn = value;
+                field = value;
 
                 MotorStateChanged?.Invoke(new MicrodriveMotorStateChangedEventArgs(driveId, value));
             }
@@ -33,13 +32,7 @@ public sealed class Microdrive(MicrodriveId driveId)
     public bool IsCartridgeWriteProtected
     {
         get => Cartridge?.IsWriteProtected == true;
-        set
-        {
-            if (Cartridge != null)
-            {
-                Cartridge.IsWriteProtected = value;
-            }
-        }
+        set => Cartridge?.IsWriteProtected = value;
     }
 
     public event MicrodriveMotorStateChangedEvent? MotorStateChanged;
