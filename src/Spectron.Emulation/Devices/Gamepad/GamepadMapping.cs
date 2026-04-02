@@ -1,11 +1,10 @@
-using System.Diagnostics.CodeAnalysis;
 using OldBit.Joypad.Controls;
 
 namespace OldBit.Spectron.Emulation.Devices.Gamepad;
 
-[SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
 public sealed record GamepadMapping
 {
+    // ReSharper disable once UnusedMember.Global
     public GamepadMapping()
     {
     }
@@ -17,9 +16,12 @@ public sealed record GamepadMapping
         Action = action;
     }
 
+    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
     public int ControlId { get; init; }
 
+    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
     public GamepadAction Action { get; init; }
 
+    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
     public DirectionalPadDirection Direction { get; init; }
 }

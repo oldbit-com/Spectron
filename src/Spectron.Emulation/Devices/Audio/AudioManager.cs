@@ -15,12 +15,10 @@ public sealed class AudioManager
     private const int SamplesPerFrame = PlayerSampleRate / FramesPerSecond;
     private const int NumberOfBuffers = 4;
 
-    private readonly bool _hasAyChip;
     private readonly AudioBufferPool _audioBufferPool;
     private readonly BeeperAudio _beeperAudio;
     private readonly AyAudio _ayAudio;
 
-    private StereoMode _stereoMode = StereoMode.Mono;
     private bool _isMuted;
     private bool _isAyEnabled;
     private bool _isBeeperEnabled;
@@ -32,21 +30,21 @@ public sealed class AudioManager
 
     public StereoMode StereoMode
     {
-        get => _stereoMode;
+        get;
         set
         {
-            if (_stereoMode == value)
+            if (field == value)
             {
                 return;
             }
 
-            _stereoMode = value;
+            field = value;
 
             Restart();
         }
-    }
+    } = StereoMode.Mono;
 
-    public bool IsAySupported => _hasAyChip || IsAySupportedStandardSpectrum;
+    public bool IsAySupported => field || IsAySupportedStandardSpectrum;
 
     public bool IsBeeperEnabled
     {
@@ -86,7 +84,7 @@ public sealed class AudioManager
 
     internal AudioManager(Clock clock, CassettePlayer? cassettePlayer, HardwareSettings hardware)
     {
-        _hasAyChip = hardware.HasAyChip;
+        IsAySupported = hardware.HasAyChip;
 
         var statesPerSample = (double)hardware.TicksPerFrame / SamplesPerFrame;
 

@@ -6,7 +6,6 @@ using CommunityToolkit.Mvvm.Input;
 using OldBit.Spectron.Debugger.Controls.Hex;
 using OldBit.Spectron.Debugger.Converters;
 using OldBit.Spectron.Debugger.Extensions;
-using OldBit.Spectron.Debugger.Parser;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Z80Cpu;

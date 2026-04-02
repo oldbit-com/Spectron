@@ -46,7 +46,7 @@ public sealed class BreakpointList
 
     private void SynchronizeLists()
     {
-        Register = _breakpoints.Where(x => x is RegisterBreakpoint).Cast<RegisterBreakpoint>().ToList();
-        Memory = _breakpoints.Where(x => x is MemoryBreakpoint).Cast<MemoryBreakpoint>().ToList();
+        Register = _breakpoints.OfType<RegisterBreakpoint>().ToList();
+        Memory = _breakpoints.OfType<MemoryBreakpoint>().ToList();
     }
 }

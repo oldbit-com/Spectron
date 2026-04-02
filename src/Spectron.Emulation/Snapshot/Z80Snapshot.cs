@@ -131,7 +131,7 @@ public sealed class Z80Snapshot(EmulatorFactory emulatorFactory)
         SetupJoystick(snapshot, emulator);
 
         screenBuffer.Reset();
-        var borderColor = SpectrumPalette.GetBorderColor(snapshot.Header.Flags1.BorderColor);;
+        var borderColor = SpectrumPalette.GetBorderColor(snapshot.Header.Flags1.BorderColor);
         screenBuffer.UpdateBorder(borderColor);
 
         return emulator;

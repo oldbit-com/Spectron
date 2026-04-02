@@ -35,7 +35,7 @@ public sealed class Cartridge
     internal Cartridge(string? filePath, byte[] data): this(data) =>
         FilePath = filePath;
 
-    internal Cartridge(byte[] data)
+    private Cartridge(byte[] data)
     {
         EnsureValidMdrDataSize(data);
 

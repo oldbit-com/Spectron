@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using OldBit.Spectron.Debugger.ViewModels;
 
 namespace OldBit.Spectron.Debugger.Breakpoints;
 

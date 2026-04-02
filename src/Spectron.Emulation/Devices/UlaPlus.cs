@@ -13,18 +13,18 @@ internal sealed class UlaPlus : IDevice
     private const int DataPort = 0xFF3B;
 
     private Register _register;
-    private bool _isActive;
     private byte _lastWrittenValue;
 
     internal byte PaletteGroup { get; set; }
     internal Color[][] PaletteColors { get; set; } = [new Color[16], new Color[16], new Color[16], new Color[16]];
     internal bool IsEnabled { get; set; }
+
     internal bool IsActive
     {
-        get => _isActive;
+        get;
         set
         {
-            _isActive = value;
+            field = value;
             ActiveChanged?.Invoke(EventArgs.Empty);
         }
     }

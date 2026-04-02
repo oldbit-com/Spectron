@@ -6,7 +6,7 @@ namespace OldBit.Spectron.Emulation.Tape.Loader;
 
 /// <summary>
 /// Responsible for simulating LOAD "" instruction entered by a user.
-/// Basically it loads a snapshot taken when the LOAD "" instruction has been entered,
+/// Basically, it loads a snapshot taken when the LOAD "" instruction has been entered,
 /// so it means we don't type the command, but we simulate it.
 /// </summary>
 public sealed class Loader(SzxSnapshot szxSnapshot)

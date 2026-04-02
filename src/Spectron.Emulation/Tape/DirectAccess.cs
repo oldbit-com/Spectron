@@ -74,7 +74,7 @@ internal sealed class DirectAccess
         checksum ^= tap.Checksum;
 
         _cpu.Registers.H = checksum;
-        _cpu.Registers.A = checksum;;
+        _cpu.Registers.A = checksum;
         _cpu.Registers.PC = 0x05E0;     // CP $01; RET
     }
 

@@ -14,7 +14,7 @@ internal sealed record HardwareSettings(
     int FloatingBusStartTicks,
     int FirstPixelTicks,        // Number of T-states passed since the interrupt generation to the first display byte is being sent to screen (early timing).
     int LastPixelTicks,         // Number of T-states passed since the interrupt generation to the last display byte is being sent to screen.
-    int TicksPerLine,           // Number of ticks for the whole screen line, e.g. including borders, content and retrace (224T).
+    int TicksPerLine,           // Number of ticks for the whole screen line, e.g., including borders, content and retrace (224T).
     bool HasAyChip = false);
 
 internal static class Hardware

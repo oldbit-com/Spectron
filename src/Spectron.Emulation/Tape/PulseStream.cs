@@ -4,7 +4,7 @@ using OldBit.Spectron.Files.Tzx.Blocks;
 namespace OldBit.Spectron.Emulation.Tape;
 
 /// <summary>
-/// A pulse represents a change in the signal level (lo->hi or hi->lo, e.g. toggle).
+/// A pulse represents a change in the signal level (lo->hi or hi->lo, e.g., toggle).
 /// </summary>
 /// <param name="RepeatCount">How many times pulse change should be repeated.</param>
 /// <param name="Duration">The pulse duration in T-states.</param>
@@ -12,8 +12,8 @@ namespace OldBit.Spectron.Emulation.Tape;
 internal sealed record Pulse(int RepeatCount, int Duration, bool IsSilence = false);
 
 /// <summary>
-/// Memory efficient tape pulse stream. Typically, a tape file is represented by thousands of pulses,
-/// This class generates them on the fly, e.g. when the tape is played.
+/// Memory efficient tape pulse stream. Typically, a tape file is represented by thousands of pulses.
+/// This class generates them on the fly, e.g., when the tape is played.
 /// </summary>
 internal class PulseStream : IDisposable
 {

@@ -229,7 +229,7 @@ public sealed class GamepadManager
         }
         else
         {
-            _keyboardState.KeyUp([key.Value]);;
+            _keyboardState.KeyUp([key.Value]);
         }
     }
 
