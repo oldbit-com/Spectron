@@ -20,8 +20,6 @@ public sealed class AudioManager
     private readonly AyAudio _ayAudio;
 
     private bool _isMuted;
-    private bool _isAyEnabled;
-    private bool _isBeeperEnabled;
     private AudioPlayer? _audioPlayer;
     private bool _isAudioPlayerRunning;
 
@@ -48,15 +46,15 @@ public sealed class AudioManager
 
     public bool IsBeeperEnabled
     {
-        get => _isBeeperEnabled;
+        get;
         set
         {
-            if (_isBeeperEnabled == value)
+            if (field == value)
             {
                 return;
             }
 
-            _isBeeperEnabled = value;
+            field = value;
             Beeper.IsEnabled = value;
 
             ToggleAudioPlayer();
@@ -65,15 +63,15 @@ public sealed class AudioManager
 
     public bool IsAyEnabled
     {
-        get => _isAyEnabled;
+        get;
         set
         {
-            if (_isAyEnabled == value)
+            if (field == value)
             {
                 return;
             }
 
-            _isAyEnabled = value;
+            field = value;
             Ay.IsEnabled = value;
 
             ToggleAudioPlayer();
@@ -114,13 +112,13 @@ public sealed class AudioManager
 
         var playAudio = false;
 
-        if (IsAySupported && _isAyEnabled)
+        if (IsAySupported && IsAyEnabled)
         {
             _ayAudio.EndFrame();
             playAudio = true;
         }
 
-        if (_isBeeperEnabled)
+        if (IsBeeperEnabled)
         {
             _beeperAudio.EndFrame();
             playAudio = true;
