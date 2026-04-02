@@ -95,25 +95,25 @@ public partial class TapeMenuViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanPlay))]
     private void Play()
     {
-        _tapeManager?.PlayTape();
+        _tapeManager.PlayTape();
     }
 
     [RelayCommand(CanExecute = nameof(CanStop))]
     private void Stop()
     {
-        _tapeManager?.StopTape();
+        _tapeManager.StopTape();
     }
 
     [RelayCommand(CanExecute = nameof(CanRewind))]
     private void Rewind()
     {
-        _tapeManager?.RewindTape();
+        _tapeManager.RewindTape();
     }
 
     [RelayCommand(CanExecute = nameof(CanEject))]
     private void Eject()
     {
-        _tapeManager?.EjectTape();
+        _tapeManager.EjectTape();
     }
 
     [RelayCommand(CanExecute = nameof(CanEject))]

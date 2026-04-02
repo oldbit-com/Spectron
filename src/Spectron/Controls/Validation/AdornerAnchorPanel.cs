@@ -14,37 +14,37 @@ public class AdornerAnchorPanel : Panel
     /// Defines the RootAnchorH attached property.
     /// </summary>
     public static readonly AttachedProperty<double> RootAnchorHProperty =
-        AvaloniaProperty.RegisterAttached<AdornerAnchorPanel, Control, double>("RootAnchorH", 0.0);
+        AvaloniaProperty.RegisterAttached<AdornerAnchorPanel, Control, double>("RootAnchorH");
 
     /// <summary>
     /// Defines the RootAnchorV attached property.
     /// </summary>
     public static readonly AttachedProperty<double> RootAnchorVProperty =
-        AvaloniaProperty.RegisterAttached<AdornerAnchorPanel, Control, double>("RootAnchorV", 0.0);
+        AvaloniaProperty.RegisterAttached<AdornerAnchorPanel, Control, double>("RootAnchorV");
 
     /// <summary>
     /// Defines the ChildAnchorH attached property.
     /// </summary>
     public static readonly AttachedProperty<double> ChildAnchorHProperty =
-        AvaloniaProperty.RegisterAttached<AdornerAnchorPanel, Control, double>("ChildAnchorH", 0.0);
+        AvaloniaProperty.RegisterAttached<AdornerAnchorPanel, Control, double>("ChildAnchorH");
 
     /// <summary>
     /// Defines the ChildAnchorV attached property.
     /// </summary>
     public static readonly AttachedProperty<double> ChildAnchorVProperty =
-        AvaloniaProperty.RegisterAttached<AdornerAnchorPanel, Control, double>("ChildAnchorV", 0.0);
+        AvaloniaProperty.RegisterAttached<AdornerAnchorPanel, Control, double>("ChildAnchorV");
 
     /// <summary>
     /// Defines the OffsetH attached property.
     /// </summary>
     public static readonly AttachedProperty<double> OffsetHProperty =
-        AvaloniaProperty.RegisterAttached<AdornerAnchorPanel, Control, double>("OffsetH", 0.0);
+        AvaloniaProperty.RegisterAttached<AdornerAnchorPanel, Control, double>("OffsetH");
 
     /// <summary>
     /// Defines the OffsetV attached property.
     /// </summary>
     public static readonly AttachedProperty<double> OffsetVProperty =
-        AvaloniaProperty.RegisterAttached<AdornerAnchorPanel, Control, double>("OffsetV", 0.0);
+        AvaloniaProperty.RegisterAttached<AdornerAnchorPanel, Control, double>("OffsetV");
 
     /// <summary>
     /// Initializes static members of the <see cref="AdornerAnchorPanel"/> class.
@@ -184,7 +184,7 @@ public class AdornerAnchorPanel : Panel
     /// <summary>
     /// Measures the control.
     /// </summary>
-    /// <param name="availableSize">The available size.</param>
+    /// <param name="orgAvailableSize">The available size.</param>
     /// <returns>The desired size of the control.</returns>
     protected override Size MeasureOverride(Size orgAvailableSize)
     {

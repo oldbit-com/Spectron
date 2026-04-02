@@ -71,7 +71,7 @@ partial class MainWindowViewModel
                 default:
                     if (_preferences.IsAutoLoadPokeFilesEnabled)
                     {
-                        TryAutoLoadPokeFile(filePath, fileType);
+                        TryAutoLoadPokeFile(filePath);
                     }
 
                     break;
@@ -168,7 +168,7 @@ partial class MainWindowViewModel
         Emulator?.DiskDriveManager.Drives[DriveId.DriveA].InsertDisk(filePath, stream);
     }
 
-    private void TryAutoLoadPokeFile(string filePath, FileType fileType)
+    private void TryAutoLoadPokeFile(string filePath)
     {
         try
         {

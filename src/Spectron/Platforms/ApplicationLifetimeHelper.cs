@@ -19,7 +19,7 @@ public sealed class ApplicationLifetimeHelper : IDisposable
 
     public ApplicationLifetimeHelper(Application application, Window mainWindow)
     {
-        var activatableLifetime = application?.TryGetFeature<IActivatableLifetime>();
+        var activatableLifetime = application.TryGetFeature<IActivatableLifetime>();
 
         if (activatableLifetime != null)
         {

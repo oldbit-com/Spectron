@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using OldBit.Spectron.Emulation.Devices.Beta128.Floppy;
 
 namespace OldBit.Spectron.Emulation.Devices.Beta128.Controller;

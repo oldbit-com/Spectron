@@ -1,3 +1,3 @@
 namespace OldBit.Spectron.Debugger.Messages;
 
-public record PauseForDebugMessage();
+public record PauseForDebugMessage;

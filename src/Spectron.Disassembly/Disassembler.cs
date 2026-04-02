@@ -169,7 +169,7 @@ public sealed class Disassembler
         if (!ExtendedInstructions.Index.TryGetValue(byteCode, out var template))
         {
             return null;
-        };
+        }
 
         var instruction = CreateInstruction(template);
         instruction.ByteCodes = GetByteCodes;

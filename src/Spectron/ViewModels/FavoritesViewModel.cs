@@ -60,7 +60,7 @@ public partial class FavoritesViewModel : ObservableObject
 
         WindowFavoritesMenu.Items.Add(new Separator());
 
-        AddFavoriteItems(WindowFavoritesMenu.Items, Nodes[0].Nodes!);
+        AddFavoriteItems(WindowFavoritesMenu.Items, Nodes[0].Nodes);
     }
 
     private void RefreshNativeMenu()
@@ -82,7 +82,7 @@ public partial class FavoritesViewModel : ObservableObject
 
         NativeFavoriteMenu.Items.Add(new NativeMenuItemSeparator());
 
-        AddFavoriteItems(NativeFavoriteMenu.Items, Nodes[0].Nodes!);
+        AddFavoriteItems(NativeFavoriteMenu.Items, Nodes[0].Nodes);
     }
 
     private FavoritePrograms GetFavorites()

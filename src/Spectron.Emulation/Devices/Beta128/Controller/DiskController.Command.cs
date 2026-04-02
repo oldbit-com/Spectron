@@ -19,7 +19,7 @@ internal partial class DiskController
             _drive.MotorOn(_next + 2 * _millisecond * 1000);
         }
 
-        _state = ControllerState.DelayBeforeCommand;;
+        _state = ControllerState.DelayBeforeCommand;
     }
 
     private void ProcessForceInterruptCommand(long now, Command command)

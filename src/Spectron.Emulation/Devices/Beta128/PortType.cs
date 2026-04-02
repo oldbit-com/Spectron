@@ -1,5 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace OldBit.Spectron.Emulation.Devices.Beta128;
 
 internal static class PortType

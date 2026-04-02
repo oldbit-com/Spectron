@@ -175,7 +175,7 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
             return new ValidationResult(invalidCommand.Error);
         }
 
-        return ValidationResult.Success;;
+        return ValidationResult.Success;
     }
 
     private static ICommand? ParseCommand(string command)

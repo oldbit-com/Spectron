@@ -2,7 +2,6 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using OldBit.Spectron.Extensions;
-using OldBit.Spectron.Settings;
 using OldBit.Spectron.Theming;
 
 namespace OldBit.Spectron.ViewModels;

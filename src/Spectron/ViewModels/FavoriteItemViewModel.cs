@@ -128,7 +128,7 @@ public partial class FavoriteItemViewModel : ObservableValidator
             return new ValidationResult("File does not exist.");
         }
 
-        return ValidationResult.Success;;
+        return ValidationResult.Success;
     }
 
     public FavoriteProgram ToFavoriteProgram()

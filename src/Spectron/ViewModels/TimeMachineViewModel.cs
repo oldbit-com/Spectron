@@ -10,7 +10,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
-using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Commands;
 using OldBit.Spectron.Emulation.Devices.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Joystick;
@@ -159,6 +158,6 @@ public partial class TimeMachineViewModel : ObservableObject, IDisposable
         _joystickManager.JoystickButtonChanged -= JoystickManagerOnJoystickButtonChanged;
         _commandManager.CommandReceived -= CommandManagerOnCommandReceived;
 
-        ScreenPreview?.Dispose();
+        ScreenPreview.Dispose();
     }
 }

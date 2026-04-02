@@ -157,7 +157,7 @@ public static class CommandLineParser
                 parseResult.GetValue(tapeLoadSpeedOption),
                 parseResult.GetValue(computerOption),
                 parseResult.GetValue(romOption),
-                parseResult.GetValue(romFileOption)?.Select(file => file.FullName)?.ToArray(),
+                parseResult.GetValue(romFileOption)?.Select(file => file.FullName).ToArray(),
                 parseResult.GetValue(joystickOption),
                 parseResult.GetValue(mouseOption),
                 parseResult.GetValue(muteAudioOption),

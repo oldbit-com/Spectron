@@ -2,7 +2,6 @@ using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using OldBit.Z80Cpu.Extensions;
 using OldBit.Z80Cpu.Registers;
 
 namespace OldBit.Spectron.Debugger.Controls;

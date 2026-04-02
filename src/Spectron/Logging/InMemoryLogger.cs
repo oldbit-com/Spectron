@@ -34,7 +34,7 @@ public sealed class InMemoryLogger(ILogStore logStore) : ILogger
 
     public bool IsEnabled(LogLevel logLevel) => logLevel != LogLevel.None;
 
-    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => NullScope.Instance;
+    public IDisposable BeginScope<TState>(TState state) where TState : notnull => NullScope.Instance;
 
     private class NullScope : IDisposable
     {

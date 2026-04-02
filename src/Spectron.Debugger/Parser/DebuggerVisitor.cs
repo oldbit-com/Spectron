@@ -9,10 +9,10 @@ public class DebuggerVisitor(Z80 cpu, IMemory memory, IBus bus, IOutput output) 
 {
     public List<string> Output { get; } = [];
 
-    public override Value? VisitInt(DebuggerParser.IntContext context) =>
+    public override Value VisitInt(DebuggerParser.IntContext context) =>
         new Integer(int.Parse(context.INT().GetText()));
 
-    public override Value? VisitHex(DebuggerParser.HexContext context)
+    public override Value VisitHex(DebuggerParser.HexContext context)
     {
         var hex = context.HEX().GetText()
             .Replace("0x", string.Empty, StringComparison.OrdinalIgnoreCase)
@@ -23,7 +23,7 @@ public class DebuggerVisitor(Z80 cpu, IMemory memory, IBus bus, IOutput output) 
         return new Integer(Convert.ToInt32(hex, 16));
     }
 
-    public override Value? VisitBin(DebuggerParser.BinContext context)
+    public override Value VisitBin(DebuggerParser.BinContext context)
     {
         var bin = context.BIN().GetText()
             .Replace("b", string.Empty, StringComparison.OrdinalIgnoreCase);
@@ -31,10 +31,10 @@ public class DebuggerVisitor(Z80 cpu, IMemory memory, IBus bus, IOutput output) 
         return new Integer(Convert.ToInt32(bin, 2));
     }
 
-    public override Value? VisitReg(DebuggerParser.RegContext context) =>
+    public override Value VisitReg(DebuggerParser.RegContext context) =>
         new Register(context.REG().GetText());
 
-    public override Value? VisitAssign(DebuggerParser.AssignContext context)
+    public override Value VisitAssign(DebuggerParser.AssignContext context)
     {
         var register = context.REG();
         var expression = context.expression();
@@ -46,7 +46,7 @@ public class DebuggerVisitor(Z80 cpu, IMemory memory, IBus bus, IOutput output) 
         return new Success();
     }
 
-    public override Value? VisitPrintstmt(DebuggerParser.PrintstmtContext context)
+    public override Value VisitPrintstmt(DebuggerParser.PrintstmtContext context)
     {
         var expressions = context.expression();
 
@@ -55,7 +55,7 @@ public class DebuggerVisitor(Z80 cpu, IMemory memory, IBus bus, IOutput output) 
         return new Print(values);
     }
 
-    public override Value? VisitGotostmt(DebuggerParser.GotostmtContext context)
+    public override Value VisitGotostmt(DebuggerParser.GotostmtContext context)
     {
         var address = GetAddressValue(base.Visit(context.address));
 
@@ -64,14 +64,14 @@ public class DebuggerVisitor(Z80 cpu, IMemory memory, IBus bus, IOutput output) 
         return new GotoAction(address);
     }
 
-    public override Value? VisitListstmt(DebuggerParser.ListstmtContext context)
+    public override Value VisitListstmt(DebuggerParser.ListstmtContext context)
     {
         var address = context.address == null ? cpu.Registers.PC : GetAddressValue(base.Visit(context.address));
 
         return new ListAction(address);
     }
 
-    public override Value? VisitPokestmt(DebuggerParser.PokestmtContext context)
+    public override Value VisitPokestmt(DebuggerParser.PokestmtContext context)
     {
         var address = Validators.GetValidWordOrThrow(base.Visit(context.address));
         var value = Validators.GetValidByteOrThrow(base.Visit(context.value));
@@ -81,7 +81,7 @@ public class DebuggerVisitor(Z80 cpu, IMemory memory, IBus bus, IOutput output) 
         return new Success();
     }
 
-    public override Value? VisitPeekfunc(DebuggerParser.PeekfuncContext context)
+    public override Value VisitPeekfunc(DebuggerParser.PeekfuncContext context)
     {
         var address = GetAddressValue(base.Visit(context.address));
 
@@ -90,7 +90,7 @@ public class DebuggerVisitor(Z80 cpu, IMemory memory, IBus bus, IOutput output) 
         return new Integer(value, value.GetType());
     }
 
-    public override Value? VisitOutfunc(DebuggerParser.OutfuncContext context)
+    public override Value VisitOutfunc(DebuggerParser.OutfuncContext context)
     {
         var address = Validators.GetValidWordOrThrow(base.Visit(context.address));
         var value = Validators.GetValidByteOrThrow(base.Visit(context.value));
@@ -100,7 +100,7 @@ public class DebuggerVisitor(Z80 cpu, IMemory memory, IBus bus, IOutput output) 
         return new Success();
     }
 
-    public override Value? VisitInfunc(DebuggerParser.InfuncContext context)
+    public override Value VisitInfunc(DebuggerParser.InfuncContext context)
     {
         var address = GetAddressValue(base.Visit(context.address));
 
@@ -109,7 +109,7 @@ public class DebuggerVisitor(Z80 cpu, IMemory memory, IBus bus, IOutput output) 
         return new Integer(value, value.GetType());
     }
 
-    public override Value? VisitSavestmt(DebuggerParser.SavestmtContext context)
+    public override Value VisitSavestmt(DebuggerParser.SavestmtContext context)
     {
         var filename = context.filepath.Text.Substring(1, context.filepath.Text.Length - 2);
         var address = context.address == null ? (Word)0 : GetAddressValue(base.Visit(context.address));
