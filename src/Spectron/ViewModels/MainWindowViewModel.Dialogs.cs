@@ -9,7 +9,7 @@ namespace OldBit.Spectron.ViewModels;
 
 partial class MainWindowViewModel
 {
-    private async Task OpenPreferencesWindow()
+    public async Task OpenPreferencesWindow()
     {
         var resumeAfter = false;
 
@@ -28,6 +28,8 @@ partial class MainWindowViewModel
             await _preferencesService.SaveAsync(preferences);
 
             _preferences = preferences;
+
+            IsNativeMenuEnabled = _preferences.IsNativeMenuEnabled;
 
             Emulator?.IsUlaPlusEnabled = _preferences.IsUlaPlusEnabled;
             Emulator?.IsFloatingBusEnabled = _preferences.IsFloatingBusEnabled;

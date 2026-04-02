@@ -5,7 +5,7 @@ namespace OldBit.Spectron.ViewModels;
 public partial class TrainerItemPokeViewModel : ObservableObject
 {
     [ObservableProperty]
-    private byte? _customValue;
+    public partial byte? CustomValue { get; set; }
 
     public string Address { get; set; } = string.Empty;
 }

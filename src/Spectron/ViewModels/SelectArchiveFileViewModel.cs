@@ -10,7 +10,7 @@ namespace OldBit.Spectron.ViewModels;
 public partial class SelectArchiveFileViewModel(List<ArchiveEntry> fileNames) : ObservableObject
 {
     [ObservableProperty]
-    private ArchiveEntry? _selectedFile;
+    public partial ArchiveEntry? SelectedFile { get; set; }
 
     public List<ArchiveEntry> FileNames { get; } = fileNames;
 

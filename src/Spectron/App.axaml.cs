@@ -58,4 +58,6 @@ public class App : Application
         var aboutView = new AboutView();
         aboutView.ShowDialog(MainWindow);
     }
+
+    private void SettingsMenuItem_OnClick(object? sender, EventArgs e) => MainWindowViewModel?.OpenPreferencesWindow();
 }

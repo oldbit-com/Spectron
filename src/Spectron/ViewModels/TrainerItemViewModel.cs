@@ -7,7 +7,7 @@ namespace OldBit.Spectron.ViewModels;
 public partial class TrainerItemViewModel(Trainer trainer) : ObservableObject
 {
     [ObservableProperty]
-    private bool _isEnabled;
+    public partial bool IsEnabled { get; set; }
 
     public string Name { get; } = trainer.Name;
     public Trainer Trainer { get; } = trainer;

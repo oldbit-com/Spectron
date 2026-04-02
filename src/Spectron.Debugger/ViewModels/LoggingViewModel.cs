@@ -20,20 +20,18 @@ public partial class LoggingViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ClearLogFileCommand))]
-    private string _logFilePath = string.Empty;
+    public partial string LogFilePath { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(StartLoggingCommand))]
     [NotifyCanExecuteChangedFor(nameof(StopLoggingCommand))]
-    private bool _isLoggingRunning;
+    public partial bool IsLoggingRunning { get; set; }
 
     [ObservableProperty]
-    private bool _shouldLogTicks = true;
+    public partial bool ShouldLogTicks { get; set; } = true;
 
-    partial void OnShouldLogTicksChanged(bool value)
-    {
+    partial void OnShouldLogTicksChanged(bool value) =>
         _instructionLogger?.ShouldLogTicks = value;
-    }
 
     partial void OnLogFilePathChanged(string value) => OnPropertyChanged(nameof(CanClearLogFile));
 

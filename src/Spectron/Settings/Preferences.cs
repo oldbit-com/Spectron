@@ -1,3 +1,4 @@
+using System;
 using OldBit.Spectron.Debugger.Settings;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Rom;
@@ -9,6 +10,8 @@ namespace OldBit.Spectron.Settings;
 public class Preferences
 {
     public Theme Theme { get; init; } = Theme.Dark;
+
+    public bool IsNativeMenuEnabled { get; init; } = OperatingSystem.IsMacOS();
 
     public ResumeSettings Resume { get; init; } = new();
 

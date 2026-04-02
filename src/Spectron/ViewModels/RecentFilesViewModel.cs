@@ -51,6 +51,22 @@ public partial class RecentFilesViewModel(RecentFilesService recentFilesService)
         }
     }
 
+    public void Opening(NativeMenu recentMenu)
+    {
+        recentMenu.Items.Clear();
+
+        foreach (var file in _recentFilesSettings.Files)
+        {
+            var fileName = Path.GetFileName(file);
+
+            recentMenu.Items.Add(new NativeMenuItem(fileName)
+            {
+                Command = OpenRecentFileCommand,
+                CommandParameter = file
+            });
+        }
+    }
+
     public void Add(string filePath)
     {
         _recentFilesSettings.Files.Remove(filePath);

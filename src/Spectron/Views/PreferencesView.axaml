@@ -51,11 +51,13 @@
             <TabItem Header="General">
                 <Border Classes="Tab">
                     <StackPanel>
-                        <controls:HeaderSeparator Text="Theme"/>
+                        <controls:HeaderSeparator Text="Display"/>
                         <StackPanel Orientation="Horizontal">
-                            <RadioButton Content="Dark" IsChecked="{Binding Theme, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static theming:Theme.Dark}}"/>
-                            <RadioButton Content="Light" IsChecked="{Binding Theme, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static theming:Theme.Light}}" Margin="10 0 0 0"/>
+                            <RadioButton Content="Dark Theme" IsChecked="{Binding Theme, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static theming:Theme.Dark}}"/>
+                            <RadioButton Content="Light Theme" IsChecked="{Binding Theme, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static theming:Theme.Light}}" Margin="10 0 0 0"/>
                         </StackPanel>
+
+                        <CheckBox Content="Display native menu" ToolTip.Tip="Display menu on macOS rather than window based menu" Classes="Center" IsChecked="{Binding IsNativeMenuEnabled}" IsEnabled="{Binding IsNativeMenuSupported}"/>
 
                         <controls:HeaderSeparator Text="Startup"/>
                         <CheckBox x:Name="SaveState" Content="Save / Load state on exit" ToolTip.Tip="Saves emulator state as a snapshot on exit and loads it when application starts" Classes="Center" Margin="10 0 0 0" IsChecked="{Binding IsResumeEnabled}"/>

@@ -49,6 +49,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         _gamepadManager.ControllerChanged += GamepadManagerOnControllerChanged;
 
         Theme = preferences.Theme;
+        IsNativeMenuEnabled = preferences.IsNativeMenuEnabled;
 
         ComputerType = preferences.ComputerType;
         IsUlaPlusEnabled = preferences.IsUlaPlusEnabled;
@@ -166,6 +167,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         var preferences = new Preferences
         {
             Theme = Theme,
+            IsNativeMenuEnabled = IsNativeMenuEnabled,
             ComputerType = ComputerType,
             IsUlaPlusEnabled = IsUlaPlusEnabled,
             IsFloatingBusEnabled = IsFloatingBusEnabled,
@@ -557,160 +559,165 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
     public ObservableCollection<GamepadController> GamepadControllers { get; }
 
     [ObservableProperty]
-    private Theme _theme;
+    public partial Theme Theme { get; set; }
 
     [ObservableProperty]
-    private ComputerType _computerType;
+    public partial bool IsNativeMenuEnabled { get; set; }
+
+    public bool IsNativeMenuSupported => OperatingSystem.IsMacOS();
 
     [ObservableProperty]
-    private bool _isUlaPlusEnabled;
+    public partial ComputerType ComputerType { get; set; }
 
     [ObservableProperty]
-    private RomType _romType;
+    public partial bool IsUlaPlusEnabled { get; set; }
 
     [ObservableProperty]
-    private JoystickType _joystickType = JoystickType.None;
+    public partial RomType RomType { get; set; }
 
     [ObservableProperty]
-    private MouseType _mouseType = MouseType.None;
+    public partial JoystickType JoystickType { get; set; }
 
     [ObservableProperty]
-    private bool _emulateUsingKeyboard;
+    public partial MouseType MouseType { get; set; }
+
+    [ObservableProperty]
+    public partial bool EmulateUsingKeyboard { get; set; }
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [CustomValidation(typeof(PreferencesViewModel), nameof(ValidateKeyboardMapping))]
-    private Key _symbolShiftKey = Key.RightAlt;
+    public partial Key SymbolShiftKey { get; set; }
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [CustomValidation(typeof(PreferencesViewModel), nameof(ValidateKeyboardMapping))]
-    private Key _capsShiftKey = Key.LeftShift;
+    public partial Key CapsShiftKey { get; set; }
 
     [ObservableProperty]
-    private bool _shouldHandleExtendedKeys = true;
+    public partial bool ShouldHandleExtendedKeys { get; set; }
 
     [ObservableProperty]
-    private Key _fireKey = Key.Space;
+    public partial Key FireKey { get; set; }
 
     [ObservableProperty]
-    private Guid _gamepadControllerId = GamepadController.None.ControllerId;
+    public partial Guid GamepadControllerId { get; set; }
 
     [ObservableProperty]
-    private bool _isStandardMousePointerHidden;
+    public partial bool IsStandardMousePointerHidden { get; set; }
 
     [ObservableProperty]
-    private bool _isTimeMachineEnabled;
+    public partial bool IsTimeMachineEnabled { get; set; }
 
     [ObservableProperty]
-    private double _snapshotInterval;
+    public partial double SnapshotInterval { get; set; }
 
     [ObservableProperty]
-    private double _maxDuration;
+    public partial double MaxDuration { get; set; }
 
     [ObservableProperty]
-    private bool _isResumeEnabled;
+    public partial bool IsResumeEnabled { get; set; }
 
     [ObservableProperty]
-    private bool _shouldIncludeTapeInResume;
+    public partial bool ShouldIncludeTapeInResume { get; set; }
 
     [ObservableProperty]
-    private bool _shouldIncludeTimeMachineInResume;
+    public partial bool ShouldIncludeTimeMachineInResume { get; set; }
 
     [ObservableProperty]
-    private bool _isAutoPlayEnabled;
+    public partial bool IsAutoPlayEnabled { get; set; }
 
     [ObservableProperty]
-    private bool _isCustomLoaderDetectionEnabled;
+    public partial bool IsCustomLoaderDetectionEnabled { get; set; }
 
     [ObservableProperty]
-    private bool _isTapeSaveEnabled;
+    public partial bool IsTapeSaveEnabled { get; set; }
 
     [ObservableProperty]
-    private TapeSpeed _tapeSaveSpeed = TapeSpeed.Normal;
+    public partial TapeSpeed TapeSaveSpeed { get; set; }
 
     [ObservableProperty]
-    private TapeSpeed _tapeLoadSpeed = TapeSpeed.Normal;
+    public partial TapeSpeed TapeLoadSpeed { get; set; }
 
     [ObservableProperty]
-    private bool _isFloatingBusEnabled;
+    public partial bool IsFloatingBusEnabled { get; set; }
 
     [ObservableProperty]
-    private bool _isBeeperEnabled;
+    public partial bool IsBeeperEnabled { get; set; }
 
     [ObservableProperty]
-    private bool _isAyEnabled;
+    public partial bool IsAyEnabled { get; set; }
 
     [ObservableProperty]
-    private bool _isAySupportedStandardSpectrum;
+    public partial bool IsAySupportedStandardSpectrum { get; set; }
 
     [ObservableProperty]
-    private StereoMode _stereoMode;
+    public partial StereoMode StereoMode { get; set; }
 
     [ObservableProperty]
-    private BorderSize _recordingBorderSize = BorderSize.Medium;
+    public partial BorderSize RecordingBorderSize { get; set; } = BorderSize.Medium;
 
     [ObservableProperty]
-    private string _scalingAlgorithm = "neighbor";
+    public partial string ScalingAlgorithm { get; set; } = "neighbor";
 
     [ObservableProperty]
-    private int _scalingFactor = 2;
+    public partial int ScalingFactor { get; set; } = 2;
 
     [ObservableProperty]
-    private string _ffmpegPath = string.Empty;
+    public partial string FfmpegPath { get; set; } = string.Empty;
 
     [ObservableProperty()]
-    private string _ffmpegMessage = string.Empty;
+    public partial string FfmpegMessage { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private int _timeMachineCountdownSeconds = 3;
+    public partial int TimeMachineCountdownSeconds { get; set; }
 
     [ObservableProperty]
-    private NumberFormat _debuggerNumberFormat = NumberFormat.HexPrefixDollar;
+    public partial NumberFormat DebuggerNumberFormat { get; set; } = NumberFormat.HexPrefixDollar;
 
     [ObservableProperty]
-    private bool _isDivMmcEnabled;
+    public partial bool IsDivMmcEnabled { get; set; }
 
     [ObservableProperty]
-    private bool _isBeta128Enabled;
+    public partial bool IsBeta128Enabled { get; set; }
 
     [ObservableProperty]
-    private int _numberOfBeta128Drives = 2;
+    public partial int NumberOfBeta128Drives { get; set; } = 2;
 
     [ObservableProperty]
-    private bool _isDivMmcWriteEnabled;
-
-    [ObservableProperty]
-    [CustomValidation(typeof(PreferencesViewModel), nameof(ValidateCardImageFile))]
-    private string _divMmcCard0FileName = string.Empty;
+    public partial bool IsDivMmcWriteEnabled { get; set; }
 
     [ObservableProperty]
     [CustomValidation(typeof(PreferencesViewModel), nameof(ValidateCardImageFile))]
-    private string _divMmcCard1FileName = string.Empty;
+    public partial string DivMmcCard0FileName { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private bool _isDivMmcDriveWriteEnabled;
+    [CustomValidation(typeof(PreferencesViewModel), nameof(ValidateCardImageFile))]
+    public partial string DivMmcCard1FileName { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private bool _isZxPrinterEnabled;
+    public partial bool IsDivMmcDriveWriteEnabled { get; set; }
 
     [ObservableProperty]
-    private bool _isInterface1Enabled;
+    public partial bool IsZxPrinterEnabled { get; set; }
 
     [ObservableProperty]
-    private Interface1RomVersion _interface1RomVersion = Interface1RomVersion.V2;
+    public partial bool IsInterface1Enabled { get; set; }
 
     [ObservableProperty]
-    private int _numberOfMicrodrives = 2;
+    public partial Interface1RomVersion Interface1RomVersion { get; set; } = Interface1RomVersion.V2;
 
     [ObservableProperty]
-    private bool _isAutoLoadPokeFilesEnabled;
+    public partial int NumberOfMicrodrives { get; set; } = 2;
 
     [ObservableProperty]
-    private string _validationSummary = string.Empty;
+    public partial bool IsAutoLoadPokeFilesEnabled { get; set; }
 
     [ObservableProperty]
-    private bool _shouldAutoSuspendResume = true;
+    public partial string ValidationSummary { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool ShouldAutoSuspendResume { get; set; }
 
     public void Dispose()
     {

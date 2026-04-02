@@ -11,7 +11,8 @@ namespace OldBit.Spectron.ViewModels;
 partial class MainWindowViewModel
 {
     [ObservableProperty]
-    private bool _breakpointsEnabled;
+    public partial bool BreakpointsEnabled { get; set; }
+
     private BreakpointHitEventArgs? _breakpointHitEventArgs;
 
     private void OpenDebuggerWindow(BreakpointHitEventArgs? breakpointHitEventArgs = null)

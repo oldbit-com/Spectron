@@ -19,6 +19,7 @@
     <UserControl.Resources>
         <converters:ValueEqualityConverter x:Key="ValueEqualityConverter"/>
         <converters:GreaterThanConverter x:Key="GreaterThanConverter"/>
+        <converters:BoolToTextConverter x:Key="BoolToTextConverter"/>
     </UserControl.Resources>
 
     <UserControl.Styles>
@@ -37,7 +38,7 @@
             <MenuItem Header="Quick Save" InputGesture="F5" Command="{Binding QuickSaveCommand}"/>
             <MenuItem Header="Quick Load" InputGesture="F6" Command="{Binding QuickLoadCommand}"/>
             <MenuItem Header="-"/>
-            <MenuItem Header="Settings" InputGesture="{OnPlatform Ctrl+S, macOS=Cmd+OemComma}" Command="{Binding ShowPreferencesViewCommand}"/>
+            <MenuItem Header="Settings" InputGesture="{OnPlatform Ctrl+E, macOS=Cmd+OemComma}" Command="{Binding ShowPreferencesViewCommand}"/>
             <MenuItem Header="-"/>
             <MenuItem Header="Exit" Command="{Binding ExitApplicationCommand}" InputGesture="{OnPlatform Ctrl+F4, macOS=Cmd+Q}"/>
         </MenuItem>
@@ -75,6 +76,7 @@
                 <MenuItem Header="None" ToggleType="Radio" Command="{Binding ChangeMouseType}" CommandParameter="{x:Static mouse:MouseType.None}" IsChecked="{Binding MouseType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static mouse:MouseType.None}}"/>
                 <MenuItem Header="Kempston" ToggleType="Radio" Command="{Binding ChangeMouseType}" CommandParameter="{x:Static mouse:MouseType.Kempston}" IsChecked="{Binding MouseType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static mouse:MouseType.Kempston}}"/>
             </MenuItem>
+            <MenuItem Header="-"/>
             <MenuItem Header="Enable ULA+" ToggleType="CheckBox" Command="{Binding ToggleUlaPlus}" IsChecked="{Binding IsUlaPlusEnabled}"/>
         </MenuItem>
 
@@ -100,15 +102,14 @@
             <MenuItem Header="Mute" ToggleType="CheckBox" Command="{Binding ToggleMuteCommand}" IsChecked="{Binding IsAudioMuted}"/>
             <MenuItem Header="-"/>
             <MenuItem Header="NMI" Command="{Binding TriggerNmiCommand}"/>
-            <MenuItem Header="-"/>
             <MenuItem Header="Reset" InputGesture="Ctrl+F5" Command="{Binding ResetCommand}"/>
             <MenuItem Header="Hard Reset" Command="{Binding HardResetCommand}"/>
         </MenuItem>
 
         <MenuItem Header="_Tools" Padding="10 0 10 0" Focusable="False">
-            <MenuItem Header="Record Audio..." Command="{Binding StartAudioRecordingCommand}" IsEnabled="{Binding !RecordingStatus}"/>
-            <MenuItem Header="Record Video..." Command="{Binding StartVideoRecordingCommand}" IsEnabled="{Binding !RecordingStatus}"/>
-            <MenuItem Header="Stop Recording" Command="{Binding StopRecordingCommand}" IsEnabled="{Binding !!RecordingStatus}"/>
+            <MenuItem Header="Record Audio..." Command="{Binding StartAudioRecordingCommand}"/>
+            <MenuItem Header="Record Video..." Command="{Binding StartVideoRecordingCommand}"/>
+            <MenuItem Header="Stop Recording" Command="{Binding StopRecordingCommand}"/>
             <MenuItem Header="-"/>
             <MenuItem Header="Take Screenshot" Command="{Binding TakeScreenshotCommand}" InputGesture="{OnPlatform Ctrl+C, macOS=Cmd+C}"/>
             <MenuItem Header="View Screenshots" Command="{Binding ShowScreenshotViewerCommand}" InputGesture="{OnPlatform Ctrl+Shift+S, macOS=Cmd+Shift+S}"/>
@@ -125,16 +126,16 @@
             <MenuItem Header="Trainers" Command="{Binding ShowTrainersCommand}"/>
             <MenuItem Header="Print Output" Command="{Binding ShowPrintOutputCommand}"/>
             <MenuItem Header="-"/>
-            <MenuItem Header="Enter Full Screen" InputGesture="Shift+Alt+Enter" Command="{Binding ToggleFullScreenCommand}"/>
+            <MenuItem Header="{Binding IsFullScreen, Converter={StaticResource BoolToTextConverter}, ConverterParameter='Exit Full Screen|Full Screen'}" InputGesture="Shift+Alt+Enter" Command="{Binding ToggleFullScreenCommand}"/>
         </MenuItem>
 
-        <MenuItem Header="Fa_vourites" Padding="10 0 10 0" Focusable="False" SubmenuOpened="FavoritesSubmenuOpened">
-            <MenuItem Header="Edit Favourites" Command="{Binding ShowFavoritesViewCommand}"/>
+        <MenuItem Name="FavoritesMenu" Header="Fa_vourites" Padding="10 0 10 0" Focusable="False">
+            <MenuItem Header="Edit..." Command="{Binding ShowFavoritesViewCommand}"/>
         </MenuItem>
 
         <MenuItem Header="Ta_pe" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="New" Command="{Binding TapeMenuViewModel.NewCommand}"/>
-            <MenuItem Header="Insert..." InputGesture="Cmd+T" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
+            <MenuItem Header="Insert..."  InputGesture="{OnPlatform Ctrl+T, macOS=Cmd+T}" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
             <MenuItem Header="Save..." Command="{Binding TapeMenuViewModel.SaveCommand}"/>
             <MenuItem Header="-"/>
             <MenuItem Header="Play" Command="{Binding TapeMenuViewModel.PlayCommand}"/>

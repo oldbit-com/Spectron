@@ -24,6 +24,8 @@ public partial class MainMenu : UserControl
         }
 
         _viewModel = viewModel;
+
+        _viewModel.FavoritesViewModel.WindowFavoritesMenu = FavoritesMenu;
     }
 
     private void OnLostFocus(object? sender, RoutedEventArgs e)
@@ -58,15 +60,5 @@ public partial class MainMenu : UserControl
         }
 
         _viewModel?.RecentFilesViewModel.Opening(menuItem.Items);
-    }
-
-    private void FavoritesSubmenuOpened(object? sender, RoutedEventArgs e)
-    {
-        if (sender is not MenuItem menuItem || !ReferenceEquals(sender, e.Source))
-        {
-            return;
-        }
-
-        _viewModel?.FavoritesViewModel.Opening(menuItem.Items);
     }
 }

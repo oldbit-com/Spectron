@@ -11,31 +11,31 @@ namespace OldBit.Spectron.ViewModels;
 public partial class FavoriteSettingsViewModel : ObservableObject
 {
     [ObservableProperty]
-    private NameValuePair<ComputerType?> _computerType;
+    public partial NameValuePair<ComputerType?> ComputerType { get; set; }
 
     [ObservableProperty]
-    private NameValuePair<JoystickType?> _joystickType;
+    public partial NameValuePair<JoystickType?> JoystickType { get; set; }
 
     [ObservableProperty]
-    private NameValuePair<MouseType?> _mouseType;
+    public partial NameValuePair<MouseType?> MouseType { get; set; }
 
     [ObservableProperty]
-    private NameValuePair<TapeSpeed?> _tapeLoadSpeed;
+    public partial NameValuePair<TapeSpeed?> TapeLoadSpeed { get; set; }
 
     [ObservableProperty]
-    private bool? _isUlaPlusEnabled;
+    public partial bool? IsUlaPlusEnabled { get; set; }
 
     [ObservableProperty]
-    private bool? _isAyEnabled;
+    public partial bool? IsAyEnabled { get; set; }
 
     [ObservableProperty]
-    private bool? _isInterface1Enabled;
+    public partial bool? IsInterface1Enabled { get; set; }
 
     [ObservableProperty]
-    private bool? _isBeta128Enabled;
+    public partial bool? IsBeta128Enabled { get; set; }
 
     [ObservableProperty]
-    private bool? _isDivMmcEnabled;
+    public partial bool? IsDivMmcEnabled { get; set; }
 
     public FavoriteSettingsViewModel(
         ComputerType? computerType = null,

@@ -31,16 +31,16 @@ public partial class TimeMachineViewModel : ObservableObject, IDisposable
     private const int PreviewWidth = 256;
 
     [ObservableProperty]
-    private int _entriesCount;
+    public partial int EntriesCount { get; set; }
 
     [ObservableProperty]
-    private double _currentEntryIndex;
+    public partial double CurrentEntryIndex { get; set; }
 
     [ObservableProperty]
-    private WriteableBitmap _screenPreview;
+    public partial WriteableBitmap ScreenPreview { get; set; }
 
     [ObservableProperty]
-    private Brush _screenBorderBrush;
+    public partial Brush ScreenBorderBrush { get; set; }
 
     public Control? PreviewControl { get; set; }
     public Action Close { get; set; } = () => { };
@@ -55,13 +55,11 @@ public partial class TimeMachineViewModel : ObservableObject, IDisposable
         _joystickManager = joystickManager;
         _commandManager = commandManager;
         _logger = logger;
-
-        _screenPreview = new WriteableBitmap(
+        ScreenPreview = new WriteableBitmap(
             new PixelSize(PreviewWidth, PreviewHeight),
             new Vector(96, 96),
             PixelFormats.Rgba8888);
-
-        _screenBorderBrush = new SolidColorBrush(Colors.Black);
+        ScreenBorderBrush = new SolidColorBrush(Colors.Black);
 
         EntriesCount = _timeMachine.Entries.Count - 1;
         CurrentEntryIndex = EntriesCount;

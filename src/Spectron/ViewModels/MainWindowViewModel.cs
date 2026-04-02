@@ -96,76 +96,92 @@ public partial class MainWindowViewModel : ObservableObject
 
     #region Observable properties
     [ObservableProperty]
-    private BorderSize _borderSize = BorderSize.Medium;
+    public partial bool IsNativeMenuEnabled { get; set; }
 
     [ObservableProperty]
-    private RomType _romType = RomType.Original;
+    public partial bool IsMenuVisible { get; set; } = true;
 
     [ObservableProperty]
-    private ComputerType _computerType = ComputerType.Spectrum48K;
+    public partial BorderSize BorderSize { get; set; } = BorderSize.Medium;
 
     [ObservableProperty]
-    private JoystickType _joystickType = JoystickType.None;
+    public partial RomType RomType { get; set; } = RomType.Original;
 
     [ObservableProperty]
-    private MouseType _mouseType = MouseType.None;
+    public partial ComputerType ComputerType { get; set; } = ComputerType.Spectrum48K;
 
     [ObservableProperty]
-    private bool _isUlaPlusEnabled;
+    public partial JoystickType JoystickType { get; set; } = JoystickType.None;
 
     [ObservableProperty]
-    private WriteableBitmap? _spectrumScreen;
+    public partial MouseType MouseType { get; set; } = MouseType.None;
 
     [ObservableProperty]
-    private bool _isPaused;
+    public partial bool IsUlaPlusEnabled { get; set; }
 
     [ObservableProperty]
-    private bool _isPauseOverlayVisible;
+    public partial WriteableBitmap? SpectrumScreen { get; set; }
 
     [ObservableProperty]
-    private bool _isTimeMachineCountdownVisible;
+    public partial bool IsPaused { get; set; }
 
     [ObservableProperty]
-    private string _emulationSpeed = "100";
+    public partial bool IsPauseOverlayVisible { get; set; }
 
     [ObservableProperty]
-    private WindowState _windowState = WindowState.Normal;
+    public partial bool IsTimeMachineCountdownVisible { get; set; }
 
     [ObservableProperty]
-    private bool _isMenuVisible = true;
+    public partial string EmulationSpeed { get; set; } = "100";
 
     [ObservableProperty]
-    private TapeSpeed _tapeLoadSpeed = TapeSpeed.Normal;
+    [NotifyPropertyChangedFor(nameof(IsFullScreen))]
+    public partial WindowState WindowState { get; set; } = WindowState.Normal;
+
+    public bool IsFullScreen => WindowState == WindowState.FullScreen;
 
     [ObservableProperty]
-    private bool _isAudioMuted;
+    public partial TapeSpeed TapeLoadSpeed { get; set; } = TapeSpeed.Normal;
 
     [ObservableProperty]
-    private bool _isTimeMachineEnabled;
+    public partial bool IsAudioMuted { get; set; }
 
     [ObservableProperty]
-    private string _title = DefaultTitle;
+    [NotifyCanExecuteChangedFor(nameof(ShowTimeMachineViewCommand))]
+    public partial bool IsTimeMachineEnabled { get; set; }
 
     [ObservableProperty]
-    private RecordingStatus _recordingStatus = RecordingStatus.None;
+    public partial string Title { get; set; } = DefaultTitle;
 
     [ObservableProperty]
-    private int _timeMachineCountdownSeconds;
+    [NotifyPropertyChangedFor(nameof(CanStartRecording))]
+    [NotifyPropertyChangedFor(nameof(CanStopRecording))]
+    [NotifyCanExecuteChangedFor(nameof(StartAudioRecordingCommand))]
+    [NotifyCanExecuteChangedFor(nameof(StartVideoRecordingCommand))]
+    [NotifyCanExecuteChangedFor(nameof(StopRecordingCommand))]
+    public partial RecordingStatus RecordingStatus { get; set; } = RecordingStatus.None;
+
+    public bool CanStartRecording => RecordingStatus == RecordingStatus.None;
+
+    public bool CanStopRecording => RecordingStatus != RecordingStatus.None;
 
     [ObservableProperty]
-    private Cursor _mouseCursor = Cursor.Default;
+    public partial int TimeMachineCountdownSeconds { get; set; }
 
     [ObservableProperty]
-    private bool _isInterface1Enabled;
+    public partial Cursor MouseCursor { get; set; } = Cursor.Default;
 
     [ObservableProperty]
-    private int _numberOfMicrodrives;
+    public partial bool IsInterface1Enabled { get; set; }
 
     [ObservableProperty]
-    private bool _isBeta128Enabled;
+    public partial int NumberOfMicrodrives { get; set; }
 
     [ObservableProperty]
-    private int _numberOfBeta128Drives;
+    public partial bool IsBeta128Enabled { get; set; }
+
+    [ObservableProperty]
+    public partial int NumberOfBeta128Drives { get; set; }
     #endregion
 
     #region Relay commands
@@ -242,13 +258,13 @@ public partial class MainWindowViewModel : ObservableObject
     private void HardReset() => HandleMachineReset(hardReset: true);
 
     // Tools
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanStartRecording))]
     private async Task StartAudioRecording() => await HandleStartAudioRecordingAsync();
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanStartRecording))]
     private async Task StartVideoRecording() => await HandleStartVideoRecordingAsync();
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanStopRecording))]
     private void StopRecording() => HandleStopRecording();
 
     [RelayCommand]

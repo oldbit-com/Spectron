@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using OldBit.Spectron.Controls;
 using OldBit.Spectron.Debugger.Views;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation.Files;

@@ -232,6 +232,7 @@ partial class MainWindowViewModel
             }
         }
 
+        EmulationSpeed = emulationSpeed;
         StatusBarViewModel.Speed = emulationSpeed;
         Emulator?.SetEmulationSpeed(emulationSpeedValue);
     }
