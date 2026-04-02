@@ -2,7 +2,7 @@ namespace OldBit.Spectron.Emulation.Files;
 
 public static class FileTypeResolver
 {
-    public static FileType FromPath(string fileName) => Path.GetExtension(fileName).ToLowerInvariant() switch
+    public static FileType FromPath(string filePath) => Path.GetExtension(filePath).ToLowerInvariant() switch
     {
         ".sna" => FileType.Sna,
         ".szx" => FileType.Szx,
