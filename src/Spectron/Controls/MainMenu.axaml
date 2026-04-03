@@ -20,6 +20,7 @@
         <converters:ValueEqualityConverter x:Key="ValueEqualityConverter"/>
         <converters:GreaterThanConverter x:Key="GreaterThanConverter"/>
         <converters:BoolToTextConverter x:Key="BoolToTextConverter"/>
+        <converters:EnumHasValueConverter x:Key="EnumHasValueConverter"/>
     </UserControl.Resources>
 
     <UserControl.Styles>
@@ -123,6 +124,11 @@
                 <MenuItem Header="Large" ToggleType="Radio" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static screen:BorderSize.Large}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static screen:BorderSize.Large}}"/>
                 <MenuItem Header="Full" ToggleType="Radio" Command="{Binding ChangeBorderSizeCommand}" CommandParameter="{x:Static screen:BorderSize.Full}" IsChecked="{Binding BorderSize, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static screen:BorderSize.Full}}"/>
             </MenuItem>
+            <MenuItem Header="Effects">
+                <MenuItem Header="Blur" ToggleType="CheckBox" Command="{Binding ChangeScreenEffectCommand}" CommandParameter="{x:Static screen:ScreenEffect.Blur}" IsChecked="{Binding ScreenEffect, Converter={StaticResource EnumHasValueConverter}, ConverterParameter={x:Static screen:ScreenEffect.Blur}}"/>
+                <MenuItem Header="CRT" ToggleType="CheckBox" Command="{Binding ChangeScreenEffectCommand}" CommandParameter="{x:Static screen:ScreenEffect.Crt}" IsChecked="{Binding ScreenEffect, Converter={StaticResource EnumHasValueConverter}, ConverterParameter={x:Static screen:ScreenEffect.Crt}}"/>
+            </MenuItem>
+            <MenuItem Header="-"/>
             <MenuItem Header="Trainers" Command="{Binding ShowTrainersCommand}"/>
             <MenuItem Header="Print Output" Command="{Binding ShowPrintOutputCommand}"/>
             <MenuItem Header="-"/>

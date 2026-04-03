@@ -17,6 +17,18 @@ partial class MainWindowViewModel
         SpectrumScreen = _frameBufferConverter.ScreenBitmap;
     }
 
+    private void HandleChangeScreenEffect(ScreenEffect screenEffect)
+    {
+        if (ScreenEffect.HasFlag(screenEffect))
+        {
+            ScreenEffect &= ~screenEffect;
+        }
+        else
+        {
+            ScreenEffect |= screenEffect;
+        }
+    }
+
     private void HandleToggleFullScreen() =>
         WindowState = WindowState == WindowState.FullScreen ? WindowState.Normal : WindowState.FullScreen;
 

@@ -23,6 +23,8 @@ public class Preferences
 
     public BorderSize BorderSize { get; set; } = BorderSize.Medium;
 
+    public ScreenEffect ScreenEffect { get; set; } = ScreenEffect.None;
+
     public ComputerType ComputerType { get; init; } = ComputerType.Spectrum48K;
 
     public RomType RomType { get; init; } = RomType.Original;

@@ -27,6 +27,7 @@ public sealed class NativeMainMenu
     private readonly Dictionary<MouseType, NativeMenuItem> _mouseTypes = new();
     private readonly Dictionary<string, NativeMenuItem> _emulationSpeeds = new();
     private readonly Dictionary<BorderSize, NativeMenuItem> _borderSizes = new();
+    private readonly Dictionary<ScreenEffect, NativeMenuItem> _screenEffects = new();
     private readonly Dictionary<TapeSpeed, NativeMenuItem> _tapeLoadingSpeeds = new();
     private readonly Dictionary<MicrodriveId, NativeMenuItem> _microdrives = new();
     private readonly Dictionary<DriveId, NativeMenuItem> _diskDrives = new();
@@ -49,6 +50,7 @@ public sealed class NativeMainMenu
         CreateMouseTypeMenu();
         CreateSpeedOptionMenu();
         CreateBorderSizeMenu();
+        CreateScreenEffectMenu();
         CreateTapeLoadingSpeedMenu();
 
         _viewModel.PropertyChanged += (_, e) => ViewModelPropertyChanged(e.PropertyName);
@@ -141,6 +143,14 @@ public sealed class NativeMainMenu
                     foreach (var border in _borderSizes.Keys)
                     {
                         _borderSizes[border].IsChecked = _viewModel.BorderSize == border;
+                    }
+
+                    break;
+
+                case nameof(MainWindowViewModel.ScreenEffect):
+                    foreach (var screenEffect in _screenEffects.Keys)
+                    {
+                        _screenEffects[screenEffect].IsChecked = _viewModel.ScreenEffect.HasFlag(screenEffect);
                     }
 
                     break;
@@ -459,6 +469,17 @@ public sealed class NativeMainMenu
                     _borderSizes[BorderSize.Full],
                 ]
             },
+
+            new NativeMenuItem("Effect")
+            {
+                Menu =
+                [
+                    _screenEffects[ScreenEffect.Blur],
+                    _screenEffects[ScreenEffect.Crt],
+                ]
+            },
+
+            new NativeMenuItemSeparator(),
 
             new NativeMenuItem("Trainers")
             {
@@ -918,6 +939,27 @@ public sealed class NativeMainMenu
                 Command = _viewModel.ChangeBorderSizeCommand,
                 CommandParameter = border.Size,
                 IsChecked = _viewModel.BorderSize == border.Size,
+                IsEnabled = true
+            };
+        }
+    }
+
+    private void CreateScreenEffectMenu()
+    {
+        var effects = new[]
+        {
+            new { Effect = ScreenEffect.Blur, DisplayName = "Blur" },
+            new { Effect = ScreenEffect.Crt, DisplayName = "CRT" },
+        };
+
+        foreach (var effect in effects)
+        {
+            _screenEffects[effect.Effect] = new NativeMenuItem(effect.DisplayName)
+            {
+                ToggleType = NativeMenuItemToggleType.CheckBox,
+                Command = _viewModel.ChangeScreenEffectCommand,
+                CommandParameter = effect.Effect,
+                IsChecked = _viewModel.ScreenEffect.HasFlag(effect.Effect),
                 IsEnabled = true
             };
         }

@@ -6,6 +6,7 @@
         xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
         xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
         xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
+        xmlns:screen="clr-namespace:OldBit.Spectron.Screen"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.MainWindow"
         x:DataType="viewModels:MainWindowViewModel"
@@ -35,6 +36,8 @@
 
     <Window.Resources>
         <converters:ValueInequalityConverter x:Key="ValueInequalityConverter"/>
+        <converters:ValueEqualityConverter x:Key="ValueEqualityConverter"/>
+        <converters:EnumHasValueConverter x:Key="EnumHasValueConverter"/>
     </Window.Resources>
 
     <Window.KeyBindings>
@@ -91,8 +94,14 @@
                                 PointerMoved="Screen_OnPointerMoved"
                                 PointerPressed="Screen_OnPointerPressed"
                                 PointerReleased="Screen_OnPointerReleased"
-                                Classes.IsPaused="{Binding IsPauseOverlayVisible}">
+                                Classes.IsPaused="{Binding IsPauseOverlayVisible}"
+                                Classes.Blur="{Binding ScreenEffect, Converter={StaticResource EnumHasValueConverter}, ConverterParameter={x:Static screen:ScreenEffect.Blur}}">
                                 <Image.Styles>
+                                    <Style Selector="Image.Blur">
+                                        <Setter Property="Effect">
+                                            <BlurEffect Radius="3"/>
+                                        </Setter>
+                                    </Style>
                                     <Style Selector="Image.IsPaused">
                                         <Setter Property="Effect">
                                             <BlurEffect Radius="7"/>
@@ -100,6 +109,18 @@
                                     </Style>
                                 </Image.Styles>
                             </Image>
+
+                            <Border IsVisible="{Binding ScreenEffect, Converter={StaticResource EnumHasValueConverter}, ConverterParameter={x:Static screen:ScreenEffect.Crt}}">
+                                <Border.Background>
+                                    <VisualBrush TileMode="Tile" SourceRect="0,0,1,2" DestinationRect="0,0,1,2">
+                                        <VisualBrush.Visual>
+                                            <Canvas Width="1" Height="2">
+                                                <Rectangle Width="1" Height="1" Fill="Black" Opacity=".3"/>
+                                            </Canvas>
+                                        </VisualBrush.Visual>
+                                    </VisualBrush>
+                                </Border.Background>
+                            </Border>
                         </Grid>
                     </Border>
 
