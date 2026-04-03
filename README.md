@@ -72,8 +72,9 @@ Grab the latest code from the repository, build and run the emulator:
 
 ```shell
 dotnet build -c Release
-dotnet run --project ./src/Spectron   
+dotnet run --project ./src/Spectron
 ```
+You can also run the emulator from the [Releases](https://github.com/oldbit-com/Spectron/releases) page.
 
 ### Command line options
 Command lines allow overriding most of the default options and loading a specified file. Full list of available 
