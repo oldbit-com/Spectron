@@ -105,6 +105,9 @@ public partial class MainWindowViewModel : ObservableObject
     public partial BorderSize BorderSize { get; set; } = BorderSize.Medium;
 
     [ObservableProperty]
+    public partial ScreenEffect ScreenEffect { get; set; } = ScreenEffect.None;
+
+    [ObservableProperty]
     public partial RomType RomType { get; set; } = RomType.Original;
 
     [ObservableProperty]
@@ -297,6 +300,9 @@ public partial class MainWindowViewModel : ObservableObject
 
     [RelayCommand]
     private void ChangeBorderSize(BorderSize borderSize) => HandleChangeBorderSize(borderSize);
+
+    [RelayCommand]
+    private void ChangeScreenEffect(ScreenEffect screenEffect) => HandleChangeScreenEffect(screenEffect);
 
     [RelayCommand]
     private void ShowTrainers() => OpenTrainersWindow();

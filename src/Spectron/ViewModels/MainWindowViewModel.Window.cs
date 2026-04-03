@@ -61,6 +61,7 @@ partial class MainWindowViewModel
 
         ConfigureShiftKeys(_preferences.Keyboard);
         HandleChangeBorderSize(CommandLineArgs?.BorderSize ?? _preferences.BorderSize);
+        HandleChangeScreenEffect(_preferences.ScreenEffect);
 
         TapeLoadSpeed = CommandLineArgs?.TapeLoadSpeed ?? _preferences.Tape.LoadSpeed;
 
@@ -191,6 +192,7 @@ partial class MainWindowViewModel
 
         _preferences.Audio.IsMuted = IsAudioMuted;
         _preferences.BorderSize = BorderSize;
+        _preferences.ScreenEffect = ScreenEffect;
 
         await Task.WhenAll(
             _preferencesService.SaveAsync(_preferences),
