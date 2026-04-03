@@ -55,7 +55,7 @@ partial class MainWindowViewModel
 
         emulator.ConfigureAudio(_preferences.Audio, favorite);
 
-       _mouseHelper = new MouseHelper(emulator.MouseManager);
+       _mouseInputHandler = new MouseInputHandler(emulator.MouseManager);
     }
 
     private bool CreateEmulator(StateSnapshot snapshot, bool shouldResume = true)
@@ -65,7 +65,7 @@ partial class MainWindowViewModel
         try
         {
             var emulator = _stateManager.CreateEmulator(snapshot);
-            _mouseHelper = new MouseHelper(emulator.MouseManager);
+            _mouseInputHandler = new MouseInputHandler(emulator.MouseManager);
 
             Initialize(emulator, shouldResume);
 

@@ -16,6 +16,7 @@ internal sealed class WinActivateAppHook : IDisposable
 {
     private IntPtr _hwnd;
     private IntPtr _oldWndProc;
+    // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
     private WndProcDelegate? _wndProcDelegate; // root delegate to prevent GC
 
     private delegate IntPtr WndProcDelegate(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);

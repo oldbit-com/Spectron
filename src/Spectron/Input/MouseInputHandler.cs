@@ -7,7 +7,7 @@ using OldBit.Spectron.Screen;
 
 namespace OldBit.Spectron.Input;
 
-public sealed class MouseHelper(MouseManager mouseManager)
+public sealed class MouseInputHandler(MouseManager mouseManager)
 {
     public void MouseMoved(BorderSize borderSize, Point position, Rect bounds)
     {

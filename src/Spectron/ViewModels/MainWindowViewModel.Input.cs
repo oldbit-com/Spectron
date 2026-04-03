@@ -177,17 +177,17 @@ partial class MainWindowViewModel
         }
 
         Emulator.MouseManager.Configure(value);
-        _mouseHelper = new MouseHelper(Emulator.MouseManager);
+        _mouseInputHandler = new MouseInputHandler(Emulator.MouseManager);
     }
 
     private bool IsKeyboardJoystickEmulationEnabled =>
         JoystickType != JoystickType.None && _preferences.Joystick.EmulateUsingKeyboard;
 
     public void HandleMouseMoved(Point position, Rect bounds) =>
-        _mouseHelper?.MouseMoved(BorderSize, position, bounds);
+        _mouseInputHandler?.MouseMoved(BorderSize, position, bounds);
 
     public void HandleMouseButtonStateChanged(PointerPoint point, Rect bounds) =>
-        _mouseHelper?.ButtonsStateChanged(point);
+        _mouseInputHandler?.ButtonsStateChanged(point);
 
     private void ConfigureMouseCursor() => MouseCursor = MouseType != MouseType.None && _preferences.Mouse.IsStandardMousePointerHidden
         ? Cursor.Parse("None")

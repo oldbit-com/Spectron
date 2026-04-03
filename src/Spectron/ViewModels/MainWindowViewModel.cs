@@ -78,7 +78,7 @@ public partial class MainWindowViewModel : ObservableObject
     private bool _isTimeMachineOpen;
     private DebuggerViewModel? _debuggerViewModel;
     private PokeFile? _pokeFile;
-    private MouseHelper? _mouseHelper;
+    private MouseInputHandler? _mouseInputHandler;
     private BreakpointHandler? _breakpointHandler;
 
     public Control ScreenControl { get; set; } = null!;
