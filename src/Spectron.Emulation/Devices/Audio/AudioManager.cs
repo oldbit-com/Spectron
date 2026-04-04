@@ -1,6 +1,7 @@
 using OldBit.Beep;
 using OldBit.Spectron.Emulation.Devices.Audio.AY;
 using OldBit.Spectron.Emulation.Devices.Audio.Beeper;
+using OldBit.Spectron.Emulation.Devices.Timex;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Z80Cpu;
 
@@ -24,7 +25,7 @@ public sealed class AudioManager
     private bool _isAudioPlayerRunning;
 
     internal BeeperDevice Beeper { get; }
-    internal AyDevice Ay { get; } = new();
+    internal AyDevice Ay { get; }
 
     public StereoMode StereoMode
     {
@@ -82,6 +83,8 @@ public sealed class AudioManager
 
     internal AudioManager(Clock clock, CassettePlayer? cassettePlayer, HardwareSettings hardware)
     {
+        Ay = hardware.ComputerType == ComputerType.Timex2048 ? new AyTimexDevice() : new AyDevice();
+
         IsAySupported = hardware.HasAyChip;
 
         var statesPerSample = (double)hardware.TicksPerFrame / SamplesPerFrame;

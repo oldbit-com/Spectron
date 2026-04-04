@@ -2,7 +2,7 @@ using static OldBit.Spectron.Emulation.Devices.Audio.AY.Registers;
 
 namespace OldBit.Spectron.Emulation.Devices.Audio.AY;
 
-internal sealed class AyDevice : IDevice
+internal class AyDevice : IDevice
 {
     private const int MaxAmplitude = 10900;
 
@@ -172,8 +172,8 @@ internal sealed class AyDevice : IDevice
     }
 
     // Register port 0xFFFD is decoded as: A15=1,A14=1 & A1=0
-    private static bool IsRegisterPort(Word address) => (address & 0xC002) == 0xC000;
+    protected virtual bool IsRegisterPort(Word address) => (address & 0xC002) == 0xC000;
 
     // Data port 0xBFFD is decoded as: A15=1 & A1=0
-    private static bool IsDataPort(Word address) => (address & 0x8002) == 0x8000;
+    protected virtual bool IsDataPort(Word address) => (address & 0x8002) == 0x8000;
 }
