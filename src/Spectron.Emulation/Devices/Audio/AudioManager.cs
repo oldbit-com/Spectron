@@ -81,7 +81,7 @@ public sealed class AudioManager
 
     public bool IsAySupportedStandardSpectrum { get; set; } = true;
 
-    internal AudioManager(Clock clock, CassettePlayer? cassettePlayer, HardwareSettings hardware)
+    internal AudioManager(Clock clock, CassettePlayer? cassettePlayer, HardwareSettings hardware, Func<Word, bool> isUlaPort)
     {
         Ay = hardware.ComputerType == ComputerType.Timex2048 ? new AyTimexDevice() : new AyDevice();
 
@@ -91,7 +91,7 @@ public sealed class AudioManager
 
         _beeperAudio = new BeeperAudio(clock, statesPerSample, hardware.ClockMhz);
 
-        Beeper = new BeeperDevice(cassettePlayer)
+        Beeper = new BeeperDevice(cassettePlayer, isUlaPort)
         {
             OnUpdateBeeper = _beeperAudio.Update
         };

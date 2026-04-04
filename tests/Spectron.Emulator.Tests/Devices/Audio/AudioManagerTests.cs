@@ -10,7 +10,7 @@ public class AudioManagerTests
     public void AudioManager_ShouldCreateCorrectly()
     {
         var clock = new Clock();
-        var audionManager = new AudioManager(clock, null, Hardware.Spectrum128K);
+        var audionManager = new AudioManager(clock, null, Hardware.Spectrum128K, port => (port & 0x01) == 0);
 
         audionManager.IsAySupported.ShouldBeTrue();
         audionManager.StereoMode.ShouldBe(StereoMode.Mono);

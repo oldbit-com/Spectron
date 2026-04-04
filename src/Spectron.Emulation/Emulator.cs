@@ -13,6 +13,7 @@ using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Devices.Printer;
+using OldBit.Spectron.Emulation.Devices.Timex;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Snapshot;
@@ -32,7 +33,8 @@ public sealed class Emulator
     private readonly ILogger _logger;
     private readonly SpectrumBus _spectrumBus;
     private readonly EmulatorTimer _emulationTimer;
-    private readonly IEmulatorMemory _memory;
+    private readonly FloatingBus _floatingBus;
+    private readonly Ula _ula;
 
     private bool _isDebuggerResume;
     private bool _invalidateScreen;
@@ -40,7 +42,6 @@ public sealed class Emulator
     private bool _isNmiRequested;
     private bool _isDebuggerBreak;
     private long _ticksSinceReset;
-    private FloatingBus _floatingBus = null!;
 
     public delegate void FrameEvent(FrameBuffer frameBuffer, AudioBuffer audioBuffer);
     public event FrameEvent? FrameCompleted;
@@ -72,7 +73,7 @@ public sealed class Emulator
     public RomType RomType { get; }
 
     public Z80 Cpu { get; }
-    public IEmulatorMemory Memory => _memory;
+    public IEmulatorMemory Memory { get; }
     public IBus Bus => _spectrumBus;
     public DivMmcDevice DivMmc { get; }
     public Beta128Device Beta128 { get; }
@@ -108,7 +109,7 @@ public sealed class Emulator
         GamepadManager = gamepadManager;
         ComputerType = emulatorArgs.ComputerType;
         RomType = emulatorArgs.RomType;
-        _memory = emulatorArgs.Memory;
+        Memory = emulatorArgs.Memory;
 
         UlaPlus = new UlaPlus();
         _spectrumBus = new SpectrumBus();
@@ -127,15 +128,21 @@ public sealed class Emulator
         KeyboardState.Reset();
         TapeManager.Attach(Cpu, Memory, hardware);
 
-        AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware);
+        _ula = hardware.ComputerType == ComputerType.Timex2048 ?
+            new UlaTimex(KeyboardState, ScreenBuffer, Cpu, TapeManager) :
+            new Ula(KeyboardState, ScreenBuffer, Cpu, TapeManager);
 
-        DivMmc = new DivMmcDevice(Cpu, _memory, logger);
-        Beta128 = new Beta128Device(Cpu, _hardware.ClockMhz, _memory, ComputerType, diskDriveManager);
-        Interface1 = microdriveManager.CreateDevice(Cpu, _memory);
+        _floatingBus = new FloatingBus(_hardware, Memory, Cpu.Clock, _ula.IsUlaPort);
+
+        AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware, _ula.IsUlaPort);
+
+        DivMmc = new DivMmcDevice(Cpu, Memory, logger);
+        Beta128 = new Beta128Device(Cpu, _hardware.ClockMhz, Memory, ComputerType, diskDriveManager);
+        Interface1 = microdriveManager.CreateDevice(Cpu, Memory);
         Printer = new ZxPrinter();
 
-        SetupUlaAndDevices();
-        SetupEventHandlers();
+        AddDevices();
+        AddEventHandlers();
 
         _emulationTimer = new EmulatorTimer();
         _emulationTimer.Elapsed += OnTimerElapsed;
@@ -191,7 +198,7 @@ public sealed class Emulator
         _ticksSinceReset = 0;
 
         AudioManager.ResetAudio();
-        _memory.Reset();
+        Memory.Reset();
         Cpu.Reset();
         ScreenBuffer.Reset();
         UlaPlus.Reset();
@@ -232,9 +239,9 @@ public sealed class Emulator
         }
     }
 
-    private void SetupEventHandlers()
+    private void AddEventHandlers()
     {
-        _memory.MemoryUpdated += (address, _) =>
+        Memory.MemoryUpdated += (address, _) =>
         {
             if (address < 0x5B00)
             {
@@ -247,13 +254,11 @@ public sealed class Emulator
         Beta128.DiskActivity += _ => DiskDriveManager.OnDiskActivity();
     }
 
-    private void SetupUlaAndDevices()
+    private void AddDevices()
     {
-        var ula = new Ula(KeyboardState, ScreenBuffer, Cpu, TapeManager);
-
-        _spectrumBus.AddDevice(ula);
+        _spectrumBus.AddDevice(_ula);
         _spectrumBus.AddDevice(UlaPlus);
-        _spectrumBus.AddDevice(_memory);
+        _spectrumBus.AddDevice(Memory);
         _spectrumBus.AddDevice(AudioManager.Beeper);
         _spectrumBus.AddDevice(AudioManager.Ay);
         _spectrumBus.AddDevice(Printer);
@@ -261,8 +266,6 @@ public sealed class Emulator
         _spectrumBus.AddDevice(DivMmc);
         _spectrumBus.AddDevice(Beta128);
         _spectrumBus.AddDevice(new RtcDevice(DivMmc));
-
-        _floatingBus = new FloatingBus(_hardware, Memory, Cpu.Clock);
         _spectrumBus.AddDevice(_floatingBus);
 
         Cpu.AddBus(_spectrumBus);
