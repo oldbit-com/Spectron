@@ -16,7 +16,7 @@
       <EmbeddedResource Include="Rom\Files\128-1.rom" />
       <EmbeddedResource Include="Rom\Files\48.rom" />
       <EmbeddedResource Include="Rom\Files\bsrom140.rom" />
-      <EmbeddedResource Include="Rom\Files\DiagROMv.171" />
+      <EmbeddedResource Include="Rom\Files\DiagROMv.173" />
       <EmbeddedResource Include="Rom\Files\gw03.rom" />
       <EmbeddedResource Include="Rom\Files\JGH077.ROM" />
       <EmbeddedResource Include="Rom\Files\testrom1.37.bin" />

@@ -398,7 +398,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         new("H.T.R. SuperBasic", RomType.HtrSuperBasic),
         new("Pretty Basic", RomType.PrettyBasic),
         new("BBC Basic (128 mode only)", RomType.BbcBasic),
-        new("Diagnostic: Retroleum v1.71", RomType.Retroleum),
+        new("Diagnostic: Retroleum v1.73", RomType.Retroleum),
         new("Diagnostic: B. Alford v1.37", RomType.BrendanAlford),
     ];
 

@@ -19,7 +19,7 @@ internal static class RomReader
     private const string BbcBasicRomResourceName = "OldBit.Spectron.Emulation.Rom.Files.BBCBasic.rom";
 
     // Diagnostic ROMs
-    private const string RetroleumRomResourceName = "OldBit.Spectron.Emulation.Rom.Files.DiagROMv.171";
+    private const string RetroleumRomResourceName = "OldBit.Spectron.Emulation.Rom.Files.DiagROMv.173";
     private const string BrendanAlfordRomResourceName = "OldBit.Spectron.Emulation.Rom.Files.testrom1.37.bin";
 
     // DivMMC ROM
