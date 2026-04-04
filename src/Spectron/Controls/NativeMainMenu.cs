@@ -825,7 +825,7 @@ public sealed class NativeMainMenu
             new { Type = RomType.HtrSuperBasic, DisplayName = "H.T.R. SuperBasic" },
             new { Type = RomType.PrettyBasic, DisplayName = "Pretty Basic" },
             new { Type = RomType.BbcBasic, DisplayName = "BBC Basic (128 mode only)" },
-            new { Type = RomType.Retroleum, DisplayName = "Retroleum v1.71" },
+            new { Type = RomType.Retroleum, DisplayName = "Retroleum v1.73" },
             new { Type = RomType.BrendanAlford, DisplayName = "B. Alford v1.37" },
             new { Type = RomType.Custom, DisplayName = "Custom" },
         };
