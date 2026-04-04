@@ -35,6 +35,8 @@ public sealed partial class StateSnapshot
 
     public PrinterState? Printer { get; set; }
 
+    public TimexState? Timex { get; set; }
+
     public byte[] Serialize() => MemoryPackSerializer.Serialize(this);
 
     public static StateSnapshot? Load(string filePath)

@@ -32,6 +32,8 @@
       <EmbeddedResource Include="Rom\Files\HTR.rom" />
       <EmbeddedResource Include="Rom\Files\pretty.rom" />
       <EmbeddedResource Include="Rom\Files\BBCBasic.rom" />
+      <None Remove="Tape\Loader\Files\2048.szx" />
+      <EmbeddedResource Include="Tape\Loader\Files\2048.szx" />
     </ItemGroup>
 
     <ItemGroup>

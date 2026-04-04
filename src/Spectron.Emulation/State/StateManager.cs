@@ -35,6 +35,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         LoadInterface1(emulator.Interface1, emulator.MicrodriveManager, snapshot.Interface1);
         LoadBeta128(emulator.Beta128, emulator.DiskDriveManager, snapshot.Beta128);
         LoadPrinter(emulator.Printer, snapshot.Printer);
+        LoadTimex();
         LoadOther(emulator, snapshot);
 
         return emulator;
@@ -58,6 +59,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         SaveInterface1(emulator.Interface1, emulator.MicrodriveManager, isTimeMachine, snapshot);
         SaveBeta128(emulator.Beta128, emulator.DiskDriveManager, isTimeMachine, snapshot);
         SavePrinter(emulator.Printer, snapshot);
+        SaveTimex();
         SaveOther(emulator, snapshot);
 
         if (emulator.RomType.IsCustomRom())
@@ -260,6 +262,11 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
     private static void SavePrinter(ZxPrinter printer, StateSnapshot stateSnapshot) =>
         stateSnapshot.Printer = new PrinterState(printer.IsEnabled);
 
+    private static void SaveTimex()
+    {
+        // TODO: Save timex registers
+    }
+
     private static void SaveOther(Emulator emulator, StateSnapshot stateSnapshot) =>
         stateSnapshot.BorderColor = emulator.ScreenBuffer.LastBorderColor;
 
@@ -453,5 +460,10 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         }
 
         printer.IsEnabled = printerState.IsZxPrinterEnabled;
+    }
+
+    private static void LoadTimex()
+    {
+        // TODO: Load timex registers
     }
 }

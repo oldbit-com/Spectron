@@ -14,6 +14,7 @@ public sealed class Loader(SzxSnapshot szxSnapshot)
     private const string Loader16ResourceName = "OldBit.Spectron.Emulation.Tape.Loader.Files.16.szx";
     private const string Loader48ResourceName = "OldBit.Spectron.Emulation.Tape.Loader.Files.48.szx";
     private const string Loader128ResourceName = "OldBit.Spectron.Emulation.Tape.Loader.Files.128.szx";
+    private const string LoaderTimex2048ResourceName = "OldBit.Spectron.Emulation.Tape.Loader.Files.2048.szx";
 
     public Emulator EnterLoadCommand(ComputerType computerType)
     {
@@ -22,6 +23,7 @@ public sealed class Loader(SzxSnapshot szxSnapshot)
             ComputerType.Spectrum16K => Loader16ResourceName,
             ComputerType.Spectrum48K => Loader48ResourceName,
             ComputerType.Spectrum128K => Loader128ResourceName,
+            ComputerType.Timex2048 => LoaderTimex2048ResourceName,
             _ => throw new NotSupportedException($"The computer type '{computerType}' is not supported.")
         };
 

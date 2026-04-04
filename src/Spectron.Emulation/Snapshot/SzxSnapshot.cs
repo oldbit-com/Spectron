@@ -33,6 +33,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
             SzxHeader.MachineId16K => ComputerType.Spectrum16K,
             SzxHeader.MachineId48K => ComputerType.Spectrum48K,
             SzxHeader.MachineId128K => ComputerType.Spectrum128K,
+            SzxHeader.MachineIdTc2048 => ComputerType.Timex2048,
             _ => throw new NotSupportedException($"Snapshot hardware mode not supported: {snapshot.Header.MachineId}")
         };
 
@@ -47,8 +48,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         LoadJoystick(emulator.JoystickManager, snapshot.Joystick);
         LoadTape(emulator.TapeManager, snapshot.Tape);
         LoadAyRegisters(emulator.AudioManager, snapshot.Ay);
-
-        // TODO: Load the rest of the snapshot
+        LoadTimex();
 
         return emulator;
     }
@@ -77,6 +77,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
             ComputerType.Spectrum16K => SzxHeader.MachineId16K,
             ComputerType.Spectrum48K => SzxHeader.MachineId48K,
             ComputerType.Spectrum128K => SzxHeader.MachineId128K,
+            ComputerType.Timex2048 => SzxHeader.MachineIdTc2048,
             _ => snapshot.Header.MachineId
         };
 
@@ -87,6 +88,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         SaveJoystick(emulator.JoystickManager, snapshot);
         SaveTape(emulator.TapeManager, snapshot, compressionLevel);
         SaveAyRegisters(emulator.AudioManager, snapshot);
+        SaveTimex();
 
         if (emulator.RomType.IsCustomRom())
         {
@@ -239,6 +241,11 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         audioManager.Ay.LoadRegisters(ay.CurrentRegister, ay.Registers);
     }
 
+    private static void LoadTimex()
+    {
+        // TODO: Load timex registers
+    }
+
     private static void SaveRegisters(Z80 cpu, Z80RegsBlock registers)
     {
         registers.AF = cpu.Registers.AF;
@@ -383,5 +390,10 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         {
             snapshot.Ay.Registers[i] = audioManager.Ay.Registers[i];
         }
+    }
+
+    private static void SaveTimex()
+    {
+        // TODO: Save timex registers
     }
 }

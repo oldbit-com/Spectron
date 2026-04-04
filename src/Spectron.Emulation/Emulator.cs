@@ -15,6 +15,7 @@ using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Devices.Printer;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
+using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Emulation.TimeTravel;
 using OldBit.Z80Cpu;
@@ -371,7 +372,8 @@ public sealed class Emulator
 
             // case 0x1AF1:
             // case RomRoutines.SAVE_ETC:
-            //    break;
+            //     SnapshotManager.Save("2048.szx", this);
+            //     break;
         }
     }
 }
