@@ -1,7 +1,6 @@
 using OldBit.Beep;
 using OldBit.Spectron.Emulation.Devices.Audio.AY;
 using OldBit.Spectron.Emulation.Devices.Audio.Beeper;
-using OldBit.Spectron.Emulation.Devices.Timex;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Z80Cpu;
 
@@ -83,7 +82,7 @@ public sealed class AudioManager
 
     internal AudioManager(Clock clock, CassettePlayer? cassettePlayer, HardwareSettings hardware, Func<Word, bool> isUlaPort)
     {
-        Ay = hardware.ComputerType == ComputerType.Timex2048 ? new AyTimexDevice() : new AyDevice();
+        Ay =  new AyDevice(hardware.ComputerType);
 
         IsAySupported = hardware.HasAyChip;
 

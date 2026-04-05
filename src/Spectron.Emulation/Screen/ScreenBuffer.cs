@@ -30,8 +30,7 @@ internal sealed class ScreenBuffer
         _content.NewFrame();
     }
 
-    internal void EndFrame(int frameTicks) =>
-        _border.Update(LastBorderColor, frameTicks);
+    internal void EndFrame(int frameTicks) => _border.Update(LastBorderColor, frameTicks);
 
     internal void UpdateBorder(Color borderColor, int frameTicks = 0)
     {
