@@ -11,6 +11,42 @@ internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer
     private int _frameCount = 1;
     private bool _isFlashOnFrame;
     private int _fetchCycleIndex;
+    private Word _screenBaseAddress = 0x4000;
+
+    internal ScreenMode ScreenMode
+    {
+        set
+        {
+            if (value == field)
+            {
+                return;
+            }
+
+            field = value;
+            ChangeScreenMode(value);
+        }
+    } = ScreenMode.Spectrum;
+
+    private void ChangeScreenMode(ScreenMode screenMode)
+    {
+        switch (screenMode)
+        {
+            case ScreenMode.Spectrum:
+                _screenBaseAddress = 0x4000;
+                break;
+
+            case ScreenMode.TimexScreen1:
+                _screenBaseAddress = 0x6000;
+                break;
+
+            case ScreenMode.TimexHiColor:
+                break;
+
+            case ScreenMode.TimexHiRes:
+                _screenBaseAddress = 0x4000;
+                break;
+        }
+    }
 
     /// <summary>
     /// Updates the frame buffer with the content of the screen at the specified frame ticks. This allows
@@ -75,8 +111,6 @@ internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer
 
     internal void Invalidate() => Array.Fill(_dirtyAddresses, true);
 
-    internal void SetDirty(Word address) => SetDirty(address - 0x4000);
-
     private void UpdateFrameBuffer(int frameBufferIndex, Word bitmapAddress, Word attributeAddress)
     {
         if (!_dirtyAddresses[bitmapAddress])
@@ -84,8 +118,8 @@ internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer
             return;
         }
 
-        var bitmap = memory.ReadScreen(bitmapAddress);
-        var attribute = memory.ReadScreen(attributeAddress);
+        var bitmap = memory.Read((Word)(bitmapAddress + _screenBaseAddress));
+        var attribute = memory.Read((Word)(attributeAddress + _screenBaseAddress));
 
         var attributeData = FastLookup.AttributeData[attribute];
         var isFlashOn = attributeData.IsFlashOn && _isFlashOnFrame;
@@ -109,8 +143,10 @@ internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer
         _dirtyAddresses[bitmapAddress] = false;
     }
 
-    private void SetDirty(int address)
+    internal void SetDirty(int address)
     {
+        address -= _screenBaseAddress;
+
         if (address < 0x1800)
         {
             // Single screen byte
@@ -136,11 +172,14 @@ internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer
     {
         _isFlashOnFrame = !_isFlashOnFrame;
 
-        for (Word attrAddress = 0x1800; attrAddress < 0x1B00; attrAddress++)
+        var startAttrAddress = 0x1800 + _screenBaseAddress;
+        var endAttrAddress = 0x1B00 + _screenBaseAddress;
+
+        for (var attrAddress = startAttrAddress; attrAddress < endAttrAddress; attrAddress++)
         {
-            if ((memory.ReadScreen(attrAddress) & 0x80) != 0)
+            if ((memory.Read((Word)attrAddress) & 0x80) != 0)
             {
-                SetDirty((int)attrAddress);
+                SetDirty(attrAddress);
             }
         }
     }
