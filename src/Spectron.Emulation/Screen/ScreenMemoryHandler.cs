@@ -44,7 +44,7 @@ internal sealed class ScreenMemoryHandler
                 break;
 
             case ScreenMode.TimexHiColor:
-                //
+                _memory.MemoryUpdated += TimexHiColorHandler;
                 break;
 
             case ScreenMode.TimexHiRes:
@@ -75,6 +75,22 @@ internal sealed class ScreenMemoryHandler
         if (address is > 0x5FFF and < 0x7B00)
         {
             _screenBuffer.UpdateScreen(address);
+        }
+    }
+
+    private void TimexHiColorHandler(Word address, byte value)
+    {
+        switch (address)
+        {
+            // Screen data, without attribute data
+            case > 0x3FFF and < 0x5800:
+                _screenBuffer.UpdateScreen(address);
+                break;
+
+            // Attribute data - Timex Screen 1
+            case > 0x5FFF and < 0x7800:
+                _screenBuffer.UpdateScreen(address - 0x2000);
+                break;
         }
     }
 }
