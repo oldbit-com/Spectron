@@ -11,9 +11,6 @@ namespace OldBit.Spectron.Screen;
 /// </summary>
 internal sealed class FrameBufferConverter : IDisposable
 {
-    private const int ZoomX = 4;      // Number of horizontal pixels, check the below code if changing value
-    private const int ZoomY = 4;      // Number of vertical pixels
-
     private Border _border = BorderSizes.Full;
 
     private int _startFrameBufferRow;
@@ -49,30 +46,11 @@ internal sealed class FrameBufferConverter : IDisposable
                     fixed (Color* color = &frameBuffer.Pixels[pixelIndex])
                     {
                         var pixelColor = *(uint*)color;
-
-                        // Replicate pixels horizontally, unrolled loop for better performance.
-                        // IMPORTANT: This needs to be in sync with ZoomX value
                         *(uint*)targetAddress = pixelColor;
-                        *(uint*)(targetAddress + 4) = pixelColor;
-                        *(uint*)(targetAddress + 8) = pixelColor;
-                        *(uint*)(targetAddress + 12) = pixelColor;
 
-                        targetAddress += 4 * ZoomX;
+                        targetAddress += 4;
                     }
                 }
-            }
-
-            var previousLine = targetAddress - rowBytes;
-
-            // Replicate the previous line vertically, no need to unroll this loop
-            for (var y = 0; y < ZoomY - 1; y++)
-            {
-                unsafe
-                {
-                    Buffer.MemoryCopy(previousLine.ToPointer(), targetAddress.ToPointer(), rowBytes, rowBytes);
-                }
-
-                targetAddress += rowBytes;
             }
         }
     }
@@ -103,8 +81,8 @@ internal sealed class FrameBufferConverter : IDisposable
 
         return new WriteableBitmap(
             new PixelSize(
-                width * ZoomX,
-                height * ZoomY),
+                width,
+                height),
             new Vector(96, 96),
             PixelFormats.Rgba8888);
     }

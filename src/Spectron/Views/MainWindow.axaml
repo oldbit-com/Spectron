@@ -88,6 +88,7 @@
                         <Grid>
                             <Image
                                 x:Name="ScreenImage"
+                                RenderOptions.BitmapInterpolationMode="None"
                                 Source="{Binding SpectrumScreen}"
                                 Stretch="Uniform"
                                 Cursor="{Binding MouseCursor}"
