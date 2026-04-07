@@ -10,7 +10,6 @@ public class BreakpointHitEventArgs(Word previousAddress) : EventArgs
 public class BreakpointHandler : IDisposable
 {
     private Emulator _emulator;
-    private bool _isEnabled;
     private Word _previousAddress;
     private Word _currentAddress;
 
@@ -18,14 +17,12 @@ public class BreakpointHandler : IDisposable
 
     public Word PreviousAddress { get; private set; }
 
-    public bool IsBreakpointHit { get; private set; }
-
     public bool IsEnabled
     {
-        get => _isEnabled;
+        get;
         set
         {
-            _isEnabled = value;
+            field = value;
             HandleIsEnabled();
         }
     }
@@ -38,13 +35,13 @@ public class BreakpointHandler : IDisposable
 
         BreakpointManager = new BreakpointManager(emulator.Cpu);
 
-        SubscribeToEvents();
+        SubscribeToEvents(emulator);
     }
 
     public void Update(Emulator emulator)
     {
-        UnsubscribeFromEvents();
-        SubscribeToEvents();
+        UnsubscribeFromEvents(_emulator);
+        SubscribeToEvents(emulator);
 
         BreakpointManager.Update(emulator.Cpu);
 
@@ -56,9 +53,9 @@ public class BreakpointHandler : IDisposable
         _previousAddress = _currentAddress;
         _currentAddress = pc;
 
-        IsBreakpointHit = BreakpointManager.IsRegisterBreakpointHit();
+        var isBreakpointHit = BreakpointManager.IsRegisterBreakpointHit();
 
-        if (!IsBreakpointHit)
+        if (!isBreakpointHit)
         {
             PreviousAddress = pc;
             return;
@@ -71,9 +68,9 @@ public class BreakpointHandler : IDisposable
 
     private void MemoryOnMemoryUpdated(Word address, byte value)
     {
-        IsBreakpointHit = BreakpointManager.IsMemoryBreakpointHit(address, _emulator.Memory);
+        var iisBreakpointHit = BreakpointManager.IsMemoryBreakpointHit(address, _emulator.Memory);
 
-        if (!IsBreakpointHit)
+        if (!iisBreakpointHit)
         {
             return;
         }
@@ -85,30 +82,30 @@ public class BreakpointHandler : IDisposable
 
     private void HandleIsEnabled()
     {
-        UnsubscribeFromEvents();
+        UnsubscribeFromEvents(_emulator);
 
         if (IsEnabled)
         {
-            SubscribeToEvents();
+            SubscribeToEvents(_emulator);
         }
     }
 
-    private void SubscribeToEvents()
+    private void SubscribeToEvents(Emulator emulator)
     {
-        _emulator.Cpu.BeforeInstruction += BeforeInstruction;
-        _emulator.Memory.MemoryUpdated += MemoryOnMemoryUpdated;
+        emulator.Cpu.BeforeInstruction += BeforeInstruction;
+        emulator.Memory.MemoryUpdated += MemoryOnMemoryUpdated;
     }
 
-    private void UnsubscribeFromEvents()
+    private void UnsubscribeFromEvents(Emulator emulator)
     {
-        _emulator.Cpu.BeforeInstruction -= BeforeInstruction;
-        _emulator.Memory.MemoryUpdated -= MemoryOnMemoryUpdated;
+        emulator.Cpu.BeforeInstruction -= BeforeInstruction;
+        emulator.Memory.MemoryUpdated -= MemoryOnMemoryUpdated;
     }
 
     public void Dispose()
     {
         GC.SuppressFinalize(this);
 
-        UnsubscribeFromEvents();
+        UnsubscribeFromEvents(_emulator);
     }
 }
