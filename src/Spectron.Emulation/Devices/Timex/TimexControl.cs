@@ -16,10 +16,10 @@ public sealed class TimexControl : IDevice
     {
         if ((address & 0xFF) != 0xFF)
         {
-            return _lastValue;
+            return null;
         }
 
-        return null;
+        return _lastValue;
     }
 
     public void WritePort(Word address, byte value)

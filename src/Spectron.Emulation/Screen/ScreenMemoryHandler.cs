@@ -84,12 +84,9 @@ internal sealed class ScreenMemoryHandler
         {
             // Screen data, without attribute data
             case > 0x3FFF and < 0x5800:
-                _screenBuffer.UpdateScreen(address);
-                break;
-
             // Attribute data - Timex Screen 1
             case > 0x5FFF and < 0x7800:
-                _screenBuffer.UpdateScreen(address - 0x2000);
+                _screenBuffer.UpdateScreen(address);
                 break;
         }
     }

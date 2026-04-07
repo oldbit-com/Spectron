@@ -35,7 +35,16 @@ internal class TimexHiColorScreenUpdater(
 
     public void SetDirty(int address)
     {
-        _dirtyAddresses[address - 0x4000] = true;
+        if (address >= 0x6000)
+        {
+            // Attribute data
+            _dirtyAddresses[address - 0x6000] = true;
+        }
+        else
+        {
+            // Pixel data
+            _dirtyAddresses[address - 0x4000] = true;
+        }
     }
 
     public void ToggleFlash()
