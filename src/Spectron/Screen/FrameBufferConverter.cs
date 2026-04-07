@@ -31,7 +31,6 @@ internal sealed class FrameBufferConverter : IDisposable
         using var lockedBitmap = ScreenBitmap.Lock();
 
         var targetAddress = lockedBitmap.Address;
-        var rowBytes = lockedBitmap.RowBytes;
 
         for (var frameBufferRow = _startFrameBufferRow; frameBufferRow <= _endFrameBufferRow; frameBufferRow++)
         {
