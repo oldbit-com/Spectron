@@ -2,9 +2,13 @@ using OldBit.Spectron.Emulation.Devices.Memory;
 
 namespace OldBit.Spectron.Emulation.Screen.Modes;
 
+/// <summary>
+/// Timex HiColor screen updater. Uses 0x4000 for data and 0x6000 for attribute data.
+/// </summary>
 internal class TimexHiColorScreenUpdater(
     FrameBuffer frameBuffer,
-    IEmulatorMemory memory) : IScreenUpdater
+    IEmulatorMemory memory,
+    bool isAlternate) : IScreenUpdater
 {
     private const int SpectrumScreenAddress = 0x4000;
     private const int TimexScreen1Address = 0x6000;
@@ -19,7 +23,7 @@ internal class TimexHiColorScreenUpdater(
             return;
         }
 
-        var bitmap = memory.Read((Word)(bitmapAddress + SpectrumScreenAddress));
+        var bitmap = memory.Read((Word)(bitmapAddress + (isAlternate ? TimexScreen1Address : SpectrumScreenAddress)));
         var attribute = memory.Read((Word)(bitmapAddress + TimexScreen1Address));
 
         var attributeData = FastLookup.AttributeData[attribute];

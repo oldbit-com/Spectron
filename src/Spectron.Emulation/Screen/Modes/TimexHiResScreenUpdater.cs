@@ -19,6 +19,6 @@ internal class TimexHiResScreenUpdater : IScreenUpdater
 
     public void ToggleFlash()
     {
-        throw new NotImplementedException();
+        // Not supported in this mode
     }
 }

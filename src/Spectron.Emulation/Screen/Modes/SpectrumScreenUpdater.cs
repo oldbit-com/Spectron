@@ -3,6 +3,9 @@ using OldBit.Spectron.Emulation.Devices.Memory;
 
 namespace OldBit.Spectron.Emulation.Screen.Modes;
 
+/// <summary>
+/// Standard Spectrum screen updater. Also handles ULA+ coloring and Timex screen 1.
+/// </summary>
 internal sealed class SpectrumScreenUpdater(
     FrameBuffer frameBuffer,
     IEmulatorMemory memory,

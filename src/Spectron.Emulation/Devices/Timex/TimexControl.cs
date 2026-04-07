@@ -34,6 +34,7 @@ public sealed class TimexControl : IDevice
             0b000 => ScreenMode.Spectrum,
             0b001 => ScreenMode.TimexScreen1,
             0b010 => ScreenMode.TimexHiColor,
+            0b011 => ScreenMode.TimexHiColorAlt,
             0b110 => ScreenMode.TimexHiRes,
             // TODO: Handle alternate modes
             _ => ScreenMode
