@@ -11,7 +11,7 @@ internal class TimexHiColorScreenUpdater(
     bool isAlternate) : IScreenUpdater
 {
     private const int SpectrumScreenAddress = 0x4000;
-    private const int TimexScreen1Address = 0x6000;
+    private const int AttributesScreenAddress = 0x6000;
 
     private readonly bool[] _dirtyAddresses = new bool[32 * 24 * 8];
     private bool _isFlashOnFrame;
@@ -23,8 +23,8 @@ internal class TimexHiColorScreenUpdater(
             return;
         }
 
-        var bitmap = memory.Read((Word)(bitmapAddress + (isAlternate ? TimexScreen1Address : SpectrumScreenAddress)));
-        var attribute = memory.Read((Word)(bitmapAddress + TimexScreen1Address));
+        var bitmap = memory.Read((Word)(bitmapAddress + (isAlternate ? AttributesScreenAddress : SpectrumScreenAddress)));
+        var attribute = memory.Read((Word)(bitmapAddress + AttributesScreenAddress));
 
         var attributeData = FastLookup.AttributeData[attribute];
         var isFlashOn = attributeData.IsFlashOn && _isFlashOnFrame;
@@ -42,10 +42,10 @@ internal class TimexHiColorScreenUpdater(
 
     public void SetDirty(int address)
     {
-        if (address >= TimexScreen1Address)
+        if (address >= AttributesScreenAddress)
         {
             // Attribute data
-            _dirtyAddresses[address - TimexScreen1Address] = true;
+            _dirtyAddresses[address - AttributesScreenAddress] = true;
         }
         else
         {
@@ -58,7 +58,7 @@ internal class TimexHiColorScreenUpdater(
     {
         _isFlashOnFrame = !_isFlashOnFrame;
 
-        for (var attrAddress = TimexScreen1Address; attrAddress < TimexScreen1Address + 0x1800; attrAddress++)
+        for (var attrAddress = AttributesScreenAddress; attrAddress < AttributesScreenAddress + 0x1800; attrAddress++)
         {
             if ((memory.Read((Word)attrAddress) & 0x80) != 0)
             {
