@@ -4,10 +4,9 @@ namespace OldBit.Spectron.Emulation.Devices;
 
 public sealed class UlaTimex : IDevice
 {
-    private byte _lastPortValue;
+    private byte _lastControlValue;
 
     internal const int ControlPort = 0xFF;
-
     internal ScreenMode ScreenMode { get; private set; }
     internal Color Paper { get; private set; }
     internal Color Ink { get; private set; }
@@ -21,7 +20,7 @@ public sealed class UlaTimex : IDevice
             return null;
         }
 
-        return _lastPortValue;
+        return _lastControlValue;
     }
 
     public void WritePort(Word address, byte value)
@@ -45,32 +44,32 @@ public sealed class UlaTimex : IDevice
         Ink = (value & 0b111_000) switch
         {
             0b000_000 => SpectrumPalette.Black,
-            0b001_000 => SpectrumPalette.Blue,
-            0b010_000 => SpectrumPalette.Red,
-            0b011_000 => SpectrumPalette.Magenta,
-            0b100_000 => SpectrumPalette.Green,
-            0b101_000 => SpectrumPalette.Cyan,
-            0b110_000 => SpectrumPalette.Yellow,
-            0b111_000 => SpectrumPalette.White
+            0b001_000 => SpectrumPalette.BrightBlue,
+            0b010_000 => SpectrumPalette.BrightRed,
+            0b011_000 => SpectrumPalette.BrightMagenta,
+            0b100_000 => SpectrumPalette.BrightGreen,
+            0b101_000 => SpectrumPalette.BrightCyan,
+            0b110_000 => SpectrumPalette.BrightYellow,
+            0b111_000 => SpectrumPalette.BrightWhite
         };
 
         Paper = (value & 0b111_000) switch
         {
-            0b000_000 => SpectrumPalette.White,
-            0b001_000 => SpectrumPalette.Yellow,
-            0b010_000 => SpectrumPalette.Cyan,
-            0b011_000 => SpectrumPalette.Green,
-            0b100_000 => SpectrumPalette.Magenta,
-            0b101_000 => SpectrumPalette.Red,
-            0b110_000 => SpectrumPalette.Blue,
+            0b000_000 => SpectrumPalette.BrightWhite,
+            0b001_000 => SpectrumPalette.BrightYellow,
+            0b010_000 => SpectrumPalette.BrightCyan,
+            0b011_000 => SpectrumPalette.BrightGreen,
+            0b100_000 => SpectrumPalette.BrightMagenta,
+            0b101_000 => SpectrumPalette.BrightRed,
+            0b110_000 => SpectrumPalette.BrightBlue,
             0b111_000 => SpectrumPalette.Black
         };
 
-        if (_lastPortValue != value)
+        if (_lastControlValue != value)
         {
             ScreenModeChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        _lastPortValue = value;
+        _lastControlValue = value;
     }
 }

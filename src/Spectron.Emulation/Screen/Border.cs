@@ -18,11 +18,11 @@ internal sealed class Border(HardwareSettings hardwareSettings, FrameBuffer fram
     internal void Update(Color color) => _lastColor = color;
 
     /// <summary>
-    /// Fill the border with the specified color up to the current tick. This fills frame buffer with the
+    /// Fill the border with the specified color up to the current tick. This fills the frame buffer with the
     /// current border color up to the current tick.
     /// </summary>
     /// <param name="color">The new color.</param>
-    /// <param name="frameTicks">The current tick when border color is changing.</param>
+    /// <param name="frameTicks">The current tick when the border color is changing.</param>
     internal void Update(Color color, int frameTicks)
     {
         for (var rangeIndex = _lastRangeIndex; rangeIndex < _borderTickRanges.Count; rangeIndex++)

@@ -6,7 +6,8 @@ namespace OldBit.Spectron.Emulation.Screen.Modes;
 internal class TimexHiResScreenUpdater(
     FrameBuffer frameBuffer,
     IEmulatorMemory memory,
-    UlaTimex ulaTimex) : IScreenUpdater
+    Color ink,
+    Color paper) : IScreenUpdater
 {
     private readonly bool[] _dirtyAddresses = new bool[16384];
 
@@ -27,7 +28,7 @@ internal class TimexHiResScreenUpdater(
 
         for (var bit = 0; bit < FastLookup.BitMasks.Length; bit++)
         {
-            var color = (bitmap & FastLookup.BitMasks[bit]) != 0 ? ulaTimex.Ink : ulaTimex.Paper;
+            var color = (bitmap & FastLookup.BitMasks[bit]) != 0 ? ink : paper;
             frameBuffer.Pixels[frameBufferIndex + bit] = color;
         }
 

@@ -16,7 +16,7 @@ internal sealed class ScreenMemoryHandler
         memory.MemoryUpdated += SpectrumHandler;
     }
 
-    internal void SetScreenMode(UlaTimex? ulaTimex = null)
+    internal void SetScreenMode(UlaTimex? ulaTimex)
     {
         RemoveHandlers();
 
@@ -42,13 +42,18 @@ internal sealed class ScreenMemoryHandler
                 break;
         }
 
-        _screenBuffer.SetScreenMode(screenMode, ulaTimex);
+        _screenBuffer.SetScreenMode(
+            screenMode,
+            ulaTimex?.Ink ?? SpectrumPalette.Black,
+            ulaTimex?.Paper ?? SpectrumPalette.White);
     }
 
     private void RemoveHandlers()
     {
         _memory.MemoryUpdated -= SpectrumHandler;
         _memory.MemoryUpdated -= TimexScreen1Handler;
+        _memory.MemoryUpdated -= TimexHiColorHandler;
+        _memory.MemoryUpdated -= TimexHiResHandler;
     }
 
     private void SpectrumHandler(Word address, byte value)

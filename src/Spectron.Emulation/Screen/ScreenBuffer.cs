@@ -9,6 +9,7 @@ internal sealed class ScreenBuffer
     private readonly Content _content;
 
     private bool _borderColorChanged = true;
+    private Color? _lockedBorderColor;
 
     public FrameBuffer FrameBuffer { get; } = new(SpectrumPalette.White);
     internal Color LastBorderColor { get; private set; } = SpectrumPalette.White;
@@ -24,9 +25,11 @@ internal sealed class ScreenBuffer
         }
     }
 
-    internal void SetScreenMode(ScreenMode screenMode, UlaTimex? ulaTimex)
+    internal void SetScreenMode(ScreenMode screenMode, Color ink, Color paper)
     {
-        _content.SetScreenMode(screenMode, ulaTimex);
+        _lockedBorderColor = screenMode != ScreenMode.TimexHiRes ? null : paper;
+
+        _content.SetScreenMode(screenMode, ink, paper);
         _content.Invalidate();
     }
 
@@ -36,7 +39,7 @@ internal sealed class ScreenBuffer
         _content.NewFrame();
     }
 
-    internal void EndFrame(int frameTicks) => _border.Update(LastBorderColor, frameTicks);
+    internal void EndFrame(int frameTicks) => _border.Update(_lockedBorderColor ?? LastBorderColor, frameTicks);
 
     internal void UpdateBorder(Color borderColor, int frameTicks = 0)
     {
@@ -51,7 +54,7 @@ internal sealed class ScreenBuffer
             return;
         }
 
-        _border.Update(borderColor, frameTicks);
+        _border.Update(_lockedBorderColor ?? borderColor, frameTicks);
 
         _borderColorChanged = false;
     }
