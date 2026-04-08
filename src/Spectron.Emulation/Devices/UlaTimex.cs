@@ -1,10 +1,12 @@
 using OldBit.Spectron.Emulation.Screen;
 
-namespace OldBit.Spectron.Emulation.Devices.Timex;
+namespace OldBit.Spectron.Emulation.Devices;
 
-public sealed class TimexControl : IDevice
+public sealed class UlaTimex : IDevice
 {
-    private byte _lastValue;
+    private byte _lastPortValue;
+
+    internal const int ControlPort = 0xFF;
 
     internal ScreenMode ScreenMode { get; private set; }
     internal Color Paper { get; private set; }
@@ -14,17 +16,17 @@ public sealed class TimexControl : IDevice
 
     public byte? ReadPort(Word address)
     {
-        if ((address & 0xFF) != 0xFF)
+        if ((address & 0xFF) != ControlPort)
         {
             return null;
         }
 
-        return _lastValue;
+        return _lastPortValue;
     }
 
     public void WritePort(Word address, byte value)
     {
-        if ((address & 0xFF) != 0xFF)
+        if ((address & 0xFF) != ControlPort)
         {
             return;
         }
@@ -64,11 +66,11 @@ public sealed class TimexControl : IDevice
             0b111_000 => SpectrumPalette.Black
         };
 
-        if (_lastValue != value)
+        if (_lastPortValue != value)
         {
             ScreenModeChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        _lastValue = value;
+        _lastPortValue = value;
     }
 }

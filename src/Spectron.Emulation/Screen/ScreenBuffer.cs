@@ -13,11 +13,6 @@ internal sealed class ScreenBuffer
     public FrameBuffer FrameBuffer { get; } = new(SpectrumPalette.White);
     internal Color LastBorderColor { get; private set; } = SpectrumPalette.White;
 
-    internal ScreenMode ScreenMode
-    {
-        set => _content.ScreenMode = value;
-    }
-
     internal ScreenBuffer(HardwareSettings hardware, IEmulatorMemory memory, UlaPlus ulaPlus)
     {
         _border = new Border(hardware, FrameBuffer);
@@ -27,6 +22,12 @@ internal sealed class ScreenBuffer
         {
             memory128K.ScreenBankPaged += _ => { _content.Invalidate(); };
         }
+    }
+
+    internal void SetScreenMode(ScreenMode screenMode, UlaTimex? ulaTimex)
+    {
+        _content.SetScreenMode(screenMode, ulaTimex);
+        _content.Invalidate();
     }
 
     internal void NewFrame()

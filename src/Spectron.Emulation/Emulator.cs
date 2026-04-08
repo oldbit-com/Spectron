@@ -13,7 +13,6 @@ using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Devices.Printer;
-using OldBit.Spectron.Emulation.Devices.Timex;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Tape;
@@ -79,7 +78,7 @@ public sealed class Emulator
     public Beta128Device Beta128 { get; }
     public Interface1Device Interface1 { get; }
     public ZxPrinter Printer { get; }
-    public TimexControl? TimexControl { get; }
+    public UlaTimex? UlaTimex { get; }
 
     public int TicksPerFrame => _hardware.TicksPerFrame;
 
@@ -116,10 +115,13 @@ public sealed class Emulator
         _spectrumBus = new SpectrumBus();
         ScreenBuffer = new ScreenBuffer(hardware, emulatorArgs.Memory, UlaPlus);
 
-        _screenMemoryHandler = new ScreenMemoryHandler(Memory, ScreenBuffer)
+        if (ComputerType == ComputerType.Timex2048)
         {
-            ScreenMode = ScreenMode.Spectrum
-        };
+            UlaTimex = new UlaTimex();
+        }
+
+        _screenMemoryHandler = new ScreenMemoryHandler(Memory, ScreenBuffer);
+        _screenMemoryHandler.SetScreenMode(UlaTimex);
 
         Cpu = new Z80(emulatorArgs.Memory)
         {
@@ -145,11 +147,6 @@ public sealed class Emulator
         Beta128 = new Beta128Device(Cpu, _hardware.ClockMhz, Memory, ComputerType, diskDriveManager);
         Interface1 = microdriveManager.CreateDevice(Cpu, Memory);
         Printer = new ZxPrinter();
-
-        if (ComputerType == ComputerType.Timex2048)
-        {
-            TimexControl = new TimexControl();
-        }
 
         AddDevices();
         AddEventHandlers();
@@ -256,19 +253,14 @@ public sealed class Emulator
         UlaPlus.ActiveChanged += _ => _invalidateScreen = true;
         Beta128.DiskActivity += _ => DiskDriveManager.OnDiskActivity();
 
-        if (TimexControl != null)
+        if (UlaTimex != null)
         {
-            TimexControl.ScreenModeChanged += TimexOnScreenModeChanged;
+            UlaTimex.ScreenModeChanged += UlaTimexOnScreenModeChanged;
         }
     }
 
-    private void TimexOnScreenModeChanged(object? sender, EventArgs e)
-    {
-        if (TimexControl != null)
-        {
-            _screenMemoryHandler.ScreenMode = TimexControl.ScreenMode;
-        }
-    }
+    private void UlaTimexOnScreenModeChanged(object? sender, EventArgs e) =>
+        _screenMemoryHandler.SetScreenMode(sender as UlaTimex);
 
     private void AddDevices()
     {
@@ -283,9 +275,9 @@ public sealed class Emulator
         _spectrumBus.AddDevice(Beta128);
         _spectrumBus.AddDevice(new RtcDevice(DivMmc));
 
-        if (TimexControl != null)
+        if (UlaTimex != null)
         {
-            _spectrumBus.AddDevice(TimexControl);
+            _spectrumBus.AddDevice(UlaTimex);
         }
 
         _spectrumBus.AddDevice(_floatingBus);

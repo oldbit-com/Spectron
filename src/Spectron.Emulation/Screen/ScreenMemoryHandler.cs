@@ -1,3 +1,4 @@
+using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Memory;
 
 namespace OldBit.Spectron.Emulation.Screen;
@@ -7,20 +8,6 @@ internal sealed class ScreenMemoryHandler
     private readonly IEmulatorMemory _memory;
     private readonly ScreenBuffer _screenBuffer;
 
-    internal ScreenMode ScreenMode
-    {
-        set
-        {
-            if (field == value)
-            {
-                return;
-            }
-
-            field = value; ;
-            ChangeScreenMode(value);
-        }
-    } = ScreenMode.Spectrum;
-
     internal ScreenMemoryHandler(IEmulatorMemory memory, ScreenBuffer screenBuffer)
     {
         _memory = memory;
@@ -29,9 +16,11 @@ internal sealed class ScreenMemoryHandler
         memory.MemoryUpdated += SpectrumHandler;
     }
 
-    private void ChangeScreenMode(ScreenMode screenMode)
+    internal void SetScreenMode(UlaTimex? ulaTimex = null)
     {
         RemoveHandlers();
+
+        var screenMode = ulaTimex?.ScreenMode ?? ScreenMode.Spectrum;
 
         switch (screenMode)
         {
@@ -53,8 +42,7 @@ internal sealed class ScreenMemoryHandler
                 break;
         }
 
-        _screenBuffer.ScreenMode = screenMode;
-        _screenBuffer.Invalidate();
+        _screenBuffer.SetScreenMode(screenMode, ulaTimex);
     }
 
     private void RemoveHandlers()

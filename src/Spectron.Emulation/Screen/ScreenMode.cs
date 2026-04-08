@@ -1,6 +1,6 @@
 namespace OldBit.Spectron.Emulation.Screen;
 
-internal enum ScreenMode
+public enum ScreenMode
 {
     /// <summary>
     /// Standard Spectrum screen.

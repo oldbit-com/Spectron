@@ -48,7 +48,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         LoadJoystick(emulator.JoystickManager, snapshot.Joystick);
         LoadTape(emulator.TapeManager, snapshot.Tape);
         LoadAyRegisters(emulator.AudioManager, snapshot.Ay);
-        LoadTimex();
+        LoadTimex(emulator.UlaTimex, snapshot.TimexSinclair);
 
         return emulator;
     }
@@ -88,7 +88,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         SaveJoystick(emulator.JoystickManager, snapshot);
         SaveTape(emulator.TapeManager, snapshot, compressionLevel);
         SaveAyRegisters(emulator.AudioManager, snapshot);
-        SaveTimex();
+        SaveTimex(emulator.UlaTimex, snapshot);
 
         if (emulator.RomType.IsCustomRom())
         {
@@ -241,9 +241,14 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         audioManager.Ay.LoadRegisters(ay.CurrentRegister, ay.Registers);
     }
 
-    private static void LoadTimex()
+    private static void LoadTimex(UlaTimex? ulaTimex, TimexSinclairBlock? timexSinclair)
     {
-        // TODO: Load timex registers
+        if (ulaTimex == null || timexSinclair == null)
+        {
+            return;
+        }
+
+        ulaTimex.WritePort(UlaTimex.ControlPort, timexSinclair.PortFF);
     }
 
     private static void SaveRegisters(Z80 cpu, Z80RegsBlock registers)
@@ -392,8 +397,16 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         }
     }
 
-    private static void SaveTimex()
+    private static void SaveTimex(UlaTimex? ulaTimex, SzxFile snapshot)
     {
-        // TODO: Save timex registers
+        if (ulaTimex == null)
+        {
+            return;
+        }
+
+        snapshot.TimexSinclair = new TimexSinclairBlock
+        {
+            PortFF = ulaTimex.ReadPort(UlaTimex.ControlPort) ?? 0
+        };
     }
 }
