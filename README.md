@@ -1,7 +1,7 @@
 ![Build and Test](https://github.com/oldbit-com/Spectron/actions/workflows/build.yml/badge.svg)
 
-# Spectron ― ZX Spectrum 16/48/128 Emulator ☺
-Here is Spectron, my personal ZX Spectrum emulator written in C# and Avalonia UI. It emulates the classic ZX Spectrum 16K, 48K, and 128K computers.
+# Spectron ― ZX Spectrum 16/48/128/TC2048 Emulator ☺
+Here is Spectron, my personal ZX Spectrum emulator written in C# and Avalonia UI. It emulates the classic ZX Spectrum 16K, 48K, 128K and Timex Computer 2048.
 
 It is accurate and stable, capable of running most games and demos without issues, including support for loading protected tapes.
 
@@ -14,7 +14,7 @@ The ZX Spectrum was my first computer, and I still have a deep affection for it.
 ![Main Window](docs/default.png?raw=true "Main Window")
 
 ## Features
-- [x] Emulation of classic machines: ZX Spectrum 16K, 48K, and 128K
+- [x] Emulation of classic machines: ZX Spectrum 16K, 48K, 128K and Timex Computer 2048
 - [x] Time Machine: Rewind and continue from any point in the past
 - [x] State persistence: Emulator state is automatically saved and restored on restart
 - [x] Wide format support: SNA, SZX, Z80, TAP, TZX, MDR, TRD, and SCL (including ZIP archives)
@@ -37,6 +37,7 @@ The ZX Spectrum was my first computer, and I still have a deep affection for it.
 - [x] Built-in debugger
 - [x] Favorites manager
 - [x] Screen effects: Blur and CRT/Scanlines
+- [x] TC2048 extended graphics support (hi-res and hi-color)
 - [x] And more to come...
 
 Spectron relies on several custom libraries developed specifically for this project:
