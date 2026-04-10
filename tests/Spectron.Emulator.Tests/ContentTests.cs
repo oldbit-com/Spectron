@@ -51,7 +51,9 @@ public class ContentTests
     public void ContentRenderer_ShouldBuildScreenEventsTableTimexHiRes(int index, int expectedTicks,
         Word expectedBitmapAddress, Word expectedAttributeAddress, int expectedFrameBufferIndex)
     {
-        var frameBuffer = new FrameBuffer(ScreenMode.TimexHiRes);
+        var frameBuffer = new FrameBuffer();
+        frameBuffer.ChangeScreenMode(ScreenMode.TimexHiRes);
+
         var eventsTable = FastLookup.GetScreenRenderEvents(Hardware.Timex2048, frameBuffer, ScreenMode.TimexHiRes);
 
         eventsTable[index].Ticks.ShouldBe(expectedTicks);

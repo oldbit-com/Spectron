@@ -40,7 +40,7 @@ public class BorderTests
 
         borderRenderer.Update(SpectrumPalette.Blue, 69888);
 
-        BorderShouldHaveColor(SpectrumPalette.Blue, screenBuffer.Pixels);
+        BorderShouldHaveColor(SpectrumPalette.Blue, screenBuffer.Pixels[..109823]);
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class BorderTests
             borderRenderer.Update(SpectrumPalette.Red, ticks);
         }
 
-        BorderShouldHaveColor(SpectrumPalette.Red, screenBuffer.Pixels);
+        BorderShouldHaveColor(SpectrumPalette.Red, screenBuffer.Pixels[..109823]);
     }
 
     [Fact]

@@ -24,7 +24,7 @@ public sealed class AudioManager
     private bool _isAudioPlayerRunning;
 
     internal BeeperDevice Beeper { get; }
-    internal AyDevice Ay { get; }
+    internal AyDevice Ay { get; } = new();
 
     public StereoMode StereoMode
     {
@@ -82,8 +82,6 @@ public sealed class AudioManager
 
     internal AudioManager(Clock clock, CassettePlayer? cassettePlayer, HardwareSettings hardware, Func<Word, bool> isUlaPort)
     {
-        Ay =  new AyDevice();
-
         IsAySupported = hardware.HasAyChip;
 
         var statesPerSample = (double)hardware.TicksPerFrame / SamplesPerFrame;

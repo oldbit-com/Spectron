@@ -42,7 +42,7 @@ internal sealed class ScreenMemoryHandler
                 break;
         }
 
-        _screenBuffer.SetScreenMode(
+        _screenBuffer.ChangeScreenMode(
             screenMode,
             ulaTimex?.Ink ?? SpectrumPalette.Black,
             ulaTimex?.Paper ?? SpectrumPalette.White);

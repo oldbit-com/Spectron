@@ -17,7 +17,7 @@ internal sealed class Content(
 
     private IScreenUpdater _screenUpdater = new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus, 0x4000);
 
-    internal void SetScreenMode(ScreenMode screenMode, Color ink, Color paper)
+    internal void ChangeScreenMode(ScreenMode screenMode, Color ink, Color paper)
     {
         _screenRenderEvents = FastLookup.GetScreenRenderEvents(hardware, frameBuffer, screenMode);
 

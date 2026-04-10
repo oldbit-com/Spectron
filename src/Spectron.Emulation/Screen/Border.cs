@@ -16,7 +16,7 @@ internal sealed class Border(HardwareSettings hardwareSettings, FrameBuffer fram
     private Color _lastColor = SpectrumPalette.White;
     private ScreenMode _screenMode = ScreenMode.Spectrum;
 
-    internal void SetScreenMode(ScreenMode screenMode)
+    internal void ChangeScreenMode(ScreenMode screenMode)
     {
         if (_screenMode == screenMode)
         {

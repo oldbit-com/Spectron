@@ -9,8 +9,8 @@ public sealed class ScreenBuffer
     private readonly IEmulatorMemory _memory;
     private readonly UlaPlus _ulaPlus;
 
-    private Border _border;
-    private Content _content;
+    private readonly Border _border;
+    private readonly Content _content;
 
     private bool _borderColorChanged = true;
     private Color? _lockedBorderColor;
@@ -26,6 +26,7 @@ public sealed class ScreenBuffer
         _hardware = hardware;
         _memory = memory;
         _ulaPlus = ulaPlus;
+
         FrameBuffer = new FrameBuffer();
 
         _border = new Border(hardware, FrameBuffer);
@@ -37,19 +38,16 @@ public sealed class ScreenBuffer
         }
     }
 
-    internal void SetScreenMode(ScreenMode screenMode, Color ink, Color paper)
+    internal void ChangeScreenMode(ScreenMode screenMode, Color ink, Color paper)
     {
         _lockedBorderColor = screenMode != ScreenMode.TimexHiRes ? null : paper;
 
-        FrameBuffer = new FrameBuffer(screenMode);
+        FrameBuffer.ChangeScreenMode(screenMode);
 
-        _border = new Border(_hardware, FrameBuffer);
-        _content = new Content(_hardware, FrameBuffer, _memory, _ulaPlus);
+        _content.ChangeScreenMode(screenMode, ink, paper);
+        _border.ChangeScreenMode(screenMode);
 
-        _content.SetScreenMode(screenMode, ink, paper);
         _content.Invalidate();
-
-        _border.SetScreenMode(screenMode);
         _border.Invalidate();
 
         FrameBufferChanged?.Invoke(this, EventArgs.Empty);

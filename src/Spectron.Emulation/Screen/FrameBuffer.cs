@@ -8,13 +8,22 @@ public sealed class FrameBuffer
 {
     private static readonly Color DefaultFillColor = SpectrumPalette.White;
 
-    internal ScreenMode ScreenMode { get; }
-    public int Width { get; }
-    public int Height { get; }
+    internal ScreenMode ScreenMode { get; private set; } = ScreenMode.Spectrum;
+    public int Width { get; private set; } = ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight;
+    public int Height { get; private set; } = ScreenSize.BorderTop + ScreenSize.ContentHeight + ScreenSize.BorderBottom;
 
     public readonly Color[] Pixels;
 
-    public FrameBuffer(ScreenMode screenMode = ScreenMode.Spectrum)
+    public FrameBuffer()
+    {
+        const int maxWidth = ScreenSize.BorderLeft + ScreenSize.ContentWidth * 2 + ScreenSize.BorderRight;
+
+        ChangeScreenMode(ScreenMode);
+
+        Pixels = Enumerable.Repeat(DefaultFillColor, maxWidth * Height).ToArray();
+    }
+
+    internal void ChangeScreenMode(ScreenMode screenMode)
     {
         ScreenMode = screenMode;
 
@@ -22,8 +31,6 @@ public sealed class FrameBuffer
 
         Width = ScreenSize.BorderLeft + ScreenSize.ContentWidth * hiResMultiplier + ScreenSize.BorderRight;
         Height = ScreenSize.BorderTop + ScreenSize.ContentHeight + ScreenSize.BorderBottom;
-
-        Pixels = Enumerable.Repeat(DefaultFillColor, Width * Height).ToArray();
     }
 
     internal void Fill(int start, int count, Color color) => Array.Fill(Pixels, color, start, count);
