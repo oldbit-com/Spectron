@@ -25,6 +25,11 @@ public sealed class FrameBuffer
 
     internal void ChangeScreenMode(ScreenMode screenMode)
     {
+        if (ScreenMode == screenMode)
+        {
+            return;
+        }
+
         ScreenMode = screenMode;
 
         var hiResMultiplier = screenMode == ScreenMode.TimexHiRes ? 2 : 1;

@@ -10,6 +10,7 @@ public sealed class ScreenBuffer
 
     private bool _borderColorChanged = true;
     private Color? _lockedBorderColor;
+    private ScreenMode _screenMode = ScreenMode.Spectrum;
 
     public FrameBuffer FrameBuffer { get; }
 
@@ -35,12 +36,18 @@ public sealed class ScreenBuffer
         _lockedBorderColor = screenMode != ScreenMode.TimexHiRes ? null : paper;
 
         FrameBuffer.ChangeScreenMode(screenMode);
+
         _content.ChangeScreenMode(screenMode, ink, paper);
         _border.ChangeScreenMode(screenMode);
 
         _border.Update(_lockedBorderColor ?? LastBorderColor, frameTicks);
 
-        FrameBufferChanged?.Invoke(this, EventArgs.Empty);
+        if (_screenMode != screenMode)
+        {
+            FrameBufferChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        _screenMode = screenMode;
     }
 
     internal void NewFrame()
