@@ -4,15 +4,29 @@ namespace OldBit.Spectron.Emulation.Screen;
 /// Represents a buffer for the ZX Spectrum screen with predefined dimensions
 /// that includes all pixels for both content and border areas.
 /// </summary>
-public sealed class FrameBuffer(Color fillColor)
+public sealed class FrameBuffer
 {
-    public static int Width => ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight;
+    private static readonly Color DefaultFillColor = SpectrumPalette.White;
 
-    public static int Height => ScreenSize.BorderTop + ScreenSize.ContentHeight + ScreenSize.BorderBottom;
+    internal ScreenMode ScreenMode { get; }
+    public int Width { get; }
+    public int Height { get; }
 
-    public readonly Color[] Pixels = Enumerable.Repeat(fillColor, Width * Height).ToArray();
+    public readonly Color[] Pixels;
+
+    public FrameBuffer(ScreenMode screenMode = ScreenMode.Spectrum)
+    {
+        ScreenMode = screenMode;
+
+        var hiResMultiplier = screenMode == ScreenMode.TimexHiRes ? 2 : 1;
+
+        Width = ScreenSize.BorderLeft + ScreenSize.ContentWidth * hiResMultiplier + ScreenSize.BorderRight;
+        Height = ScreenSize.BorderTop + ScreenSize.ContentHeight + ScreenSize.BorderBottom;
+
+        Pixels = Enumerable.Repeat(DefaultFillColor, Width * Height).ToArray();
+    }
 
     internal void Fill(int start, int count, Color color) => Array.Fill(Pixels, color, start, count);
 
-    internal static int GetLineIndex(int line, int borderTop) => Width * borderTop + ScreenSize.BorderLeft + Width * line;
+    internal int GetLineIndex(int line, int borderTop) => Width * borderTop + ScreenSize.BorderLeft + Width * line;
 }

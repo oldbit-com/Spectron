@@ -82,7 +82,7 @@ public sealed class AudioManager
 
     internal AudioManager(Clock clock, CassettePlayer? cassettePlayer, HardwareSettings hardware, Func<Word, bool> isUlaPort)
     {
-        Ay =  new AyDevice(hardware.ComputerType);
+        Ay =  new AyDevice();
 
         IsAySupported = hardware.HasAyChip;
 

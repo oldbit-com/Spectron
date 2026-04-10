@@ -10,6 +10,7 @@ namespace OldBit.Spectron.Recorder;
 
 public sealed class MediaRecorder : IDisposable
 {
+    private readonly FrameBuffer _frameBuffer;
     private readonly RecorderMode _recorderMode;
     private readonly string _filePath;
     private readonly RecorderOptions _options;
@@ -23,11 +24,13 @@ public sealed class MediaRecorder : IDisposable
     private bool _isRecordingActive;
 
     public MediaRecorder(
+        FrameBuffer frameBuffer,
         RecorderMode recorderMode,
         string filePath,
         RecorderOptions options,
         ILogger logger)
     {
+        _frameBuffer = frameBuffer;
         _recorderMode = recorderMode;
         _filePath = filePath;
         _options = options;
@@ -156,7 +159,7 @@ public sealed class MediaRecorder : IDisposable
         var tempVideoFilePath = $"{_filePath}.temp.mp4";
         var tempAudioFilePath = $"{_filePath}.temp.wav";
 
-        var videoProcessor = new VideoProcessor(_options, tempVideoFilePath, _videoRecordedFilePath, tempAudioFilePath);
+        var videoProcessor = new VideoProcessor(_frameBuffer, _options, tempVideoFilePath, _videoRecordedFilePath, tempAudioFilePath);
         videoProcessor.Process();
 
         FileHelper.TryDeleteFile(_audioRecordedFilePath);

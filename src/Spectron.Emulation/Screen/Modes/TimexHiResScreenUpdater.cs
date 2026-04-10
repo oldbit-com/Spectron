@@ -13,10 +13,18 @@ internal class TimexHiResScreenUpdater(
 {
     private readonly bool[] _dirtyAddresses = new bool[16384];
 
-    public void Update(int frameBufferIndex, Word bitmapAddress, Word attributeAddress)
+    public void Update(int frameBufferIndex, Word bitmapAddress, Word attributeAddress, int byteIndex)
     {
-        Update(frameBufferIndex, bitmapAddress);
-        Update(frameBufferIndex, (Word)(bitmapAddress + 0x2000));
+        if (byteIndex == 1)
+        {
+            Update(frameBufferIndex, bitmapAddress);
+            Update(frameBufferIndex + 8, (Word)(bitmapAddress + 0x2000));
+        }
+        else
+        {
+           Update(frameBufferIndex + 8, bitmapAddress);
+           Update(frameBufferIndex + 16, (Word)(bitmapAddress + 0x2000));
+        }
     }
 
     private void Update(int frameBufferIndex, Word bitmapAddress)

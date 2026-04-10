@@ -50,7 +50,8 @@ public sealed class UlaTimex : IDevice
             0b100_000 => SpectrumPalette.BrightGreen,
             0b101_000 => SpectrumPalette.BrightCyan,
             0b110_000 => SpectrumPalette.BrightYellow,
-            0b111_000 => SpectrumPalette.BrightWhite
+            0b111_000 => SpectrumPalette.BrightWhite,
+            _ => throw new ArgumentOutOfRangeException(nameof(value))
         };
 
         Paper = (value & 0b111_000) switch
@@ -62,7 +63,8 @@ public sealed class UlaTimex : IDevice
             0b100_000 => SpectrumPalette.BrightMagenta,
             0b101_000 => SpectrumPalette.BrightRed,
             0b110_000 => SpectrumPalette.BrightBlue,
-            0b111_000 => SpectrumPalette.Black
+            0b111_000 => SpectrumPalette.Black,
+            _ => throw new ArgumentOutOfRangeException(nameof(value))
         };
 
         if (_lastControlValue != value)
@@ -72,4 +74,6 @@ public sealed class UlaTimex : IDevice
 
         _lastControlValue = value;
     }
+
+    internal void Reset() => WritePort(ControlPort, 0);
 }

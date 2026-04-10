@@ -79,10 +79,10 @@ public sealed class Emulator
     public Interface1Device Interface1 { get; }
     public ZxPrinter Printer { get; }
     public UlaTimex? UlaTimex { get; }
+    public ScreenBuffer ScreenBuffer { get; }
 
     public int TicksPerFrame => _hardware.TicksPerFrame;
 
-    internal ScreenBuffer ScreenBuffer { get; }
     internal UlaPlus UlaPlus { get; }
 
     internal Emulator(
@@ -113,6 +113,7 @@ public sealed class Emulator
 
         UlaPlus = new UlaPlus();
         _spectrumBus = new SpectrumBus();
+
         ScreenBuffer = new ScreenBuffer(hardware, emulatorArgs.Memory, UlaPlus);
 
         if (ComputerType == ComputerType.Timex2048)
@@ -213,6 +214,7 @@ public sealed class Emulator
         Interface1.Reset();
         DivMmc.Reset();
         Beta128.Reset();
+        UlaTimex?.Reset();
     }
 
     public void Break()
@@ -255,12 +257,9 @@ public sealed class Emulator
 
         if (UlaTimex != null)
         {
-            UlaTimex.ScreenModeChanged += UlaTimexOnScreenModeChanged;
+            UlaTimex.ScreenModeChanged += (sender, _) => _screenMemoryHandler.SetScreenMode(sender as UlaTimex);
         }
     }
-
-    private void UlaTimexOnScreenModeChanged(object? sender, EventArgs e) =>
-        _screenMemoryHandler.SetScreenMode(sender as UlaTimex);
 
     private void AddDevices()
     {

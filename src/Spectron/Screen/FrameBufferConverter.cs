@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
@@ -18,15 +19,17 @@ internal sealed class FrameBufferConverter : IDisposable
     private int _startFrameBufferCol;
     private int _endFrameBufferCol;
 
+    private readonly FrameBuffer _frameBuffer;
+
     internal WriteableBitmap ScreenBitmap { get; private set; }
 
-    internal FrameBufferConverter()
+    internal FrameBufferConverter(FrameBuffer frameBuffer, BorderSize borderSize)
     {
-        SetBorderSize(BorderSize.Full);
-        ScreenBitmap = CreateBitmap();
+        _frameBuffer = frameBuffer;
+        SetBorderSize(borderSize);
     }
 
-    internal void UpdateBitmap(FrameBuffer frameBuffer)
+    internal void UpdateBitmap()
     {
         using var lockedBitmap = ScreenBitmap.Lock();
 
@@ -34,7 +37,7 @@ internal sealed class FrameBufferConverter : IDisposable
 
         for (var frameBufferRow = _startFrameBufferRow; frameBufferRow <= _endFrameBufferRow; frameBufferRow++)
         {
-            var rowOffset = frameBufferRow * FrameBuffer.Width;
+            var rowOffset = frameBufferRow * _frameBuffer.Width;
 
             for (var frameBufferCol = _startFrameBufferCol; frameBufferCol <= _endFrameBufferCol; frameBufferCol++)
             {
@@ -42,7 +45,7 @@ internal sealed class FrameBufferConverter : IDisposable
 
                 unsafe
                 {
-                    fixed (Color* color = &frameBuffer.Pixels[pixelIndex])
+                    fixed (Color* color = &_frameBuffer.Pixels[pixelIndex])
                     {
                         var pixelColor = *(uint*)color;
                         *(uint*)targetAddress = pixelColor;
@@ -54,6 +57,7 @@ internal sealed class FrameBufferConverter : IDisposable
         }
     }
 
+    [MemberNotNull(nameof(ScreenBitmap))]
     internal void SetBorderSize(BorderSize borderSize)
     {
         _border = borderSize switch
@@ -66,17 +70,17 @@ internal sealed class FrameBufferConverter : IDisposable
         };
 
         _startFrameBufferRow = BorderSizes.Max.Top - _border.Top;
-        _endFrameBufferRow = FrameBuffer.Height - (BorderSizes.Max.Bottom - _border.Bottom) - 1;
+        _endFrameBufferRow = _frameBuffer.Height - (BorderSizes.Max.Bottom - _border.Bottom) - 1;
         _startFrameBufferCol = BorderSizes.Max.Left - _border.Left;
-        _endFrameBufferCol = FrameBuffer.Width - (BorderSizes.Max.Right - _border.Right) - 1;
+        _endFrameBufferCol = _frameBuffer.Width - (BorderSizes.Max.Right - _border.Right) - 1;
 
         ScreenBitmap = CreateBitmap();
     }
 
     private WriteableBitmap CreateBitmap()
     {
-        var height = FrameBuffer.Height - (BorderSizes.Max.Top - _border.Top) - (BorderSizes.Max.Bottom - _border.Bottom);
-        var width = FrameBuffer.Width - (BorderSizes.Max.Left - _border.Left) - (BorderSizes.Max.Right - _border.Right);
+        var height = _frameBuffer.Height - (BorderSizes.Max.Top - _border.Top) - (BorderSizes.Max.Bottom - _border.Bottom);
+        var width = _frameBuffer.Width - (BorderSizes.Max.Left - _border.Left) - (BorderSizes.Max.Right - _border.Right);
 
         return new WriteableBitmap(
             new PixelSize(

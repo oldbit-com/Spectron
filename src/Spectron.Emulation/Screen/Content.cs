@@ -10,22 +10,27 @@ internal sealed class Content(
     IEmulatorMemory memory,
     UlaPlus ulaPlus)
 {
-    private readonly ScreenRenderEvent[] _screenRenderEvents = FastLookup.GetScreenRenderEvents(hardware);
+    private ScreenRenderEvent[] _screenRenderEvents = FastLookup.GetScreenRenderEvents(hardware, frameBuffer);
 
     private int _frameCount = 1;
     private int _fetchCycleIndex;
 
     private IScreenUpdater _screenUpdater = new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus, 0x4000);
 
-    internal void SetScreenMode(ScreenMode screenMode, Color ink, Color paper) => _screenUpdater = screenMode switch
+    internal void SetScreenMode(ScreenMode screenMode, Color ink, Color paper)
     {
-        ScreenMode.Spectrum => new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus, 0x4000),
-        ScreenMode.TimexScreen1 => new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus, 0x6000),
-        ScreenMode.TimexHiColor => new TimexHiColorScreenUpdater(frameBuffer, memory, isAlternate: false),
-        ScreenMode.TimexHiColorAlt => new TimexHiColorScreenUpdater(frameBuffer, memory, isAlternate: true),
-        ScreenMode.TimexHiRes => new TimexHiResScreenUpdater(frameBuffer, memory, ink, paper),
-        _ => _screenUpdater
-    };
+        _screenRenderEvents = FastLookup.GetScreenRenderEvents(hardware, frameBuffer, screenMode);
+
+        _screenUpdater = screenMode switch
+        {
+            ScreenMode.Spectrum => new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus, 0x4000),
+            ScreenMode.TimexScreen1 => new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus, 0x6000),
+            ScreenMode.TimexHiColor => new TimexHiColorScreenUpdater(frameBuffer, memory, isAlternate: false),
+            ScreenMode.TimexHiColorAlt => new TimexHiColorScreenUpdater(frameBuffer, memory, isAlternate: true),
+            ScreenMode.TimexHiRes => new TimexHiResScreenUpdater(frameBuffer, memory, ink, paper),
+            _ => _screenUpdater
+        };
+    }
 
     /// <summary>
     /// Updates the frame buffer with the content of the screen at the specified frame ticks. This allows
@@ -51,11 +56,11 @@ internal sealed class Content(
 
             // First byte and attribute
             _screenUpdater.Update(fetchCycleData.FrameBufferIndex, fetchCycleData.BitmapAddress,
-                fetchCycleData.AttributeAddress);
+                fetchCycleData.AttributeAddress, 1);
 
             // Second byte and attribute
             _screenUpdater.Update(fetchCycleData.FrameBufferIndex + 8, (Word)(fetchCycleData.BitmapAddress + 1),
-                (Word)(fetchCycleData.AttributeAddress + 1));
+                (Word)(fetchCycleData.AttributeAddress + 1), 2);
 
             _fetchCycleIndex += 1;
 

@@ -3,19 +3,31 @@ using OldBit.Spectron.Emulation.Devices.Memory;
 
 namespace OldBit.Spectron.Emulation.Screen;
 
-internal sealed class ScreenBuffer
+public sealed class ScreenBuffer
 {
-    private readonly Border _border;
-    private readonly Content _content;
+    private readonly HardwareSettings _hardware;
+    private readonly IEmulatorMemory _memory;
+    private readonly UlaPlus _ulaPlus;
+
+    private Border _border;
+    private Content _content;
 
     private bool _borderColorChanged = true;
     private Color? _lockedBorderColor;
 
-    public FrameBuffer FrameBuffer { get; } = new(SpectrumPalette.White);
+    public FrameBuffer FrameBuffer { get; private set; }
+
     internal Color LastBorderColor { get; private set; } = SpectrumPalette.White;
+
+    public event EventHandler<EventArgs>? FrameBufferChanged;
 
     internal ScreenBuffer(HardwareSettings hardware, IEmulatorMemory memory, UlaPlus ulaPlus)
     {
+        _hardware = hardware;
+        _memory = memory;
+        _ulaPlus = ulaPlus;
+        FrameBuffer = new FrameBuffer();
+
         _border = new Border(hardware, FrameBuffer);
         _content = new Content(hardware, FrameBuffer, memory, ulaPlus);
 
@@ -29,8 +41,18 @@ internal sealed class ScreenBuffer
     {
         _lockedBorderColor = screenMode != ScreenMode.TimexHiRes ? null : paper;
 
+        FrameBuffer = new FrameBuffer(screenMode);
+
+        _border = new Border(_hardware, FrameBuffer);
+        _content = new Content(_hardware, FrameBuffer, _memory, _ulaPlus);
+
         _content.SetScreenMode(screenMode, ink, paper);
         _content.Invalidate();
+
+        _border.SetScreenMode(screenMode);
+        _border.Invalidate();
+
+        FrameBufferChanged?.Invoke(this, EventArgs.Empty);
     }
 
     internal void NewFrame()

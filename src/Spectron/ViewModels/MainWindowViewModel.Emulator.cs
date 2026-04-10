@@ -150,6 +150,8 @@ partial class MainWindowViewModel
 
         _debuggerViewModel?.ConfigureEmulator(Emulator);
 
+        InitializeFrameBuffer();
+
         Emulator.Start();
 
         if (shouldResume)

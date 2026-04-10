@@ -34,7 +34,7 @@ public class BorderTests
     [Fact]
     public void BorderRenderer_ShouldSetBorderBlue()
     {
-        var screenBuffer = new FrameBuffer(SpectrumPalette.White);
+        var screenBuffer = new FrameBuffer();
         var borderRenderer = new Border(Hardware.Spectrum48K, screenBuffer);
         borderRenderer.Update(SpectrumPalette.Blue);
 
@@ -48,7 +48,7 @@ public class BorderTests
     {
         var random = new Random(69888);
 
-        var screenBuffer = new FrameBuffer(SpectrumPalette.White);
+        var screenBuffer = new FrameBuffer();
         var borderRenderer = new Border(Hardware.Spectrum48K, screenBuffer);
         borderRenderer.Update(SpectrumPalette.Red);
 
@@ -65,7 +65,7 @@ public class BorderTests
     [Fact]
     public void BorderRenderer_ShouldMatchAquaplane()
     {
-        var screenBuffer = new FrameBuffer(SpectrumPalette.White);
+        var screenBuffer = new FrameBuffer();
         var borderRenderer = new Border(Hardware.Spectrum48K, screenBuffer);
 
         borderRenderer.Update(SpectrumPalette.Cyan, 1);

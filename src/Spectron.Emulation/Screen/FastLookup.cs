@@ -6,7 +6,7 @@ internal record ScreenRenderEvent(Word BitmapAddress, Word AttributeAddress, int
 
 internal static class FastLookup
 {
-    private static readonly Dictionary<ComputerType, ScreenRenderEvent[]> ScreenRenderEvents = new();
+    private static readonly Dictionary<string, ScreenRenderEvent[]> ScreenRenderEvents = new();
 
     /// <summary>
     /// Bit masks for each bit in a byte.
@@ -32,17 +32,22 @@ internal static class FastLookup
     /// bytes of the screen.
     /// </summary>
     /// <param name="hardware">The hardware settings.</param>
+    /// <param name="frameBuffer">The frame buffer to use for screen rendering.</param>
+    /// <param name="screenMode">The screen mode to use for screen rendering.</param>
     /// <returns>A list of <see cref="ScreenRenderEvent"/> events.</returns>
-    internal static ScreenRenderEvent[] GetScreenRenderEvents(HardwareSettings hardware)
+    internal static ScreenRenderEvent[] GetScreenRenderEvents(HardwareSettings hardware,
+        FrameBuffer frameBuffer, ScreenMode screenMode = ScreenMode.Spectrum)
     {
-        if (ScreenRenderEvents.TryGetValue(hardware.ComputerType, out var events))
+        var key = $"{hardware.ComputerType}-{screenMode}";
+
+        if (ScreenRenderEvents.TryGetValue(key, out var events))
         {
             return events;
         }
 
-        ScreenRenderEvents[hardware.ComputerType] = BuildScreenEventsTable(hardware);
+        ScreenRenderEvents[key] = BuildScreenEventsTable(hardware, frameBuffer);
 
-        return ScreenRenderEvents[hardware.ComputerType];
+        return ScreenRenderEvents[key];
     }
 
     private static AttributeColor[] BuildAttributeColorLookupTable()
@@ -80,14 +85,15 @@ internal static class FastLookup
         return screenAddressLookup;
     }
 
-    private static ScreenRenderEvent[] BuildScreenEventsTable(HardwareSettings hardware)
+    private static ScreenRenderEvent[] BuildScreenEventsTable(HardwareSettings hardware, FrameBuffer frameBuffer)
     {
+        var hiResFactor = frameBuffer.ScreenMode == ScreenMode.TimexHiRes ? 2 : 1;
         var screenEvents = new List<ScreenRenderEvent>();
 
         for (var y = 0; y < ScreenSize.ContentHeight; y++)
         {
             var rowTime = hardware.FirstPixelTicks + hardware.TicksPerLine * y;
-            var bufferLineIndex = FrameBuffer.GetLineIndex(y, hardware.BorderTop);
+            var bufferLineIndex = frameBuffer.GetLineIndex(y, hardware.BorderTop);
 
             for (var x = 0; x < 16; x++)
             {
@@ -98,7 +104,7 @@ internal static class FastLookup
                     BitmapAddress: (Word)bitmapAddress,
                     AttributeAddress: (Word)attributeAddress,
                     Ticks: rowTime + 8 * x,
-                    FrameBufferIndex: bufferLineIndex + 8 * x * 2));
+                    FrameBufferIndex: bufferLineIndex + 8 * x * 2 * hiResFactor));
             }
         }
 

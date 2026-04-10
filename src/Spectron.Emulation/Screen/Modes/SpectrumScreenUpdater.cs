@@ -15,7 +15,7 @@ internal sealed class SpectrumScreenUpdater(
     private readonly bool[] _dirtyAddresses = new bool[32 * 24 * 8];
     private bool _isFlashOnFrame;
 
-    public void Update(int frameBufferIndex, Word bitmapAddress, Word attributeAddress)
+    public void Update(int frameBufferIndex, Word bitmapAddress, Word attributeAddress, int byteIndex)
     {
         if (!_dirtyAddresses[bitmapAddress])
         {
