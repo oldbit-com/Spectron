@@ -30,17 +30,15 @@ public sealed class ScreenBuffer
         }
     }
 
-    internal void ChangeScreenMode(ScreenMode screenMode, Color ink, Color paper)
+    internal void ChangeScreenMode(ScreenMode screenMode, Color ink, Color paper, int frameTicks)
     {
         _lockedBorderColor = screenMode != ScreenMode.TimexHiRes ? null : paper;
 
         FrameBuffer.ChangeScreenMode(screenMode);
-
         _content.ChangeScreenMode(screenMode, ink, paper);
         _border.ChangeScreenMode(screenMode);
 
-        _content.Invalidate();
-        _border.Invalidate();
+        _border.Update(_lockedBorderColor ?? LastBorderColor, frameTicks);
 
         FrameBufferChanged?.Invoke(this, EventArgs.Empty);
     }

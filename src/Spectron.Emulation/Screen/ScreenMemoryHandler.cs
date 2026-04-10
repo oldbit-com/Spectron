@@ -16,7 +16,7 @@ internal sealed class ScreenMemoryHandler
         memory.MemoryUpdated += SpectrumHandler;
     }
 
-    internal void SetScreenMode(UlaTimex? ulaTimex)
+    internal void SetScreenMode(UlaTimex? ulaTimex, int frameTicks = 0)
     {
         RemoveHandlers();
 
@@ -45,7 +45,8 @@ internal sealed class ScreenMemoryHandler
         _screenBuffer.ChangeScreenMode(
             screenMode,
             ulaTimex?.Ink ?? SpectrumPalette.Black,
-            ulaTimex?.Paper ?? SpectrumPalette.White);
+            ulaTimex?.Paper ?? SpectrumPalette.White,
+            frameTicks);
     }
 
     private void RemoveHandlers()

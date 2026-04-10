@@ -29,6 +29,8 @@ internal sealed class Border(HardwareSettings hardwareSettings, FrameBuffer fram
             screenMode == ScreenMode.TimexHiRes ? 2 * ScreenSize.ContentWidth : ScreenSize.ContentWidth);
 
         _screenMode = screenMode;
+
+        Invalidate();
     }
 
     internal void Update(Color color) => _lastColor = color;

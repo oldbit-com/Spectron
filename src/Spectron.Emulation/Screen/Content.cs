@@ -30,6 +30,8 @@ internal sealed class Content(
             ScreenMode.TimexHiRes => new TimexHiResScreenUpdater(frameBuffer, memory, ink, paper),
             _ => _screenUpdater
         };
+
+        Invalidate();
     }
 
     /// <summary>

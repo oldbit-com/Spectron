@@ -257,7 +257,8 @@ public sealed class Emulator
 
         if (UlaTimex != null)
         {
-            UlaTimex.ScreenModeChanged += (sender, _) => _screenMemoryHandler.SetScreenMode(sender as UlaTimex);
+            UlaTimex.ScreenModeChanged += (sender, _) =>
+                _screenMemoryHandler.SetScreenMode(sender as UlaTimex, Cpu.Clock.FrameTicks);
         }
     }
 
