@@ -5,17 +5,13 @@ namespace OldBit.Spectron.Emulation.Screen;
 
 public sealed class ScreenBuffer
 {
-    private readonly HardwareSettings _hardware;
-    private readonly IEmulatorMemory _memory;
-    private readonly UlaPlus _ulaPlus;
-
     private readonly Border _border;
     private readonly Content _content;
 
     private bool _borderColorChanged = true;
     private Color? _lockedBorderColor;
 
-    public FrameBuffer FrameBuffer { get; private set; }
+    public FrameBuffer FrameBuffer { get; }
 
     internal Color LastBorderColor { get; private set; } = SpectrumPalette.White;
 
@@ -23,10 +19,6 @@ public sealed class ScreenBuffer
 
     internal ScreenBuffer(HardwareSettings hardware, IEmulatorMemory memory, UlaPlus ulaPlus)
     {
-        _hardware = hardware;
-        _memory = memory;
-        _ulaPlus = ulaPlus;
-
         FrameBuffer = new FrameBuffer();
 
         _border = new Border(hardware, FrameBuffer);

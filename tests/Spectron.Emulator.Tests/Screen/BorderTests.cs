@@ -9,6 +9,9 @@ public class BorderTests
     private readonly List<BorderTick> _borderTicks =
         Border.BuildBorderTickRanges(Hardware.Spectrum48K.RetraceTicks, Hardware.Spectrum48K.BorderTop);
 
+    private readonly List<BorderTick> _hiResBorderTicks =
+        Border.BuildBorderTickRanges(Hardware.Timex2048.RetraceTicks, Hardware.Timex2048.BorderTop, ScreenSize.ContentWidth * 2);
+
     [Theory]
     [InlineData(0, 0, 151, 48)]                 // first top border line
     [InlineData(1, 200, 375, 352)]
@@ -29,6 +32,30 @@ public class BorderTests
         _borderTicks[index].StartTick.ShouldBe(startTick);
         _borderTicks[index].EndTick.ShouldBe(endTick);
         _borderTicks[index].StartPixel.ShouldBe(startPixel);
+        _borderTicks[index].Shift.ShouldBe(1);
+    }
+
+    [Theory]
+    [InlineData(0, 0, 127, 48, 2)]
+    [InlineData(1, 128, 151, 560, 1)]
+    [InlineData(2, 200, 223, 608, 1)]
+    [InlineData(3, 224, 351, 656, 2)]
+    [InlineData(4, 352, 375, 1168, 1)]
+    [InlineData(191, 14312, 14335, 38912, 1)]
+    [InlineData(575, 57320, 57343, 155648, 1)]
+    [InlineData(576, 57344, 57471, 155696, 2)]
+    [InlineData(577, 57472, 57495, 156208, 1)]
+    public void BorderTicksTable_ShouldHaveCorrectHiResRanges(
+        int index,
+        int startTick,
+        int endTick,
+        int startPixel,
+        int shift)
+    {
+        _hiResBorderTicks[index].StartTick.ShouldBe(startTick);
+        _hiResBorderTicks[index].EndTick.ShouldBe(endTick);
+        _hiResBorderTicks[index].StartPixel.ShouldBe(startPixel);
+        _hiResBorderTicks[index].Shift.ShouldBe(shift);
     }
 
     [Fact]
@@ -77,6 +104,21 @@ public class BorderTests
         screenBuffer.Pixels[50..351].ShouldAllBe(c => c == SpectrumPalette.Cyan);
     }
 
+    [Fact]
+    public void BorderRenderer_ShouldFillFullTopAndBottomBordersInTimexHiRes()
+    {
+        var screenBuffer = new FrameBuffer();
+        screenBuffer.ChangeScreenMode(ScreenMode.TimexHiRes);
+
+        var borderRenderer = new Border(Hardware.Timex2048, screenBuffer);
+        borderRenderer.ChangeScreenMode(ScreenMode.TimexHiRes);
+        borderRenderer.Update(SpectrumPalette.Red);
+
+        borderRenderer.Update(SpectrumPalette.Red, Hardware.Timex2048.TicksPerFrame);
+
+        HiResBorderShouldHaveColor(SpectrumPalette.Red, screenBuffer.Pixels);
+    }
+
     private static void BorderShouldHaveColor(Color color, Color[] screenBuffer)
     {
         screenBuffer[..47].ShouldAllBe(c => c == SpectrumPalette.White);
@@ -90,5 +132,36 @@ public class BorderTests
         }
 
         screenBuffer[90112..].ShouldAllBe(c => c == color);
+    }
+
+    private static void HiResBorderShouldHaveColor(Color color, Color[] screenBuffer)
+    {
+        const int width = ScreenSize.BorderLeft + ScreenSize.ContentWidth * 2 + ScreenSize.BorderRight;
+        const int topPixels = ScreenSize.BorderTop * width;
+        const int bottomStart = topPixels + ScreenSize.ContentHeight * width;
+
+        screenBuffer[..47].ShouldAllBe(c => c == SpectrumPalette.White);
+        screenBuffer[48..topPixels].ShouldAllBe(c => c == color);
+
+        for (var i = 0; i < ScreenSize.ContentHeight; i++)
+        {
+            screenBuffer
+                .Skip(topPixels + i * width)
+                .Take(ScreenSize.BorderLeft)
+                .ShouldAllBe(c => c == color);
+
+            screenBuffer
+                .Skip(topPixels + i * width + ScreenSize.BorderLeft)
+                .Take(ScreenSize.ContentWidth * 2)
+                .ShouldAllBe(c => c == SpectrumPalette.White);
+
+            screenBuffer
+                .Skip(topPixels + i * width + ScreenSize.BorderLeft + ScreenSize.ContentWidth * 2)
+                .Take(ScreenSize.BorderRight)
+                .ShouldAllBe(c => c == color);
+        }
+
+        screenBuffer[bottomStart..(width * (ScreenSize.BorderTop + ScreenSize.ContentHeight + ScreenSize.BorderBottom))]
+            .ShouldAllBe(c => c == color);
     }
 }
