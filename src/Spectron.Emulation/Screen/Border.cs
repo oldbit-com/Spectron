@@ -1,6 +1,6 @@
 namespace OldBit.Spectron.Emulation.Screen;
 
-public record struct BorderTick(int StartTick, int EndTick, int StartPixel, string Type);
+public record struct BorderTick(int StartTick, int EndTick, int StartPixel);
 
 internal sealed class Border(HardwareSettings hardwareSettings, FrameBuffer frameBuffer)
 {
@@ -109,9 +109,10 @@ internal sealed class Border(HardwareSettings hardwareSettings, FrameBuffer fram
 
         for (var line = 0; line < totalLines; line++)
         {
+            // Top border
             if (line < borderTop)
             {
-                ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel, "Top Border"));
+                ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
 
                 startTick = endTick + retraceTicks;
                 endTick = startTick + LeftBorderTicks + ContentLineTicks + RightBorderTicks;
@@ -119,11 +120,12 @@ internal sealed class Border(HardwareSettings hardwareSettings, FrameBuffer fram
                     ? contentWidth + ScreenSize.BorderRight
                     : ScreenSize.BorderLeft + contentWidth + ScreenSize.BorderRight;
             }
+            // Bottom border
             else if (line >= borderTop + ScreenSize.ContentHeight)
             {
                 endTick = startTick + LeftBorderTicks + ContentLineTicks + RightBorderTicks;
 
-                ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel, "Bottom Border"));
+                ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
 
                 startTick = endTick + retraceTicks;
                 startPixel += ScreenSize.BorderLeft + contentWidth + ScreenSize.BorderRight;
@@ -132,7 +134,7 @@ internal sealed class Border(HardwareSettings hardwareSettings, FrameBuffer fram
             {
                 // Left border
                 endTick = startTick + LeftBorderTicks;
-                ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel, "Left Border"));
+                ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
 
                 // Skip content area
                 startTick = endTick + ContentLineTicks;
@@ -140,7 +142,7 @@ internal sealed class Border(HardwareSettings hardwareSettings, FrameBuffer fram
                 startPixel += ScreenSize.BorderLeft + contentWidth;
 
                 // Right border
-                ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel, "Right Border"));
+                ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
                 startTick = endTick + retraceTicks;
                 startPixel += ScreenSize.BorderRight;
             }
