@@ -9,21 +9,26 @@ internal class TimexHiResAttrScreenUpdater(
     FrameBuffer frameBuffer,
     IEmulatorMemory memory,
     Color ink,
-    Color paper) : IScreenUpdater
+    Color paper,
+    bool isAlternative = false) : IScreenUpdater
 {
     private readonly bool[] _dirtyAddresses = new bool[16384];
+    private readonly int _offset = isAlternative ? 0x2000 : 0;
 
     public void Update(int frameBufferIndex, Word bitmapAddress, Word attributeAddress, int byteIndex)
     {
+        var actualBitmapAddress = (Word)(bitmapAddress + _offset);
+        var actualAttributeAddress = (Word)(attributeAddress + _offset);
+
         if (byteIndex == 1)
         {
-            Update(frameBufferIndex, bitmapAddress, bitmapAddress);
-            Update(frameBufferIndex + 8, (Word)(bitmapAddress + 0x2000), attributeAddress);
+            Update(frameBufferIndex, bitmapAddress, actualBitmapAddress);
+            Update(frameBufferIndex + 8, (Word)(bitmapAddress + 0x2000), actualAttributeAddress);
         }
         else
         {
-           Update(frameBufferIndex + 8, bitmapAddress, bitmapAddress);
-           Update(frameBufferIndex + 16, (Word)(bitmapAddress + 0x2000), attributeAddress);
+           Update(frameBufferIndex + 8, bitmapAddress, actualBitmapAddress);
+           Update(frameBufferIndex + 16, (Word)(bitmapAddress + 0x2000), actualAttributeAddress);
         }
     }
 
@@ -49,7 +54,7 @@ internal class TimexHiResAttrScreenUpdater(
 
     public void SetDirty(int address)
     {
-        address -= 0x4000;
+        address -= isAlternative ? 0x6000 : 0x4000;
 
         if (address < 0x1800)
         {

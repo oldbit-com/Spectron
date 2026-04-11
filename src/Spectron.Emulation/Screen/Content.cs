@@ -25,10 +25,13 @@ internal sealed class Content(
         {
             ScreenMode.Spectrum => new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus, 0x4000),
             ScreenMode.TimexSecondScreen => new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus, 0x6000),
-            ScreenMode.TimexHiColor => new TimexHiColorScreenUpdater(frameBuffer, memory, isAlternate: false),
-            ScreenMode.TimexHiColorAlt => new TimexHiColorScreenUpdater(frameBuffer, memory, isAlternate: true),
+            ScreenMode.TimexHiColor => new TimexHiColorScreenUpdater(frameBuffer, memory),
+            ScreenMode.TimexHiColorAlt => new TimexHiColorScreenUpdater(frameBuffer, memory, isAlternative: true),
             ScreenMode.TimexHiRes => new TimexHiResScreenUpdater(frameBuffer, memory, ink, paper),
             ScreenMode.TimexHiResAttr => new TimexHiResAttrScreenUpdater(frameBuffer, memory, ink, paper),
+            ScreenMode.TimexHiResAttrAlt => new TimexHiResAttrScreenUpdater(frameBuffer, memory, ink, paper, isAlternative: true),
+            // TODO: Implement TimexHiResDouble
+            // ScreenMode.TimexHiResDouble =>
             _ => _screenUpdater
         };
 

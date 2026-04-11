@@ -37,9 +37,9 @@ public sealed class UlaTimex : IDevice
             0b010 => ScreenMode.TimexHiColor,
             0b011 => ScreenMode.TimexHiColorAlt,
             0b100 => ScreenMode.TimexHiResAttr,
+            0b101 => ScreenMode.TimexHiResAttrAlt,
             0b110 => ScreenMode.TimexHiRes,
             0b111 => ScreenMode.TimexHiResDouble,
-            // TODO: Handle alternate modes
             _ => ScreenMode
         };
 

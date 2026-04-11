@@ -8,7 +8,7 @@ namespace OldBit.Spectron.Emulation.Screen.Modes;
 internal class TimexHiColorScreenUpdater(
     FrameBuffer frameBuffer,
     IEmulatorMemory memory,
-    bool isAlternate) : IScreenUpdater
+    bool isAlternative = false) : IScreenUpdater
 {
     private const int SpectrumScreenAddress = 0x4000;
     private const int AttributesScreenAddress = 0x6000;
@@ -23,7 +23,7 @@ internal class TimexHiColorScreenUpdater(
             return;
         }
 
-        var bitmap = memory.Read((Word)(bitmapAddress + (isAlternate ? AttributesScreenAddress : SpectrumScreenAddress)));
+        var bitmap = memory.Read((Word)(bitmapAddress + (isAlternative ? AttributesScreenAddress : SpectrumScreenAddress)));
         var attribute = memory.Read((Word)(bitmapAddress + AttributesScreenAddress));
 
         var attributeData = FastLookup.AttributeData[attribute];

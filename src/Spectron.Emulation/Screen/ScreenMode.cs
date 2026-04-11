@@ -13,7 +13,7 @@ public enum ScreenMode
     TimexSecondScreen = 0x01,
 
     /// <summary>
-    /// Hi-color Timex screen. Standard screen is used for data, and the second screen for attributes.
+    /// Hi-color Timex screen. The standard screen is used for data, and the second screen for attributes.
     /// </summary>
     TimexHiColor = 0x02,
 
@@ -23,7 +23,7 @@ public enum ScreenMode
     TimexHiColorAlt = 0x03,
 
     /// <summary>
-    /// Hi-res Timex screen. A standard screen is used to display even bytes and
+    /// Hi-res Timex screen. The standard screen is used to display even bytes and
     /// attributes for odd bytes.
     /// </summary>
     TimexHiResAttr = 0x04,
@@ -35,7 +35,7 @@ public enum ScreenMode
     TimexHiResAttrAlt = 0x05,
 
     /// <summary>
-    /// Hi-res Timex screen. Standard screen is used to display even bytes and
+    /// Hi-res Timex screen. The standard screen is used to display even bytes and
     /// a second screen for odd bytes to create a 512x192 pixel screen.
     /// </summary>
     TimexHiRes = 0x06,
