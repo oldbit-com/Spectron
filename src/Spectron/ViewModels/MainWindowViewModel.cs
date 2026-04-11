@@ -63,13 +63,13 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly QuickSaveService _quickSaveService;
     private readonly ILogStore _logStore;
     private readonly ILogger _logger;
-    private readonly FrameBufferConverter _frameBufferConverter = new();
     private readonly KeyboardHandler _keyboardHandler;
     private readonly Stopwatch _renderStopwatch = new();
     private readonly FrameRateCalculator _frameRateCalculator = new();
     private readonly ScreenshotViewModel _screenshotViewModel = new();
 
     private Emulator? Emulator { get; set; }
+    private FrameBufferConverter? _frameBufferConverter;
     private Preferences _preferences = new();
     private FavoritePrograms _favorites = new();
     private TimeSpan _lastScreenRender = TimeSpan.Zero;
@@ -384,8 +384,6 @@ public partial class MainWindowViewModel : ObservableObject
         DiskDriveMenuViewModel = diskDriveMenuViewModel;
         recentFilesViewModel.OpenRecentFileAsync = async fileName => await HandleLoadFileAsync(fileName);
 
-        SpectrumScreen = _frameBufferConverter.ScreenBitmap;
-
         tapeManager.TapeChanged += HandleTapeTapeChanged;
         microdriveManager.CartridgeChanged += HandleCartridgeChanged;
         diskDriveManager.DiskChanged += HandleFloppyDiskChanged;
@@ -462,8 +460,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         Dispatcher.UIThread.Post(() =>
         {
-            _frameBufferConverter.UpdateBitmap(frameBuffer);
-
+            _frameBufferConverter?.UpdateBitmap();
             ScreenControl.InvalidateVisual();
         });
 

@@ -5,16 +5,21 @@ namespace OldBit.Spectron.Emulation.Devices.Audio.Beeper;
 internal class BeeperDevice : IDevice
 {
     private readonly CassettePlayer? _cassettePlayer;
+    private readonly Func<Word, bool> _isUlaPort;
 
     internal bool IsEnabled { get; set; }
 
     internal Action<byte> OnUpdateBeeper { get; init; } = _ => { };
 
-    internal BeeperDevice(CassettePlayer? cassettePlayer) => _cassettePlayer = cassettePlayer;
+    internal BeeperDevice(CassettePlayer? cassettePlayer, Func<Word, bool> isUlaPort)
+    {
+        _cassettePlayer = cassettePlayer;
+        _isUlaPort = isUlaPort;
+    }
 
     public void WritePort(Word address, byte value)
     {
-        if (!IsEnabled || !Ula.IsUlaPort(address))
+        if (!IsEnabled || !_isUlaPort(address))
         {
             return;
         }

@@ -262,7 +262,8 @@ public sealed class NativeMainMenu
                 [
                     _computerTypes[ComputerType.Spectrum16K],
                     _computerTypes[ComputerType.Spectrum48K],
-                    _computerTypes[ComputerType.Spectrum128K]
+                    _computerTypes[ComputerType.Spectrum128K],
+                    _computerTypes[ComputerType.Timex2048],
                 ]
             },
 
@@ -798,6 +799,7 @@ public sealed class NativeMainMenu
             new { Type = ComputerType.Spectrum16K, DisplayName = "ZX Spectrum 16" },
             new { Type = ComputerType.Spectrum48K, DisplayName = "ZX Spectrum 48" },
             new { Type = ComputerType.Spectrum128K, DisplayName = "ZX Spectrum 128" },
+            new { Type = ComputerType.Timex2048, DisplayName = "Timex Computer 2048" },
         };
 
         foreach (var computer in computers)

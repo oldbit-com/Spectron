@@ -48,7 +48,8 @@ public sealed class EmulatorFactory(
                 return CreateSpectrum128K(romType, new Memory128K(rom, bank1Rom));
 
             case ComputerType.Timex2048:
-                throw new NotImplementedException();
+                rom = customRom ?? GetTimex2048Rom(romType);
+                return CreateTimex(romType, new Memory48K(rom));
 
             default:
                 throw new ArgumentOutOfRangeException(nameof(computerType));
@@ -107,6 +108,31 @@ public sealed class EmulatorFactory(
             logger);
     }
 
+    private Emulator CreateTimex(RomType romType, IEmulatorMemory memory)
+    {
+        var contentionProvider = new ContentionProvider(
+            Hardware.Timex2048.ContentionStartTicks,
+            Hardware.Timex2048.TicksPerLine);
+
+        var emulatorSettings = new EmulatorArgs(
+            ComputerType.Timex2048,
+            romType,
+            memory,
+            contentionProvider);
+
+        return new Emulator(
+            emulatorSettings,
+            Hardware.Timex2048,
+            tapeManager,
+            microdriveManager,
+            diskDriveManager,
+            gamepadManager,
+            keyboardState,
+            timeMachine,
+            commandManager,
+            logger);
+    }
+
     private static byte[] GetSpectrum48KRom(RomType romType) => romType switch
     {
         RomType.Original or RomType.Custom => RomReader.ReadRom(RomType.Original48),
@@ -117,6 +143,12 @@ public sealed class EmulatorFactory(
     {
         RomType.Pentagon128 => RomReader.ReadRom(RomType.Pentagon128),
         RomType.Original or RomType.Custom => RomReader.ReadRom(RomType.Original128Bank0),
+        _ => RomReader.ReadRom(romType)
+    };
+
+    private static byte[] GetTimex2048Rom(RomType romType) => romType switch
+    {
+        RomType.Original or RomType.Custom => RomReader.ReadRom(RomType.Timex2048),
         _ => RomReader.ReadRom(romType)
     };
 }

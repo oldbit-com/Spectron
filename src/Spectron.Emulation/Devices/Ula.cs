@@ -6,6 +6,7 @@ using OldBit.Z80Cpu;
 namespace OldBit.Spectron.Emulation.Devices;
 
 internal sealed class Ula(
+    ComputerType computerType,
     KeyboardState keyboardState,
     ScreenBuffer screenBuffer,
     Z80 cpu,
@@ -35,7 +36,8 @@ internal sealed class Ula(
         screenBuffer.UpdateBorder(color, cpu.Clock.FrameTicks);
     }
 
-    internal static bool IsUlaPort(Word address) => (address & 0x01) == 0x00;
+    internal bool IsUlaPort(Word address) =>
+        computerType == ComputerType.Timex2048 ? (address & 0xFF) == 0xFE : (address & 0x01) == 0x00;
 
     private void UpdateEarBit(ref byte value)
     {

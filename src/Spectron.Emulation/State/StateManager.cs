@@ -35,6 +35,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         LoadInterface1(emulator.Interface1, emulator.MicrodriveManager, snapshot.Interface1);
         LoadBeta128(emulator.Beta128, emulator.DiskDriveManager, snapshot.Beta128);
         LoadPrinter(emulator.Printer, snapshot.Printer);
+        LoadTimex(emulator.UlaTimex, snapshot.Timex);
         LoadOther(emulator, snapshot);
 
         return emulator;
@@ -58,6 +59,7 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         SaveInterface1(emulator.Interface1, emulator.MicrodriveManager, isTimeMachine, snapshot);
         SaveBeta128(emulator.Beta128, emulator.DiskDriveManager, isTimeMachine, snapshot);
         SavePrinter(emulator.Printer, snapshot);
+        SaveTimex(emulator.UlaTimex, snapshot);
         SaveOther(emulator, snapshot);
 
         if (emulator.RomType.IsCustomRom())
@@ -260,6 +262,19 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
     private static void SavePrinter(ZxPrinter printer, StateSnapshot stateSnapshot) =>
         stateSnapshot.Printer = new PrinterState(printer.IsEnabled);
 
+    private static void SaveTimex(UlaTimex? ulaTimex, StateSnapshot stateSnapshot)
+    {
+        if (ulaTimex == null)
+        {
+            return;
+        }
+
+        stateSnapshot.Timex = new TimexState
+        {
+            PortFF = ulaTimex.ReadPort(UlaTimex.ControlPort) ?? 0
+        };
+    }
+
     private static void SaveOther(Emulator emulator, StateSnapshot stateSnapshot) =>
         stateSnapshot.BorderColor = emulator.ScreenBuffer.LastBorderColor;
 
@@ -453,5 +468,15 @@ public sealed class StateManager(EmulatorFactory emulatorFactory)
         }
 
         printer.IsEnabled = printerState.IsZxPrinterEnabled;
+    }
+
+    private static void LoadTimex(UlaTimex? ulaTimex, TimexState? timexState)
+    {
+        if (timexState == null || ulaTimex == null)
+        {
+            return;
+        }
+
+        ulaTimex.WritePort(UlaTimex.ControlPort, timexState.PortFF);
     }
 }

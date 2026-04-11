@@ -13,8 +13,8 @@ partial class MainWindowViewModel
     {
         BorderSize = borderSize;
 
-        _frameBufferConverter.SetBorderSize(borderSize);
-        SpectrumScreen = _frameBufferConverter.ScreenBitmap;
+        _frameBufferConverter?.SetBorderSize(borderSize);
+        SpectrumScreen = _frameBufferConverter?.ScreenBitmap;
     }
 
     private void HandleChangeScreenEffect(ScreenEffect screenEffect)
@@ -53,5 +53,22 @@ partial class MainWindowViewModel
         {
             NativeMenu.SetMenu(MainWindow, _nativeMainMenu.Empty());
         }
+    }
+
+    private void InitializeFrameBuffer()
+    {
+        if (Emulator == null)
+        {
+            return;
+        }
+
+        _frameBufferConverter = new FrameBufferConverter(Emulator.ScreenBuffer.FrameBuffer, BorderSize);
+        SpectrumScreen = _frameBufferConverter.ScreenBitmap;
+
+        Emulator.ScreenBuffer.FrameBufferChanged += (_, _) =>
+        {
+            _frameBufferConverter = new FrameBufferConverter(Emulator.ScreenBuffer.FrameBuffer, BorderSize);
+            SpectrumScreen = _frameBufferConverter.ScreenBitmap;
+        };
     }
 }

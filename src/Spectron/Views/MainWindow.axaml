@@ -86,29 +86,34 @@
                 <Grid>
                     <Border CornerRadius="15" HorizontalAlignment="Center" VerticalAlignment="Center" ClipToBounds="True">
                         <Grid>
-                            <Image
-                                x:Name="ScreenImage"
-                                Source="{Binding SpectrumScreen}"
-                                Stretch="Uniform"
-                                Cursor="{Binding MouseCursor}"
-                                PointerMoved="Screen_OnPointerMoved"
-                                PointerPressed="Screen_OnPointerPressed"
-                                PointerReleased="Screen_OnPointerReleased"
-                                Classes.IsPaused="{Binding IsPauseOverlayVisible}"
-                                Classes.Blur="{Binding ScreenEffect, Converter={StaticResource EnumHasValueConverter}, ConverterParameter={x:Static screen:ScreenEffect.Blur}}">
-                                <Image.Styles>
-                                    <Style Selector="Image.Blur">
-                                        <Setter Property="Effect">
-                                            <BlurEffect Radius="3"/>
-                                        </Setter>
-                                    </Style>
-                                    <Style Selector="Image.IsPaused">
-                                        <Setter Property="Effect">
-                                            <BlurEffect Radius="7"/>
-                                        </Setter>
-                                    </Style>
-                                </Image.Styles>
-                            </Image>
+                            <Viewbox Stretch="Uniform">
+                                <Image
+                                    x:Name="ScreenImage"
+                                    Stretch="Fill"
+                                    Height="192"
+                                    Width="256"
+                                    RenderOptions.BitmapInterpolationMode="None"
+                                    Source="{Binding SpectrumScreen}"
+                                    Cursor="{Binding MouseCursor}"
+                                    PointerMoved="Screen_OnPointerMoved"
+                                    PointerPressed="Screen_OnPointerPressed"
+                                    PointerReleased="Screen_OnPointerReleased"
+                                    Classes.IsPaused="{Binding IsPauseOverlayVisible}"
+                                    Classes.Blur="{Binding ScreenEffect, Converter={StaticResource EnumHasValueConverter}, ConverterParameter={x:Static screen:ScreenEffect.Blur}}">
+                                    <Image.Styles>
+                                        <Style Selector="Image.Blur">
+                                            <Setter Property="Effect">
+                                                <BlurEffect Radius="3"/>
+                                            </Setter>
+                                        </Style>
+                                        <Style Selector="Image.IsPaused">
+                                            <Setter Property="Effect">
+                                                <BlurEffect Radius="7"/>
+                                            </Setter>
+                                        </Style>
+                                    </Image.Styles>
+                                </Image>
+                            </Viewbox>
 
                             <Border IsVisible="{Binding ScreenEffect, Converter={StaticResource EnumHasValueConverter}, ConverterParameter={x:Static screen:ScreenEffect.Crt}}">
                                 <Border.Background>

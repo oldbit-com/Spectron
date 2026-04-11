@@ -49,4 +49,19 @@ internal static class Hardware
         LastPixelTicks: 14362 + (ScreenSize.ContentHeight - 1) * 228 + ContentLineTicks,
         TicksPerLine: 228,
         HasAyChip: true);
+
+    internal static HardwareSettings Timex2048 { get; } = new(
+        ClockMhz: 3.5f,
+        ComputerType: ComputerType.Timex2048,
+        TicksPerFrame: 69888,
+        InterruptFrequency: 50,
+        RetraceTicks: 48,
+        BorderTop: 64,
+        ContentionStartTicks: 14336,
+        FloatingBusStartTicks: 14338,
+        InterruptDuration: 32,
+        FirstPixelTicks: 14336,
+        LastPixelTicks: 14336 + (ScreenSize.ContentHeight - 1) * 224 + ContentLineTicks,
+        TicksPerLine: 224,
+        HasAyChip: true);
 }

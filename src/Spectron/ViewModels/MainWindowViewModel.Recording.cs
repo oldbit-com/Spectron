@@ -38,6 +38,7 @@ partial class MainWindowViewModel
             if (file != null && Emulator != null)
             {
                 _mediaRecorder = new MediaRecorder(
+                    Emulator.ScreenBuffer.FrameBuffer,
                     RecorderMode.Audio,
                     file.Path.LocalPath,
                     GetRecorderOptions(),
@@ -81,6 +82,7 @@ partial class MainWindowViewModel
             if (file != null && Emulator != null)
             {
                 _mediaRecorder = new MediaRecorder(
+                    Emulator.ScreenBuffer.FrameBuffer,
                     RecorderMode.AudioVideo,
                     file.Path.LocalPath,
                     GetRecorderOptions(),

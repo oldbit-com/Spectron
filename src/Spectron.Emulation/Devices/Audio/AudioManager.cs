@@ -80,7 +80,7 @@ public sealed class AudioManager
 
     public bool IsAySupportedStandardSpectrum { get; set; } = true;
 
-    internal AudioManager(Clock clock, CassettePlayer? cassettePlayer, HardwareSettings hardware)
+    internal AudioManager(Clock clock, CassettePlayer? cassettePlayer, HardwareSettings hardware, Func<Word, bool> isUlaPort)
     {
         IsAySupported = hardware.HasAyChip;
 
@@ -88,7 +88,7 @@ public sealed class AudioManager
 
         _beeperAudio = new BeeperAudio(clock, statesPerSample, hardware.ClockMhz);
 
-        Beeper = new BeeperDevice(cassettePlayer)
+        Beeper = new BeeperDevice(cassettePlayer, isUlaPort)
         {
             OnUpdateBeeper = _beeperAudio.Update
         };

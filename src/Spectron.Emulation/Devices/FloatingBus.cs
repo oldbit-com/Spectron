@@ -14,22 +14,24 @@ internal sealed class FloatingBus : IDevice
     private readonly HardwareSettings _hardware;
     private readonly IMemory _memory;
     private readonly Clock _clock;
+    private readonly Func<Word, bool> _isUlaPort;
     private readonly Dictionary<int, Word> _floatingBusAddressIndex = new();
 
     public bool IsEnabled { get; set; } = true;
 
-    internal FloatingBus(HardwareSettings hardware, IMemory memory, Clock clock)
+    internal FloatingBus(HardwareSettings hardware, IMemory memory, Clock clock, Func<Word, bool> isUlaPort)
     {
         _hardware = hardware;
         _memory = memory;
         _clock = clock;
+        _isUlaPort = isUlaPort;
 
         BuildFloatingBusTable();
     }
 
     public byte? ReadPort(Word address)
     {
-        if (!IsEnabled || Ula.IsUlaPort(address))
+        if (!IsEnabled || _isUlaPort(address))
         {
             return null;
         }
