@@ -28,8 +28,8 @@ internal sealed class ScreenMemoryHandler
                 _memory.MemoryUpdated += SpectrumHandler;
                 break;
 
-            case ScreenMode.TimexScreen1:
-                _memory.MemoryUpdated += TimexScreen1Handler;
+            case ScreenMode.TimexSecondScreen:
+                _memory.MemoryUpdated += TimexSecondScreenHandler;
                 break;
 
             case ScreenMode.TimexHiColor:
@@ -56,7 +56,7 @@ internal sealed class ScreenMemoryHandler
     private void RemoveHandlers()
     {
         _memory.MemoryUpdated -= SpectrumHandler;
-        _memory.MemoryUpdated -= TimexScreen1Handler;
+        _memory.MemoryUpdated -= TimexSecondScreenHandler;
         _memory.MemoryUpdated -= TimexHiColorHandler;
         _memory.MemoryUpdated -= TimexHiResHandler;
         _memory.MemoryUpdated -= TimexHiResAttrHandler;
@@ -70,7 +70,7 @@ internal sealed class ScreenMemoryHandler
         }
     }
 
-    private void TimexScreen1Handler(Word address, byte value)
+    private void TimexSecondScreenHandler(Word address, byte value)
     {
         if (address is > 0x5FFF and < 0x7B00)
         {
@@ -84,7 +84,7 @@ internal sealed class ScreenMemoryHandler
         {
             // Screen data, without attribute data
             case > 0x3FFF and < 0x5800:
-            // Attribute data - Timex Screen 1
+            // Attribute data - Timex second screen
             case > 0x5FFF and < 0x7800:
                 _screenBuffer.UpdateScreen(address);
                 break;
@@ -95,9 +95,9 @@ internal sealed class ScreenMemoryHandler
     {
         switch (address)
         {
-            // Screen 0 data
+            // Standard scree data
             case > 0x3FFF and < 0x5800:
-            // Screen 1 data
+            // Second screen data
             case > 0x5FFF and < 0x7800:
                 _screenBuffer.UpdateScreen(address);
                 break;

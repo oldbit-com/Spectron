@@ -33,7 +33,7 @@ public sealed class UlaTimex : IDevice
         ScreenMode = (value & 0b111) switch
         {
             0b000 => ScreenMode.Spectrum,
-            0b001 => ScreenMode.TimexScreen1,
+            0b001 => ScreenMode.TimexSecondScreen,
             0b010 => ScreenMode.TimexHiColor,
             0b011 => ScreenMode.TimexHiColorAlt,
             0b100 => ScreenMode.TimexHiResAttr,

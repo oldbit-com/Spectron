@@ -3,7 +3,7 @@ using OldBit.Spectron.Emulation.Devices.Memory;
 namespace OldBit.Spectron.Emulation.Screen.Modes;
 
 /// <summary>
-/// Timex HiRes screen updater. Uses 0x4000 & 0x6000 for data.
+/// Timex HiRes screen updater. Uses standard and second screen for data.
 /// </summary>
 internal class TimexHiResScreenUpdater(
     FrameBuffer frameBuffer,

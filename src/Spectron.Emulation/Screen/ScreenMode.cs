@@ -8,17 +8,17 @@ public enum ScreenMode
     Spectrum = 0x00,
 
     /// <summary>
-    /// Timex screen 1, the same as Spectrum, but at 0x6000.
+    /// Timex second screen, the same as Spectrum, but at 0x6000.
     /// </summary>
-    TimexScreen1 = 0x01,
+    TimexSecondScreen = 0x01,
 
     /// <summary>
-    /// Hi-color Timex screen. Standard screen is used for data, and Screen1 for attributes.
+    /// Hi-color Timex screen. Standard screen is used for data, and the second screen for attributes.
     /// </summary>
     TimexHiColor = 0x02,
 
     /// <summary>
-    /// Hi-color Timex screen. Similar to TimexHiColor. Screen1 is used for both data and attributes.
+    /// Hi-color Timex screen. Similar to TimexHiColor. The second screen is used for both data and attributes.
     /// </summary>
     TimexHiColorAlt = 0x03,
 
@@ -29,19 +29,19 @@ public enum ScreenMode
     TimexHiResAttr = 0x04,
 
     /// <summary>
-    /// Hi-res Timex screen. Screen1 is used to display even bytes and
+    /// Hi-res Timex screen. The second screen is used to display even bytes and
     /// attributes for odd bytes.
     /// </summary>
     TimexHiResAttrAlt = 0x05,
 
     /// <summary>
     /// Hi-res Timex screen. Standard screen is used to display even bytes and
-    /// Screen1 for odd bytes to create a 512x192 pixel screen.
+    /// a second screen for odd bytes to create a 512x192 pixel screen.
     /// </summary>
     TimexHiRes = 0x06,
 
     /// <summary>
-    /// Hi-res Timex screen. Screen1 is used to display even and odd bytes (duplicated).
+    /// Hi-res Timex screen. The second is used to display even and odd bytes (duplicated).
     /// </summary>
     TimexHiResDouble = 0x07,
 }

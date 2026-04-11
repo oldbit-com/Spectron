@@ -24,7 +24,7 @@ internal sealed class Content(
         _screenUpdater = screenMode switch
         {
             ScreenMode.Spectrum => new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus, 0x4000),
-            ScreenMode.TimexScreen1 => new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus, 0x6000),
+            ScreenMode.TimexSecondScreen => new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus, 0x6000),
             ScreenMode.TimexHiColor => new TimexHiColorScreenUpdater(frameBuffer, memory, isAlternate: false),
             ScreenMode.TimexHiColorAlt => new TimexHiColorScreenUpdater(frameBuffer, memory, isAlternate: true),
             ScreenMode.TimexHiRes => new TimexHiResScreenUpdater(frameBuffer, memory, ink, paper),

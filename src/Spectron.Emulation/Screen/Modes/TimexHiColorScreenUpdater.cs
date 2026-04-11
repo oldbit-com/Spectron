@@ -3,7 +3,7 @@ using OldBit.Spectron.Emulation.Devices.Memory;
 namespace OldBit.Spectron.Emulation.Screen.Modes;
 
 /// <summary>
-/// Timex HiColor screen updater. Uses 0x4000 for data and 0x6000 for attribute data.
+/// Timex HiColor screen updater. Uses standard screen for data and a second screen for attribute data.
 /// </summary>
 internal class TimexHiColorScreenUpdater(
     FrameBuffer frameBuffer,
