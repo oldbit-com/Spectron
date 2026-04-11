@@ -36,15 +36,15 @@ public class BorderTests
     }
 
     [Theory]
-    [InlineData(0, 0, 127, 48, 2)]
-    [InlineData(1, 128, 151, 560, 1)]
-    [InlineData(2, 200, 223, 608, 1)]
-    [InlineData(3, 224, 351, 656, 2)]
-    [InlineData(4, 352, 375, 1168, 1)]
-    [InlineData(191, 14312, 14335, 38912, 1)]
-    [InlineData(575, 57320, 57343, 155648, 1)]
-    [InlineData(576, 57344, 57471, 155696, 2)]
-    [InlineData(577, 57472, 57495, 156208, 1)]
+    [InlineData(0, 0, 151, 96, 2)]
+    [InlineData(1, 200, 375, 704, 2)]
+    [InlineData(2, 424, 599, 1408, 2)]
+    [InlineData(3, 648, 823, 2112, 2)]
+    [InlineData(4, 872, 1047, 2816, 2)]
+    [InlineData(191, 28576, 28599, 90016, 2)]
+    [InlineData(501, 69192, 69367, 217536, 2)]
+    [InlineData(502, 69416, 69591, 218240, 2)]
+    [InlineData(503, 69640, 69815, 218944, 2)]
     public void BorderTicksTable_ShouldHaveCorrectHiResRanges(
         int index,
         int startTick,
@@ -136,27 +136,27 @@ public class BorderTests
 
     private static void HiResBorderShouldHaveColor(Color color, Color[] screenBuffer)
     {
-        const int width = ScreenSize.BorderLeft + ScreenSize.ContentWidth * 2 + ScreenSize.BorderRight;
+        const int width = (ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight) * 2;
         const int topPixels = ScreenSize.BorderTop * width;
         const int bottomStart = topPixels + ScreenSize.ContentHeight * width;
 
-        screenBuffer[..47].ShouldAllBe(c => c == SpectrumPalette.White);
-        screenBuffer[48..topPixels].ShouldAllBe(c => c == color);
+        screenBuffer[..95].ShouldAllBe(c => c == SpectrumPalette.White);
+        screenBuffer[96..topPixels].ShouldAllBe(c => c == color);
 
         for (var i = 0; i < ScreenSize.ContentHeight; i++)
         {
             screenBuffer
                 .Skip(topPixels + i * width)
-                .Take(ScreenSize.BorderLeft)
+                .Take(ScreenSize.BorderLeft * 2)
                 .ShouldAllBe(c => c == color);
 
             screenBuffer
-                .Skip(topPixels + i * width + ScreenSize.BorderLeft)
+                .Skip(topPixels + i * width + ScreenSize.BorderLeft * 2)
                 .Take(ScreenSize.ContentWidth * 2)
                 .ShouldAllBe(c => c == SpectrumPalette.White);
 
             screenBuffer
-                .Skip(topPixels + i * width + ScreenSize.BorderLeft + ScreenSize.ContentWidth * 2)
+                .Skip(topPixels + i * width + ScreenSize.BorderLeft * 2 + ScreenSize.ContentWidth * 2)
                 .Take(ScreenSize.BorderRight)
                 .ShouldAllBe(c => c == color);
         }

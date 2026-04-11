@@ -69,18 +69,21 @@ internal sealed class FrameBufferConverter : IDisposable
             _ => BorderSizes.Full,
         };
 
+        // In hi-res mode the frame buffer border is doubled, so the skip amount scales accordingly.
+        var borderMultiplier = _frameBuffer.Width / (ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight);
+
         _startFrameBufferRow = BorderSizes.Max.Top - _border.Top;
         _endFrameBufferRow = _frameBuffer.Height - (BorderSizes.Max.Bottom - _border.Bottom) - 1;
-        _startFrameBufferCol = BorderSizes.Max.Left - _border.Left;
-        _endFrameBufferCol = _frameBuffer.Width - (BorderSizes.Max.Right - _border.Right) - 1;
+        _startFrameBufferCol = (BorderSizes.Max.Left - _border.Left) * borderMultiplier;
+        _endFrameBufferCol = _frameBuffer.Width - (BorderSizes.Max.Right - _border.Right) * borderMultiplier - 1;
 
         ScreenBitmap = CreateBitmap();
     }
 
     private WriteableBitmap CreateBitmap()
     {
-        var height = _frameBuffer.Height - (BorderSizes.Max.Top - _border.Top) - (BorderSizes.Max.Bottom - _border.Bottom);
-        var width = _frameBuffer.Width - (BorderSizes.Max.Left - _border.Left) - (BorderSizes.Max.Right - _border.Right);
+        var height = _endFrameBufferRow - _startFrameBufferRow + 1;
+        var width = _endFrameBufferCol - _startFrameBufferCol + 1;
 
         return new WriteableBitmap(
             new PixelSize(

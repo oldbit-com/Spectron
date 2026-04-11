@@ -9,8 +9,10 @@ namespace OldBit.Spectron.Emulation.Screen;
 public sealed class FrameBuffer
 {
     private static readonly Color DefaultFillColor = SpectrumPalette.White;
+    private int _borderLeft = ScreenSize.BorderLeft;
 
     internal ScreenMode ScreenMode { get; private set; } = ScreenMode.Spectrum;
+
     public int Width { get; private set; } = ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight;
     public int Height { get; private set; } = ScreenSize.BorderTop + ScreenSize.ContentHeight + ScreenSize.BorderBottom;
 
@@ -18,11 +20,11 @@ public sealed class FrameBuffer
 
     public FrameBuffer()
     {
-        const int maxWidth = ScreenSize.BorderLeft + ScreenSize.ContentWidth * 2 + ScreenSize.BorderRight;
+        const int hiResWidth = (ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight) * 2;
 
         ChangeScreenMode(ScreenMode);
 
-        Pixels = Enumerable.Repeat(DefaultFillColor, maxWidth * Height).ToArray();
+        Pixels = Enumerable.Repeat(DefaultFillColor, hiResWidth * Height).ToArray();
     }
 
     internal void ChangeScreenMode(ScreenMode screenMode)
@@ -35,12 +37,13 @@ public sealed class FrameBuffer
         ScreenMode = screenMode;
 
         var hiResMultiplier = screenMode.IsTimexHiRes() ? 2 : 1;
+        _borderLeft = ScreenSize.BorderLeft * hiResMultiplier;
 
-        Width = ScreenSize.BorderLeft + ScreenSize.ContentWidth * hiResMultiplier + ScreenSize.BorderRight;
+        Width = (ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight) * hiResMultiplier;
         Height = ScreenSize.BorderTop + ScreenSize.ContentHeight + ScreenSize.BorderBottom;
     }
 
     internal void Fill(int start, int count, Color color) => Array.Fill(Pixels, color, start, count);
 
-    internal int GetLineIndex(int line, int borderTop) => Width * borderTop + ScreenSize.BorderLeft + Width * line;
+    internal int GetLineIndex(int line, int borderTop) => Width * borderTop + _borderLeft + Width * line;
 }

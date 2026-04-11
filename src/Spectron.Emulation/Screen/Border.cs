@@ -106,8 +106,13 @@ internal sealed class Border(HardwareSettings hardwareSettings, FrameBuffer fram
     {
         var ticksTable = new List<BorderTick>();
 
+        // 1 = 2 pixels per tick (standard), 2 = 4 pixels per tick (hi-res)
+        var shift = contentWidth > ScreenSize.ContentWidth ? 2 : 1;
+        var borderLeft = ScreenSize.BorderLeft * shift;
+        var borderRight = ScreenSize.BorderRight * shift;
+
         var startTick = 0;
-        var startPixel = ScreenSize.BorderLeft;
+        var startPixel = borderLeft;
         var totalLines = borderTop + ScreenSize.ContentHeight + ScreenSize.BorderBottom;
 
         for (var line = 0; line < totalLines; line++)
@@ -115,103 +120,61 @@ internal sealed class Border(HardwareSettings hardwareSettings, FrameBuffer fram
             // Top border
             if (line < borderTop)
             {
-                AddFullBorderLine(ticksTable, line, startTick, startPixel, contentWidth);
+                AddFullBorderLine(ticksTable, line, startTick, startPixel, shift);
+
                 startTick += line == 0
                     ? ContentLineTicks + RightBorderTicks + retraceTicks
                     : LeftBorderTicks + ContentLineTicks + RightBorderTicks + retraceTicks;
 
                 startPixel += line == 0
-                    ? contentWidth + ScreenSize.BorderRight
-                    : ScreenSize.BorderLeft + contentWidth + ScreenSize.BorderRight;
+                    ? contentWidth + borderRight
+                    : borderLeft + contentWidth + borderRight;
             }
             // Bottom border
             else if (line >= borderTop + ScreenSize.ContentHeight)
             {
-                AddFullBorderLine(ticksTable, line, startTick, startPixel, contentWidth);
+                AddFullBorderLine(ticksTable, line, startTick, startPixel, shift);
                 startTick += LeftBorderTicks + ContentLineTicks + RightBorderTicks + retraceTicks;
-                startPixel += ScreenSize.BorderLeft + contentWidth + ScreenSize.BorderRight;
+                startPixel += borderLeft + contentWidth + borderRight;
             }
             else
             {
                 // Left border
                 var endTick = startTick + LeftBorderTicks;
-                ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
+                ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel, shift));
 
                 // Skip content area
                 startTick = endTick + ContentLineTicks;
                 endTick = startTick + RightBorderTicks;
-                startPixel += ScreenSize.BorderLeft + contentWidth;
+                startPixel += borderLeft + contentWidth;
 
                 // Right border
-                ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel));
+                ticksTable.Add(new BorderTick(startTick, endTick - 1, startPixel, shift));
                 startTick = endTick + retraceTicks;
-                startPixel += ScreenSize.BorderRight;
+                startPixel += borderRight;
             }
         }
 
         return ticksTable;
     }
 
-    private static void AddFullBorderLine(List<BorderTick> ticksTable, int line, int startTick, int startPixel, int contentWidth)
+    private static void AddFullBorderLine(List<BorderTick> ticksTable, int line, int startTick, int startPixel, int shift)
     {
-        // 1 = 2 pixels per tick (standard), 2 = 4 pixels per tick (hi-res content area)
-        var contentShift = contentWidth > ScreenSize.ContentWidth ? 2 : 1;
-
         if (line == 0)
         {
-            if (contentShift == 1)
-            {
-                ticksTable.Add(new BorderTick(
-                    startTick,
-                    startTick + ContentLineTicks + RightBorderTicks - 1,
-                    startPixel));
-
-                return;
-            }
-
-            // Content line
             ticksTable.Add(new BorderTick(
                 startTick,
-                startTick + ContentLineTicks - 1,
-                startPixel,
-                contentShift));
-
-            // Right border
-            ticksTable.Add(new BorderTick(
-                startTick + ContentLineTicks,
                 startTick + ContentLineTicks + RightBorderTicks - 1,
-                startPixel + contentWidth));
+                startPixel,
+                shift));
 
             return;
         }
 
-        if (contentShift == 1)
-        {
-            ticksTable.Add(new BorderTick(
-                startTick,
-                startTick + LeftBorderTicks + ContentLineTicks + RightBorderTicks - 1,
-                startPixel));
-
-            return;
-        }
-
-        // Left border
         ticksTable.Add(new BorderTick(
             startTick,
-            startTick + LeftBorderTicks - 1,
-            startPixel));
-
-        // Content line
-        ticksTable.Add(new BorderTick(
-            startTick + LeftBorderTicks,
-            startTick + LeftBorderTicks + ContentLineTicks - 1,
-            startPixel + ScreenSize.BorderLeft,
-            contentShift));
-
-        // Right border
-        ticksTable.Add(new BorderTick(
-            startTick + LeftBorderTicks + ContentLineTicks,
             startTick + LeftBorderTicks + ContentLineTicks + RightBorderTicks - 1,
-            startPixel + ScreenSize.BorderLeft + contentWidth));
+            startPixel,
+            shift));
     }
 }
