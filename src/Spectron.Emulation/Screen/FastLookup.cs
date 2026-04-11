@@ -1,3 +1,5 @@
+using OldBit.Spectron.Emulation.Extensions;
+
 namespace OldBit.Spectron.Emulation.Screen;
 
 internal record AttributeColor(Color Paper, Color Ink, bool IsFlashOn);
@@ -87,7 +89,7 @@ internal static class FastLookup
 
     private static ScreenRenderEvent[] BuildScreenEventsTable(HardwareSettings hardware, FrameBuffer frameBuffer)
     {
-        var hiResFactor = frameBuffer.ScreenMode == ScreenMode.TimexHiRes ? 2 : 1;
+        var hiResFactor = frameBuffer.ScreenMode.IsTimexHiRes() ? 2 : 1;
         var screenEvents = new List<ScreenRenderEvent>();
 
         for (var y = 0; y < ScreenSize.ContentHeight; y++)

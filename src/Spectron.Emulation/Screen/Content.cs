@@ -28,6 +28,7 @@ internal sealed class Content(
             ScreenMode.TimexHiColor => new TimexHiColorScreenUpdater(frameBuffer, memory, isAlternate: false),
             ScreenMode.TimexHiColorAlt => new TimexHiColorScreenUpdater(frameBuffer, memory, isAlternate: true),
             ScreenMode.TimexHiRes => new TimexHiResScreenUpdater(frameBuffer, memory, ink, paper),
+            ScreenMode.TimexHiResAttr => new TimexHiResAttrScreenUpdater(frameBuffer, memory, ink, paper),
             _ => _screenUpdater
         };
 

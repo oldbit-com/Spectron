@@ -23,8 +23,25 @@ public enum ScreenMode
     TimexHiColorAlt = 0x03,
 
     /// <summary>
+    /// Hi-res Timex screen. A standard screen is used to display even bytes and
+    /// attributes for odd bytes.
+    /// </summary>
+    TimexHiResAttr = 0x04,
+
+    /// <summary>
+    /// Hi-res Timex screen. Screen1 is used to display even bytes and
+    /// attributes for odd bytes.
+    /// </summary>
+    TimexHiResAttrAlt = 0x05,
+
+    /// <summary>
     /// Hi-res Timex screen. Standard screen is used to display even bytes and
     /// Screen1 for odd bytes to create a 512x192 pixel screen.
     /// </summary>
     TimexHiRes = 0x06,
+
+    /// <summary>
+    /// Hi-res Timex screen. Screen1 is used to display even and odd bytes (duplicated).
+    /// </summary>
+    TimexHiResDouble = 0x07,
 }

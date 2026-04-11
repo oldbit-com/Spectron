@@ -1,5 +1,6 @@
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Memory;
+using OldBit.Spectron.Emulation.Extensions;
 
 namespace OldBit.Spectron.Emulation.Screen;
 
@@ -33,7 +34,7 @@ public sealed class ScreenBuffer
 
     internal void ChangeScreenMode(ScreenMode screenMode, Color ink, Color paper, int frameTicks)
     {
-        _lockedBorderColor = screenMode != ScreenMode.TimexHiRes ? null : paper;
+        _lockedBorderColor = screenMode.IsTimexHiRes() ? paper : null;
 
         FrameBuffer.ChangeScreenMode(screenMode);
 

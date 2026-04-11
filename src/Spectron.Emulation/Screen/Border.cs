@@ -1,3 +1,5 @@
+using OldBit.Spectron.Emulation.Extensions;
+
 namespace OldBit.Spectron.Emulation.Screen;
 
 public record struct BorderTick(int StartTick, int EndTick, int StartPixel, int Shift = 1);
@@ -26,7 +28,7 @@ internal sealed class Border(HardwareSettings hardwareSettings, FrameBuffer fram
         _borderTickRanges = BuildBorderTickRanges(
             hardwareSettings.RetraceTicks,
             hardwareSettings.BorderTop,
-            screenMode == ScreenMode.TimexHiRes ? 2 * ScreenSize.ContentWidth : ScreenSize.ContentWidth);
+            screenMode.IsTimexHiRes() ? 2 * ScreenSize.ContentWidth : ScreenSize.ContentWidth);
 
         _screenMode = screenMode;
 

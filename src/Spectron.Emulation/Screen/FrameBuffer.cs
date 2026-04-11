@@ -1,3 +1,5 @@
+using OldBit.Spectron.Emulation.Extensions;
+
 namespace OldBit.Spectron.Emulation.Screen;
 
 /// <summary>
@@ -32,7 +34,7 @@ public sealed class FrameBuffer
 
         ScreenMode = screenMode;
 
-        var hiResMultiplier = screenMode == ScreenMode.TimexHiRes ? 2 : 1;
+        var hiResMultiplier = screenMode.IsTimexHiRes() ? 2 : 1;
 
         Width = ScreenSize.BorderLeft + ScreenSize.ContentWidth * hiResMultiplier + ScreenSize.BorderRight;
         Height = ScreenSize.BorderTop + ScreenSize.ContentHeight + ScreenSize.BorderBottom;

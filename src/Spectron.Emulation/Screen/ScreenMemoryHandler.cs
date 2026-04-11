@@ -40,6 +40,10 @@ internal sealed class ScreenMemoryHandler
             case ScreenMode.TimexHiRes:
                 _memory.MemoryUpdated += TimexHiResHandler;
                 break;
+
+            case ScreenMode.TimexHiResAttr:
+                _memory.MemoryUpdated += TimexHiResAttrHandler;
+                break;
         }
 
         _screenBuffer.ChangeScreenMode(
@@ -55,6 +59,7 @@ internal sealed class ScreenMemoryHandler
         _memory.MemoryUpdated -= TimexScreen1Handler;
         _memory.MemoryUpdated -= TimexHiColorHandler;
         _memory.MemoryUpdated -= TimexHiResHandler;
+        _memory.MemoryUpdated -= TimexHiResAttrHandler;
     }
 
     private void SpectrumHandler(Word address, byte value)
@@ -94,6 +99,17 @@ internal sealed class ScreenMemoryHandler
             case > 0x3FFF and < 0x5800:
             // Screen 1 data
             case > 0x5FFF and < 0x7800:
+                _screenBuffer.UpdateScreen(address);
+                break;
+        }
+    }
+
+    private void TimexHiResAttrHandler(Word address, byte value)
+    {
+        switch (address)
+        {
+            // Screen 0 data and attributes
+            case > 0x3FFF and < 0x5B00:
                 _screenBuffer.UpdateScreen(address);
                 break;
         }
