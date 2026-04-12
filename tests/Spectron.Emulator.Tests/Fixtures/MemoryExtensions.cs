@@ -4,47 +4,38 @@ namespace OldBit.Spectron.Emulator.Tests.Fixtures;
 
 internal static class MemoryExtensions
 {
-    internal static byte[] ReadAll(this IEmulatorMemory memory)
+    extension(IEmulatorMemory memory)
     {
-        var result = new byte[65536];
-
-        for (var address = 0; address < 65536; address++)
+        internal byte[] ReadRange(int startAddress, int count)
         {
-            result[address] = memory.Read((Word)address);
+            var result = new byte[count];
+
+            for (var i = 0; i < count; i++)
+            {
+                result[i] = memory.Read((Word)(startAddress + i));
+            }
+
+            return result;
         }
 
-        return result;
-    }
-
-    internal static byte[] ReadRange(this IEmulatorMemory memory, int startAddress, int count)
-    {
-        var result = new byte[count];
-
-        for (var i = 0; i < count; i++)
+        internal byte[] ReadScreen()
         {
-            result[i] = memory.Read((Word)(startAddress + i));
+            var result = new byte[16384];
+
+            for (Word address = 0; address < 16384; address++)
+            {
+                result[address] = memory.ReadScreen(address);
+            }
+
+            return result;
         }
 
-        return result;
-    }
-
-    internal static byte[] ReadScreen(this IEmulatorMemory memory)
-    {
-        var result = new byte[16384];
-
-        for (Word address = 0; address < 16384; address++)
+        internal void Fill(int startAddress, int count, byte value)
         {
-            result[address] = memory.ReadScreen(address);
-        }
-
-        return result;
-    }
-
-    internal static void Fill(this IEmulatorMemory memory, int startAddress, int count, byte value)
-    {
-        for (var i = 0; i < count; i++)
-        {
-            memory.Write((Word)(startAddress + i), value);
+            for (var i = 0; i < count; i++)
+            {
+                memory.Write((Word)(startAddress + i), value);
+            }
         }
     }
 }

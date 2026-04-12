@@ -19,22 +19,29 @@ internal sealed class VideoProcessor : IDisposable
     private readonly string _rawRecordingFilePath;
     private readonly string _audioFilePath;
     private readonly int _frameSizeInBytes;
+    private readonly FrameBuffer _emulatorFrameBuffer;
     private readonly byte[] _frameBuffer;
     private readonly SKBitmap _bitmap;
 
-    public VideoProcessor(RecorderOptions options, string outputFilePath, string rawRecordingFilePath, string audioFilePath)
+    public VideoProcessor(
+        FrameBuffer frameBuffer,
+        RecorderOptions options,
+        string outputFilePath,
+        string rawRecordingFilePath,
+        string audioFilePath)
     {
+        _emulatorFrameBuffer = frameBuffer;
         _options = options;
         _outputFilePath = outputFilePath;
         _rawRecordingFilePath = rawRecordingFilePath;
         _audioFilePath = audioFilePath;
-        _frameSizeInBytes = Marshal.SizeOf<Color>() * FrameBuffer.Width * FrameBuffer.Height;
+        _frameSizeInBytes = Marshal.SizeOf<Color>() * _emulatorFrameBuffer.Width * _emulatorFrameBuffer.Height;
 
         _frameBuffer = new byte[_frameSizeInBytes];
 
         _bitmap = new SKBitmap(
-            FrameBuffer.Width,
-            FrameBuffer.Height,
+            _emulatorFrameBuffer.Width,
+            _emulatorFrameBuffer.Height,
             SKColorType.Rgba8888,
             SKAlphaType.Unpremul);
     }
@@ -104,11 +111,11 @@ internal sealed class VideoProcessor : IDisposable
     {
         var inputPattern = Path.Combine(tempWorkingDir, $"{FileNamePrefix}%d.png");
 
-        var height = FrameBuffer.Height -
+        var height = _emulatorFrameBuffer.Height -
                      (ScreenSize.BorderTop - _options.BorderTop) -
                      (ScreenSize.BorderBottom - _options.BorderBottom);
 
-        var width = FrameBuffer.Width -
+        var width = _emulatorFrameBuffer.Width -
                     (ScreenSize.BorderLeft - _options.BorderLeft) -
                     (ScreenSize.BorderRight - _options.BorderRight);
 

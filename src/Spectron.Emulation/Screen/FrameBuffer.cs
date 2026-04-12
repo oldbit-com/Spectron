@@ -1,18 +1,49 @@
+using OldBit.Spectron.Emulation.Extensions;
+
 namespace OldBit.Spectron.Emulation.Screen;
 
 /// <summary>
 /// Represents a buffer for the ZX Spectrum screen with predefined dimensions
 /// that includes all pixels for both content and border areas.
 /// </summary>
-public sealed class FrameBuffer(Color fillColor)
+public sealed class FrameBuffer
 {
-    public static int Width => ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight;
+    private static readonly Color DefaultFillColor = SpectrumPalette.White;
+    private int _borderLeft = ScreenSize.BorderLeft;
 
-    public static int Height => ScreenSize.BorderTop + ScreenSize.ContentHeight + ScreenSize.BorderBottom;
+    internal ScreenMode ScreenMode { get; private set; } = ScreenMode.Spectrum;
 
-    public readonly Color[] Pixels = Enumerable.Repeat(fillColor, Width * Height).ToArray();
+    public int Width { get; private set; } = ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight;
+    public int Height { get; private set; } = ScreenSize.BorderTop + ScreenSize.ContentHeight + ScreenSize.BorderBottom;
+
+    public readonly Color[] Pixels;
+
+    public FrameBuffer()
+    {
+        const int hiResWidth = (ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight) * 2;
+
+        ChangeScreenMode(ScreenMode);
+
+        Pixels = Enumerable.Repeat(DefaultFillColor, hiResWidth * Height).ToArray();
+    }
+
+    internal void ChangeScreenMode(ScreenMode screenMode)
+    {
+        if (ScreenMode == screenMode)
+        {
+            return;
+        }
+
+        ScreenMode = screenMode;
+
+        var hiResMultiplier = screenMode.IsTimexHiRes() ? 2 : 1;
+        _borderLeft = ScreenSize.BorderLeft * hiResMultiplier;
+
+        Width = (ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight) * hiResMultiplier;
+        Height = ScreenSize.BorderTop + ScreenSize.ContentHeight + ScreenSize.BorderBottom;
+    }
 
     internal void Fill(int start, int count, Color color) => Array.Fill(Pixels, color, start, count);
 
-    internal static int GetLineIndex(int line, int borderTop) => Width * borderTop + ScreenSize.BorderLeft + Width * line;
+    internal int GetLineIndex(int line, int borderTop) => Width * borderTop + _borderLeft + Width * line;
 }

@@ -1,20 +1,28 @@
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Memory;
+using OldBit.Spectron.Emulation.Extensions;
 
 namespace OldBit.Spectron.Emulation.Screen;
 
-internal sealed class ScreenBuffer
+public sealed class ScreenBuffer
 {
     private readonly Border _border;
     private readonly Content _content;
 
     private bool _borderColorChanged = true;
+    private Color? _lockedBorderColor;
+    private ScreenMode _screenMode = ScreenMode.Spectrum;
 
-    public FrameBuffer FrameBuffer { get; } = new(SpectrumPalette.White);
+    public FrameBuffer FrameBuffer { get; }
+
     internal Color LastBorderColor { get; private set; } = SpectrumPalette.White;
+
+    public event EventHandler<EventArgs>? FrameBufferChanged;
 
     internal ScreenBuffer(HardwareSettings hardware, IEmulatorMemory memory, UlaPlus ulaPlus)
     {
+        FrameBuffer = new FrameBuffer();
+
         _border = new Border(hardware, FrameBuffer);
         _content = new Content(hardware, FrameBuffer, memory, ulaPlus);
 
@@ -24,14 +32,32 @@ internal sealed class ScreenBuffer
         }
     }
 
+    internal void ChangeScreenMode(ScreenMode screenMode, Color ink, Color paper, int frameTicks)
+    {
+        _lockedBorderColor = screenMode.IsTimexHiRes() ? paper : null;
+
+        FrameBuffer.ChangeScreenMode(screenMode);
+
+        _content.ChangeScreenMode(screenMode, ink, paper);
+        _border.ChangeScreenMode(screenMode);
+
+        _border.Update(_lockedBorderColor ?? LastBorderColor, frameTicks);
+
+        if (_screenMode != screenMode)
+        {
+            FrameBufferChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        _screenMode = screenMode;
+    }
+
     internal void NewFrame()
     {
         _border.NewFrame();
         _content.NewFrame();
     }
 
-    internal void EndFrame(int frameTicks) =>
-        _border.Update(LastBorderColor, frameTicks);
+    internal void EndFrame(int frameTicks) => _border.Update(_lockedBorderColor ?? LastBorderColor, frameTicks);
 
     internal void UpdateBorder(Color borderColor, int frameTicks = 0)
     {
@@ -46,7 +72,7 @@ internal sealed class ScreenBuffer
             return;
         }
 
-        _border.Update(borderColor, frameTicks);
+        _border.Update(_lockedBorderColor ?? borderColor, frameTicks);
 
         _borderColorChanged = false;
     }
