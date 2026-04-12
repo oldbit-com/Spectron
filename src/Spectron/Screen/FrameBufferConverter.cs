@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
@@ -11,9 +12,6 @@ namespace OldBit.Spectron.Screen;
 /// </summary>
 internal sealed class FrameBufferConverter : IDisposable
 {
-    private const int ZoomX = 4;      // Number of horizontal pixels, check the below code if changing value
-    private const int ZoomY = 4;      // Number of vertical pixels
-
     private Border _border = BorderSizes.Full;
 
     private int _startFrameBufferRow;
@@ -21,24 +19,25 @@ internal sealed class FrameBufferConverter : IDisposable
     private int _startFrameBufferCol;
     private int _endFrameBufferCol;
 
+    private readonly FrameBuffer _frameBuffer;
+
     internal WriteableBitmap ScreenBitmap { get; private set; }
 
-    internal FrameBufferConverter()
+    internal FrameBufferConverter(FrameBuffer frameBuffer, BorderSize borderSize)
     {
-        SetBorderSize(BorderSize.Full);
-        ScreenBitmap = CreateBitmap();
+        _frameBuffer = frameBuffer;
+        SetBorderSize(borderSize);
     }
 
-    internal void UpdateBitmap(FrameBuffer frameBuffer)
+    internal void UpdateBitmap()
     {
         using var lockedBitmap = ScreenBitmap.Lock();
 
         var targetAddress = lockedBitmap.Address;
-        var rowBytes = lockedBitmap.RowBytes;
 
         for (var frameBufferRow = _startFrameBufferRow; frameBufferRow <= _endFrameBufferRow; frameBufferRow++)
         {
-            var rowOffset = frameBufferRow * FrameBuffer.Width;
+            var rowOffset = frameBufferRow * _frameBuffer.Width;
 
             for (var frameBufferCol = _startFrameBufferCol; frameBufferCol <= _endFrameBufferCol; frameBufferCol++)
             {
@@ -46,37 +45,19 @@ internal sealed class FrameBufferConverter : IDisposable
 
                 unsafe
                 {
-                    fixed (Color* color = &frameBuffer.Pixels[pixelIndex])
+                    fixed (Color* color = &_frameBuffer.Pixels[pixelIndex])
                     {
                         var pixelColor = *(uint*)color;
-
-                        // Replicate pixels horizontally, unrolled loop for better performance.
-                        // IMPORTANT: This needs to be in sync with ZoomX value
                         *(uint*)targetAddress = pixelColor;
-                        *(uint*)(targetAddress + 4) = pixelColor;
-                        *(uint*)(targetAddress + 8) = pixelColor;
-                        *(uint*)(targetAddress + 12) = pixelColor;
 
-                        targetAddress += 4 * ZoomX;
+                        targetAddress += 4;
                     }
                 }
-            }
-
-            var previousLine = targetAddress - rowBytes;
-
-            // Replicate the previous line vertically, no need to unroll this loop
-            for (var y = 0; y < ZoomY - 1; y++)
-            {
-                unsafe
-                {
-                    Buffer.MemoryCopy(previousLine.ToPointer(), targetAddress.ToPointer(), rowBytes, rowBytes);
-                }
-
-                targetAddress += rowBytes;
             }
         }
     }
 
+    [MemberNotNull(nameof(ScreenBitmap))]
     internal void SetBorderSize(BorderSize borderSize)
     {
         _border = borderSize switch
@@ -88,23 +69,26 @@ internal sealed class FrameBufferConverter : IDisposable
             _ => BorderSizes.Full,
         };
 
+        // In hi-res mode the frame buffer border is doubled, so the skip amount scales accordingly.
+        var borderMultiplier = _frameBuffer.Width / (ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight);
+
         _startFrameBufferRow = BorderSizes.Max.Top - _border.Top;
-        _endFrameBufferRow = FrameBuffer.Height - (BorderSizes.Max.Bottom - _border.Bottom) - 1;
-        _startFrameBufferCol = BorderSizes.Max.Left - _border.Left;
-        _endFrameBufferCol = FrameBuffer.Width - (BorderSizes.Max.Right - _border.Right) - 1;
+        _endFrameBufferRow = _frameBuffer.Height - (BorderSizes.Max.Bottom - _border.Bottom) - 1;
+        _startFrameBufferCol = (BorderSizes.Max.Left - _border.Left) * borderMultiplier;
+        _endFrameBufferCol = _frameBuffer.Width - (BorderSizes.Max.Right - _border.Right) * borderMultiplier - 1;
 
         ScreenBitmap = CreateBitmap();
     }
 
     private WriteableBitmap CreateBitmap()
     {
-        var height = FrameBuffer.Height - (BorderSizes.Max.Top - _border.Top) - (BorderSizes.Max.Bottom - _border.Bottom);
-        var width = FrameBuffer.Width - (BorderSizes.Max.Left - _border.Left) - (BorderSizes.Max.Right - _border.Right);
+        var height = _endFrameBufferRow - _startFrameBufferRow + 1;
+        var width = _endFrameBufferCol - _startFrameBufferCol + 1;
 
         return new WriteableBitmap(
             new PixelSize(
-                width * ZoomX,
-                height * ZoomY),
+                width,
+                height),
             new Vector(96, 96),
             PixelFormats.Rgba8888);
     }

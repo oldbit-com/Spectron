@@ -171,9 +171,9 @@ internal sealed class AyDevice : IDevice
         }
     }
 
-    // Register port 0xFFFD is decoded as: A15=1,A14=1 & A1=0
+    // Register port 0xFFFD is decoded as: A15=1,A14=1 & A1=0 for ZX Spectrum
     private static bool IsRegisterPort(Word address) => (address & 0xC002) == 0xC000;
 
-    // Data port 0xBFFD is decoded as: A15=1 & A1=0
+    // Data port 0xBFFD is decoded as: A15=1 & A1=0 for ZX Spectrum
     private static bool IsDataPort(Word address) => (address & 0x8002) == 0x8000;
 }

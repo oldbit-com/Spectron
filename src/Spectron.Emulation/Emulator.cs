@@ -31,7 +31,9 @@ public sealed class Emulator
     private readonly ILogger _logger;
     private readonly SpectrumBus _spectrumBus;
     private readonly EmulatorTimer _emulationTimer;
-    private readonly IEmulatorMemory _memory;
+    private readonly FloatingBus _floatingBus;
+    private readonly Ula _ula;
+    private readonly ScreenMemoryHandler _screenMemoryHandler;
 
     private bool _isDebuggerResume;
     private bool _invalidateScreen;
@@ -39,7 +41,6 @@ public sealed class Emulator
     private bool _isNmiRequested;
     private bool _isDebuggerBreak;
     private long _ticksSinceReset;
-    private FloatingBus _floatingBus = null!;
 
     public delegate void FrameEvent(FrameBuffer frameBuffer, AudioBuffer audioBuffer);
     public event FrameEvent? FrameCompleted;
@@ -71,16 +72,17 @@ public sealed class Emulator
     public RomType RomType { get; }
 
     public Z80 Cpu { get; }
-    public IEmulatorMemory Memory => _memory;
+    public IEmulatorMemory Memory { get; }
     public IBus Bus => _spectrumBus;
     public DivMmcDevice DivMmc { get; }
     public Beta128Device Beta128 { get; }
     public Interface1Device Interface1 { get; }
     public ZxPrinter Printer { get; }
+    public UlaTimex? UlaTimex { get; }
+    public ScreenBuffer ScreenBuffer { get; }
 
     public int TicksPerFrame => _hardware.TicksPerFrame;
 
-    internal ScreenBuffer ScreenBuffer { get; }
     internal UlaPlus UlaPlus { get; }
 
     internal Emulator(
@@ -107,11 +109,21 @@ public sealed class Emulator
         GamepadManager = gamepadManager;
         ComputerType = emulatorArgs.ComputerType;
         RomType = emulatorArgs.RomType;
-        _memory = emulatorArgs.Memory;
+        Memory = emulatorArgs.Memory;
 
         UlaPlus = new UlaPlus();
         _spectrumBus = new SpectrumBus();
+
         ScreenBuffer = new ScreenBuffer(hardware, emulatorArgs.Memory, UlaPlus);
+
+        if (ComputerType == ComputerType.Timex2048)
+        {
+            UlaTimex = new UlaTimex();
+        }
+
+        _screenMemoryHandler = new ScreenMemoryHandler(Memory, ScreenBuffer);
+        _screenMemoryHandler.SetScreenMode(UlaTimex);
+
         Cpu = new Z80(emulatorArgs.Memory)
         {
             Clock =
@@ -126,15 +138,19 @@ public sealed class Emulator
         KeyboardState.Reset();
         TapeManager.Attach(Cpu, Memory, hardware);
 
-        AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware);
+        _ula = new Ula(hardware.ComputerType, KeyboardState, ScreenBuffer, Cpu, TapeManager);
 
-        DivMmc = new DivMmcDevice(Cpu, _memory, logger);
-        Beta128 = new Beta128Device(Cpu, _hardware.ClockMhz, _memory, ComputerType, diskDriveManager);
-        Interface1 = microdriveManager.CreateDevice(Cpu, _memory);
+        _floatingBus = new FloatingBus(_hardware, Memory, Cpu.Clock, _ula.IsUlaPort);
+
+        AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware, _ula.IsUlaPort);
+
+        DivMmc = new DivMmcDevice(Cpu, Memory, logger);
+        Beta128 = new Beta128Device(Cpu, _hardware.ClockMhz, Memory, ComputerType, diskDriveManager);
+        Interface1 = microdriveManager.CreateDevice(Cpu, Memory);
         Printer = new ZxPrinter();
 
-        SetupUlaAndDevices();
-        SetupEventHandlers();
+        AddDevices();
+        AddEventHandlers();
 
         _emulationTimer = new EmulatorTimer();
         _emulationTimer.Elapsed += OnTimerElapsed;
@@ -190,7 +206,7 @@ public sealed class Emulator
         _ticksSinceReset = 0;
 
         AudioManager.ResetAudio();
-        _memory.Reset();
+        Memory.Reset();
         Cpu.Reset();
         ScreenBuffer.Reset();
         UlaPlus.Reset();
@@ -198,6 +214,7 @@ public sealed class Emulator
         Interface1.Reset();
         DivMmc.Reset();
         Beta128.Reset();
+        UlaTimex?.Reset();
     }
 
     public void Break()
@@ -231,28 +248,25 @@ public sealed class Emulator
         }
     }
 
-    private void SetupEventHandlers()
+    private void AddEventHandlers()
     {
-        _memory.MemoryUpdated += (address, _) =>
-        {
-            if (address < 0x5B00)
-            {
-                ScreenBuffer.UpdateScreen(address);
-            }
-        };
         Cpu.Clock.TicksAdded += (_, previousFrameTicks, _) => ScreenBuffer.UpdateScreen(previousFrameTicks);
         Cpu.BeforeInstruction += BeforeInstruction;
         UlaPlus.ActiveChanged += _ => _invalidateScreen = true;
         Beta128.DiskActivity += _ => DiskDriveManager.OnDiskActivity();
+
+        if (UlaTimex != null)
+        {
+            UlaTimex.ScreenModeChanged += (sender, _) =>
+                _screenMemoryHandler.SetScreenMode(sender as UlaTimex, Cpu.Clock.FrameTicks);
+        }
     }
 
-    private void SetupUlaAndDevices()
+    private void AddDevices()
     {
-        var ula = new Ula(KeyboardState, ScreenBuffer, Cpu, TapeManager);
-
-        _spectrumBus.AddDevice(ula);
+        _spectrumBus.AddDevice(_ula);
         _spectrumBus.AddDevice(UlaPlus);
-        _spectrumBus.AddDevice(_memory);
+        _spectrumBus.AddDevice(Memory);
         _spectrumBus.AddDevice(AudioManager.Beeper);
         _spectrumBus.AddDevice(AudioManager.Ay);
         _spectrumBus.AddDevice(Printer);
@@ -261,7 +275,11 @@ public sealed class Emulator
         _spectrumBus.AddDevice(Beta128);
         _spectrumBus.AddDevice(new RtcDevice(DivMmc));
 
-        _floatingBus = new FloatingBus(_hardware, Memory, Cpu.Clock);
+        if (UlaTimex != null)
+        {
+            _spectrumBus.AddDevice(UlaTimex);
+        }
+
         _spectrumBus.AddDevice(_floatingBus);
 
         Cpu.AddBus(_spectrumBus);
@@ -371,7 +389,8 @@ public sealed class Emulator
 
             // case 0x1AF1:
             // case RomRoutines.SAVE_ETC:
-            //    break;
+            //     SnapshotManager.Save("2048.szx", this);
+            //     break;
         }
     }
 }

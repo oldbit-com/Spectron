@@ -1,16 +1,41 @@
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Memory;
+using OldBit.Spectron.Emulation.Screen.Modes;
 
 namespace OldBit.Spectron.Emulation.Screen;
 
-internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer, IEmulatorMemory memory, UlaPlus ulaPlus)
+internal sealed class Content(
+    HardwareSettings hardware,
+    FrameBuffer frameBuffer,
+    IEmulatorMemory memory,
+    UlaPlus ulaPlus)
 {
-    private readonly ScreenRenderEvent[] _screenRenderEvents = FastLookup.GetScreenRenderEvents(hardware);
-    private readonly bool[] _dirtyAddresses = new bool[32 * 24 * 8];
+    private ScreenRenderEvent[] _screenRenderEvents = FastLookup.GetScreenRenderEvents(hardware, frameBuffer);
 
     private int _frameCount = 1;
-    private bool _isFlashOnFrame;
     private int _fetchCycleIndex;
+
+    private IScreenUpdater _screenUpdater = new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus, 0x4000);
+
+    internal void ChangeScreenMode(ScreenMode screenMode, Color ink, Color paper)
+    {
+        _screenRenderEvents = FastLookup.GetScreenRenderEvents(hardware, frameBuffer, screenMode);
+
+        _screenUpdater = screenMode switch
+        {
+            ScreenMode.Spectrum => new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus, 0x4000),
+            ScreenMode.TimexSecondScreen => new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus, 0x6000),
+            ScreenMode.TimexHiColor => new TimexHiColorScreenUpdater(frameBuffer, memory),
+            ScreenMode.TimexHiColorAlt => new TimexHiColorScreenUpdater(frameBuffer, memory, isAlternative: true),
+            ScreenMode.TimexHiRes => new TimexHiResScreenUpdater(frameBuffer, memory, ink, paper),
+            ScreenMode.TimexHiResAttr => new TimexHiResAttrScreenUpdater(frameBuffer, memory, ink, paper),
+            ScreenMode.TimexHiResAttrAlt => new TimexHiResAttrScreenUpdater(frameBuffer, memory, ink, paper, isAlternative: true),
+            ScreenMode.TimexHiResDouble => new TimexHiResDoubleScreenUpdater(frameBuffer, memory, ink, paper),
+            _ => _screenUpdater
+        };
+
+        Invalidate();
+    }
 
     /// <summary>
     /// Updates the frame buffer with the content of the screen at the specified frame ticks. This allows
@@ -35,12 +60,12 @@ internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer
             }
 
             // First byte and attribute
-            UpdateFrameBuffer(fetchCycleData.FrameBufferIndex, fetchCycleData.BitmapAddress,
-                fetchCycleData.AttributeAddress);
+            _screenUpdater.Update(fetchCycleData.FrameBufferIndex, fetchCycleData.BitmapAddress,
+                fetchCycleData.AttributeAddress, 1);
 
             // Second byte and attribute
-            UpdateFrameBuffer(fetchCycleData.FrameBufferIndex + 8, (Word)(fetchCycleData.BitmapAddress + 1),
-                (Word)(fetchCycleData.AttributeAddress + 1));
+            _screenUpdater.Update(fetchCycleData.FrameBufferIndex + 8, (Word)(fetchCycleData.BitmapAddress + 1),
+                (Word)(fetchCycleData.AttributeAddress + 1), 2);
 
             _fetchCycleIndex += 1;
 
@@ -61,7 +86,7 @@ internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer
             return;
         }
 
-        ToggleFlash();
+        _screenUpdater.ToggleFlash();
         _frameCount = 1;
     }
 
@@ -73,75 +98,7 @@ internal sealed class Content(HardwareSettings hardware, FrameBuffer frameBuffer
         Invalidate();
     }
 
-    internal void Invalidate() => Array.Fill(_dirtyAddresses, true);
+    internal void Invalidate() => _screenUpdater.Invalidate();
 
-    internal void SetDirty(Word address) => SetDirty(address - 0x4000);
-
-    private void UpdateFrameBuffer(int frameBufferIndex, Word bitmapAddress, Word attributeAddress)
-    {
-        if (!_dirtyAddresses[bitmapAddress])
-        {
-            return;
-        }
-
-        var bitmap = memory.ReadScreen(bitmapAddress);
-        var attribute = memory.ReadScreen(attributeAddress);
-
-        var attributeData = FastLookup.AttributeData[attribute];
-        var isFlashOn = attributeData.IsFlashOn && _isFlashOnFrame;
-
-        for (var bit = 0; bit < FastLookup.BitMasks.Length; bit++)
-        {
-            Color color;
-
-            if (ulaPlus is { IsEnabled: true, IsActive: true })
-            {
-                color = (bitmap & FastLookup.BitMasks[bit]) != 0 ? ulaPlus.GetInkColor(attribute) : ulaPlus.GetPaperColor(attribute);
-            }
-            else
-            {
-                color = (bitmap & FastLookup.BitMasks[bit]) != 0 ^ isFlashOn ? attributeData.Ink : attributeData.Paper;
-            }
-
-            frameBuffer.Pixels[frameBufferIndex + bit] = color;
-        }
-
-        _dirtyAddresses[bitmapAddress] = false;
-    }
-
-    private void SetDirty(int address)
-    {
-        if (address < 0x1800)
-        {
-            // Single screen byte
-            _dirtyAddresses[address] = true;
-        }
-        else
-        {
-            // Attribute byte affecting 8 screen bytes, unrolled for performance (~7x faster than a for loop)
-            var screenAddress = FastLookup.LineAddressForAttrAddress[address - 0x1800];
-
-            _dirtyAddresses[screenAddress] = true;
-            _dirtyAddresses[screenAddress + 256] = true;
-            _dirtyAddresses[screenAddress + 512] = true;
-            _dirtyAddresses[screenAddress + 768] = true;
-            _dirtyAddresses[screenAddress + 1024] = true;
-            _dirtyAddresses[screenAddress + 1280] = true;
-            _dirtyAddresses[screenAddress + 1536] = true;
-            _dirtyAddresses[screenAddress + 1792] = true;
-        }
-    }
-
-    private void ToggleFlash()
-    {
-        _isFlashOnFrame = !_isFlashOnFrame;
-
-        for (Word attrAddress = 0x1800; attrAddress < 0x1B00; attrAddress++)
-        {
-            if ((memory.ReadScreen(attrAddress) & 0x80) != 0)
-            {
-                SetDirty((int)attrAddress);
-            }
-        }
-    }
+    internal void SetDirty(int address) => _screenUpdater.SetDirty(address);
 }

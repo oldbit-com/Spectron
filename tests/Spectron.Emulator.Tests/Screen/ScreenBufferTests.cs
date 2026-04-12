@@ -15,10 +15,10 @@ public class ScreenBufferTests
         var memory = new Memory48K(rom);
         var ulaPlus = new UlaPlus();
 
-        var buffer = new ScreenBuffer(Hardware.Spectrum48K, memory, ulaPlus);
+        var screenBuffer = new ScreenBuffer(Hardware.Spectrum48K, memory, ulaPlus);
 
-        buffer.UpdateBorder(SpectrumPalette.Cyan, 224);
-        buffer.UpdateBorder(SpectrumPalette.White, 448);
+        screenBuffer.UpdateBorder(SpectrumPalette.Cyan, 224);
+        screenBuffer.UpdateBorder(SpectrumPalette.White, 448);
 
        // TODO: Write some tests for the frame buffer, not so easy
     }

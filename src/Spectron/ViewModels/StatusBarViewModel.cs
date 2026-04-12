@@ -74,7 +74,7 @@ public partial class StatusBarViewModel : ObservableObject
         ComputerType.Spectrum16K => "16k",
         ComputerType.Spectrum48K => "48k",
         ComputerType.Spectrum128K => "128k",
-        ComputerType.Timex2048 => "Timex",
+        ComputerType.Timex2048 => "TC2048",
         _ => "Unknown"
     };
 

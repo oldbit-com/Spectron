@@ -6,7 +6,7 @@ namespace OldBit.Spectron.Recorder.Video;
 
 internal class VideoRecorder(string filePath) : IDisposable
 {
-    private readonly int _frameSizeInBytes = Marshal.SizeOf<Color>() * FrameBuffer.Width * FrameBuffer.Height;
+    private readonly int _sizeOfColor = Marshal.SizeOf<Color>();
 
     private Stream? _stream;
     private VideoProcessor? _videoGenerator;
@@ -18,11 +18,13 @@ internal class VideoRecorder(string filePath) : IDisposable
             return;
         }
 
+        var frameSizeInBytes = _sizeOfColor * frameBuffer.Width * frameBuffer.Height;
+
         unsafe
         {
             fixed (Color* bufferPtr = &frameBuffer.Pixels[0])
             {
-                var span = new Span<byte>(bufferPtr, _frameSizeInBytes);
+                var span = new Span<byte>(bufferPtr, frameSizeInBytes);
 
                 _stream?.Write(span);
             }
