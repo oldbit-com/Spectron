@@ -30,8 +30,7 @@ internal sealed class Content(
             ScreenMode.TimexHiRes => new TimexHiResScreenUpdater(frameBuffer, memory, ink, paper),
             ScreenMode.TimexHiResAttr => new TimexHiResAttrScreenUpdater(frameBuffer, memory, ink, paper),
             ScreenMode.TimexHiResAttrAlt => new TimexHiResAttrScreenUpdater(frameBuffer, memory, ink, paper, isAlternative: true),
-            // TODO: Implement TimexHiResDouble
-            // ScreenMode.TimexHiResDouble =>
+            ScreenMode.TimexHiResDouble => new TimexHiResDoubleScreenUpdater(frameBuffer, memory, ink, paper),
             _ => _screenUpdater
         };
 
