@@ -30,9 +30,6 @@
         <PackageReference Include="Avalonia.Desktop" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Include="Avalonia.Themes.Fluent" />
-        <PackageReference Include="Avalonia.Xaml.Behaviors" />
-        <PackageReference Include="Avalonia.Xaml.Interactions" />
-        <PackageReference Include="Avalonia.Xaml.Interactivity" />
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="AvaloniaUI.DiagnosticsSupport" />
         <PackageReference Include="CommunityToolkit.Mvvm" />
         <PackageReference Include="Material.Icons.Avalonia" />
@@ -44,6 +41,7 @@
         <PackageReference Include="OldBit.Z80Cpu.Spectron" />
         <PackageReference Include="SkiaSharp.NativeAssets.Linux" />
         <PackageReference Include="System.CommandLine" />
+        <PackageReference Include="Xaml.Behaviors" />
     </ItemGroup>
 
     <ItemGroup>
