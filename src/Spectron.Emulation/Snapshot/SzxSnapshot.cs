@@ -48,7 +48,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         LoadJoystick(emulator.JoystickManager, snapshot.Joystick);
         LoadTape(emulator.TapeManager, snapshot.Tape);
         LoadAyRegisters(emulator.AudioManager, snapshot.Ay);
-        LoadTimex(emulator.UlaTimex, snapshot.TimexSinclair);
+        LoadTimex(emulator.Ula, snapshot.TimexSinclair);
 
         return emulator;
     }
@@ -88,7 +88,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         SaveJoystick(emulator.JoystickManager, snapshot);
         SaveTape(emulator.TapeManager, snapshot, compressionLevel);
         SaveAyRegisters(emulator.AudioManager, snapshot);
-        SaveTimex(emulator.UlaTimex, snapshot);
+        SaveTimex(emulator.Ula, snapshot);
 
         if (emulator.RomType.IsCustomRom())
         {
@@ -241,9 +241,9 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         audioManager.Ay.LoadRegisters(ay.CurrentRegister, ay.Registers);
     }
 
-    private static void LoadTimex(UlaTimex? ulaTimex, TimexSinclairBlock? timexSinclair)
+    private static void LoadTimex(Ula ula, TimexSinclairBlock? timexSinclair)
     {
-        if (ulaTimex == null || timexSinclair == null)
+        if (ula is not UlaTimex ulaTimex || timexSinclair == null)
         {
             return;
         }
@@ -397,9 +397,9 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         }
     }
 
-    private static void SaveTimex(UlaTimex? ulaTimex, SzxFile snapshot)
+    private static void SaveTimex(Ula ula, SzxFile snapshot)
     {
-        if (ulaTimex == null)
+        if (ula is not UlaTimex ulaTimex)
         {
             return;
         }

@@ -1,8 +1,15 @@
+using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Screen;
+using OldBit.Spectron.Emulation.Tape;
+using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.Devices;
 
-public sealed class UlaTimex : IDevice
+internal sealed class UlaTimex(
+    KeyboardState keyboardState,
+    ScreenBuffer screenBuffer,
+    Z80 cpu,
+    TapeManager tapeManager) : Ula(keyboardState, screenBuffer, cpu, tapeManager)
 {
     private byte _lastControlValue;
 
@@ -13,8 +20,15 @@ public sealed class UlaTimex : IDevice
 
     internal event EventHandler<EventArgs>? ScreenModeChanged;
 
-    public byte? ReadPort(Word address)
+    public override byte? ReadPort(Word address)
     {
+        var result = base.ReadPort(address);
+
+        if (result != null)
+        {
+            return result;
+        }
+
         if ((address & 0xFF) != ControlPort)
         {
             return null;
@@ -23,8 +37,10 @@ public sealed class UlaTimex : IDevice
         return _lastControlValue;
     }
 
-    public void WritePort(Word address, byte value)
+    public override void WritePort(Word address, byte value)
     {
+        base.WritePort(address, value);
+
         if ((address & 0xFF) != ControlPort)
         {
             return;
@@ -77,5 +93,7 @@ public sealed class UlaTimex : IDevice
         _lastControlValue = value;
     }
 
-    internal void Reset() => WritePort(ControlPort, 0);
+    internal override bool IsUlaPort(Word address) => (address & 0xFF) == 0xFE;
+
+    internal override void Reset() => WritePort(ControlPort, 0);
 }
