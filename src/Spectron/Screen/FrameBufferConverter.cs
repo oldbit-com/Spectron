@@ -22,6 +22,7 @@ internal sealed class FrameBufferConverter : IDisposable
     private readonly FrameBuffer _frameBuffer;
 
     internal WriteableBitmap ScreenBitmap { get; private set; }
+    public bool IsHiRes => _frameBuffer.IsHiRes;
 
     internal FrameBufferConverter(FrameBuffer frameBuffer, BorderSize borderSize)
     {

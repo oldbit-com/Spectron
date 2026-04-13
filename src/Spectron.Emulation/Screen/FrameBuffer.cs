@@ -15,6 +15,7 @@ public sealed class FrameBuffer
 
     public int Width { get; private set; } = ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight;
     public int Height { get; private set; } = ScreenSize.BorderTop + ScreenSize.ContentHeight + ScreenSize.BorderBottom;
+    public bool IsHiRes => ScreenMode.IsTimexHiRes();
 
     public readonly Color[] Pixels;
 
@@ -36,7 +37,7 @@ public sealed class FrameBuffer
 
         ScreenMode = screenMode;
 
-        var hiResMultiplier = screenMode.IsTimexHiRes() ? 2 : 1;
+        var hiResMultiplier = IsHiRes ? 2 : 1;
         _borderLeft = ScreenSize.BorderLeft * hiResMultiplier;
 
         Width = (ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight) * hiResMultiplier;
