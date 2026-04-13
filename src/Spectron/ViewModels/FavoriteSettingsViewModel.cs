@@ -37,6 +37,19 @@ public partial class FavoriteSettingsViewModel : ObservableObject
     [ObservableProperty]
     public partial bool? IsDivMmcEnabled { get; set; }
 
+    public FavoriteSettingsViewModel(FavoriteSettingsViewModel settings) : this(
+        settings.ComputerType.Value,
+        settings.JoystickType.Value,
+        settings.MouseType.Value,
+        settings.TapeLoadSpeed.Value,
+        settings.IsUlaPlusEnabled,
+        settings.IsAyEnabled,
+        settings.IsInterface1Enabled,
+        settings.IsBeta128Enabled,
+        settings.IsDivMmcEnabled)
+    {
+    }
+
     public FavoriteSettingsViewModel(
         ComputerType? computerType = null,
         JoystickType? joystickType = null,

@@ -77,7 +77,8 @@ public partial class FavoriteItemViewModel : ObservableValidator
             Path = Path,
             IsFile = IsFile,
             IsRoot = IsRoot,
-            IsFolder = IsFolder
+            IsFolder = IsFolder,
+            SettingsViewModel = new FavoriteSettingsViewModel(SettingsViewModel),
         };
 
         if (IsFolder)
