@@ -386,6 +386,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         new("ZX Spectrum 16k", ComputerType.Spectrum16K),
         new("ZX Spectrum 48k", ComputerType.Spectrum48K),
         new("ZX Spectrum 128k", ComputerType.Spectrum128K),
+        new("Timex Computer 2048", ComputerType.Timex2048),
     ];
 
     public List<NameValuePair<RomType>> RomTypes { get; } =

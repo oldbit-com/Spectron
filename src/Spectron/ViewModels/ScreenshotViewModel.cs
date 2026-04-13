@@ -20,10 +20,7 @@ public partial class ScreenshotViewModel : ObservableObject
     public ObservableCollection<ScreenViewModel> Screenshots { get; } = [];
 
     [RelayCommand]
-    private void Remove(ScreenViewModel item)
-    {
-        Screenshots.Remove(item);
-    }
+    private void Remove(ScreenViewModel item) => Screenshots.Remove(item);
 
     [RelayCommand]
     private async Task Save(ScreenViewModel viewModel)
