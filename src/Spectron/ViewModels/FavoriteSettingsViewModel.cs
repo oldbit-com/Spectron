@@ -65,6 +65,7 @@ public partial class FavoriteSettingsViewModel : ObservableObject
         new("ZX Spectrum 16k", OldBit.Spectron.Emulation.ComputerType.Spectrum16K),
         new("ZX Spectrum 48k", OldBit.Spectron.Emulation.ComputerType.Spectrum48K),
         new("ZX Spectrum 128k", OldBit.Spectron.Emulation.ComputerType.Spectrum128K),
+        new("Timex Computer 2048", OldBit.Spectron.Emulation.ComputerType.Timex2048),
     ];
 
     public List<NameValuePair<JoystickType?>> JoystickTypes { get; } =
