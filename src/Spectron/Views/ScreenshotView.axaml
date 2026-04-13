@@ -47,10 +47,13 @@
                             CornerRadius="4"
                             Margin="4">
                             <Grid>
-                                <Image
-                                    Width="300"
-                                    Stretch="Uniform"
-                                    Source="{Binding Data, Converter={StaticResource ScreenshotBytesToImageConverter}}"/>
+                                <Viewbox Stretch="Uniform" Width="300">
+                                    <Image
+                                        Width="256"
+                                        Height="192"
+                                        Stretch="Fill"
+                                        Source="{Binding Data, Converter={StaticResource ScreenshotBytesToImageConverter}}"/>
+                                </Viewbox>
                                 <StackPanel
                                     Orientation="Horizontal"
                                     HorizontalAlignment="Right"
