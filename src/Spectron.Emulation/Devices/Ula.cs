@@ -5,14 +5,13 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.Devices;
 
-internal sealed class Ula(
-    ComputerType computerType,
+internal class Ula(
     KeyboardState keyboardState,
     ScreenBuffer screenBuffer,
     Z80 cpu,
     TapeManager tapeManager) : IDevice
 {
-    public byte? ReadPort(Word address)
+    public virtual byte? ReadPort(Word address)
     {
         if (!IsUlaPort(address))
         {
@@ -25,7 +24,7 @@ internal sealed class Ula(
         return value;
     }
 
-    public void WritePort(Word address, byte value)
+    public virtual void WritePort(Word address, byte value)
     {
         if (!IsUlaPort(address))
         {
@@ -36,8 +35,9 @@ internal sealed class Ula(
         screenBuffer.UpdateBorder(color, cpu.Clock.FrameTicks);
     }
 
-    internal bool IsUlaPort(Word address) =>
-        computerType == ComputerType.Timex2048 ? (address & 0xFF) == 0xFE : (address & 0x01) == 0x00;
+    internal virtual bool IsUlaPort(Word address) => (address & 0x01) == 0x00;
+
+    internal virtual void Reset() { }
 
     private void UpdateEarBit(ref byte value)
     {

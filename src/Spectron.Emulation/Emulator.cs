@@ -32,7 +32,6 @@ public sealed class Emulator
     private readonly SpectrumBus _spectrumBus;
     private readonly EmulatorTimer _emulationTimer;
     private readonly FloatingBus _floatingBus;
-    private readonly Ula _ula;
     private readonly ScreenMemoryHandler _screenMemoryHandler;
 
     private bool _isDebuggerResume;
@@ -72,13 +71,13 @@ public sealed class Emulator
     public RomType RomType { get; }
 
     public Z80 Cpu { get; }
+    internal Ula Ula { get; }
     public IEmulatorMemory Memory { get; }
     public IBus Bus => _spectrumBus;
     public DivMmcDevice DivMmc { get; }
     public Beta128Device Beta128 { get; }
     public Interface1Device Interface1 { get; }
     public ZxPrinter Printer { get; }
-    public UlaTimex? UlaTimex { get; }
     public ScreenBuffer ScreenBuffer { get; }
 
     public int TicksPerFrame => _hardware.TicksPerFrame;
@@ -111,19 +110,6 @@ public sealed class Emulator
         RomType = emulatorArgs.RomType;
         Memory = emulatorArgs.Memory;
 
-        UlaPlus = new UlaPlus();
-        _spectrumBus = new SpectrumBus();
-
-        ScreenBuffer = new ScreenBuffer(hardware, emulatorArgs.Memory, UlaPlus);
-
-        if (ComputerType == ComputerType.Timex2048)
-        {
-            UlaTimex = new UlaTimex();
-        }
-
-        _screenMemoryHandler = new ScreenMemoryHandler(Memory, ScreenBuffer);
-        _screenMemoryHandler.SetScreenMode(UlaTimex);
-
         Cpu = new Z80(emulatorArgs.Memory)
         {
             Clock =
@@ -133,16 +119,26 @@ public sealed class Emulator
             }
         };
 
+        UlaPlus = new UlaPlus();
+        ScreenBuffer = new ScreenBuffer(hardware, emulatorArgs.Memory, UlaPlus);
+
+        Ula = ComputerType == ComputerType.Timex2048
+            ? new UlaTimex(KeyboardState, ScreenBuffer, Cpu, TapeManager)
+            : new Ula(KeyboardState, ScreenBuffer, Cpu, TapeManager);
+
+        _screenMemoryHandler = new ScreenMemoryHandler(Memory, ScreenBuffer);
+        _screenMemoryHandler.SetScreenMode(Ula as UlaTimex);
+
+        _spectrumBus = new SpectrumBus();
+
         JoystickManager = new JoystickManager(gamepadManager, _spectrumBus, KeyboardState);
         MouseManager = new MouseManager(_spectrumBus);
         KeyboardState.Reset();
         TapeManager.Attach(Cpu, Memory, hardware);
 
-        _ula = new Ula(hardware.ComputerType, KeyboardState, ScreenBuffer, Cpu, TapeManager);
+        _floatingBus = new FloatingBus(_hardware, Memory, Cpu.Clock, Ula.IsUlaPort);
 
-        _floatingBus = new FloatingBus(_hardware, Memory, Cpu.Clock, _ula.IsUlaPort);
-
-        AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware, _ula.IsUlaPort);
+        AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware, Ula.IsUlaPort);
 
         DivMmc = new DivMmcDevice(Cpu, Memory, logger);
         Beta128 = new Beta128Device(Cpu, _hardware.ClockMhz, Memory, ComputerType, diskDriveManager);
@@ -214,7 +210,7 @@ public sealed class Emulator
         Interface1.Reset();
         DivMmc.Reset();
         Beta128.Reset();
-        UlaTimex?.Reset();
+        Ula.Reset();
     }
 
     public void Break()
@@ -255,16 +251,16 @@ public sealed class Emulator
         UlaPlus.ActiveChanged += _ => _invalidateScreen = true;
         Beta128.DiskActivity += _ => DiskDriveManager.OnDiskActivity();
 
-        if (UlaTimex != null)
+        if (Ula is UlaTimex ulaTimex)
         {
-            UlaTimex.ScreenModeChanged += (sender, _) =>
+            ulaTimex.ScreenModeChanged += (sender, _) =>
                 _screenMemoryHandler.SetScreenMode(sender as UlaTimex, Cpu.Clock.FrameTicks);
         }
     }
 
     private void AddDevices()
     {
-        _spectrumBus.AddDevice(_ula);
+        _spectrumBus.AddDevice(Ula);
         _spectrumBus.AddDevice(UlaPlus);
         _spectrumBus.AddDevice(Memory);
         _spectrumBus.AddDevice(AudioManager.Beeper);
@@ -274,12 +270,6 @@ public sealed class Emulator
         _spectrumBus.AddDevice(DivMmc);
         _spectrumBus.AddDevice(Beta128);
         _spectrumBus.AddDevice(new RtcDevice(DivMmc));
-
-        if (UlaTimex != null)
-        {
-            _spectrumBus.AddDevice(UlaTimex);
-        }
-
         _spectrumBus.AddDevice(_floatingBus);
 
         Cpu.AddBus(_spectrumBus);
