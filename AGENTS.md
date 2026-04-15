@@ -42,6 +42,7 @@ dotnet test
 ├── /Spectron.Debugger.Tests        # Tests for the debugger UI
 ├── /Spectron.Disassembly.Tests     # Tests for the Z80 disassembler
 ├── /Spectron.Emulator.Tests        # Tests for the core emulation logic
+└── /Spectron.Tests                 # Tests for the UI related components
 ```
 
 ## Core Dependencies
