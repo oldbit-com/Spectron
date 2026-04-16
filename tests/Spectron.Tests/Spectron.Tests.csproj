@@ -32,4 +32,8 @@
       <ProjectReference Include="..\..\src\Spectron\Spectron.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\Spectron.Emulation\Spectron.Emulation.csproj" />
+    </ItemGroup>
+
 </Project>
