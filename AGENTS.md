@@ -80,9 +80,12 @@ For macOS native menu is implented in src/Spectron/Controls/NativeMainMenu.cs.
 - Naming: Use meaningful variable and method names following standard .NET conventions (PascalCase for methods/properties, camelCase for private fields with _ prefix).
 - Global Usings: Word is defined as a global using for ushort in the Emulation project.
 
+## Testing Guidelines
+- All internal classes and methods are accessible in test projects, no need to change access modifiers.
+- Use NSubstitute only if easy to mock. In most cases use actual objects for testing.
+- Use Shouldly for assertions.
+
 ## Guidelines for AI Agents
 - NuGet Dependencies: Do not introduce new NuGet dependencies without explicit approval.
 - File Organization: When adding functionality to ViewModels, check if a partial class structure is already in place.
 - Emulation Safety: Core emulation logic in Spectron.Emulation is performance-sensitive. Avoid heavy allocations in hot paths (like RunFrame or ReadPort).
-
-
