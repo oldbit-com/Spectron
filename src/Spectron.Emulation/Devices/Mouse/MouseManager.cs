@@ -20,15 +20,8 @@ public sealed class MouseManager
         Mouse.Y = (byte)y;
     }
 
-    public void UpdateMouseButtons(MouseButtons pressedButtons)
-    {
-        if (Mouse == null)
-        {
-            return;
-        }
-
-        Mouse.Buttons = pressedButtons;
-    }
+    public void UpdateMouseButtons(MouseButtons pressedButtons) =>
+        Mouse?.Buttons = pressedButtons;
 
     public void Configure(MouseType mouseType)
     {
