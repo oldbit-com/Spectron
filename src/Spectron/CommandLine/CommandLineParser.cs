@@ -62,20 +62,21 @@ public static class CommandLineParser
                                           """);
 
         rootCommand.Options.Add(fileOption);
-        rootCommand.Options.Add(tapeLoadSpeedOption);
         rootCommand.Options.Add(computerOption);
-        rootCommand.Options.Add(romOption);
-        rootCommand.Options.Add(romFileOption);
         rootCommand.Options.Add(joystickOption);
         rootCommand.Options.Add(mouseOption);
-        rootCommand.Options.Add(themeOption);
+        rootCommand.Options.Add(tapeLoadSpeedOption);
         rootCommand.Options.Add(borderSizeOption);
+        rootCommand.Options.Add(romOption);
+        rootCommand.Options.Add(romFileOption);
+        rootCommand.Options.Add(timeMachineEnabledOption);
+        rootCommand.Options.Add(timeMachineDisabledOption);
+        rootCommand.Options.Add(resumeEnabledOption);
+        rootCommand.Options.Add(resumeDisabledOption);
         rootCommand.Options.Add(muteAudioOption);
         rootCommand.Options.Add(ayEnabledOption);
         rootCommand.Options.Add(ayDisabledOption);
         rootCommand.Options.Add(ayStereoModeOption);
-        rootCommand.Options.Add(zxPrinterEnabledOption);
-        rootCommand.Options.Add(zxPrinterDisabledOption);
         rootCommand.Options.Add(ulaPlusEnabledOption);
         rootCommand.Options.Add(ulaPlusDisabledOption);
         rootCommand.Options.Add(divMmcEnabledOption);
@@ -83,13 +84,12 @@ public static class CommandLineParser
         rootCommand.Options.Add(divMmcImageOption);
         rootCommand.Options.Add(divMmcReadOnly);
         rootCommand.Options.Add(divMmcWritable);
-        rootCommand.Options.Add(timeMachineEnabledOption);
-        rootCommand.Options.Add(timeMachineDisabledOption);
-        rootCommand.Options.Add(resumeEnabledOption);
-        rootCommand.Options.Add(resumeDisabledOption);
         rootCommand.Options.Add(interface1EnabledOption);
         rootCommand.Options.Add(interface1DisabledOption);
         rootCommand.Options.Add(interface1RomOption);
+        rootCommand.Options.Add(zxPrinterEnabledOption);
+        rootCommand.Options.Add(zxPrinterDisabledOption);
+        rootCommand.Options.Add(themeOption);
 
         rootCommand.Validators.Add(result =>
         {
@@ -203,18 +203,28 @@ public static class CommandLineParser
         };
 
     private static Option<ComputerType?> GetComputerOption() =>
-        new Option<ComputerType?>("--computer", "-c")
-            {
-                Description = "Specifies the computer to emulate",
-            }
-            .AcceptOnlyFromAmong("Spectrum16K", "Spectrum48K", "Spectrum128K");
+        new("--computer", "-c")
+        {
+            Description = "Specifies the computer to emulate"
+        };
 
     private static Option<RomType?> GetRomOption() =>
         new Option<RomType?>("--rom", "-r")
             {
                 Description = "Specifies the ROM to load",
             }
-            .AcceptOnlyFromAmong("Original", "Retroleum", "GoshWonderful", "BusySoft", "Harston", "BrendanAlford", "Custom");
+            .AcceptOnlyFromAmong(
+                nameof(RomType.BbcBasic),
+                nameof(RomType.BrendanAlford),
+                nameof(RomType.BusySoft),
+                nameof(RomType.Custom),
+                nameof(RomType.GoshWonderful),
+                nameof(RomType.Harston),
+                nameof(RomType.HtrSuperBasic),
+                nameof(RomType.Original),
+                nameof(RomType.Pentagon128),
+                nameof(RomType.PrettyBasic),
+                nameof(RomType.Retroleum));
 
     private static Option<FileInfo[]> GetRomFileOption() =>
         new("--rom-file", "-rf")
@@ -223,20 +233,20 @@ public static class CommandLineParser
         };
 
     private static Option<bool> GetMuteAudioOption() =>
-        new("--mute", "-m")
+        new("--mute")
         {
             Description = "Mutes the audio playback",
             DefaultValueFactory = _ => false
         };
 
     private static Option<Theme?> GetThemeOption() =>
-        new("--theme", "-t")
+        new("--theme")
         {
             Description = "Specifies the application theme",
         };
 
     private static Option<TapeSpeed?> GetTapeLoadSpeedOption() =>
-        new("--tape-load-speed", "-ts")
+        new("--tape-load-speed", "-t")
         {
             Description = "Specifies the tape loading speed",
         };
@@ -356,13 +366,13 @@ public static class CommandLineParser
         };
 
     private static Option<bool?> GetInterface1EnabledOption() =>
-        new("--interface1", "--if1")
+        new("--interface1")
         {
             Description = "Enables Interface 1 emulation",
         };
 
     private static Option<bool?> GetInterface1DisabledOption() =>
-        new("--no-interface1", "--no-if1")
+        new("--no-interface1")
         {
             Description = "Disables Interface 1 emulation",
         };

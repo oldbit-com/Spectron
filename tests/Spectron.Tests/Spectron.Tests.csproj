@@ -36,4 +36,16 @@
       <ProjectReference Include="..\..\src\Spectron.Emulation\Spectron.Emulation.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="TestFiles\Spectron.tap">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestFiles\divmmc.image">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="TestFiles\rom.bin">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

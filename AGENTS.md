@@ -84,6 +84,8 @@ For macOS native menu is implented in src/Spectron/Controls/NativeMainMenu.cs.
 - All internal classes and methods are accessible in test projects, no need to change access modifiers.
 - Use NSubstitute only if easy to mock. In most cases use actual objects for testing.
 - Use Shouldly for assertions.
+- xunit.v3 is used for unit tests ([Fact], [Theory], [InlineData]).
+- Do not add `// Arrange` `// Act` `// Assert` comments to tests.
 
 ## Guidelines for AI Agents
 - NuGet Dependencies: Do not introduce new NuGet dependencies without explicit approval.
