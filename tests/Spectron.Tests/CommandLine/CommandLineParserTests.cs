@@ -25,6 +25,23 @@ public class CommandLineParserTests
     }
 
     [Theory]
+    [InlineData("--beta128", true)]
+    [InlineData("--no-beta128", false)]
+    public void Parse_Beta128EnabledOption_ShouldBeParsed(string option, bool expectedValue)
+    {
+        CommandLineArgs? args = null;
+
+        var result = CommandLineParser.Parse(parsed => { args = parsed; }, [option]);
+
+        result.ShouldBe(0);
+        args.ShouldNotBeNull();
+
+        var expected = DefaultArgs with { IsBeta128Enabled = expectedValue };
+
+        args.ShouldBe(expected);
+    }
+
+    [Theory]
     [InlineData("--divmmc", true)]
     [InlineData("--no-divmmc", false)]
     public void Parse_DivMmcEnabledOption_ShouldBeParsed(string option, bool expectedValue)
@@ -412,6 +429,7 @@ public class CommandLineParserTests
         IsTimeMachineEnabled: null,
         IsUlaPlusEnabled: null,
         IsZxPrinterEnabled: null,
+        IsBeta128Enabled: null,
         JoystickType: null,
         MouseType: null,
         RomType: null,

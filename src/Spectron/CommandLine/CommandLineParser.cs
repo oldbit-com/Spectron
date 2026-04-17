@@ -54,6 +54,8 @@ public static class CommandLineParser
         var interface1EnabledOption = GetInterface1EnabledOption();
         var interface1DisabledOption = GetInterface1DisabledOption();
         var interface1RomOption = GetInterface1RomOption();
+        var beta128EnabledOption = GetBeta128EnabledOption();
+        var beta128DisabledOption = GetBeta128DisabledOption();
 
         var rootCommand = new RootCommand("""
                                           **** Spectron ZX Spectrum Emulator ****
@@ -84,6 +86,8 @@ public static class CommandLineParser
         rootCommand.Options.Add(divMmcImageOption);
         rootCommand.Options.Add(divMmcReadOnly);
         rootCommand.Options.Add(divMmcWritable);
+        rootCommand.Options.Add(beta128EnabledOption);
+        rootCommand.Options.Add(beta128DisabledOption);
         rootCommand.Options.Add(interface1EnabledOption);
         rootCommand.Options.Add(interface1DisabledOption);
         rootCommand.Options.Add(interface1RomOption);
@@ -171,6 +175,7 @@ public static class CommandLineParser
                 IsEnabled(parseResult.GetValue(timeMachineEnabledOption), parseResult.GetValue(timeMachineDisabledOption)),
                 IsEnabled(parseResult.GetValue(resumeEnabledOption), parseResult.GetValue(resumeDisabledOption)),
                 IsEnabled(parseResult.GetValue(interface1EnabledOption), parseResult.GetValue(interface1DisabledOption)),
+                IsEnabled(parseResult.GetValue(beta128EnabledOption), parseResult.GetValue(beta128DisabledOption)),
                 parseResult.GetValue(interface1RomOption),
                 parseResult.GetValue(borderSizeOption),
                 parseResult.GetValue(themeOption)));
@@ -199,7 +204,7 @@ public static class CommandLineParser
     private static Option<FileInfo> GetFileOption() =>
         new("--file", "-f")
         {
-            Description = "Specifies the file to load. This can be any supported file type: TAP | TZX | Z80 | SNA | SZX | POK | ZIP"
+            Description = "Specifies the file to load. This can be any supported file type: TAP | TZX | Z80 | SNA | SZX | TRD | SCL | POK | Spectron | ZIP"
         };
 
     private static Option<ComputerType?> GetComputerOption() =>
@@ -381,5 +386,17 @@ public static class CommandLineParser
         new("--interface1-rom")
         {
             Description = "Specifies ROM version to use for Interface 1 emulation",
+        };
+
+    private static Option<bool?> GetBeta128EnabledOption() =>
+        new("--beta128")
+        {
+            Description = "Enables Beta 128 disk interface emulation",
+        };
+
+    private static Option<bool?> GetBeta128DisabledOption() =>
+        new("--no-beta128")
+        {
+            Description = "Disables Beta 128 disk interface emulation",
         };
 }
