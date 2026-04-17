@@ -36,6 +36,7 @@ public static class CommandLineParser
         var ayDisabledOption = GetAyDisabledOption();
         var ayStereoModeOption = GetAyStereoModeOption();
         var borderSizeOption = GetBorderSizeOption();
+        var fullScreenOption = GetFullScreenOption();
         var joystickOption = GetJoystickTypeOption();
         var mouseOption = GetMouseTypeOption();
         var divMmcEnabledOption = GetDivMmcEnabledOption();
@@ -69,6 +70,7 @@ public static class CommandLineParser
         rootCommand.Options.Add(mouseOption);
         rootCommand.Options.Add(tapeLoadSpeedOption);
         rootCommand.Options.Add(borderSizeOption);
+        rootCommand.Options.Add(fullScreenOption);
         rootCommand.Options.Add(romOption);
         rootCommand.Options.Add(romFileOption);
         rootCommand.Options.Add(timeMachineEnabledOption);
@@ -178,6 +180,7 @@ public static class CommandLineParser
                 IsEnabled(parseResult.GetValue(beta128EnabledOption), parseResult.GetValue(beta128DisabledOption)),
                 parseResult.GetValue(interface1RomOption),
                 parseResult.GetValue(borderSizeOption),
+                parseResult.GetValue(fullScreenOption),
                 parseResult.GetValue(themeOption)));
         });
 
@@ -278,6 +281,13 @@ public static class CommandLineParser
         new("--border", "-b")
         {
             Description = "Specifies the border size",
+        };
+
+    private static Option<bool> GetFullScreenOption() =>
+        new("--full-screen")
+        {
+            Description = "Opens the application in full screen mode",
+            DefaultValueFactory = _ => false
         };
 
     private static Option<JoystickType?> GetJoystickTypeOption() =>

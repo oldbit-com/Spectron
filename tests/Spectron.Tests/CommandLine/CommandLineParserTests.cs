@@ -173,6 +173,22 @@ public class CommandLineParserTests
     }
 
     [Theory]
+    [InlineData("--full-screen", true)]
+    public void Parse_FullScreenOption_ShouldBeParsed(string option, bool expectedValue)
+    {
+        CommandLineArgs? args = null;
+
+        var result = CommandLineParser.Parse(parsed => { args = parsed; }, [option]);
+
+        result.ShouldBe(0);
+        args.ShouldNotBeNull();
+
+        var expected = DefaultArgs with { IsFullScreen = expectedValue };
+
+        args.ShouldBe(expected);
+    }
+
+    [Theory]
     [InlineData("--interface1", true)]
     [InlineData("--no-interface1", false)]
     public void Parse_Interface1EnabledOption_ShouldBeParsed(string option, bool expectedValue)
@@ -424,6 +440,7 @@ public class CommandLineParserTests
         IsAyEnabled: null,
         IsDivMmcEnabled: null,
         IsDivMmcReadOnly: null,
+        IsFullScreen: false,
         IsInterface1Enabled: null,
         IsResumeEnabled: null,
         IsTimeMachineEnabled: null,
