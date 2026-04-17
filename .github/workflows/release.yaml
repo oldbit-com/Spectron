@@ -52,7 +52,7 @@ jobs:
 
       - name: Publish
         run: |
-          dotnet publish -r ${{ matrix.rid }} -p:DebugType=embedded -o ./dist/${{ matrix.rid }}${{ matrix.bin }} ./src/Spectron/Spectron.csproj
+          dotnet publish -r ${{ matrix.rid }} -p:DebugType=embedded -p:PublishSingleFile=true -p:SelfContained=true -o ./dist/${{ matrix.rid }}${{ matrix.bin }} ./src/Spectron/Spectron.csproj
 
       - name: Package Windows
         if: startsWith(matrix.rid, 'win-')

@@ -73,11 +73,6 @@ partial class MainWindowViewModel
             return;
         }
 
-        if (CommandLineArgs?.FilePath != null)
-        {
-            await HandleLoadFileAsync(CommandLineArgs?.FilePath);
-        }
-
         if (Emulator == null)
         {
             byte[]? customRom = null;
@@ -96,6 +91,11 @@ partial class MainWindowViewModel
         }
 
         ApplyCommandLineArguments();
+
+        if (CommandLineArgs?.FilePath != null)
+        {
+            await HandleLoadFileAsync(CommandLineArgs?.FilePath);
+        }
     }
 
     private void ApplyCommandLineArguments()
@@ -134,6 +134,18 @@ partial class MainWindowViewModel
             else
             {
                 Emulator.DivMmc.Disable();
+            }
+        }
+
+        if (CommandLineArgs?.IsBeta128Enabled != null)
+        {
+            if (CommandLineArgs.IsBeta128Enabled.Value)
+            {
+                Emulator.Beta128.Enable();
+            }
+            else
+            {
+                Emulator.Beta128.Disable();
             }
         }
 

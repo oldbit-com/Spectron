@@ -29,6 +29,7 @@ public record CommandLineArgs(
     bool? IsTimeMachineEnabled,
     bool? IsResumeEnabled,
     bool? IsInterface1Enabled,
+    bool? IsBeta128Enabled,
     Interface1RomVersion? Interface1RomVersion,
     BorderSize? BorderSize,
     Theme? Theme);
