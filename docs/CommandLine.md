@@ -12,6 +12,7 @@ Options:
   -m, --mouse <Kempston|None>                                                                  Specifies the emulated mouse type
   -t, --tape-load-speed <Accelerated|Instant|Normal>                                           Specifies the tape loading speed
   -b, --border <Full|Large|Medium|None|Small>                                                  Specifies the border size
+  --full-screen                                                                                Opens the application in full screen mode
   -r, --rom                                                                                    Specifies the ROM to load
   <BbcBasic|BrendanAlford|BusySoft|Custom|GoshWonderful|Harston|HtrSuperBasic|Original|Pentag
   on128|PrettyBasic|Retroleum>
