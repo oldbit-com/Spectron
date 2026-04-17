@@ -141,9 +141,9 @@ partial class MainWindowViewModel
     private void OpenPrintOutputViewer() =>
         WeakReferenceMessenger.Default.Send(new ShowPrintOutputViewMessage(Emulator!.Printer));
 
-    private async Task OpenFavoritesWindow()
+    private void OpenFavoritesWindow()
     {
         FavoritesViewModel.Favorites = _favorites;
-        await WeakReferenceMessenger.Default.Send(new ShowFavoritesViewMessage(FavoritesViewModel));
+        WeakReferenceMessenger.Default.Send(new ShowFavoritesViewMessage(FavoritesViewModel));
     }
 }
