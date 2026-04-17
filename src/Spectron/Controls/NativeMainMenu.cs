@@ -883,7 +883,7 @@ public sealed class NativeMainMenu
             _mouseTypes[mouse.Type] = new NativeMenuItem(mouse.DisplayName)
             {
                 ToggleType = NativeMenuItemToggleType.Radio,
-                Command = _viewModel.ChangeJoystickTypeCommand,
+                Command = _viewModel.ChangeMouseTypeCommand,
                 CommandParameter = mouse.Type,
                 IsChecked = _viewModel.MouseType == mouse.Type,
                 IsEnabled = true
