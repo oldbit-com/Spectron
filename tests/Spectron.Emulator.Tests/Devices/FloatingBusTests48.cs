@@ -2,7 +2,6 @@ using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Z80Cpu;
-using Shouldly;
 
 namespace OldBit.Spectron.Emulator.Tests.Devices;
 
