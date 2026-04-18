@@ -20,6 +20,9 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
     private record FindCommand (string Text, bool ForceText = false) : ICommand;
     private record InvalidCommand (string Error) : ICommand;
 
+    private int _historyIndex = -1;
+    private readonly List<string> _commandHistory = [];
+
     private readonly Emulator _emulator;
 
     public HexViewer? Viewer { get; set; }
@@ -80,9 +83,34 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
     [RelayCommand]
     private void Immediate(KeyEventArgs e)
     {
-        if (e.Key != Key.Enter || string.IsNullOrWhiteSpace(CommandText))
+        switch (e.Key)
         {
-            return;
+            case Key.Enter when string.IsNullOrWhiteSpace(CommandText):
+                return;
+
+            case Key.Up when _commandHistory.Count > 0:
+                _historyIndex -= 1;
+
+                if (_historyIndex < 0)
+                {
+                    _historyIndex = _commandHistory.Count - 1;
+                }
+
+                CommandText = _commandHistory[_historyIndex];
+
+                break;
+
+            case Key.Down when _commandHistory.Count > 0:
+                _historyIndex += 1;
+
+                if (_historyIndex >= _commandHistory.Count)
+                {
+                    _historyIndex = 0;
+                }
+
+                CommandText = _commandHistory[_historyIndex];
+
+                break;
         }
 
         var command = ParseCommand(CommandText);
@@ -91,10 +119,14 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
         {
             case GoToCommand goToCommand:
                 GoTo(goToCommand.Address);
+                AddToHistory();
+
                 break;
 
             case WriteCommand memoryCommand:
                 _emulator.Memory.Write(memoryCommand.Address, memoryCommand.Value);
+                AddToHistory();
+
                 break;
 
             case FindCommand findCommand:
@@ -139,6 +171,9 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
                 {
                     _lastFindInex = 0;
                 }
+
+                AddToHistory();
+
                 break;
             }
         }
@@ -232,5 +267,23 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
         }
 
         return new InvalidCommand("Invalid command");
+    }
+
+    private void AddToHistory()
+    {
+        if (_commandHistory.LastOrDefault() == CommandText)
+        {
+            return;
+        }
+
+        if (_commandHistory.Count > 100)
+        {
+            _commandHistory.RemoveAt(0);
+        }
+
+        _commandHistory.Add(CommandText);
+        _historyIndex = _commandHistory.Count;
+
+        CommandText = string.Empty;
     }
 }
