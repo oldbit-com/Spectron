@@ -24,7 +24,7 @@ internal static class MemoryExtensions
 
             for (Word address = 0; address < 16384; address++)
             {
-                result[address] = memory.ReadActiveScreen(address);
+                result[address] = memory.ReadScreen(address);
             }
 
             return result;

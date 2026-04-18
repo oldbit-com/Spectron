@@ -8,7 +8,7 @@ public interface IEmulatorMemory : IMemory, IDevice
 {
     void Reset() { }
 
-    byte ReadActiveScreen(Word address, Word screenBaseAddress = 0x4000) => Read((Word)(address + screenBaseAddress));
+    byte ReadScreen(Word address) => Read((Word)(address + 0x4000));
 
     void ShadowRom(IRomMemory? shadowRom);
 

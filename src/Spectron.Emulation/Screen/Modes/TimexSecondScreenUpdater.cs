@@ -23,8 +23,8 @@ internal sealed class TimexSecondScreenUpdater(
             return;
         }
 
-        var bitmap = memory.ReadActiveScreen(bitmapAddress, ScreenBaseAddress);
-        var attribute = memory.ReadActiveScreen(attributeAddress, ScreenBaseAddress);
+        var bitmap = memory.Read((Word)(bitmapAddress + ScreenBaseAddress));
+        var attribute = memory.Read((Word)(attributeAddress + ScreenBaseAddress));
 
         var attributeData = FastLookup.AttributeData[attribute];
         var isFlashOn = attributeData.IsFlashOn && _isFlashOnFrame;

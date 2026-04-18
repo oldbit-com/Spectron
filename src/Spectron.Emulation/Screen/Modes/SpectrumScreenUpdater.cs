@@ -23,8 +23,8 @@ internal sealed class SpectrumScreenUpdater(
             return;
         }
 
-        var bitmap = memory.ReadActiveScreen(bitmapAddress);
-        var attribute = memory.ReadActiveScreen(attributeAddress);
+        var bitmap = memory.ReadScreen(bitmapAddress);
+        var attribute = memory.ReadScreen(attributeAddress);
 
         var attributeData = FastLookup.AttributeData[attribute];
         var isFlashOn = attributeData.IsFlashOn && _isFlashOnFrame;
