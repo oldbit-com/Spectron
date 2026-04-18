@@ -2,7 +2,7 @@ namespace OldBit.Spectron.Emulation.Devices.Joystick.Joysticks;
 
 internal class KempstonJoystick : IJoystick
 {
-    private const Word KempstonPort = 0x1F;
+    private const Word KempstonPortMask = 0xE0; // Partially decoded: ---- ---- 000- ----
     private const byte None = 0x0;
     private const byte Right = 0x01;
     private const byte Left = 0x02;
@@ -12,7 +12,7 @@ internal class KempstonJoystick : IJoystick
 
     private byte _joystickState = None;
 
-    public byte? ReadPort(Word address) => (address & 0x1F) != KempstonPort ? null : _joystickState;
+    public byte? ReadPort(Word address) => (address & KempstonPortMask) == 0 ? _joystickState : null;
 
     public void HandleInput(JoystickInput input, InputState state)
     {

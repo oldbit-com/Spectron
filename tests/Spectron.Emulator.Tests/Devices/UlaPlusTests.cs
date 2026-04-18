@@ -1,5 +1,4 @@
 using OldBit.Spectron.Emulation.Devices;
-using Shouldly;
 
 namespace OldBit.Spectron.Emulator.Tests.Devices;
 
@@ -54,7 +53,7 @@ public class UlaPlusTests
 
         var value = ulaPlus.ReadPort(DataPort);
 
-        value.ShouldBe((byte)0xAB);
+        value.ShouldBe(0xAB);
     }
 
     // Standard Spectrum Palette for ULA+ (G..R..B.)

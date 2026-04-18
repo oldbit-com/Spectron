@@ -1,5 +1,4 @@
 using OldBit.Spectron.Emulation.Devices.Keyboard;
-using Shouldly;
 
 namespace OldBit.Spectron.Emulator.Tests.Devices.Keyboard;
 

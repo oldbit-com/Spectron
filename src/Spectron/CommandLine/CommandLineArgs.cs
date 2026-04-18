@@ -32,4 +32,5 @@ public record CommandLineArgs(
     bool? IsBeta128Enabled,
     Interface1RomVersion? Interface1RomVersion,
     BorderSize? BorderSize,
+    bool IsFullScreen,
     Theme? Theme);

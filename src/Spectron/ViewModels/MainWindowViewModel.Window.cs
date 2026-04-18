@@ -63,6 +63,7 @@ partial class MainWindowViewModel
         HandleChangeBorderSize(CommandLineArgs?.BorderSize ?? _preferences.BorderSize);
         HandleChangeScreenEffect(_preferences.ScreenEffect);
 
+        WindowState = CommandLineArgs?.IsFullScreen == true ? WindowState.FullScreen : WindowState.Normal;
         TapeLoadSpeed = CommandLineArgs?.TapeLoadSpeed ?? _preferences.Tape.LoadSpeed;
 
         if (await ResumeEmulatorSession())

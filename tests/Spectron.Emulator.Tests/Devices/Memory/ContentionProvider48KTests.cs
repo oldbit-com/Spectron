@@ -1,6 +1,5 @@
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Memory;
-using Shouldly;
 
 namespace OldBit.Spectron.Emulator.Tests.Devices.Memory;
 

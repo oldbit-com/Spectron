@@ -125,11 +125,11 @@ public class UlaTimexTests
         _ulaTimex.WritePort(ControlPort, 0x55);
 
         var value = _ulaTimex.ReadPort(ControlPort);
-        value.ShouldBe((byte)0x55);
+        value.ShouldBe(0x55);
 
         _ulaTimex.WritePort(ControlPort, 0xAA);
 
         value = _ulaTimex.ReadPort(ControlPort);
-        value.ShouldBe((byte)0xAA);
+        value.ShouldBe(0xAA);
     }
 }
