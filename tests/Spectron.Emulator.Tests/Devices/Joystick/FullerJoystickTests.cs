@@ -15,14 +15,14 @@ public class FullerJoystickTests
     }
 
     [Theory]
-    [InlineData(JoystickInput.Right, InputState.Pressed, 0b1111_0111)]
-    [InlineData(JoystickInput.Left, InputState.Pressed, 0b1111_1011)]
-    [InlineData(JoystickInput.Down, InputState.Pressed, 0b1111_1101)]
-    [InlineData(JoystickInput.Up, InputState.Pressed, 0b1111_1110)]
-    [InlineData(JoystickInput.Fire, InputState.Pressed, 0b0111_1111)]
-    public void FullerPort_ShouldReturnButtonValue(JoystickInput input, InputState state, byte expectedValue)
+    [InlineData(JoystickInput.Right, 0b1111_0111)]
+    [InlineData(JoystickInput.Left, 0b1111_1011)]
+    [InlineData(JoystickInput.Down, 0b1111_1101)]
+    [InlineData(JoystickInput.Up, 0b1111_1110)]
+    [InlineData(JoystickInput.Fire, 0b0111_1111)]
+    public void FullerPort_ShouldReturnButtonValue(JoystickInput input, byte expectedValue)
     {
-        _joystick.HandleInput(input, state);
+        _joystick.HandleInput(input, InputState.Pressed);
 
         var result = _joystick.ReadPort(0x7F);
 

@@ -28,14 +28,14 @@ public class KempstonJoystickTests
     }
 
     [Theory]
-    [InlineData(JoystickInput.Right, InputState.Pressed, 0x01)]
-    [InlineData(JoystickInput.Left, InputState.Pressed, 0x02)]
-    [InlineData(JoystickInput.Down, InputState.Pressed, 0x04)]
-    [InlineData(JoystickInput.Up, InputState.Pressed, 0x08)]
-    [InlineData(JoystickInput.Fire, InputState.Pressed, 0x10)]
-    public void KempstonPort_ShouldReturnButtonValue(JoystickInput input, InputState state, byte expectedValue)
+    [InlineData(JoystickInput.Right, 0x01)]
+    [InlineData(JoystickInput.Left, 0x02)]
+    [InlineData(JoystickInput.Down, 0x04)]
+    [InlineData(JoystickInput.Up, 0x08)]
+    [InlineData(JoystickInput.Fire, 0x10)]
+    public void KempstonPort_ShouldReturnButtonValue(JoystickInput input, byte expectedValue)
     {
-        _joystick.HandleInput(input, state);
+        _joystick.HandleInput(input, InputState.Pressed);
 
         var result = _joystick.ReadPort(0x1F);
 
