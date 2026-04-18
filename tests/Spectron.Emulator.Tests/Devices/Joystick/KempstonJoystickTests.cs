@@ -54,6 +54,6 @@ public class KempstonJoystickTests
 
         var result = _joystick.ReadPort(0x1F);
 
-        result.ShouldBe((byte)0x1A);
+        result.ShouldBe(0x1A);
     }
 }
