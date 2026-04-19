@@ -36,7 +36,7 @@ public class Memory128KTests
     }
 
     [Fact]
-    public void Rom_ShouldBeAbleToSwitchScreen()
+    public void Ram_ShouldBeAbleToSwitchScreen()
     {
         var memory = new Memory128K(_rom128, _rom48);
         // Fill standard screen with 0x20
@@ -59,7 +59,7 @@ public class Memory128KTests
     }
 
     [Fact]
-    public void Rom_ShouldBeAbleToWriteToBank2()
+    public void Ram_ShouldBeAbleToWriteToBank2()
     {
         var memory = new Memory128K(_rom128, _rom48);
         memory.SetPagingMode(2);
@@ -72,7 +72,7 @@ public class Memory128KTests
     }
 
     [Fact]
-    public void Rom_ShouldBeAbleToWriteToBank5()
+    public void Ram_ShouldBeAbleToWriteToBank5()
     {
         var memory = new Memory128K(_rom128, _rom48);
         memory.SetPagingMode(5);
