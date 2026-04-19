@@ -6,12 +6,12 @@ namespace OldBit.Spectron.Emulation.Screen.Modes;
 /// <summary>
 /// Standard Spectrum screen updater. Also handles ULA+ coloring and Timex second screen.
 /// </summary>
-internal sealed class SpectrumScreenUpdater(
+internal sealed class TimexSecondScreenUpdater(
     FrameBuffer frameBuffer,
     IEmulatorMemory memory,
     UlaPlus ulaPlus) : IScreenUpdater
 {
-    private const int ScreenBaseAddress = 0x4000;
+    private const int ScreenBaseAddress = 0x6000;
 
     private readonly bool[] _dirtyAddresses = new bool[32 * 24 * 8];
     private bool _isFlashOnFrame;
@@ -23,8 +23,8 @@ internal sealed class SpectrumScreenUpdater(
             return;
         }
 
-        var bitmap = memory.ReadScreen(bitmapAddress);
-        var attribute = memory.ReadScreen(attributeAddress);
+        var bitmap = memory.Read((Word)(bitmapAddress + ScreenBaseAddress));
+        var attribute = memory.Read((Word)(attributeAddress + ScreenBaseAddress));
 
         var attributeData = FastLookup.AttributeData[attribute];
         var isFlashOn = attributeData.IsFlashOn && _isFlashOnFrame;

@@ -15,7 +15,7 @@ internal sealed class Content(
     private int _frameCount = 1;
     private int _fetchCycleIndex;
 
-    private IScreenUpdater _screenUpdater = new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus, 0x4000);
+    private IScreenUpdater _screenUpdater = new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus);
 
     internal void ChangeScreenMode(ScreenMode screenMode, Color ink, Color paper)
     {
@@ -23,8 +23,8 @@ internal sealed class Content(
 
         _screenUpdater = screenMode switch
         {
-            ScreenMode.Spectrum => new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus, 0x4000),
-            ScreenMode.TimexSecondScreen => new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus, 0x6000),
+            ScreenMode.Spectrum => new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus),
+            ScreenMode.TimexSecondScreen => new TimexSecondScreenUpdater(frameBuffer, memory, ulaPlus),
             ScreenMode.TimexHiColor => new TimexHiColorScreenUpdater(frameBuffer, memory),
             ScreenMode.TimexHiColorAlt => new TimexHiColorScreenUpdater(frameBuffer, memory, isAlternative: true),
             ScreenMode.TimexHiRes => new TimexHiResScreenUpdater(frameBuffer, memory, ink, paper),
