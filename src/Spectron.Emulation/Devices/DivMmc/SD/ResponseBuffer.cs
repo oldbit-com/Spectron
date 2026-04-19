@@ -21,7 +21,7 @@ internal sealed class ResponseBuffer
 
     internal void Put(Status status, byte token, byte[] data, byte crc1, byte crc2)
     {
-        _buffer[0] = (byte)(status);
+        _buffer[0] = (byte)status;
         _buffer[1] = token;
 
         Array.Copy(data, 0, _buffer, 2, data.Length);
@@ -35,7 +35,7 @@ internal sealed class ResponseBuffer
 
     internal void Put(Status status, byte token)
     {
-        _buffer[0] = (byte)(status);
+        _buffer[0] = (byte)status;
         _buffer[1] = token;
 
         _endPosition = 2;
@@ -44,11 +44,11 @@ internal sealed class ResponseBuffer
 
     internal void Put(Status status, uint value)
     {
-        _buffer[0] = (byte)(status);
+        _buffer[0] = (byte)status;
         _buffer[1] = (byte)(value >> 24);
         _buffer[2] = (byte)(value >> 16);
         _buffer[3] = (byte)(value >> 8);
-        _buffer[4] = (byte)(value);
+        _buffer[4] = (byte)value;
 
         _endPosition = 5;
         _currentPosition = 0;
@@ -56,7 +56,7 @@ internal sealed class ResponseBuffer
 
     internal void Put(Status status, byte voltage, byte checkPattern)
     {
-        _buffer[0] = (byte)(status);
+        _buffer[0] = (byte)status;
         _buffer[1] = 0;
         _buffer[2] = 0;
         _buffer[3] = (byte)(voltage & 0x0F);
