@@ -83,4 +83,40 @@ public class Memory128KTests
         memory.ReadRange(0x4000, 0x4000).ShouldAllBe(x => x == 0xAF);
         memory.ReadRange(0xC000, 0x4000).ShouldAllBe(x => x == 0xAF);
     }
+
+    [Theory]
+    [InlineData(5)]
+    [InlineData(7)]
+    public void Screen_ShouldBePaged(byte screenBlock)
+    {
+        var memory = new Memory128K(_rom128, _rom48);
+        memory.SetPagingMode(screenBlock);
+
+        memory.IsScreenPaged.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Ram_ShouldReadActiveScreen()
+    {
+        var memory = new Memory128K(_rom128, _rom48);
+
+        memory.SetPagingMode(Memory128K.ScreenBank1);
+
+        memory.Write(0xC000, 0x55);
+        memory.Write(0xC001, 0xAA);
+
+        memory.SetPagingMode(Memory128K.ScreenBank2);
+        memory.Write(0xC000, 0x77);
+        memory.Write(0xC001, 0xBB);
+
+        memory.ReadScreen(0x0000).ShouldBe(0x55);
+        memory.ReadScreen(0x0001).ShouldBe(0xAA);
+        memory.ReadScreen()[..2].ShouldBe([0x55, 0xAA]);
+
+        memory.SetPagingMode(0b00001000);
+
+        memory.ReadScreen(0x0000).ShouldBe(0x77);
+        memory.ReadScreen(0x0001).ShouldBe(0xBB);
+        memory.ReadScreen()[..2].ShouldBe([0x77, 0xBB]);
+    }
 }

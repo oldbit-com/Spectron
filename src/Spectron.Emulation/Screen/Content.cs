@@ -100,5 +100,5 @@ internal sealed class Content(
 
     internal void Invalidate() => _screenUpdater.Invalidate();
 
-    internal void SetDirty(int address) => _screenUpdater.SetDirty(address);
+    internal void MakeDirty(int address) => _screenUpdater.SetDirty(address);
 }
