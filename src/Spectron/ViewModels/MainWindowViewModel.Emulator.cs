@@ -86,6 +86,7 @@ partial class MainWindowViewModel
         if (fileType.IsSnapshot())
         {
             emulator = _snapshotManager.Load(stream, fileType);
+            emulator.ConfigureAudio(_preferences.Audio);
         }
         else if (fileType.IsTape())
         {
