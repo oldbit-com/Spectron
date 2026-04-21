@@ -43,7 +43,7 @@ public class SpectrumScreenUpdaterTests
         _memory.Write(0x5800, InkMagenta | PaperCyan);
         _memory.Write(0x5801, InkRed | PaperGreen);
 
-        _content.UpdateFrameBuffer(14363);
+        _content.UpdateFrameBuffer(14362);
 
         _frameBuffer.Pixels[..0x56D0].ShouldAllBe(c => c == White);
         _frameBuffer.Pixels[0x56D0..0x56D8].ShouldBe([Magenta, Cyan, Magenta, Cyan, Magenta, Cyan, Magenta, Cyan]);
@@ -59,7 +59,7 @@ public class SpectrumScreenUpdaterTests
         _memory.Write(0x5800, InkMagenta | PaperCyan);
 
         // Update frame buffer and verify it has been updated
-        _content.UpdateFrameBuffer(14363);
+        _content.UpdateFrameBuffer(14362);
         _frameBuffer.Pixels[0x56D0..0x56D8].ShouldBe([Magenta, Cyan, Magenta, Cyan, Magenta, Cyan, Magenta, Cyan]);
 
         // Clear frame buffer
@@ -67,7 +67,7 @@ public class SpectrumScreenUpdaterTests
 
         // New frame to update screen again, it should not be updated
         _content.NewFrame();
-        _content.UpdateFrameBuffer(14363);
+        _content.UpdateFrameBuffer(14362);
 
         _frameBuffer.Pixels.ShouldAllBe(c => c == White);
     }
@@ -75,19 +75,38 @@ public class SpectrumScreenUpdaterTests
     [Fact]
     public void FrameBuffer_ShouldHandleFlashAttribute()
     {
-        _memory.Write(0x4000, 0xAA);
+        // Write 8x8 data block
+        for (var i = 0; i < 8; i++)
+        {
+            var address = ScreenAddress.Calculate(0, i);
+            _memory.Write(address, 0xAA);
+        }
+
+        // Set flash attribute
         _memory.Write(0x5800, InkRed | PaperCyan | Flash);
 
+        // For the first 31 frames, the flash should be off, color should be normal
         for (var i = 0; i < 31; i++)
         {
-            _content.UpdateFrameBuffer(14363);
+            _content.UpdateFrameBuffer(14362);
             _frameBuffer.Pixels[0x56D0..0x56D8].ShouldBe([Red, Cyan, Red, Cyan, Red, Cyan, Red, Cyan]);
             _content.NewFrame();
         }
 
-        // Now the flash should be on, color should be inverted
-        _content.UpdateFrameBuffer(14363);
-        _frameBuffer.Pixels[0x56D0..0x56D8].ShouldBe([Cyan, Red, Cyan, Red, Cyan, Red, Cyan, Red]);
+        // Toggle the flash
+        _content.UpdateFrameBuffer(Hardware.Spectrum128K.LastPixelTicks);
+
+        var start = 0x56D0;
+        var end = start + 8;
+
+        // Whole 8x8 should be inverted
+        for (var line = 0; line < 8; line++)
+        {
+            _frameBuffer.Pixels[start..end].ShouldBe([Cyan, Red, Cyan, Red, Cyan, Red, Cyan, Red]);
+
+            start = 0x56D0 + (ScreenSize.BorderLeft + ScreenSize.ContentWidth + ScreenSize.BorderRight) * (line + 1);
+            end = start + 8;
+        }
     }
 
     [Fact]
@@ -102,7 +121,7 @@ public class SpectrumScreenUpdaterTests
 
         _memory.SetPagingMode(0b00001000);  // Make second screen active
 
-        _content.UpdateFrameBuffer(14363);
+        _content.UpdateFrameBuffer(14362);
 
         _frameBuffer.Pixels[..0x56D0].ShouldAllBe(c => c == White);
         _frameBuffer.Pixels[0x56D0..0x56D8].ShouldBe([Magenta, Cyan, Magenta, Cyan, Magenta, Cyan, Magenta, Cyan]);
