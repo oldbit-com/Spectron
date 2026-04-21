@@ -36,8 +36,6 @@ public sealed class ScreenBuffer
     {
         _lockedBorderColor = screenMode.IsTimexHiRes() ? paper : null;
 
-        FrameBuffer.ChangeScreenMode(screenMode);
-
         _content.ChangeScreenMode(screenMode, ink, paper);
         _border.ChangeScreenMode(screenMode);
 

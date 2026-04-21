@@ -19,6 +19,8 @@ internal sealed class Content(
 
     internal void ChangeScreenMode(ScreenMode screenMode, Color ink, Color paper)
     {
+        frameBuffer.ChangeScreenMode(screenMode);
+
         _screenRenderEvents = FastLookup.GetScreenRenderEvents(hardware, frameBuffer, screenMode);
 
         _screenUpdater = screenMode switch
