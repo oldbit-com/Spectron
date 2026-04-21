@@ -1,6 +1,6 @@
 using OldBit.Spectron.Emulation.Devices.DivMmc.SD;
 
-namespace OldBit.Spectron.Emulator.Tests.Devices.Storage.SD;
+namespace OldBit.Spectron.Emulator.Tests.Devices.DivMmc.SD;
 
 public class CommandTests
 {

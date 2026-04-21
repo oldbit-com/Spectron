@@ -2,7 +2,7 @@ using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Z80Cpu;
 
-namespace OldBit.Spectron.Emulator.Tests.Devices.Storage;
+namespace OldBit.Spectron.Emulator.Tests.Devices.DivMmc;
 
 public class DivMmcDeviceTests
 {

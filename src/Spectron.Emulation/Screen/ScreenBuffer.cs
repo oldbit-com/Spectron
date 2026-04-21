@@ -36,8 +36,6 @@ public sealed class ScreenBuffer
     {
         _lockedBorderColor = screenMode.IsTimexHiRes() ? paper : null;
 
-        FrameBuffer.ChangeScreenMode(screenMode);
-
         _content.ChangeScreenMode(screenMode, ink, paper);
         _border.ChangeScreenMode(screenMode);
 
@@ -100,5 +98,5 @@ public sealed class ScreenBuffer
     /// frame buffer needs to be updated, too.
     /// </summary>
     /// <param name="address">The address of the screen memory that value has been updated.</param>
-    internal void UpdateScreen(Word address) => _content.SetDirty(address);
+    internal void MakeDirty(Word address) => _content.MakeDirty(address);
 }

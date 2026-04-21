@@ -54,19 +54,22 @@ public static class EmulatorStateExtensions
         return Buffer;
     }
 
-    private static Color GetInkColor(this UlaPlusState ulaPlusState, byte attribute)
+    extension(UlaPlusState ulaPlusState)
     {
-        var paletteIndex = attribute >> 6;
-        var colorIndex = attribute & 0x07;
+        private Color GetInkColor(byte attribute)
+        {
+            var paletteIndex = attribute >> 6;
+            var colorIndex = attribute & 0x07;
 
-        return ulaPlusState.PaletteColors[paletteIndex][colorIndex];
-    }
+            return ulaPlusState.PaletteColors[paletteIndex][colorIndex];
+        }
 
-    private static Color GetPaperColor(this UlaPlusState ulaPlusState, byte attribute)
-    {
-        var paletteIndex = attribute >> 6;
-        var colorIndex = ((attribute >> 3) & 0x07) | 8;
+        private Color GetPaperColor(byte attribute)
+        {
+            var paletteIndex = attribute >> 6;
+            var colorIndex = ((attribute >> 3) & 0x07) | 8;
 
-        return ulaPlusState.PaletteColors[paletteIndex][colorIndex];
+            return ulaPlusState.PaletteColors[paletteIndex][colorIndex];
+        }
     }
 }

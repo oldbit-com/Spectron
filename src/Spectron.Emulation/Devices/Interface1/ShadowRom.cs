@@ -6,18 +6,15 @@ namespace OldBit.Spectron.Emulation.Devices.Interface1;
 public sealed class ShadowRom : IRomMemory
 {
     private readonly IEmulatorMemory _emulatorMemory;
-    private Interface1RomVersion _version = Interface1RomVersion.V2;
 
     public Interface1RomVersion Version
     {
-        get => _version;
+        get;
         set
         {
-            _version = value;
+            field = value;
 
-            Memory = RomReader.ReadRom(_version == Interface1RomVersion.V1 ?
-                RomType.Interface1V1 :
-                RomType.Interface1V2);
+            Memory = RomReader.ReadRom(field == Interface1RomVersion.V1 ? RomType.Interface1V1 : RomType.Interface1V2);
         }
     }
 
