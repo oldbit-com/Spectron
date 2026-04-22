@@ -116,6 +116,14 @@ public sealed class NativeMainMenu
 
                     break;
 
+                case nameof(MainWindowViewModel.MouseType):
+                    foreach (var mouseType in _mouseTypes.Keys)
+                    {
+                        _mouseTypes[mouseType].IsChecked = _viewModel.MouseType == mouseType;
+                    }
+
+                    break;
+
                 case nameof(MainWindowViewModel.IsUlaPlusEnabled):
                     _ulaPlusMenuItem?.IsChecked = _viewModel.IsUlaPlusEnabled;
 
