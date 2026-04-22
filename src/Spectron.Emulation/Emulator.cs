@@ -275,7 +275,7 @@ public sealed class Emulator
         Cpu.AddBus(_spectrumBus);
     }
 
-    private void RunFrame()
+    internal void RunFrame()
     {
         StartFrame();
 
