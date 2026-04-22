@@ -32,7 +32,10 @@ public class IntegrationTestBase
         using var converter = new ScreenConverter(frameBuffer);
         converter.UpdateBitmap();
 
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), $"TestResults/{fileName}");
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "TestResults");
+        Directory.CreateDirectory(path);
+
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), $"{path}/{fileName}");
 
         converter.SaveBitmap(filePath);
     }
