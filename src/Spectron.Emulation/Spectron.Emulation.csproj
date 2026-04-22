@@ -47,6 +47,9 @@
             <_Parameter1>OldBit.Spectron.Debugger.Tests</_Parameter1>
         </AssemblyAttribute>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>OldBit.Spectron.Integration.Tests</_Parameter1>
+        </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>OldBit.Spectron.Debugger</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
