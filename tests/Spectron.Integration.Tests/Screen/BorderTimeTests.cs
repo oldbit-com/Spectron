@@ -5,6 +5,7 @@ using OldBit.Spectron.Integration.Tests.Fixtures;
 namespace OldBit.Spectron.Integration.Tests.Screen;
 
 [Trait("Category", "Integration")]
+[MeasureTime]
 public class BorderTimeTests : IntegrationTestBase
 {
     [Fact]

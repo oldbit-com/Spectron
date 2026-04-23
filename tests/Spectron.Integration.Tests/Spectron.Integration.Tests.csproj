@@ -31,16 +31,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="TestFiles\Float48k.tap">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="TestFiles\Float128k.tap">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="TestFiles\btime.tap">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="TestFiles\floatspy.tap">
+      <None Update="TestFiles\*.tap">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

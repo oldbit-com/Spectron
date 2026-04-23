@@ -1,11 +1,11 @@
 using OldBit.Spectron.Emulation;
-using OldBit.Spectron.Emulation.Devices.Memory;
+using OldBit.Spectron.Emulation.Devices.Memory.Contention;
 
 namespace OldBit.Spectron.Emulator.Tests.Devices.Memory;
 
 public class ContentionProvider128KTests
 {
-    private readonly ContentionProvider _contention = new(
+    private readonly ContentionProvider128K _contention = new(
         Hardware.Spectrum128K.ContentionStartTicks,
         Hardware.Spectrum128K.TicksPerLine);
 

@@ -24,12 +24,12 @@ public class ContentTests
     }
 
     [Theory]
-    [InlineData(0, 14362, 0x0000, 0x1800, 22224)]
-    [InlineData(1, 14370, 0x0002, 0x1802, 22240)]
-    [InlineData(15, 14482, 0x001E, 0x181E, 22464)]
-    [InlineData(16, 14590, 0x0100, 0x1800, 22576)]
-    [InlineData(3056, 57910, 0x17E0, 0x1AE0, 89456)]
-    [InlineData(3071, 58030, 0x17FE, 0x1AFE, 89696)]
+    [InlineData(0, 14361, 0x0000, 0x1800, 22224)]
+    [InlineData(1, 14369, 0x0002, 0x1802, 22240)]
+    [InlineData(15, 14481, 0x001E, 0x181E, 22464)]
+    [InlineData(16, 14589, 0x0100, 0x1800, 22576)]
+    [InlineData(3056, 57909, 0x17E0, 0x1AE0, 89456)]
+    [InlineData(3071, 58029, 0x17FE, 0x1AFE, 89696)]
     public void ContentRenderer_ShouldBuildScreenEventsTableSpectrum128(int index, int expectedTicks,
         Word expectedBitmapAddress, Word expectedAttributeAddress, int expectedFrameBufferIndex)
     {

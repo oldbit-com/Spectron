@@ -5,6 +5,7 @@ using OldBit.Spectron.Emulation.Devices.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Devices.Memory;
+using OldBit.Spectron.Emulation.Devices.Memory.Contention;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Emulation.TimeTravel;
@@ -58,7 +59,7 @@ public sealed class EmulatorFactory(
 
     private Emulator CreateSpectrum128K(RomType romType, Memory128K memory)
     {
-        var contentionProvider = new ContentionProvider(
+        var contentionProvider = new ContentionProvider128K(
             Hardware.Spectrum128K.ContentionStartTicks,
             Hardware.Spectrum128K.TicksPerLine);
 
@@ -85,7 +86,7 @@ public sealed class EmulatorFactory(
 
     private Emulator CreateSpectrum(ComputerType computerType, RomType romType, IEmulatorMemory memory)
     {
-        var contentionProvider = new ContentionProvider(
+        var contentionProvider = new ContentionProvider48K(
             Hardware.Spectrum48K.ContentionStartTicks,
             Hardware.Spectrum48K.TicksPerLine);
 
@@ -110,7 +111,7 @@ public sealed class EmulatorFactory(
 
     private Emulator CreateTimex(RomType romType, IEmulatorMemory memory)
     {
-        var contentionProvider = new ContentionProvider(
+        var contentionProvider = new ContentionProvider48K(
             Hardware.Timex2048.ContentionStartTicks,
             Hardware.Timex2048.TicksPerLine);
 
