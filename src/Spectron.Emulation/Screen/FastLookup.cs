@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using OldBit.Spectron.Emulation.Extensions;
 
 namespace OldBit.Spectron.Emulation.Screen;
@@ -8,7 +9,7 @@ internal record ScreenRenderEvent(Word BitmapAddress, Word AttributeAddress, int
 
 internal static class FastLookup
 {
-    private static readonly Dictionary<string, ScreenRenderEvent[]> ScreenRenderEvents = new();
+    private static readonly ConcurrentDictionary<string, ScreenRenderEvent[]> ScreenRenderEvents = new();
 
     /// <summary>
     /// Bit masks for each bit in a byte.
