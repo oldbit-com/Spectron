@@ -2,7 +2,7 @@ using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Integration.Tests.Fixtures;
 
-namespace OldBit.Spectron.Integration.Tests.FloatingBus;
+namespace OldBit.Spectron.Integration.Tests;
 
 [Trait("Category", "Integration")]
 [MeasureTime]
