@@ -3,13 +3,14 @@ using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Integration.Tests.Fixtures;
 
-namespace OldBit.Spectron.Integration.Tests.FloatingBus;
+namespace OldBit.Spectron.Integration.Tests;
 
 [Trait("Category", "Integration")]
-public class FloatingBusTests : IntegrationTestBase
+[MeasureTime]
+public class FloatingBusTests: IntegrationTestBase
 {
     [Fact]
-    public void RunFloat48K()
+    public void RunFloat_48K()
     {
         var emulator = Loader.EnterLoadCommand(ComputerType.Spectrum48K);
 
@@ -28,7 +29,7 @@ public class FloatingBusTests : IntegrationTestBase
     }
 
     [Fact]
-    public void RunFloat128K()
+    public void RunFloat_128K()
     {
         var emulator = Loader.EnterLoadCommand(ComputerType.Spectrum128K);
 
@@ -47,7 +48,7 @@ public class FloatingBusTests : IntegrationTestBase
     }
 
     [Fact]
-    public void RunFloatSpy48K()
+    public void RunFloatSpy_48K()
     {
         var emulator = Loader.EnterLoadCommand(ComputerType.Spectrum48K);
 
@@ -72,7 +73,7 @@ public class FloatingBusTests : IntegrationTestBase
     }
 
     [Fact]
-    public void RunFloatSpy128K()
+    public void RunFloatSpy_128K()
     {
         var emulator = Loader.EnterLoadCommand(ComputerType.Spectrum128K);
 

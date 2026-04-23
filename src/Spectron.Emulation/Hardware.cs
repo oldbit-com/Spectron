@@ -45,8 +45,8 @@ internal static class Hardware
         ContentionStartTicks: 14361,
         FloatingBusStartTicks: 14364,
         InterruptDuration: 36,
-        FirstPixelTicks: 14362,
-        LastPixelTicks: 14362 + (ScreenSize.ContentHeight - 1) * 228 + ContentLineTicks,
+        FirstPixelTicks: 14361,
+        LastPixelTicks: 14361 + (ScreenSize.ContentHeight - 1) * 228 + ContentLineTicks,
         TicksPerLine: 228,
         HasAyChip: true);
 
