@@ -257,7 +257,7 @@ public sealed class NativeMainMenu
 
         _ulaPlusMenuItem = new NativeMenuItem("Enable ULA+")
         {
-            ToggleType = NativeMenuItemToggleType.CheckBox,
+            ToggleType = MenuItemToggleType.CheckBox,
             Command = _viewModel.ToggleUlaPlusCommand,
             IsChecked = _viewModel.IsUlaPlusEnabled,
         };
@@ -339,7 +339,7 @@ public sealed class NativeMainMenu
 
         _pauseMenuItem = new NativeMenuItem("Pause")
         {
-            ToggleType = NativeMenuItemToggleType.CheckBox,
+            ToggleType = MenuItemToggleType.CheckBox,
             Command = _viewModel.TogglePauseCommand,
             Gesture = new KeyGesture(Key.F2),
             IsChecked = _viewModel.IsPaused,
@@ -347,7 +347,7 @@ public sealed class NativeMainMenu
 
         _muteMenuItem = new NativeMenuItem("Mute")
         {
-            ToggleType = NativeMenuItemToggleType.CheckBox,
+            ToggleType = MenuItemToggleType.CheckBox,
             Command = _viewModel.ToggleMuteCommand,
             IsChecked = _viewModel.IsAudioMuted,
         };
@@ -715,7 +715,7 @@ public sealed class NativeMainMenu
 
         _debuggerBreakpointMenuItem = new NativeMenuItem("Breakpoints Enabled")
         {
-            ToggleType = NativeMenuItemToggleType.CheckBox,
+            ToggleType = MenuItemToggleType.CheckBox,
             Command = _viewModel.ToggleBreakpointsCommand,
             IsChecked = _viewModel.BreakpointsEnabled,
         };
@@ -814,7 +814,7 @@ public sealed class NativeMainMenu
         {
             _computerTypes[computer.Type] = new NativeMenuItem(computer.DisplayName)
             {
-                ToggleType = NativeMenuItemToggleType.Radio,
+                ToggleType = MenuItemToggleType.Radio,
                 Command = _viewModel.ChangeComputerTypeCommand,
                 CommandParameter = computer.Type,
                 IsChecked = _viewModel.ComputerType == computer.Type,
@@ -844,7 +844,7 @@ public sealed class NativeMainMenu
         {
             _romTypes[rom.Type] = new NativeMenuItem(rom.DisplayName)
             {
-                ToggleType = NativeMenuItemToggleType.Radio,
+                ToggleType = MenuItemToggleType.Radio,
                 Command = _viewModel.ChangeRomCommand,
                 CommandParameter = rom.Type,
                 IsChecked = _viewModel.RomType == rom.Type,
@@ -869,7 +869,7 @@ public sealed class NativeMainMenu
         {
             _joystickTypes[joystick.Type] = new NativeMenuItem(joystick.DisplayName)
             {
-                ToggleType = NativeMenuItemToggleType.Radio,
+                ToggleType = MenuItemToggleType.Radio,
                 Command = _viewModel.ChangeJoystickTypeCommand,
                 CommandParameter = joystick.Type,
                 IsChecked = _viewModel.JoystickType == joystick.Type,
@@ -890,7 +890,7 @@ public sealed class NativeMainMenu
         {
             _mouseTypes[mouse.Type] = new NativeMenuItem(mouse.DisplayName)
             {
-                ToggleType = NativeMenuItemToggleType.Radio,
+                ToggleType = MenuItemToggleType.Radio,
                 Command = _viewModel.ChangeMouseTypeCommand,
                 CommandParameter = mouse.Type,
                 IsChecked = _viewModel.MouseType == mouse.Type,
@@ -921,7 +921,7 @@ public sealed class NativeMainMenu
         {
             _emulationSpeeds[speed.Value] = new NativeMenuItem(speed.DisplayName)
             {
-                ToggleType = NativeMenuItemToggleType.Radio,
+                ToggleType = MenuItemToggleType.Radio,
                 Command = _viewModel.SetEmulationSpeedCommand,
                 CommandParameter = speed.Value,
                 IsChecked = _viewModel.EmulationSpeed == speed.Value,
@@ -945,7 +945,7 @@ public sealed class NativeMainMenu
         {
             _borderSizes[border.Size] = new NativeMenuItem(border.DisplayName)
             {
-                ToggleType = NativeMenuItemToggleType.Radio,
+                ToggleType = MenuItemToggleType.Radio,
                 Command = _viewModel.ChangeBorderSizeCommand,
                 CommandParameter = border.Size,
                 IsChecked = _viewModel.BorderSize == border.Size,
@@ -966,7 +966,7 @@ public sealed class NativeMainMenu
         {
             _screenEffects[effect.Effect] = new NativeMenuItem(effect.DisplayName)
             {
-                ToggleType = NativeMenuItemToggleType.CheckBox,
+                ToggleType = MenuItemToggleType.CheckBox,
                 Command = _viewModel.ChangeScreenEffectCommand,
                 CommandParameter = effect.Effect,
                 IsChecked = _viewModel.ScreenEffect.HasFlag(effect.Effect),
@@ -988,7 +988,7 @@ public sealed class NativeMainMenu
         {
             _tapeLoadingSpeeds[speed.Value] = new NativeMenuItem(speed.DisplayName)
             {
-                ToggleType = NativeMenuItemToggleType.Radio,
+                ToggleType = MenuItemToggleType.Radio,
                 Command = _viewModel.SetTapeLoadSpeedCommand,
                 CommandParameter = speed.Value,
                 IsChecked = _viewModel.TapeLoadSpeed == speed.Value,
@@ -1016,7 +1016,7 @@ public sealed class NativeMainMenu
     {
         var menuItem = new NativeMenuItem("Write Protect")
         {
-            ToggleType = NativeMenuItemToggleType.CheckBox,
+            ToggleType = MenuItemToggleType.CheckBox,
             Command = _viewModel.MicrodriveMenuViewModel.ToggleWriteProtectCommand,
             CommandParameter = driveId,
             IsEnabled = _viewModel.MicrodriveMenuViewModel.ToggleWriteProtectCommand.CanExecute(null),
@@ -1048,7 +1048,7 @@ public sealed class NativeMainMenu
     {
         var menuItem = new NativeMenuItem("Write Protect")
         {
-            ToggleType = NativeMenuItemToggleType.CheckBox,
+            ToggleType = MenuItemToggleType.CheckBox,
             Command = _viewModel.DiskDriveMenuViewModel.ToggleWriteProtectCommand,
             CommandParameter = driveId,
             IsEnabled = _viewModel.DiskDriveMenuViewModel.ToggleWriteProtectCommand.CanExecute(null),

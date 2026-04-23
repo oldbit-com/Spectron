@@ -11,7 +11,7 @@
         Height="400"
         Focusable="True"
         WindowStartupLocation="CenterOwner"
-        SystemDecorations="BorderOnly"
+        WindowDecorations="BorderOnly"
         Title="ZX Spectrum Keyboard"
         Name="Window">
 

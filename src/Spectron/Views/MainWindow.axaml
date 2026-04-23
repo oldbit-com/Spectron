@@ -2,7 +2,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
         xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
         xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
         xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
@@ -19,7 +18,7 @@
         WindowState="{Binding WindowState}"
         Name="Window">
 
-    <i:Interaction.Behaviors>
+    <Interaction.Behaviors>
         <EventTriggerBehavior EventName="Opened" SourceObject="Window">
             <InvokeCommandAction Command="{Binding WindowOpenedCommand}" />
         </EventTriggerBehavior>
@@ -32,7 +31,7 @@
         <EventTriggerBehavior EventName="KeyUp" SourceObject="Window">
             <InvokeCommandAction Command="{Binding KeyUpCommand}" PassEventArgsToCommand="True"/>
         </EventTriggerBehavior>
-    </i:Interaction.Behaviors>
+    </Interaction.Behaviors>
 
     <Window.Resources>
         <converters:ValueInequalityConverter x:Key="ValueInequalityConverter"/>

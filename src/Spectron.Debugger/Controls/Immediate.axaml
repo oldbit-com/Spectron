@@ -2,7 +2,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:viewModels="clr-namespace:OldBit.Spectron.Debugger.ViewModels"
              x:DataType="viewModels:ImmediateViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -21,11 +20,11 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <i:Interaction.Behaviors>
+    <Interaction.Behaviors>
         <EventTriggerBehavior EventName="KeyDown" SourceObject="ImmediateTextBox">
             <InvokeCommandAction Command="{Binding ImmediateCommand}" PassEventArgsToCommand="True" />
         </EventTriggerBehavior>
-    </i:Interaction.Behaviors>
+    </Interaction.Behaviors>
 
     <Grid RowDefinitions="*, Auto" ColumnDefinitions="16,*">
         <TextBox Grid.Row="0"
@@ -47,7 +46,7 @@
         <TextBox Grid.Row="1"
                  Grid.Column="1"
                  Name="ImmediateTextBox"
-                 Watermark="Enter command or type HELP to see available commands"
+                 PlaceholderText="Enter command or type HELP to see available commands"
                  Text="{Binding CommandText}"
                  FontFamily="{StaticResource VT220}"
                  Foreground="{DynamicResource VT220Brush}"
