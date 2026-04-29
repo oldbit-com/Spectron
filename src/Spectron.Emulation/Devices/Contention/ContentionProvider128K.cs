@@ -1,6 +1,6 @@
 using OldBit.Z80Cpu.Contention;
 
-namespace OldBit.Spectron.Emulation.Devices.Memory.Contention;
+namespace OldBit.Spectron.Emulation.Devices.Contention;
 
 internal sealed class ContentionProvider128K(int firstPixelTick, int ticksPerLine) : IContentionProvider
 {

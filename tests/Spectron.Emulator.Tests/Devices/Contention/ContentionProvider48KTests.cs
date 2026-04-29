@@ -1,7 +1,7 @@
 using OldBit.Spectron.Emulation;
-using OldBit.Spectron.Emulation.Devices.Memory.Contention;
+using OldBit.Spectron.Emulation.Devices.Contention;
 
-namespace OldBit.Spectron.Emulator.Tests.Devices.Memory;
+namespace OldBit.Spectron.Emulator.Tests.Devices.Contention;
 
 public class ContentionProvider48KTests
 {

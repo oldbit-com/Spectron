@@ -1,6 +1,6 @@
 using OldBit.Spectron.Emulation.Screen;
 
-namespace OldBit.Spectron.Emulation.Devices.Memory.Contention;
+namespace OldBit.Spectron.Emulation.Devices.Contention;
 
 internal static class ContentionProvider
 {
