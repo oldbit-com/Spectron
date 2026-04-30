@@ -96,6 +96,10 @@ partial class MainWindowViewModel
 
             ApplyEmulatorDefaults(emulator, favorite: favorite);
         }
+        else if (fileType == FileType.Rzx)
+        {
+            emulator = _rzxPlayer.Load(stream);
+        }
 
         if (emulator != null)
         {

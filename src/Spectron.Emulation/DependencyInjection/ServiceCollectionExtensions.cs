@@ -4,6 +4,7 @@ using OldBit.Spectron.Emulation.Devices.Beta128;
 using OldBit.Spectron.Emulation.Devices.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
+using OldBit.Spectron.Emulation.Rzx;
 using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Emulation.Tape;
@@ -30,5 +31,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<GamepadManager>();
         services.AddSingleton<KeyboardState>();
         services.AddSingleton<CommandManager>();
+        services.AddSingleton<RzxPlayer>();
     }
 }
