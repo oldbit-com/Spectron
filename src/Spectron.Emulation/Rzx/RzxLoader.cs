@@ -4,7 +4,7 @@ using OldBit.Spectron.Files.Rzx;
 
 namespace OldBit.Spectron.Emulation.Rzx;
 
-public class RzxPlayer(SnapshotManager snapshotManager)
+public class RzxLoader(SnapshotManager snapshotManager)
 {
     private RzxFile? _rzxFile;
 
