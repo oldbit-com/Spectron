@@ -99,6 +99,9 @@ partial class MainWindowViewModel
         else if (fileType == FileType.Rzx)
         {
             emulator = _rzxPlayer.Load(stream);
+            // TODO: Audio playback doesn't work with RZX files yet, uses fixed frame size
+            // Needs to by dynamically adjusted.
+           // emulator.ConfigureAudio(_preferences.Audio);
         }
 
         if (emulator != null)

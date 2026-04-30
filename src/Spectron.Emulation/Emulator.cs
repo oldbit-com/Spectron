@@ -14,9 +14,11 @@ using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Devices.Printer;
 using OldBit.Spectron.Emulation.Rom;
+using OldBit.Spectron.Emulation.Rzx;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Emulation.TimeTravel;
+using OldBit.Spectron.Files.Rzx;
 using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation;
@@ -41,10 +43,13 @@ public sealed class Emulator
     private bool _isDebuggerBreak;
     private long _ticksSinceReset;
 
+    private RzxHandler? _rzxHandler;
+
     public delegate void FrameEvent(FrameBuffer frameBuffer, AudioBuffer audioBuffer);
     public event FrameEvent? FrameCompleted;
 
     public bool IsPaused => _emulationTimer.IsPaused;
+    private bool IsRzxPlayback => _rzxHandler != null;
 
     public bool IsUlaPlusEnabled
     {
@@ -227,6 +232,15 @@ public sealed class Emulator
             TimeSpan.Zero :
             TimeSpan.FromMilliseconds(20 * (100f / emulationSpeedPercentage));
 
+    public void PlayRzx(RzxFile rzxFile)
+    {
+        _rzxHandler = new RzxHandler(rzxFile);
+
+        _spectrumBus.AddDevice(new RzxDevice(_rzxHandler));
+
+        Cpu.AfterFetch += _ => _rzxHandler.FetchCounter += 1;
+    }
+
     private void OnTimerElapsed(object? sender, EventArgs e)
     {
         if (_isDebuggerBreak)
@@ -279,14 +293,14 @@ public sealed class Emulator
     {
         StartFrame();
 
-        if (_isNmiRequested)
+        if (_isNmiRequested && !IsRzxPlayback)
         {
             _isNmiRequested = false;
 
             Cpu.TriggerNmi();
         }
 
-        Cpu.Run();
+        Run();
 
         EndFrame();
 
@@ -299,6 +313,26 @@ public sealed class Emulator
         _invalidateScreen = false;
     }
 
+    private void Run()
+    {
+        if (IsRzxPlayback)
+        {
+            while (!_rzxHandler!.IsFrameComplete)
+            {
+                Cpu.Step();
+            }
+
+            if (Cpu.IFF1)
+            {
+                Cpu.TriggerInt(0xFF);
+            }
+        }
+        else
+        {
+            Cpu.Run();
+        }
+    }
+
     private void StartFrame()
     {
         if (_isDebuggerResume)
@@ -308,7 +342,11 @@ public sealed class Emulator
             return;
         }
 
-        Cpu.Clock.NewFrame(_hardware.TicksPerFrame);
+        if (!IsRzxPlayback)
+        {
+            Cpu.Clock.NewFrame(_hardware.TicksPerFrame);
+        }
+
         ScreenBuffer.NewFrame();
         AudioManager.NewFrame();
         Beta128.NewFrame(_ticksSinceReset);
@@ -324,7 +362,12 @@ public sealed class Emulator
 
         FrameCompleted?.Invoke(ScreenBuffer.FrameBuffer, audioBuffer);
 
-        _timeMachine.AddEntry(this);
+        if (!IsRzxPlayback)
+        {
+            _timeMachine.AddEntry(this);
+        }
+
+        _rzxHandler?.NextFrame();
     }
 
     private void ToggleUlaPlus(bool value)
