@@ -72,10 +72,8 @@ public sealed class SnaSnapshot(EmulatorFactory emulatorFactory)
         snapshot.Save(fileName);
     }
 
-    private Emulator CreateEmulator(SnaFile snapshot)
+    internal static void Update(Emulator emulator, SnaFile snapshot, bool updateBorder = true)
     {
-        var emulator = emulatorFactory.Create(snapshot.Header128 != null ?
-            ComputerType.Spectrum128K : ComputerType.Spectrum48K, RomType.Original);
         var (cpu, memory, screenBuffer) = (emulator.Cpu, emulator.Memory, emulator.ScreenBuffer);
 
         cpu.Registers.AF = snapshot.Header.AF;
@@ -113,10 +111,23 @@ public sealed class SnaSnapshot(EmulatorFactory emulatorFactory)
             cpu.Registers.SP += 2;
         }
 
+        if (!updateBorder)
+        {
+            return;
+        }
+
         var borderColor = SpectrumPalette.GetBorderColor(snapshot.Header.BorderColor);
 
         screenBuffer.Reset();
         screenBuffer.UpdateBorder(borderColor);
+    }
+
+    private Emulator CreateEmulator(SnaFile snapshot)
+    {
+        var emulator = emulatorFactory.Create(snapshot.Header128 != null ?
+            ComputerType.Spectrum128K : ComputerType.Spectrum48K, RomType.Original);
+
+        Update(emulator, snapshot);
 
         return emulator;
     }

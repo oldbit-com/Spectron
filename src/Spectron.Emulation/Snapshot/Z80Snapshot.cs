@@ -92,16 +92,8 @@ public sealed class Z80Snapshot(EmulatorFactory emulatorFactory)
         snapshot?.Save(fileName);
     }
 
-    private Emulator CreateEmulator(Z80File snapshot)
+    internal static void Update(Emulator emulator, Z80File snapshot, bool updateBorder = true)
     {
-        var emulator = (snapshot.Header.HardwareMode, snapshot.Header.Flags3?.ModifyHardware) switch
-        {
-            (HardwareMode.Spectrum48, false) => emulatorFactory.Create(ComputerType.Spectrum48K, RomType.Original),
-            (HardwareMode.Spectrum48, true) => emulatorFactory.Create(ComputerType.Spectrum16K, RomType.Original),
-            (HardwareMode.Spectrum128, false) => emulatorFactory.Create(ComputerType.Spectrum128K, RomType.Original),
-            _ => throw new NotSupportedException($"Snapshot hardware mode not supported: {snapshot.Header.HardwareMode}")
-        };
-
         var (cpu, memory, screenBuffer) = (emulator.Cpu, emulator.Memory, emulator.ScreenBuffer);
 
         cpu.Registers.A = snapshot.Header.A;
@@ -132,9 +124,27 @@ public sealed class Z80Snapshot(EmulatorFactory emulatorFactory)
         LoadMemory(emulator.ComputerType, snapshot, memory);
         SetupJoystick(snapshot, emulator);
 
+        if (!updateBorder)
+        {
+            return;
+        }
+
         screenBuffer.Reset();
         var borderColor = SpectrumPalette.GetBorderColor(snapshot.Header.Flags1.BorderColor);
         screenBuffer.UpdateBorder(borderColor);
+    }
+
+    private Emulator CreateEmulator(Z80File snapshot)
+    {
+        var emulator = (snapshot.Header.HardwareMode, snapshot.Header.Flags3?.ModifyHardware) switch
+        {
+            (HardwareMode.Spectrum48, false) => emulatorFactory.Create(ComputerType.Spectrum48K, RomType.Original),
+            (HardwareMode.Spectrum48, true) => emulatorFactory.Create(ComputerType.Spectrum16K, RomType.Original),
+            (HardwareMode.Spectrum128, false) => emulatorFactory.Create(ComputerType.Spectrum128K, RomType.Original),
+            _ => throw new NotSupportedException($"Snapshot hardware mode not supported: {snapshot.Header.HardwareMode}")
+        };
+
+        Update(emulator, snapshot);
 
         return emulator;
     }
