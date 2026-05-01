@@ -61,7 +61,6 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly SessionService _sessionService;
     private readonly DebuggerContext _debuggerContext;
     private readonly QuickSaveService _quickSaveService;
-    private readonly RzxPlayer _rzxPlayer;
     private readonly ILogStore _logStore;
     private readonly ILogger _logger;
     private readonly KeyboardHandler _keyboardHandler;
@@ -81,6 +80,7 @@ public partial class MainWindowViewModel : ObservableObject
     private PokeFile? _pokeFile;
     private MouseInputHandler? _mouseInputHandler;
     private BreakpointHandler? _breakpointHandler;
+    private RzxController? _rzxController;
 
     public Control ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }
@@ -343,7 +343,6 @@ public partial class MainWindowViewModel : ObservableObject
         MicrodriveManager microdriveManager,
         DiskDriveManager diskDriveManager,
         QuickSaveService quickSaveService,
-        RzxPlayer rzxPlayer,
         ILogStore logStore,
         ILogger<MainWindowViewModel> logger)
     {
@@ -358,7 +357,6 @@ public partial class MainWindowViewModel : ObservableObject
         _sessionService = sessionService;
         _debuggerContext = debuggerContext;
         _quickSaveService = quickSaveService;
-        _rzxPlayer = rzxPlayer;
         _logStore = logStore;
         _logger = logger;
 

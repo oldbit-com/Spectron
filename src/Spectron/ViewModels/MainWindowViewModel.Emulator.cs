@@ -8,6 +8,7 @@ using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Rom;
+using OldBit.Spectron.Emulation.Rzx;
 using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Extensions;
@@ -98,10 +99,10 @@ partial class MainWindowViewModel
         }
         else if (fileType == FileType.Rzx)
         {
-            emulator = _rzxLoader.Load(stream);
-            // TODO: Audio playback doesn't work with RZX files yet, uses fixed frame size
-            // Needs to by dynamically adjusted.
-            //emulator.ConfigureAudio(_preferences.Audio);
+            _rzxController = new RzxController(_snapshotManager);
+
+            emulator = _rzxController.Load(stream);
+            emulator.ConfigureAudio(_preferences.Audio);
         }
 
         if (emulator != null)
