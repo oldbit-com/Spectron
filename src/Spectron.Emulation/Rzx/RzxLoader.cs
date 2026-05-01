@@ -4,20 +4,17 @@ using OldBit.Spectron.Files.Rzx;
 
 namespace OldBit.Spectron.Emulation.Rzx;
 
-public class RzxLoader(SnapshotManager snapshotManager)
+internal sealed class RzxLoader(SnapshotManager snapshotManager)
 {
-    private RzxFile? _rzxFile;
-
-    public Emulator Load(Stream stream)
+    internal Emulator CreateEmulator(RzxFile rzxFile)
     {
-        _rzxFile = RzxFile.Load(stream);
-
-        if (_rzxFile.Snapshots.Count == 0)
+        if (rzxFile.Snapshots.Count == 0)
         {
             throw new NotSupportedException("RZX file must contain at least one snapshot");
         }
 
-        var snapshot = _rzxFile.Snapshots.First();
+        var snapshot = rzxFile.Snapshots[0];
+
         using var memoryStream = new MemoryStream(snapshot.Data ?? []);
 
         Emulator emulator;
@@ -40,8 +37,31 @@ public class RzxLoader(SnapshotManager snapshotManager)
                 throw new NotSupportedException($"Unsupported RZX snapshot format: {snapshot.Extension}");
         }
 
-        emulator.PlayRzx(_rzxFile);
-
         return emulator;
+    }
+
+    internal static void UpdateEmulator(Emulator emulator, RzxFile rzxFile, int currentSnapshot)
+    {
+        var snapshot = rzxFile.Snapshots[currentSnapshot];
+
+        using var memoryStream = new MemoryStream(snapshot.Data ?? []);
+
+        switch (snapshot.Extension.ToLowerInvariant())
+        {
+            case "sna":
+                SnapshotManager.Update(emulator, memoryStream, FileType.Sna);
+                break;
+
+            case "szx":
+                SnapshotManager.Update(emulator, memoryStream, FileType.Szx);
+                break;
+
+            case "z80":
+                SnapshotManager.Update(emulator, memoryStream, FileType.Z80);
+                break;
+
+            default:
+                throw new NotSupportedException($"Unsupported RZX snapshot format: {snapshot.Extension}");
+        }
     }
 }
