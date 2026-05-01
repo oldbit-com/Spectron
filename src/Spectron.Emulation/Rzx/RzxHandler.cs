@@ -3,39 +3,66 @@ using OldBit.Spectron.Files.Rzx.Blocks;
 
 namespace OldBit.Spectron.Emulation.Rzx;
 
-internal sealed class RzxHandler(RzxFile rzxFile)
+public sealed class RzxHandler(RzxController rzxController)
 {
-    private int _currentFrame;
-    private int _currentSnapshot;
+    private RzxFile? _rzxFile;
+    private int _currentFrameIndex;
+    private int _currentSnapshotIndex;
     private int _inReadCounter;
 
-    private SnapshotBlock CurrentSnapshot => rzxFile.Snapshots[_currentSnapshot];
-    private RecordingFrame CurrentFrame => CurrentSnapshot.Recording.Frames[_currentFrame];
+    private SnapshotBlock? CurrentSnapshot => _rzxFile?.Snapshots[_currentSnapshotIndex];
 
-    internal int FetchCounter { get; set; }
+    internal RecordingFrame? CurrentFrame => CurrentSnapshot?.Recording.Frames.Count > 0
+        ? CurrentSnapshot?.Recording.Frames[_currentFrameIndex]
+        : null;
 
-    internal bool IsFrameComplete => FetchCounter >= CurrentFrame.FetchCounter;
+    internal bool IsPlaybackComplete { get; private set; }
+
+    internal bool IsPlaybackActive => _rzxFile != null && !IsPlaybackComplete;
+
+    public void Load(RzxFile rzxFile, int currentSnapshot)
+    {
+        _rzxFile = rzxFile;
+        _currentSnapshotIndex = currentSnapshot;
+    }
 
     internal void NextFrame()
     {
-        if (_currentFrame < CurrentSnapshot.Recording.FrameCount - 1)
+        if (_rzxFile == null)
         {
-            _currentFrame += 1;
-            _inReadCounter = 0;
-            FetchCounter = 0;
+            return;
+        }
+
+        _inReadCounter = 0;
+
+        if (_currentFrameIndex < CurrentSnapshot?.Recording.FrameCount - 1)
+        {
+            _currentFrameIndex += 1;
+        }
+        else if (_currentSnapshotIndex < _rzxFile.Snapshots.Count - 1)
+        {
+            _currentSnapshotIndex += 1;
+            _currentFrameIndex = 0;
+
+            rzxController.NextSnapshot(_currentSnapshotIndex);
         }
         else
         {
-            // TODO: Handle next snapshot if there is one
-            // Or end of RZX
+            // TODO: Handle playback complete
+            IsPlaybackComplete = true;
         }
     }
 
     internal byte ReadPort()
     {
-        var inValues = CurrentSnapshot.Recording.Frames[_currentFrame].InValues;
+        byte inValue = 0xFF;
 
-        byte inValue = 0;
+        if (CurrentFrame == null)
+        {
+            return inValue;
+        }
+
+        var inValues = CurrentFrame.InValues;
 
         if (inValues.Length > _inReadCounter)
         {
@@ -45,5 +72,16 @@ internal sealed class RzxHandler(RzxFile rzxFile)
         _inReadCounter += 1;
 
         return inValue;
+    }
+
+    public void Reset()
+    {
+        _rzxFile = null;
+
+        _currentFrameIndex = 0;
+        _currentSnapshotIndex = 0;
+        _inReadCounter = 0;
+
+        IsPlaybackComplete = false;
     }
 }
