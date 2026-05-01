@@ -143,8 +143,8 @@ public sealed class Z80Snapshot(EmulatorFactory emulatorFactory)
         {
             (HardwareMode.Spectrum48, false) => emulatorFactory.Create(ComputerType.Spectrum48K, RomType.Original),
             (HardwareMode.Spectrum48, true) => emulatorFactory.Create(ComputerType.Spectrum16K, RomType.Original),
-            (HardwareMode.Spectrum128, false) => emulatorFactory.Create(ComputerType.Spectrum128K, RomType.Original),
-            (HardwareMode.TC2048, false) => emulatorFactory.Create(ComputerType.Timex2048, RomType.Original),
+            (HardwareMode.Spectrum128, _) => emulatorFactory.Create(ComputerType.Spectrum128K, RomType.Original),
+            (HardwareMode.TC2048, _) => emulatorFactory.Create(ComputerType.Timex2048, RomType.Original),
             _ => throw new NotSupportedException($"Snapshot hardware mode not supported: {snapshot.Header.HardwareMode}")
         };
 
