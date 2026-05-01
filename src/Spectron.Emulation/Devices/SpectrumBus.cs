@@ -2,7 +2,7 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.Devices;
 
-internal sealed class SpectrumBus : IBus
+public sealed class SpectrumBus : IBus
 {
     private readonly List<IDevice> _devices = [];
 
