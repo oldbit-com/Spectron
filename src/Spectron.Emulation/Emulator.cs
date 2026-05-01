@@ -18,7 +18,6 @@ using OldBit.Spectron.Emulation.Rzx;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Emulation.TimeTravel;
-using OldBit.Spectron.Files.Rzx;
 using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation;
@@ -31,7 +30,6 @@ public sealed class Emulator
     private readonly HardwareSettings _hardware;
     private readonly TimeMachine _timeMachine;
     private readonly ILogger _logger;
-    private readonly SpectrumBus _spectrumBus;
     private readonly EmulatorTimer _emulationTimer;
     private readonly FloatingBus _floatingBus;
     private readonly ScreenMemoryHandler _screenMemoryHandler;
@@ -43,13 +41,10 @@ public sealed class Emulator
     private bool _isDebuggerBreak;
     private long _ticksSinceReset;
 
-    private RzxHandler? _rzxHandler;
-
     public delegate void FrameEvent(FrameBuffer frameBuffer, AudioBuffer audioBuffer);
     public event FrameEvent? FrameCompleted;
 
     public bool IsPaused => _emulationTimer.IsPaused;
-    private bool IsRzxPlayback => _rzxHandler != null;
 
     public bool IsUlaPlusEnabled
     {
@@ -71,6 +66,7 @@ public sealed class Emulator
     public GamepadManager GamepadManager { get; }
     public MouseManager MouseManager { get; }
     public CommandManager CommandManager { get; }
+    public RzxHandler? RzxHandler { get; internal set; }
 
     public ComputerType ComputerType { get; }
     public RomType RomType { get; }
@@ -78,7 +74,7 @@ public sealed class Emulator
     public Z80 Cpu { get; }
     internal Ula Ula { get; }
     public IEmulatorMemory Memory { get; }
-    public IBus Bus => _spectrumBus;
+    public SpectrumBus Bus { get; }
     public DivMmcDevice DivMmc { get; }
     public Beta128Device Beta128 { get; }
     public Interface1Device Interface1 { get; }
@@ -134,10 +130,10 @@ public sealed class Emulator
         _screenMemoryHandler = new ScreenMemoryHandler(Memory, ScreenBuffer);
         _screenMemoryHandler.SetScreenMode(Ula as UlaTimex);
 
-        _spectrumBus = new SpectrumBus();
+        Bus = new SpectrumBus();
 
-        JoystickManager = new JoystickManager(gamepadManager, _spectrumBus, KeyboardState);
-        MouseManager = new MouseManager(_spectrumBus);
+        JoystickManager = new JoystickManager(gamepadManager, Bus, KeyboardState);
+        MouseManager = new MouseManager(Bus);
         KeyboardState.Reset();
         TapeManager.Attach(Cpu, Memory, hardware);
 
@@ -206,6 +202,7 @@ public sealed class Emulator
         _isDebuggerBreak = false;
         _ticksSinceReset = 0;
 
+        RzxHandler?.Reset();
         AudioManager.ResetAudio();
         Memory.Reset();
         Cpu.Reset();
@@ -231,15 +228,6 @@ public sealed class Emulator
         _emulationTimer.Interval = emulationSpeedPercentage == int.MaxValue ?
             TimeSpan.Zero :
             TimeSpan.FromMilliseconds(20 * (100f / emulationSpeedPercentage));
-
-    public void PlayRzx(RzxFile rzxFile)
-    {
-        _rzxHandler = new RzxHandler(rzxFile);
-
-        _spectrumBus.AddDevice(new RzxDevice(_rzxHandler));
-
-        Cpu.AfterFetch += _ => _rzxHandler.FetchCounter += 1;
-    }
 
     private void OnTimerElapsed(object? sender, EventArgs e)
     {
@@ -274,33 +262,33 @@ public sealed class Emulator
 
     private void AddDevices()
     {
-        _spectrumBus.AddDevice(Ula);
-        _spectrumBus.AddDevice(UlaPlus);
-        _spectrumBus.AddDevice(Memory);
-        _spectrumBus.AddDevice(AudioManager.Beeper);
-        _spectrumBus.AddDevice(AudioManager.Ay);
-        _spectrumBus.AddDevice(Printer);
-        _spectrumBus.AddDevice(Interface1);
-        _spectrumBus.AddDevice(DivMmc);
-        _spectrumBus.AddDevice(Beta128);
-        _spectrumBus.AddDevice(new RtcDevice(DivMmc));
-        _spectrumBus.AddDevice(_floatingBus);
+        Bus.AddDevice(Ula);
+        Bus.AddDevice(UlaPlus);
+        Bus.AddDevice(Memory);
+        Bus.AddDevice(AudioManager.Beeper);
+        Bus.AddDevice(AudioManager.Ay);
+        Bus.AddDevice(Printer);
+        Bus.AddDevice(Interface1);
+        Bus.AddDevice(DivMmc);
+        Bus.AddDevice(Beta128);
+        Bus.AddDevice(new RtcDevice(DivMmc));
+        Bus.AddDevice(_floatingBus);
 
-        Cpu.AddBus(_spectrumBus);
+        Cpu.AddBus(Bus);
     }
 
     internal void RunFrame()
     {
         StartFrame();
 
-        if (_isNmiRequested && !IsRzxPlayback)
+        if (_isNmiRequested)
         {
             _isNmiRequested = false;
 
             Cpu.TriggerNmi();
         }
 
-        Run();
+        Cpu.Run();
 
         EndFrame();
 
@@ -313,26 +301,6 @@ public sealed class Emulator
         _invalidateScreen = false;
     }
 
-    private void Run()
-    {
-        if (IsRzxPlayback)
-        {
-            while (!_rzxHandler!.IsFrameComplete)
-            {
-                Cpu.Step();
-            }
-
-            if (Cpu.IFF1)
-            {
-                Cpu.TriggerInt(0xFF);
-            }
-        }
-        else
-        {
-            Cpu.Run();
-        }
-    }
-
     private void StartFrame()
     {
         if (_isDebuggerResume)
@@ -342,7 +310,11 @@ public sealed class Emulator
             return;
         }
 
-        if (!IsRzxPlayback)
+        if (RzxHandler?.IsPlaybackActive == true)
+        {
+            Cpu.Clock.NewFrame(frameFetches: RzxHandler.CurrentFrame?.FetchCounter ?? 0);
+        }
+        else
         {
             Cpu.Clock.NewFrame(_hardware.TicksPerFrame);
         }
@@ -362,12 +334,14 @@ public sealed class Emulator
 
         FrameCompleted?.Invoke(ScreenBuffer.FrameBuffer, audioBuffer);
 
-        if (!IsRzxPlayback)
+        if (RzxHandler?.IsPlaybackActive != true)
         {
             _timeMachine.AddEntry(this);
         }
-
-        _rzxHandler?.NextFrame();
+        else
+        {
+            RzxHandler.NextFrame();
+        }
     }
 
     private void ToggleUlaPlus(bool value)
