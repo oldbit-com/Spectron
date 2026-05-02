@@ -49,6 +49,7 @@ public sealed class RzxController
 
         if (_currentFrameIndex < CurrentSnapshot.Recording.Frames.Count - 1)
         {
+            // Handle next frame
             _currentFrameIndex += 1;
             _runningFramesCount += 1;
 
@@ -62,6 +63,7 @@ public sealed class RzxController
         }
         else if (_currentSnapshotIndex < _rzxFile.Snapshots.Count - 1)
         {
+            // Handle next snapshot
             _currentSnapshotIndex += 1;
             _currentFrameIndex = 0;
 
@@ -69,8 +71,8 @@ public sealed class RzxController
         }
         else
         {
+            // Handle end of playback
             _isPlaybackComplete = true;
-
             PlaybackCompleted?.Invoke(this, EventArgs.Empty);
         }
     }
