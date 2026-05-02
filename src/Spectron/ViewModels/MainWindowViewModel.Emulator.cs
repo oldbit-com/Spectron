@@ -100,6 +100,8 @@ partial class MainWindowViewModel
         else if (fileType == FileType.Rzx)
         {
             _rzxController = new RzxController(_snapshotManager, stream);
+            _rzxController.PlaybackProgressChanged += (_, e) => StatusBarViewModel.RzxPlayProgress = $"{e.Progress:P2}";
+
             emulator = _rzxController.Emulator;
             emulator.ConfigureAudio(_preferences.Audio);
         }

@@ -13,8 +13,9 @@ public sealed class RzxController
     private int _inReadCounter;
     private bool _isPlaybackComplete;
 
-    private int _totalFramesCount;
+    private readonly int _totalFramesCount;
     private int _runningFramesCount;
+    private double _playbackProgress;
 
     private SnapshotBlock? CurrentSnapshot => _rzxFile?.Snapshots[_currentSnapshotIndex];
 
@@ -24,10 +25,10 @@ public sealed class RzxController
 
     internal bool IsPlaybackActive => !_isPlaybackComplete;
 
-    public Emulator Emulator { get; private set; }
+    public Emulator Emulator { get; }
 
     public event EventHandler? PlaybackCompleted;
-    public event EventHandler? PlaybackProgressChanged;
+    public event EventHandler<RzxProgressChangedEventArgs>? PlaybackProgressChanged;
 
     public RzxController(SnapshotManager snapshotManager, Stream stream)
     {
@@ -50,6 +51,16 @@ public sealed class RzxController
         {
             _currentFrameIndex += 1;
             _runningFramesCount += 1;
+
+            var playbackProgress = Math.Round((double)_runningFramesCount / _totalFramesCount, 4);
+
+            if (!(playbackProgress > _playbackProgress))
+            {
+                return;
+            }
+
+            _playbackProgress = playbackProgress;
+            PlaybackProgressChanged?.Invoke(this, new RzxProgressChangedEventArgs(playbackProgress));
         }
         else if (_currentSnapshotIndex < _rzxFile.Snapshots.Count - 1)
         {
