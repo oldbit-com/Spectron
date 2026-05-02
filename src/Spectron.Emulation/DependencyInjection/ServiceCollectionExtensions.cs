@@ -31,6 +31,5 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<GamepadManager>();
         services.AddSingleton<KeyboardState>();
         services.AddSingleton<CommandManager>();
-        services.AddSingleton<RzxLoader>();
     }
 }
