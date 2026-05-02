@@ -288,7 +288,10 @@ public sealed class Emulator
             Cpu.TriggerNmi();
         }
 
-        Cpu.Run();
+        if (RzxController == null || RzxController.IsPlaybackActive)
+        {
+            Cpu.Run();
+        }
 
         EndFrame();
 
@@ -310,9 +313,12 @@ public sealed class Emulator
             return;
         }
 
-        if ((RzxController?.IsPlaybackActive == true))
+        if (RzxController != null)
         {
-            Cpu.Clock.NewFrame(frameFetches: RzxController.CurrentFrame?.FetchCounter ?? 0);
+            if (RzxController.IsPlaybackActive)
+            {
+                Cpu.Clock.NewFrame(frameFetches: RzxController.CurrentFrame?.FetchCounter ?? 0);
+            }
         }
         else
         {

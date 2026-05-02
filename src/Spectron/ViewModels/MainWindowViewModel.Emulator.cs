@@ -101,6 +101,7 @@ partial class MainWindowViewModel
         {
             _rzxController = new RzxController(_snapshotManager, stream);
             _rzxController.PlaybackProgressChanged += (_, e) => StatusBarViewModel.RzxPlayProgress = $"{e.Progress:P2}";
+            _rzxController.PlaybackCompleted += (_, e) => StatusBarViewModel.RzxPlayProgress = "Completed";
 
             emulator = _rzxController.Emulator;
             emulator.ConfigureAudio(_preferences.Audio);

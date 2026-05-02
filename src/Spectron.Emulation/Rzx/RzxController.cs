@@ -17,10 +17,10 @@ public sealed class RzxController
     private int _runningFramesCount;
     private double _playbackProgress;
 
-    private SnapshotBlock? CurrentSnapshot => _rzxFile?.Snapshots[_currentSnapshotIndex];
+    private SnapshotBlock CurrentSnapshot => _rzxFile.Snapshots[_currentSnapshotIndex];
 
-    internal RecordingFrame? CurrentFrame => CurrentSnapshot?.Recording.Frames.Count > 0
-        ? CurrentSnapshot?.Recording.Frames[_currentFrameIndex]
+    internal RecordingFrame? CurrentFrame => CurrentSnapshot.Recording.Frames.Count > 0
+        ? CurrentSnapshot.Recording.Frames[_currentFrameIndex]
         : null;
 
     internal bool IsPlaybackActive => !_isPlaybackComplete;
@@ -47,20 +47,18 @@ public sealed class RzxController
     {
         _inReadCounter = 0;
 
-        if (_currentFrameIndex < CurrentSnapshot?.Recording.FrameCount - 1)
+        if (_currentFrameIndex < CurrentSnapshot.Recording.Frames.Count - 1)
         {
             _currentFrameIndex += 1;
             _runningFramesCount += 1;
 
             var playbackProgress = Math.Round((double)_runningFramesCount / _totalFramesCount, 4);
 
-            if (!(playbackProgress > _playbackProgress))
+            if (playbackProgress > _playbackProgress)
             {
-                return;
+                _playbackProgress = playbackProgress;
+                PlaybackProgressChanged?.Invoke(this, new RzxProgressChangedEventArgs(playbackProgress));
             }
-
-            _playbackProgress = playbackProgress;
-            PlaybackProgressChanged?.Invoke(this, new RzxProgressChangedEventArgs(playbackProgress));
         }
         else if (_currentSnapshotIndex < _rzxFile.Snapshots.Count - 1)
         {
