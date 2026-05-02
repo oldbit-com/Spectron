@@ -8,6 +8,7 @@ using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Rom;
+using OldBit.Spectron.Emulation.Rzx;
 using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Extensions;
@@ -95,6 +96,15 @@ partial class MainWindowViewModel
                 _preferences.Tape.IsAutoPlayEnabled && (favorite?.TapeLoadSpeed ?? TapeLoadSpeed) != TapeSpeed.Instant);
 
             ApplyEmulatorDefaults(emulator, favorite: favorite);
+        }
+        else if (fileType == FileType.Rzx)
+        {
+            _rzxController = new RzxController(_snapshotManager, stream);
+            _rzxController.PlaybackProgressChanged += (_, e) => StatusBarViewModel.RzxPlayProgress = $"{e.Progress:P2}";
+            _rzxController.PlaybackCompleted += (_, e) => StatusBarViewModel.RzxPlayProgress = "Completed";
+
+            emulator = _rzxController.Emulator;
+            emulator.ConfigureAudio(_preferences.Audio);
         }
 
         if (emulator != null)
@@ -322,6 +332,8 @@ partial class MainWindowViewModel
 
         IsInterface1Enabled = Emulator.Interface1.IsEnabled;
         NumberOfMicrodrives = _preferences.Interface1.NumberOfDrives;
+
+        StatusBarViewModel.IsRzxPlaying = _rzxController != null;
     }
 
     private void Pause(bool showOverlay = true)

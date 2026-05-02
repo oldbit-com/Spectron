@@ -41,14 +41,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
 
         var emulator = emulatorFactory.Create(computerType, romType, snapshot.CustomRom?.Data);
 
-        LoadRegisters(emulator.Cpu, snapshot.Z80Registers);
-        LoadMemory(emulator.Memory, snapshot.RamPages, snapshot.SpecRegs);
-        LoadSpectrumRegisters(emulator.ScreenBuffer, snapshot.SpecRegs);
-        LoadUlaPlus(emulator.UlaPlus, snapshot.Palette);
-        LoadJoystick(emulator.JoystickManager, snapshot.Joystick);
-        LoadTape(emulator.TapeManager, snapshot.Tape);
-        LoadAyRegisters(emulator.AudioManager, snapshot.Ay);
-        LoadTimex(emulator.Ula, snapshot.TimexSinclair);
+        Update(emulator, snapshot);
 
         return emulator;
     }
@@ -58,6 +51,22 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         var snapshot = CreateSnapshot(emulator);
 
         snapshot.Save(fileName);
+    }
+
+    internal static void Update(Emulator emulator, SzxFile snapshot, bool updateBorder = true)
+    {
+        LoadRegisters(emulator.Cpu, snapshot.Z80Registers);
+        LoadMemory(emulator.Memory, snapshot.RamPages, snapshot.SpecRegs);
+        LoadUlaPlus(emulator.UlaPlus, snapshot.Palette);
+        LoadJoystick(emulator.JoystickManager, snapshot.Joystick);
+        LoadTape(emulator.TapeManager, snapshot.Tape);
+        LoadAyRegisters(emulator.AudioManager, snapshot.Ay);
+        LoadTimex(emulator.Ula, snapshot.TimexSinclair);
+
+        if (updateBorder)
+        {
+            UpdateBorder(emulator.ScreenBuffer, snapshot.SpecRegs);
+        }
     }
 
     private static SzxFile CreateSnapshot(Emulator emulator, CompressionLevel compressionLevel = CompressionLevel.SmallestSize)
@@ -170,7 +179,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         }
     }
 
-    private static void LoadSpectrumRegisters(ScreenBuffer screenBuffer, SpecRegsBlock specRegs)
+    private static void UpdateBorder(ScreenBuffer screenBuffer, SpecRegsBlock specRegs)
     {
         var borderColor = SpectrumPalette.GetBorderColor(specRegs.Border);
 
