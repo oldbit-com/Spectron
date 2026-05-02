@@ -66,7 +66,7 @@ public sealed class Emulator
     public GamepadManager GamepadManager { get; }
     public MouseManager MouseManager { get; }
     public CommandManager CommandManager { get; }
-    public RzxHandler? RzxHandler { get; internal set; }
+    public RzxController? RzxController { get; internal set; }
 
     public ComputerType ComputerType { get; }
     public RomType RomType { get; }
@@ -202,7 +202,7 @@ public sealed class Emulator
         _isDebuggerBreak = false;
         _ticksSinceReset = 0;
 
-        RzxHandler?.Reset();
+        RzxController = null;
         AudioManager.ResetAudio();
         Memory.Reset();
         Cpu.Reset();
@@ -310,9 +310,9 @@ public sealed class Emulator
             return;
         }
 
-        if (RzxHandler?.IsPlaybackActive == true)
+        if ((RzxController?.IsPlaybackActive == true))
         {
-            Cpu.Clock.NewFrame(frameFetches: RzxHandler.CurrentFrame?.FetchCounter ?? 0);
+            Cpu.Clock.NewFrame(frameFetches: RzxController.CurrentFrame?.FetchCounter ?? 0);
         }
         else
         {
@@ -334,13 +334,13 @@ public sealed class Emulator
 
         FrameCompleted?.Invoke(ScreenBuffer.FrameBuffer, audioBuffer);
 
-        if (RzxHandler?.IsPlaybackActive != true)
+        if (RzxController?.IsPlaybackActive != true)
         {
             _timeMachine.AddEntry(this);
         }
         else
         {
-            RzxHandler.NextFrame();
+            RzxController.NextFrame();
         }
     }
 

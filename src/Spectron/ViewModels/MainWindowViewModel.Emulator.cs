@@ -99,9 +99,8 @@ partial class MainWindowViewModel
         }
         else if (fileType == FileType.Rzx)
         {
-            _rzxController = new RzxController(_snapshotManager);
-
-            emulator = _rzxController.Load(stream);
+            _rzxController = new RzxController(_snapshotManager, stream);
+            emulator = _rzxController.Emulator;
             emulator.ConfigureAudio(_preferences.Audio);
         }
 
@@ -330,6 +329,8 @@ partial class MainWindowViewModel
 
         IsInterface1Enabled = Emulator.Interface1.IsEnabled;
         NumberOfMicrodrives = _preferences.Interface1.NumberOfDrives;
+
+        StatusBarViewModel.IsRzxPlaying = _rzxController != null;
     }
 
     private void Pause(bool showOverlay = true)
