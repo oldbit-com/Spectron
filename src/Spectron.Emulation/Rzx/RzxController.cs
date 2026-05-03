@@ -39,12 +39,18 @@ public sealed class RzxController
         Emulator.Bus.AddDevice(new RzxDevice(ReadPort));
         Emulator.RzxController = this;
 
+        // Disable automatic interrupts trigger during playback
+        Emulator.Cpu.Clock.InterruptDuration = 4;
+
         _currentSnapshotIndex = 0;
         _totalFramesCount = _rzxFile.Snapshots.Sum(s => s.Recording.Frames.Count);
     }
 
     internal void NextFrame()
     {
+        // Trigger INT befor the next frame
+        Emulator.Cpu.TriggerInt(0xFF);
+
         _inReadCounter = 0;
 
         if (_currentFrameIndex < CurrentSnapshot.Recording.Frames.Count - 1)
