@@ -53,11 +53,16 @@ public sealed class RzxController
 
         _inReadCounter = 0;
 
-        if (_currentFrameIndex < CurrentSnapshot.Recording.Frames.Count - 1)
+        while (_currentFrameIndex < CurrentSnapshot.Recording.Frames.Count - 1)
         {
-            // Handle next frame
+            // Handle next frame - skip if fetch counter is not zero
             _currentFrameIndex += 1;
             _runningFramesCount += 1;
+
+            if (CurrentFrame?.FetchCounter == 0)
+            {
+                continue;
+            }
 
             var playbackProgress = Math.Round((double)_runningFramesCount / _totalFramesCount, 4);
 
@@ -66,8 +71,11 @@ public sealed class RzxController
                 _playbackProgress = playbackProgress;
                 PlaybackProgressChanged?.Invoke(this, new RzxProgressChangedEventArgs(playbackProgress));
             }
+
+            return;
         }
-        else if (_currentSnapshotIndex < _rzxFile.Snapshots.Count - 1)
+
+        if (_currentSnapshotIndex < _rzxFile.Snapshots.Count - 1)
         {
             // Handle next snapshot
             _currentSnapshotIndex += 1;
