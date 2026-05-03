@@ -40,7 +40,7 @@ public sealed class RzxController
         Emulator.RzxController = this;
 
         // Disable automatic interrupts trigger during playback
-        Emulator.Cpu.Clock.InterruptDuration = 4;
+        Emulator.Cpu.Clock.InterruptDuration = 0;
 
         _currentSnapshotIndex = 0;
         _totalFramesCount = _rzxFile.Snapshots.Sum(s => s.Recording.Frames.Count);
