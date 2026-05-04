@@ -17,8 +17,9 @@ The ZX Spectrum was my first computer, and I still have a deep affection for it.
 - [x] Emulation of classic machines: ZX Spectrum 16K, 48K, 128K and Timex Computer 2048
 - [x] Time Machine: Rewind and continue from any point in the past
 - [x] State persistence: Emulator state is automatically saved and restored on restart
-- [x] Wide format support: SNA, SZX, Z80, TAP, TZX, MDR, TRD, and SCL (including ZIP archives)
+- [x] Wide format support: SNA, SZX, Z80, TAP, TZX, RZX, MDR, TRD, and SCL (including ZIP archives)
 - [x] Support for POK trainer files
+- [x] RZX playback (recordings of ZX Spectrum games)
 - [x] High accuracy: Precise timings, including memory and I/O contention
 - [x] Floating bus support
 - [x] Multicolor screen effects
@@ -171,6 +172,10 @@ The built-in debugger allows for inspection of CPU registers, memory, and disass
 
 ## Favorites Manager
 The Favorites Manager helps organize your favorite games, demos, and files, accessible directly from the main menu. For more details, see the [Favorites documentation](docs/Favorites.md).
+
+## RZX Playback
+Playback of RZX files (recordings of ZX Spectrum games) is supported. You can find many RZX files in the [RZX Archive](https://www.rzxarchive.co.uk/).
+
 
 ### Resources
 - [Avalonia UI](https://avaloniaui.net/)
