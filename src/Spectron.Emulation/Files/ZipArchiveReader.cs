@@ -17,7 +17,7 @@ public sealed class ZipArchiveReader(string filePath) : IDisposable
         {
             var fileType = FileTypeResolver.FromPath(entry.FullName);
 
-            if (fileType.IsSnapshot() || fileType.IsTape() || fileType.IsMicrodrive())
+            if (fileType.IsSnapshot() || fileType.IsTape() || fileType.IsMicrodrive() || fileType == FileType.Rzx)
             {
                 entries.Add(new ArchiveEntry(entry.FullName, fileType));
             }
