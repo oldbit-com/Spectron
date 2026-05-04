@@ -39,7 +39,7 @@ public sealed class RzxController
         Emulator.Bus.AddDevice(new RzxDevice(ReadPort));
         Emulator.RzxController = this;
 
-        // Interrupts are disabled during the playback, so we need to set the duration to zero
+        // Automaitc interrupts are disabled during the playback
         Emulator.Cpu.Clock.InterruptDuration = 0;
 
         _currentSnapshotIndex = 0;
