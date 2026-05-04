@@ -49,6 +49,9 @@ public partial class StatusBarViewModel : ObservableObject
     public partial bool IsTapeInserted { get; set; }
 
     [ObservableProperty]
+    public partial bool IsRzxPlaying { get; set; }
+
+    [ObservableProperty]
     public partial bool IsMicroDriveCartridgeInserted { get; set; }
 
     [ObservableProperty]
@@ -56,6 +59,9 @@ public partial class StatusBarViewModel : ObservableObject
 
     [ObservableProperty]
     public partial string TapeLoadProgress { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string RzxPlayProgress { get; set; } = "0%";
 
     [ObservableProperty]
     public partial bool IsAyEnabled { get; set; }

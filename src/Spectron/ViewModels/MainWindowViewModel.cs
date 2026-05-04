@@ -22,6 +22,7 @@ using OldBit.Spectron.Emulation.Devices.Beta128;
 using OldBit.Spectron.Emulation.Devices.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 using OldBit.Spectron.Emulation.Rom;
+using OldBit.Spectron.Emulation.Rzx;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Emulation.State;
@@ -79,6 +80,7 @@ public partial class MainWindowViewModel : ObservableObject
     private PokeFile? _pokeFile;
     private MouseInputHandler? _mouseInputHandler;
     private BreakpointHandler? _breakpointHandler;
+    private RzxController? _rzxController;
 
     public Control ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }

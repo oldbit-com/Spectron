@@ -90,6 +90,16 @@
             <StackPanel
                 Orientation="Horizontal"
                 Margin="0 0 10 0"
+                IsVisible="{Binding IsRzxPlaying}"
+                ToolTip.Tip="RZX Playback Progress">
+
+                <material:MaterialIcon Kind="MotionPlay"/>
+                <TextBlock Text="{Binding RzxPlayProgress}"/>
+            </StackPanel>
+
+            <StackPanel
+                Orientation="Horizontal"
+                Margin="0 0 10 0"
                 IsVisible="{Binding IsTapeInserted}"
                 ToolTip.Tip="Tape">
 

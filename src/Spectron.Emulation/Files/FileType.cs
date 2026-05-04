@@ -22,6 +22,8 @@ public enum FileType
 
     Scl,
 
+    Rzx,
+
     Spectron,
 
     Unsupported

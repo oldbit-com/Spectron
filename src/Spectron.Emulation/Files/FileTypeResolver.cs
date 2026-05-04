@@ -14,6 +14,7 @@ public static class FileTypeResolver
         ".mdr" => FileType.Mdr,
         ".trd" => FileType.Trd,
         ".scl" => FileType.Scl,
+        ".rzx" => FileType.Rzx,
         ".spectron" => FileType.Spectron,
         _ => FileType.Unsupported
     };

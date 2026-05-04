@@ -1,5 +1,8 @@
 using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.State;
+using OldBit.Spectron.Files.Sna;
+using OldBit.Spectron.Files.Szx;
+using OldBit.Spectron.Files.Z80;
 
 namespace OldBit.Spectron.Emulation.Snapshot;
 
@@ -45,6 +48,24 @@ public sealed class SnapshotManager(
 
             default:
                 throw new NotSupportedException($"The file extension '{Path.GetExtension(filePath)}' is not supported.");
+        }
+    }
+
+    public static void Update(Emulator emulator, Stream stream, FileType fileType)
+    {
+        switch (fileType)
+        {
+            case FileType.Sna:
+                SnaSnapshot.Update(emulator, SnaFile.Load(stream), false);
+                break;
+
+            case FileType.Szx:
+                SzxSnapshot.Update(emulator, SzxFile.Load(stream), false);
+                break;
+
+            case FileType.Z80:
+                Z80Snapshot.Update(emulator, Z80File.Load(stream), false);
+                break;
         }
     }
 }

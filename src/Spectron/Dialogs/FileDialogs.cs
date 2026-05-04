@@ -22,6 +22,7 @@ public static class FileDialogs
             FilePickerType.Tap,
             FilePickerType.Tzx,
             FilePickerType.Z80,
+            FilePickerType.Rzx,
             FilePickerType.Zip,
             FilePickerType.Pok,
             FilePickerType.Mdr,
