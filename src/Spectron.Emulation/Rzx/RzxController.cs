@@ -39,7 +39,7 @@ public sealed class RzxController
         Emulator.Bus.AddDevice(new RzxDevice(ReadPort));
         Emulator.RzxController = this;
 
-        // Disable automatic interrupts trigger during playback
+        // Interrupts are disabled during the playback, so we need to set the duration to zero
         Emulator.Cpu.Clock.InterruptDuration = 0;
 
         _currentSnapshotIndex = 0;
@@ -48,7 +48,7 @@ public sealed class RzxController
 
     internal void NextFrame()
     {
-        // Trigger INT befor the next frame
+        // Trigger INT before the next frame, these are not triggered automatically
         Emulator.Cpu.TriggerInt(0xFF);
 
         _inReadCounter = 0;
