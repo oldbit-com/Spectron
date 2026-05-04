@@ -6,6 +6,10 @@ namespace OldBit.Spectron.Emulation.Rzx;
 
 internal sealed class RzxLoader(SnapshotManager snapshotManager)
 {
+    private const string SnaExtension = "sna";
+    private const string SzxExtension = "szx";
+    private const string Z80Extension = "z80";
+
     internal Emulator CreateEmulator(RzxFile rzxFile)
     {
         if (rzxFile.Snapshots.Count == 0)
@@ -21,15 +25,15 @@ internal sealed class RzxLoader(SnapshotManager snapshotManager)
 
         switch (snapshot.Extension.ToLowerInvariant())
         {
-            case "sna":
+            case SnaExtension:
                 emulator = snapshotManager.Load(memoryStream, FileType.Sna);
                 break;
 
-            case "szx":
+            case SzxExtension:
                 emulator = snapshotManager.Load(memoryStream, FileType.Szx);
                 break;
 
-            case "z80":
+            case Z80Extension:
                 emulator = snapshotManager.Load(memoryStream, FileType.Z80);
                 break;
 
@@ -48,15 +52,15 @@ internal sealed class RzxLoader(SnapshotManager snapshotManager)
 
         switch (snapshot.Extension.ToLowerInvariant())
         {
-            case "sna":
+            case SnaExtension:
                 SnapshotManager.Update(emulator, memoryStream, FileType.Sna);
                 break;
 
-            case "szx":
+            case SzxExtension:
                 SnapshotManager.Update(emulator, memoryStream, FileType.Szx);
                 break;
 
-            case "z80":
+            case Z80Extension:
                 SnapshotManager.Update(emulator, memoryStream, FileType.Z80);
                 break;
 
