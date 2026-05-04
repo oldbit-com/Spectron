@@ -39,7 +39,7 @@ public class Program
 
                     builder.Startup += (sender, e) =>
                     {
-                        if (sender is ClassicDesktopStyleApplicationLifetime { MainWindow.DataContext: MainWindowViewModel viewModel })
+                        if (sender is ClassicDesktopStyleApplicationLifetime { MainWindow.DataContext: MainViewModel viewModel })
                         {
                             viewModel.CommandLineArgs = commandLineArgs;
                         }

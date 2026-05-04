@@ -8,7 +8,7 @@ namespace OldBit.Spectron.Controls;
 
 public partial class MainMenu : UserControl
 {
-    private MainWindowViewModel? _viewModel;
+    private MainViewModel? _viewModel;
 
     public MainMenu()
     {
@@ -18,7 +18,7 @@ public partial class MainMenu : UserControl
 
     protected override void OnDataContextChanged(EventArgs e)
     {
-        if (DataContext is not MainWindowViewModel viewModel)
+        if (DataContext is not MainViewModel viewModel)
         {
             return;
         }

@@ -10,7 +10,7 @@ using OldBit.Spectron.Settings;
 
 namespace OldBit.Spectron.ViewModels;
 
-partial class MainWindowViewModel
+partial class MainViewModel
 {
     private void HandleKeyDown(KeyEventArgs e)
     {

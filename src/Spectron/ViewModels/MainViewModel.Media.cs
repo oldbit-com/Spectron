@@ -5,7 +5,7 @@ using OldBit.Spectron.Emulation.Tape;
 
 namespace OldBit.Spectron.ViewModels;
 
-partial class MainWindowViewModel
+partial class MainViewModel
 {
     private void HandleTapeTapeChanged(TapeChangedEventArgs e)
     {

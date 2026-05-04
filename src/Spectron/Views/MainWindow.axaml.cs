@@ -17,7 +17,7 @@ namespace OldBit.Spectron.Views;
 
 public partial class MainWindow : Window
 {
-    private MainWindowViewModel? _mainViewModel;
+    private MainViewModel? _mainViewModel;
     private readonly Dictionary<string, Window> _windows = new();
 
     public MainWindow()
@@ -161,7 +161,7 @@ public partial class MainWindow : Window
 
     protected override void OnDataContextChanged(EventArgs e)
     {
-        if (DataContext is not MainWindowViewModel viewModel)
+        if (DataContext is not MainViewModel viewModel)
         {
             return;
         }

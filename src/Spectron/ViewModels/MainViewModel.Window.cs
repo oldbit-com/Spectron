@@ -6,7 +6,7 @@ using OldBit.Spectron.Theming;
 
 namespace OldBit.Spectron.ViewModels;
 
-partial class MainWindowViewModel
+partial class MainViewModel
 {
     private bool _shouldResume;
     private bool IsDebuggerOpen => _debuggerViewModel != null;

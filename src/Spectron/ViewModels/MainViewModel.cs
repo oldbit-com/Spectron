@@ -44,7 +44,7 @@ using MouseType = OldBit.Spectron.Emulation.Devices.Mouse.MouseType;
 
 namespace OldBit.Spectron.ViewModels;
 
-public partial class MainWindowViewModel : ObservableObject
+public partial class MainViewModel : ObservableObject
 {
     private const string DefaultTitle = "Spectron - ZX Spectrum Emulator";
 
@@ -323,7 +323,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     #endregion
 
-    public MainWindowViewModel(
+    public MainViewModel(
         EmulatorFactory emulatorFactory,
         TimeMachine timeMachine,
         GamepadManager gamepadManager,
@@ -344,7 +344,7 @@ public partial class MainWindowViewModel : ObservableObject
         DiskDriveManager diskDriveManager,
         QuickSaveService quickSaveService,
         ILogStore logStore,
-        ILogger<MainWindowViewModel> logger)
+        ILogger<MainViewModel> logger)
     {
         _emulatorFactory = emulatorFactory;
         _timeMachine = timeMachine;

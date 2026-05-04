@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace OldBit.Spectron.ViewModels;
 
-public partial class MainWindowViewModel
+public partial class MainViewModel
 {
     private async Task HandleScreenshot()
     {

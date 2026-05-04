@@ -8,7 +8,7 @@ using OldBit.Spectron.Messages;
 
 namespace OldBit.Spectron.ViewModels;
 
-partial class MainWindowViewModel
+partial class MainViewModel
 {
     [ObservableProperty]
     public partial bool BreakpointsEnabled { get; set; }

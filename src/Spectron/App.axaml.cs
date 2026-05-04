@@ -14,7 +14,7 @@ namespace OldBit.Spectron;
 public class App : Application
 {
     internal IServiceProvider? ServiceProvider { get; set; }
-    private MainWindowViewModel? MainWindowViewModel { get; set; }
+    private MainViewModel? MainViewModel { get; set; }
 
     public override void Initialize()
     {
@@ -29,13 +29,13 @@ public class App : Application
     {
         if (ApplicationLifetime is ClassicDesktopStyleApplicationLifetime desktop)
         {
-            MainWindowViewModel = ServiceProvider!.GetRequiredService<MainWindowViewModel>();
-            desktop.MainWindow = new MainWindow { DataContext = MainWindowViewModel };
+            MainViewModel = ServiceProvider!.GetRequiredService<MainViewModel>();
+            desktop.MainWindow = new MainWindow { DataContext = MainViewModel };
 
             var lifetime = new ApplicationLifetimeHelper(this, desktop.MainWindow);
 
-            lifetime.AppActivated += (_, e) => MainWindowViewModel.WindowActivated(e);
-            lifetime.AppDeactivated += (_, e) => MainWindowViewModel.WindowDeactivated(e);
+            lifetime.AppActivated += (_, e) => MainViewModel.WindowActivated(e);
+            lifetime.AppDeactivated += (_, e) => MainViewModel.WindowDeactivated(e);
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -54,5 +54,5 @@ public class App : Application
         aboutView.ShowDialog(MainWindow);
     }
 
-    private void SettingsMenuItem_OnClick(object? sender, EventArgs e) => MainWindowViewModel?.OpenPreferencesWindow();
+    private void SettingsMenuItem_OnClick(object? sender, EventArgs e) => MainViewModel?.OpenPreferencesWindow();
 }

@@ -11,7 +11,7 @@ using OldBit.Spectron.Screen;
 
 namespace OldBit.Spectron.ViewModels;
 
-partial class MainWindowViewModel
+partial class MainViewModel
 {
     private RecorderOptions GetRecorderOptions() => new()
     {

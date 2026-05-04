@@ -17,7 +17,7 @@ namespace OldBit.Spectron.Controls;
 
 public sealed class NativeMainMenu
 {
-    private readonly MainWindowViewModel _viewModel;
+    private readonly MainViewModel _viewModel;
     private readonly NativeMenu _nativeMenu = [];
     private NativeMenuItem[] _rootItems = [];
 
@@ -40,7 +40,7 @@ public sealed class NativeMainMenu
     private NativeMenuItem? _diskDriveMenuItem;
     private NativeMenuItem? _debuggerBreakpointMenuItem;
 
-    public NativeMainMenu(MainWindowViewModel viewModel)
+    public NativeMainMenu(MainViewModel viewModel)
     {
         _viewModel = viewModel;
 
@@ -92,7 +92,7 @@ public sealed class NativeMainMenu
     {
         switch (propertyName)
             {
-                case nameof(MainWindowViewModel.ComputerType):
+                case nameof(MainViewModel.ComputerType):
                     foreach (var computerType in _computerTypes.Keys)
                     {
                         _computerTypes[computerType].IsChecked = _viewModel.ComputerType == computerType;
@@ -100,7 +100,7 @@ public sealed class NativeMainMenu
 
                     break;
 
-                case nameof(MainWindowViewModel.RomType):
+                case nameof(MainViewModel.RomType):
                     foreach (var romType in _romTypes.Keys)
                     {
                         _romTypes[romType].IsChecked = _viewModel.RomType == romType;
@@ -108,7 +108,7 @@ public sealed class NativeMainMenu
 
                     break;
 
-                case nameof(MainWindowViewModel.JoystickType):
+                case nameof(MainViewModel.JoystickType):
                     foreach (var joystickType in _joystickTypes.Keys)
                     {
                         _joystickTypes[joystickType].IsChecked = _viewModel.JoystickType == joystickType;
@@ -116,7 +116,7 @@ public sealed class NativeMainMenu
 
                     break;
 
-                case nameof(MainWindowViewModel.MouseType):
+                case nameof(MainViewModel.MouseType):
                     foreach (var mouseType in _mouseTypes.Keys)
                     {
                         _mouseTypes[mouseType].IsChecked = _viewModel.MouseType == mouseType;
@@ -124,12 +124,12 @@ public sealed class NativeMainMenu
 
                     break;
 
-                case nameof(MainWindowViewModel.IsUlaPlusEnabled):
+                case nameof(MainViewModel.IsUlaPlusEnabled):
                     _ulaPlusMenuItem?.IsChecked = _viewModel.IsUlaPlusEnabled;
 
                     break;
 
-                case nameof(MainWindowViewModel.EmulationSpeed):
+                case nameof(MainViewModel.EmulationSpeed):
                     foreach (var speed in _emulationSpeeds.Keys)
                     {
                         _emulationSpeeds[speed].IsChecked = _viewModel.EmulationSpeed == speed;
@@ -137,17 +137,17 @@ public sealed class NativeMainMenu
 
                     break;
 
-                case nameof(MainWindowViewModel.IsPaused):
+                case nameof(MainViewModel.IsPaused):
                     _pauseMenuItem?.IsChecked = _viewModel.IsPaused;
 
                     break;
 
-                case nameof(MainWindowViewModel.IsAudioMuted):
+                case nameof(MainViewModel.IsAudioMuted):
                     _muteMenuItem?.IsChecked = _viewModel.IsAudioMuted;
 
                     break;
 
-                case nameof(MainWindowViewModel.BorderSize):
+                case nameof(MainViewModel.BorderSize):
                     foreach (var border in _borderSizes.Keys)
                     {
                         _borderSizes[border].IsChecked = _viewModel.BorderSize == border;
@@ -155,7 +155,7 @@ public sealed class NativeMainMenu
 
                     break;
 
-                case nameof(MainWindowViewModel.ScreenEffect):
+                case nameof(MainViewModel.ScreenEffect):
                     foreach (var screenEffect in _screenEffects.Keys)
                     {
                         _screenEffects[screenEffect].IsChecked = _viewModel.ScreenEffect.HasFlag(screenEffect);
@@ -163,12 +163,12 @@ public sealed class NativeMainMenu
 
                     break;
 
-                case nameof(MainWindowViewModel.IsFullScreen):
+                case nameof(MainViewModel.IsFullScreen):
                     _fullScreenMenuItem?.Header = _viewModel.IsFullScreen ? "Exit Full Screen" : "Full Screen";
 
                     break;
 
-                case nameof(MainWindowViewModel.TapeLoadSpeed):
+                case nameof(MainViewModel.TapeLoadSpeed):
                     foreach (var speed in _tapeLoadingSpeeds.Keys)
                     {
                         _tapeLoadingSpeeds[speed].IsChecked = _viewModel.TapeLoadSpeed == speed;
@@ -176,12 +176,12 @@ public sealed class NativeMainMenu
 
                     break;
 
-                case nameof(MainWindowViewModel.IsInterface1Enabled):
+                case nameof(MainViewModel.IsInterface1Enabled):
                     _microdriveMenuItem?.IsVisible = _viewModel.IsInterface1Enabled;
 
                     break;
 
-                case nameof(MainWindowViewModel.NumberOfMicrodrives):
+                case nameof(MainViewModel.NumberOfMicrodrives):
                     foreach (var driveId in _microdrives.Keys)
                     {
                         _microdrives[driveId].IsVisible = _viewModel.NumberOfMicrodrives >= (int)driveId;
@@ -189,12 +189,12 @@ public sealed class NativeMainMenu
 
                     break;
 
-                case nameof(MainWindowViewModel.IsBeta128Enabled):
+                case nameof(MainViewModel.IsBeta128Enabled):
                     _diskDriveMenuItem?.IsVisible = _viewModel.IsBeta128Enabled;
 
                     break;
 
-                case nameof(MainWindowViewModel.NumberOfBeta128Drives):
+                case nameof(MainViewModel.NumberOfBeta128Drives):
                     foreach (var driveId in _diskDrives.Keys)
                     {
                         _diskDrives[driveId].IsVisible = _viewModel.NumberOfBeta128Drives >= (int)driveId;
@@ -202,7 +202,7 @@ public sealed class NativeMainMenu
 
                     break;
 
-                case nameof(MainWindowViewModel.BreakpointsEnabled):
+                case nameof(MainViewModel.BreakpointsEnabled):
                     _debuggerBreakpointMenuItem?.IsChecked = _viewModel.BreakpointsEnabled;
 
                     break;

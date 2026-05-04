@@ -17,7 +17,7 @@ using OldBit.Spectron.Settings;
 
 namespace OldBit.Spectron.ViewModels;
 
-partial class MainWindowViewModel
+partial class MainViewModel
 {
     private void CreateEmulator(ComputerType computerType, RomType romType, byte[]? customRom = null, bool hardReset = false)
     {

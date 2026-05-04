@@ -14,7 +14,7 @@ using OldBit.Spectron.Settings;
 
 namespace OldBit.Spectron.ViewModels;
 
-partial class MainWindowViewModel
+partial class MainViewModel
 {
     private async Task HandleLoadFileAsync() => await HandleLoadFileAsync(null);
 

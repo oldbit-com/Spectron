@@ -8,7 +8,7 @@
         xmlns:screen="clr-namespace:OldBit.Spectron.Screen"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.MainWindow"
-        x:DataType="viewModels:MainWindowViewModel"
+        x:DataType="viewModels:MainViewModel"
         Icon="/Assets/spectron.ico"
         Title="{Binding Title}"
         MinHeight="500"

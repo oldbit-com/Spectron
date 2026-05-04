@@ -7,7 +7,7 @@ using OldBit.Spectron.Theming;
 
 namespace OldBit.Spectron.ViewModels;
 
-partial class MainWindowViewModel
+partial class MainViewModel
 {
     public async Task OpenPreferencesWindow()
     {
