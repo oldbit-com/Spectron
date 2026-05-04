@@ -359,6 +359,7 @@ public sealed class NativeMainMenu
                 Menu =
                 [
                     _emulationSpeeds["25"],
+                    _emulationSpeeds["50"],
                     _emulationSpeeds["75"],
                     _emulationSpeeds["100"],
                     _emulationSpeeds["125"],
@@ -906,7 +907,7 @@ public sealed class NativeMainMenu
             new { Value = "25", DisplayName = "25%" },
             new { Value = "50", DisplayName = "50%" },
             new { Value = "75", DisplayName = "75%" },
-            new { Value = "100", DisplayName = "100%" },
+            new { Value = "100", DisplayName = "Normal" },
             new { Value = "125", DisplayName = "125%" },
             new { Value = "150", DisplayName = "150%" },
             new { Value = "200", DisplayName = "200%" },
