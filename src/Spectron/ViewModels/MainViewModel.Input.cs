@@ -6,6 +6,7 @@ using OldBit.Spectron.Emulation.Devices.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Input;
+using OldBit.Spectron.Models;
 using OldBit.Spectron.Settings;
 
 namespace OldBit.Spectron.ViewModels;
@@ -190,6 +191,6 @@ partial class MainViewModel
         _mouseInputHandler?.ButtonsStateChanged(point);
 
     private void ConfigureMouseCursor() => MouseCursor = MouseType != MouseType.None && _preferences.Mouse.IsStandardMousePointerHidden
-        ? Cursor.Parse("None")
-        : Cursor.Default;
+        ? MouseCursors.None
+        : MouseCursors.Default;
 }

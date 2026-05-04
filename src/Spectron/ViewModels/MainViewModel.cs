@@ -173,7 +173,7 @@ public partial class MainViewModel : ObservableObject
     public partial int TimeMachineCountdownSeconds { get; set; }
 
     [ObservableProperty]
-    public partial Cursor MouseCursor { get; set; } = Cursor.Default;
+    public partial string MouseCursor { get; set; } = MouseCursors.Default;
 
     [ObservableProperty]
     public partial bool IsInterface1Enabled { get; set; }

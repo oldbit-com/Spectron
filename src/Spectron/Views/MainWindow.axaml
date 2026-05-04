@@ -35,8 +35,8 @@
 
     <Window.Resources>
         <converters:ValueInequalityConverter x:Key="ValueInequalityConverter"/>
-        <converters:ValueEqualityConverter x:Key="ValueEqualityConverter"/>
         <converters:EnumHasValueConverter x:Key="EnumHasValueConverter"/>
+        <converters:CursorConverter x:Key="CursorConverter"/>
     </Window.Resources>
 
     <Window.KeyBindings>
@@ -93,7 +93,7 @@
                                     Width="256"
                                     RenderOptions.BitmapInterpolationMode="None"
                                     Source="{Binding SpectrumScreen}"
-                                    Cursor="{Binding MouseCursor}"
+                                    Cursor="{Binding MouseCursor, Converter={StaticResource CursorConverter}}"
                                     PointerMoved="Screen_OnPointerMoved"
                                     PointerPressed="Screen_OnPointerPressed"
                                     PointerReleased="Screen_OnPointerReleased"
