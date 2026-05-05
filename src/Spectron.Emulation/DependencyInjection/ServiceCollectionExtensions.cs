@@ -18,11 +18,12 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<TimeMachine>();
         services.AddSingleton<EmulatorFactory>();
+        services.AddSingleton<StateSnapshotManager>();
+        services.AddSingleton<IStateSnapshotStore, StateSnapshotStore>();
         services.AddSingleton<SnaSnapshot>();
         services.AddSingleton<SzxSnapshot>();
         services.AddSingleton<Z80Snapshot>();
         services.AddSingleton<SnapshotManager>();
-        services.AddSingleton<StateManager>();
         services.AddSingleton<Loader>();
         services.AddSingleton<TapeManager>();
         services.AddSingleton<MicrodriveManager>();

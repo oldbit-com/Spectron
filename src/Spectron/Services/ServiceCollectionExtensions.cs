@@ -7,7 +7,7 @@ public static class ServiceCollectionExtensions
 {
     public static void AddServices(this IServiceCollection services)
     {
-        services.AddSingleton<ApplicationDataService>();
+        services.AddSingleton<IApplicationDataService, ApplicationDataService>();
         services.AddSingleton<PreferencesService>();
         services.AddSingleton<FavoritesService>();
         services.AddSingleton<SessionService>();

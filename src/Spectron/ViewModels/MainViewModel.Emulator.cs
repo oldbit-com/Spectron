@@ -65,7 +65,7 @@ partial class MainViewModel
 
         try
         {
-            var emulator = _stateManager.CreateEmulator(snapshot);
+            var emulator = _stateSnapshotManager.CreateEmulator(snapshot);
             _mouseInputHandler = new MouseInputHandler(emulator.MouseManager);
 
             Initialize(emulator, shouldResume);

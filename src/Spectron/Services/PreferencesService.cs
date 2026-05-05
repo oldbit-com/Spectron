@@ -3,7 +3,7 @@ using OldBit.Spectron.Settings;
 
 namespace OldBit.Spectron.Services;
 
-public class PreferencesService(ApplicationDataService applicationDataService)
+public class PreferencesService(IApplicationDataService applicationDataService)
 {
     public async Task SaveAsync(Preferences settings) => await applicationDataService.SaveAsync(settings);
 

@@ -7,7 +7,6 @@ using OldBit.Spectron.Emulation.Devices.Beta128.Drive;
 using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Spectron.Emulation.Files;
-using OldBit.Spectron.Emulation.Snapshot;
 using OldBit.Spectron.Files.Pok;
 using OldBit.Spectron.Messages;
 using OldBit.Spectron.Settings;
@@ -200,7 +199,7 @@ partial class MainViewModel
 
             if (file != null && Emulator != null)
             {
-                SnapshotManager.Save(file.Path.LocalPath, Emulator);
+                _snapshotManager.Save(file.Path.LocalPath, Emulator);
             }
         }
         catch (Exception ex)

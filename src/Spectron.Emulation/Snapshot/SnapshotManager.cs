@@ -10,7 +10,8 @@ public sealed class SnapshotManager(
     SnaSnapshot snaSnapshot,
     SzxSnapshot szxSnapshot,
     Z80Snapshot z80Snapshot,
-    StateManager stateManager)
+    IStateSnapshotStore stateSnapshotStore,
+    StateSnapshotManager stateSnapshotManager)
 {
     public Emulator Load(Stream stream, FileType fileType)
     {
@@ -19,12 +20,12 @@ public sealed class SnapshotManager(
             FileType.Sna => snaSnapshot.Load(stream),
             FileType.Szx => szxSnapshot.Load(stream),
             FileType.Z80 => z80Snapshot.Load(stream),
-            FileType.Spectron => stateManager.CreateEmulator(StateSnapshot.Load(stream)!),
+            FileType.Spectron => stateSnapshotManager.CreateEmulator(stateSnapshotStore.Load(stream)!),
             _ => throw new NotSupportedException($"The file type '{fileType}' is not supported.")
         };
     }
 
-    public static void Save(string filePath, Emulator emulator)
+    public void Save(string filePath, Emulator emulator)
     {
         var fileType = FileTypeResolver.FromPath(filePath);
 
@@ -43,7 +44,8 @@ public sealed class SnapshotManager(
                 break;
 
             case FileType.Spectron:
-                StateManager.CreateSnapshot(emulator).Save(filePath);
+                var stateSnapshot = StateSnapshotManager.CreateSnapshot(emulator);
+                stateSnapshotStore.Save(filePath, stateSnapshot);
                 break;
 
             default:

@@ -16,7 +16,7 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.State;
 
-public sealed class StateManager(EmulatorFactory emulatorFactory)
+public sealed class StateSnapshotManager(EmulatorFactory emulatorFactory)
 {
     public Emulator CreateEmulator(StateSnapshot snapshot)
     {

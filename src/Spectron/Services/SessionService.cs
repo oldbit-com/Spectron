@@ -11,7 +11,8 @@ using OldBit.Spectron.Settings;
 namespace OldBit.Spectron.Services;
 
 public class SessionService(
-    ApplicationDataService applicationDataService,
+    IApplicationDataService applicationDataService,
+    IStateSnapshotStore snapshotStore,
     TimeMachine timeMachine,
     ILogger<SessionService> logger)
 {
@@ -26,7 +27,7 @@ public class SessionService(
 
         if (resumeSettings.IsResumeEnabled)
         {
-            var snapshot = StateManager.CreateSnapshot(emulator);
+            var snapshot = StateSnapshotManager.CreateSnapshot(emulator);
 
             session.LastSnapshot = EmulatorStateToBase64(snapshot);
         }
@@ -92,13 +93,13 @@ public class SessionService(
         return EmulatorStateToBase64(serializedState);
     }
 
-    private static StateSnapshot? EmulatorStateFromBase64(string base64)
+    private StateSnapshot? EmulatorStateFromBase64(string base64)
     {
         var bytes = Convert.FromBase64String(base64);
 
         using var memoryStream = new MemoryStream(bytes);
         using var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
 
-        return StateSnapshot.Load(gzipStream);
+        return snapshotStore.Load(gzipStream);
     }
 }

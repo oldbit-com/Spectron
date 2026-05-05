@@ -53,7 +53,7 @@ public partial class MainViewModel : ObservableObject
     private readonly GamepadManager _gamepadManager;
 
     private readonly SnapshotManager _snapshotManager;
-    private readonly StateManager _stateManager;
+    private readonly StateSnapshotManager _stateSnapshotManager;
     private readonly Loader _loader;
 
     private readonly PreferencesService _preferencesService;
@@ -328,7 +328,7 @@ public partial class MainViewModel : ObservableObject
         TimeMachine timeMachine,
         GamepadManager gamepadManager,
         SnapshotManager snapshotManager,
-        StateManager stateManager,
+        StateSnapshotManager stateSnapshotManager,
         Loader loader,
         PreferencesService preferencesService,
         FavoritesService favoritesService,
@@ -350,7 +350,7 @@ public partial class MainViewModel : ObservableObject
         _timeMachine = timeMachine;
         _gamepadManager = gamepadManager;
         _snapshotManager = snapshotManager;
-        _stateManager = stateManager;
+        _stateSnapshotManager = stateSnapshotManager;
         _loader = loader;
         _preferencesService = preferencesService;
         _favoritesService = favoritesService;

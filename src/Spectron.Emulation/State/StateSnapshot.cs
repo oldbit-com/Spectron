@@ -39,31 +39,5 @@ public sealed partial class StateSnapshot
 
     public byte[] Serialize() => MemoryPackSerializer.Serialize(this);
 
-    public static StateSnapshot? Load(string filePath)
-    {
-        var file = File.ReadAllBytes(filePath);
-
-        return MemoryPackSerializer.Deserialize<StateSnapshot>(file);
-    }
-
-    public static StateSnapshot? Deserialize(byte[] data) =>
-        MemoryPackSerializer.Deserialize<StateSnapshot>(data);
-
-    public static StateSnapshot? Load(Stream stream)
-    {
-        using var memoryStream = new MemoryStream();
-        stream.CopyTo(memoryStream);
-
-        return MemoryPackSerializer.Deserialize<StateSnapshot>(memoryStream.ToArray());
-    }
-
-    public void Save(string filePath)
-    {
-        using var stream = File.Create(filePath);
-
-        var data = Serialize();
-
-        stream.Write(data, 0, data.Length);
-        stream.Close();
-    }
+    public static StateSnapshot? Deserialize(byte[] data) => MemoryPackSerializer.Deserialize<StateSnapshot>(data);
 }

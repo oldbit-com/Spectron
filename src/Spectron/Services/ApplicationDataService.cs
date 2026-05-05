@@ -7,7 +7,7 @@ using OldBit.Spectron.Extensions;
 
 namespace OldBit.Spectron.Services;
 
-public class ApplicationDataService(ILogger<ApplicationDataService> logger)
+public class ApplicationDataService(ILogger<ApplicationDataService> logger) : IApplicationDataService
 {
     private readonly ILogger _logger = logger;
 
