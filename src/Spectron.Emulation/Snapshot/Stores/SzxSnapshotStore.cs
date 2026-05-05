@@ -1,6 +1,6 @@
 using OldBit.Spectron.Files.Szx;
 
-namespace OldBit.Spectron.Emulation.Snapshot;
+namespace OldBit.Spectron.Emulation.Snapshot.Stores;
 
 public interface ISzxSnapshotStore
 {

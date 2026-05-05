@@ -1,6 +1,7 @@
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
+using OldBit.Spectron.Emulation.Snapshot.Stores;
 using OldBit.Z80Cpu;
 using OldBit.Z80Cpu.Registers;
 using OldBit.Spectron.Files.Z80;

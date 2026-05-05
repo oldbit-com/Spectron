@@ -1,6 +1,6 @@
 using OldBit.Spectron.Files.Sna;
 
-namespace OldBit.Spectron.Emulation.Snapshot;
+namespace OldBit.Spectron.Emulation.Snapshot.Stores;
 
 public interface ISnaSnapshotStore
 {

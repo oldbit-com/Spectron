@@ -1,6 +1,6 @@
 using OldBit.Spectron.Files.Z80;
 
-namespace OldBit.Spectron.Emulation.Snapshot;
+namespace OldBit.Spectron.Emulation.Snapshot.Stores;
 
 public interface IZ80SnapshotStore
 {
