@@ -8,16 +8,16 @@ using OldBit.Spectron.Files.Z80.Types;
 
 namespace OldBit.Spectron.Emulation.Snapshot;
 
-public sealed class Z80Snapshot(EmulatorFactory emulatorFactory)
+public sealed class Z80Snapshot(EmulatorFactory emulatorFactory, IZ80SnapshotStore snapshotStore)
 {
     internal Emulator Load(Stream stream)
     {
-        var snapshot = Z80File.Load(stream);
+        var snapshot = snapshotStore.Load(stream);
 
         return CreateEmulator(snapshot);
     }
 
-    internal static void Save(string fileName, Emulator emulator)
+    internal void Save(string fileName, Emulator emulator)
     {
         var header = new Z80Header
         {
@@ -89,7 +89,10 @@ public sealed class Z80Snapshot(EmulatorFactory emulatorFactory)
                 break;
         }
 
-        snapshot?.Save(fileName);
+        if (snapshot != null)
+        {
+            snapshotStore.Save(fileName, snapshot);
+        }
     }
 
     internal static void Update(Emulator emulator, Z80File snapshot, bool updateBorder = true)

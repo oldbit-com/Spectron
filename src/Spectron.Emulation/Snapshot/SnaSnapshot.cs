@@ -6,16 +6,16 @@ using OldBit.Spectron.Files.Sna;
 
 namespace OldBit.Spectron.Emulation.Snapshot;
 
-public sealed class SnaSnapshot(EmulatorFactory emulatorFactory)
+public sealed class SnaSnapshot(EmulatorFactory emulatorFactory, ISnaSnapshotStore snapshotStore)
 {
     internal Emulator Load(Stream stream)
     {
-        var snapshot = SnaFile.Load(stream);
+        var snapshot = snapshotStore.Load(stream);
 
         return CreateEmulator(snapshot);
     }
 
-    internal static void Save(string fileName, Emulator emulator)
+    internal void Save(string fileName, Emulator emulator)
     {
         var snapshot = new SnaFile
         {
@@ -67,9 +67,14 @@ public sealed class SnaSnapshot(EmulatorFactory emulatorFactory)
                     snapshot.Ram48 = memory48K.Ram.ToArray();
                     break;
             }
+
+            // Push PC onto the stack
+            snapshot.Ram48[snapshot.Header.SP - 1 - 16384] = (byte)(emulator.Cpu.Registers.PC >> 8);
+            snapshot.Ram48[snapshot.Header.SP - 2 - 16384] = (byte)emulator.Cpu.Registers.PC;
+            snapshot.Header.SP -= 2;
         }
 
-        snapshot.Save(fileName);
+        snapshotStore.Save(fileName, snapshot);
     }
 
     internal static void Update(Emulator emulator, SnaFile snapshot, bool updateBorder = true)
@@ -106,6 +111,7 @@ public sealed class SnaSnapshot(EmulatorFactory emulatorFactory)
         {
             LoadMemory(snapshot, (Memory48K)memory);
 
+            // Pop PC from the stack
             cpu.Registers.PC = (Word)(memory.Read((Word)(cpu.Registers.SP + 1)) << 8 |
                                       memory.Read(cpu.Registers.SP));
             cpu.Registers.SP += 2;

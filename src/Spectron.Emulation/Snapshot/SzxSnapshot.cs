@@ -17,11 +17,11 @@ using JoystickType = OldBit.Spectron.Emulation.Devices.Joystick.JoystickType;
 
 namespace OldBit.Spectron.Emulation.Snapshot;
 
-public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
+public sealed class SzxSnapshot(EmulatorFactory emulatorFactory, ISzxSnapshotStore snapshotStore)
 {
     internal Emulator Load(Stream stream)
     {
-        var snapshot = SzxFile.Load(stream);
+        var snapshot = snapshotStore.Load(stream);
 
         return CreateEmulator(snapshot);
     }
@@ -46,11 +46,11 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory)
         return emulator;
     }
 
-    internal static void Save(string fileName, Emulator emulator)
+    internal void Save(string fileName, Emulator emulator)
     {
         var snapshot = CreateSnapshot(emulator);
 
-        snapshot.Save(fileName);
+        snapshotStore.Save(fileName, snapshot);
     }
 
     internal static void Update(Emulator emulator, SzxFile snapshot, bool updateBorder = true)

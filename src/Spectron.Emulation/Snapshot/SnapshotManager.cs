@@ -32,15 +32,15 @@ public sealed class SnapshotManager(
         switch (fileType)
         {
             case FileType.Sna:
-                SnaSnapshot.Save(filePath, emulator);
+                snaSnapshot.Save(filePath, emulator);
                 break;
 
             case FileType.Szx:
-                SzxSnapshot.Save(filePath, emulator);
+                szxSnapshot.Save(filePath, emulator);
                 break;
 
             case FileType.Z80:
-                Z80Snapshot.Save(filePath, emulator);
+                z80Snapshot.Save(filePath, emulator);
                 break;
 
             case FileType.Spectron:
