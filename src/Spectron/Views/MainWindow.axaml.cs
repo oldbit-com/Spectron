@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.DependencyInjection;
 using OldBit.Spectron.Debugger.Views;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation.Files;
@@ -20,7 +21,7 @@ public partial class MainWindow : Window
     private MainViewModel? _mainViewModel;
     private readonly Dictionary<string, Window> _windows = new();
 
-    public MainWindow()
+    public MainWindow(IServiceProvider services)
     {
         InitializeComponent();
 
@@ -47,12 +48,17 @@ public partial class MainWindow : Window
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowPreferencesViewMessage>(this, (window, message) =>
         {
-            var result = ShowDialog<PreferencesView, Preferences?>(window, new PreferencesViewModel(message.Preferences, message.GamepadManager));
+            var vm = ActivatorUtilities.CreateInstance<PreferencesViewModel>(services, message.Preferences, message.GamepadManager);
+            var result = ShowDialog<PreferencesView, Preferences?>(window, vm);
+
             message.Reply(result);
         });
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowPrintOutputViewMessage>(this, (window, message) =>
-            Show<PrintOutputView>(window, new PrintOutputViewModel(message.Printer)));
+        {
+            var vm = ActivatorUtilities.CreateInstance<PrintOutputViewModel>(services, message.Printer);
+            Show<PrintOutputView>(window, vm);
+        });
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowScreenshotViewMessage>(this, (window, message) =>
             Show<ScreenshotView>(window, message.ViewModel));

@@ -28,7 +28,7 @@ partial class MainViewModel
 
             if (filePath == null)
             {
-                var files = await FileDialogs.OpenEmulatorFileAsync();
+                var files = await _fileDialogs.OpenEmulatorFileAsync();
                 if (files.Count <= 0)
                 {
                     return;
@@ -195,7 +195,7 @@ partial class MainViewModel
             Pause();
 
             var suggestedFileName = GetSuggestedFileName();
-            var file = await FileDialogs.SaveSnapshotFileAsync(suggestedFileName);
+            var file = await _fileDialogs.SaveSnapshotFileAsync(suggestedFileName);
 
             if (file != null && Emulator != null)
             {

@@ -33,7 +33,7 @@ partial class MainViewModel
         {
             Pause();
 
-            var file = await FileDialogs.SaveAudioFileAsync();
+            var file = await _fileDialogs.SaveAudioFileAsync();
 
             if (file != null && Emulator != null)
             {
@@ -77,7 +77,7 @@ partial class MainViewModel
         {
             Pause();
 
-            var file = await FileDialogs.SaveVideoFileAsync();
+            var file = await _fileDialogs.SaveVideoFileAsync();
 
             if (file != null && Emulator != null)
             {

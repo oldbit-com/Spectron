@@ -261,7 +261,7 @@ partial class MainViewModel
         {
             if (romType == RomType.Custom)
             {
-                var files = await FileDialogs.OpenCustomRomFileAsync();
+                var files = await _fileDialogs.OpenCustomRomFileAsync();
 
                 if (files.Count <= 0)
                 {

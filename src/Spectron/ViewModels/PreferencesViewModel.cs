@@ -32,14 +32,16 @@ namespace OldBit.Spectron.ViewModels;
 
 public partial class PreferencesViewModel : ObservableValidator, IDisposable
 {
+    private readonly FileDialogs _fileDialogs;
     private readonly GamepadManager _gamepadManager;
     private readonly GamepadSettings _gamepadSettings;
     private Guid _previousGamepadControllerId;
 
     public GamepadMappingViewModel GamepadMappingViewModel { get; }
 
-    public PreferencesViewModel(Preferences preferences, GamepadManager gamepadManager)
+    public PreferencesViewModel(FileDialogs fileDialogs, Preferences preferences, GamepadManager gamepadManager)
     {
+        _fileDialogs = fileDialogs;
         _gamepadManager = gamepadManager;
         _gamepadSettings = preferences.Joystick.GamepadSettings;
 
@@ -284,7 +286,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
     [RelayCommand]
     public async Task SelectSdCardImageFile(string cardId)
     {
-        var file = await FileDialogs.OpenDiskImageFileAsync();
+        var file = await _fileDialogs.OpenDiskImageFileAsync();
 
         if (file.Count == 0)
         {

@@ -16,6 +16,7 @@ using OldBit.Spectron.Debugger;
 using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Debugger.Messages;
 using OldBit.Spectron.Debugger.ViewModels;
+using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Beta128;
@@ -49,6 +50,7 @@ public partial class MainViewModel : ObservableObject
     private const string DefaultTitle = "Spectron - ZX Spectrum Emulator";
 
     private readonly EmulatorFactory _emulatorFactory;
+    private readonly FileDialogs _fileDialogs;
     private readonly TimeMachine _timeMachine;
     private readonly GamepadManager _gamepadManager;
 
@@ -66,7 +68,7 @@ public partial class MainViewModel : ObservableObject
     private readonly KeyboardHandler _keyboardHandler;
     private readonly Stopwatch _renderStopwatch = new();
     private readonly FrameRateCalculator _frameRateCalculator = new();
-    private readonly ScreenshotViewModel _screenshotViewModel = new();
+    private readonly ScreenshotViewModel _screenshotViewModel;
 
     private Emulator? Emulator { get; set; }
     private FrameBufferConverter? _frameBufferConverter;
@@ -325,6 +327,7 @@ public partial class MainViewModel : ObservableObject
 
     public MainViewModel(
         EmulatorFactory emulatorFactory,
+        FileDialogs fileDialogs,
         TimeMachine timeMachine,
         GamepadManager gamepadManager,
         SnapshotManager snapshotManager,
@@ -347,6 +350,7 @@ public partial class MainViewModel : ObservableObject
         ILogger<MainViewModel> logger)
     {
         _emulatorFactory = emulatorFactory;
+        _fileDialogs = fileDialogs;
         _timeMachine = timeMachine;
         _gamepadManager = gamepadManager;
         _snapshotManager = snapshotManager;
@@ -366,6 +370,7 @@ public partial class MainViewModel : ObservableObject
         MicrodriveMenuViewModel = microdriveMenuViewModel;
         DiskDriveMenuViewModel = diskDriveMenuViewModel;
         recentFilesViewModel.OpenRecentFileAsync = async fileName => await HandleLoadFileAsync(fileName);
+        _screenshotViewModel = new ScreenshotViewModel(fileDialogs);
 
         tapeManager.TapeChanged += HandleTapeTapeChanged;
         microdriveManager.CartridgeChanged += HandleCartridgeChanged;

@@ -13,7 +13,7 @@ namespace OldBit.Spectron.ViewModels;
 
 public record ScreenViewModel(byte[] Data);
 
-public partial class ScreenshotViewModel : ObservableObject
+public partial class ScreenshotViewModel(FileDialogs fileDialogs) : ObservableObject
 {
     public Window? Window { get; set; }
 
@@ -27,7 +27,7 @@ public partial class ScreenshotViewModel : ObservableObject
     {
         try
         {
-            var file = await FileDialogs.SaveImageAsync("Save Screenshot", Window, "screen.png");
+            var file = await fileDialogs.SaveImageAsync("Save Screenshot", Window, "screen.png");
 
             if (file != null)
             {

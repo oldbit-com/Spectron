@@ -58,7 +58,7 @@ public class Program
     private static AppBuilder BuildAvaloniaApp(IServiceProvider services) => AppBuilder
         .Configure<App>()
         .UsePlatformDetect()
-        .AfterSetup(app => ((App?)app.Instance)?.ServiceProvider = services)
+        .AfterSetup(_ => App.ServiceProvider = services)
         .LogToConsole(services.GetRequiredService<ILogger<Program>>());
 
 #if DEBUG

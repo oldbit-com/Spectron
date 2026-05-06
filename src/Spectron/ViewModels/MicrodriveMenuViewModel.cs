@@ -12,12 +12,13 @@ namespace OldBit.Spectron.ViewModels;
 
 public partial class MicrodriveMenuViewModel : ObservableObject
 {
+    private readonly FileDialogs _fileDialogs;
     private readonly MicrodriveManager _microdriveManager;
 
     public Dictionary<MicrodriveId, Observable<string>> EjectCommandHeadings { get; } = new();
     public Dictionary<MicrodriveId, Observable<bool>> IsWriteProtected { get; } = new();
 
-    public MicrodriveMenuViewModel(MicrodriveManager microdriveManager)
+    public MicrodriveMenuViewModel(FileDialogs fileDialogs, MicrodriveManager microdriveManager)
     {
         foreach (var drive in Enum.GetValues<MicrodriveId>())
         {
@@ -25,6 +26,7 @@ public partial class MicrodriveMenuViewModel : ObservableObject
             IsWriteProtected.Add(drive, new Observable<bool>(false));
         }
 
+        _fileDialogs = fileDialogs;
         _microdriveManager = microdriveManager;
         _microdriveManager.CartridgeChanged += OnCartridgeChanged;
     }
@@ -70,7 +72,7 @@ public partial class MicrodriveMenuViewModel : ObservableObject
     {
         try
         {
-            var files = await FileDialogs.OpenMicrodriveFileAsync();
+            var files = await _fileDialogs.OpenMicrodriveFileAsync();
 
             if (files.Count == 0)
             {
@@ -100,7 +102,7 @@ public partial class MicrodriveMenuViewModel : ObservableObject
 
         try
         {
-            var file = await FileDialogs.SaveMicrodriveFileAsync(Path.GetFileNameWithoutExtension(cartridge.FilePath));
+            var file = await _fileDialogs.SaveMicrodriveFileAsync(Path.GetFileNameWithoutExtension(cartridge.FilePath));
 
             if (file == null)
             {

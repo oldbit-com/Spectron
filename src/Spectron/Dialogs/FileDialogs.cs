@@ -5,11 +5,11 @@ using Avalonia.Platform.Storage;
 
 namespace OldBit.Spectron.Dialogs;
 
-public static class FileDialogs
+public sealed class FileDialogs(IFileDialogProvider fileDialogProvider)
 {
-    public static Window MainWindow { get; set; } = null!;
+    public static Window? MainWindow { get; set; }
 
-    public static async Task<IReadOnlyList<IStorageFile>> OpenEmulatorFileAsync() =>
+    public async Task<IReadOnlyList<IStorageFile>> OpenEmulatorFileAsync() =>
         await OpenFileAsync("Select File",
         [
             FilePickerType.All,
@@ -30,7 +30,7 @@ public static class FileDialogs
             FilePickerType.Scl,
         ]);
 
-    public static async Task<IReadOnlyList<IStorageFile>> OpenTapeFileAsync() =>
+    public async Task<IReadOnlyList<IStorageFile>> OpenTapeFileAsync() =>
         await OpenFileAsync("Select Tape File",
         [
             FilePickerType.TapeFiles,
@@ -38,7 +38,7 @@ public static class FileDialogs
             FilePickerType.Tzx
         ]);
 
-    public static async Task<IReadOnlyList<IStorageFile>> OpenCustomRomFileAsync() =>
+    public async Task<IReadOnlyList<IStorageFile>> OpenCustomRomFileAsync() =>
         await OpenFileAsync("Select Custom ROM File",
         [
             FilePickerType.Rom,
@@ -46,21 +46,21 @@ public static class FileDialogs
             FilePickerType.Any,
         ]);
 
-    public static async Task<IReadOnlyList<IStorageFile>> OpenDiskImageFileAsync() =>
+    public async Task<IReadOnlyList<IStorageFile>> OpenDiskImageFileAsync() =>
         await OpenFileAsync("Select Disk Image",
         [
             FilePickerType.Img,
             FilePickerType.Any,
         ]);
 
-    public static async Task<IReadOnlyList<IStorageFile>> OpenMicrodriveFileAsync() =>
+    public async Task<IReadOnlyList<IStorageFile>> OpenMicrodriveFileAsync() =>
         await OpenFileAsync("Select Microdrive File",
         [
             FilePickerType.Mdr,
             FilePickerType.Any,
         ]);
 
-    public static async Task<IReadOnlyList<IStorageFile>> OpenDiskFileAsync() =>
+    public async Task<IReadOnlyList<IStorageFile>> OpenDiskFileAsync() =>
         await OpenFileAsync("Select Disk File",
         [
             FilePickerType.DiskFiles,
@@ -69,153 +69,113 @@ public static class FileDialogs
             FilePickerType.Any,
         ]);
 
-    public static async Task<IStorageFile?> SaveTapeFileAsync(string? suggestedFileName = null)
+    public async Task<IStorageFile?> SaveTapeFileAsync(string? suggestedFileName = null)
     {
-        var topLevel = TopLevel.GetTopLevel(MainWindow);
-
-        if (topLevel == null)
-        {
-            return null;
-        }
-
-        return await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        var options = new FilePickerSaveOptions
         {
             Title = "Save Tape File",
             DefaultExtension = ".tzx",
             SuggestedFileName = suggestedFileName,
             ShowOverwritePrompt = true,
             FileTypeChoices = [FilePickerType.Tzx, FilePickerType.Tap]
-        });
+        };
+
+        return await fileDialogProvider.SaveFilePickerAsync(MainWindow, options);
     }
 
-    public static async Task<IStorageFile?> SaveMicrodriveFileAsync(string? suggestedFileName = null)
+    public async Task<IStorageFile?> SaveMicrodriveFileAsync(string? suggestedFileName = null)
     {
-        var topLevel = TopLevel.GetTopLevel(MainWindow);
-
-        if (topLevel == null)
-        {
-            return null;
-        }
-
-        return await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        var options = new FilePickerSaveOptions
         {
             Title = "Save Microdrive File",
             DefaultExtension = ".mdr",
             SuggestedFileName = suggestedFileName,
             ShowOverwritePrompt = true,
             FileTypeChoices = [FilePickerType.Mdr]
-        });
+        };
+
+        return await fileDialogProvider.SaveFilePickerAsync(MainWindow, options);
     }
 
-    public static async Task<IStorageFile?> SaveDiskFileAsync(string? suggestedFileName = null)
+    public async Task<IStorageFile?> SaveDiskFileAsync(string? suggestedFileName = null)
     {
-        var topLevel = TopLevel.GetTopLevel(MainWindow);
-
-        if (topLevel == null)
-        {
-            return null;
-        }
-
-        return await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        var options = new FilePickerSaveOptions
         {
             Title = "Save Disk File",
             DefaultExtension = ".trd",
             SuggestedFileName = suggestedFileName,
             ShowOverwritePrompt = true,
             FileTypeChoices = [FilePickerType.Trd, FilePickerType.Scl]
-        });
+        };
+
+        return await fileDialogProvider.SaveFilePickerAsync(MainWindow, options);
     }
 
-    public static async Task<IStorageFile?> SaveSnapshotFileAsync(string? suggestedFileName = null)
+    public async Task<IStorageFile?> SaveSnapshotFileAsync(string? suggestedFileName = null)
     {
-        var topLevel = TopLevel.GetTopLevel(MainWindow);
-
-        if (topLevel == null)
-        {
-            return null;
-        }
-
-        return await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        var options = new FilePickerSaveOptions
         {
             Title = "Save Snapshot File",
             DefaultExtension = ".spectron",
             SuggestedFileName = suggestedFileName,
             ShowOverwritePrompt = true,
             FileTypeChoices = [FilePickerType.Spectron, FilePickerType.Szx, FilePickerType.Z80, FilePickerType.Sna],
-        });
+        };
+
+        return await fileDialogProvider.SaveFilePickerAsync(MainWindow, options);
     }
 
-    public static async Task<IStorageFile?> SaveAudioFileAsync(string? suggestedFileName = null)
+    public async Task<IStorageFile?> SaveAudioFileAsync(string? suggestedFileName = null)
     {
-        var topLevel = TopLevel.GetTopLevel(MainWindow);
-
-        if (topLevel == null)
-        {
-            return null;
-        }
-
-        return await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        var options = new FilePickerSaveOptions
         {
             Title = "Save Audio File",
             DefaultExtension = ".wav",
             SuggestedFileName = suggestedFileName,
             ShowOverwritePrompt = true,
             FileTypeChoices = [FilePickerType.Wav],
-        });
+        };
+
+        return await fileDialogProvider.SaveFilePickerAsync(MainWindow, options);
     }
 
-    public static async Task<IStorageFile?> SaveVideoFileAsync(string? suggestedFileName = null)
+    public async Task<IStorageFile?> SaveVideoFileAsync(string? suggestedFileName = null)
     {
-        var topLevel = TopLevel.GetTopLevel(MainWindow);
-
-        if (topLevel == null)
-        {
-            return null;
-        }
-
-        return await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        var options = new FilePickerSaveOptions
         {
             Title = "Save Video File",
             DefaultExtension = ".mp4",
             SuggestedFileName = suggestedFileName,
             ShowOverwritePrompt = true,
             FileTypeChoices = [FilePickerType.Mp4],
-        });
+        };
+
+        return await fileDialogProvider.SaveFilePickerAsync(MainWindow, options);
     }
 
-    public static async Task<IStorageFile?> SaveImageAsync(string title, Control? owner, string? suggestedFileName = null)
+    public async Task<IStorageFile?> SaveImageAsync(string title, Control? owner, string? suggestedFileName = null)
     {
-        var topLevel = owner != null ? TopLevel.GetTopLevel(owner) : TopLevel.GetTopLevel(MainWindow);
-
-        if (topLevel == null)
-        {
-            return null;
-        }
-
-        return await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        var options = new FilePickerSaveOptions
         {
             Title = title,
             DefaultExtension = ".png",
             SuggestedFileName = suggestedFileName,
             ShowOverwritePrompt = true,
             FileTypeChoices = [FilePickerType.Png],
-        });
+        };
+
+        return await fileDialogProvider.SaveFilePickerAsync(owner, options);
     }
 
-    private static async Task<IReadOnlyList<IStorageFile>> OpenFileAsync(string title, IReadOnlyList<FilePickerFileType> fileTypes)
+    private async Task<IReadOnlyList<IStorageFile>> OpenFileAsync(string title, IReadOnlyList<FilePickerFileType> fileTypes)
     {
-        var topLevel = TopLevel.GetTopLevel(MainWindow);
-
-        if (topLevel == null)
-        {
-            return [];
-        }
-
-        return await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        var options = new FilePickerOpenOptions
         {
             Title = title,
             AllowMultiple = false,
             FileTypeFilter = fileTypes
-        });
+        };
+
+        return await fileDialogProvider.OpenFilePickerAsync(MainWindow, options);
     }
 }

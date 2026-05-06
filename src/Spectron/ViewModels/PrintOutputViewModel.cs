@@ -19,6 +19,7 @@ public partial class PrintOutputViewModel : ObservableObject
     private static readonly Color White = new(0xD8, 0xD8, 0xD8);
     private static readonly byte[] Masks = [0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01];
 
+    private readonly FileDialogs _fileDialogs;
     private readonly ZxPrinter _printer;
     private int _height;
 
@@ -27,8 +28,9 @@ public partial class PrintOutputViewModel : ObservableObject
 
     public Control? PreviewControl { get; set; }
 
-    public PrintOutputViewModel(ZxPrinter printer)
+    public PrintOutputViewModel(FileDialogs fileDialogs, ZxPrinter printer)
     {
+        _fileDialogs = fileDialogs;
         _printer = printer;
         UpdatePreview();
     }
@@ -45,7 +47,7 @@ public partial class PrintOutputViewModel : ObservableObject
     {
         try
         {
-            var file = await FileDialogs.SaveImageAsync("Save Printout", PreviewControl, "printout.png");
+            var file = await _fileDialogs.SaveImageAsync("Save Printout", PreviewControl, "printout.png");
 
             if (file != null)
             {

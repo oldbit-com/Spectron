@@ -13,7 +13,7 @@ namespace OldBit.Spectron;
 
 public class App : Application
 {
-    internal IServiceProvider? ServiceProvider { get; set; }
+    internal static IServiceProvider ServiceProvider { get; set; } = null!;
     private MainViewModel? MainViewModel { get; set; }
 
     public override void Initialize()
@@ -30,7 +30,7 @@ public class App : Application
         if (ApplicationLifetime is ClassicDesktopStyleApplicationLifetime desktop)
         {
             MainViewModel = ServiceProvider!.GetRequiredService<MainViewModel>();
-            desktop.MainWindow = new MainWindow { DataContext = MainViewModel };
+            desktop.MainWindow = new MainWindow(ServiceProvider) { DataContext = MainViewModel };
 
             var lifetime = new ApplicationLifetimeHelper(this, desktop.MainWindow);
 
