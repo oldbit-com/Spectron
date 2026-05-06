@@ -27,7 +27,7 @@ public partial class ScreenshotViewModel(FileDialogs fileDialogs) : ObservableOb
     {
         try
         {
-            var file = await fileDialogs.SaveImageAsync("Save Screenshot", Window, "screen.png");
+            var file = await fileDialogs.SaveImageAsync("Save Screenshot", "screen.png");
 
             if (file != null)
             {

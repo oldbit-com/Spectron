@@ -1,17 +1,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 
 namespace OldBit.Spectron.Dialogs;
 
 public sealed class FileDialogs(IFileDialogProvider fileDialogProvider)
 {
-    public static Window? MainWindow { get; set; }
-
     public async Task<IReadOnlyList<IStorageFile>> OpenEmulatorFileAsync() =>
-        await OpenFileAsync("Select File",
-        [
+        await OpenFileAsync("Select File", [
             FilePickerType.All,
             FilePickerType.TapeFiles,
             FilePickerType.SnapshotFiles,
@@ -31,38 +27,33 @@ public sealed class FileDialogs(IFileDialogProvider fileDialogProvider)
         ]);
 
     public async Task<IReadOnlyList<IStorageFile>> OpenTapeFileAsync() =>
-        await OpenFileAsync("Select Tape File",
-        [
+        await OpenFileAsync("Select Tape File", [
             FilePickerType.TapeFiles,
             FilePickerType.Tap,
             FilePickerType.Tzx
         ]);
 
     public async Task<IReadOnlyList<IStorageFile>> OpenCustomRomFileAsync() =>
-        await OpenFileAsync("Select Custom ROM File",
-        [
+        await OpenFileAsync("Select Custom ROM File", [
             FilePickerType.Rom,
             FilePickerType.Bin,
             FilePickerType.Any,
         ]);
 
     public async Task<IReadOnlyList<IStorageFile>> OpenDiskImageFileAsync() =>
-        await OpenFileAsync("Select Disk Image",
-        [
+        await OpenFileAsync("Select Disk Image", [
             FilePickerType.Img,
             FilePickerType.Any,
         ]);
 
     public async Task<IReadOnlyList<IStorageFile>> OpenMicrodriveFileAsync() =>
-        await OpenFileAsync("Select Microdrive File",
-        [
+        await OpenFileAsync("Select Microdrive File", [
             FilePickerType.Mdr,
             FilePickerType.Any,
         ]);
 
     public async Task<IReadOnlyList<IStorageFile>> OpenDiskFileAsync() =>
-        await OpenFileAsync("Select Disk File",
-        [
+        await OpenFileAsync("Select Disk File", [
             FilePickerType.DiskFiles,
             FilePickerType.Trd,
             FilePickerType.Scl,
@@ -80,7 +71,7 @@ public sealed class FileDialogs(IFileDialogProvider fileDialogProvider)
             FileTypeChoices = [FilePickerType.Tzx, FilePickerType.Tap]
         };
 
-        return await fileDialogProvider.SaveFilePickerAsync(MainWindow, options);
+        return await fileDialogProvider.SaveFilePickerAsync(options);
     }
 
     public async Task<IStorageFile?> SaveMicrodriveFileAsync(string? suggestedFileName = null)
@@ -94,7 +85,7 @@ public sealed class FileDialogs(IFileDialogProvider fileDialogProvider)
             FileTypeChoices = [FilePickerType.Mdr]
         };
 
-        return await fileDialogProvider.SaveFilePickerAsync(MainWindow, options);
+        return await fileDialogProvider.SaveFilePickerAsync(options);
     }
 
     public async Task<IStorageFile?> SaveDiskFileAsync(string? suggestedFileName = null)
@@ -108,7 +99,7 @@ public sealed class FileDialogs(IFileDialogProvider fileDialogProvider)
             FileTypeChoices = [FilePickerType.Trd, FilePickerType.Scl]
         };
 
-        return await fileDialogProvider.SaveFilePickerAsync(MainWindow, options);
+        return await fileDialogProvider.SaveFilePickerAsync(options);
     }
 
     public async Task<IStorageFile?> SaveSnapshotFileAsync(string? suggestedFileName = null)
@@ -122,7 +113,7 @@ public sealed class FileDialogs(IFileDialogProvider fileDialogProvider)
             FileTypeChoices = [FilePickerType.Spectron, FilePickerType.Szx, FilePickerType.Z80, FilePickerType.Sna],
         };
 
-        return await fileDialogProvider.SaveFilePickerAsync(MainWindow, options);
+        return await fileDialogProvider.SaveFilePickerAsync(options);
     }
 
     public async Task<IStorageFile?> SaveAudioFileAsync(string? suggestedFileName = null)
@@ -136,7 +127,7 @@ public sealed class FileDialogs(IFileDialogProvider fileDialogProvider)
             FileTypeChoices = [FilePickerType.Wav],
         };
 
-        return await fileDialogProvider.SaveFilePickerAsync(MainWindow, options);
+        return await fileDialogProvider.SaveFilePickerAsync(options);
     }
 
     public async Task<IStorageFile?> SaveVideoFileAsync(string? suggestedFileName = null)
@@ -150,10 +141,10 @@ public sealed class FileDialogs(IFileDialogProvider fileDialogProvider)
             FileTypeChoices = [FilePickerType.Mp4],
         };
 
-        return await fileDialogProvider.SaveFilePickerAsync(MainWindow, options);
+        return await fileDialogProvider.SaveFilePickerAsync(options);
     }
 
-    public async Task<IStorageFile?> SaveImageAsync(string title, Control? owner, string? suggestedFileName = null)
+    public async Task<IStorageFile?> SaveImageAsync(string title, string? suggestedFileName = null)
     {
         var options = new FilePickerSaveOptions
         {
@@ -164,7 +155,7 @@ public sealed class FileDialogs(IFileDialogProvider fileDialogProvider)
             FileTypeChoices = [FilePickerType.Png],
         };
 
-        return await fileDialogProvider.SaveFilePickerAsync(owner, options);
+        return await fileDialogProvider.SaveFilePickerAsync(options);
     }
 
     private async Task<IReadOnlyList<IStorageFile>> OpenFileAsync(string title, IReadOnlyList<FilePickerFileType> fileTypes)
@@ -176,6 +167,6 @@ public sealed class FileDialogs(IFileDialogProvider fileDialogProvider)
             FileTypeFilter = fileTypes
         };
 
-        return await fileDialogProvider.OpenFilePickerAsync(MainWindow, options);
+        return await fileDialogProvider.OpenFilePickerAsync(options);
     }
 }

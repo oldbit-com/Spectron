@@ -47,7 +47,7 @@ public partial class PrintOutputViewModel : ObservableObject
     {
         try
         {
-            var file = await _fileDialogs.SaveImageAsync("Save Printout", PreviewControl, "printout.png");
+            var file = await _fileDialogs.SaveImageAsync("Save Printout", "printout.png");
 
             if (file != null)
             {

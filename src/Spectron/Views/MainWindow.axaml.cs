@@ -176,7 +176,6 @@ public partial class MainWindow : Window
         _mainViewModel.ScreenControl = ScreenImage;
         _mainViewModel.MainMenu = MainMenu;
 
-        FileDialogs.MainWindow = this;
         MessageDialogs.MainWindow = this;
         viewModel.MainWindow = this;
         viewModel.NotificationManager = NotificationManager;
