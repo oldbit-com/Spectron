@@ -4,6 +4,7 @@ using NSubstitute;
 using OldBit.Spectron.Debugger.Extensions;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation.DependencyInjection;
+using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Snapshot.Stores;
 using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Files.Sna;
@@ -30,6 +31,8 @@ internal sealed class MainViewModelBuilder
 
         var mockApplicationDataService = Substitute.For<IApplicationDataService>();
         _services.AddSingleton(mockApplicationDataService);
+
+        AudioManager.UseSilentAudioPlayer = true;
     }
 
     internal MainViewModelBuilder WithMessageDialogs(Action<string>? onMessage = null)
