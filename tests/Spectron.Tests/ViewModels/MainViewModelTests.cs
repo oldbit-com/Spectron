@@ -1,16 +1,12 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
-using Microsoft.Extensions.DependencyInjection;
-using OldBit.Spectron.Debugger.Extensions;
 using OldBit.Spectron.Emulation;
-using OldBit.Spectron.Emulation.DependencyInjection;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Rom;
+using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Emulation.Tape;
-using OldBit.Spectron.Logging;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Screen;
-using OldBit.Spectron.Services;
 using OldBit.Spectron.ViewModels;
 
 namespace OldBit.Spectron.Tests.ViewModels;
@@ -18,23 +14,17 @@ namespace OldBit.Spectron.Tests.ViewModels;
 public class MainViewModelTests
 {
     private readonly MainViewModel _viewModel;
+    private StateSnapshot? _stateSnapshot;
 
     public MainViewModelTests()
     {
-        var services = new ServiceCollection();
-        services.AddServices();
-        services.AddViewModels();
-        services.AddEmulation();
-        services.AddDebugging();
-        services.AddLogging();
-        services.AddSingleton<ILogStore, InMemoryLogStore>();
+        var snapshotUri = new Uri("file:///path/file.spectron");
 
-        var applicationDataService = NSubstitute.Substitute.For<IApplicationDataService>();
-        services.AddSingleton(applicationDataService);
+        var builder = new MainViewModelBuilder()
+            .WithSaveFilePicker(snapshotUri)
+            .WithStateSnapshotStore(snapshotUri, snapshot => _stateSnapshot = snapshot);
 
-        var provider = services.BuildServiceProvider();
-
-        _viewModel = provider.GetRequiredService<MainViewModel>();
+        _viewModel = builder.Build();
     }
 
     [Fact]
@@ -68,13 +58,44 @@ public class MainViewModelTests
     }
 
     [AvaloniaFact]
-    public async Task Test()
+    public async Task ShouldChangeRom()
     {
         await _viewModel.ChangeRomCommand.ExecuteAsync(RomType.Harston);
 
-        _viewModel.SpectrumScreen.ShouldNotBeNull();
+        //_viewModel.SpectrumScreen.ShouldNotBeNull();
         _viewModel.StatusBarViewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
 
         await _viewModel.SaveFileCommand.ExecuteAsync(null);
+
+        _stateSnapshot?.CustomRom?.RomType.ShouldBe(RomType.Harston);
+    }
+
+    [AvaloniaFact]
+    public async Task ShouldChangeComputerType()
+    {
+        _viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Timex2048);
+
+        //_viewModel.SpectrumScreen.ShouldNotBeNull();
+        _viewModel.StatusBarViewModel.ComputerType.ShouldBe(ComputerType.Timex2048);
+
+        await _viewModel.SaveFileCommand.ExecuteAsync(null);
+
+        _stateSnapshot?.ComputerType.ShouldBe(ComputerType.Timex2048);
+    }
+
+    [AvaloniaTheory]
+    [InlineData(JoystickType.None)]
+    [InlineData(JoystickType.Cursor)]
+    [InlineData(JoystickType.Kempston)]
+    [InlineData(JoystickType.Sinclair1)]
+    [InlineData(JoystickType.Sinclair2)]
+    [InlineData(JoystickType.Fuller)]
+    public async Task ShouldChangeJoystickType(JoystickType joystickType)
+    {
+        _viewModel.ChangeJoystickTypeCommand.Execute(joystickType);
+        await _viewModel.SaveFileCommand.ExecuteAsync(null);
+
+        _stateSnapshot?.Joystick.JoystickType.ShouldBe(joystickType);
+        _viewModel.StatusBarViewModel.JoystickType.ShouldBe(joystickType);
     }
 }

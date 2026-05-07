@@ -84,7 +84,7 @@ public partial class MainViewModel : ObservableObject
     private BreakpointHandler? _breakpointHandler;
     private RzxController? _rzxController;
 
-    public Control ScreenControl { get; set; } = null!;
+    public Image ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }
     public MainMenu? MainMenu { get; set; }
     public CommandLineArgs? CommandLineArgs { get; set; }
@@ -99,7 +99,7 @@ public partial class MainViewModel : ObservableObject
 
     #region Observable properties
     [ObservableProperty]
-    public partial bool IsNativeMenuEnabled { get; set; }
+    public partial bool IsNativeMenuEnabled { get; private set; }
 
     [ObservableProperty]
     public partial bool IsMenuVisible { get; set; } = true;
