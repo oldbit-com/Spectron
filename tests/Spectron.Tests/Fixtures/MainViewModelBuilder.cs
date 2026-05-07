@@ -32,6 +32,19 @@ internal sealed class MainViewModelBuilder
         _services.AddSingleton(mockApplicationDataService);
     }
 
+    internal MainViewModelBuilder WithMessageDialogs(Action<string>? onMessage = null)
+    {
+        var mockMessageDialogs = Substitute.For<IMessageDialogs>();
+
+        mockMessageDialogs
+            .Error(Arg.Do<string>(m => onMessage?.Invoke(m)))
+            .Returns(Task.CompletedTask);
+
+        _services.AddSingleton(mockMessageDialogs);
+
+        return this;
+    }
+
     internal MainViewModelBuilder WithSaveFilePicker(Uri fileUri)
     {
         var mockStorageFile = Substitute.For<IStorageFile>();
@@ -50,7 +63,9 @@ internal sealed class MainViewModelBuilder
     internal MainViewModelBuilder WithStateSnapshotStore(Uri fileUri, Action<StateSnapshot>? onSave = null)
     {
         var mockSnapshotStore = Substitute.For<IStateSnapshotStore>();
-        mockSnapshotStore.Save(Arg.Is(fileUri.LocalPath), Arg.Do<StateSnapshot>(snapshot => onSave?.Invoke(snapshot)));
+        mockSnapshotStore.Save(
+            Arg.Is(fileUri.LocalPath),
+            Arg.Do<StateSnapshot>(snapshot => onSave?.Invoke(snapshot)));
 
         _services.AddSingleton(mockSnapshotStore);
 
@@ -60,7 +75,9 @@ internal sealed class MainViewModelBuilder
     internal MainViewModelBuilder WithSnaSnapshotStore(Uri fileUri, Action<SnaFile>? onSave = null)
     {
         var mockSnapshotStore = Substitute.For<ISnaSnapshotStore>();
-        mockSnapshotStore.Save(Arg.Is(fileUri.LocalPath), Arg.Do<SnaFile>(snapshot => onSave?.Invoke(snapshot)));
+        mockSnapshotStore.Save(
+            Arg.Is(fileUri.LocalPath),
+            Arg.Do<SnaFile>(snapshot => onSave?.Invoke(snapshot)));
 
         _services.AddSingleton(mockSnapshotStore);
 
@@ -70,7 +87,9 @@ internal sealed class MainViewModelBuilder
     internal MainViewModelBuilder WithSzxSnapshotStore(Uri fileUri, Action<SzxFile>? onSave = null)
     {
         var mockSnapshotStore = Substitute.For<ISzxSnapshotStore>();
-        mockSnapshotStore.Save(Arg.Is(fileUri.LocalPath), Arg.Do<SzxFile>(snapshot => onSave?.Invoke(snapshot)));
+        mockSnapshotStore.Save(
+            Arg.Is(fileUri.LocalPath),
+            Arg.Do<SzxFile>(snapshot => onSave?.Invoke(snapshot)));
 
         _services.AddSingleton(mockSnapshotStore);
 
@@ -80,7 +99,9 @@ internal sealed class MainViewModelBuilder
     internal MainViewModelBuilder WithZ80SnapshotStore(Uri fileUri, Action<Z80File>? onSave = null)
     {
         var mockSnapshotStore = Substitute.For<IZ80SnapshotStore>();
-        mockSnapshotStore.Save(Arg.Is(fileUri.LocalPath), Arg.Do<Z80File>(snapshot => onSave?.Invoke(snapshot)));
+        mockSnapshotStore.Save(
+            Arg.Is(fileUri.LocalPath),
+            Arg.Do<Z80File>(snapshot => onSave?.Invoke(snapshot)));
 
         _services.AddSingleton(mockSnapshotStore);
 

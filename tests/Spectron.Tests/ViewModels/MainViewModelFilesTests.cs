@@ -85,4 +85,23 @@ public class MainViewModelFilesTests
         spectronSnapshot.ShouldNotBeNull();
         spectronSnapshot.ComputerType.ShouldBe(ComputerType.Spectrum128K);
     }
+
+    [AvaloniaFact]
+    public async Task ShouldShowError_UnknownFileType()
+    {
+        var snapshotUri = new Uri("file:///path/file.unknown");
+        string? errorMessage = null;
+
+        var builder = new MainViewModelBuilder()
+            .WithMessageDialogs(message => errorMessage = message)
+            .WithSaveFilePicker(snapshotUri);
+
+        var viewModel = builder.Build();
+        viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum128K);
+
+        await viewModel.SaveFileCommand.ExecuteAsync(null);
+
+        errorMessage.ShouldNotBeNull();
+        errorMessage.ShouldBe("The file extension '.unknown' is not supported.");
+    }
 }
