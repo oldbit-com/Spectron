@@ -4,7 +4,11 @@ using NSubstitute;
 using OldBit.Spectron.Debugger.Extensions;
 using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation.DependencyInjection;
+using OldBit.Spectron.Emulation.Snapshot.Stores;
 using OldBit.Spectron.Emulation.State;
+using OldBit.Spectron.Files.Sna;
+using OldBit.Spectron.Files.Szx;
+using OldBit.Spectron.Files.Z80;
 using OldBit.Spectron.Logging;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.ViewModels;
@@ -45,10 +49,40 @@ internal sealed class MainViewModelBuilder
 
     internal MainViewModelBuilder WithStateSnapshotStore(Uri fileUri, Action<StateSnapshot>? onSave = null)
     {
-        var mockStateSnapshotStore = Substitute.For<IStateSnapshotStore>();
-        mockStateSnapshotStore.Save(Arg.Is(fileUri.LocalPath), Arg.Do<StateSnapshot>(snapshot => onSave?.Invoke(snapshot)));
+        var mockSnapshotStore = Substitute.For<IStateSnapshotStore>();
+        mockSnapshotStore.Save(Arg.Is(fileUri.LocalPath), Arg.Do<StateSnapshot>(snapshot => onSave?.Invoke(snapshot)));
 
-        _services.AddSingleton(mockStateSnapshotStore);
+        _services.AddSingleton(mockSnapshotStore);
+
+        return this;
+    }
+
+    internal MainViewModelBuilder WithSnaSnapshotStore(Uri fileUri, Action<SnaFile>? onSave = null)
+    {
+        var mockSnapshotStore = Substitute.For<ISnaSnapshotStore>();
+        mockSnapshotStore.Save(Arg.Is(fileUri.LocalPath), Arg.Do<SnaFile>(snapshot => onSave?.Invoke(snapshot)));
+
+        _services.AddSingleton(mockSnapshotStore);
+
+        return this;
+    }
+
+    internal MainViewModelBuilder WithSzxSnapshotStore(Uri fileUri, Action<SzxFile>? onSave = null)
+    {
+        var mockSnapshotStore = Substitute.For<ISzxSnapshotStore>();
+        mockSnapshotStore.Save(Arg.Is(fileUri.LocalPath), Arg.Do<SzxFile>(snapshot => onSave?.Invoke(snapshot)));
+
+        _services.AddSingleton(mockSnapshotStore);
+
+        return this;
+    }
+
+    internal MainViewModelBuilder WithZ80SnapshotStore(Uri fileUri, Action<Z80File>? onSave = null)
+    {
+        var mockSnapshotStore = Substitute.For<IZ80SnapshotStore>();
+        mockSnapshotStore.Save(Arg.Is(fileUri.LocalPath), Arg.Do<Z80File>(snapshot => onSave?.Invoke(snapshot)));
+
+        _services.AddSingleton(mockSnapshotStore);
 
         return this;
     }

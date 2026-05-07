@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Joystick;
+using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Emulation.Tape;
@@ -70,26 +71,19 @@ public class MainViewModelTests
         _stateSnapshot?.CustomRom?.RomType.ShouldBe(RomType.Harston);
     }
 
-    [AvaloniaFact]
-    public async Task ShouldChangeComputerType()
+    [AvaloniaTheory]
+    [MemberData(nameof(AllComputerTypes))]
+    public async Task ShouldChangeComputerType(ComputerType computerType)
     {
-        _viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Timex2048);
-
-        //_viewModel.SpectrumScreen.ShouldNotBeNull();
-        _viewModel.StatusBarViewModel.ComputerType.ShouldBe(ComputerType.Timex2048);
-
+        _viewModel.ChangeComputerTypeCommand.Execute(computerType);
         await _viewModel.SaveFileCommand.ExecuteAsync(null);
 
-        _stateSnapshot?.ComputerType.ShouldBe(ComputerType.Timex2048);
+        _viewModel.StatusBarViewModel.ComputerType.ShouldBe(computerType);
+        _stateSnapshot?.ComputerType.ShouldBe(computerType);
     }
 
     [AvaloniaTheory]
-    [InlineData(JoystickType.None)]
-    [InlineData(JoystickType.Cursor)]
-    [InlineData(JoystickType.Kempston)]
-    [InlineData(JoystickType.Sinclair1)]
-    [InlineData(JoystickType.Sinclair2)]
-    [InlineData(JoystickType.Fuller)]
+    [MemberData(nameof(AllJoystickTypes))]
     public async Task ShouldChangeJoystickType(JoystickType joystickType)
     {
         _viewModel.ChangeJoystickTypeCommand.Execute(joystickType);
@@ -98,4 +92,17 @@ public class MainViewModelTests
         _stateSnapshot?.Joystick.JoystickType.ShouldBe(joystickType);
         _viewModel.StatusBarViewModel.JoystickType.ShouldBe(joystickType);
     }
+
+    [AvaloniaFact]
+    public async Task ShouldChangeMouseType()
+    {
+        _viewModel.ChangeMouseTypeCommand.Execute(MouseType.Kempston);
+        await _viewModel.SaveFileCommand.ExecuteAsync(null);
+
+        _stateSnapshot?.Mouse.MouseType.ShouldBe(MouseType.Kempston);
+        _viewModel.StatusBarViewModel.IsMouseEnabled.ShouldBeTrue();
+    }
+
+    public static TheoryData<ComputerType> AllComputerTypes => new(Enum.GetValues<ComputerType>());
+    public static TheoryData<JoystickType> AllJoystickTypes => new(Enum.GetValues<JoystickType>());
 }
