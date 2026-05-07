@@ -17,5 +17,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<QuickSaveService>();
         services.AddSingleton<IFileDialogProvider, FileDialogProvider>();
         services.AddSingleton<FileDialogs>();
+        services.AddSingleton<IMessageDialogs, MessageDialogs>();
     }
 }

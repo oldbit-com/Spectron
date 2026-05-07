@@ -8,12 +8,6 @@ using Avalonia.Platform.Storage;
 
 namespace OldBit.Spectron.Dialogs;
 
-public interface IFileDialogProvider
-{
-    Task<IReadOnlyList<IStorageFile>> OpenFilePickerAsync(FilePickerOpenOptions options);
-    Task<IStorageFile?> SaveFilePickerAsync(FilePickerSaveOptions options);
-}
-
 public class FileDialogProvider : IFileDialogProvider
 {
     public async Task<IReadOnlyList<IStorageFile>> OpenFilePickerAsync(FilePickerOpenOptions options)

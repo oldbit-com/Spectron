@@ -51,6 +51,7 @@ public partial class MainViewModel : ObservableObject
 
     private readonly EmulatorFactory _emulatorFactory;
     private readonly FileDialogs _fileDialogs;
+    private readonly IMessageDialogs _messageDialogs;
     private readonly TimeMachine _timeMachine;
     private readonly GamepadManager _gamepadManager;
 
@@ -328,6 +329,7 @@ public partial class MainViewModel : ObservableObject
     public MainViewModel(
         EmulatorFactory emulatorFactory,
         FileDialogs fileDialogs,
+        IMessageDialogs messageDialogs,
         TimeMachine timeMachine,
         GamepadManager gamepadManager,
         SnapshotManager snapshotManager,
@@ -351,6 +353,7 @@ public partial class MainViewModel : ObservableObject
     {
         _emulatorFactory = emulatorFactory;
         _fileDialogs = fileDialogs;
+        _messageDialogs = messageDialogs;
         _timeMachine = timeMachine;
         _gamepadManager = gamepadManager;
         _snapshotManager = snapshotManager;
@@ -370,7 +373,7 @@ public partial class MainViewModel : ObservableObject
         MicrodriveMenuViewModel = microdriveMenuViewModel;
         DiskDriveMenuViewModel = diskDriveMenuViewModel;
         recentFilesViewModel.OpenRecentFileAsync = async fileName => await HandleLoadFileAsync(fileName);
-        _screenshotViewModel = new ScreenshotViewModel(fileDialogs);
+        _screenshotViewModel = new ScreenshotViewModel(fileDialogs, messageDialogs);
 
         tapeManager.TapeChanged += HandleTapeTapeChanged;
         microdriveManager.CartridgeChanged += HandleCartridgeChanged;

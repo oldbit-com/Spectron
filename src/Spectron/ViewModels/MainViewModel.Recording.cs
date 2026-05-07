@@ -51,7 +51,7 @@ partial class MainViewModel
         }
         catch (Exception ex)
         {
-            await MessageDialogs.Error(ex.Message);
+            await _messageDialogs.Error(ex.Message);
         }
         finally
         {
@@ -68,7 +68,7 @@ partial class MainViewModel
 
         if (!MediaRecorder.VerifyDependencies())
         {
-            await MessageDialogs.Error("Video recording is not available. It requires FFmpeg to be available.\nPlease check the documentation for more information.");
+            await _messageDialogs.Error("Video recording is not available. It requires FFmpeg to be available.\nPlease check the documentation for more information.");
 
             return;
         }
@@ -95,7 +95,7 @@ partial class MainViewModel
         }
         catch (Exception ex)
         {
-            await MessageDialogs.Error(ex.Message);
+            await _messageDialogs.Error(ex.Message);
         }
         finally
         {

@@ -274,7 +274,7 @@ partial class MainViewModel
         }
         catch (Exception ex)
         {
-            await MessageDialogs.Error(ex.Message);
+            await _messageDialogs.Error(ex.Message);
         }
 
         CreateEmulator(ComputerType, RomType, customRom);

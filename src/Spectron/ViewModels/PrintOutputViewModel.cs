@@ -20,6 +20,7 @@ public partial class PrintOutputViewModel : ObservableObject
     private static readonly byte[] Masks = [0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01];
 
     private readonly FileDialogs _fileDialogs;
+    private readonly IMessageDialogs _messageDialogs;
     private readonly ZxPrinter _printer;
     private int _height;
 
@@ -28,9 +29,13 @@ public partial class PrintOutputViewModel : ObservableObject
 
     public Control? PreviewControl { get; set; }
 
-    public PrintOutputViewModel(FileDialogs fileDialogs, ZxPrinter printer)
+    public PrintOutputViewModel(
+        FileDialogs fileDialogs,
+        IMessageDialogs messageDialogs,
+        ZxPrinter printer)
     {
         _fileDialogs = fileDialogs;
+        _messageDialogs = messageDialogs;
         _printer = printer;
         UpdatePreview();
     }
@@ -57,7 +62,7 @@ public partial class PrintOutputViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            await MessageDialogs.Error(ex.Message);
+            await _messageDialogs.Error(ex.Message);
         }
     }
 

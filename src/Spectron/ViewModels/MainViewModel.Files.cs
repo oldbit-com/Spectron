@@ -40,7 +40,7 @@ partial class MainViewModel
             var fileType = FileTypeResolver.FromPath(filePath);
             if (fileType == FileType.Unsupported)
             {
-                await MessageDialogs.Warning($"Unsupported file type: {fileType}.");
+                await _messageDialogs.Warning($"Unsupported file type: {fileType}.");
                 return;
             }
 
@@ -84,7 +84,7 @@ partial class MainViewModel
         }
         catch (Exception ex)
         {
-            await MessageDialogs.Error(ex.Message);
+            await _messageDialogs.Error(ex.Message);
             RecentFilesViewModel.Remove(filePath);
         }
         finally
@@ -106,7 +106,7 @@ partial class MainViewModel
         }
     }
 
-    private static async Task<(Stream? Stream, FileType FileType)> LoadFileAsync(string filePath, FileType fileType)
+    private async Task<(Stream? Stream, FileType FileType)> LoadFileAsync(string filePath, FileType fileType)
     {
         Stream? stream = null;
 
@@ -118,7 +118,7 @@ partial class MainViewModel
             switch (files.Count)
             {
                 case 0:
-                    await MessageDialogs.Warning("No matching files found in the archive.");
+                    await _messageDialogs.Warning("No matching files found in the archive.");
                     return (null, fileType);
 
                 case 1:
@@ -204,7 +204,7 @@ partial class MainViewModel
         }
         catch (Exception ex)
         {
-            await MessageDialogs.Error(ex.Message);
+            await _messageDialogs.Error(ex.Message);
         }
         finally
         {

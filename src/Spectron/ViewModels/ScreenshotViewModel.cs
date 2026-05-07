@@ -13,7 +13,9 @@ namespace OldBit.Spectron.ViewModels;
 
 public record ScreenViewModel(byte[] Data);
 
-public partial class ScreenshotViewModel(FileDialogs fileDialogs) : ObservableObject
+public partial class ScreenshotViewModel(
+    FileDialogs fileDialogs,
+    IMessageDialogs messageDialogs) : ObservableObject
 {
     public Window? Window { get; set; }
 
@@ -39,7 +41,7 @@ public partial class ScreenshotViewModel(FileDialogs fileDialogs) : ObservableOb
         }
         catch (Exception ex)
         {
-            await MessageDialogs.Error(ex.Message);
+            await messageDialogs.Error(ex.Message);
         }
     }
 
