@@ -69,6 +69,8 @@ partial class MainViewModel
         if (await ResumeEmulatorSession())
         {
             Emulator.ConfigureTape(_preferences.Tape);
+            Emulator.ConfigureAudio(_preferences.Audio);
+
             ApplyCommandLineArguments();
 
             return;

@@ -25,9 +25,11 @@ public partial class StatusBarViewModel : ObservableObject
     public partial string TimeElapsed { get; set; } = string.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ComputerName))]
     public partial ComputerType ComputerType { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(JoystickName))]
     public partial JoystickType JoystickType { get; set; }
 
     [ObservableProperty]
@@ -67,10 +69,8 @@ public partial class StatusBarViewModel : ObservableObject
     public partial bool IsAyEnabled { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ToolTipAy))]
     public partial StereoMode StereoMode { get; set; }
-
-    [ObservableProperty]
-    public partial string ToolTipAy { get; set; } = string.Empty;
 
     private readonly Timer _timer;
     private readonly Stopwatch _stopwatch = new();
@@ -95,6 +95,14 @@ public partial class StatusBarViewModel : ObservableObject
         _ => "Unknown"
     };
 
+    public string ToolTipAy => StereoMode switch
+    {
+        StereoMode.Mono => "AY Mono",
+        StereoMode.StereoABC => "AY Stereo ABC",
+        StereoMode.StereoACB => "AY Stereo ACB",
+        _ => "Unknown"
+    };
+
     public Action AnimateQuickSave { get; set; } = () => {};      // Body defined in code-behind
     public Action AnimateDiskActivity { get; set; } = () => {};   // Body defined in code-behind
 
@@ -103,10 +111,6 @@ public partial class StatusBarViewModel : ObservableObject
         _timer = new Timer(1000);
         _timer.Elapsed += UpdateRecordingTime;
     }
-
-    partial void OnComputerTypeChanged(ComputerType value) => OnPropertyChanged(nameof(ComputerName));
-
-    partial void OnJoystickTypeChanged(JoystickType value) => OnPropertyChanged(nameof(JoystickName));
 
     partial void OnRecordingStatusChanged(RecordingStatus value)
     {
@@ -124,17 +128,6 @@ public partial class StatusBarViewModel : ObservableObject
                 UpdateProcessingStatus(false);
                 break;
         }
-    }
-
-    partial void OnStereoModeChanged(StereoMode value)
-    {
-        ToolTipAy = value switch
-        {
-            StereoMode.Mono => "AY Mono",
-            StereoMode.StereoABC => "AY Stereo ABC",
-            StereoMode.StereoACB => "AY Stereo ACB",
-            _ => ToolTipAy
-        };
     }
 
     private void UpdateProcessingStatus(bool isActive, string message = "")
