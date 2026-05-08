@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation.TimeTravel;
 
 namespace OldBit.Spectron.Services;
@@ -14,5 +15,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<RecentFilesService>();
         services.AddSingleton<TimeMachine>();
         services.AddSingleton<QuickSaveService>();
+        services.AddSingleton<IFileDialogProvider, FileDialogProvider>();
+        services.AddSingleton<FileDialogs>();
+        services.AddSingleton<IMessageDialogs, MessageDialogs>();
     }
 }

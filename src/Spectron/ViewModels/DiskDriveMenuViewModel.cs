@@ -16,11 +16,13 @@ namespace OldBit.Spectron.ViewModels;
 public partial class DiskDriveMenuViewModel : ObservableObject
 {
     private readonly DiskDriveManager _diskDriveManager;
+    private readonly FileDialogs _fileDialogs;
+    private readonly IMessageDialogs _messageDialogs;
 
     public Dictionary<DriveId, Observable<string>> EjectCommandHeadings { get; } = new();
     public Dictionary<DriveId, Observable<bool>> IsWriteProtected { get; } = new();
 
-    public DiskDriveMenuViewModel(DiskDriveManager diskDriveManager)
+    public DiskDriveMenuViewModel(DiskDriveManager diskDriveManager, FileDialogs fileDialogs, IMessageDialogs messageDialogs)
     {
         foreach (var drive in Enum.GetValues<DriveId>())
         {
@@ -29,6 +31,8 @@ public partial class DiskDriveMenuViewModel : ObservableObject
         }
 
         _diskDriveManager = diskDriveManager;
+        _fileDialogs = fileDialogs;
+        _messageDialogs = messageDialogs;
         _diskDriveManager.DiskChanged += OnDiskChanged;
     }
 
@@ -81,7 +85,7 @@ public partial class DiskDriveMenuViewModel : ObservableObject
     {
         try
         {
-            var files = await FileDialogs.OpenDiskFileAsync();
+            var files = await _fileDialogs.OpenDiskFileAsync();
 
             if (files.Count == 0)
             {
@@ -92,7 +96,7 @@ public partial class DiskDriveMenuViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            await MessageDialogs.Error(ex.Message);
+            await _messageDialogs.Error(ex.Message);
         }
 
         NotifyCanExecuteChanged();
@@ -110,7 +114,7 @@ public partial class DiskDriveMenuViewModel : ObservableObject
 
         try
         {
-            var file = await FileDialogs.SaveDiskFileAsync(Path.GetFileNameWithoutExtension(diskImage.FilePath));
+            var file = await _fileDialogs.SaveDiskFileAsync(Path.GetFileNameWithoutExtension(diskImage.FilePath));
 
             if (file == null)
             {
@@ -124,7 +128,7 @@ public partial class DiskDriveMenuViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            await MessageDialogs.Error(ex.Message);
+            await _messageDialogs.Error(ex.Message);
         }
     }
 

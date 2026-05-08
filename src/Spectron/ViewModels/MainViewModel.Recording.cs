@@ -33,7 +33,7 @@ partial class MainViewModel
         {
             Pause();
 
-            var file = await FileDialogs.SaveAudioFileAsync();
+            var file = await _fileDialogs.SaveAudioFileAsync();
 
             if (file != null && Emulator != null)
             {
@@ -51,7 +51,7 @@ partial class MainViewModel
         }
         catch (Exception ex)
         {
-            await MessageDialogs.Error(ex.Message);
+            await _messageDialogs.Error(ex.Message);
         }
         finally
         {
@@ -68,7 +68,7 @@ partial class MainViewModel
 
         if (!MediaRecorder.VerifyDependencies())
         {
-            await MessageDialogs.Error("Video recording is not available. It requires FFmpeg to be available.\nPlease check the documentation for more information.");
+            await _messageDialogs.Error("Video recording is not available. It requires FFmpeg to be available.\nPlease check the documentation for more information.");
 
             return;
         }
@@ -77,7 +77,7 @@ partial class MainViewModel
         {
             Pause();
 
-            var file = await FileDialogs.SaveVideoFileAsync();
+            var file = await _fileDialogs.SaveVideoFileAsync();
 
             if (file != null && Emulator != null)
             {
@@ -95,7 +95,7 @@ partial class MainViewModel
         }
         catch (Exception ex)
         {
-            await MessageDialogs.Error(ex.Message);
+            await _messageDialogs.Error(ex.Message);
         }
         finally
         {

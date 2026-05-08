@@ -16,6 +16,7 @@ using OldBit.Spectron.Debugger;
 using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Debugger.Messages;
 using OldBit.Spectron.Debugger.ViewModels;
+using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Devices.Beta128;
@@ -49,6 +50,8 @@ public partial class MainViewModel : ObservableObject
     private const string DefaultTitle = "Spectron - ZX Spectrum Emulator";
 
     private readonly EmulatorFactory _emulatorFactory;
+    private readonly FileDialogs _fileDialogs;
+    private readonly IMessageDialogs _messageDialogs;
     private readonly TimeMachine _timeMachine;
     private readonly GamepadManager _gamepadManager;
 
@@ -66,9 +69,9 @@ public partial class MainViewModel : ObservableObject
     private readonly KeyboardHandler _keyboardHandler;
     private readonly Stopwatch _renderStopwatch = new();
     private readonly FrameRateCalculator _frameRateCalculator = new();
-    private readonly ScreenshotViewModel _screenshotViewModel = new();
+    private readonly ScreenshotViewModel _screenshotViewModel;
 
-    private Emulator? Emulator { get; set; }
+    internal Emulator? Emulator { get; set; }
     private FrameBufferConverter? _frameBufferConverter;
     private Preferences _preferences = new();
     private FavoritePrograms _favorites = new();
@@ -82,7 +85,7 @@ public partial class MainViewModel : ObservableObject
     private BreakpointHandler? _breakpointHandler;
     private RzxController? _rzxController;
 
-    public Control ScreenControl { get; set; } = null!;
+    public Image ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }
     public MainMenu? MainMenu { get; set; }
     public CommandLineArgs? CommandLineArgs { get; set; }
@@ -97,7 +100,7 @@ public partial class MainViewModel : ObservableObject
 
     #region Observable properties
     [ObservableProperty]
-    public partial bool IsNativeMenuEnabled { get; set; }
+    public partial bool IsNativeMenuEnabled { get; private set; }
 
     [ObservableProperty]
     public partial bool IsMenuVisible { get; set; } = true;
@@ -325,6 +328,8 @@ public partial class MainViewModel : ObservableObject
 
     public MainViewModel(
         EmulatorFactory emulatorFactory,
+        FileDialogs fileDialogs,
+        IMessageDialogs messageDialogs,
         TimeMachine timeMachine,
         GamepadManager gamepadManager,
         SnapshotManager snapshotManager,
@@ -347,6 +352,8 @@ public partial class MainViewModel : ObservableObject
         ILogger<MainViewModel> logger)
     {
         _emulatorFactory = emulatorFactory;
+        _fileDialogs = fileDialogs;
+        _messageDialogs = messageDialogs;
         _timeMachine = timeMachine;
         _gamepadManager = gamepadManager;
         _snapshotManager = snapshotManager;
@@ -366,6 +373,7 @@ public partial class MainViewModel : ObservableObject
         MicrodriveMenuViewModel = microdriveMenuViewModel;
         DiskDriveMenuViewModel = diskDriveMenuViewModel;
         recentFilesViewModel.OpenRecentFileAsync = async fileName => await HandleLoadFileAsync(fileName);
+        _screenshotViewModel = new ScreenshotViewModel(fileDialogs, messageDialogs);
 
         tapeManager.TapeChanged += HandleTapeTapeChanged;
         microdriveManager.CartridgeChanged += HandleCartridgeChanged;

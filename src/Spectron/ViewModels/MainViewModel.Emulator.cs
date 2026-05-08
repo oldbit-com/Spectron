@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Spectron.Emulation.Files;
@@ -206,7 +205,6 @@ partial class MainViewModel
         UpdateWindowTitle();
 
         return true;
-
     }
 
     private void HandleMachineReset(bool hardReset = false)
@@ -261,7 +259,7 @@ partial class MainViewModel
         {
             if (romType == RomType.Custom)
             {
-                var files = await FileDialogs.OpenCustomRomFileAsync();
+                var files = await _fileDialogs.OpenCustomRomFileAsync();
 
                 if (files.Count <= 0)
                 {
@@ -274,7 +272,7 @@ partial class MainViewModel
         }
         catch (Exception ex)
         {
-            await MessageDialogs.Error(ex.Message);
+            await _messageDialogs.Error(ex.Message);
         }
 
         CreateEmulator(ComputerType, RomType, customRom);

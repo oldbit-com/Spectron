@@ -33,11 +33,13 @@ public partial class TapeMenuViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
     public partial bool CanEject { get; set; }
 
+    private readonly FileDialogs _fileDialogs;
     private readonly TapeManager _tapeManager;
     private readonly RecentFilesViewModel _recentFilesViewModel;
 
-    public TapeMenuViewModel(TapeManager tapeManager, RecentFilesViewModel recentFilesViewModel)
+    public TapeMenuViewModel(FileDialogs fileDialogs, TapeManager tapeManager, RecentFilesViewModel recentFilesViewModel)
     {
+        _fileDialogs = fileDialogs;
         _tapeManager = tapeManager;
         _recentFilesViewModel = recentFilesViewModel;
 
@@ -50,7 +52,7 @@ public partial class TapeMenuViewModel : ObservableObject
     [RelayCommand]
     private async Task Insert()
     {
-        var files = await FileDialogs.OpenTapeFileAsync();
+        var files = await _fileDialogs.OpenTapeFileAsync();
 
         if (files.Count == 0)
         {
@@ -72,7 +74,7 @@ public partial class TapeMenuViewModel : ObservableObject
             fileName = _recentFilesViewModel.CurrentFileName;
         }
 
-        var file = await FileDialogs.SaveTapeFileAsync(Path.GetFileNameWithoutExtension(fileName));
+        var file = await _fileDialogs.SaveTapeFileAsync(Path.GetFileNameWithoutExtension(fileName));
 
         if (file == null)
         {

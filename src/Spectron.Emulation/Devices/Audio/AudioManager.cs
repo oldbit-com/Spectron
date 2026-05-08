@@ -26,6 +26,8 @@ public sealed class AudioManager
     internal BeeperDevice Beeper { get; }
     internal AyDevice Ay { get; } = new();
 
+    public static bool UseSilentAudioPlayer { get; set;}
+
     public StereoMode StereoMode
     {
         get;
@@ -186,7 +188,8 @@ public sealed class AudioManager
             new PlayerOptions
             {
                 BufferSizeInBytes = 65536,
-                BufferQueueSize = NumberOfBuffers
+                BufferQueueSize = NumberOfBuffers,
+                UseSilentAudioPlayer = UseSilentAudioPlayer
             });
 
         _audioPlayer.Volume = 100;

@@ -4,13 +4,16 @@ using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Extensions;
 using OldBit.Spectron.Messages;
 using OldBit.Spectron.Settings;
 
 namespace OldBit.Spectron.ViewModels;
 
-public partial class FavoritesViewModel : ObservableObject
+public partial class FavoritesViewModel(
+    FileDialogs fileDialogs,
+    IMessageDialogs messageDialogs) : ObservableObject
 {
     private FavoriteItemViewModel? _cutItem;
     private FavoriteItemViewModel? _copyItem;
@@ -123,18 +126,28 @@ public partial class FavoritesViewModel : ObservableObject
     private void RefreshFavorites()
     {
         Nodes.Clear();
-        Nodes.Add(new FavoriteItemViewModel { Title = "Favorites", IsFolder = true, IsRoot = true });
+        Nodes.Add(new FavoriteItemViewModel(fileDialogs, messageDialogs)
+        {
+            Title = "Favorites",
+            IsFolder = true,
+            IsRoot = true
+        });
 
         AddFavorites(Favorites.Items, Nodes[0]);
     }
 
-    private static void AddFavorites(List<FavoriteProgram> favorites, FavoriteItemViewModel parent)
+    private void AddFavorites(List<FavoriteProgram> favorites, FavoriteItemViewModel parent)
     {
         foreach (var favorite in favorites)
         {
             if (favorite.IsFolder)
             {
-                var folder = new FavoriteItemViewModel { Title = favorite.Title, IsFolder = true };
+                var folder = new FavoriteItemViewModel(fileDialogs, messageDialogs)
+                {
+                    Title = favorite.Title,
+                    IsFolder = true
+                };
+
                 parent.Nodes.Add(folder);
 
                 AddFavorites(favorite.Items, folder);
@@ -142,7 +155,7 @@ public partial class FavoritesViewModel : ObservableObject
                 continue;
             }
 
-            parent.Nodes.Add(new FavoriteItemViewModel
+            parent.Nodes.Add(new FavoriteItemViewModel(fileDialogs, messageDialogs)
             {
                 Title = favorite.Title,
                 Path = favorite.Path,
@@ -179,10 +192,18 @@ public partial class FavoritesViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteInsert))]
-    private void InsertFolder() => InsertItem(new FavoriteItemViewModel { Title = "New Folder", IsFolder = true });
+    private void InsertFolder() => InsertItem(new FavoriteItemViewModel(fileDialogs, messageDialogs)
+    {
+        Title = "New Folder",
+        IsFolder = true
+    });
 
     [RelayCommand(CanExecute = nameof(CanExecuteInsert))]
-    private void InsertItem() => InsertItem(new FavoriteItemViewModel { Title = "New File", IsFile = true });
+    private void InsertItem() => InsertItem(new FavoriteItemViewModel(fileDialogs, messageDialogs)
+    {
+        Title = "New File",
+        IsFile = true
+    });
 
     [RelayCommand(CanExecute = nameof(CanMoveItemUp))]
     private void MoveItemUp()

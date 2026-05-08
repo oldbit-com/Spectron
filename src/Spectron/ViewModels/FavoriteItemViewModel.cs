@@ -9,7 +9,9 @@ using OldBit.Spectron.Settings;
 
 namespace OldBit.Spectron.ViewModels;
 
-public partial class FavoriteItemViewModel : ObservableValidator
+public partial class FavoriteItemViewModel(
+    FileDialogs fileDialogs,
+    IMessageDialogs messageDialogs) : ObservableValidator
 {
     public ObservableCollection<FavoriteItemViewModel> Nodes { get; } = [];
 
@@ -71,7 +73,7 @@ public partial class FavoriteItemViewModel : ObservableValidator
 
     public FavoriteItemViewModel Clone()
     {
-        var copy = new FavoriteItemViewModel
+        var copy = new FavoriteItemViewModel(fileDialogs, messageDialogs)
         {
             Title = Title,
             Path = Path,
@@ -95,7 +97,7 @@ public partial class FavoriteItemViewModel : ObservableValidator
     [RelayCommand]
     private async Task GetFile()
     {
-        var files = await FileDialogs.OpenEmulatorFileAsync();
+        var files = await fileDialogs.OpenEmulatorFileAsync();
 
         if (files.Count <= 0)
         {
@@ -108,7 +110,7 @@ public partial class FavoriteItemViewModel : ObservableValidator
 
         if (fileType == FileType.Unsupported)
         {
-            await MessageDialogs.Warning($"Unsupported file type: {fileType}.");
+            await messageDialogs.Warning($"Unsupported file type: {fileType}.");
             return;
         }
 
