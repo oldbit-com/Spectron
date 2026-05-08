@@ -1,5 +1,6 @@
 using Avalonia.Headless.XUnit;
 using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.ViewModels;
 
 namespace OldBit.Spectron.Tests.ViewModels;
@@ -10,7 +11,8 @@ public class MainViewModelEmulatorTests : IDisposable
 
     public MainViewModelEmulatorTests()
     {
-        var builder = new MainViewModelBuilder();
+        var serviceProvider = new TestServiceProvider();
+        var builder = new MainViewModelBuilder(serviceProvider);
 
         _viewModel = builder.Build();
 
@@ -20,6 +22,7 @@ public class MainViewModelEmulatorTests : IDisposable
     public void Dispose()
     {
         GC.SuppressFinalize(this);
+
         _viewModel.Emulator?.Shutdown();
     }
 
@@ -30,15 +33,40 @@ public class MainViewModelEmulatorTests : IDisposable
 
         _viewModel.IsUlaPlusEnabled.ShouldBeTrue();
         _viewModel.StatusBarViewModel.IsUlaPlusEnabled.ShouldBeTrue();
-        _viewModel.Emulator.ShouldNotBeNull();
-        _viewModel.Emulator.UlaPlus.IsEnabled.ShouldBeTrue();
+        _viewModel.Emulator?.UlaPlus.IsEnabled.ShouldBeTrue();
 
         _viewModel.ToggleUlaPlusCommand.Execute(null);
 
         _viewModel.IsUlaPlusEnabled.ShouldBeFalse();
         _viewModel.StatusBarViewModel.IsUlaPlusEnabled.ShouldBeFalse();
-        _viewModel.Emulator.ShouldNotBeNull();
-        _viewModel.Emulator.UlaPlus.IsEnabled.ShouldBeFalse();
+        _viewModel.Emulator?.UlaPlus.IsEnabled.ShouldBeFalse();
+    }
+
+    [AvaloniaFact]
+    public void ShouldTogglePause()
+    {
+        _viewModel.TogglePauseCommand.Execute(null);
+
+        _viewModel.IsPaused.ShouldBeTrue();
+        _viewModel.IsPauseOverlayVisible.ShouldBeTrue();
+        _viewModel.Emulator?.IsPaused.ShouldBeTrue();
+
+        _viewModel.TogglePauseCommand.Execute(null);
+
+        _viewModel.IsPaused.ShouldBeFalse();
+        _viewModel.IsPauseOverlayVisible.ShouldBeFalse();
+        _viewModel.Emulator?.IsPaused.ShouldBeFalse();
+    }
+
+    [AvaloniaTheory]
+    [InlineData(TapeSpeed.Normal)]
+    [InlineData(TapeSpeed.Accelerated)]
+    [InlineData(TapeSpeed.Instant)]
+    public void ShouldChangeTapeLoadSpeed(TapeSpeed tapeSpeed)
+    {
+        _viewModel.SetTapeLoadSpeedCommand.Execute(tapeSpeed);
+
+        _viewModel.Emulator?.TapeManager.TapeLoadSpeed.ShouldBe(tapeSpeed);
     }
 
     private void EnsureEmulatorIsCreated() => _viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum48K);

@@ -17,7 +17,7 @@ public class MainViewModelTests : IDisposable
 
     public MainViewModelTests()
     {
-        var builder = new MainViewModelBuilder();
+        var builder = new MainViewModelBuilder(new TestServiceProvider());
 
         _viewModel = builder.Build();
 
@@ -27,6 +27,7 @@ public class MainViewModelTests : IDisposable
     public void Dispose()
     {
         GC.SuppressFinalize(this);
+
         _viewModel.Emulator?.Shutdown();
     }
 

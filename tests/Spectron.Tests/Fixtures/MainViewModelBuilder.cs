@@ -1,39 +1,27 @@
 using Avalonia.Platform.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
-using OldBit.Spectron.Debugger.Extensions;
 using OldBit.Spectron.Dialogs;
-using OldBit.Spectron.Emulation.DependencyInjection;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Snapshot.Stores;
 using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Files.Sna;
 using OldBit.Spectron.Files.Szx;
 using OldBit.Spectron.Files.Z80;
-using OldBit.Spectron.Logging;
-using OldBit.Spectron.Services;
 using OldBit.Spectron.ViewModels;
 
 namespace OldBit.Spectron.Tests.Fixtures;
 
 internal sealed class MainViewModelBuilder
 {
-    private readonly ServiceCollection _services = [];
+    private readonly TestServiceProvider _servicesProvider;
+    private IServiceCollection Services => _servicesProvider.Services;
 
     private Uri _fileUri = new("", UriKind.Relative);
 
-    internal MainViewModelBuilder()
+    internal MainViewModelBuilder(TestServiceProvider servicesProvider)
     {
-        _services.AddServices();
-        _services.AddViewModels();
-        _services.AddEmulation();
-        _services.AddDebugging();
-        _services.AddLogging();
-        _services.AddSingleton<ILogStore, InMemoryLogStore>();
-
-        var mockApplicationDataService = Substitute.For<IApplicationDataService>();
-        _services.AddSingleton(mockApplicationDataService);
-
+        _servicesProvider = servicesProvider;
         AudioManager.UseSilentAudioPlayer = true;
     }
 
@@ -45,7 +33,7 @@ internal sealed class MainViewModelBuilder
             .Error(Arg.Do<string>(m => onMessage?.Invoke(m)))
             .Returns(Task.CompletedTask);
 
-        _services.AddSingleton(mockMessageDialogs);
+        Services.AddSingleton(mockMessageDialogs);
 
         return this;
     }
@@ -61,7 +49,7 @@ internal sealed class MainViewModelBuilder
             .SaveFilePickerAsync(Arg.Any<FilePickerSaveOptions>())
             .Returns(Task.FromResult<IStorageFile?>(mockStorageFile));
 
-        _services.AddSingleton(mockDialogProvider);
+        Services.AddSingleton(mockDialogProvider);
 
         return this;
     }
@@ -77,7 +65,7 @@ internal sealed class MainViewModelBuilder
             .OpenFilePickerAsync(Arg.Any<FilePickerOpenOptions>())
             .Returns(Task.FromResult<IReadOnlyList<IStorageFile>>([mockStorageFile]));
 
-        _services.AddSingleton(mockDialogProvider);
+        Services.AddSingleton(mockDialogProvider);
 
         return this;
     }
@@ -98,7 +86,7 @@ internal sealed class MainViewModelBuilder
             Arg.Is(_fileUri.LocalPath),
             Arg.Do<StateSnapshot>(snapshot => onSave?.Invoke(snapshot)));
 
-        _services.AddSingleton(mockSnapshotStore);
+        Services.AddSingleton(mockSnapshotStore);
 
         return this;
     }
@@ -113,7 +101,7 @@ internal sealed class MainViewModelBuilder
 
         mockSnapshotStore.Load(Arg.Any<Stream>()).Returns(SnaFile.Load(_fileUri.LocalPath));
 
-        _services.AddSingleton(mockSnapshotStore);
+        Services.AddSingleton(mockSnapshotStore);
 
         return this;
     }
@@ -128,7 +116,7 @@ internal sealed class MainViewModelBuilder
 
         mockSnapshotStore.Load(Arg.Any<Stream>()).Returns(SzxFile.Load(_fileUri.LocalPath));
 
-        _services.AddSingleton(mockSnapshotStore);
+        Services.AddSingleton(mockSnapshotStore);
 
         return this;
     }
@@ -143,14 +131,14 @@ internal sealed class MainViewModelBuilder
 
         mockSnapshotStore.Load(Arg.Any<Stream>()).Returns(Z80File.Load(_fileUri.LocalPath));
 
-        _services.AddSingleton(mockSnapshotStore);
+        Services.AddSingleton(mockSnapshotStore);
 
         return this;
     }
 
     internal MainViewModel Build()
     {
-        var viewModel = _services.BuildServiceProvider().GetRequiredService<MainViewModel>();
+        var viewModel = Services.BuildServiceProvider().GetRequiredService<MainViewModel>();
 
         viewModel.ScreenControl = Substitute.For<Avalonia.Controls.Image>();
 
