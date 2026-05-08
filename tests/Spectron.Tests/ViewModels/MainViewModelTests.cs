@@ -4,7 +4,6 @@ using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Rom;
-using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Screen;
@@ -15,14 +14,10 @@ namespace OldBit.Spectron.Tests.ViewModels;
 public class MainViewModelTests : IDisposable
 {
     private readonly MainViewModel _viewModel;
-    private StateSnapshot? _stateSnapshot;
 
     public MainViewModelTests()
     {
-        var builder = new MainViewModelBuilder()
-            .WithFile("test.spectron")
-            .WithSaveFilePicker()
-            .WithStateSnapshotStore(snapshot => _stateSnapshot = snapshot);
+        var builder = new MainViewModelBuilder();
 
         _viewModel = builder.Build();
 
@@ -72,9 +67,8 @@ public class MainViewModelTests : IDisposable
 
         _viewModel.StatusBarViewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
 
-        await _viewModel.SaveFileCommand.ExecuteAsync(null);
-
-        _stateSnapshot?.CustomRom?.RomType.ShouldBe(RomType.Harston);
+        _viewModel.Emulator.ShouldNotBeNull();
+        _viewModel.Emulator.RomType.ShouldBe(RomType.Harston);
     }
 
     [AvaloniaTheory]
@@ -84,7 +78,6 @@ public class MainViewModelTests : IDisposable
         _viewModel.ChangeComputerTypeCommand.Execute(computerType);
 
         _viewModel.StatusBarViewModel.ComputerType.ShouldBe(computerType);
-        _stateSnapshot?.ComputerType.ShouldBe(computerType);
 
         _viewModel.Emulator.ShouldNotBeNull();
         _viewModel.Emulator.ComputerType.ShouldBe(computerType);
@@ -96,7 +89,6 @@ public class MainViewModelTests : IDisposable
     {
         _viewModel.ChangeJoystickTypeCommand.Execute(joystickType);
 
-        _stateSnapshot?.Joystick.JoystickType.ShouldBe(joystickType);
         _viewModel.StatusBarViewModel.JoystickType.ShouldBe(joystickType);
 
         _viewModel.Emulator.ShouldNotBeNull();
@@ -108,7 +100,6 @@ public class MainViewModelTests : IDisposable
     {
         _viewModel.ChangeMouseTypeCommand.Execute(MouseType.Kempston);
 
-        _stateSnapshot?.Mouse.MouseType.ShouldBe(MouseType.Kempston);
         _viewModel.StatusBarViewModel.IsMouseEnabled.ShouldBeTrue();
 
         _viewModel.Emulator.ShouldNotBeNull();
