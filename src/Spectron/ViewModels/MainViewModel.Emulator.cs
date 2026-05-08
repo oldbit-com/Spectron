@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Spectron.Emulation.Files;
@@ -206,7 +205,6 @@ partial class MainViewModel
         UpdateWindowTitle();
 
         return true;
-
     }
 
     private void HandleMachineReset(bool hardReset = false)
