@@ -12,7 +12,7 @@ using OldBit.Spectron.ViewModels;
 
 namespace OldBit.Spectron.Tests.ViewModels;
 
-public class MainViewModelTests
+public class MainViewModelTests : IDisposable
 {
     private readonly MainViewModel _viewModel;
     private StateSnapshot? _stateSnapshot;
@@ -25,9 +25,17 @@ public class MainViewModelTests
             .WithStateSnapshotStore(snapshot => _stateSnapshot = snapshot);
 
         _viewModel = builder.Build();
+
+        EnsureEmulatorIsCreated();
     }
 
-    [Fact]
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        _viewModel.Emulator?.Shutdown();
+    }
+
+    [AvaloniaFact]
     public void ViewModel_ShouldInitialize()
     {
         _viewModel.ShouldNotBeNull();
@@ -62,7 +70,6 @@ public class MainViewModelTests
     {
         await _viewModel.ChangeRomCommand.ExecuteAsync(RomType.Harston);
 
-        //_viewModel.SpectrumScreen.ShouldNotBeNull();
         _viewModel.StatusBarViewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
 
         await _viewModel.SaveFileCommand.ExecuteAsync(null);
@@ -72,36 +79,44 @@ public class MainViewModelTests
 
     [AvaloniaTheory]
     [MemberData(nameof(AllComputerTypes))]
-    public async Task ShouldChangeComputerType(ComputerType computerType)
+    public void ShouldChangeComputerType(ComputerType computerType)
     {
         _viewModel.ChangeComputerTypeCommand.Execute(computerType);
-        await _viewModel.SaveFileCommand.ExecuteAsync(null);
 
         _viewModel.StatusBarViewModel.ComputerType.ShouldBe(computerType);
         _stateSnapshot?.ComputerType.ShouldBe(computerType);
+
+        _viewModel.Emulator.ShouldNotBeNull();
+        _viewModel.Emulator.ComputerType.ShouldBe(computerType);
     }
 
     [AvaloniaTheory]
     [MemberData(nameof(AllJoystickTypes))]
-    public async Task ShouldChangeJoystickType(JoystickType joystickType)
+    public void ShouldChangeJoystickType(JoystickType joystickType)
     {
         _viewModel.ChangeJoystickTypeCommand.Execute(joystickType);
-        await _viewModel.SaveFileCommand.ExecuteAsync(null);
 
         _stateSnapshot?.Joystick.JoystickType.ShouldBe(joystickType);
         _viewModel.StatusBarViewModel.JoystickType.ShouldBe(joystickType);
+
+        _viewModel.Emulator.ShouldNotBeNull();
+        _viewModel.Emulator.JoystickManager.JoystickType.ShouldBe(joystickType);
     }
 
     [AvaloniaFact]
-    public async Task ShouldChangeMouseType()
+    public void ShouldChangeMouseType()
     {
         _viewModel.ChangeMouseTypeCommand.Execute(MouseType.Kempston);
-        await _viewModel.SaveFileCommand.ExecuteAsync(null);
 
         _stateSnapshot?.Mouse.MouseType.ShouldBe(MouseType.Kempston);
         _viewModel.StatusBarViewModel.IsMouseEnabled.ShouldBeTrue();
+
+        _viewModel.Emulator.ShouldNotBeNull();
+        _viewModel.Emulator.MouseManager.MouseType.ShouldBe(MouseType.Kempston);
     }
 
     public static TheoryData<ComputerType> AllComputerTypes => new(Enum.GetValues<ComputerType>());
     public static TheoryData<JoystickType> AllJoystickTypes => new(Enum.GetValues<JoystickType>());
+
+    private void EnsureEmulatorIsCreated() => _viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum48K);
 }
