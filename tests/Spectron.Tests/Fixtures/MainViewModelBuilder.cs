@@ -157,5 +157,6 @@ internal sealed class MainViewModelBuilder
         return viewModel;
     }
 
-    private static string GetTestFilePath(string fileName) => Path.Combine(Directory.GetCurrentDirectory(), $"TestFiles/{fileName}");
+    private static string GetTestFilePath(string fileName) =>
+        Path.Combine(Directory.GetCurrentDirectory(), "TestFiles", fileName);
 }
