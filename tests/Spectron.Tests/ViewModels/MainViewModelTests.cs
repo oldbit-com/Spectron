@@ -19,11 +19,10 @@ public class MainViewModelTests
 
     public MainViewModelTests()
     {
-        var snapshotUri = new Uri("file:///path/file.spectron");
-
         var builder = new MainViewModelBuilder()
-            .WithSaveFilePicker(snapshotUri)
-            .WithStateSnapshotStore(snapshotUri, snapshot => _stateSnapshot = snapshot);
+            .WithFile("test.spectron")
+            .WithSaveFilePicker()
+            .WithStateSnapshotStore(snapshot => _stateSnapshot = snapshot);
 
         _viewModel = builder.Build();
     }

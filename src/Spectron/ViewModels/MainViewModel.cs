@@ -71,7 +71,7 @@ public partial class MainViewModel : ObservableObject
     private readonly FrameRateCalculator _frameRateCalculator = new();
     private readonly ScreenshotViewModel _screenshotViewModel;
 
-    private Emulator? Emulator { get; set; }
+    internal Emulator? Emulator { get; set; }
     private FrameBufferConverter? _frameBufferConverter;
     private Preferences _preferences = new();
     private FavoritePrograms _favorites = new();

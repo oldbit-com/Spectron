@@ -20,6 +20,8 @@ internal sealed class MainViewModelBuilder
 {
     private readonly ServiceCollection _services = [];
 
+    private Uri _fileUri = new("", UriKind.Relative);
+
     internal MainViewModelBuilder()
     {
         _services.AddServices();
@@ -48,12 +50,13 @@ internal sealed class MainViewModelBuilder
         return this;
     }
 
-    internal MainViewModelBuilder WithSaveFilePicker(Uri fileUri)
+    internal MainViewModelBuilder WithSaveFilePicker()
     {
         var mockStorageFile = Substitute.For<IStorageFile>();
-        mockStorageFile.Path.Returns(fileUri);
+        mockStorageFile.Path.Returns(_fileUri);
 
         var mockDialogProvider = Substitute.For<IFileDialogProvider>();
+
         mockDialogProvider
             .SaveFilePickerAsync(Arg.Any<FilePickerSaveOptions>())
             .Returns(Task.FromResult<IStorageFile?>(mockStorageFile));
@@ -63,11 +66,36 @@ internal sealed class MainViewModelBuilder
         return this;
     }
 
-    internal MainViewModelBuilder WithStateSnapshotStore(Uri fileUri, Action<StateSnapshot>? onSave = null)
+    internal MainViewModelBuilder WithOpenFilePicker()
+    {
+        var mockStorageFile = Substitute.For<IStorageFile>();
+        mockStorageFile.Path.Returns(_fileUri);
+
+        var mockDialogProvider = Substitute.For<IFileDialogProvider>();
+
+        mockDialogProvider
+            .OpenFilePickerAsync(Arg.Any<FilePickerOpenOptions>())
+            .Returns(Task.FromResult<IReadOnlyList<IStorageFile>>([mockStorageFile]));
+
+        _services.AddSingleton(mockDialogProvider);
+
+        return this;
+    }
+
+    internal MainViewModelBuilder WithFile(string fileName)
+    {
+        var filePath = GetTestFilePath(fileName);
+        _fileUri = new Uri(filePath);
+
+        return this;
+    }
+
+    internal MainViewModelBuilder WithStateSnapshotStore(Action<StateSnapshot>? onSave = null)
     {
         var mockSnapshotStore = Substitute.For<IStateSnapshotStore>();
+
         mockSnapshotStore.Save(
-            Arg.Is(fileUri.LocalPath),
+            Arg.Is(_fileUri.LocalPath),
             Arg.Do<StateSnapshot>(snapshot => onSave?.Invoke(snapshot)));
 
         _services.AddSingleton(mockSnapshotStore);
@@ -75,36 +103,45 @@ internal sealed class MainViewModelBuilder
         return this;
     }
 
-    internal MainViewModelBuilder WithSnaSnapshotStore(Uri fileUri, Action<SnaFile>? onSave = null)
+    internal MainViewModelBuilder WithSnaSnapshotStore(Action<SnaFile>? onSave = null)
     {
         var mockSnapshotStore = Substitute.For<ISnaSnapshotStore>();
+
         mockSnapshotStore.Save(
-            Arg.Is(fileUri.LocalPath),
+            Arg.Is(_fileUri.LocalPath),
             Arg.Do<SnaFile>(snapshot => onSave?.Invoke(snapshot)));
 
+        mockSnapshotStore.Load(Arg.Any<Stream>()).Returns(SnaFile.Load(_fileUri.LocalPath));
+
         _services.AddSingleton(mockSnapshotStore);
 
         return this;
     }
 
-    internal MainViewModelBuilder WithSzxSnapshotStore(Uri fileUri, Action<SzxFile>? onSave = null)
+    internal MainViewModelBuilder WithSzxSnapshotStore(Action<SzxFile>? onSave = null)
     {
         var mockSnapshotStore = Substitute.For<ISzxSnapshotStore>();
+
         mockSnapshotStore.Save(
-            Arg.Is(fileUri.LocalPath),
+            Arg.Is(_fileUri.LocalPath),
             Arg.Do<SzxFile>(snapshot => onSave?.Invoke(snapshot)));
+
+        mockSnapshotStore.Load(Arg.Any<Stream>()).Returns(SzxFile.Load(_fileUri.LocalPath));
 
         _services.AddSingleton(mockSnapshotStore);
 
         return this;
     }
 
-    internal MainViewModelBuilder WithZ80SnapshotStore(Uri fileUri, Action<Z80File>? onSave = null)
+    internal MainViewModelBuilder WithZ80SnapshotStore(Action<Z80File>? onSave = null)
     {
         var mockSnapshotStore = Substitute.For<IZ80SnapshotStore>();
+
         mockSnapshotStore.Save(
-            Arg.Is(fileUri.LocalPath),
+            Arg.Is(_fileUri.LocalPath),
             Arg.Do<Z80File>(snapshot => onSave?.Invoke(snapshot)));
+
+        mockSnapshotStore.Load(Arg.Any<Stream>()).Returns(Z80File.Load(_fileUri.LocalPath));
 
         _services.AddSingleton(mockSnapshotStore);
 
@@ -119,4 +156,6 @@ internal sealed class MainViewModelBuilder
 
         return viewModel;
     }
+
+    private static string GetTestFilePath(string fileName) => Path.Combine(Directory.GetCurrentDirectory(), $"TestFiles/{fileName}");
 }

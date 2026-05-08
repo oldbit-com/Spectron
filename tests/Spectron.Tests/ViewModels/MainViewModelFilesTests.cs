@@ -13,12 +13,12 @@ public class MainViewModelFilesTests
     [AvaloniaFact]
     public async Task ShouldSave_SnaSnapshotFile()
     {
-        var snapshotUri = new Uri("file:///path/file.sna");
         SnaFile? snaSnapshot = null;
 
         var builder = new MainViewModelBuilder()
-            .WithSaveFilePicker(snapshotUri)
-            .WithSnaSnapshotStore(snapshotUri, snapshot => snaSnapshot = snapshot);
+            .WithFile("test.sna")
+            .WithSaveFilePicker()
+            .WithSnaSnapshotStore(snapshot => snaSnapshot = snapshot);
 
         var viewModel = builder.Build();
         viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum128K);
@@ -32,12 +32,12 @@ public class MainViewModelFilesTests
     [AvaloniaFact]
     public async Task ShouldSave_SzxSnapshotFile()
     {
-        var snapshotUri = new Uri("file:///path/file.szx");
         SzxFile? szxSnapshot = null;
 
         var builder = new MainViewModelBuilder()
-            .WithSaveFilePicker(snapshotUri)
-            .WithSzxSnapshotStore(snapshotUri, snapshot => szxSnapshot = snapshot);
+            .WithFile("test.szx")
+            .WithSaveFilePicker()
+            .WithSzxSnapshotStore(snapshot => szxSnapshot = snapshot);
 
         var viewModel = builder.Build();
         viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum128K);
@@ -51,12 +51,12 @@ public class MainViewModelFilesTests
     [AvaloniaFact]
     public async Task ShouldSave_Z80SnapshotFile()
     {
-        var snapshotUri = new Uri("file:///path/file.z80");
         Z80File? z80Snapshot = null;
 
         var builder = new MainViewModelBuilder()
-            .WithSaveFilePicker(snapshotUri)
-            .WithZ80SnapshotStore(snapshotUri, snapshot => z80Snapshot = snapshot);
+            .WithFile("test.z80")
+            .WithSaveFilePicker()
+            .WithZ80SnapshotStore(snapshot => z80Snapshot = snapshot);
 
         var viewModel = builder.Build();
         viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum128K);
@@ -70,12 +70,12 @@ public class MainViewModelFilesTests
     [AvaloniaFact]
     public async Task ShouldSave_SpectronSnapshotFile()
     {
-        var snapshotUri = new Uri("file:///path/file.spectron");
         StateSnapshot? spectronSnapshot = null;
 
         var builder = new MainViewModelBuilder()
-            .WithSaveFilePicker(snapshotUri)
-            .WithStateSnapshotStore(snapshotUri, snapshot => spectronSnapshot = snapshot);
+            .WithFile("test.spectron")
+            .WithSaveFilePicker()
+            .WithStateSnapshotStore(snapshot => spectronSnapshot = snapshot);
 
         var viewModel = builder.Build();
         viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum128K);
@@ -89,12 +89,12 @@ public class MainViewModelFilesTests
     [AvaloniaFact]
     public async Task ShouldShowError_UnknownFileType()
     {
-        var snapshotUri = new Uri("file:///path/file.unknown");
         string? errorMessage = null;
 
         var builder = new MainViewModelBuilder()
+            .WithFile("file.unknown")
             .WithMessageDialogs(message => errorMessage = message)
-            .WithSaveFilePicker(snapshotUri);
+            .WithSaveFilePicker();
 
         var viewModel = builder.Build();
         viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum128K);
@@ -103,5 +103,62 @@ public class MainViewModelFilesTests
 
         errorMessage.ShouldNotBeNull();
         errorMessage.ShouldBe("The file extension '.unknown' is not supported.");
+    }
+
+    [AvaloniaFact]
+    public async Task ShouldLoad_SnaSnapshotFile()
+    {
+        var builder = new MainViewModelBuilder()
+            .WithFile("test.sna")
+            .WithOpenFilePicker()
+            .WithSnaSnapshotStore();
+
+        var viewModel = builder.Build();
+
+        viewModel.Emulator.ShouldBeNull();
+
+        await viewModel.LoadFileCommand.ExecuteAsync(null);
+
+        viewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+        viewModel.Emulator.ShouldNotBeNull();
+        viewModel.Emulator.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+    }
+
+    [AvaloniaFact]
+    public async Task ShouldLoad_Z80SnapshotFile()
+    {
+        var builder = new MainViewModelBuilder()
+            .WithFile("test.z80")
+            .WithOpenFilePicker()
+            .WithZ80SnapshotStore();
+
+        var viewModel = builder.Build();
+
+        viewModel.Emulator.ShouldBeNull();
+
+        await viewModel.LoadFileCommand.ExecuteAsync(null);
+
+        viewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+        viewModel.Emulator.ShouldNotBeNull();
+        viewModel.Emulator.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+    }
+
+    [AvaloniaFact]
+    public async Task ShouldLoad_SzxSnapshotFile()
+    {
+        var builder = new MainViewModelBuilder()
+            .WithFile("test.szx")
+            .WithOpenFilePicker()
+            .WithSzxSnapshotStore();
+
+        var viewModel = builder.Build();
+
+        viewModel.Emulator.ShouldBeNull();
+
+        await viewModel.LoadFileCommand.ExecuteAsync(null);
+
+        viewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+        viewModel.Emulator.ShouldNotBeNull();
+        viewModel.Emulator.ComputerType.ShouldBe(ComputerType.Spectrum48K);
     }
 }
