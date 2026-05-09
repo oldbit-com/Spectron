@@ -7,7 +7,9 @@ using OldBit.Spectron.Extensions;
 
 namespace OldBit.Spectron.Services;
 
-public class ApplicationDataService(ILogger<ApplicationDataService> logger) : IApplicationDataService
+public class ApplicationDataService(
+    IEnvironmentService environmentService,
+    ILogger<ApplicationDataService> logger) : IApplicationDataService
 {
     private readonly ILogger _logger = logger;
 
@@ -55,11 +57,11 @@ public class ApplicationDataService(ILogger<ApplicationDataService> logger) : IA
         return new T();
     }
 
-    private static string GetSettingsFilePath(object settings)
+    private string GetSettingsFilePath(object settings)
     {
         var fileName = GetFileName(settings.GetType());
 
-        return GetFilePath(fileName);
+        return environmentService.GetAppDataPath(fileName);
     }
 
     private static bool TryCreateDirectory(string filePath)
@@ -84,13 +86,6 @@ public class ApplicationDataService(ILogger<ApplicationDataService> logger) : IA
         {
             return false;
         }
-    }
-
-    private static string GetFilePath(string fileName)
-    {
-        var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-
-        return Path.Join(appData, "OldBit", "Spectron", fileName);
     }
 
     private static string GetFileName(Type settingsType) => $"{settingsType.Name.ToKebabCase()}.json";

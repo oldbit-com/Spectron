@@ -7,9 +7,12 @@ using OldBit.Spectron.Emulation.State;
 namespace OldBit.Spectron.Services;
 
 public class QuickSaveService(
+    IEnvironmentService environmentService,
     IStateSnapshotStore snapshotStore,
     ILogger<QuickSaveService> logger)
 {
+    private const string QuickSaveFileName = "quick-save.spectron";
+
     private bool _isQuickSaveRequested;
 
     public void RequestQuickSave() => _isQuickSaveRequested = true;
@@ -30,7 +33,7 @@ public class QuickSaveService(
 
         try
         {
-            var quickSaveFilePath = GetQuickSaveFilePath();
+            var quickSaveFilePath = environmentService.GetAppDataPath(QuickSaveFileName);
             var snapshot = StateSnapshotManager.CreateSnapshot(emulator);
             snapshotStore.Save(quickSaveFilePath, snapshot);
 
@@ -48,7 +51,7 @@ public class QuickSaveService(
     {
         try
         {
-            var quickSaveFilePath = GetQuickSaveFilePath();
+            var quickSaveFilePath = environmentService.GetAppDataPath(QuickSaveFileName);
 
             return snapshotStore.Load(quickSaveFilePath);
         }
@@ -58,11 +61,5 @@ public class QuickSaveService(
         }
 
         return null;
-    }
-
-    private static string GetQuickSaveFilePath()
-    {
-        var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        return Path.Join(appData, "OldBit", "Spectron", "quick-save.spectron");
     }
 }
