@@ -13,14 +13,15 @@ internal sealed class TestServiceProvider
 
     internal ServiceCollection Services { get; } = [];
 
-    internal TestServiceProvider()
+    internal TestServiceProvider(ITestOutputHelper output)
     {
         Services.AddServices();
         Services.AddViewModels();
         Services.AddEmulation();
         Services.AddDebugging();
         Services.AddLogging();
-        Services.AddSingleton<ILogStore, InMemoryLogStore>();
+        Services.AddSingleton(output);
+        Services.AddSingleton<ILogStore, TestLogStore>();
     }
 
     internal ServiceProvider Build()

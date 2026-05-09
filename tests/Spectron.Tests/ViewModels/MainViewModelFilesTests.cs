@@ -5,12 +5,21 @@ using OldBit.Spectron.Files.Sna;
 using OldBit.Spectron.Files.Szx;
 using OldBit.Spectron.Files.Z80;
 using OldBit.Spectron.Files.Z80.Types;
+using OldBit.Spectron.ViewModels;
 
 namespace OldBit.Spectron.Tests.ViewModels;
 
-public class MainViewModelFilesTests
+public class MainViewModelFilesTests(ITestOutputHelper output) : IDisposable
 {
-    private readonly MainViewModelBuilder _mainViewModelBuilder = new(new TestServiceProvider());
+    private readonly MainViewModelBuilder _mainViewModelBuilder = new(new TestServiceProvider(output));
+    private MainViewModel? _viewModel;
+
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+
+        _viewModel?.Emulator?.Shutdown();
+    }
 
     [AvaloniaFact]
     public async Task ShouldSave_SnaSnapshotFile()
@@ -22,10 +31,10 @@ public class MainViewModelFilesTests
             .WithSaveFilePicker()
             .WithSnaSnapshotStore(snapshotSaved.SetResult);
 
-        var viewModel = builder.Build();
-        viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum128K);
+        _viewModel = builder.Build();
+        _viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum128K);
 
-        await viewModel.SaveFileCommand.ExecuteAsync(null);
+        await _viewModel.SaveFileCommand.ExecuteAsync(null);
         var snapshot = await snapshotSaved.Task.WaitAsync(TimeSpan.FromSeconds(1));
 
         snapshot.Header128.ShouldNotBeNull();
@@ -41,10 +50,10 @@ public class MainViewModelFilesTests
             .WithSaveFilePicker()
             .WithSzxSnapshotStore(snapshotSaved.SetResult);
 
-        var viewModel = builder.Build();
-        viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum128K);
+        _viewModel = builder.Build();
+        _viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum128K);
 
-        await viewModel.SaveFileCommand.ExecuteAsync(null);
+        await _viewModel.SaveFileCommand.ExecuteAsync(null);
         var snapshot = await snapshotSaved.Task.WaitAsync(TimeSpan.FromSeconds(1));
 
         snapshot.Header.MachineId.ShouldBe(SzxHeader.MachineId128K);
@@ -60,10 +69,10 @@ public class MainViewModelFilesTests
             .WithSaveFilePicker()
             .WithZ80SnapshotStore(snapshotSaved.SetResult);
 
-        var viewModel = builder.Build();
-        viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum128K);
+        _viewModel = builder.Build();
+        _viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum128K);
 
-        await viewModel.SaveFileCommand.ExecuteAsync(null);
+        await _viewModel.SaveFileCommand.ExecuteAsync(null);
         var snapshot = await snapshotSaved.Task.WaitAsync(TimeSpan.FromSeconds(1));
 
         snapshot.Header.HardwareMode.ShouldBe(HardwareMode.Spectrum128);
@@ -79,10 +88,10 @@ public class MainViewModelFilesTests
             .WithSaveFilePicker()
             .WithStateSnapshotStore(snapshotSaved.SetResult);
 
-        var viewModel = builder.Build();
-        viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum128K);
+        _viewModel = builder.Build();
+        _viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum128K);
 
-        await viewModel.SaveFileCommand.ExecuteAsync(null);
+        await _viewModel.SaveFileCommand.ExecuteAsync(null);
         var snapshot = await snapshotSaved.Task.WaitAsync(TimeSpan.FromSeconds(1));
 
         snapshot.ComputerType.ShouldBe(ComputerType.Spectrum128K);
@@ -98,10 +107,10 @@ public class MainViewModelFilesTests
             .WithMessageDialogs(message => errorMessage = message)
             .WithSaveFilePicker();
 
-        var viewModel = builder.Build();
-        viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum128K);
+        _viewModel = builder.Build();
+        _viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum128K);
 
-        await viewModel.SaveFileCommand.ExecuteAsync(null);
+        await _viewModel.SaveFileCommand.ExecuteAsync(null);
 
         errorMessage.ShouldNotBeNull();
         errorMessage.ShouldBe("The file extension '.unknown' is not supported.");
@@ -115,15 +124,15 @@ public class MainViewModelFilesTests
             .WithOpenFilePicker()
             .WithStateSnapshotStore();
 
-        var viewModel = builder.Build();
+        _viewModel = builder.Build();
 
-        viewModel.Emulator.ShouldBeNull();
+        _viewModel.Emulator.ShouldBeNull();
 
-        await viewModel.LoadFileCommand.ExecuteAsync(null);
+        await _viewModel.LoadFileCommand.ExecuteAsync(null);
 
-        viewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
-        viewModel.Emulator.ShouldNotBeNull();
-        viewModel.Emulator.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+        _viewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+        _viewModel.Emulator.ShouldNotBeNull();
+        _viewModel.Emulator.ComputerType.ShouldBe(ComputerType.Spectrum48K);
     }
 
     [AvaloniaFact]
@@ -134,15 +143,15 @@ public class MainViewModelFilesTests
             .WithOpenFilePicker()
             .WithSnaSnapshotStore();
 
-        var viewModel = builder.Build();
+        _viewModel = builder.Build();
 
-        viewModel.Emulator.ShouldBeNull();
+        _viewModel.Emulator.ShouldBeNull();
 
-        await viewModel.LoadFileCommand.ExecuteAsync(null);
+        await _viewModel.LoadFileCommand.ExecuteAsync(null);
 
-        viewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
-        viewModel.Emulator.ShouldNotBeNull();
-        viewModel.Emulator.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+        _viewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+        _viewModel.Emulator.ShouldNotBeNull();
+        _viewModel.Emulator.ComputerType.ShouldBe(ComputerType.Spectrum48K);
     }
 
     [AvaloniaFact]
@@ -153,15 +162,15 @@ public class MainViewModelFilesTests
             .WithOpenFilePicker()
             .WithZ80SnapshotStore();
 
-        var viewModel = builder.Build();
+        _viewModel = builder.Build();
 
-        viewModel.Emulator.ShouldBeNull();
+        _viewModel.Emulator.ShouldBeNull();
 
-        await viewModel.LoadFileCommand.ExecuteAsync(null);
+        await _viewModel.LoadFileCommand.ExecuteAsync(null);
 
-        viewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
-        viewModel.Emulator.ShouldNotBeNull();
-        viewModel.Emulator.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+        _viewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+        _viewModel.Emulator.ShouldNotBeNull();
+        _viewModel.Emulator.ComputerType.ShouldBe(ComputerType.Spectrum48K);
     }
 
     [AvaloniaFact]
@@ -172,15 +181,15 @@ public class MainViewModelFilesTests
             .WithOpenFilePicker()
             .WithSzxSnapshotStore();
 
-        var viewModel = builder.Build();
+        _viewModel = builder.Build();
 
-        viewModel.Emulator.ShouldBeNull();
+        _viewModel.Emulator.ShouldBeNull();
 
-        await viewModel.LoadFileCommand.ExecuteAsync(null);
+        await _viewModel.LoadFileCommand.ExecuteAsync(null);
 
-        viewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
-        viewModel.Emulator.ShouldNotBeNull();
-        viewModel.Emulator.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+        _viewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+        _viewModel.Emulator.ShouldNotBeNull();
+        _viewModel.Emulator.ComputerType.ShouldBe(ComputerType.Spectrum48K);
     }
 
     [AvaloniaFact]
@@ -192,10 +201,10 @@ public class MainViewModelFilesTests
             .WithFile("test.spectron")
             .WithStateSnapshotStore(snapshotSaved.SetResult, matchAnyName: true);
 
-        var viewModel = builder.Build();
-        viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum128K);
+        _viewModel = builder.Build();
+        _viewModel.ChangeComputerTypeCommand.Execute(ComputerType.Spectrum128K);
 
-        viewModel.QuickSaveCommand.Execute(null);
+        _viewModel.QuickSaveCommand.Execute(null);
 
         var snapshot = await snapshotSaved.Task.WaitAsync(TimeSpan.FromSeconds(1));
 
@@ -210,14 +219,14 @@ public class MainViewModelFilesTests
             .WithFile("quick-save.spectron")
             .WithStateSnapshotStore();
 
-        var viewModel = builder.Build();
+        _viewModel = builder.Build();
 
-        viewModel.Emulator.ShouldBeNull();
+        _viewModel.Emulator.ShouldBeNull();
 
-        viewModel.QuickLoadCommand.Execute(null);
+        _viewModel.QuickLoadCommand.Execute(null);
 
-        viewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
-        viewModel.Emulator.ShouldNotBeNull();
-        viewModel.Emulator.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+        _viewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+        _viewModel.Emulator.ShouldNotBeNull();
+        _viewModel.Emulator.ComputerType.ShouldBe(ComputerType.Spectrum48K);
     }
 }

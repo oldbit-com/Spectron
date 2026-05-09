@@ -32,7 +32,7 @@ internal sealed class EmulatorTimer : IDisposable
     {
         _cancellationTokenSource.Cancel();
 
-        _worker.Join();
+        _worker.Join(TimeSpan.FromSeconds(5));
     }
 
     internal void Pause() => IsPaused = true;

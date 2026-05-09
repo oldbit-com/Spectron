@@ -15,9 +15,9 @@ public class MainViewModelTests : IDisposable
 {
     private readonly MainViewModel _viewModel;
 
-    public MainViewModelTests()
+    public MainViewModelTests(ITestOutputHelper output)
     {
-        var builder = new MainViewModelBuilder(new TestServiceProvider());
+        var builder = new MainViewModelBuilder(new TestServiceProvider(output));
 
         _viewModel = builder.Build();
 

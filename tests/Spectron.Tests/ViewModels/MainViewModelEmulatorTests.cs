@@ -9,9 +9,9 @@ public class MainViewModelEmulatorTests : IDisposable
 {
     private readonly MainViewModel _viewModel;
 
-    public MainViewModelEmulatorTests()
+    public MainViewModelEmulatorTests(ITestOutputHelper output)
     {
-        var serviceProvider = new TestServiceProvider();
+        var serviceProvider = new TestServiceProvider(output);
         var builder = new MainViewModelBuilder(serviceProvider);
 
         _viewModel = builder.Build();

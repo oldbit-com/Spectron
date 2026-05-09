@@ -13,9 +13,9 @@ public class MainWindowTests : IDisposable
     private readonly MainWindow _mainWindow;
     private readonly MainViewModel _viewModel;
 
-    public MainWindowTests()
+    public MainWindowTests(ITestOutputHelper output)
     {
-        var servicesProvider = new TestServiceProvider();
+        var servicesProvider = new TestServiceProvider(output);
 
         AudioManager.UseSilentAudioPlayer = true;
 
