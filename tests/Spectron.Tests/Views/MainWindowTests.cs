@@ -53,6 +53,17 @@ public class MainWindowTests : IDisposable
         MachineTypeShouldBeChecked("ZX Spectrum 48");
     }
 
+    [AvaloniaFact]
+    public void ShouldExecuteSaveCommand()
+    {
+        var saveMenuItem = _mainWindow.FindMenuItem("Save Snapshot...");
+
+        saveMenuItem.ShouldNotBeNull();
+        saveMenuItem.Command.ShouldBeOfType<AsyncRelayCommand>();
+
+        saveMenuItem.Command.Execute(null);
+    }
+
     [AvaloniaTheory]
     [InlineData("ZX Spectrum 16", ComputerType.Spectrum16K)]
     [InlineData("ZX Spectrum 48", ComputerType.Spectrum48K)]
@@ -65,6 +76,8 @@ public class MainWindowTests : IDisposable
 
         _viewModel.Emulator.ShouldNotBeNull();
         _viewModel.Emulator.ComputerType.ShouldBe(computerType);
+
+        _viewModel.StatusBarViewModel.ComputerType.ShouldBe(computerType);
 
         MachineTypeShouldBeChecked(computerName);
     }

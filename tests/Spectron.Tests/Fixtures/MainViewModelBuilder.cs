@@ -78,13 +78,15 @@ internal sealed class MainViewModelBuilder
         return this;
     }
 
-    internal MainViewModelBuilder WithStateSnapshotStore(Action<StateSnapshot>? onSave = null)
+    internal MainViewModelBuilder WithStateSnapshotStore(Action<StateSnapshot>? onSave = null, bool matchAnyName = false)
     {
         var mockSnapshotStore = Substitute.For<IStateSnapshotStore>();
 
         mockSnapshotStore.Save(
-            Arg.Is(_fileUri.LocalPath),
+            matchAnyName ? Arg.Any<string>() : Arg.Is(_fileUri.LocalPath),
             Arg.Do<StateSnapshot>(snapshot => onSave?.Invoke(snapshot)));
+
+        mockSnapshotStore.Load(Arg.Any<Stream>()).Returns(new StateSnapshotStore().Load(_fileUri.LocalPath));
 
         Services.AddSingleton(mockSnapshotStore);
 
