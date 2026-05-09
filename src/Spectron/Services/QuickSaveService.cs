@@ -52,8 +52,9 @@ public class QuickSaveService(
         try
         {
             var quickSaveFilePath = environmentService.GetAppDataPath(QuickSaveFileName);
+            using var stream = File.OpenRead(quickSaveFilePath);
 
-            return snapshotStore.Load(quickSaveFilePath);
+            return snapshotStore.Load(stream);
         }
         catch (Exception ex)
         {

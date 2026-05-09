@@ -8,6 +8,7 @@ using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Files.Sna;
 using OldBit.Spectron.Files.Szx;
 using OldBit.Spectron.Files.Z80;
+using OldBit.Spectron.Services;
 using OldBit.Spectron.ViewModels;
 
 namespace OldBit.Spectron.Tests.Fixtures;
@@ -22,6 +23,18 @@ internal sealed class MainViewModelBuilder
     internal MainViewModelBuilder(TestServiceProvider servicesProvider)
     {
         _servicesProvider = servicesProvider;
+
+        var environmentService = Substitute.For<IEnvironmentService>();
+
+        environmentService.GetAppDataPath(Arg.Any<string>()).Returns(callInfo =>
+        {
+            var filePath = GetTestFilePath(callInfo.Arg<string>());
+
+            return filePath;
+        });
+
+        Services.AddSingleton(environmentService);
+
         AudioManager.UseSilentAudioPlayer = true;
     }
 

@@ -14,9 +14,9 @@ public class StateSnapshotStore : IStateSnapshotStore
 
     public StateSnapshot? Load(string filePath)
     {
-        var data = File.ReadAllBytes(filePath);
+        using var stream = File.OpenRead(filePath);
 
-        return MemoryPackSerializer.Deserialize<StateSnapshot>(data);
+        return Load(stream);
     }
 
     public StateSnapshot? Load(Stream stream)

@@ -202,4 +202,22 @@ public class MainViewModelFilesTests
         snapshot.ShouldNotBeNull();
         snapshot.ComputerType.ShouldBe(ComputerType.Spectrum128K);
     }
+
+    [AvaloniaFact]
+    public void ShouldQuickLoad()
+    {
+        var builder = _mainViewModelBuilder
+            .WithFile("quick-save.spectron")
+            .WithStateSnapshotStore();
+
+        var viewModel = builder.Build();
+
+        viewModel.Emulator.ShouldBeNull();
+
+        viewModel.QuickLoadCommand.Execute(null);
+
+        viewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+        viewModel.Emulator.ShouldNotBeNull();
+        viewModel.Emulator.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+    }
 }
