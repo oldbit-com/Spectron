@@ -34,7 +34,7 @@ public class MainWindowTests : IDisposable
     {
         GC.SuppressFinalize(this);
 
-        _viewModel.Emulator?.Shutdown();
+        _viewModel.Dispose();
     }
 
     [AvaloniaFact]

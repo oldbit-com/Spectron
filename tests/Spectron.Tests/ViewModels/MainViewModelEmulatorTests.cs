@@ -23,7 +23,7 @@ public class MainViewModelEmulatorTests : IDisposable
     {
         GC.SuppressFinalize(this);
 
-        _viewModel.Emulator?.Shutdown();
+        _viewModel.Dispose();
     }
 
     [AvaloniaFact]
