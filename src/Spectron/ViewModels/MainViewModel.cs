@@ -425,14 +425,16 @@ public partial class MainViewModel : ObservableObject
                 StatusBarViewModel.FramesPerSecond = fps.ToString();
 
                 var tapeBlockProgress = string.Empty;
+
                 if (Emulator?.TapeManager.BlockReadProgressPercentage > 0)
                 {
                     tapeBlockProgress = $"{(int)Emulator.TapeManager.BlockReadProgressPercentage}%";
                 }
 
                 StatusBarViewModel.TapeLoadProgress = tapeBlockProgress;
-            });
+            }, DispatcherPriority.Background);
         };
+
         _frameRateCalculator.Start();
 
         StatusBarViewModel.ComputerType = ComputerType;
