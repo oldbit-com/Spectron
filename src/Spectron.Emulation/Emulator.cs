@@ -177,10 +177,6 @@ public sealed class Emulator
     public void Pause()
     {
         _emulationTimer.Pause();
-
-        // Ensure that the emulator finishes the current frame before pausing
-        Thread.Sleep(75);
-
         _timeMachine.AddEntry(this);
     }
 

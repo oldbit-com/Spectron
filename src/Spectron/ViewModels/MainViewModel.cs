@@ -45,7 +45,7 @@ using MouseType = OldBit.Spectron.Emulation.Devices.Mouse.MouseType;
 
 namespace OldBit.Spectron.ViewModels;
 
-public partial class MainViewModel : ObservableObject
+public partial class MainViewModel : ObservableObject, IDisposable
 {
     private const string DefaultTitle = "Spectron - ZX Spectrum Emulator";
 
@@ -493,5 +493,13 @@ public partial class MainViewModel : ObservableObject
         _timeMachine.SnapshotInterval = timeMachineSettings.SnapshotInterval;
         _timeMachine.MaxDuration = timeMachineSettings.MaxDuration;
         TimeMachineCountdownSeconds = timeMachineSettings.CountdownSeconds;
+    }
+
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+
+        _frameRateCalculator.Dispose();
+        ShutdownEmulator();
     }
 }

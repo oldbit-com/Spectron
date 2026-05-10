@@ -11,6 +11,7 @@ internal sealed class EmulatorTimer : IDisposable
     private readonly Thread _worker;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly ManualResetEventSlim _stoppedEvent = new(initialState: false);
+    private readonly ManualResetEventSlim _pausedEvent = new(initialState: false);
 
     internal bool IsPaused { get; private set; }
     internal ThreadPriority Priority { get; set; } = ThreadPriority.AboveNormal;
@@ -34,7 +35,25 @@ internal sealed class EmulatorTimer : IDisposable
         _stoppedEvent.Wait();
     }
 
-    internal void Pause() => IsPaused = true;
+    internal void Pause()
+    {
+        _pausedEvent.Reset();
+        IsPaused = true;
+
+        if (!_worker.IsAlive)
+        {
+            return;
+        }
+
+        try
+        {
+            _pausedEvent.Wait(_cancellationTokenSource.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // Timer is stopping, ignore
+        }
+    }
 
     internal void Resume() => IsPaused = false;
 
@@ -49,7 +68,9 @@ internal sealed class EmulatorTimer : IDisposable
             {
                 if (IsPaused)
                 {
-                    Thread.Sleep(250);
+                    _pausedEvent.Set();
+
+                    Thread.Sleep(100);
 
                     stopwatch.Restart();
                     nextTrigger = Interval;
@@ -100,5 +121,6 @@ internal sealed class EmulatorTimer : IDisposable
     {
         _cancellationTokenSource.Dispose();
         _stoppedEvent.Dispose();
+        _pausedEvent.Dispose();
     }
 }
