@@ -10,9 +10,9 @@ internal sealed class EmulatorTimer : IDisposable
 {
     private readonly Thread _worker;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private readonly ManualResetEventSlim _stoppedEvent = new(initialState: false);
 
     internal bool IsPaused { get; private set; }
-    internal bool IsStopped { get; private set; }
     internal ThreadPriority Priority { get; set; } = ThreadPriority.AboveNormal;
 
     internal TimeSpan Interval { get; set; } = TimeSpan.FromMilliseconds(20);
@@ -31,8 +31,7 @@ internal sealed class EmulatorTimer : IDisposable
     internal void Stop()
     {
         _cancellationTokenSource.Cancel();
-
-        _worker.Join(TimeSpan.FromSeconds(5));
+        _stoppedEvent.Wait();
     }
 
     internal void Pause() => IsPaused = true;
@@ -41,58 +40,65 @@ internal sealed class EmulatorTimer : IDisposable
 
     private void Worker()
     {
-        IsStopped = false;
-
         var stopwatch = Stopwatch.StartNew();
         var nextTrigger = TimeSpan.Zero;
 
-        while (!_cancellationTokenSource.IsCancellationRequested)
+        try
         {
-            if (IsPaused)
-            {
-                Thread.Sleep(250);
-
-                stopwatch.Restart();
-                nextTrigger = Interval;
-
-                continue;
-            }
-
             while (!_cancellationTokenSource.IsCancellationRequested)
             {
-                var elapsed = stopwatch.Elapsed;
-
-                if (elapsed >= nextTrigger)
+                if (IsPaused)
                 {
+                    Thread.Sleep(250);
+
                     stopwatch.Restart();
                     nextTrigger = Interval;
 
-                    Elapsed?.Invoke(this, EventArgs.Empty);
-                    break;
+                    continue;
                 }
 
-                var timeToWait = nextTrigger - elapsed;
-
-                switch (timeToWait.TotalMilliseconds)
+                while (!_cancellationTokenSource.IsCancellationRequested)
                 {
-                    case < 1:
-                        Thread.SpinWait(5);
-                        break;
+                    var elapsed = stopwatch.Elapsed;
 
-                    case < 5:
-                        Thread.SpinWait(10);
-                        break;
+                    if (elapsed >= nextTrigger)
+                    {
+                        stopwatch.Restart();
+                        nextTrigger = Interval;
 
-                    case < 10:
-                        Thread.SpinWait(25);
+                        Elapsed?.Invoke(this, EventArgs.Empty);
                         break;
+                    }
+
+                    var timeToWait = nextTrigger - elapsed;
+
+                    switch (timeToWait.TotalMilliseconds)
+                    {
+                        case < 1:
+                            Thread.SpinWait(5);
+                            break;
+
+                        case < 5:
+                            Thread.SpinWait(10);
+                            break;
+
+                        case < 10:
+                            Thread.SpinWait(25);
+                            break;
+                    }
                 }
             }
         }
-
-        IsStopped = true;
-        stopwatch.Stop();
+        finally
+        {
+            stopwatch.Stop();
+            _stoppedEvent.Set();
+        }
     }
 
-    public void Dispose() => _cancellationTokenSource.Dispose();
+    public void Dispose()
+    {
+        _cancellationTokenSource.Dispose();
+        _stoppedEvent.Dispose();
+    }
 }

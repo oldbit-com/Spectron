@@ -172,11 +172,6 @@ public sealed class Emulator
 
         JoystickManager.Stop();
         DivMmc.Stop();
-
-        while (!_emulationTimer.IsStopped)
-        {
-            Thread.Sleep(TimeSpan.FromMilliseconds(50));
-        }
     }
 
     public void Pause()
