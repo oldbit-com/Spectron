@@ -31,7 +31,8 @@ The ZX Spectrum was my first computer, and I still have a deep affection for it.
 - [x] Kempston mouse emulation
 - [x] ZX Printer emulation
 - [x] Integrated tape and disk viewers
-- [x] Adjustable emulation speed
+- [x] Adjustable emulation speed (frames/second)
+- [x] Adjustable clock speed (3.5, 7, 14 and 28 MHz)
 - [x] Keyboard-based joystick emulation: Kempston, Sinclair, Cursor, and Fuller
 - [x] Audio and video recording
 - [x] Support for alternative and custom ROMs
@@ -96,6 +97,13 @@ Test programs can be found in the [Tests](https://github.com/oldbit-com/Spectron
 ## CPU Emulation
 I have developed a custom [Z80 CPU](https://github.com/oldbit-com/Z80/tree/spectron) emulator library for this project. 
 The emulation is highly accurate and supports many undocumented instructions, as well as memory and I/O contention.
+
+## Emulation Speed
+There are two options for adjusting the speed:
+- *Speed multiplier* - this option allows running the emulator at a higher or slower speed, e.g. more frames per second.
+This means that **everything** will run at selected speed.
+- *CPU clock multiplier* - this option allows running just CPU at a higher frequency. This can make some slower games more responsive.
+However, it may also cause compatibility issues with some games and programs.
 
 ## Session Persistence
 When the emulator is closed, it automatically saves its current state, which is then restored upon restart. This behavior can be toggled in the settings.
