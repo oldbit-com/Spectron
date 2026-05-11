@@ -9,7 +9,7 @@ public class AudioManagerTests
     [Fact]
     public void AudioManager_ShouldCreateCorrectly()
     {
-        var clock = new Clock();
+        var clock = new EmulatorClock(Hardware.Spectrum128K.TicksPerFrame, new Clock());
         var audionManager = new AudioManager(clock, null, Hardware.Spectrum128K, port => (port & 0x01) == 0);
 
         audionManager.IsAySupported.ShouldBeTrue();

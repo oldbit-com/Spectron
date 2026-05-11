@@ -1,5 +1,3 @@
-using OldBit.Z80Cpu;
-
 namespace OldBit.Spectron.Emulation.Devices.Audio.AY;
 
 /// <summary>
@@ -17,10 +15,10 @@ internal sealed class AyAudio
 
     private int _ayTicks;
     private long _clockStepCounter;
-    private readonly Clock _clock;
+    private readonly EmulatorClock _clock;
     private readonly AyDevice _ay;
 
-    public AyAudio(Clock clock, AyDevice ay, double statesPerSample)
+    public AyAudio(EmulatorClock clock, AyDevice ay, double statesPerSample)
     {
         _clock = clock;
         _ay = ay;
@@ -28,7 +26,7 @@ internal sealed class AyAudio
         _statesPerSample = (long)(Multiplier * statesPerSample);
         _sampleRate = statesPerSample / AyCycles;
 
-        _ay.OnUpdateAudio = () => Update(clock.FrameTicks);
+        _ay.OnUpdateAudio = () => Update(clock.UlaTicks);
     }
 
     internal void NewFrame()
@@ -40,8 +38,8 @@ internal sealed class AyAudio
 
     internal void EndFrame()
     {
-        Update(_clock.FrameTicks);
-        _ayTicks -= _clock.FrameTicks;
+        Update(_clock.UlaTicks);
+        _ayTicks -= _clock.UlaTicks;
     }
 
     internal void Reset() => _ay.Reset();
