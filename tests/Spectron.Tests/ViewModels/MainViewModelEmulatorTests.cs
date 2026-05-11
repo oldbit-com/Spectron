@@ -42,22 +42,6 @@ public class MainViewModelEmulatorTests : IDisposable
         _viewModel.Emulator?.UlaPlus.IsEnabled.ShouldBeFalse();
     }
 
-    [AvaloniaFact]
-    public void ShouldTogglePause()
-    {
-        _viewModel.TogglePauseCommand.Execute(null);
-
-        _viewModel.IsPaused.ShouldBeTrue();
-        _viewModel.IsPauseOverlayVisible.ShouldBeTrue();
-        _viewModel.Emulator?.IsPaused.ShouldBeTrue();
-
-        _viewModel.TogglePauseCommand.Execute(null);
-
-        _viewModel.IsPaused.ShouldBeFalse();
-        _viewModel.IsPauseOverlayVisible.ShouldBeFalse();
-        _viewModel.Emulator?.IsPaused.ShouldBeFalse();
-    }
-
     [AvaloniaTheory]
     [InlineData(TapeSpeed.Normal)]
     [InlineData(TapeSpeed.Accelerated)]

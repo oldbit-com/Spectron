@@ -133,6 +133,7 @@ public class MainViewModelFilesTests(ITestOutputHelper output) : IDisposable
         _viewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
         _viewModel.Emulator.ShouldNotBeNull();
         _viewModel.Emulator.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+        _viewModel.Title.ShouldBe("Spectron - ZX Spectrum Emulator [test.spectron]");
     }
 
     [AvaloniaFact]
@@ -152,6 +153,7 @@ public class MainViewModelFilesTests(ITestOutputHelper output) : IDisposable
         _viewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
         _viewModel.Emulator.ShouldNotBeNull();
         _viewModel.Emulator.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+        _viewModel.Title.ShouldBe("Spectron - ZX Spectrum Emulator [test.sna]");
     }
 
     [AvaloniaFact]
@@ -171,6 +173,7 @@ public class MainViewModelFilesTests(ITestOutputHelper output) : IDisposable
         _viewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
         _viewModel.Emulator.ShouldNotBeNull();
         _viewModel.Emulator.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+        _viewModel.Title.ShouldBe("Spectron - ZX Spectrum Emulator [test.z80]");
     }
 
     [AvaloniaFact]
@@ -190,6 +193,7 @@ public class MainViewModelFilesTests(ITestOutputHelper output) : IDisposable
         _viewModel.ComputerType.ShouldBe(ComputerType.Spectrum48K);
         _viewModel.Emulator.ShouldNotBeNull();
         _viewModel.Emulator.ComputerType.ShouldBe(ComputerType.Spectrum48K);
+        _viewModel.Title.ShouldBe("Spectron - ZX Spectrum Emulator [test.szx]");
     }
 
     [AvaloniaFact]

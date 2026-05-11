@@ -9,12 +9,7 @@ public static class ThemeManager
     {
         var app = Application.Current;
 
-        if (app == null)
-        {
-            return;
-        }
-
-        app.RequestedThemeVariant = theme switch
+        app?.RequestedThemeVariant = theme switch
         {
             Theme.Dark => ThemeVariant.Dark,
             Theme.Light => ThemeVariant.Light,
