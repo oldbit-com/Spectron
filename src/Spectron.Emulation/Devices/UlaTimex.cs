@@ -8,8 +8,9 @@ namespace OldBit.Spectron.Emulation.Devices;
 internal sealed class UlaTimex(
     KeyboardState keyboardState,
     ScreenBuffer screenBuffer,
+    EmulatorClock clock,
     Z80 cpu,
-    TapeManager tapeManager) : Ula(keyboardState, screenBuffer, cpu, tapeManager)
+    TapeManager tapeManager) : Ula(keyboardState, screenBuffer, clock, cpu, tapeManager)
 {
     private byte _lastControlValue;
 
