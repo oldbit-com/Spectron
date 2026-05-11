@@ -17,6 +17,7 @@ internal sealed record EmulatorArgs(
     ComputerType ComputerType,
     RomType RomType,
     IEmulatorMemory Memory,
+    int ClockMultiplier,
     IContentionProvider ContentionProvider);
 
 public sealed class EmulatorFactory(
@@ -29,7 +30,7 @@ public sealed class EmulatorFactory(
     CommandManager commandManager,
     ILogger<EmulatorFactory> logger)
 {
-    public Emulator Create(ComputerType computerType, RomType romType, byte[]? customRom = null)
+    public Emulator Create(ComputerType computerType, RomType romType, int clockMultiplier = 1, byte[]? customRom = null)
     {
         byte[] rom;
 
@@ -37,27 +38,27 @@ public sealed class EmulatorFactory(
         {
             case ComputerType.Spectrum16K:
                 rom = customRom ?? GetSpectrum48KRom(romType);
-                return CreateSpectrum(computerType, romType, new Memory16K(rom));
+                return CreateSpectrum(computerType, romType, new Memory16K(rom), clockMultiplier);
 
             case ComputerType.Spectrum48K:
                 rom = customRom ?? GetSpectrum48KRom(romType);
-                return CreateSpectrum(computerType, romType, new Memory48K(rom));
+                return CreateSpectrum(computerType, romType, new Memory48K(rom), clockMultiplier);
 
             case ComputerType.Spectrum128K:
                 rom = customRom != null ? customRom[..0x4000] : GetSpectrum128KRom(romType);
                 var bank1Rom = customRom?.Length == 0x8000 ? customRom[0x4000..] : RomReader.ReadRom(RomType.Original128Bank1);
-                return CreateSpectrum128K(romType, new Memory128K(rom, bank1Rom));
+                return CreateSpectrum128K(romType, new Memory128K(rom, bank1Rom), clockMultiplier);
 
             case ComputerType.Timex2048:
                 rom = customRom ?? GetTimex2048Rom(romType);
-                return CreateTimex(romType, new Memory48K(rom));
+                return CreateTimex(romType, new Memory48K(rom), clockMultiplier);
 
             default:
                 throw new ArgumentOutOfRangeException(nameof(computerType));
         }
     }
 
-    private Emulator CreateSpectrum128K(RomType romType, Memory128K memory)
+    private Emulator CreateSpectrum128K(RomType romType, Memory128K memory, int clockMultiplier)
     {
         var contentionProvider = new ContentionProvider128K(
             Hardware.Spectrum128K.ContentionStartTicks,
@@ -69,6 +70,7 @@ public sealed class EmulatorFactory(
             ComputerType.Spectrum128K,
             romType,
             memory,
+            clockMultiplier,
             contentionProvider);
 
         return new Emulator(
@@ -84,7 +86,7 @@ public sealed class EmulatorFactory(
             logger);
     }
 
-    private Emulator CreateSpectrum(ComputerType computerType, RomType romType, IEmulatorMemory memory)
+    private Emulator CreateSpectrum(ComputerType computerType, RomType romType, IEmulatorMemory memory, int clockMultiplier)
     {
         var contentionProvider = new ContentionProvider48K(
             Hardware.Spectrum48K.ContentionStartTicks,
@@ -94,6 +96,7 @@ public sealed class EmulatorFactory(
             computerType,
             romType,
             memory,
+            clockMultiplier,
             contentionProvider);
 
         return new Emulator(
@@ -109,7 +112,7 @@ public sealed class EmulatorFactory(
             logger);
     }
 
-    private Emulator CreateTimex(RomType romType, IEmulatorMemory memory)
+    private Emulator CreateTimex(RomType romType, IEmulatorMemory memory, int clockMultiplier)
     {
         var contentionProvider = new ContentionProvider48K(
             Hardware.Timex2048.ContentionStartTicks,
@@ -119,6 +122,7 @@ public sealed class EmulatorFactory(
             ComputerType.Timex2048,
             romType,
             memory,
+            clockMultiplier,
             contentionProvider);
 
         return new Emulator(

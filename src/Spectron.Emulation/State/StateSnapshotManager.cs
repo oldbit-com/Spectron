@@ -22,7 +22,7 @@ public sealed class StateSnapshotManager(EmulatorFactory emulatorFactory)
     {
         var romType = snapshot.CustomRom?.RomType ?? RomType.Original;
 
-        var emulator = emulatorFactory.Create(snapshot.ComputerType, romType, snapshot.CustomRom?.Concatenated);
+        var emulator = emulatorFactory.Create(snapshot.ComputerType, romType, customRom: snapshot.CustomRom?.Concatenated);
 
         LoadCpu(emulator.Cpu, snapshot.Cpu);
         LoadMemory(emulator.Memory, snapshot.Memory);

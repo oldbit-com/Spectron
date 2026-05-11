@@ -88,6 +88,7 @@ partial class MainViewModel
             CreateEmulator(
                 CommandLineArgs?.ComputerType ??_preferences.ComputerType,
                 CommandLineArgs?.RomType ?? _preferences.RomType,
+                ClockMultiplier,
                 customRom);
 
             Emulator.ConfigureTape(_preferences.Tape);

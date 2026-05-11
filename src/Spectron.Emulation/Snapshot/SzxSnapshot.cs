@@ -40,7 +40,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory, ISzxSnapshotSto
 
         var romType = snapshot.CustomRom?.Data != null ? RomType.Custom : RomType.Original;
 
-        var emulator = emulatorFactory.Create(computerType, romType, snapshot.CustomRom?.Data);
+        var emulator = emulatorFactory.Create(computerType, romType, customRom: snapshot.CustomRom?.Data);
 
         Update(emulator, snapshot);
 

@@ -15,6 +15,5 @@ public sealed class EmulatorClock(int ticksPerFrame, Clock clock, int multiplier
     } = multiplier;
 
     internal int TicksPerFrame = ticksPerFrame * multiplier;
-    internal int FrameTicks => clock.FrameTicks * Multiplier;
     internal int UlaTicks => clock.FrameTicks / Multiplier;
 }
