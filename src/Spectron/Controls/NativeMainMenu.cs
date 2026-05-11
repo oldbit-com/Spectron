@@ -26,6 +26,7 @@ public sealed class NativeMainMenu
     private readonly Dictionary<JoystickType, NativeMenuItem> _joystickTypes = new();
     private readonly Dictionary<MouseType, NativeMenuItem> _mouseTypes = new();
     private readonly Dictionary<string, NativeMenuItem> _emulationSpeeds = new();
+    private readonly Dictionary<string, NativeMenuItem> _clockMultipliers = new();
     private readonly Dictionary<BorderSize, NativeMenuItem> _borderSizes = new();
     private readonly Dictionary<ScreenEffect, NativeMenuItem> _screenEffects = new();
     private readonly Dictionary<TapeSpeed, NativeMenuItem> _tapeLoadingSpeeds = new();
@@ -49,6 +50,7 @@ public sealed class NativeMainMenu
         CreateJoystickTypeMenu();
         CreateMouseTypeMenu();
         CreateSpeedOptionMenu();
+        CreateClockMultiplierOptionMenu();
         CreateBorderSizeMenu();
         CreateScreenEffectMenu();
         CreateTapeLoadingSpeedMenu();
@@ -133,6 +135,14 @@ public sealed class NativeMainMenu
                     foreach (var speed in _emulationSpeeds.Keys)
                     {
                         _emulationSpeeds[speed].IsChecked = _viewModel.EmulationSpeed == speed;
+                    }
+
+                    break;
+
+                case nameof(MainViewModel.ClockMultiplier):
+                    foreach (var multiplier in _clockMultipliers.Keys)
+                    {
+                        _clockMultipliers[multiplier].IsChecked = _viewModel.ClockMultiplier == multiplier;
                     }
 
                     break;
@@ -370,6 +380,17 @@ public sealed class NativeMainMenu
                     _emulationSpeeds["400"],
                     _emulationSpeeds["500"],
                     _emulationSpeeds["Max"],
+                ]
+            },
+
+            new NativeMenuItem("Clock")
+            {
+                Menu =
+                [
+                    _clockMultipliers["1"],
+                    _clockMultipliers["2"],
+                    _clockMultipliers["4"],
+                    _clockMultipliers["8"],
                 ]
             },
 
@@ -926,6 +947,29 @@ public sealed class NativeMainMenu
                 Command = _viewModel.SetEmulationSpeedCommand,
                 CommandParameter = speed.Value,
                 IsChecked = _viewModel.EmulationSpeed == speed.Value,
+                IsEnabled = true
+            };
+        }
+    }
+
+    private void CreateClockMultiplierOptionMenu()
+    {
+        var speeds = new[]
+        {
+            new { Value = "1", DisplayName = "3.5 MHz" },
+            new { Value = "2", DisplayName = "7 MHz" },
+            new { Value = "4", DisplayName = "14 MHz" },
+            new { Value = "8", DisplayName = "28 MHz" },
+        };
+
+        foreach (var speed in speeds)
+        {
+            _clockMultipliers[speed.Value] = new NativeMenuItem(speed.DisplayName)
+            {
+                ToggleType = MenuItemToggleType.Radio,
+                Command = _viewModel.SetClockMultiplierCommand,
+                CommandParameter = speed.Value,
+                IsChecked = _viewModel.ClockMultiplier == speed.Value,
                 IsEnabled = true
             };
         }

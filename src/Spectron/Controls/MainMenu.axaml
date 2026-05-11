@@ -97,6 +97,12 @@
                 <MenuItem Header="500%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="500" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='500'}"/>
                 <MenuItem Header="Max" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="Max" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='Max'}"/>
             </MenuItem>
+            <MenuItem Header="Clock">
+                <MenuItem Header="3.5 MHz" ToggleType="Radio" Command="{Binding SetClockMultiplierCommand}" CommandParameter="1" IsChecked="{Binding ClockMultiplier, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='1'}"/>
+                <MenuItem Header="7 MHz" ToggleType="Radio" Command="{Binding SetClockMultiplierCommand}" CommandParameter="1" IsChecked="{Binding ClockMultiplier, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='2'}"/>
+                <MenuItem Header="14 MHz" ToggleType="Radio" Command="{Binding SetClockMultiplierCommand}" CommandParameter="1" IsChecked="{Binding ClockMultiplier, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='4'}"/>
+                <MenuItem Header="28 MHz" ToggleType="Radio" Command="{Binding SetClockMultiplierCommand}" CommandParameter="1" IsChecked="{Binding ClockMultiplier, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='8'}"/>
+            </MenuItem>
             <MenuItem Header="-"/>
             <MenuItem Header="Pause" InputGesture="F2" Command="{Binding TogglePauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>
             <MenuItem Header="Time Machine" InputGesture="F3" Command="{Binding ShowTimeMachineViewCommand}"/>

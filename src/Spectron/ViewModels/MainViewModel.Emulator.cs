@@ -248,6 +248,11 @@ partial class MainViewModel
         Emulator?.SetEmulationSpeed(emulationSpeedValue);
     }
 
+    private void HandleSetClockMultiplier(string clockMultiplier)
+    {
+        // TODO: Implement clock multiplier
+    }
+
     private async Task HandleChangeRomAsync(RomType romType)
     {
         var oldRomType = RomType;
