@@ -18,9 +18,9 @@ namespace OldBit.Spectron.ViewModels;
 
 partial class MainViewModel
 {
-    private void CreateEmulator(ComputerType computerType, RomType romType, byte[]? customRom = null, bool hardReset = false)
+    private void CreateEmulator(ComputerType computerType, RomType romType, string clockMultiplier, byte[]? customRom = null, bool hardReset = false)
     {
-        var emulator = _emulatorFactory.Create(computerType, romType, customRom);
+        var emulator = _emulatorFactory.Create(computerType, romType, int.Parse(clockMultiplier), customRom);
 
         ApplyEmulatorDefaults(emulator, hardReset);
 
@@ -86,11 +86,13 @@ partial class MainViewModel
         if (fileType.IsSnapshot())
         {
             emulator = _snapshotManager.Load(stream, fileType);
+            emulator.Clock.Multiplier = int.Parse(ClockMultiplier);
             emulator.ConfigureAudio(_preferences.Audio);
         }
         else if (fileType.IsTape())
         {
             emulator = _loader.EnterLoadCommand(favorite?.ComputerType ?? ComputerType);
+            emulator.Clock.Multiplier = int.Parse(ClockMultiplier);
             emulator.TapeManager.InsertTape(stream, fileType,
                 _preferences.Tape.IsAutoPlayEnabled && (favorite?.TapeLoadSpeed ?? TapeLoadSpeed) != TapeSpeed.Instant);
 
@@ -213,7 +215,7 @@ partial class MainViewModel
 
         if (hardReset)
         {
-            CreateEmulator(_preferences.ComputerType, _preferences.RomType, hardReset: true);
+            CreateEmulator(_preferences.ComputerType, _preferences.RomType, ClockMultiplier, hardReset: true);
         }
         else if (Emulator != null)
         {
@@ -250,7 +252,8 @@ partial class MainViewModel
 
     private void HandleSetClockMultiplier(string clockMultiplier)
     {
-        // TODO: Implement clock multiplier
+        ClockMultiplier = clockMultiplier;
+        Emulator?.Clock.Multiplier = int.Parse(clockMultiplier);
     }
 
     private async Task HandleChangeRomAsync(RomType romType)
@@ -280,7 +283,7 @@ partial class MainViewModel
             await _messageDialogs.Error(ex.Message);
         }
 
-        CreateEmulator(ComputerType, RomType, customRom);
+        CreateEmulator(ComputerType, RomType, ClockMultiplier, customRom);
     }
 
     private void HandleChangeComputerType(ComputerType computerType)
@@ -292,7 +295,7 @@ partial class MainViewModel
             RomType = RomType.Original;
         }
 
-        CreateEmulator(ComputerType, RomType);
+        CreateEmulator(ComputerType, RomType, ClockMultiplier);
     }
 
     partial void OnIsPausedChanged(bool value) => _debuggerViewModel?.HandlePause(value, _breakpointHitEventArgs);

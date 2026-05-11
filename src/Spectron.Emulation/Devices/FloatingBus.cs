@@ -13,13 +13,13 @@ internal sealed class FloatingBus : IDevice
 {
     private readonly HardwareSettings _hardware;
     private readonly IMemory _memory;
-    private readonly Clock _clock;
+    private readonly EmulatorClock _clock;
     private readonly Func<Word, bool> _isUlaPort;
     private readonly Dictionary<int, Word> _floatingBusAddressIndex = new();
 
     public bool IsEnabled { get; set; } = true;
 
-    internal FloatingBus(HardwareSettings hardware, IMemory memory, Clock clock, Func<Word, bool> isUlaPort)
+    internal FloatingBus(HardwareSettings hardware, IMemory memory, EmulatorClock clock, Func<Word, bool> isUlaPort)
     {
         _hardware = hardware;
         _memory = memory;
@@ -36,13 +36,13 @@ internal sealed class FloatingBus : IDevice
             return null;
         }
 
-        if (_clock.FrameTicks < _hardware.FloatingBusStartTicks || _clock.FrameTicks > _hardware.LastPixelTicks)
+        if (_clock.UlaTicks < _hardware.FloatingBusStartTicks || _clock.UlaTicks > _hardware.LastPixelTicks)
         {
             return null;
         }
 
         // Note that the Z80 samples the data bus during the final T-state of the I/O machine cycle
-        return _floatingBusAddressIndex.TryGetValue(_clock.FrameTicks - 1, out var screenAddress)
+        return _floatingBusAddressIndex.TryGetValue(_clock.UlaTicks - 1, out var screenAddress)
             ? _memory.Read(screenAddress)
             : null;
     }

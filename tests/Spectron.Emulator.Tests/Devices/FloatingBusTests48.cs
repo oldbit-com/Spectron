@@ -15,8 +15,9 @@ public class FloatingBusTests48
     {
         _memory = new Memory48K(new byte[16384]);
         _clock = new Clock();
+        var emulatorClock = new EmulatorClock(Hardware.Spectrum48K.TicksPerFrame, _clock);
 
-        _floatingBus = new FloatingBus(Hardware.Spectrum48K, _memory, _clock, port => (port & 0x01) == 0);
+        _floatingBus = new FloatingBus(Hardware.Spectrum48K, _memory, emulatorClock, port => (port & 0x01) == 0);
     }
 
     [Fact]

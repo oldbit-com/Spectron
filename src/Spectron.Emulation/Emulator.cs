@@ -80,8 +80,7 @@ public sealed class Emulator
     public Interface1Device Interface1 { get; }
     public ZxPrinter Printer { get; }
     public ScreenBuffer ScreenBuffer { get; }
-
-    public int TicksPerFrame => _hardware.TicksPerFrame;
+    public EmulatorClock Clock { get; }
 
     internal UlaPlus UlaPlus { get; }
 
@@ -120,12 +119,14 @@ public sealed class Emulator
             }
         };
 
+        Clock = new EmulatorClock(hardware.TicksPerFrame, Cpu.Clock, emulatorArgs.ClockMultiplier);
+
         UlaPlus = new UlaPlus();
         ScreenBuffer = new ScreenBuffer(hardware, emulatorArgs.Memory, UlaPlus);
 
         Ula = ComputerType == ComputerType.Timex2048
-            ? new UlaTimex(KeyboardState, ScreenBuffer, Cpu, TapeManager)
-            : new Ula(KeyboardState, ScreenBuffer, Cpu, TapeManager);
+            ? new UlaTimex(KeyboardState, ScreenBuffer, Clock, Cpu, TapeManager)
+            : new Ula(KeyboardState, ScreenBuffer, Clock, Cpu, TapeManager);
 
         _screenMemoryHandler = new ScreenMemoryHandler(Memory, ScreenBuffer);
         _screenMemoryHandler.SetScreenMode(Ula as UlaTimex);
@@ -137,9 +138,9 @@ public sealed class Emulator
         KeyboardState.Reset();
         TapeManager.Attach(Cpu, Memory, hardware);
 
-        _floatingBus = new FloatingBus(_hardware, Memory, Cpu.Clock, Ula.IsUlaPort);
+        _floatingBus = new FloatingBus(_hardware, Memory, Clock, Ula.IsUlaPort);
 
-        AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware, Ula.IsUlaPort);
+        AudioManager = new AudioManager(Clock, tapeManager.CassettePlayer, hardware, Ula.IsUlaPort);
 
         DivMmc = new DivMmcDevice(Cpu, Memory, logger);
         Beta128 = new Beta128Device(Cpu, _hardware.ClockMhz, Memory, ComputerType, diskDriveManager);
@@ -313,7 +314,7 @@ public sealed class Emulator
         }
         else
         {
-            Cpu.Clock.NewFrame(_hardware.TicksPerFrame);
+            Cpu.Clock.NewFrame(Clock.TicksPerFrame);
         }
 
         ScreenBuffer.NewFrame();
@@ -323,11 +324,11 @@ public sealed class Emulator
 
     private void EndFrame()
     {
-        _ticksSinceReset += Cpu.Clock.FrameTicks;
+        _ticksSinceReset += Clock.UlaTicks;
 
         var audioBuffer = AudioManager.EndFrame();
 
-        ScreenBuffer.EndFrame(Cpu.Clock.FrameTicks);
+        ScreenBuffer.EndFrame(Clock.UlaTicks);
 
         FrameCompleted?.Invoke(ScreenBuffer.FrameBuffer, audioBuffer);
 
