@@ -18,9 +18,9 @@ namespace OldBit.Spectron.ViewModels;
 
 partial class MainViewModel
 {
-    private void CreateEmulator(ComputerType computerType, RomType romType, string clockMultiplier, byte[]? customRom = null, bool hardReset = false)
+    private void CreateEmulator(ComputerType computerType, RomType romType, int clockMultiplier, byte[]? customRom = null, bool hardReset = false)
     {
-        var emulator = _emulatorFactory.Create(computerType, romType, int.Parse(clockMultiplier), customRom);
+        var emulator = _emulatorFactory.Create(computerType, romType, clockMultiplier, customRom);
 
         ApplyEmulatorDefaults(emulator, hardReset);
 
@@ -86,13 +86,13 @@ partial class MainViewModel
         if (fileType.IsSnapshot())
         {
             emulator = _snapshotManager.Load(stream, fileType);
-            emulator.Clock.Multiplier = int.Parse(ClockMultiplier);
+            emulator.Clock.Multiplier = ClockMultiplier;
             emulator.ConfigureAudio(_preferences.Audio);
         }
         else if (fileType.IsTape())
         {
             emulator = _loader.EnterLoadCommand(favorite?.ComputerType ?? ComputerType);
-            emulator.Clock.Multiplier = int.Parse(ClockMultiplier);
+            emulator.Clock.Multiplier = ClockMultiplier;
             emulator.TapeManager.InsertTape(stream, fileType,
                 _preferences.Tape.IsAutoPlayEnabled && (favorite?.TapeLoadSpeed ?? TapeLoadSpeed) != TapeSpeed.Instant);
 
@@ -229,31 +229,17 @@ partial class MainViewModel
         UpdateWindowTitle();
     }
 
-    private void HandleSetEmulationSpeed(string emulationSpeed)
+    private void HandleSetEmulationSpeed(int emulationSpeed)
     {
-        int emulationSpeedValue;
-
-        if (emulationSpeed.Equals("max", StringComparison.OrdinalIgnoreCase))
-        {
-            emulationSpeedValue = int.MaxValue;
-        }
-        else
-        {
-            if (!int.TryParse(emulationSpeed, out emulationSpeedValue))
-            {
-                return;
-            }
-        }
-
         EmulationSpeed = emulationSpeed;
-        StatusBarViewModel.Speed = emulationSpeed;
-        Emulator?.SetEmulationSpeed(emulationSpeedValue);
+        StatusBarViewModel.Speed = emulationSpeed == -1 ? "Max" : $"{emulationSpeed}%";
+        Emulator?.SetEmulationSpeed(emulationSpeed);
     }
 
-    private void HandleSetClockMultiplier(string clockMultiplier)
+    private void HandleSetClockMultiplier(int clockMultiplier)
     {
         ClockMultiplier = clockMultiplier;
-        Emulator?.Clock.Multiplier = int.Parse(clockMultiplier);
+        Emulator?.Clock.Multiplier = clockMultiplier;
     }
 
     private async Task HandleChangeRomAsync(RomType romType)

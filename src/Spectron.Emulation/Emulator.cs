@@ -110,16 +110,13 @@ public sealed class Emulator
         RomType = emulatorArgs.RomType;
         Memory = emulatorArgs.Memory;
 
-        Cpu = new Z80(emulatorArgs.Memory)
+        Clock = new EmulatorClock(hardware.TicksPerFrame, emulatorArgs.ClockMultiplier)
         {
-            Clock =
-            {
-                InterruptDuration = hardware.InterruptDuration,
-                ContentionProvider = emulatorArgs.ContentionProvider
-            }
+            InterruptDuration = hardware.InterruptDuration,
+            ContentionProvider = emulatorArgs.ContentionProvider
         };
 
-        Clock = new EmulatorClock(hardware.TicksPerFrame, Cpu.Clock, emulatorArgs.ClockMultiplier);
+        Cpu = new Z80(emulatorArgs.Memory, Clock);
 
         UlaPlus = new UlaPlus();
         ScreenBuffer = new ScreenBuffer(hardware, emulatorArgs.Memory, UlaPlus);

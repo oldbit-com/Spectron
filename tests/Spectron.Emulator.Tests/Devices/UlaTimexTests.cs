@@ -28,7 +28,7 @@ public class UlaTimexTests
 
         var z80 = new Z80(memory);
 
-        var emulatorClock = new EmulatorClock(Hardware.Timex2048.TicksPerFrame, z80.Clock);
+        var emulatorClock = new EmulatorClock(Hardware.Timex2048.TicksPerFrame);
 
         _ulaTimex = new UlaTimex(keyboardState, screenBuffer, emulatorClock, z80, new TapeManager());
     }

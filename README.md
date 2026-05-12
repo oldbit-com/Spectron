@@ -69,15 +69,18 @@ The solution consists of several projects:
 There are some test releases that can be found in the project [Releases](https://github.com/oldbit-com/Spectron/releases)
 if you don't want to build the project. These are self-contained and do not need .NET Framework to be installed separetely.
 
-## Running the emulator
+## Running the emulator using source code
 Requires .NET 10 to build and run the emulator.
 Grab the latest code from the repository, build and run the emulator:
 
 ```shell
+git clone https://github.com/oldbit-com/Spectron.git
+
+cd Spectron
+
 dotnet build -c Release
 dotnet run --project ./src/Spectron
 ```
-You can also run the emulator from the [Releases](https://github.com/oldbit-com/Spectron/releases) page.
 
 ### Command line options
 Command lines allow overriding most of the default options and loading a specified file. Full list of available 
@@ -100,13 +103,15 @@ The emulation is highly accurate and supports many undocumented instructions, as
 
 ## Emulation Speed
 There are two options for adjusting the speed:
-- *Speed multiplier* - this option allows running the emulator at a higher or slower speed, e.g. more frames per second.
-This means that **everything** will run at selected speed.
-- *CPU clock multiplier* - this option allows running just CPU at a higher frequency. This can make some slower games more responsive.
-However, it may also cause compatibility issues with some games and programs.
+- **At n% of normal speed** - this option allows running the emulator at a higher or slower speed, e.g. more or less frames per second.
+*Everything* will run at selected speed, e.g. like using fast-forward or slow-motion playback.
+
+- **At higher CPU clock** - this option runs the CPU at a higher frequency. Standard clock is 3.5 MHz, but it can be increased to 7 MHz, 14 MHz 
+or 28 MHz. This can be useful for games that are normally sluggish. Some software and games may not work properly with higher clock speeds.
 
 ## Session Persistence
-When the emulator is closed, it automatically saves its current state, which is then restored upon restart. This behavior can be toggled in the settings.
+When the emulator is closed, it automatically saves its current state, which is then restored upon restart. 
+This behavior can be toggled in the settings.
 
 ## Tape Loading
 Tape loading is supported for **TAP** and **TZX** files (including ZIP archives). Three loading speeds are available:
