@@ -86,13 +86,11 @@ partial class MainViewModel
         if (fileType.IsSnapshot())
         {
             emulator = _snapshotManager.Load(stream, fileType);
-            emulator.Clock.Multiplier = ClockMultiplier;
             emulator.ConfigureAudio(_preferences.Audio);
         }
         else if (fileType.IsTape())
         {
             emulator = _loader.EnterLoadCommand(favorite?.ComputerType ?? ComputerType);
-            emulator.Clock.Multiplier = ClockMultiplier;
             emulator.TapeManager.InsertTape(stream, fileType,
                 _preferences.Tape.IsAutoPlayEnabled && (favorite?.TapeLoadSpeed ?? TapeLoadSpeed) != TapeSpeed.Instant);
 
@@ -164,6 +162,9 @@ partial class MainViewModel
 
         InitializeFrameBuffer();
 
+        emulator.Clock.Multiplier = ClockMultiplier;
+        emulator.EmulationSpeed = EmulationSpeed;
+
         Emulator.Start();
 
         if (shouldResume)
@@ -233,12 +234,13 @@ partial class MainViewModel
     {
         EmulationSpeed = emulationSpeed;
         StatusBarViewModel.Speed = emulationSpeed == -1 ? "Max" : $"{emulationSpeed}%";
-        Emulator?.SetEmulationSpeed(emulationSpeed);
+        Emulator?.EmulationSpeed = emulationSpeed;
     }
 
     private void HandleSetClockMultiplier(int clockMultiplier)
     {
         ClockMultiplier = clockMultiplier;
+        StatusBarViewModel.Clock = clockMultiplier == 1 ? "" : $"{3.5 * clockMultiplier} MHz";
         Emulator?.Clock.Multiplier = clockMultiplier;
     }
 

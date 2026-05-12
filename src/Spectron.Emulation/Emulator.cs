@@ -27,7 +27,8 @@ namespace OldBit.Spectron.Emulation;
 /// </summary>
 public sealed class Emulator
 {
-    private readonly HardwareSettings _hardware;
+    private const int MaxEmulationSpeed = -1;
+
     private readonly TimeMachine _timeMachine;
     private readonly ILogger _logger;
     private readonly EmulatorTimer _emulationTimer;
@@ -96,7 +97,6 @@ public sealed class Emulator
         CommandManager commandManager,
         ILogger logger)
     {
-        _hardware = hardware;
         KeyboardState = keyboardState;
         _timeMachine = timeMachine;
         _logger = logger;
@@ -135,12 +135,12 @@ public sealed class Emulator
         KeyboardState.Reset();
         TapeManager.Attach(Cpu, Memory, hardware);
 
-        _floatingBus = new FloatingBus(_hardware, Memory, Clock, Ula.IsUlaPort);
+        _floatingBus = new FloatingBus(hardware, Memory, Clock, Ula.IsUlaPort);
 
         AudioManager = new AudioManager(Clock, tapeManager.CassettePlayer, hardware, Ula.IsUlaPort);
 
         DivMmc = new DivMmcDevice(Cpu, Memory, logger);
-        Beta128 = new Beta128Device(Cpu, _hardware.ClockMhz, Memory, ComputerType, diskDriveManager);
+        Beta128 = new Beta128Device(Cpu, hardware.ClockMhz, Memory, ComputerType, diskDriveManager);
         Interface1 = microdriveManager.CreateDevice(Cpu, Memory);
         Printer = new ZxPrinter();
 
@@ -213,10 +213,13 @@ public sealed class Emulator
 
     public void RequestNmi() => _isNmiRequested = true;
 
-    public void SetEmulationSpeed(int emulationSpeedPercentage) =>
-        _emulationTimer.Interval = emulationSpeedPercentage == -1 ?
-            TimeSpan.Zero :
-            TimeSpan.FromMilliseconds(20 * (100f / emulationSpeedPercentage));
+    public int EmulationSpeed
+    {
+        set =>
+            _emulationTimer.Interval = value == MaxEmulationSpeed ?
+                TimeSpan.Zero :
+                TimeSpan.FromMilliseconds(20 * (100f / value));
+    }
 
     private void OnTimerElapsed(object? sender, EventArgs e)
     {
@@ -357,7 +360,7 @@ public sealed class Emulator
                         break;
 
                     case TapeSpeed.Accelerated:
-                        SetEmulationSpeed(int.MaxValue);
+                        EmulationSpeed = MaxEmulationSpeed;
                         _isAcceleratedTapeSpeed = true;
                         break;
                 }
@@ -371,7 +374,7 @@ public sealed class Emulator
                         break;
 
                     case TapeSpeed.Accelerated:
-                        SetEmulationSpeed(int.MaxValue);
+                        EmulationSpeed = MaxEmulationSpeed;
                         _isAcceleratedTapeSpeed = true;
                         break;
                 }
@@ -383,7 +386,7 @@ public sealed class Emulator
             case RomRoutines.ERROR_1:
                 if (_isAcceleratedTapeSpeed)
                 {
-                    SetEmulationSpeed(100);
+                    EmulationSpeed = 100;
                     _isAcceleratedTapeSpeed = false;
                 }
 

@@ -36,6 +36,9 @@ public partial class StatusBarViewModel : ObservableObject
     public partial string Speed { get; set; } = "100";
 
     [ObservableProperty]
+    public partial string Clock { get; set; } = string.Empty;
+
+    [ObservableProperty]
     public partial bool IsDivMmcEnabled { get; set; }
 
     [ObservableProperty]
