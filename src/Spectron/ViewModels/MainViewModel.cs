@@ -139,10 +139,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public partial bool IsTimeMachineCountdownVisible { get; set; }
 
     [ObservableProperty]
-    public partial string EmulationSpeed { get; set; } = "100";
+    public partial int EmulationSpeed { get; set; } = 100;
 
     [ObservableProperty]
-    public partial string ClockMultiplier { get; set; } = "1";
+    public partial int ClockMultiplier { get; set; } = 1;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsFullScreen))]
@@ -247,10 +247,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     // Control
     [RelayCommand]
-    private void SetEmulationSpeed(string emulationSpeed) => HandleSetEmulationSpeed(emulationSpeed);
+    private void SetEmulationSpeed(int emulationSpeed) => HandleSetEmulationSpeed(emulationSpeed);
 
     [RelayCommand]
-    private void SetClockMultiplier(string clockMultiplier) => HandleSetClockMultiplier(clockMultiplier);
+    private void SetClockMultiplier(int clockMultiplier) => HandleSetClockMultiplier(clockMultiplier);
 
     [RelayCommand]
     private void TogglePause() => HandleTogglePause();

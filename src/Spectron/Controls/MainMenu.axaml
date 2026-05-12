@@ -12,6 +12,7 @@
              xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
              xmlns:microdrive="clr-namespace:OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;assembly=OldBit.Spectron.Emulation"
              xmlns:diskDrive="clr-namespace:OldBit.Spectron.Emulation.Devices.Beta128.Drive;assembly=OldBit.Spectron.Emulation"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              x:DataType="viewModels:MainViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="OldBit.Spectron.Controls.MainMenu">
@@ -21,6 +22,26 @@
         <converters:GreaterThanConverter x:Key="GreaterThanConverter"/>
         <converters:BoolToTextConverter x:Key="BoolToTextConverter"/>
         <converters:EnumHasValueConverter x:Key="EnumHasValueConverter"/>
+
+        <!-- Clock multipliers -->
+        <system:Int32 x:Key="1">1</system:Int32>
+        <system:Int32 x:Key="2">2</system:Int32>
+        <system:Int32 x:Key="4">4</system:Int32>
+        <system:Int32 x:Key="8">8</system:Int32>
+
+        <!-- Speed percentages -->
+        <system:Int32 x:Key="25">25</system:Int32>
+        <system:Int32 x:Key="50">50</system:Int32>
+        <system:Int32 x:Key="75">75</system:Int32>
+        <system:Int32 x:Key="100">100</system:Int32>
+        <system:Int32 x:Key="125">125</system:Int32>
+        <system:Int32 x:Key="150">150</system:Int32>
+        <system:Int32 x:Key="200">200</system:Int32>
+        <system:Int32 x:Key="250">250</system:Int32>
+        <system:Int32 x:Key="300">300</system:Int32>
+        <system:Int32 x:Key="400">400</system:Int32>
+        <system:Int32 x:Key="500">500</system:Int32>
+        <system:Int32 x:Key="-1">-1</system:Int32>
     </UserControl.Resources>
 
     <UserControl.Styles>
@@ -84,24 +105,24 @@
 
         <MenuItem Header="_Control" Padding="10 0 10 0" Focusable="False">
             <MenuItem Header="Speed">
-                <MenuItem Header="25%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="25" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='25'}"/>
-                <MenuItem Header="50%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="50" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='50'}"/>
-                <MenuItem Header="75%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="75" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='75'}"/>
-                <MenuItem Header="Normal" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="100" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='100'}"/>
-                <MenuItem Header="125%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="125" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='125'}"/>
-                <MenuItem Header="150%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="150" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='150'}"/>
-                <MenuItem Header="200%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="200" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='200'}"/>
-                <MenuItem Header="250%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="250" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='250'}"/>
-                <MenuItem Header="300%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="300" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='300'}"/>
-                <MenuItem Header="400%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="400" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='400'}"/>
-                <MenuItem Header="500%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="500" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='500'}"/>
-                <MenuItem Header="Max" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="Max" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='Max'}"/>
+                <MenuItem Header="25%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="{StaticResource 25}" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 25}}"/>
+                <MenuItem Header="50%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="{StaticResource 50}" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 50}}"/>
+                <MenuItem Header="75%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="{StaticResource 75 }" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 75}}"/>
+                <MenuItem Header="Normal" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="{StaticResource 100}" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 100}}"/>
+                <MenuItem Header="125%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="{StaticResource 125}" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 125}}"/>
+                <MenuItem Header="150%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="{StaticResource 150}" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 150}}"/>
+                <MenuItem Header="200%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="{StaticResource 200}" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 200}}"/>
+                <MenuItem Header="250%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="{StaticResource 250}" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 250}}"/>
+                <MenuItem Header="300%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="{StaticResource 300}" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 300}}"/>
+                <MenuItem Header="400%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="{StaticResource 400}" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 400}}"/>
+                <MenuItem Header="500%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="{StaticResource 500}" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 500}}"/>
+                <MenuItem Header="Max" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="{StaticResource -1}" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource -1}}"/>
             </MenuItem>
             <MenuItem Header="Clock">
-                <MenuItem Header="3.5 MHz" ToggleType="Radio" Command="{Binding SetClockMultiplierCommand}" CommandParameter="1" IsChecked="{Binding ClockMultiplier, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='1'}"/>
-                <MenuItem Header="7 MHz" ToggleType="Radio" Command="{Binding SetClockMultiplierCommand}" CommandParameter="2" IsChecked="{Binding ClockMultiplier, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='2'}"/>
-                <MenuItem Header="14 MHz" ToggleType="Radio" Command="{Binding SetClockMultiplierCommand}" CommandParameter="4" IsChecked="{Binding ClockMultiplier, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='4'}"/>
-                <MenuItem Header="28 MHz" ToggleType="Radio" Command="{Binding SetClockMultiplierCommand}" CommandParameter="8" IsChecked="{Binding ClockMultiplier, Converter={StaticResource ValueEqualityConverter}, ConverterParameter='8'}"/>
+                <MenuItem Header="3.5 MHz" ToggleType="Radio" Command="{Binding SetClockMultiplierCommand}" CommandParameter="{StaticResource 1}" IsChecked="{Binding ClockMultiplier, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 1}}"/>
+                <MenuItem Header="7 MHz" ToggleType="Radio" Command="{Binding SetClockMultiplierCommand}" CommandParameter="{StaticResource 2}" IsChecked="{Binding ClockMultiplier, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 2}}"/>
+                <MenuItem Header="14 MHz" ToggleType="Radio" Command="{Binding SetClockMultiplierCommand}" CommandParameter="{StaticResource 4}" IsChecked="{Binding ClockMultiplier, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 4}}"/>
+                <MenuItem Header="28 MHz" ToggleType="Radio" Command="{Binding SetClockMultiplierCommand}" CommandParameter="{StaticResource 8}" IsChecked="{Binding ClockMultiplier, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 8}}"/>
             </MenuItem>
             <MenuItem Header="-"/>
             <MenuItem Header="Pause" InputGesture="F2" Command="{Binding TogglePauseCommand}" ToggleType="CheckBox" IsChecked="{Binding IsPaused}"/>

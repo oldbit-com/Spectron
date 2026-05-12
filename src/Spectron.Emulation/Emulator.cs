@@ -214,7 +214,7 @@ public sealed class Emulator
     public void RequestNmi() => _isNmiRequested = true;
 
     public void SetEmulationSpeed(int emulationSpeedPercentage) =>
-        _emulationTimer.Interval = emulationSpeedPercentage == int.MaxValue ?
+        _emulationTimer.Interval = emulationSpeedPercentage == -1 ?
             TimeSpan.Zero :
             TimeSpan.FromMilliseconds(20 * (100f / emulationSpeedPercentage));
 
