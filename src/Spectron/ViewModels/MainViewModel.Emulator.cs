@@ -214,7 +214,7 @@ partial class MainViewModel
     {
         _pokeFile = null;
 
-        if (hardReset)
+        if (hardReset || _rzxController != null)
         {
             CreateEmulator(_preferences.ComputerType, _preferences.RomType, ClockMultiplier, hardReset: true);
         }
@@ -226,6 +226,7 @@ partial class MainViewModel
             ConfigureDebugging(Emulator);
         }
 
+        _rzxController = null;
         RecentFilesViewModel.CurrentFileName = string.Empty;
         UpdateWindowTitle();
     }

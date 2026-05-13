@@ -195,7 +195,6 @@ public sealed class Emulator
         AudioManager.ResetAudio();
         Memory.Reset();
         Cpu.Reset();
-        Cpu.Clock.Reset();
         ScreenBuffer.Reset();
         UlaPlus.Reset();
         KeyboardState.Reset();
