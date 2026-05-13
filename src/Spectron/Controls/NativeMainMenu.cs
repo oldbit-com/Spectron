@@ -954,7 +954,7 @@ public sealed class NativeMainMenu
 
     private void CreateClockMultiplierOptionMenu()
     {
-        var speeds = new[]
+        var clocks = new[]
         {
             new { Value = 1, DisplayName = "3.5 MHz" },
             new { Value = 2, DisplayName = "7 MHz" },
@@ -962,14 +962,14 @@ public sealed class NativeMainMenu
             new { Value = 8, DisplayName = "28 MHz" },
         };
 
-        foreach (var speed in speeds)
+        foreach (var clock in clocks)
         {
-            _clockMultipliers[speed.Value] = new NativeMenuItem(speed.DisplayName)
+            _clockMultipliers[clock.Value] = new NativeMenuItem(clock.DisplayName)
             {
                 ToggleType = MenuItemToggleType.Radio,
                 Command = _viewModel.SetClockMultiplierCommand,
-                CommandParameter = speed.Value,
-                IsChecked = _viewModel.ClockMultiplier == speed.Value,
+                CommandParameter = clock.Value,
+                IsChecked = _viewModel.ClockMultiplier == clock.Value,
                 IsEnabled = true
             };
         }

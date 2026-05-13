@@ -9,14 +9,14 @@ public class FloatingBusTests48
 {
     private readonly FloatingBus _floatingBus;
     private readonly Memory48K _memory;
-    private readonly Clock _clock;
+    private readonly EmulatorClock _clock;
 
     public FloatingBusTests48()
     {
         _memory = new Memory48K(new byte[16384]);
         _clock = new EmulatorClock(Hardware.Spectrum48K.TicksPerFrame);
 
-        _floatingBus = new FloatingBus(Hardware.Spectrum48K, _memory, (EmulatorClock)_clock, port => (port & 0x01) == 0);
+        _floatingBus = new FloatingBus(Hardware.Spectrum48K, _memory, _clock, port => (port & 0x01) == 0);
     }
 
     [Fact]

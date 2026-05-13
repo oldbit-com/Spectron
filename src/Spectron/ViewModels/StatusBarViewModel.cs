@@ -33,7 +33,7 @@ public partial class StatusBarViewModel : ObservableObject
     public partial JoystickType JoystickType { get; set; }
 
     [ObservableProperty]
-    public partial string Speed { get; set; } = "100";
+    public partial string Speed { get; set; } = "100%";
 
     [ObservableProperty]
     public partial string Clock { get; set; } = string.Empty;
