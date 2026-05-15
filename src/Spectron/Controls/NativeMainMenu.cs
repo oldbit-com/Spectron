@@ -364,7 +364,7 @@ public sealed class NativeMainMenu
 
         var controlSubMenu = new NativeMenu
         {
-            new NativeMenuItem("Speed")
+            new NativeMenuItem("Emulator Speed")
             {
                 Menu =
                 [
@@ -383,7 +383,7 @@ public sealed class NativeMainMenu
                 ]
             },
 
-            new NativeMenuItem("Clock")
+            new NativeMenuItem("CPU Clock")
             {
                 Menu =
                 [

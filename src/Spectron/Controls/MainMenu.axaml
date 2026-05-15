@@ -104,7 +104,7 @@
         </MenuItem>
 
         <MenuItem Header="_Control" Padding="10 0 10 0" Focusable="False">
-            <MenuItem Header="Speed">
+            <MenuItem Header="Emulator Speed">
                 <MenuItem Header="25%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="{StaticResource 25}" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 25}}"/>
                 <MenuItem Header="50%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="{StaticResource 50}" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 50}}"/>
                 <MenuItem Header="75%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="{StaticResource 75}" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 75}}"/>
@@ -118,7 +118,7 @@
                 <MenuItem Header="500%" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="{StaticResource 500}" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 500}}"/>
                 <MenuItem Header="Max" ToggleType="Radio" Command="{Binding SetEmulationSpeedCommand}" CommandParameter="{StaticResource -1}" IsChecked="{Binding EmulationSpeed, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource -1}}"/>
             </MenuItem>
-            <MenuItem Header="Clock">
+            <MenuItem Header="CPU Clock">
                 <MenuItem Header="3.5 MHz" ToggleType="Radio" Command="{Binding SetClockMultiplierCommand}" CommandParameter="{StaticResource 1}" IsChecked="{Binding ClockMultiplier, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 1}}"/>
                 <MenuItem Header="7 MHz" ToggleType="Radio" Command="{Binding SetClockMultiplierCommand}" CommandParameter="{StaticResource 2}" IsChecked="{Binding ClockMultiplier, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 2}}"/>
                 <MenuItem Header="14 MHz" ToggleType="Radio" Command="{Binding SetClockMultiplierCommand}" CommandParameter="{StaticResource 4}" IsChecked="{Binding ClockMultiplier, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={StaticResource 4}}"/>
