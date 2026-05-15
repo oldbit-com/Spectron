@@ -25,7 +25,8 @@ public sealed class NativeMainMenu
     private readonly Dictionary<RomType, NativeMenuItem> _romTypes = new();
     private readonly Dictionary<JoystickType, NativeMenuItem> _joystickTypes = new();
     private readonly Dictionary<MouseType, NativeMenuItem> _mouseTypes = new();
-    private readonly Dictionary<string, NativeMenuItem> _emulationSpeeds = new();
+    private readonly Dictionary<int, NativeMenuItem> _emulationSpeeds = new();
+    private readonly Dictionary<int, NativeMenuItem> _clockMultipliers = new();
     private readonly Dictionary<BorderSize, NativeMenuItem> _borderSizes = new();
     private readonly Dictionary<ScreenEffect, NativeMenuItem> _screenEffects = new();
     private readonly Dictionary<TapeSpeed, NativeMenuItem> _tapeLoadingSpeeds = new();
@@ -49,6 +50,7 @@ public sealed class NativeMainMenu
         CreateJoystickTypeMenu();
         CreateMouseTypeMenu();
         CreateSpeedOptionMenu();
+        CreateClockMultiplierOptionMenu();
         CreateBorderSizeMenu();
         CreateScreenEffectMenu();
         CreateTapeLoadingSpeedMenu();
@@ -133,6 +135,14 @@ public sealed class NativeMainMenu
                     foreach (var speed in _emulationSpeeds.Keys)
                     {
                         _emulationSpeeds[speed].IsChecked = _viewModel.EmulationSpeed == speed;
+                    }
+
+                    break;
+
+                case nameof(MainViewModel.ClockMultiplier):
+                    foreach (var multiplier in _clockMultipliers.Keys)
+                    {
+                        _clockMultipliers[multiplier].IsChecked = _viewModel.ClockMultiplier == multiplier;
                     }
 
                     break;
@@ -358,18 +368,29 @@ public sealed class NativeMainMenu
             {
                 Menu =
                 [
-                    _emulationSpeeds["25"],
-                    _emulationSpeeds["50"],
-                    _emulationSpeeds["75"],
-                    _emulationSpeeds["100"],
-                    _emulationSpeeds["125"],
-                    _emulationSpeeds["150"],
-                    _emulationSpeeds["200"],
-                    _emulationSpeeds["250"],
-                    _emulationSpeeds["300"],
-                    _emulationSpeeds["400"],
-                    _emulationSpeeds["500"],
-                    _emulationSpeeds["Max"],
+                    _emulationSpeeds[25],
+                    _emulationSpeeds[50],
+                    _emulationSpeeds[75],
+                    _emulationSpeeds[100],
+                    _emulationSpeeds[125],
+                    _emulationSpeeds[150],
+                    _emulationSpeeds[200],
+                    _emulationSpeeds[250],
+                    _emulationSpeeds[300],
+                    _emulationSpeeds[400],
+                    _emulationSpeeds[500],
+                    _emulationSpeeds[-1],
+                ]
+            },
+
+            new NativeMenuItem("Clock")
+            {
+                Menu =
+                [
+                    _clockMultipliers[1],
+                    _clockMultipliers[2],
+                    _clockMultipliers[4],
+                    _clockMultipliers[8],
                 ]
             },
 
@@ -904,18 +925,18 @@ public sealed class NativeMainMenu
     {
         var speeds = new[]
         {
-            new { Value = "25", DisplayName = "25%" },
-            new { Value = "50", DisplayName = "50%" },
-            new { Value = "75", DisplayName = "75%" },
-            new { Value = "100", DisplayName = "Normal" },
-            new { Value = "125", DisplayName = "125%" },
-            new { Value = "150", DisplayName = "150%" },
-            new { Value = "200", DisplayName = "200%" },
-            new { Value = "250", DisplayName = "250%" },
-            new { Value = "300", DisplayName = "300%" },
-            new { Value = "400", DisplayName = "400%" },
-            new { Value = "500", DisplayName = "500%" },
-            new { Value = "Max", DisplayName = "Max" },
+            new { Value = 25, DisplayName = "25%" },
+            new { Value = 50, DisplayName = "50%" },
+            new { Value = 75, DisplayName = "75%" },
+            new { Value = 100, DisplayName = "Normal" },
+            new { Value = 125, DisplayName = "125%" },
+            new { Value = 150, DisplayName = "150%" },
+            new { Value = 200, DisplayName = "200%" },
+            new { Value = 250, DisplayName = "250%" },
+            new { Value = 300, DisplayName = "300%" },
+            new { Value = 400, DisplayName = "400%" },
+            new { Value = 500, DisplayName = "500%" },
+            new { Value = -1, DisplayName = "Max" },
         };
 
         foreach (var speed in speeds)
@@ -926,6 +947,29 @@ public sealed class NativeMainMenu
                 Command = _viewModel.SetEmulationSpeedCommand,
                 CommandParameter = speed.Value,
                 IsChecked = _viewModel.EmulationSpeed == speed.Value,
+                IsEnabled = true
+            };
+        }
+    }
+
+    private void CreateClockMultiplierOptionMenu()
+    {
+        var clocks = new[]
+        {
+            new { Value = 1, DisplayName = "3.5 MHz" },
+            new { Value = 2, DisplayName = "7 MHz" },
+            new { Value = 4, DisplayName = "14 MHz" },
+            new { Value = 8, DisplayName = "28 MHz" },
+        };
+
+        foreach (var clock in clocks)
+        {
+            _clockMultipliers[clock.Value] = new NativeMenuItem(clock.DisplayName)
+            {
+                ToggleType = MenuItemToggleType.Radio,
+                Command = _viewModel.SetClockMultiplierCommand,
+                CommandParameter = clock.Value,
+                IsChecked = _viewModel.ClockMultiplier == clock.Value,
                 IsEnabled = true
             };
         }

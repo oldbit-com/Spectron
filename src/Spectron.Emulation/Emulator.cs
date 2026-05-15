@@ -27,7 +27,8 @@ namespace OldBit.Spectron.Emulation;
 /// </summary>
 public sealed class Emulator
 {
-    private readonly HardwareSettings _hardware;
+    private const int MaxEmulationSpeed = -1;
+
     private readonly TimeMachine _timeMachine;
     private readonly ILogger _logger;
     private readonly EmulatorTimer _emulationTimer;
@@ -80,8 +81,7 @@ public sealed class Emulator
     public Interface1Device Interface1 { get; }
     public ZxPrinter Printer { get; }
     public ScreenBuffer ScreenBuffer { get; }
-
-    public int TicksPerFrame => _hardware.TicksPerFrame;
+    public EmulatorClock Clock { get; }
 
     internal UlaPlus UlaPlus { get; }
 
@@ -97,7 +97,6 @@ public sealed class Emulator
         CommandManager commandManager,
         ILogger logger)
     {
-        _hardware = hardware;
         KeyboardState = keyboardState;
         _timeMachine = timeMachine;
         _logger = logger;
@@ -111,21 +110,20 @@ public sealed class Emulator
         RomType = emulatorArgs.RomType;
         Memory = emulatorArgs.Memory;
 
-        Cpu = new Z80(emulatorArgs.Memory)
+        Clock = new EmulatorClock(hardware.TicksPerFrame, emulatorArgs.ClockMultiplier)
         {
-            Clock =
-            {
-                InterruptDuration = hardware.InterruptDuration,
-                ContentionProvider = emulatorArgs.ContentionProvider
-            }
+            InterruptDuration = hardware.InterruptDuration,
+            ContentionProvider = emulatorArgs.ContentionProvider
         };
+
+        Cpu = new Z80(emulatorArgs.Memory, Clock);
 
         UlaPlus = new UlaPlus();
         ScreenBuffer = new ScreenBuffer(hardware, emulatorArgs.Memory, UlaPlus);
 
         Ula = ComputerType == ComputerType.Timex2048
-            ? new UlaTimex(KeyboardState, ScreenBuffer, Cpu, TapeManager)
-            : new Ula(KeyboardState, ScreenBuffer, Cpu, TapeManager);
+            ? new UlaTimex(KeyboardState, ScreenBuffer, Clock, Cpu, TapeManager)
+            : new Ula(KeyboardState, ScreenBuffer, Clock, Cpu, TapeManager);
 
         _screenMemoryHandler = new ScreenMemoryHandler(Memory, ScreenBuffer);
         _screenMemoryHandler.SetScreenMode(Ula as UlaTimex);
@@ -137,12 +135,12 @@ public sealed class Emulator
         KeyboardState.Reset();
         TapeManager.Attach(Cpu, Memory, hardware);
 
-        _floatingBus = new FloatingBus(_hardware, Memory, Cpu.Clock, Ula.IsUlaPort);
+        _floatingBus = new FloatingBus(hardware, Memory, Clock, Ula.IsUlaPort);
 
-        AudioManager = new AudioManager(Cpu.Clock, tapeManager.CassettePlayer, hardware, Ula.IsUlaPort);
+        AudioManager = new AudioManager(Clock, tapeManager.CassettePlayer, hardware, Ula.IsUlaPort);
 
         DivMmc = new DivMmcDevice(Cpu, Memory, logger);
-        Beta128 = new Beta128Device(Cpu, _hardware.ClockMhz, Memory, ComputerType, diskDriveManager);
+        Beta128 = new Beta128Device(Cpu, hardware.ClockMhz, Memory, ComputerType, diskDriveManager);
         Interface1 = microdriveManager.CreateDevice(Cpu, Memory);
         Printer = new ZxPrinter();
 
@@ -215,10 +213,13 @@ public sealed class Emulator
 
     public void RequestNmi() => _isNmiRequested = true;
 
-    public void SetEmulationSpeed(int emulationSpeedPercentage) =>
-        _emulationTimer.Interval = emulationSpeedPercentage == int.MaxValue ?
-            TimeSpan.Zero :
-            TimeSpan.FromMilliseconds(20 * (100f / emulationSpeedPercentage));
+    public int EmulationSpeed
+    {
+        set =>
+            _emulationTimer.Interval = value == MaxEmulationSpeed ?
+                TimeSpan.Zero :
+                TimeSpan.FromMilliseconds(20 * (100f / value));
+    }
 
     private void OnTimerElapsed(object? sender, EventArgs e)
     {
@@ -239,7 +240,7 @@ public sealed class Emulator
 
     private void AddEventHandlers()
     {
-        Cpu.Clock.TicksAdded += (_, previousFrameTicks, _) => ScreenBuffer.UpdateScreen(previousFrameTicks);
+        Cpu.Clock.TicksAdded += (_, previousFrameTicks, _) => ScreenBuffer.UpdateScreen(previousFrameTicks / Clock.Multiplier);
         Cpu.BeforeInstruction += BeforeInstruction;
         UlaPlus.ActiveChanged += _ => _invalidateScreen = true;
         Beta128.DiskActivity += _ => DiskDriveManager.OnDiskActivity();
@@ -247,7 +248,7 @@ public sealed class Emulator
         if (Ula is UlaTimex ulaTimex)
         {
             ulaTimex.ScreenModeChanged += (sender, _) =>
-                _screenMemoryHandler.SetScreenMode(sender as UlaTimex, Cpu.Clock.FrameTicks);
+                _screenMemoryHandler.SetScreenMode(sender as UlaTimex, Clock.UlaTicks);
         }
     }
 
@@ -313,7 +314,7 @@ public sealed class Emulator
         }
         else
         {
-            Cpu.Clock.NewFrame(_hardware.TicksPerFrame);
+            Cpu.Clock.NewFrame(Clock.TicksPerFrame);
         }
 
         ScreenBuffer.NewFrame();
@@ -323,11 +324,11 @@ public sealed class Emulator
 
     private void EndFrame()
     {
-        _ticksSinceReset += Cpu.Clock.FrameTicks;
+        _ticksSinceReset += Clock.UlaTicks;
 
         var audioBuffer = AudioManager.EndFrame();
 
-        ScreenBuffer.EndFrame(Cpu.Clock.FrameTicks);
+        ScreenBuffer.EndFrame(Clock.UlaTicks);
 
         FrameCompleted?.Invoke(ScreenBuffer.FrameBuffer, audioBuffer);
 
@@ -359,7 +360,7 @@ public sealed class Emulator
                         break;
 
                     case TapeSpeed.Accelerated:
-                        SetEmulationSpeed(int.MaxValue);
+                        EmulationSpeed = MaxEmulationSpeed;
                         _isAcceleratedTapeSpeed = true;
                         break;
                 }
@@ -373,7 +374,7 @@ public sealed class Emulator
                         break;
 
                     case TapeSpeed.Accelerated:
-                        SetEmulationSpeed(int.MaxValue);
+                        EmulationSpeed = MaxEmulationSpeed;
                         _isAcceleratedTapeSpeed = true;
                         break;
                 }
@@ -385,7 +386,7 @@ public sealed class Emulator
             case RomRoutines.ERROR_1:
                 if (_isAcceleratedTapeSpeed)
                 {
-                    SetEmulationSpeed(100);
+                    EmulationSpeed = 100;
                     _isAcceleratedTapeSpeed = false;
                 }
 

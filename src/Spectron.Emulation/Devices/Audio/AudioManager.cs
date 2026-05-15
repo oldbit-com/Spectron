@@ -2,7 +2,6 @@ using OldBit.Beep;
 using OldBit.Spectron.Emulation.Devices.Audio.AY;
 using OldBit.Spectron.Emulation.Devices.Audio.Beeper;
 using OldBit.Spectron.Emulation.Tape;
-using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulation.Devices.Audio;
 
@@ -82,7 +81,7 @@ public sealed class AudioManager
 
     public bool IsAySupportedStandardSpectrum { get; set; } = true;
 
-    internal AudioManager(Clock clock, CassettePlayer? cassettePlayer, HardwareSettings hardware, Func<Word, bool> isUlaPort)
+    internal AudioManager(EmulatorClock clock, CassettePlayer? cassettePlayer, HardwareSettings hardware, Func<Word, bool> isUlaPort)
     {
         IsAySupported = hardware.HasAyChip;
 

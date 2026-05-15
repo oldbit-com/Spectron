@@ -18,9 +18,9 @@ namespace OldBit.Spectron.ViewModels;
 
 partial class MainViewModel
 {
-    private void CreateEmulator(ComputerType computerType, RomType romType, byte[]? customRom = null, bool hardReset = false)
+    private void CreateEmulator(ComputerType computerType, RomType romType, int clockMultiplier, byte[]? customRom = null, bool hardReset = false)
     {
-        var emulator = _emulatorFactory.Create(computerType, romType, customRom);
+        var emulator = _emulatorFactory.Create(computerType, romType, clockMultiplier, customRom);
 
         ApplyEmulatorDefaults(emulator, hardReset);
 
@@ -162,6 +162,9 @@ partial class MainViewModel
 
         InitializeFrameBuffer();
 
+        emulator.Clock.Multiplier = ClockMultiplier;
+        emulator.EmulationSpeed = EmulationSpeed;
+
         Emulator.Start();
 
         if (shouldResume)
@@ -211,9 +214,9 @@ partial class MainViewModel
     {
         _pokeFile = null;
 
-        if (hardReset)
+        if (hardReset || _rzxController != null)
         {
-            CreateEmulator(_preferences.ComputerType, _preferences.RomType, hardReset: true);
+            CreateEmulator(_preferences.ComputerType, _preferences.RomType, ClockMultiplier, hardReset: true);
         }
         else if (Emulator != null)
         {
@@ -223,29 +226,23 @@ partial class MainViewModel
             ConfigureDebugging(Emulator);
         }
 
+        _rzxController = null;
         RecentFilesViewModel.CurrentFileName = string.Empty;
         UpdateWindowTitle();
     }
 
-    private void HandleSetEmulationSpeed(string emulationSpeed)
+    private void HandleSetEmulationSpeed(int emulationSpeed)
     {
-        int emulationSpeedValue;
-
-        if (emulationSpeed.Equals("max", StringComparison.OrdinalIgnoreCase))
-        {
-            emulationSpeedValue = int.MaxValue;
-        }
-        else
-        {
-            if (!int.TryParse(emulationSpeed, out emulationSpeedValue))
-            {
-                return;
-            }
-        }
-
         EmulationSpeed = emulationSpeed;
-        StatusBarViewModel.Speed = emulationSpeed;
-        Emulator?.SetEmulationSpeed(emulationSpeedValue);
+        StatusBarViewModel.Speed = emulationSpeed == -1 ? "Max" : $"{emulationSpeed}%";
+        Emulator?.EmulationSpeed = emulationSpeed;
+    }
+
+    private void HandleSetClockMultiplier(int clockMultiplier)
+    {
+        ClockMultiplier = clockMultiplier;
+        StatusBarViewModel.Clock = clockMultiplier == 1 ? "" : $"{3.5 * clockMultiplier} MHz";
+        Emulator?.Clock.Multiplier = clockMultiplier;
     }
 
     private async Task HandleChangeRomAsync(RomType romType)
@@ -275,7 +272,7 @@ partial class MainViewModel
             await _messageDialogs.Error(ex.Message);
         }
 
-        CreateEmulator(ComputerType, RomType, customRom);
+        CreateEmulator(ComputerType, RomType, ClockMultiplier, customRom);
     }
 
     private void HandleChangeComputerType(ComputerType computerType)
@@ -287,7 +284,7 @@ partial class MainViewModel
             RomType = RomType.Original;
         }
 
-        CreateEmulator(ComputerType, RomType);
+        CreateEmulator(ComputerType, RomType, ClockMultiplier);
     }
 
     partial void OnIsPausedChanged(bool value) => _debuggerViewModel?.HandlePause(value, _breakpointHitEventArgs);

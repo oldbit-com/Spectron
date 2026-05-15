@@ -19,7 +19,7 @@ public class UlaTimexTests
     {
         var keyboardState = new KeyboardState();
 
-        var memory = new Memory128K(RomReader.ReadRom(RomType.Original128Bank0), RomReader.ReadRom(RomType.Original128Bank0));
+        var memory = new Memory48K(RomReader.ReadRom(RomType.Timex2048));
 
         var screenBuffer = new ScreenBuffer(
             Hardware.Timex2048,
@@ -28,7 +28,9 @@ public class UlaTimexTests
 
         var z80 = new Z80(memory);
 
-        _ulaTimex = new UlaTimex(keyboardState, screenBuffer, z80, new TapeManager());
+        var emulatorClock = new EmulatorClock(Hardware.Timex2048.TicksPerFrame);
+
+        _ulaTimex = new UlaTimex(keyboardState, screenBuffer, emulatorClock, z80, new TapeManager());
     }
 
     [Fact]

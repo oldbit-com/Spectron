@@ -1,6 +1,5 @@
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
-using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulator.Tests.Devices.Audio;
 
@@ -9,7 +8,7 @@ public class AudioManagerTests
     [Fact]
     public void AudioManager_ShouldCreateCorrectly()
     {
-        var clock = new Clock();
+        var clock = new EmulatorClock(Hardware.Spectrum128K.TicksPerFrame);
         var audionManager = new AudioManager(clock, null, Hardware.Spectrum128K, port => (port & 0x01) == 0);
 
         audionManager.IsAySupported.ShouldBeTrue();

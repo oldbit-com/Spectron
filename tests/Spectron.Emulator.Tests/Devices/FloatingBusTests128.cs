@@ -9,12 +9,12 @@ public class FloatingBusTests128
 {
     private readonly FloatingBus _floatingBus;
     private readonly Memory128K _memory;
-    private readonly Clock _clock;
+    private readonly EmulatorClock _clock;
 
     public FloatingBusTests128()
     {
         _memory = new Memory128K(new byte[16384], new byte[16384]);
-        _clock = new Clock();
+        _clock = new EmulatorClock(Hardware.Spectrum128K.TicksPerFrame);
 
         _floatingBus = new FloatingBus(Hardware.Spectrum128K, _memory, _clock, port => (port & 0x01) == 0);
     }

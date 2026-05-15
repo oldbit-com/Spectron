@@ -49,7 +49,7 @@ public class MainViewModelTests : IDisposable
         _viewModel.IsAudioMuted.ShouldBeFalse();
         _viewModel.IsTimeMachineEnabled.ShouldBeFalse();
         _viewModel.IsTimeMachineCountdownVisible.ShouldBeFalse();
-        _viewModel.EmulationSpeed.ShouldBe("100");
+        _viewModel.EmulationSpeed.ShouldBe(100);
         _viewModel.Title.ShouldBe("Spectron - ZX Spectrum Emulator");
         _viewModel.WindowState.ShouldBe(WindowState.Normal);
         _viewModel.IsFullScreen.ShouldBeFalse();

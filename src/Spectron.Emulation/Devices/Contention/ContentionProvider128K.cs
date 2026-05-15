@@ -2,17 +2,26 @@ using OldBit.Z80Cpu.Contention;
 
 namespace OldBit.Spectron.Emulation.Devices.Contention;
 
-internal sealed class ContentionProvider128K(int firstPixelTick, int ticksPerLine) : IContentionProvider
+internal sealed class ContentionProvider128K(int firstPixelTick, int ticksPerLine, int clockMultiplier = 1) : IContentionProvider
 {
     private readonly int[] _contentionTable = ContentionProvider.BuildContentionTable(firstPixelTick, ticksPerLine);
 
+    internal int ClockMultiplier { get; set; } = clockMultiplier;
     internal int ActiveRamBankId { get; set; }
 
-    public int GetMemoryContention(int ticks, Word address) =>
-        ticks >= 0 && ticks < _contentionTable.Length ? _contentionTable[ticks] : 0;
+    public int GetMemoryContention(int ticks, Word address)
+    {
+        var ulaTicks = ticks / ClockMultiplier;
 
-    public int GetPortContention(int ticks, Word port) =>
-        ticks >= 0 && ticks < _contentionTable.Length ? _contentionTable[ticks] : 0;
+        return ulaTicks >= 0 && ulaTicks < _contentionTable.Length ? _contentionTable[ulaTicks] * ClockMultiplier : 0;
+    }
+
+    public int GetPortContention(int ticks, Word port)
+    {
+        var ulaTicks = ticks / ClockMultiplier;
+
+        return ulaTicks >= 0 && ulaTicks < _contentionTable.Length ? _contentionTable[ulaTicks] * ClockMultiplier : 0;
+    }
 
     public bool IsAddressContended(Word address) =>
         address is >= 0x4000 and <= 0x7FFF ||

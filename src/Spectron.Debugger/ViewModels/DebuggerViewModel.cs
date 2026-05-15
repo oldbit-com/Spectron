@@ -140,7 +140,7 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
 
         if (Emulator.Cpu.Clock.IsFrameComplete)
         {
-            Emulator.Cpu.Clock.NewFrame(Emulator.TicksPerFrame);
+            Emulator.Cpu.Clock.NewFrame(Emulator.Clock.TicksPerFrame);
         }
 
         Refresh(refreshMemory: false);

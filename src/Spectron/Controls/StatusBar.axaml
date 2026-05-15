@@ -140,6 +140,17 @@
             <StackPanel
                 Orientation="Horizontal"
                 Margin="0 0 10 0"
+                IsVisible="{Binding Clock, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                ToolTip.Tip="CPU Speed">
+
+                <material:MaterialIcon Kind="ClockFast"/>
+
+                <TextBlock Text="{Binding Clock}"/>
+            </StackPanel>
+
+            <StackPanel
+                Orientation="Horizontal"
+                Margin="0 0 10 0"
                 IsVisible="{Binding IsUlaPlusEnabled}"
                 ToolTip.Tip="ULA+">
 

@@ -8,6 +8,7 @@ namespace OldBit.Spectron.Emulation.Devices;
 internal class Ula(
     KeyboardState keyboardState,
     ScreenBuffer screenBuffer,
+    EmulatorClock clock,
     Z80 cpu,
     TapeManager tapeManager) : IDevice
 {
@@ -32,7 +33,7 @@ internal class Ula(
         }
 
         var color = SpectrumPalette.GetBorderColor(value);
-        screenBuffer.UpdateBorder(color, cpu.Clock.FrameTicks);
+        screenBuffer.UpdateBorder(color, clock.UlaTicks);
     }
 
     internal virtual bool IsUlaPort(Word address) => (address & 0x01) == 0x00;
@@ -41,7 +42,7 @@ internal class Ula(
 
     private void UpdateEarBit(ref byte value)
     {
-        tapeManager.DetectLoader(cpu.Clock.FrameTicks, cpu.Registers.PC);
+        tapeManager.DetectLoader(clock.UlaTicks, cpu.Registers.PC);
 
         if (tapeManager.CassettePlayer?.IsPlaying != true)
         {
