@@ -240,7 +240,7 @@ public sealed class Emulator
 
     private void AddEventHandlers()
     {
-        Cpu.Clock.TicksAdded += (_, previousFrameTicks, _) => ScreenBuffer.UpdateScreen(previousFrameTicks);
+        Cpu.Clock.TicksAdded += (_, previousFrameTicks, _) => ScreenBuffer.UpdateScreen(previousFrameTicks / Clock.Multiplier);
         Cpu.BeforeInstruction += BeforeInstruction;
         UlaPlus.ActiveChanged += _ => _invalidateScreen = true;
         Beta128.DiskActivity += _ => DiskDriveManager.OnDiskActivity();
@@ -248,7 +248,7 @@ public sealed class Emulator
         if (Ula is UlaTimex ulaTimex)
         {
             ulaTimex.ScreenModeChanged += (sender, _) =>
-                _screenMemoryHandler.SetScreenMode(sender as UlaTimex, Cpu.Clock.FrameTicks);
+                _screenMemoryHandler.SetScreenMode(sender as UlaTimex, Clock.UlaTicks);
         }
     }
 
