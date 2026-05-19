@@ -122,7 +122,7 @@ internal sealed class EmulatorTimer : IDisposable
                             break;
 
                         default:
-                            Thread.Sleep(1);
+                            Thread.Sleep(Math.Max(1, (int)timeToWait.TotalMilliseconds - 5));
                             break;
                     }
                 }
