@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using OldBit.Spectron.Emulation.Platforms;
 
 namespace OldBit.Spectron.Emulation;
 
@@ -28,10 +29,17 @@ internal sealed class EmulatorTimer : IDisposable
         Name = "Emulator Timer"
     };
 
-    internal void Start() => _worker.Start();
+    internal void Start()
+    {
+        Platform.RequestMinimumTimerResolution();
+
+        _worker.Start();
+    }
 
     internal void Stop()
     {
+        Platform.ReleaseMinimumTimerResolution();
+
         _cancellationTokenSource.Cancel();
         _stoppedEvent.Wait();
     }
@@ -114,7 +122,7 @@ internal sealed class EmulatorTimer : IDisposable
                             break;
 
                         default:
-                            Thread.Sleep(Math.Max(1, (int)timeToWait.TotalMilliseconds - 5));
+                            Thread.Sleep(1);
                             break;
                     }
                 }
@@ -130,6 +138,7 @@ internal sealed class EmulatorTimer : IDisposable
     public void Dispose()
     {
         _isDisposed = true;
+
         _cancellationTokenSource.Dispose();
         _stoppedEvent.Dispose();
         _pausedEvent.Dispose();

@@ -4,6 +4,7 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AssemblyName>OldBit.Spectron.Emulation</AssemblyName>
         <RootNamespace>OldBit.Spectron.Emulation</RootNamespace>
         <Version>1.0.0</Version>
