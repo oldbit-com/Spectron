@@ -12,6 +12,7 @@ internal sealed class EmulatorTimer : IDisposable
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly ManualResetEventSlim _stoppedEvent = new(initialState: false);
     private readonly ManualResetEventSlim _pausedEvent = new(initialState: false);
+    private bool _isDisposed;
 
     internal bool IsPaused { get; private set; }
     internal ThreadPriority Priority { get; set; } = ThreadPriority.AboveNormal;
@@ -37,6 +38,11 @@ internal sealed class EmulatorTimer : IDisposable
 
     internal void Pause()
     {
+        if (_isDisposed)
+        {
+            return;
+        }
+
         _pausedEvent.Reset();
         IsPaused = true;
 
@@ -123,6 +129,7 @@ internal sealed class EmulatorTimer : IDisposable
 
     public void Dispose()
     {
+        _isDisposed = true;
         _cancellationTokenSource.Dispose();
         _stoppedEvent.Dispose();
         _pausedEvent.Dispose();
