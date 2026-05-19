@@ -106,6 +106,10 @@ internal sealed class EmulatorTimer : IDisposable
                         case < 10:
                             Thread.SpinWait(25);
                             break;
+
+                        default:
+                            Thread.Sleep(Math.Max(1, (int)timeToWait.TotalMilliseconds - 5));
+                            break;
                     }
                 }
             }
