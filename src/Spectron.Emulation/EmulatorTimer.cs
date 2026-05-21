@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using OldBit.Spectron.Emulation.Platforms;
 
 namespace OldBit.Spectron.Emulation;
 
@@ -12,6 +13,9 @@ internal sealed class EmulatorTimer : IDisposable
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly ManualResetEventSlim _stoppedEvent = new(initialState: false);
     private readonly ManualResetEventSlim _pausedEvent = new(initialState: false);
+    private readonly TimerResolutionScope _timerResolutionScope;
+
+    private volatile bool _isDisposed;
 
     internal bool IsPaused { get; private set; }
     internal ThreadPriority Priority { get; set; } = ThreadPriority.AboveNormal;
@@ -20,12 +24,17 @@ internal sealed class EmulatorTimer : IDisposable
 
     internal event EventHandler? Elapsed;
 
-    internal EmulatorTimer() => _worker = new Thread(Worker)
+    internal EmulatorTimer()
     {
-        IsBackground = true,
-        Priority = Priority,
-        Name = "Emulator Timer"
-    };
+        _timerResolutionScope = new TimerResolutionScope();
+
+        _worker = new Thread(Worker)
+        {
+            IsBackground = true,
+            Priority = Priority,
+            Name = "Emulator Timer"
+        };
+    }
 
     internal void Start() => _worker.Start();
 
@@ -37,6 +46,11 @@ internal sealed class EmulatorTimer : IDisposable
 
     internal void Pause()
     {
+        if (_isDisposed)
+        {
+            return;
+        }
+
         _pausedEvent.Reset();
         IsPaused = true;
 
@@ -106,6 +120,10 @@ internal sealed class EmulatorTimer : IDisposable
                         case < 10:
                             Thread.SpinWait(25);
                             break;
+
+                        default:
+                            Thread.Sleep(Math.Max(1, (int)timeToWait.TotalMilliseconds - 5));
+                            break;
                     }
                 }
             }
@@ -119,6 +137,9 @@ internal sealed class EmulatorTimer : IDisposable
 
     public void Dispose()
     {
+        _isDisposed = true;
+
+        _timerResolutionScope.Dispose();
         _cancellationTokenSource.Dispose();
         _stoppedEvent.Dispose();
         _pausedEvent.Dispose();

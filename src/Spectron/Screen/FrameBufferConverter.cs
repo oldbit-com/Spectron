@@ -34,25 +34,22 @@ internal sealed class FrameBufferConverter : IDisposable
     {
         using var lockedBitmap = ScreenBitmap.Lock();
 
-        var targetAddress = lockedBitmap.Address;
+        var colCount = _endFrameBufferCol - _startFrameBufferCol + 1;
+        var rowBytes = colCount * 4;
 
-        for (var frameBufferRow = _startFrameBufferRow; frameBufferRow <= _endFrameBufferRow; frameBufferRow++)
+        unsafe
         {
-            var rowOffset = frameBufferRow * _frameBuffer.Width;
-
-            for (var frameBufferCol = _startFrameBufferCol; frameBufferCol <= _endFrameBufferCol; frameBufferCol++)
+            fixed (Color* pixelsBase = _frameBuffer.Pixels)
             {
-                var pixelIndex = rowOffset + frameBufferCol;
+                var destination = (byte*)lockedBitmap.Address;
 
-                unsafe
+                for (var row = _startFrameBufferRow; row <= _endFrameBufferRow; row++)
                 {
-                    fixed (Color* color = &_frameBuffer.Pixels[pixelIndex])
-                    {
-                        var pixelColor = *(uint*)color;
-                        *(uint*)targetAddress = pixelColor;
+                    var source = (byte*)(pixelsBase + row * _frameBuffer.Width + _startFrameBufferCol);
 
-                        targetAddress += 4;
-                    }
+                    Buffer.MemoryCopy(source, destination, rowBytes, rowBytes);
+
+                    destination += rowBytes;
                 }
             }
         }
