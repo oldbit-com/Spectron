@@ -27,6 +27,8 @@ partial class MainViewModel
         {
             ScreenEffect |= screenEffect;
         }
+
+        _frameBufferConverter?.ScreenEffect = ScreenEffect;
     }
 
     private void HandleToggleFullScreen() =>
@@ -62,12 +64,12 @@ partial class MainViewModel
             return;
         }
 
-        _frameBufferConverter = new FrameBufferConverter(Emulator.ScreenBuffer.FrameBuffer, BorderSize);
+        _frameBufferConverter = new FrameBufferConverter(Emulator.ScreenBuffer.FrameBuffer, BorderSize, ScreenEffect);
         SpectrumScreen = _frameBufferConverter.ScreenBitmap;
 
         Emulator.ScreenBuffer.FrameBufferChanged += (_, _) =>
         {
-            _frameBufferConverter = new FrameBufferConverter(Emulator.ScreenBuffer.FrameBuffer, BorderSize);
+            _frameBufferConverter = new FrameBufferConverter(Emulator.ScreenBuffer.FrameBuffer, BorderSize, ScreenEffect);
             SpectrumScreen = _frameBufferConverter.ScreenBitmap;
         };
     }

@@ -22,11 +22,13 @@ internal sealed class FrameBufferConverter : IDisposable
     private readonly FrameBuffer _frameBuffer;
 
     internal WriteableBitmap ScreenBitmap { get; private set; }
+    internal ScreenEffect ScreenEffect { get; set; }
     public bool IsHiRes => _frameBuffer.IsHiRes;
 
-    internal FrameBufferConverter(FrameBuffer frameBuffer, BorderSize borderSize)
+    internal FrameBufferConverter(FrameBuffer frameBuffer, BorderSize borderSize, ScreenEffect screenEffect)
     {
         _frameBuffer = frameBuffer;
+        ScreenEffect = screenEffect;
         SetBorderSize(borderSize);
     }
 
@@ -41,18 +43,59 @@ internal sealed class FrameBufferConverter : IDisposable
         {
             fixed (Color* pixelsBase = _frameBuffer.Pixels)
             {
-                var destination = (byte*)lockedBitmap.Address;
-
-                for (var row = _startFrameBufferRow; row <= _endFrameBufferRow; row++)
+                if (ScreenEffect.HasFlag(ScreenEffect.Blur))
                 {
-                    var source = (byte*)(pixelsBase + row * _frameBuffer.Width + _startFrameBufferCol);
-
-                    Buffer.MemoryCopy(source, destination, rowBytes, rowBytes);
-
-                    destination += rowBytes;
+                    UpdateBitmapWithBlur(lockedBitmap, pixelsBase, colCount);
+                }
+                else
+                {
+                    UpdateBitmap(lockedBitmap, pixelsBase, rowBytes);
                 }
             }
         }
+    }
+
+    private unsafe void UpdateBitmap(ILockedFramebuffer lockedBitmap, Color* pixelsBase, int rowBytes)
+    {
+        var destination = (byte*)lockedBitmap.Address;
+
+        for (var row = _startFrameBufferRow; row <= _endFrameBufferRow; row++)
+        {
+            var source = (byte*)(pixelsBase + row * _frameBuffer.Width + _startFrameBufferCol);
+            Buffer.MemoryCopy(source, destination, rowBytes, rowBytes);
+            destination += rowBytes;
+        }
+    }
+
+    private unsafe void UpdateBitmapWithBlur(ILockedFramebuffer lockedBitmap, Color* pixelsBase, int colCount)
+    {
+        var destination = (uint*)lockedBitmap.Address;
+
+        for (var row = _startFrameBufferRow; row <= _endFrameBufferRow; row++)
+        {
+            var source = pixelsBase + row * _frameBuffer.Width + _startFrameBufferCol;
+            BlurRow(source, destination, colCount);
+            destination += colCount;
+        }
+    }
+
+    private static uint Pack(byte r, byte g, byte b) => 0xFF000000u | ((uint)b << 16) | ((uint)g << 8) | r;
+
+    private static unsafe void BlurRow(Color* source, uint* dest, int colCount)
+    {
+        dest[0] = Pack(source[0].Red, source[0].Green, source[0].Blue);
+
+        for (var column = 1; column < colCount - 1; column++)
+        {
+            // Horizontal [1,6,1]/8 blur — very subtle CRT softening, applied in source-pixel space
+            var r = (source[column - 1].Red   + 6 * source[column].Red   + source[column + 1].Red)   >> 3;
+            var g = (source[column - 1].Green + 6 * source[column].Green + source[column + 1].Green) >> 3;
+            var b = (source[column - 1].Blue  + 6 * source[column].Blue  + source[column + 1].Blue)  >> 3;
+
+            dest[column] = Pack((byte)r, (byte)g, (byte)b);
+        }
+
+        dest[colCount - 1] = Pack(source[colCount - 1].Red, source[colCount - 1].Green, source[colCount - 1].Blue);
     }
 
     [MemberNotNull(nameof(ScreenBitmap))]

@@ -97,17 +97,11 @@
                                     PointerMoved="Screen_OnPointerMoved"
                                     PointerPressed="Screen_OnPointerPressed"
                                     PointerReleased="Screen_OnPointerReleased"
-                                    Classes.IsPaused="{Binding IsPauseOverlayVisible}"
-                                    Classes.Blur="{Binding ScreenEffect, Converter={StaticResource EnumHasValueConverter}, ConverterParameter={x:Static screen:ScreenEffect.Blur}}">
+                                    Classes.IsPaused="{Binding IsPauseOverlayVisible}">
                                     <Image.Styles>
-                                        <Style Selector="Image.Blur">
-                                            <Setter Property="Effect">
-                                                <BlurEffect Radius="3"/>
-                                            </Setter>
-                                        </Style>
                                         <Style Selector="Image.IsPaused">
                                             <Setter Property="Effect">
-                                                <BlurEffect Radius="7"/>
+                                                <BlurEffect Radius="2"/>
                                             </Setter>
                                         </Style>
                                     </Image.Styles>
