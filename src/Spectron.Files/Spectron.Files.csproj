@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>OldBit.Spectron.Files</AssemblyName>
+        <RootNamespace>OldBit.Spectron.Files</RootNamespace>
+        <Version>1.0.1</Version>
+        <Title>ZX Spectrum emulator files parser</Title>
+        <Authors>Wojciech Sobieszek</Authors>
+        <Description>This package allows reading and writing files used by ZX Spectrum emulators such as TAP, TZX, SNA, SZX, POK and Z80.</Description>
+        <PackageProjectUrl>https://github.com/oldbit-com/Spectron.Files</PackageProjectUrl>
+        <PackageTags>TAP TZX SNA SZX Z80 POK</PackageTags>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>OldBit.Spectron.Files.Tests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="icon.png" Pack="true" PackagePath=""/>
+        <None Include="../../README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+</Project>

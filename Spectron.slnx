@@ -3,6 +3,7 @@
     <Project Path="src/Spectron.Debugger/Spectron.Debugger.csproj" />
     <Project Path="src/Spectron.Disassembly/Spectron.Disassembly.csproj" />
     <Project Path="src/Spectron.Emulation/Spectron.Emulation.csproj" />
+    <Project Path="src/Spectron.Files/Spectron.Files.csproj" />
     <Project Path="src/Spectron.Recorder/Spectron.Recorder.csproj" />
     <Project Path="src/Spectron/Spectron.csproj" />
   </Folder>
@@ -10,6 +11,7 @@
     <Project Path="tests/Spectron.Debugger.Tests/Spectron.Debugger.Tests.csproj" />
     <Project Path="tests/Spectron.Disassembly.Tests/Spectron.Disassembly.Tests.csproj" />
     <Project Path="tests/Spectron.Emulator.Tests/Spectron.Emulator.Tests.csproj" />
+    <Project Path="tests/Spectron.Files.Tests/Spectron.Files.Tests.csproj" />
     <Project Path="tests/Spectron.Integration.Tests/Spectron.Integration.Tests.csproj" />
     <Project Path="tests/Spectron.Tests/Spectron.Tests.csproj" />
   </Folder>

@@ -61,7 +61,6 @@
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
       <PackageReference Include="OldBit.Beep" />
       <PackageReference Include="OldBit.Joypad" />
-      <PackageReference Include="OldBit.Spectron.Files" />
       <PackageReference Include="OldBit.Z80Cpu.Spectron" />
     </ItemGroup>
 
@@ -81,6 +80,10 @@
       <Compile Update="Devices\Beta128\Controller\DiskController.Control.cs">
         <DependentUpon>DiskController.cs</DependentUpon>
       </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Spectron.Files\Spectron.Files.csproj" />
     </ItemGroup>
 
 </Project>
