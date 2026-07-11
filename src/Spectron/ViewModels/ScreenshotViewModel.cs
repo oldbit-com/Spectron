@@ -56,7 +56,7 @@ public partial class ScreenshotViewModel(
 
         using (var compressed = new GZipStream(memoryStream, CompressionLevel.Fastest))
         {
-            screen.Save(compressed, 100);
+            screen.Save(compressed, PngBitmapEncoderOptions.Default);
         }
 
         Screenshots.Add(new ScreenViewModel(memoryStream.ToArray()));

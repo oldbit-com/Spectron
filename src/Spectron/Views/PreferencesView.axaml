@@ -124,7 +124,7 @@
                                         Margin="4 2 0 0"
                                         ToolTip.Tip="Select Disk Image"
                                         VerticalAlignment="Top"
-                                        Command="{Binding SelectSdCardImageFile}" CommandParameter="0">
+                                        Command="{Binding SelectSdCardImageFileCommand}" CommandParameter="0">
                                         <material:MaterialIcon Kind="Harddisk"/>
                                     </Button>
 
@@ -150,7 +150,7 @@
                                         Margin="4 2 0 0"
                                         ToolTip.Tip="Select Disk Image"
                                         VerticalAlignment="Top"
-                                        Command="{Binding SelectSdCardImageFile}" CommandParameter="1">
+                                        Command="{Binding SelectSdCardImageFileCommand}" CommandParameter="1">
                                         <material:MaterialIcon Kind="Harddisk"/>
                                     </Button>
                                 </Grid>

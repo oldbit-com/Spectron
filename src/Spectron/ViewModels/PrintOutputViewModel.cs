@@ -57,7 +57,7 @@ public partial class PrintOutputViewModel : ObservableObject
             if (file != null)
             {
                 await using var output = File.OpenWrite(file.Path.LocalPath);
-                OutputImage.Save(output, 100);
+                OutputImage.Save(output, PngBitmapEncoderOptions.Default);
             }
         }
         catch (Exception ex)
