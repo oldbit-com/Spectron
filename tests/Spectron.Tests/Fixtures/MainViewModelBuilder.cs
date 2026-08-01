@@ -28,7 +28,7 @@ internal sealed class MainViewModelBuilder
 
         environmentService.GetAppDataPath(Arg.Any<string>()).Returns(callInfo =>
         {
-            var filePath = GetTestFilePath(callInfo.Arg<string>());
+            var filePath = GetTestFilePath(callInfo.Arg<string>() ?? string.Empty);
 
             return filePath;
         });
