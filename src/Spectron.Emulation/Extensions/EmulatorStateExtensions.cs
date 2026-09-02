@@ -16,6 +16,8 @@ public static class EmulatorStateExtensions
                 snapshot.Memory.Banks[5] :
                 snapshot.Memory.Banks[0];
 
+            var isUlaPlus = snapshot.UlaPlus is { IsEnabled: true, IsActive: true };
+
             for (var line = 0; line < ScreenSize.ContentHeight; line++)
             {
                 for (var column = 0; column < 32; column++)
@@ -35,11 +37,11 @@ public static class EmulatorStateExtensions
                     {
                         Color color;
 
-                        if (snapshot.UlaPlus != null && snapshot.UlaPlus.PaletteGroup != 0)
+                        if (isUlaPlus)
                         {
                             color = (bitmap & FastLookup.BitMasks[bit]) != 0 ?
-                                snapshot.UlaPlus.GetInkColor(attribute) :
-                                snapshot.UlaPlus.GetPaperColor(attribute);
+                                snapshot.UlaPlus!.GetInkColor(attribute) :
+                                snapshot.UlaPlus!.GetPaperColor(attribute);
                         }
                         else
                         {
