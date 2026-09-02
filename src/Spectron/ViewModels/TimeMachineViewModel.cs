@@ -14,6 +14,7 @@ using OldBit.Spectron.Emulation.Commands;
 using OldBit.Spectron.Emulation.Devices.Gamepad;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Extensions;
+using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.TimeTravel;
 using OldBit.Spectron.Messages;
 
@@ -129,7 +130,8 @@ public partial class TimeMachineViewModel : ObservableObject, IDisposable
                 Marshal.Copy(screenshot, 0, bitmap.Address, screenshot.Length);
             }
 
-            ScreenBorderBrush = new SolidColorBrush(snapshot.BorderColor.Argb);
+            var borderColor = SpectrumPalette.GetBorderColor(snapshot.Border);
+            ScreenBorderBrush = new SolidColorBrush(borderColor.Argb);
 
             PreviewControl?.InvalidateVisual();
         }

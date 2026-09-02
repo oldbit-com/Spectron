@@ -18,6 +18,7 @@ internal sealed class UlaTimex(
     internal ScreenMode ScreenMode { get; private set; }
     internal Color Paper { get; private set; }
     internal Color Ink { get; private set; }
+    internal byte PaperIndex { get; private set; } = 0x07;
 
     internal event EventHandler<EventArgs>? ScreenModeChanged;
 
@@ -62,29 +63,31 @@ internal sealed class UlaTimex(
 
         Ink = (value & 0b111_000) switch
         {
-            0b000_000 => SpectrumPalette.Black,
-            0b001_000 => SpectrumPalette.BrightBlue,
-            0b010_000 => SpectrumPalette.BrightRed,
-            0b011_000 => SpectrumPalette.BrightMagenta,
-            0b100_000 => SpectrumPalette.BrightGreen,
-            0b101_000 => SpectrumPalette.BrightCyan,
-            0b110_000 => SpectrumPalette.BrightYellow,
-            0b111_000 => SpectrumPalette.BrightWhite,
+            0b000_000 => SpectrumPalette.Black,             // 000
+            0b001_000 => SpectrumPalette.BrightBlue,        // 001
+            0b010_000 => SpectrumPalette.BrightRed,         // 010
+            0b011_000 => SpectrumPalette.BrightMagenta,     // 011
+            0b100_000 => SpectrumPalette.BrightGreen,       // 100
+            0b101_000 => SpectrumPalette.BrightCyan,        // 101
+            0b110_000 => SpectrumPalette.BrightYellow,      // 110
+            0b111_000 => SpectrumPalette.BrightWhite,       // 111
             _ => throw new ArgumentOutOfRangeException(nameof(value))
         };
 
         Paper = (value & 0b111_000) switch
         {
-            0b000_000 => SpectrumPalette.BrightWhite,
-            0b001_000 => SpectrumPalette.BrightYellow,
-            0b010_000 => SpectrumPalette.BrightCyan,
-            0b011_000 => SpectrumPalette.BrightGreen,
-            0b100_000 => SpectrumPalette.BrightMagenta,
-            0b101_000 => SpectrumPalette.BrightRed,
-            0b110_000 => SpectrumPalette.BrightBlue,
-            0b111_000 => SpectrumPalette.Black,
+            0b000_000 => SpectrumPalette.BrightWhite,       // 111
+            0b001_000 => SpectrumPalette.BrightYellow,      // 110
+            0b010_000 => SpectrumPalette.BrightCyan,        // 101
+            0b011_000 => SpectrumPalette.BrightGreen,       // 100
+            0b100_000 => SpectrumPalette.BrightMagenta,     // 011
+            0b101_000 => SpectrumPalette.BrightRed,         // 010
+            0b110_000 => SpectrumPalette.BrightBlue,        // 001
+            0b111_000 => SpectrumPalette.Black,             // 000
             _ => throw new ArgumentOutOfRangeException(nameof(value))
         };
+
+        PaperIndex = (byte)(~(value >> 3) & 0x07);          // Inverted to match the paper color index
 
         if (_lastControlValue != value)
         {

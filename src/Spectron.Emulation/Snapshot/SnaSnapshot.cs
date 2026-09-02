@@ -41,7 +41,7 @@ public sealed class SnaSnapshot(EmulatorFactory emulatorFactory, ISnaSnapshotSto
                 InterruptMode = (byte)emulator.Cpu.IM,
                 Interrupt = (byte)((emulator.Cpu.IFF2 ? 0x04 : 0x00) | (emulator.Cpu.IFF1 ? 0x02 : 0x00)),
 
-                BorderColor = SpectrumPalette.ReverseBorderColors[emulator.ScreenBuffer.LastBorderColor]
+                BorderColor = emulator.ScreenBuffer.LastBorderColorIndex
             }
         };
 
@@ -123,10 +123,8 @@ public sealed class SnaSnapshot(EmulatorFactory emulatorFactory, ISnaSnapshotSto
             return;
         }
 
-        var borderColor = SpectrumPalette.GetBorderColor(snapshot.Header.BorderColor);
-
         screenBuffer.Reset();
-        screenBuffer.UpdateBorder(borderColor);
+        screenBuffer.UpdateBorder(snapshot.Header.BorderColor);
     }
 
     private Emulator CreateEmulator(SnaFile snapshot)

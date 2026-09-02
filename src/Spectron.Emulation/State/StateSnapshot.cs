@@ -9,7 +9,7 @@ public sealed partial class StateSnapshot
 {
     public ComputerType ComputerType { get; set; }
 
-    public Color BorderColor { get; set; }
+    public byte Border { get; set; }
 
     public CpuState Cpu { get; set; } = new();
 
