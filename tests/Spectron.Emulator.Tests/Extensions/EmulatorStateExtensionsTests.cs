@@ -106,6 +106,35 @@ public class EmulatorStateExtensionsTests
         screenshot[0].ShouldBe((int)SpectrumPalette.Blue.Abgr);
     }
 
+    [Fact]
+    public void GetScreenshot_AfterSerializationRoundTrip_PreservesUlaPlusPalette()
+    {
+        // Mirrors the exact Time Machine path: Serialize -> Deserialize -> GetScreenshot.
+        var expected = new Color(0x11, 0x22, 0x33);
+        var palette = CreatePalette();
+        palette[0][8] = expected;
+
+        var original = new StateSnapshot
+        {
+            ComputerType = ComputerType.Spectrum48K,
+            UlaPlus = new UlaPlusState
+            {
+                IsEnabled = true,
+                IsActive = true,
+                PaletteGroup = 0x3F,
+                PaletteColors = palette,
+            },
+        };
+        original.Memory.SetBank(new byte[0xC000], pageNumber: 0);
+
+        var snapshot = StateSnapshot.Deserialize(original.Serialize());
+
+        snapshot.ShouldNotBeNull();
+        var screenshot = snapshot.GetScreenshot();
+
+        screenshot[0].ShouldBe((int)expected.Abgr);
+    }
+
     private static Color[][] CreatePalette() =>
         [new Color[16], new Color[16], new Color[16], new Color[16]];
 }
