@@ -242,7 +242,8 @@ public sealed class Emulator
     {
         Cpu.Clock.TicksAdded += (_, previousFrameTicks, _) => ScreenBuffer.UpdateScreen(previousFrameTicks / Clock.Multiplier);
         Cpu.BeforeInstruction += BeforeInstruction;
-        UlaPlus.ActiveChanged += _ => _invalidateScreen = true;
+        UlaPlus.ActiveChanged += (_, _) => InvalidateUlaPlus();
+        UlaPlus.PaletteChanged += (_, _) => InvalidateUlaPlus();
         Beta128.DiskActivity += _ => DiskDriveManager.OnDiskActivity();
 
         if (Ula is UlaTimex ulaTimex)
@@ -345,7 +346,15 @@ public sealed class Emulator
     private void ToggleUlaPlus(bool value)
     {
         UlaPlus.IsEnabled = value;
+
+        InvalidateUlaPlus();
+    }
+
+    private void InvalidateUlaPlus()
+    {
         _invalidateScreen = true;
+
+        ScreenBuffer.RefreshBorder(Clock.UlaTicks);
     }
 
     private void BeforeInstruction(Word pc)

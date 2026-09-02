@@ -25,12 +25,12 @@ internal sealed class UlaPlus : IDevice
         set
         {
             field = value;
-            ActiveChanged?.Invoke(EventArgs.Empty);
+            ActiveChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
-    internal delegate void ActiveChangedEvent(EventArgs e);
-    internal event ActiveChangedEvent? ActiveChanged;
+    internal event EventHandler? ActiveChanged;
+    internal event EventHandler? PaletteChanged;
 
     public void WritePort(Word address, byte value)
     {
@@ -56,6 +56,7 @@ internal sealed class UlaPlus : IDevice
                         var color = ColorFromValue(value);
 
                         PaletteColors[paletteIndex][colorIndex] = color;
+                        PaletteChanged?.Invoke(this, EventArgs.Empty);
                         break;
 
                     case Register.ModeGroup:
@@ -84,6 +85,9 @@ internal sealed class UlaPlus : IDevice
 
         return palette[colorIndex];
     }
+
+    internal Color GetBorderColor(byte borderIndex, bool isHiRes = false) =>
+        PaletteColors[isHiRes ? 1 : 0][(borderIndex & 0x07) | 8];
 
     internal Color GetPaperColor(byte attribute)
     {

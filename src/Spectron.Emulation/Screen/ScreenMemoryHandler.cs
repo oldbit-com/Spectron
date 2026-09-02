@@ -70,6 +70,7 @@ internal sealed class ScreenMemoryHandler
             screenMode,
             ulaTimex?.Ink ?? SpectrumPalette.Black,
             ulaTimex?.Paper ?? SpectrumPalette.White,
+            ulaTimex?.PaperIndex ?? 0x07,
             frameTicks);
     }
 
