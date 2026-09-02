@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Messaging;
-using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation.Devices.Beta128.Drive;
 using OldBit.Spectron.Emulation.Devices.Interface1.Microdrives;
 using OldBit.Spectron.Emulation.Extensions;
@@ -96,6 +95,13 @@ partial class MainViewModel
                 Resume();
             }
         }
+    }
+
+    private static Task HandleBrowseGamesAsync()
+    {
+        WeakReferenceMessenger.Default.Send(new ShowGameBrowserViewMessage(new GameBrowserViewModel()));
+
+        return Task.CompletedTask;
     }
 
     private async Task OpenFavorite(FavoriteProgram favorite)

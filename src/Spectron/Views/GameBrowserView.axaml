@@ -1,0 +1,36 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
+        xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="OldBit.Spectron.Views.GameBrowserView"
+        x:DataType="viewModels:GameBrowserViewModel"
+        Title="Game Browser">
+    <Grid>
+        <StackPanel>
+            <TextBox PlaceholderText="Search games, publishers or authors"/>
+            <Grid>
+
+            </Grid>
+
+            <controls:HeaderSeparator />
+
+            <Grid ColumnDefinitions="*,200">
+                <ListBox SelectionMode="Single" ItemsSource="{Binding Games}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Name}" />
+                                <TextBlock Text="{Binding Publisher}" Margin="10,0,0,0"/>
+                                <TextBlock Text="{Binding Year}" Margin="10,0,0,0"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+
+                </ListBox>
+            </Grid>
+        </StackPanel>
+    </Grid>
+</Window>

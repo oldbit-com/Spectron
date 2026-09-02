@@ -233,6 +233,14 @@ public sealed class NativeMainMenu
                     : new KeyGesture(Key.O, KeyModifiers.Control)
             },
 
+            new NativeMenuItem("Browse Games...")
+            {
+                Command = _viewModel.BrowseGamesCommand,
+                Gesture = OperatingSystem.IsMacOS()
+                    ? new KeyGesture(Key.O, KeyModifiers.Meta | KeyModifiers.Shift)
+                    : new KeyGesture(Key.O, KeyModifiers.Control | KeyModifiers.Shift)
+            },
+
             CreateRecentMenuItem(),
 
             new NativeMenuItem("Save Snapshot...")

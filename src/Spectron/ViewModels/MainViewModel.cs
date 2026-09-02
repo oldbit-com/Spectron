@@ -215,6 +215,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private async Task LoadFile() => await HandleLoadFileAsync();
 
     [RelayCommand]
+    private async Task BrowseGames() => await HandleBrowseGamesAsync();
+
+    [RelayCommand]
     private async Task SaveFile() => await HandleSaveFileAsync();
 
     [RelayCommand]

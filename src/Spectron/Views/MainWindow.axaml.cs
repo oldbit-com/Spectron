@@ -37,6 +37,9 @@ public partial class MainWindow : Window
         WeakReferenceMessenger.Default.Register<MainWindow, ShowFavoritesViewMessage>(this, (window, message) =>
             Show<FavoritesView>(window, message.ViewModel));
 
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowGameBrowserViewMessage>(this, (window, message) =>
+            Show<GameBrowserView>(window, message.ViewModel));
+
         WeakReferenceMessenger.Default.Register<MainWindow, ShowKeyboardViewMessage>(this, (window, message) =>
             Show<KeyboardView>(window, message.ViewModel));
 

@@ -53,6 +53,7 @@
     <Menu x:Name="Menu">
         <MenuItem Header="_File" Padding="10 0 10 0" IsTabStop="False" Focusable="False">
             <MenuItem Header="Load..." InputGesture="{OnPlatform Ctrl+O, macOS=Cmd+O}" Command="{Binding LoadFileCommand}"/>
+            <MenuItem Header="Browse Games..." InputGesture="{OnPlatform Ctrl+Shift+O, macOS=Cmd+Shift+O}" Command="{Binding BrowseGamesCommand}"/>
             <MenuItem Header="Recent..." SubmenuOpened="RecentFilesSubmenuOpened">
                 <MenuItem/>
             </MenuItem>
