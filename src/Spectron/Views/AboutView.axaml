@@ -49,7 +49,7 @@
         <Image Grid.Row="0" Source="../Assets/Logo.png" Height="128" Width="96"/>
         <StackPanel Grid.Row="1">
             <TextBlock Text="Spectron" FontFamily="{StaticResource SpectrumFont}" FontSize="29" HorizontalAlignment="Center" Classes="Spectron"/>
-            <TextBlock Text="Version 1.0.0" FontFamily="{StaticResource SpectrumFont}" FontSize="11" HorizontalAlignment="Center" Padding="30" Foreground="{StaticResource SpectrumBrightGreen}"/>
+            <TextBlock Text="Version 1.0.1" FontFamily="{StaticResource SpectrumFont}" FontSize="11" HorizontalAlignment="Center" Padding="30" Foreground="{StaticResource SpectrumBrightGreen}"/>
             <TextBlock Text="© 2025-2026 Wojciech Sobieszek" FontFamily="{StaticResource SpectrumFont}" FontSize="9" HorizontalAlignment="Center" Padding="0,35,0,3" Foreground="{StaticResource SpectrumBrightCyan}"/>
             <TextBlock Text="OldBit Ltd" FontFamily="{StaticResource SpectrumFont}" FontSize="9" HorizontalAlignment="Center" Foreground="{StaticResource SpectrumBrightCyan}"/>
         </StackPanel>

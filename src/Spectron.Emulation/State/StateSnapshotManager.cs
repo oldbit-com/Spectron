@@ -275,8 +275,10 @@ public sealed class StateSnapshotManager(EmulatorFactory emulatorFactory)
         };
     }
 
-    private static void SaveOther(Emulator emulator, StateSnapshot stateSnapshot) =>
-        stateSnapshot.BorderColor = emulator.ScreenBuffer.LastBorderColor;
+    private static void SaveOther(Emulator emulator, StateSnapshot stateSnapshot)
+    {
+        stateSnapshot.Border = emulator.ScreenBuffer.LastBorderColorIndex;
+    }
 
     private static void SaveCustomRom(Emulator emulator, StateSnapshot stateSnapshot)
     {
@@ -385,8 +387,10 @@ public sealed class StateSnapshotManager(EmulatorFactory emulatorFactory)
 
     private static void LoadOther(Emulator emulator, StateSnapshot stateSnapshot)
     {
+        var border = stateSnapshot.Border;
+
         emulator.ScreenBuffer.Reset();
-        emulator.ScreenBuffer.UpdateBorder(stateSnapshot.BorderColor);
+        emulator.ScreenBuffer.UpdateBorder(border);
     }
 
     private static void LoadAy(AudioManager audioManager, AyState? ayState)

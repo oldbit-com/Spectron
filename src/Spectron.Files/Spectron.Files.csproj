@@ -6,19 +6,8 @@
         <Nullable>enable</Nullable>
         <AssemblyName>OldBit.Spectron.Files</AssemblyName>
         <RootNamespace>OldBit.Spectron.Files</RootNamespace>
+        <AssemblyVersion>1.0.1</AssemblyVersion>
         <Version>1.0.1</Version>
-        <Title>ZX Spectrum emulator files parser</Title>
-        <Authors>Wojciech Sobieszek</Authors>
-        <Description>This package allows reading and writing files used by ZX Spectrum emulators such as TAP, TZX, SNA, SZX, POK and Z80.</Description>
-        <PackageProjectUrl>https://github.com/oldbit-com/Spectron.Files</PackageProjectUrl>
-        <PackageTags>TAP TZX SNA SZX Z80 POK</PackageTags>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageIcon>icon.png</PackageIcon>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <GenerateDocumentationFile>True</GenerateDocumentationFile>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
 
     <ItemGroup>

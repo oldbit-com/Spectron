@@ -129,7 +129,8 @@ public partial class TimeMachineViewModel : ObservableObject, IDisposable
                 Marshal.Copy(screenshot, 0, bitmap.Address, screenshot.Length);
             }
 
-            ScreenBorderBrush = new SolidColorBrush(snapshot.BorderColor.Argb);
+            var borderColor = snapshot.GetBorderColor();
+            ScreenBorderBrush = new SolidColorBrush(borderColor.Argb);
 
             PreviewControl?.InvalidateVisual();
         }

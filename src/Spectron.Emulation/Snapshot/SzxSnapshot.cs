@@ -182,10 +182,8 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory, ISzxSnapshotSto
 
     private static void UpdateBorder(ScreenBuffer screenBuffer, SpecRegsBlock specRegs)
     {
-        var borderColor = SpectrumPalette.GetBorderColor(specRegs.Border);
-
         screenBuffer.Reset();
-        screenBuffer.UpdateBorder(borderColor);
+        screenBuffer.UpdateBorder(specRegs.Border);
     }
 
     private static void LoadUlaPlus(UlaPlus ulaPlus, PaletteBlock? palette)
@@ -335,7 +333,7 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory, ISzxSnapshotSto
     }
 
     private static void SaveSpectrumRegisters(ScreenBuffer screenBuffer, SpecRegsBlock specRegs) =>
-        specRegs.Border = SpectrumPalette.ReverseBorderColors[screenBuffer.LastBorderColor];
+        specRegs.Border = screenBuffer.LastBorderColorIndex;
 
     private static void SaveUlaPlus(UlaPlus ulaPlus, SzxFile snapshot)
     {

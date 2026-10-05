@@ -42,7 +42,7 @@ public sealed class Z80Snapshot(EmulatorFactory emulatorFactory, IZ80SnapshotSto
             IFF2 = (byte)(emulator.Cpu.IFF2 ? 1 : 0),
             Flags1 =
             {
-                BorderColor = SpectrumPalette.ReverseBorderColors[emulator.ScreenBuffer.LastBorderColor],
+                BorderColor = emulator.ScreenBuffer.LastBorderColorIndex,
             },
             Flags2 =
             {
@@ -134,8 +134,7 @@ public sealed class Z80Snapshot(EmulatorFactory emulatorFactory, IZ80SnapshotSto
         }
 
         screenBuffer.Reset();
-        var borderColor = SpectrumPalette.GetBorderColor(snapshot.Header.Flags1.BorderColor);
-        screenBuffer.UpdateBorder(borderColor);
+        screenBuffer.UpdateBorder(snapshot.Header.Flags1.BorderColor);
     }
 
     private Emulator CreateEmulator(Z80File snapshot)

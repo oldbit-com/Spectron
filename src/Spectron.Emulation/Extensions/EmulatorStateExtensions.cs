@@ -8,50 +8,65 @@ public static class EmulatorStateExtensions
 {
     private static readonly int[] Buffer = new int[ScreenSize.ContentHeight * ScreenSize.ContentWidth];
 
-    public static int[] GetScreenshot(this StateSnapshot snapshot, bool isFlashOnFrame = false)
+    extension(StateSnapshot snapshot)
     {
-        var screenMemory = snapshot.ComputerType == ComputerType.Spectrum128K ?
-            snapshot.Memory.Banks[5] :
-            snapshot.Memory.Banks[0];
-
-        for (var line = 0; line < ScreenSize.ContentHeight; line++)
+        public int[] GetScreenshot(bool isFlashOnFrame = false)
         {
-            for (var column = 0; column < 32; column++)
+            var screenMemory = snapshot.ComputerType == ComputerType.Spectrum128K ?
+                snapshot.Memory.Banks[5] :
+                snapshot.Memory.Banks[0];
+
+            var isUlaPlus = snapshot.UlaPlus is { IsEnabled: true, IsActive: true };
+
+            for (var line = 0; line < ScreenSize.ContentHeight; line++)
             {
-                var bitmapAddress = ScreenAddress.Calculate(column, line) - 0x4000;
-                var attributeAddress = ScreenAddress.CalculateAttribute(column, line) - 0x4000;
-
-                var bitmap = screenMemory[bitmapAddress];
-                var attribute = screenMemory[attributeAddress];
-
-                var attributeData = FastLookup.AttributeData[attribute];
-                var isFlashOn = attributeData.IsFlashOn && isFlashOnFrame;
-
-                var bufferIndex = 256 * line + 8 * column;
-
-                for (var bit = 0; bit < FastLookup.BitMasks.Length; bit++)
+                for (var column = 0; column < 32; column++)
                 {
-                    Color color;
+                    var bitmapAddress = ScreenAddress.Calculate(column, line) - 0x4000;
+                    var attributeAddress = ScreenAddress.CalculateAttribute(column, line) - 0x4000;
 
-                    if (snapshot.UlaPlus != null && snapshot.UlaPlus.PaletteGroup != 0)
-                    {
-                        color = (bitmap & FastLookup.BitMasks[bit]) != 0 ?
-                            snapshot.UlaPlus.GetInkColor(attribute) :
-                            snapshot.UlaPlus.GetPaperColor(attribute);
-                    }
-                    else
-                    {
-                        color = (bitmap & FastLookup.BitMasks[bit]) != 0 ^ isFlashOn ?
-                            attributeData.Ink :
-                            attributeData.Paper;
-                    }
+                    var bitmap = screenMemory[bitmapAddress];
+                    var attribute = screenMemory[attributeAddress];
 
-                    Buffer[bufferIndex + bit] = (int)color.Abgr;
+                    var attributeData = FastLookup.AttributeData[attribute];
+                    var isFlashOn = attributeData.IsFlashOn && isFlashOnFrame;
+
+                    var bufferIndex = 256 * line + 8 * column;
+
+                    for (var bit = 0; bit < FastLookup.BitMasks.Length; bit++)
+                    {
+                        Color color;
+
+                        if (isUlaPlus)
+                        {
+                            color = (bitmap & FastLookup.BitMasks[bit]) != 0 ?
+                                snapshot.UlaPlus!.GetInkColor(attribute) :
+                                snapshot.UlaPlus!.GetPaperColor(attribute);
+                        }
+                        else
+                        {
+                            color = (bitmap & FastLookup.BitMasks[bit]) != 0 ^ isFlashOn ?
+                                attributeData.Ink :
+                                attributeData.Paper;
+                        }
+
+                        Buffer[bufferIndex + bit] = (int)color.Abgr;
+                    }
                 }
             }
+
+            return Buffer;
         }
 
-        return Buffer;
+        public Color GetBorderColor()
+        {
+            if (snapshot.UlaPlus is { IsEnabled: true, IsActive: true } ulaPlus)
+            {
+                return ulaPlus.GetBorderColor(snapshot.Border);
+            }
+
+            return SpectrumPalette.GetBorderColor(snapshot.Border);
+        }
     }
 
     extension(UlaPlusState ulaPlusState)
@@ -71,5 +86,8 @@ public static class EmulatorStateExtensions
 
             return ulaPlusState.PaletteColors[paletteIndex][colorIndex];
         }
+
+        private Color GetBorderColor(byte borderIndex) =>
+            ulaPlusState.PaletteColors[0][(borderIndex & 0x07) | 8];
     }
 }

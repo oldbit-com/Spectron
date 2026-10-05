@@ -8,14 +8,16 @@ public sealed class ScreenBuffer
 {
     private readonly Border _border;
     private readonly Content _content;
+    private readonly UlaPlus _ulaPlus;
 
     private bool _borderColorChanged = true;
     private Color? _lockedBorderColor;
+    private byte _lockedBorderColorIndex;
     private ScreenMode _screenMode = ScreenMode.Spectrum;
 
     public FrameBuffer FrameBuffer { get; }
 
-    internal Color LastBorderColor { get; private set; } = SpectrumPalette.White;
+    internal byte LastBorderColorIndex { get; private set; } = 0x07;
 
     public event EventHandler<EventArgs>? FrameBufferChanged;
 
@@ -23,6 +25,7 @@ public sealed class ScreenBuffer
     {
         FrameBuffer = new FrameBuffer();
 
+        _ulaPlus = ulaPlus;
         _border = new Border(hardware, FrameBuffer);
         _content = new Content(hardware, FrameBuffer, memory, ulaPlus);
 
@@ -32,14 +35,15 @@ public sealed class ScreenBuffer
         }
     }
 
-    internal void ChangeScreenMode(ScreenMode screenMode, Color ink, Color paper, int frameTicks)
+    internal void ChangeScreenMode(ScreenMode screenMode, Color ink, Color paper, byte paperIndex, int frameTicks)
     {
         _lockedBorderColor = screenMode.IsTimexHiRes() ? paper : null;
+        _lockedBorderColorIndex = paperIndex;
 
         _content.ChangeScreenMode(screenMode, ink, paper);
         _border.ChangeScreenMode(screenMode);
 
-        _border.Update(_lockedBorderColor ?? LastBorderColor, frameTicks);
+        _border.Update(BorderColor, frameTicks);
 
         if (_screenMode != screenMode)
         {
@@ -55,13 +59,15 @@ public sealed class ScreenBuffer
         _content.NewFrame();
     }
 
-    internal void EndFrame(int frameTicks) => _border.Update(_lockedBorderColor ?? LastBorderColor, frameTicks);
+    internal void EndFrame(int frameTicks) => _border.Update(BorderColor, frameTicks);
 
-    internal void UpdateBorder(Color borderColor, int frameTicks = 0)
+    internal void UpdateBorder(byte borderColor, int frameTicks = 0)
     {
-        if (LastBorderColor != borderColor)
+        borderColor &= 0x07;
+
+        if (LastBorderColorIndex != borderColor)
         {
-            LastBorderColor = borderColor;
+            LastBorderColorIndex = borderColor;
             _borderColorChanged = true;
         }
 
@@ -70,9 +76,31 @@ public sealed class ScreenBuffer
             return;
         }
 
-        _border.Update(_lockedBorderColor ?? borderColor, frameTicks);
+        _border.Update(BorderColor, frameTicks);
 
         _borderColorChanged = false;
+    }
+
+    internal void RefreshBorder(int frameTicks = 0)
+    {
+        _borderColorChanged = true;
+
+        UpdateBorder(LastBorderColorIndex, frameTicks);
+    }
+
+    private Color BorderColor
+    {
+        get
+        {
+            if (_ulaPlus is { IsEnabled: true, IsActive: true })
+            {
+                return _lockedBorderColor != null ?
+                    _ulaPlus.GetBorderColor(_lockedBorderColorIndex, isHiRes: true) :
+                    _ulaPlus.GetBorderColor(LastBorderColorIndex);
+            }
+
+            return _lockedBorderColor ?? SpectrumPalette.GetBorderColor(LastBorderColorIndex);
+        }
     }
 
     internal void Reset()
