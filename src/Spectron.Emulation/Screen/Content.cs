@@ -12,7 +12,7 @@ internal sealed class Content(
 {
     private ScreenRenderEvent[] _screenRenderEvents = FastLookup.GetScreenRenderEvents(hardware, frameBuffer);
 
-    private int _frameCount = 1;
+    private int _flashFrameCounter;
     private int _fetchCycleIndex;
 
     private IScreenUpdater _screenUpdater = new SpectrumScreenUpdater(frameBuffer, memory, ulaPlus);
@@ -80,21 +80,22 @@ internal sealed class Content(
 
     internal void NewFrame()
     {
-        _frameCount += 1;
+        _flashFrameCounter += 1;
         _fetchCycleIndex = 0;
 
-        if (_frameCount < 32)
+        const int flashFrames = 16; // FLASH inverts every 16 frames (full on/off cycle = 32 frames, ~1.56 Hz at 50 Hz)
+
+        if (_flashFrameCounter < flashFrames)
         {
             return;
         }
 
         _screenUpdater.ToggleFlash();
-        _frameCount = 1;
+        _flashFrameCounter = 0;
     }
 
     internal void Reset()
     {
-        _frameCount += 1;
         _fetchCycleIndex = 0;
 
         Invalidate();
