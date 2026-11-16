@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using OldBit.Spectron.Emulation.Extensions;
+using OldBit.Spectron.Emulation.Screen.Palettes;
 
 namespace OldBit.Spectron.Emulation.Screen;
 

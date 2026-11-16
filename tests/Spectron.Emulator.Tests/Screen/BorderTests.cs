@@ -1,5 +1,6 @@
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Screen;
+using OldBit.Spectron.Emulation.Screen.Palettes;
 using Shouldly;
 
 namespace OldBit.Spectron.Emulator.Tests.Screen;

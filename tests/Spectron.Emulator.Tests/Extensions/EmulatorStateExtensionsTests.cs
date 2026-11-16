@@ -1,6 +1,7 @@
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Spectron.Emulation.Screen;
+using OldBit.Spectron.Emulation.Screen.Palettes;
 using OldBit.Spectron.Emulation.State;
 using OldBit.Spectron.Emulation.State.Components;
 
