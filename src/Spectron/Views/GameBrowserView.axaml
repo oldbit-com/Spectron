@@ -4,33 +4,103 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
         xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+        xmlns:scr="clr-namespace:OldBit.Spectron.Controls.Scr"
+        xmlns:material="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.GameBrowserView"
         x:DataType="viewModels:GameBrowserViewModel"
         Title="Game Browser">
-    <Grid>
-        <StackPanel>
-            <TextBox PlaceholderText="Search games, publishers or authors"/>
-            <Grid>
+    <Grid Margin="10">
+        <Grid RowDefinitions="30,5,*">
+            <TextBox Grid.Row="0" PlaceholderText="Search games, publishers or authors"/>
 
-            </Grid>
+            <controls:HeaderSeparator Grid.Row="1" />
 
-            <controls:HeaderSeparator />
-
-            <Grid ColumnDefinitions="*,200">
-                <ListBox SelectionMode="Single" ItemsSource="{Binding Games}">
+            <Grid Grid.Row="2" ColumnDefinitions="*,280">
+                <ListBox
+                    SelectionMode="Single"
+                    ItemsSource="{Binding Games}"
+                    SelectedItem="{Binding SelectedGame}"
+                    Background="Transparent">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Name}" />
-                                <TextBlock Text="{Binding Publisher}" Margin="10,0,0,0"/>
-                                <TextBlock Text="{Binding Year}" Margin="10,0,0,0"/>
-                            </StackPanel>
+                            <Grid ColumnDefinitions="40,*,200">
+                                <material:MaterialIcon
+                                    Grid.Column="0"
+                                    Height="32"
+                                    Width="32"
+                                    Kind="GamepadVariantOutline"/>
+                                <StackPanel Grid.Column="1" Grid.ColumnSpan="2" Orientation="Vertical" Margin="10,0,0,0">
+                                    <TextBlock
+                                        Text="{Binding Name}"
+                                        Foreground="{StaticResource SpectrumBrightMagenta}"
+                                        FontWeight="Bold"
+                                        FontSize="16"
+                                        Margin="0,0,0,10"/>
+
+                                    <TextBlock Margin="0,0,0,10" FontSize="12">
+                                        <Run Text="{Binding Year}"/>
+                                        <Run Text="-"/>
+                                        <Run Text="{Binding Publisher}"/>
+                                    </TextBlock>
+
+                                    <TextBlock Text="{Binding Genre}" FontSize="12"/>
+                                </StackPanel>
+
+                                <TextBlock
+                                    Grid.Column="2"
+                                    Text="{Binding Availability}"
+                                    FontSize="12"
+                                    TextWrapping="Wrap"
+                                    TextAlignment="Right"
+                                    VerticalAlignment="Center" />
+                            </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
-
                 </ListBox>
+
+                <Grid
+                    Column="1"
+                    DataContext="{Binding SelectedGame}"
+                    RowDefinitions="192,*" Margin="10"
+                    IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}}">
+
+                    <Border Height="192" Width="256" CornerRadius="10" ClipToBounds="True">
+                        <scr:ScrImage Data="{Binding Data}"/>
+                    </Border>
+
+                    <StackPanel Grid.Row="1" Orientation="Vertical">
+                        <TextBlock
+                            Text="{Binding Name}"
+                            FontSize="18"
+                            Margin="0,10,0,0"
+                            Foreground="{StaticResource SpectrumBrightMagenta}"
+                            TextAlignment="Center"
+                            TextWrapping="WrapWithOverflow"/>
+
+                        <TextBlock Margin="0,5,0,0" Opacity="0.8">
+                            <Run Text="{Binding Year}"/>
+                            <Run Text="∙"/>
+                            <Run Text="{Binding Publisher}"/>
+                        </TextBlock>
+
+                        <Grid RowDefinitions="30,30,30" Margin="0,20,0,0" Opacity="0.8">
+                            <Grid Grid.Row="0" ColumnDefinitions="70,*">
+                                <TextBlock Grid.Column="0" Text="Machine"/>
+                                <TextBlock Grid.Column="1" Text="Machine" TextAlignment="Right"/>
+                            </Grid>
+                            <Grid Grid.Row="1" ColumnDefinitions="70,*">
+                                <TextBlock Grid.Column="0" Text="Genre"/>
+                                <TextBlock Grid.Column="1" Text="Genre" TextAlignment="Right"/>
+                            </Grid>
+                            <Grid Grid.Row="2" ColumnDefinitions="70,*">
+                                <TextBlock Grid.Column="0" Text="Rating"/>
+                                <TextBlock Grid.Column="1" Text="Rating" TextAlignment="Right"/>
+                            </Grid>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
             </Grid>
-        </StackPanel>
+        </Grid>
     </Grid>
 </Window>
