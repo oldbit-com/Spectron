@@ -5,7 +5,7 @@
         xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.PaletteView"
-        x:DataType="viewModels:PaletteViewModel"
+        x:DataType="viewModels:PaletteEditorViewModel"
         Title="Palette Editor">
 
     <Window.Styles>
@@ -24,17 +24,39 @@
         </Style>
     </Window.Styles>
 
-    <Grid RowDefinitions="100,*">
+    <Grid RowDefinitions="110,*" Margin="10">
+        <StackPanel Orientation="Vertical">
+            <TextBlock Text="SELECTED PALETTE" Margin="8 0 0 2" FontSize="10" />
+            <StackPanel Orientation="Horizontal">
+                <ComboBox
+                    ItemsSource="{Binding Palettes}"
+                    SelectedItem="{Binding SelectedPalette}"
+                    DisplayMemberBinding="{Binding Name}"
+                    Padding="8"
+                    Width="250" />
 
-        <TextBox Text="Standard" Height="20"/>
+                <Button Content="Clone" Margin="10 0 0 0" Command="{Binding ClonePaletteCommand}"/>
+                <Button Content="Delete" Margin="10 0 0 0" Command="{Binding DeletePaletteCommand}"/>
+            </StackPanel>
+
+            <TextBlock Text="PALETTE NAME" Margin="8 10 0 2" FontSize="10" />
+            <TextBox
+                Text="{Binding PaletteName}"
+                IsReadOnly="{Binding !IsEditable}"
+                MaxLength="50"
+                Width="370"
+                HorizontalAlignment="Left"
+                VerticalContentAlignment="Center" />
+        </StackPanel>
 
         <Grid
             Grid.Row="1"
+            DataContext="{Binding SelectedPalette}"
+            IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}}"
             RowDefinitions="20,30,30,30,30,30,30,30,30"
             ColumnDefinitions="20,100,100,100,100,100,100"
             RowSpacing="10"
-            ColumnSpacing="10"
-            >
+            ColumnSpacing="10">
 
             <TextBlock Grid.Row="0" Grid.Column="2" Text="Ink" Classes="Header"/>
             <TextBlock Grid.Row="0" Grid.Column="3" Text="Ink Bright" Classes="Header"/>
@@ -57,7 +79,7 @@
             <TextBlock Grid.Row="4" Grid.Column="1" Text="Magenta"/>
             <TextBlock Grid.Row="5" Grid.Column="1" Text="Green"/>
             <TextBlock Grid.Row="6" Grid.Column="1" Text="Cyan"/>
-            <TextBlock Grid.Row="7" Grid.Column="1" Text="Yello"/>
+            <TextBlock Grid.Row="7" Grid.Column="1" Text="Yellow"/>
             <TextBlock Grid.Row="8" Grid.Column="1" Text="White"/>
 
             <Border Grid.Row="1" Grid.Column="2" Background="{Binding Colors[0]}" Classes="Color"/>

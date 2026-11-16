@@ -21,4 +21,6 @@ public readonly record struct Color
         this.Green = Green;
         this.Blue = Blue;
     }
+
+    public string ToHex() => $"#{Alpha:X2}{Red:X2}{Green:X2}{Blue:X2}";
 }

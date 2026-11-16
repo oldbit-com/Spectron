@@ -10,7 +10,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<RecentFilesViewModel>();
         services.AddSingleton<FavoritesViewModel>();
         services.AddSingleton<TapeMenuViewModel>();
-        services.AddSingleton<PaletteViewModel>();
+        services.AddSingleton<PaletteEditorViewModel>();
         services.AddSingleton<MicrodriveMenuViewModel>();
         services.AddSingleton<DiskDriveMenuViewModel>();
     }

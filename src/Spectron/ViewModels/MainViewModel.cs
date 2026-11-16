@@ -97,7 +97,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public DiskDriveMenuViewModel DiskDriveMenuViewModel { get; }
     public RecentFilesViewModel RecentFilesViewModel { get; }
     public FavoritesViewModel FavoritesViewModel { get; }
-    public PaletteViewModel PaletteViewModel { get; }
+    public PaletteEditorViewModel PaletteEditorViewModel { get; }
 
     #region Observable properties
     [ObservableProperty]
@@ -350,7 +350,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         SessionService sessionService,
         RecentFilesViewModel recentFilesViewModel,
         FavoritesViewModel favoritesViewModel,
-        PaletteViewModel paletteViewModel,
+        PaletteEditorViewModel paletteEditorViewModel,
         TapeMenuViewModel tapeMenuViewModel,
         MicrodriveMenuViewModel microdriveMenuViewModel,
         DiskDriveMenuViewModel diskDriveMenuViewModel,
@@ -380,7 +380,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         RecentFilesViewModel = recentFilesViewModel;
         FavoritesViewModel = favoritesViewModel;
-        PaletteViewModel = paletteViewModel;
+        PaletteEditorViewModel = paletteEditorViewModel;
         TapeMenuViewModel = tapeMenuViewModel;
         MicrodriveMenuViewModel = microdriveMenuViewModel;
         DiskDriveMenuViewModel = diskDriveMenuViewModel;

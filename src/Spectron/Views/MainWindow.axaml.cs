@@ -47,7 +47,7 @@ public partial class MainWindow : Window
             Show<MemoryView>(window, message.ViewModel));
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowPaletteViewMessage>(this, (window, message) =>
-            Show<PaletteView>(window, message.ViewModel));
+            Show<PaletteView>(window, message.EditorViewModel));
 
         WeakReferenceMessenger.Default.Register<MainWindow, ShowPreferencesViewMessage>(this, (window, message) =>
         {

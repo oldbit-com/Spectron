@@ -8,6 +8,6 @@ public partial class PaletteView : Window
     public PaletteView()
     {
         InitializeComponent();
-        DataContext = new PaletteViewModel();
+        DataContext = new PaletteEditorViewModel();
     }
 }

@@ -142,7 +142,7 @@ partial class MainViewModel
         WeakReferenceMessenger.Default.Send(new ShowPrintOutputViewMessage(Emulator!.Printer));
 
     private void OpenPaletteEditor() =>
-        WeakReferenceMessenger.Default.Send(new ShowPaletteViewMessage(PaletteViewModel));
+        WeakReferenceMessenger.Default.Send(new ShowPaletteViewMessage(PaletteEditorViewModel));
 
     private void OpenFavoritesWindow()
     {
