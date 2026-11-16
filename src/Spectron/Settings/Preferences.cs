@@ -52,4 +52,6 @@ public class Preferences
     public PrinterSettings Printer { get; init; } = new();
 
     public Interface1Settings Interface1 { get; init; } = new();
+
+    public PaletteSettings Palette { get; init; } = new();
 }

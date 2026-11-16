@@ -156,6 +156,8 @@
                 <MenuItem Header="Blur" ToggleType="CheckBox" Command="{Binding ChangeScreenEffectCommand}" CommandParameter="{x:Static screen:ScreenEffect.Blur}" IsChecked="{Binding ScreenEffect, Converter={StaticResource EnumHasValueConverter}, ConverterParameter={x:Static screen:ScreenEffect.Blur}}"/>
                 <MenuItem Header="CRT" ToggleType="CheckBox" Command="{Binding ChangeScreenEffectCommand}" CommandParameter="{x:Static screen:ScreenEffect.Crt}" IsChecked="{Binding ScreenEffect, Converter={StaticResource EnumHasValueConverter}, ConverterParameter={x:Static screen:ScreenEffect.Crt}}"/>
             </MenuItem>
+            <MenuItem Header="Palette">
+            </MenuItem>
             <MenuItem Header="-"/>
             <MenuItem Header="Trainers" Command="{Binding ShowTrainersCommand}"/>
             <MenuItem Header="Print Output" Command="{Binding ShowPrintOutputCommand}"/>

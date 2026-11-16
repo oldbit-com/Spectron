@@ -141,6 +141,9 @@ partial class MainViewModel
     private void OpenPrintOutputViewer() =>
         WeakReferenceMessenger.Default.Send(new ShowPrintOutputViewMessage(Emulator!.Printer));
 
+    private void OpenPaletteEditor() =>
+        WeakReferenceMessenger.Default.Send(new ShowPaletteViewMessage(PaletteViewModel));
+
     private void OpenFavoritesWindow()
     {
         FavoritesViewModel.Favorites = _favorites;

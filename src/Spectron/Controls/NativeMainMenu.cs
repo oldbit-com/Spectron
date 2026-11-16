@@ -53,6 +53,7 @@ public sealed class NativeMainMenu
         CreateClockMultiplierOptionMenu();
         CreateBorderSizeMenu();
         CreateScreenEffectMenu();
+        CreatePaletteMenu();
         CreateTapeLoadingSpeedMenu();
 
         _viewModel.PropertyChanged += (_, e) => ViewModelPropertyChanged(e.PropertyName);
@@ -507,6 +508,19 @@ public sealed class NativeMainMenu
                 [
                     _screenEffects[ScreenEffect.Blur],
                     _screenEffects[ScreenEffect.Crt],
+                ]
+            },
+
+            new NativeMenuItem("Palette")
+            {
+                Menu =
+                [
+                    new NativeMenuItemSeparator(),
+
+                    new NativeMenuItem("Edit")
+                    {
+                        Command = _viewModel.ShowPaletteEditorCommand
+                    },
                 ]
             },
 
@@ -1019,6 +1033,12 @@ public sealed class NativeMainMenu
             };
         }
     }
+
+    private void CreatePaletteMenu()
+    {
+
+    }
+
 
     private void CreateTapeLoadingSpeedMenu()
     {

@@ -46,6 +46,9 @@ public partial class MainWindow : Window
         WeakReferenceMessenger.Default.Register<MainWindow, ShowMemoryViewMessage>(this, (window, message) =>
             Show<MemoryView>(window, message.ViewModel));
 
+        WeakReferenceMessenger.Default.Register<MainWindow, ShowPaletteViewMessage>(this, (window, message) =>
+            Show<PaletteView>(window, message.ViewModel));
+
         WeakReferenceMessenger.Default.Register<MainWindow, ShowPreferencesViewMessage>(this, (window, message) =>
         {
             var vm = ActivatorUtilities.CreateInstance<PreferencesViewModel>(services, message.Preferences, message.GamepadManager);

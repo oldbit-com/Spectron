@@ -97,6 +97,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public DiskDriveMenuViewModel DiskDriveMenuViewModel { get; }
     public RecentFilesViewModel RecentFilesViewModel { get; }
     public FavoritesViewModel FavoritesViewModel { get; }
+    public PaletteViewModel PaletteViewModel { get; }
 
     #region Observable properties
     [ObservableProperty]
@@ -297,6 +298,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private void ChangeScreenEffect(ScreenEffect screenEffect) => HandleChangeScreenEffect(screenEffect);
 
     [RelayCommand]
+    private void ShowPaletteEditor() => OpenPaletteEditor();
+
+    [RelayCommand]
     private void ShowTrainers() => OpenTrainersWindow();
 
     [RelayCommand]
@@ -346,6 +350,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         SessionService sessionService,
         RecentFilesViewModel recentFilesViewModel,
         FavoritesViewModel favoritesViewModel,
+        PaletteViewModel paletteViewModel,
         TapeMenuViewModel tapeMenuViewModel,
         MicrodriveMenuViewModel microdriveMenuViewModel,
         DiskDriveMenuViewModel diskDriveMenuViewModel,
@@ -375,6 +380,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         RecentFilesViewModel = recentFilesViewModel;
         FavoritesViewModel = favoritesViewModel;
+        PaletteViewModel = paletteViewModel;
         TapeMenuViewModel = tapeMenuViewModel;
         MicrodriveMenuViewModel = microdriveMenuViewModel;
         DiskDriveMenuViewModel = diskDriveMenuViewModel;
