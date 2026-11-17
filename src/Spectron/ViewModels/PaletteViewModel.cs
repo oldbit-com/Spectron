@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using OldBit.Spectron.Emulation.Screen.Palettes;
+using OldBit.Spectron.Extensions;
 
 namespace OldBit.Spectron.ViewModels;
 

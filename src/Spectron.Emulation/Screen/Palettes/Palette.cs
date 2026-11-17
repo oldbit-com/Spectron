@@ -4,7 +4,7 @@ public record Bright(PaletteColor Ink, PaletteColor Paper);
 
 public sealed class Palette
 {
-    public PaletteColor Ink { get; } = new(
+    public PaletteColor Ink { get; init; } = new(
         SpectrumPalette.Black,
         SpectrumPalette.Blue,
         SpectrumPalette.Red,
@@ -14,7 +14,7 @@ public sealed class Palette
         SpectrumPalette.Yellow,
         SpectrumPalette.White);
 
-    public PaletteColor Paper { get; } = new(
+    public PaletteColor Paper { get; set; } = new(
         SpectrumPalette.Black,
         SpectrumPalette.Blue,
         SpectrumPalette.Red,
@@ -24,7 +24,7 @@ public sealed class Palette
         SpectrumPalette.Yellow,
         SpectrumPalette.White);
 
-    public Bright Bright { get; } = new(
+    public Bright Bright { get; init; } = new(
         new PaletteColor(
             SpectrumPalette.Black,
             SpectrumPalette.BrightBlue,
@@ -45,7 +45,7 @@ public sealed class Palette
             SpectrumPalette.BrightYellow,
             SpectrumPalette.BrightWhite));
 
-    public PaletteColor Border { get; } = new(
+    public PaletteColor Border { get; init; } = new(
         SpectrumPalette.Black,
         SpectrumPalette.Blue,
         SpectrumPalette.Red,

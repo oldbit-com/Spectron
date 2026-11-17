@@ -76,6 +76,8 @@ public static class SpectrumPalette
         PaperColors[0b01101000] = palette.Bright.Paper.Cyan;
         PaperColors[0b01110000] = palette.Bright.Paper.Yellow;
         PaperColors[0b01111000] = palette.Bright.Paper.White;
+
+        FastLookup.UpdateAttributeData();
     }
 
     private static readonly Dictionary<byte, Color> BorderColors = new();

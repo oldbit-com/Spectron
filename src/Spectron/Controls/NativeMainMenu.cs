@@ -53,7 +53,6 @@ public sealed class NativeMainMenu
         CreateClockMultiplierOptionMenu();
         CreateBorderSizeMenu();
         CreateScreenEffectMenu();
-        CreatePaletteMenu();
         CreateTapeLoadingSpeedMenu();
 
         _viewModel.PropertyChanged += (_, e) => ViewModelPropertyChanged(e.PropertyName);
@@ -511,18 +510,7 @@ public sealed class NativeMainMenu
                 ]
             },
 
-            new NativeMenuItem("Palette")
-            {
-                Menu =
-                [
-                    new NativeMenuItemSeparator(),
-
-                    new NativeMenuItem("Edit")
-                    {
-                        Command = _viewModel.ShowPaletteEditorCommand
-                    },
-                ]
-            },
+            CreatePaletteMenu(),
 
             new NativeMenuItemSeparator(),
 
@@ -1034,11 +1022,26 @@ public sealed class NativeMainMenu
         }
     }
 
-    private void CreatePaletteMenu()
+    private NativeMenuItem CreatePaletteMenu()
     {
+        var paletteItem = new NativeMenuItem("Palette")
+        {
+            Menu =
+            [
+                new NativeMenuItemSeparator(),
 
+                new NativeMenuItem("Edit...")
+                {
+                    Command = _viewModel.ShowPaletteEditorCommand
+                },
+            ]
+        };
+
+        _viewModel.PaletteEditorViewModel.NativeFavoriteMenu = paletteItem.Menu;
+        _viewModel.PaletteEditorViewModel.RefreshMenu();
+
+        return paletteItem;
     }
-
 
     private void CreateTapeLoadingSpeedMenu()
     {
