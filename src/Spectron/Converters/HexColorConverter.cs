@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using Avalonia.Data;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
 using Avalonia.Media.Immutable;
@@ -22,7 +23,12 @@ public class HexColorConverter : IValueConverter
     {
         var color = HexToColor(value as string);
 
-        return new ImmutableSolidColorBrush(color ?? uint.MaxValue);
+        if (color is null)
+        {
+            return BindingOperations.DoNothing;
+        }
+
+        return new ImmutableSolidColorBrush(color.Value);
     }
 
     private static uint? HexToColor(string? hex)
