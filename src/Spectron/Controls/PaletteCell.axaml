@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
              xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="OldBit.Spectron.Controls.PaletteCell"
@@ -22,6 +23,7 @@
         <Grid Margin="4" ClipToBounds="True">
             <TextBox
                 Text="{Binding Background, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource HexColorConverter}}"
+                IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=controls:PaletteCell}}"
                 MaxLength="7"
                 BorderThickness="0"
                 Background="Transparent"

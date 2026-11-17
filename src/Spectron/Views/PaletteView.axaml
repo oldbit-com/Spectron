@@ -7,6 +7,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.PaletteView"
         x:DataType="viewModels:PaletteEditorViewModel"
+        Name="PaletteEditor"
         Title="Palette Editor">
 
     <Window.Styles>
@@ -17,6 +18,9 @@
             <Setter Property="TextAlignment" Value="Center"/>
             <Setter Property="Opacity" Value="0.7"/>
             <Setter Property="FontSize" Value="12"/>
+        </Style>
+        <Style Selector="controls|PaletteCell">
+            <Setter Property="IsReadOnly" Value="{Binding !((viewModels:PaletteEditorViewModel)DataContext).IsEditable, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
         </Style>
     </Window.Styles>
 
