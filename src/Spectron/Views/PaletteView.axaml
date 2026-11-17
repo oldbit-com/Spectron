@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+        xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.PaletteView"
         x:DataType="viewModels:PaletteEditorViewModel"
@@ -16,11 +17,6 @@
             <Setter Property="TextAlignment" Value="Center"/>
             <Setter Property="Opacity" Value="0.7"/>
             <Setter Property="FontSize" Value="12"/>
-        </Style>
-        <Style Selector="Border.Color">
-            <Setter Property="BorderBrush" Value="White"/>
-            <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="CornerRadius" Value="8"/>
         </Style>
     </Window.Styles>
 
@@ -53,7 +49,7 @@
             Grid.Row="1"
             DataContext="{Binding SelectedPalette}"
             IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}}"
-            RowDefinitions="20,30,30,30,30,30,30,30,30"
+            RowDefinitions="20,35,35,35,35,35,35,35,35"
             ColumnDefinitions="20,100,100,100,100,100,100"
             RowSpacing="10"
             ColumnSpacing="10">
@@ -82,50 +78,50 @@
             <TextBlock Grid.Row="7" Grid.Column="1" Text="Yellow"/>
             <TextBlock Grid.Row="8" Grid.Column="1" Text="White"/>
 
-            <Border Grid.Row="1" Grid.Column="2" Background="{Binding Colors[0]}" Classes="Color"/>
-            <Border Grid.Row="2" Grid.Column="2" Background="{Binding Colors[1]}" Classes="Color"/>
-            <Border Grid.Row="3" Grid.Column="2" Background="{Binding Colors[2]}" Classes="Color"/>
-            <Border Grid.Row="4" Grid.Column="2" Background="{Binding Colors[3]}" Classes="Color"/>
-            <Border Grid.Row="5" Grid.Column="2" Background="{Binding Colors[4]}" Classes="Color"/>
-            <Border Grid.Row="6" Grid.Column="2" Background="{Binding Colors[5]}" Classes="Color"/>
-            <Border Grid.Row="7" Grid.Column="2" Background="{Binding Colors[6]}" Classes="Color"/>
-            <Border Grid.Row="8" Grid.Column="2" Background="{Binding Colors[7]}" Classes="Color"/>
+            <controls:PaletteCell Grid.Row="1" Grid.Column="2" Background="{Binding Colors[0]}"/>
+            <controls:PaletteCell Grid.Row="2" Grid.Column="2" Background="{Binding Colors[1]}"/>
+            <controls:PaletteCell Grid.Row="3" Grid.Column="2" Background="{Binding Colors[2]}"/>
+            <controls:PaletteCell Grid.Row="4" Grid.Column="2" Background="{Binding Colors[3]}"/>
+            <controls:PaletteCell Grid.Row="5" Grid.Column="2" Background="{Binding Colors[4]}"/>
+            <controls:PaletteCell Grid.Row="6" Grid.Column="2" Background="{Binding Colors[5]}"/>
+            <controls:PaletteCell Grid.Row="7" Grid.Column="2" Background="{Binding Colors[6]}"/>
+            <controls:PaletteCell Grid.Row="8" Grid.Column="2" Background="{Binding Colors[7]}"/>
 
-            <Border Grid.Row="1" Grid.Column="3" Background="{Binding Colors[8]}" Classes="Color"/>
-            <Border Grid.Row="2" Grid.Column="3" Background="{Binding Colors[9]}" Classes="Color"/>
-            <Border Grid.Row="3" Grid.Column="3" Background="{Binding Colors[10]}" Classes="Color"/>
-            <Border Grid.Row="4" Grid.Column="3" Background="{Binding Colors[11]}" Classes="Color"/>
-            <Border Grid.Row="5" Grid.Column="3" Background="{Binding Colors[12]}" Classes="Color"/>
-            <Border Grid.Row="6" Grid.Column="3" Background="{Binding Colors[13]}" Classes="Color"/>
-            <Border Grid.Row="7" Grid.Column="3" Background="{Binding Colors[14]}" Classes="Color"/>
-            <Border Grid.Row="8" Grid.Column="3" Background="{Binding Colors[15]}" Classes="Color"/>
+            <controls:PaletteCell Grid.Row="1" Grid.Column="3" Background="{Binding Colors[8]}"/>
+            <controls:PaletteCell Grid.Row="2" Grid.Column="3" Background="{Binding Colors[9]}"/>
+            <controls:PaletteCell Grid.Row="3" Grid.Column="3" Background="{Binding Colors[10]}"/>
+            <controls:PaletteCell Grid.Row="4" Grid.Column="3" Background="{Binding Colors[11]}"/>
+            <controls:PaletteCell Grid.Row="5" Grid.Column="3" Background="{Binding Colors[12]}"/>
+            <controls:PaletteCell Grid.Row="6" Grid.Column="3" Background="{Binding Colors[13]}"/>
+            <controls:PaletteCell Grid.Row="7" Grid.Column="3" Background="{Binding Colors[14]}"/>
+            <controls:PaletteCell Grid.Row="8" Grid.Column="3" Background="{Binding Colors[15]}"/>
 
-            <Border Grid.Row="1" Grid.Column="4" Background="{Binding Colors[16]}" Classes="Color"/>
-            <Border Grid.Row="2" Grid.Column="4" Background="{Binding Colors[17]}" Classes="Color"/>
-            <Border Grid.Row="3" Grid.Column="4" Background="{Binding Colors[18]}" Classes="Color"/>
-            <Border Grid.Row="4" Grid.Column="4" Background="{Binding Colors[19]}" Classes="Color"/>
-            <Border Grid.Row="5" Grid.Column="4" Background="{Binding Colors[20]}" Classes="Color"/>
-            <Border Grid.Row="6" Grid.Column="4" Background="{Binding Colors[21]}" Classes="Color"/>
-            <Border Grid.Row="7" Grid.Column="4" Background="{Binding Colors[22]}" Classes="Color"/>
-            <Border Grid.Row="8" Grid.Column="4" Background="{Binding Colors[23]}" Classes="Color"/>
+            <controls:PaletteCell Grid.Row="1" Grid.Column="4" Background="{Binding Colors[16]}"/>
+            <controls:PaletteCell Grid.Row="2" Grid.Column="4" Background="{Binding Colors[17]}"/>
+            <controls:PaletteCell Grid.Row="3" Grid.Column="4" Background="{Binding Colors[18]}"/>
+            <controls:PaletteCell Grid.Row="4" Grid.Column="4" Background="{Binding Colors[19]}"/>
+            <controls:PaletteCell Grid.Row="5" Grid.Column="4" Background="{Binding Colors[20]}"/>
+            <controls:PaletteCell Grid.Row="6" Grid.Column="4" Background="{Binding Colors[21]}"/>
+            <controls:PaletteCell Grid.Row="7" Grid.Column="4" Background="{Binding Colors[22]}"/>
+            <controls:PaletteCell Grid.Row="8" Grid.Column="4" Background="{Binding Colors[23]}"/>
 
-            <Border Grid.Row="1" Grid.Column="5" Background="{Binding Colors[24]}" Classes="Color"/>
-            <Border Grid.Row="2" Grid.Column="5" Background="{Binding Colors[25]}" Classes="Color"/>
-            <Border Grid.Row="3" Grid.Column="5" Background="{Binding Colors[26]}" Classes="Color"/>
-            <Border Grid.Row="4" Grid.Column="5" Background="{Binding Colors[27]}" Classes="Color"/>
-            <Border Grid.Row="5" Grid.Column="5" Background="{Binding Colors[28]}" Classes="Color"/>
-            <Border Grid.Row="6" Grid.Column="5" Background="{Binding Colors[29]}" Classes="Color"/>
-            <Border Grid.Row="7" Grid.Column="5" Background="{Binding Colors[30]}" Classes="Color"/>
-            <Border Grid.Row="8" Grid.Column="5" Background="{Binding Colors[31]}" Classes="Color"/>
+            <controls:PaletteCell Grid.Row="1" Grid.Column="5" Background="{Binding Colors[24]}"/>
+            <controls:PaletteCell Grid.Row="2" Grid.Column="5" Background="{Binding Colors[25]}"/>
+            <controls:PaletteCell Grid.Row="3" Grid.Column="5" Background="{Binding Colors[26]}"/>
+            <controls:PaletteCell Grid.Row="4" Grid.Column="5" Background="{Binding Colors[27]}"/>
+            <controls:PaletteCell Grid.Row="5" Grid.Column="5" Background="{Binding Colors[28]}"/>
+            <controls:PaletteCell Grid.Row="6" Grid.Column="5" Background="{Binding Colors[29]}"/>
+            <controls:PaletteCell Grid.Row="7" Grid.Column="5" Background="{Binding Colors[30]}"/>
+            <controls:PaletteCell Grid.Row="8" Grid.Column="5" Background="{Binding Colors[31]}"/>
 
-            <Border Grid.Row="1" Grid.Column="6" Background="{Binding Colors[32]}" Classes="Color"/>
-            <Border Grid.Row="2" Grid.Column="6" Background="{Binding Colors[33]}" Classes="Color"/>
-            <Border Grid.Row="3" Grid.Column="6" Background="{Binding Colors[34]}" Classes="Color"/>
-            <Border Grid.Row="4" Grid.Column="6" Background="{Binding Colors[35]}" Classes="Color"/>
-            <Border Grid.Row="5" Grid.Column="6" Background="{Binding Colors[36]}" Classes="Color"/>
-            <Border Grid.Row="6" Grid.Column="6" Background="{Binding Colors[37]}" Classes="Color"/>
-            <Border Grid.Row="7" Grid.Column="6" Background="{Binding Colors[38]}" Classes="Color"/>
-            <Border Grid.Row="8" Grid.Column="6" Background="{Binding Colors[39]}" Classes="Color"/>
+            <controls:PaletteCell Grid.Row="1" Grid.Column="6" Background="{Binding Colors[32]}"/>
+            <controls:PaletteCell Grid.Row="2" Grid.Column="6" Background="{Binding Colors[33]}"/>
+            <controls:PaletteCell Grid.Row="3" Grid.Column="6" Background="{Binding Colors[34]}"/>
+            <controls:PaletteCell Grid.Row="4" Grid.Column="6" Background="{Binding Colors[35]}"/>
+            <controls:PaletteCell Grid.Row="5" Grid.Column="6" Background="{Binding Colors[36]}"/>
+            <controls:PaletteCell Grid.Row="6" Grid.Column="6" Background="{Binding Colors[37]}"/>
+            <controls:PaletteCell Grid.Row="7" Grid.Column="6" Background="{Binding Colors[38]}"/>
+            <controls:PaletteCell Grid.Row="8" Grid.Column="6" Background="{Binding Colors[39]}"/>
 
         </Grid>
     </Grid>
