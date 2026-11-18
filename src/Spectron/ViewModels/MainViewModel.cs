@@ -113,6 +113,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public partial ScreenEffect ScreenEffect { get; set; } = ScreenEffect.None;
 
     [ObservableProperty]
+    public partial PaletteType PaletteType { get; set; } = PaletteType.Standard;
+
+    [ObservableProperty]
     public partial RomType RomType { get; set; } = RomType.Original;
 
     [ObservableProperty]
@@ -301,6 +304,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private void ShowPaletteEditor() => OpenPaletteEditor();
 
     [RelayCommand]
+    private void ChangePalette(PaletteType paletteType) => HandleChangePalette(paletteType);
+
+    [RelayCommand]
     private void ShowTrainers() => OpenTrainersWindow();
 
     [RelayCommand]
@@ -395,6 +401,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _keyboardHandler = new KeyboardHandler();
         _keyboardHandler.SpectrumKeyPressed += HandleSpectrumKeyPressed;
         _keyboardHandler.SpectrumKeyReleased += HandleSpectrumKeyReleased;
+
+        paletteEditorViewModel.SetEmulatorPalette = palette => { Emulator?.SetPalette(palette); };
 
         WeakReferenceMessenger.Default.Register<ResetEmulatorMessage>(this, (_, message) =>
             HandleMachineReset(message.HardReset));

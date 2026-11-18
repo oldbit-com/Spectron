@@ -7,9 +7,9 @@ using Avalonia.Media.Immutable;
 
 namespace OldBit.Spectron.Converters;
 
-public class HexColorConverter : IValueConverter
+public class HexToColorConverter : IValueConverter
 {
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is ISolidColorBrush brush)
         {
@@ -19,7 +19,7 @@ public class HexColorConverter : IValueConverter
         return string.Empty;
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         var color = HexToColor(value as string);
 

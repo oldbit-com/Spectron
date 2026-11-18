@@ -11,6 +11,11 @@ public static class ColorExtensions
 
         public static Color FromHex(string hex)
         {
+            if (Avalonia.Media.Color.TryParse(hex, out var parsed))
+            {
+                return new Color(parsed.R, parsed.G, parsed.B);
+            }
+
             hex = hex.TrimStart('#');
 
             return !uint.TryParse(hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var rgb) ?

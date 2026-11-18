@@ -16,6 +16,7 @@ using OldBit.Spectron.Emulation.Devices.Printer;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Rzx;
 using OldBit.Spectron.Emulation.Screen;
+using OldBit.Spectron.Emulation.Screen.Palettes;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Emulation.TimeTravel;
 using OldBit.Z80Cpu;
@@ -219,6 +220,14 @@ public sealed class Emulator
             _emulationTimer.Interval = value == MaxEmulationSpeed ?
                 TimeSpan.Zero :
                 TimeSpan.FromMilliseconds(20 * (100f / value));
+    }
+
+    public void SetPalette(Palette palette)
+    {
+        SpectrumPalette.SetPalette(palette);
+        FastLookup.UpdateAttributeData();
+
+        _invalidateScreen = true;
     }
 
     private void OnTimerElapsed(object? sender, EventArgs e)

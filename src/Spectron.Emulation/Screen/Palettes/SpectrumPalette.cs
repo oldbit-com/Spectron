@@ -30,7 +30,7 @@ public static class SpectrumPalette
     static SpectrumPalette() => SetPalette(new Palette());
 
     [MemberNotNull(nameof(Current))]
-    public static void SetPalette(Palette palette)
+    internal static void SetPalette(Palette palette)
     {
         Current = palette;
 
@@ -76,8 +76,6 @@ public static class SpectrumPalette
         PaperColors[0b01101000] = palette.Bright.Paper.Cyan;
         PaperColors[0b01110000] = palette.Bright.Paper.Yellow;
         PaperColors[0b01111000] = palette.Bright.Paper.White;
-
-        FastLookup.UpdateAttributeData();
     }
 
     private static readonly Dictionary<byte, Color> BorderColors = new();

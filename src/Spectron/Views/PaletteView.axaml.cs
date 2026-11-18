@@ -19,10 +19,4 @@ public partial class PaletteView : Window
 
         _viewModel = viewModel;
     }
-
-    protected override void OnClosed(EventArgs e)
-    {
-        _viewModel?.UpdatePalettes();
-        base.OnClosed(e);
-    }
 }

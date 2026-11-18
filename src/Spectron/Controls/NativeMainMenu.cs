@@ -29,6 +29,7 @@ public sealed class NativeMainMenu
     private readonly Dictionary<int, NativeMenuItem> _clockMultipliers = new();
     private readonly Dictionary<BorderSize, NativeMenuItem> _borderSizes = new();
     private readonly Dictionary<ScreenEffect, NativeMenuItem> _screenEffects = new();
+    private readonly Dictionary<PaletteType, NativeMenuItem> _palettes = new();
     private readonly Dictionary<TapeSpeed, NativeMenuItem> _tapeLoadingSpeeds = new();
     private readonly Dictionary<MicrodriveId, NativeMenuItem> _microdrives = new();
     private readonly Dictionary<DriveId, NativeMenuItem> _diskDrives = new();
@@ -175,6 +176,14 @@ public sealed class NativeMainMenu
 
                 case nameof(MainViewModel.IsFullScreen):
                     _fullScreenMenuItem?.Header = _viewModel.IsFullScreen ? "Exit Full Screen" : "Full Screen";
+
+                    break;
+
+                case nameof(MainViewModel.PaletteType):
+                    foreach (var paletteType in _palettes.Keys)
+                    {
+                        _palettes[paletteType].IsChecked = _viewModel.PaletteType == paletteType;
+                    }
 
                     break;
 
@@ -1024,10 +1033,29 @@ public sealed class NativeMainMenu
 
     private NativeMenuItem CreatePaletteMenu()
     {
+        foreach(var palette in _viewModel.PaletteEditorViewModel.Palettes)
+        {
+            _palettes[palette.PaletteType] = new NativeMenuItem(palette.Name)
+            {
+                ToggleType = MenuItemToggleType.Radio,
+                Command = _viewModel.ChangePaletteCommand,
+                CommandParameter = palette.PaletteType,
+                IsChecked = _viewModel.PaletteType == palette.PaletteType,
+            };
+        }
+
         var paletteItem = new NativeMenuItem("Palette")
         {
             Menu =
             [
+                _palettes[PaletteType.Standard],
+                _palettes[PaletteType.BlackAndWhite],
+                _palettes[PaletteType.Commodore],
+                _palettes[PaletteType.Green],
+                _palettes[PaletteType.Amber],
+                _palettes[PaletteType.Sepia],
+                _palettes[PaletteType.Custom],
+
                 new NativeMenuItemSeparator(),
 
                 new NativeMenuItem("Edit...")
@@ -1036,9 +1064,6 @@ public sealed class NativeMainMenu
                 },
             ]
         };
-
-        _viewModel.PaletteEditorViewModel.NativeFavoriteMenu = paletteItem.Menu;
-        _viewModel.PaletteEditorViewModel.RefreshMenu();
 
         return paletteItem;
     }
