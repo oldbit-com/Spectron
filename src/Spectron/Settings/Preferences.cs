@@ -4,6 +4,7 @@ using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Screen;
 using OldBit.Spectron.Theming;
+using OldBit.Spectron.ViewModels;
 
 namespace OldBit.Spectron.Settings;
 
@@ -53,5 +54,5 @@ public class Preferences
 
     public Interface1Settings Interface1 { get; init; } = new();
 
-    public PaletteSettings Palette { get; init; } = new();
+    public PaletteType PaletteType { get; set; } = PaletteType.Standard;
 }

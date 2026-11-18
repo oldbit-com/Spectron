@@ -72,6 +72,7 @@ partial class MainViewModel
             Emulator.ConfigureAudio(_preferences.Audio);
 
             ApplyCommandLineArguments();
+            HandleChangePalette(_preferences.PaletteType);
 
             return;
         }
@@ -95,6 +96,7 @@ partial class MainViewModel
         }
 
         ApplyCommandLineArguments();
+        HandleChangePalette(_preferences.PaletteType);
 
         if (CommandLineArgs?.FilePath != null)
         {
@@ -209,6 +211,7 @@ partial class MainViewModel
         _preferences.Audio.IsMuted = IsAudioMuted;
         _preferences.BorderSize = BorderSize;
         _preferences.ScreenEffect = ScreenEffect;
+        _preferences.PaletteType = PaletteType;
 
         await Task.WhenAll(
             _preferencesService.SaveAsync(_preferences),
