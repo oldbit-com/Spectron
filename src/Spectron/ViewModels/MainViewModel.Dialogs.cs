@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
@@ -141,8 +142,11 @@ partial class MainViewModel
     private void OpenPrintOutputViewer() =>
         WeakReferenceMessenger.Default.Send(new ShowPrintOutputViewMessage(Emulator!.Printer));
 
-    private void OpenPaletteEditor() =>
+    private void OpenPaletteEditor()
+    {
+        PaletteEditorViewModel.SelectedPalette = PaletteEditorViewModel.Palettes.FirstOrDefault(p => p.PaletteType == PaletteType);
         WeakReferenceMessenger.Default.Send(new ShowPaletteViewMessage(PaletteEditorViewModel));
+    }
 
     private void OpenFavoritesWindow()
     {
