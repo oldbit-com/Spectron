@@ -3,7 +3,7 @@ using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
-using static OldBit.Spectron.Emulation.Screen.SpectrumPalette;
+using static OldBit.Spectron.Emulation.Screen.Palettes.SpectrumPalette;
 
 namespace OldBit.Spectron.Emulator.Tests.Screen.Modes;
 

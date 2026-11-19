@@ -2,6 +2,7 @@ using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Screen;
+using OldBit.Spectron.Emulation.Screen.Palettes;
 
 namespace OldBit.Spectron.Emulator.Tests.Screen;
 

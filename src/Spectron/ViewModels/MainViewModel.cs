@@ -61,6 +61,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private readonly PreferencesService _preferencesService;
     private readonly FavoritesService _favoritesService;
+    private readonly PaletteService _paletteService;
     private readonly SessionService _sessionService;
     private readonly DebuggerContext _debuggerContext;
     private readonly QuickSaveService _quickSaveService;
@@ -97,6 +98,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public DiskDriveMenuViewModel DiskDriveMenuViewModel { get; }
     public RecentFilesViewModel RecentFilesViewModel { get; }
     public FavoritesViewModel FavoritesViewModel { get; }
+    public PaletteEditorViewModel PaletteEditorViewModel { get; }
 
     #region Observable properties
     [ObservableProperty]
@@ -110,6 +112,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     public partial ScreenEffect ScreenEffect { get; set; } = ScreenEffect.None;
+
+    [ObservableProperty]
+    public partial PaletteType PaletteType { get; set; } = PaletteType.Standard;
 
     [ObservableProperty]
     public partial RomType RomType { get; set; } = RomType.Original;
@@ -297,6 +302,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private void ChangeScreenEffect(ScreenEffect screenEffect) => HandleChangeScreenEffect(screenEffect);
 
     [RelayCommand]
+    private void ShowPaletteEditor() => OpenPaletteEditor();
+
+    [RelayCommand]
+    private void ChangePalette(PaletteType paletteType) => HandleChangePalette(paletteType);
+
+    [RelayCommand]
     private void ShowTrainers() => OpenTrainersWindow();
 
     [RelayCommand]
@@ -343,9 +354,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Loader loader,
         PreferencesService preferencesService,
         FavoritesService favoritesService,
+        PaletteService paletteService,
         SessionService sessionService,
         RecentFilesViewModel recentFilesViewModel,
         FavoritesViewModel favoritesViewModel,
+        PaletteEditorViewModel paletteEditorViewModel,
         TapeMenuViewModel tapeMenuViewModel,
         MicrodriveMenuViewModel microdriveMenuViewModel,
         DiskDriveMenuViewModel diskDriveMenuViewModel,
@@ -367,6 +380,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _loader = loader;
         _preferencesService = preferencesService;
         _favoritesService = favoritesService;
+        _paletteService = paletteService;
         _sessionService = sessionService;
         _debuggerContext = debuggerContext;
         _quickSaveService = quickSaveService;
@@ -375,6 +389,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         RecentFilesViewModel = recentFilesViewModel;
         FavoritesViewModel = favoritesViewModel;
+        PaletteEditorViewModel = paletteEditorViewModel;
         TapeMenuViewModel = tapeMenuViewModel;
         MicrodriveMenuViewModel = microdriveMenuViewModel;
         DiskDriveMenuViewModel = diskDriveMenuViewModel;
@@ -389,6 +404,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _keyboardHandler = new KeyboardHandler();
         _keyboardHandler.SpectrumKeyPressed += HandleSpectrumKeyPressed;
         _keyboardHandler.SpectrumKeyReleased += HandleSpectrumKeyReleased;
+
+        paletteEditorViewModel.SetEmulatorPalette = palette => { Emulator?.SetPalette(palette); };
 
         WeakReferenceMessenger.Default.Register<ResetEmulatorMessage>(this, (_, message) =>
             HandleMachineReset(message.HardReset));

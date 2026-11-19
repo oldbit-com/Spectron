@@ -1,5 +1,6 @@
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Screen;
+using OldBit.Spectron.Emulation.Screen.Palettes;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Z80Cpu;
 
@@ -63,27 +64,27 @@ internal sealed class UlaTimex(
 
         Ink = (value & 0b111_000) switch
         {
-            0b000_000 => SpectrumPalette.Black,             // 000
-            0b001_000 => SpectrumPalette.BrightBlue,        // 001
-            0b010_000 => SpectrumPalette.BrightRed,         // 010
-            0b011_000 => SpectrumPalette.BrightMagenta,     // 011
-            0b100_000 => SpectrumPalette.BrightGreen,       // 100
-            0b101_000 => SpectrumPalette.BrightCyan,        // 101
-            0b110_000 => SpectrumPalette.BrightYellow,      // 110
-            0b111_000 => SpectrumPalette.BrightWhite,       // 111
+            0b000_000 => SpectrumPalette.Current.Bright.Ink.Black,       // 000
+            0b001_000 => SpectrumPalette.Current.Bright.Ink.Blue,        // 001
+            0b010_000 => SpectrumPalette.Current.Bright.Ink.Red,         // 010
+            0b011_000 => SpectrumPalette.Current.Bright.Ink.Magenta,     // 011
+            0b100_000 => SpectrumPalette.Current.Bright.Ink.Green,       // 100
+            0b101_000 => SpectrumPalette.Current.Bright.Ink.Cyan,        // 101
+            0b110_000 => SpectrumPalette.Current.Bright.Ink.Yellow,      // 110
+            0b111_000 => SpectrumPalette.Current.Bright.Ink.White,       // 111
             _ => throw new ArgumentOutOfRangeException(nameof(value))
         };
 
         Paper = (value & 0b111_000) switch
         {
-            0b000_000 => SpectrumPalette.BrightWhite,       // 111
-            0b001_000 => SpectrumPalette.BrightYellow,      // 110
-            0b010_000 => SpectrumPalette.BrightCyan,        // 101
-            0b011_000 => SpectrumPalette.BrightGreen,       // 100
-            0b100_000 => SpectrumPalette.BrightMagenta,     // 011
-            0b101_000 => SpectrumPalette.BrightRed,         // 010
-            0b110_000 => SpectrumPalette.BrightBlue,        // 001
-            0b111_000 => SpectrumPalette.Black,             // 000
+            0b000_000 => SpectrumPalette.Current.Bright.Paper.White,       // 111
+            0b001_000 => SpectrumPalette.Current.Bright.Paper.Yellow,      // 110
+            0b010_000 => SpectrumPalette.Current.Bright.Paper.Cyan,        // 101
+            0b011_000 => SpectrumPalette.Current.Bright.Paper.Green,       // 100
+            0b100_000 => SpectrumPalette.Current.Bright.Paper.Magenta,     // 011
+            0b101_000 => SpectrumPalette.Current.Bright.Paper.Red,         // 010
+            0b110_000 => SpectrumPalette.Current.Bright.Paper.Blue,        // 001
+            0b111_000 => SpectrumPalette.Current.Bright.Paper.Black,       // 000
             _ => throw new ArgumentOutOfRangeException(nameof(value))
         };
 

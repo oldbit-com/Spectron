@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using OldBit.Spectron.Emulation.Extensions;
+using OldBit.Spectron.Emulation.Screen.Palettes;
 
 namespace OldBit.Spectron.Emulation.Screen;
 
@@ -53,6 +54,16 @@ internal static class FastLookup
         return ScreenRenderEvents[key];
     }
 
+    internal static void UpdateAttributeData()
+    {
+        var data = BuildAttributeColorLookupTable();
+
+        for(var i = 0; i < data.Length; i++)
+        {
+            AttributeData[i] = data[i];
+        }
+    }
+
     private static AttributeColor[] BuildAttributeColorLookupTable()
     {
         var colors = new List<AttributeColor>();
@@ -67,7 +78,7 @@ internal static class FastLookup
             colors.Add(new AttributeColor(paper, ink, isFlashOn));
         }
 
-        return colors.ToArray();
+        return [.. colors];
     }
 
     private static Word[] BuildScreenAddressLookupTable()

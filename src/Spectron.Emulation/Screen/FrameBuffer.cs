@@ -1,4 +1,5 @@
 using OldBit.Spectron.Emulation.Extensions;
+using OldBit.Spectron.Emulation.Screen.Palettes;
 
 namespace OldBit.Spectron.Emulation.Screen;
 
@@ -25,7 +26,7 @@ public sealed class FrameBuffer
 
         ChangeScreenMode(ScreenMode);
 
-        Pixels = Enumerable.Repeat(DefaultFillColor, hiResWidth * Height).ToArray();
+        Pixels = [.. Enumerable.Repeat(DefaultFillColor, hiResWidth * Height)];
     }
 
     internal void ChangeScreenMode(ScreenMode screenMode)

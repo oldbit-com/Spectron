@@ -4,6 +4,7 @@ using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Screen;
+using OldBit.Spectron.Emulation.Screen.Palettes;
 using OldBit.Spectron.Emulation.Tape;
 using OldBit.Z80Cpu;
 

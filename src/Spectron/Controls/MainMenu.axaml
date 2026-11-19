@@ -156,6 +156,17 @@
                 <MenuItem Header="Blur" ToggleType="CheckBox" Command="{Binding ChangeScreenEffectCommand}" CommandParameter="{x:Static screen:ScreenEffect.Blur}" IsChecked="{Binding ScreenEffect, Converter={StaticResource EnumHasValueConverter}, ConverterParameter={x:Static screen:ScreenEffect.Blur}}"/>
                 <MenuItem Header="CRT" ToggleType="CheckBox" Command="{Binding ChangeScreenEffectCommand}" CommandParameter="{x:Static screen:ScreenEffect.Crt}" IsChecked="{Binding ScreenEffect, Converter={StaticResource EnumHasValueConverter}, ConverterParameter={x:Static screen:ScreenEffect.Crt}}"/>
             </MenuItem>
+            <MenuItem Header="Palette">
+                <MenuItem Header="Standard" ToggleType="Radio" Command="{Binding ChangePaletteCommand}" CommandParameter="{x:Static viewModels:PaletteType.Standard}" IsChecked="{Binding PaletteType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static viewModels:PaletteType.Standard}}"/>
+                <MenuItem Header="Black and White" ToggleType="Radio" Command="{Binding ChangePaletteCommand}" CommandParameter="{x:Static viewModels:PaletteType.BlackAndWhite}" IsChecked="{Binding PaletteType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static viewModels:PaletteType.BlackAndWhite}}"/>
+                <MenuItem Header="Commodore" ToggleType="Radio" Command="{Binding ChangePaletteCommand}" CommandParameter="{x:Static viewModels:PaletteType.Commodore}" IsChecked="{Binding PaletteType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static viewModels:PaletteType.Commodore}}"/>
+                <MenuItem Header="Green" ToggleType="Radio" Command="{Binding ChangePaletteCommand}" CommandParameter="{x:Static viewModels:PaletteType.Green}" IsChecked="{Binding PaletteType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static viewModels:PaletteType.Green}}"/>
+                <MenuItem Header="Amber" ToggleType="Radio" Command="{Binding ChangePaletteCommand}" CommandParameter="{x:Static viewModels:PaletteType.Amber}" IsChecked="{Binding PaletteType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static viewModels:PaletteType.Amber}}"/>
+                <MenuItem Header="Sepia" ToggleType="Radio" Command="{Binding ChangePaletteCommand}" CommandParameter="{x:Static viewModels:PaletteType.Sepia}" IsChecked="{Binding PaletteType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static viewModels:PaletteType.Sepia}}"/>
+                <MenuItem Header="Custom" ToggleType="Radio" Command="{Binding ChangePaletteCommand}" CommandParameter="{x:Static viewModels:PaletteType.Custom}" IsChecked="{Binding PaletteType, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static viewModels:PaletteType.Custom}}"/>
+                <MenuItem Header="-"/>
+                <MenuItem Header="Edit..." Command="{Binding ShowPaletteEditorCommand}"/>
+            </MenuItem>
             <MenuItem Header="-"/>
             <MenuItem Header="Trainers" Command="{Binding ShowTrainersCommand}"/>
             <MenuItem Header="Print Output" Command="{Binding ShowPrintOutputCommand}"/>

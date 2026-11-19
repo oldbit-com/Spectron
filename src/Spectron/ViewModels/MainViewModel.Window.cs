@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using OldBit.Spectron.Extensions;
+using OldBit.Spectron.Settings;
 using OldBit.Spectron.Theming;
 
 namespace OldBit.Spectron.ViewModels;
@@ -41,11 +42,19 @@ partial class MainViewModel
 
     private async Task WindowOpenedAsync()
     {
-        _preferences = await _preferencesService.LoadAsync();
-        _favorites = await _favoritesService.LoadAsync();
+        var preferencesTask = _preferencesService.LoadAsync();
+        var favoritesTask = _favoritesService.LoadAsync();
+        var paletteTask = _paletteService.LoadAsync();
+
+        await Task.WhenAll(preferencesTask, favoritesTask, paletteTask);
+
+        _preferences = preferencesTask.Result;
+        _favorites = favoritesTask.Result;
 
         FavoritesViewModel.Favorites = _favorites;
         FavoritesViewModel.RefreshMenu();
+
+        PaletteEditorViewModel.Update(paletteTask.Result.PaletteColors);
 
         ThemeManager.SelectTheme(CommandLineArgs?.Theme ?? _preferences.Theme);
         IsNativeMenuEnabled = _preferences.IsNativeMenuEnabled;
@@ -72,6 +81,7 @@ partial class MainViewModel
             Emulator.ConfigureAudio(_preferences.Audio);
 
             ApplyCommandLineArguments();
+            HandleChangePalette(_preferences.PaletteType);
 
             return;
         }
@@ -95,6 +105,7 @@ partial class MainViewModel
         }
 
         ApplyCommandLineArguments();
+        HandleChangePalette(_preferences.PaletteType);
 
         if (CommandLineArgs?.FilePath != null)
         {
@@ -209,10 +220,17 @@ partial class MainViewModel
         _preferences.Audio.IsMuted = IsAudioMuted;
         _preferences.BorderSize = BorderSize;
         _preferences.ScreenEffect = ScreenEffect;
+        _preferences.PaletteType = PaletteType;
+
+        var paletteSettings = new PaletteSettings
+        {
+            PaletteColors = PaletteEditorViewModel.ToDictionary()
+        };
 
         await Task.WhenAll(
             _preferencesService.SaveAsync(_preferences),
             _favoritesService.SaveAsync(_favorites),
+            _paletteService.SaveAsync(paletteSettings),
             RecentFilesViewModel.SaveAsync(),
             _sessionService.SaveAsync(Emulator, _preferences.Resume));
 
