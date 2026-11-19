@@ -21,11 +21,7 @@ public partial class PaletteEditorViewModel : ObservableObject
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ResetPaletteCommand))]
     [NotifyPropertyChangedFor(nameof(IsEditable))]
-    [NotifyPropertyChangedFor(nameof(PaletteName))]
     public partial PaletteViewModel? SelectedPalette { get; set; }
-
-    [ObservableProperty]
-    public partial string PaletteName { get; set; } = string.Empty;
 
     public bool IsEditable => SelectedPalette is not { IsDefault: true };
 
@@ -40,22 +36,6 @@ public partial class PaletteEditorViewModel : ObservableObject
         Palettes.Add(PaletteViewModel.CreatePalette(PaletteType.Custom));
 
         SelectedPalette = Palettes[0];
-    }
-
-    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
-    {
-        base.OnPropertyChanged(e);
-
-        switch (e.PropertyName)
-        {
-            case nameof(SelectedPalette):
-                PaletteName = SelectedPalette?.Name ?? string.Empty;
-                break;
-
-            case nameof(PaletteName) when !string.Equals(PaletteName, SelectedPalette?.Name, StringComparison.CurrentCulture):
-                SelectedPalette?.Name = PaletteName;
-                break;
-        }
     }
 
     public Dictionary<PaletteType, IList<string>> ToDictionary() => Palettes
