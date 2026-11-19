@@ -6,7 +6,9 @@ using System.Linq;
 using AvaloniaEdit.Utils;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Screen.Palettes;
+using OldBit.Spectron.Extensions;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -66,11 +68,15 @@ public partial class PaletteEditorViewModel : ObservableObject
         {
             var existingPalette = Palettes.FirstOrDefault(p => p.PaletteType == palette.Key);
 
-            if (existingPalette is not null && palette.Value.Count == 40)
+            if (existingPalette is null ||
+                palette.Value.Count != 40 ||
+                !palette.Value.All(hex => ColorExtensions.TryParseHex(hex, out _)))
             {
-                existingPalette.Colors.Clear();
-                existingPalette.Colors.AddRange(palette.Value);
+                continue;
             }
+
+            existingPalette.Colors.Clear();
+            existingPalette.Colors.AddRange(palette.Value.Select(hex => Color.FromHex(hex).ToHex()));
         }
     }
 

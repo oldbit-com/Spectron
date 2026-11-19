@@ -10,11 +10,12 @@
              ClipToBounds="True">
 
     <UserControl.Resources>
-        <converters:HexToColorConverter x:Key="HexToColorConverter"/>
+        <converters:HexToBrushConverter x:Key="HexToBrushConverter"/>
+        <converters:HexColorTextConverter x:Key="HexColorTextConverter"/>
     </UserControl.Resources>
 
     <Border
-        Background="{Binding Background, RelativeSource={RelativeSource AncestorType=UserControl}}"
+        Background="{Binding Hex, RelativeSource={RelativeSource AncestorType=controls:PaletteCell}, Converter={StaticResource HexToBrushConverter}}"
         BorderBrush="White"
         BorderThickness="2"
         CornerRadius="8"
@@ -22,7 +23,7 @@
 
         <Grid Margin="4" ClipToBounds="True">
             <TextBox
-                Text="{Binding Background, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource HexToColorConverter}}"
+                Text="{Binding Hex, RelativeSource={RelativeSource AncestorType=controls:PaletteCell}, Converter={StaticResource HexColorTextConverter}}"
                 IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=controls:PaletteCell}}"
                 MaxLength="7"
                 BorderThickness="0"

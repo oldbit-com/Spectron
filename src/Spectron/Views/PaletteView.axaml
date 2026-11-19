@@ -4,7 +4,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
         xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
-        xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.PaletteView"
         x:DataType="viewModels:PaletteEditorViewModel"
@@ -13,10 +12,6 @@
         Width="720"
         Height="480"
         Title="Palette Editor">
-
-    <Window.Resources>
-        <converters:HexToBrushConverter x:Key="HexToBrushConverter"/>
-    </Window.Resources>
 
     <Window.Styles>
         <Style Selector="TextBlock">
@@ -88,50 +83,50 @@
             <TextBlock Grid.Row="7" Grid.Column="1" Text="Yellow"/>
             <TextBlock Grid.Row="8" Grid.Column="1" Text="White"/>
 
-            <controls:PaletteCell Grid.Row="1" Grid.Column="2" Background="{Binding Colors[0], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="2" Grid.Column="2" Background="{Binding Colors[1], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="3" Grid.Column="2" Background="{Binding Colors[2], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="4" Grid.Column="2" Background="{Binding Colors[3], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="5" Grid.Column="2" Background="{Binding Colors[4], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="6" Grid.Column="2" Background="{Binding Colors[5], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="7" Grid.Column="2" Background="{Binding Colors[6], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="8" Grid.Column="2" Background="{Binding Colors[7], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
+            <controls:PaletteCell Grid.Row="1" Grid.Column="2" Hex="{Binding Colors[0]}"/>
+            <controls:PaletteCell Grid.Row="2" Grid.Column="2" Hex="{Binding Colors[1]}"/>
+            <controls:PaletteCell Grid.Row="3" Grid.Column="2" Hex="{Binding Colors[2]}"/>
+            <controls:PaletteCell Grid.Row="4" Grid.Column="2" Hex="{Binding Colors[3]}"/>
+            <controls:PaletteCell Grid.Row="5" Grid.Column="2" Hex="{Binding Colors[4]}"/>
+            <controls:PaletteCell Grid.Row="6" Grid.Column="2" Hex="{Binding Colors[5]}"/>
+            <controls:PaletteCell Grid.Row="7" Grid.Column="2" Hex="{Binding Colors[6]}"/>
+            <controls:PaletteCell Grid.Row="8" Grid.Column="2" Hex="{Binding Colors[7]}"/>
 
-            <controls:PaletteCell Grid.Row="1" Grid.Column="3" Background="{Binding Colors[8], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="2" Grid.Column="3" Background="{Binding Colors[9], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="3" Grid.Column="3" Background="{Binding Colors[10], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="4" Grid.Column="3" Background="{Binding Colors[11], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="5" Grid.Column="3" Background="{Binding Colors[12], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="6" Grid.Column="3" Background="{Binding Colors[13], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="7" Grid.Column="3" Background="{Binding Colors[14], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="8" Grid.Column="3" Background="{Binding Colors[15], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
+            <controls:PaletteCell Grid.Row="1" Grid.Column="3" Hex="{Binding Colors[8]}"/>
+            <controls:PaletteCell Grid.Row="2" Grid.Column="3" Hex="{Binding Colors[9]}"/>
+            <controls:PaletteCell Grid.Row="3" Grid.Column="3" Hex="{Binding Colors[10]}"/>
+            <controls:PaletteCell Grid.Row="4" Grid.Column="3" Hex="{Binding Colors[11]}"/>
+            <controls:PaletteCell Grid.Row="5" Grid.Column="3" Hex="{Binding Colors[12]}"/>
+            <controls:PaletteCell Grid.Row="6" Grid.Column="3" Hex="{Binding Colors[13]}"/>
+            <controls:PaletteCell Grid.Row="7" Grid.Column="3" Hex="{Binding Colors[14]}"/>
+            <controls:PaletteCell Grid.Row="8" Grid.Column="3" Hex="{Binding Colors[15]}"/>
 
-            <controls:PaletteCell Grid.Row="1" Grid.Column="4" Background="{Binding Colors[16], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="2" Grid.Column="4" Background="{Binding Colors[17], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="3" Grid.Column="4" Background="{Binding Colors[18], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="4" Grid.Column="4" Background="{Binding Colors[19], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="5" Grid.Column="4" Background="{Binding Colors[20], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="6" Grid.Column="4" Background="{Binding Colors[21], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="7" Grid.Column="4" Background="{Binding Colors[22], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="8" Grid.Column="4" Background="{Binding Colors[23], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
+            <controls:PaletteCell Grid.Row="1" Grid.Column="4" Hex="{Binding Colors[16]}"/>
+            <controls:PaletteCell Grid.Row="2" Grid.Column="4" Hex="{Binding Colors[17]}"/>
+            <controls:PaletteCell Grid.Row="3" Grid.Column="4" Hex="{Binding Colors[18]}"/>
+            <controls:PaletteCell Grid.Row="4" Grid.Column="4" Hex="{Binding Colors[19]}"/>
+            <controls:PaletteCell Grid.Row="5" Grid.Column="4" Hex="{Binding Colors[20]}"/>
+            <controls:PaletteCell Grid.Row="6" Grid.Column="4" Hex="{Binding Colors[21]}"/>
+            <controls:PaletteCell Grid.Row="7" Grid.Column="4" Hex="{Binding Colors[22]}"/>
+            <controls:PaletteCell Grid.Row="8" Grid.Column="4" Hex="{Binding Colors[23]}"/>
 
-            <controls:PaletteCell Grid.Row="1" Grid.Column="5" Background="{Binding Colors[24], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="2" Grid.Column="5" Background="{Binding Colors[25], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="3" Grid.Column="5" Background="{Binding Colors[26], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="4" Grid.Column="5" Background="{Binding Colors[27], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="5" Grid.Column="5" Background="{Binding Colors[28], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="6" Grid.Column="5" Background="{Binding Colors[29], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="7" Grid.Column="5" Background="{Binding Colors[30], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="8" Grid.Column="5" Background="{Binding Colors[31], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
+            <controls:PaletteCell Grid.Row="1" Grid.Column="5" Hex="{Binding Colors[24]}"/>
+            <controls:PaletteCell Grid.Row="2" Grid.Column="5" Hex="{Binding Colors[25]}"/>
+            <controls:PaletteCell Grid.Row="3" Grid.Column="5" Hex="{Binding Colors[26]}"/>
+            <controls:PaletteCell Grid.Row="4" Grid.Column="5" Hex="{Binding Colors[27]}"/>
+            <controls:PaletteCell Grid.Row="5" Grid.Column="5" Hex="{Binding Colors[28]}"/>
+            <controls:PaletteCell Grid.Row="6" Grid.Column="5" Hex="{Binding Colors[29]}"/>
+            <controls:PaletteCell Grid.Row="7" Grid.Column="5" Hex="{Binding Colors[30]}"/>
+            <controls:PaletteCell Grid.Row="8" Grid.Column="5" Hex="{Binding Colors[31]}"/>
 
-            <controls:PaletteCell Grid.Row="1" Grid.Column="6" Background="{Binding Colors[32], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="2" Grid.Column="6" Background="{Binding Colors[33], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="3" Grid.Column="6" Background="{Binding Colors[34], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="4" Grid.Column="6" Background="{Binding Colors[35], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="5" Grid.Column="6" Background="{Binding Colors[36], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="6" Grid.Column="6" Background="{Binding Colors[37], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="7" Grid.Column="6" Background="{Binding Colors[38], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
-            <controls:PaletteCell Grid.Row="8" Grid.Column="6" Background="{Binding Colors[39], Mode=TwoWay, Converter={StaticResource HexToBrushConverter}}"/>
+            <controls:PaletteCell Grid.Row="1" Grid.Column="6" Hex="{Binding Colors[32]}"/>
+            <controls:PaletteCell Grid.Row="2" Grid.Column="6" Hex="{Binding Colors[33]}"/>
+            <controls:PaletteCell Grid.Row="3" Grid.Column="6" Hex="{Binding Colors[34]}"/>
+            <controls:PaletteCell Grid.Row="4" Grid.Column="6" Hex="{Binding Colors[35]}"/>
+            <controls:PaletteCell Grid.Row="5" Grid.Column="6" Hex="{Binding Colors[36]}"/>
+            <controls:PaletteCell Grid.Row="6" Grid.Column="6" Hex="{Binding Colors[37]}"/>
+            <controls:PaletteCell Grid.Row="7" Grid.Column="6" Hex="{Binding Colors[38]}"/>
+            <controls:PaletteCell Grid.Row="8" Grid.Column="6" Hex="{Binding Colors[39]}"/>
 
         </Grid>
     </Grid>

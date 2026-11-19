@@ -156,36 +156,36 @@ public partial class PaletteViewModel : ObservableObject
             PaletteType.Standard => new PaletteViewModel(paletteType) { Name = "Standard", IsDefault = true },
 
             PaletteType.BlackAndWhite => new PaletteViewModel(paletteType,
-                ["#FF000000", "#FF181818", "#FF404040", "#FF595959", "#FF7E7E7E", "#FF979797", "#FFBEBEBE", "#FFD7D7D7"],
-                ["#FF000000", "#FF1D1D1D", "#FF4C4C4C", "#FF696969", "#FF969696", "#FFB3B3B3", "#FFE2E2E2", "#FFFFFFFF"])
+                ["#000000", "#181818", "#404040", "#595959", "#7E7E7E", "#979797", "#BEBEBE", "#D7D7D7"],
+                ["#000000", "#1D1D1D", "#4C4C4C", "#696969", "#969696", "#B3B3B3", "#E2E2E2", "#FFFFFF"])
             {
                 Name = "Black and White"
             },
 
             PaletteType.Commodore => new PaletteViewModel(paletteType,
-                ["#FF000000", "#FF352879", "#FF68372B", "#FF6F3D86", "#FF588D43", "#FF70A4B2", "#FF6F4F25", "#FF959595"],
-                ["#FF000000", "#FF6C5EB5", "#FF9A6759", "#FF8B5FA0", "#FF9AD284", "#FF8CC8D6", "#FFB8C76F", "#FFFFFFFF"])
+                ["#000000", "#352879", "#68372B", "#6F3D86", "#588D43", "#70A4B2", "#6F4F25", "#959595"],
+                ["#000000", "#6C5EB5", "#9A6759", "#8B5FA0", "#9AD284", "#8CC8D6", "#B8C76F", "#FFFFFF"])
             {
                 Name = "Commodore"
             },
 
             PaletteType.Green => new PaletteViewModel(paletteType,
-                ["#FF000000", "#FF041807", "#FF0C4013", "#FF11581A", "#FF197E25", "#FF1E962D", "#FF26BE39", "#FF2BD740"],
-                ["#FF000000", "#FF051D08", "#FF0F4C16", "#FF15691F", "#FF1D952C", "#FF23B235", "#FF2DE143", "#FF33FF4C"])
+                ["#000000", "#041807", "#0C4013", "#11581A", "#197E25", "#1E962D", "#26BE39", "#2BD740"],
+                ["#000000", "#051D08", "#0F4C16", "#15691F", "#1D952C", "#23B235", "#2DE143", "#33FF4C"])
             {
                 Name = "Green"
             },
 
             PaletteType.Amber => new PaletteViewModel(paletteType,
-                ["#FF000000", "#FF181100", "#FF402C00", "#FF583E00", "#FF7E5800", "#FF966900", "#FFBE8500", "#FFD79600"],
-                ["#FF000000", "#FF1D1400", "#FF4C3500", "#FF694900", "#FF956800", "#FFB27D00", "#FFE19E00", "#FFFFB200"])
+                ["#000000", "#181100", "#402C00", "#583E00", "#7E5800", "#966900", "#BE8500", "#D79600"],
+                ["#000000", "#1D1400", "#4C3500", "#694900", "#956800", "#B27D00", "#E19E00", "#FFB200"])
             {
                 Name = "Amber"
             },
 
             PaletteType.Sepia => new PaletteViewModel(PaletteType.Sepia,
-                ["#FF000000", "#FF18140F", "#FF403629", "#FF584B39", "#FF7E6B52", "#FF968061", "#FFBEA17B", "#FFD7B68B"],
-                ["#FF000000", "#FF1D1812", "#FF4C4031", "#FF695944", "#FF957F61", "#FFB29774", "#FFE1C092", "#FFFFD8A5"])
+                ["#000000", "#18140F", "#403629", "#584B39", "#7E6B52", "#968061", "#BEA17B", "#D7B68B"],
+                ["#000000", "#1D1812", "#4C4031", "#695944", "#957F61", "#B29774", "#E1C092", "#FFD8A5"])
             {
                 Name = "Sepia"
             },
