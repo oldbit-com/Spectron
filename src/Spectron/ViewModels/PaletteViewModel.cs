@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using AvaloniaEdit.Utils;
 using CommunityToolkit.Mvvm.ComponentModel;
 using OldBit.Spectron.Emulation.Screen;
@@ -19,8 +20,28 @@ public enum PaletteType
     Custom
 }
 
+/// <summary>
+/// Colour groups in the order they are stored in <see cref="PaletteViewModel.Colors"/>
+/// and shown as columns in PaletteView.
+/// </summary>
+public enum ColorGroup
+{
+    Ink,
+    InkBright,
+    Paper,
+    PaperBright,
+    Border
+}
+
 public partial class PaletteViewModel : ObservableObject
 {
+    private static readonly ColorGroup[] ColorGroups = Enum.GetValues<ColorGroup>();
+
+    /// <summary>
+    /// Total number of colours: 8 colours in each of the <see cref="ColorGroup"/> groups.
+    /// </summary>
+    public static readonly int ColorCount = ColorGroups.Length * PaletteColor.Count;
+
     [ObservableProperty]
     public partial string Name { get; set; } = string.Empty;
 
@@ -36,117 +57,45 @@ public partial class PaletteViewModel : ObservableObject
 
         var palette = new Palette();
 
-        Colors.Add(palette.Ink.Black.ToHex());
-        Colors.Add(palette.Ink.Blue.ToHex());
-        Colors.Add(palette.Ink.Red.ToHex());
-        Colors.Add(palette.Ink.Magenta.ToHex());
-        Colors.Add(palette.Ink.Green.ToHex());
-        Colors.Add(palette.Ink.Cyan.ToHex());
-        Colors.Add(palette.Ink.Yellow.ToHex());
-        Colors.Add(palette.Ink.White.ToHex());
-
-        Colors.Add(palette.Bright.Ink.Black.ToHex());
-        Colors.Add(palette.Bright.Ink.Blue.ToHex());
-        Colors.Add(palette.Bright.Ink.Red.ToHex());
-        Colors.Add(palette.Bright.Ink.Magenta.ToHex());
-        Colors.Add(palette.Bright.Ink.Green.ToHex());
-        Colors.Add(palette.Bright.Ink.Cyan.ToHex());
-        Colors.Add(palette.Bright.Ink.Yellow.ToHex());
-        Colors.Add(palette.Bright.Ink.White.ToHex());
-
-        Colors.Add(palette.Paper.Black.ToHex());
-        Colors.Add(palette.Paper.Blue.ToHex());
-        Colors.Add(palette.Paper.Red.ToHex());
-        Colors.Add(palette.Paper.Magenta.ToHex());
-        Colors.Add(palette.Paper.Green.ToHex());
-        Colors.Add(palette.Paper.Cyan.ToHex());
-        Colors.Add(palette.Paper.Yellow.ToHex());
-        Colors.Add(palette.Paper.White.ToHex());
-
-        Colors.Add(palette.Bright.Paper.Black.ToHex());
-        Colors.Add(palette.Bright.Paper.Blue.ToHex());
-        Colors.Add(palette.Bright.Paper.Red.ToHex());
-        Colors.Add(palette.Bright.Paper.Magenta.ToHex());
-        Colors.Add(palette.Bright.Paper.Green.ToHex());
-        Colors.Add(palette.Bright.Paper.Cyan.ToHex());
-        Colors.Add(palette.Bright.Paper.Yellow.ToHex());
-        Colors.Add(palette.Bright.Paper.White.ToHex());
-
-        Colors.Add(palette.Border.Black.ToHex());
-        Colors.Add(palette.Border.Blue.ToHex());
-        Colors.Add(palette.Border.Red.ToHex());
-        Colors.Add(palette.Border.Magenta.ToHex());
-        Colors.Add(palette.Border.Green.ToHex());
-        Colors.Add(palette.Border.Cyan.ToHex());
-        Colors.Add(palette.Border.Yellow.ToHex());
-        Colors.Add(palette.Border.White.ToHex());
+        Colors.AddRange(ColorGroups
+            .SelectMany(group => GetGroup(palette, group).ToArray())
+            .Select(color => color.ToHex()));
     }
 
     private PaletteViewModel(PaletteType paletteType, string[] normal, string[] bright)
     {
         PaletteType = paletteType;
 
-        Colors.AddRange(normal); // Ink
-        Colors.AddRange(bright); // Ink bright
-        Colors.AddRange(normal); // Paper
-        Colors.AddRange(bright); // Paper bright
-        Colors.AddRange(normal); // Border
+        foreach (var group in ColorGroups)
+        {
+            Colors.AddRange(group is ColorGroup.InkBright or ColorGroup.PaperBright ? bright : normal);
+        }
     }
 
-    public Palette ToPalette() => new()
+    public Palette ToPalette()
     {
-        Ink = new PaletteColor(
-            Color.FromHex(Colors[0]),
-            Color.FromHex(Colors[1]),
-            Color.FromHex(Colors[2]),
-            Color.FromHex(Colors[3]),
-            Color.FromHex(Colors[4]),
-            Color.FromHex(Colors[5]),
-            Color.FromHex(Colors[6]),
-            Color.FromHex(Colors[7])),
+        var colors = Colors.Select(hex => Color.FromHex(hex)).ToArray();
 
-        Bright = new Bright(
-            new PaletteColor(
-                Color.FromHex(Colors[8]),
-                Color.FromHex(Colors[9]),
-                Color.FromHex(Colors[10]),
-                Color.FromHex(Colors[11]),
-                Color.FromHex(Colors[12]),
-                Color.FromHex(Colors[13]),
-                Color.FromHex(Colors[14]),
-                Color.FromHex(Colors[15])
-            ),
+        return new Palette
+        {
+            Ink = Get(ColorGroup.Ink),
+            Paper = Get(ColorGroup.Paper),
+            Bright = new Bright(Get(ColorGroup.InkBright), Get(ColorGroup.PaperBright)),
+            Border = Get(ColorGroup.Border),
+        };
 
-            new PaletteColor(
-                Color.FromHex(Colors[24]),
-                Color.FromHex(Colors[25]),
-                Color.FromHex(Colors[26]),
-                Color.FromHex(Colors[27]),
-                Color.FromHex(Colors[28]),
-                Color.FromHex(Colors[29]),
-                Color.FromHex(Colors[30]),
-                Color.FromHex(Colors[31])
-            )),
+        PaletteColor Get(ColorGroup group) =>
+            PaletteColor.From(colors.AsSpan((int)group * PaletteColor.Count, PaletteColor.Count));
+    }
 
-        Paper = new PaletteColor(
-            Color.FromHex(Colors[16]),
-            Color.FromHex(Colors[17]),
-            Color.FromHex(Colors[18]),
-            Color.FromHex(Colors[19]),
-            Color.FromHex(Colors[20]),
-            Color.FromHex(Colors[21]),
-            Color.FromHex(Colors[22]),
-            Color.FromHex(Colors[23])),
-
-        Border = new PaletteColor(
-            Color.FromHex(Colors[32]),
-            Color.FromHex(Colors[33]),
-            Color.FromHex(Colors[34]),
-            Color.FromHex(Colors[35]),
-            Color.FromHex(Colors[36]),
-            Color.FromHex(Colors[37]),
-            Color.FromHex(Colors[38]),
-            Color.FromHex(Colors[39])),
+    private static PaletteColor GetGroup(Palette palette, ColorGroup group) => group switch
+    {
+        ColorGroup.Ink => palette.Ink,
+        ColorGroup.InkBright => palette.Bright.Ink,
+        ColorGroup.Paper => palette.Paper,
+        ColorGroup.PaperBright => palette.Bright.Paper,
+        ColorGroup.Border => palette.Border,
+        _ => throw new ArgumentOutOfRangeException(nameof(group))
     };
 
     public static PaletteViewModel CreatePalette(PaletteType paletteType)

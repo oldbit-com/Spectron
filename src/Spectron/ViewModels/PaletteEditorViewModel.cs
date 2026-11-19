@@ -69,7 +69,7 @@ public partial class PaletteEditorViewModel : ObservableObject
             var existingPalette = Palettes.FirstOrDefault(p => p.PaletteType == palette.Key);
 
             if (existingPalette is null ||
-                palette.Value.Count != 40 ||
+                palette.Value.Count != PaletteViewModel.ColorCount ||
                 !palette.Value.All(hex => ColorExtensions.TryParseHex(hex, out _)))
             {
                 continue;

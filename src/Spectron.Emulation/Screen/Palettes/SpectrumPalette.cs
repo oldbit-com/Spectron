@@ -4,8 +4,6 @@ namespace OldBit.Spectron.Emulation.Screen.Palettes;
 
 public static class SpectrumPalette
 {
-    public static Palette Current { get; private set; }
-
     internal static readonly Color Black = new (0x00, 0x00, 0x00);
     internal static readonly Color Blue = new (0x00, 0x00, 0xD7);
     internal static readonly Color Red = new (0xD7, 0x00, 0x00);
@@ -23,9 +21,21 @@ public static class SpectrumPalette
     internal static readonly Color BrightYellow = new (0xFF, 0xFF, 0x00);
     internal static readonly Color BrightWhite = new (0xFF, 0xFF, 0xFF);
 
-    public static Color GetBorderColor(int attr) => BorderColors[(byte)(attr & 0x07)];
-    public static Color GetPaperColor(int attr) => PaperColors[(byte)(attr & 0x78)];
-    public static Color GetInkColor(int attr) => InkColors[(byte)(attr & 0x47)];
+    internal static readonly PaletteColor StandardColors =
+        new(Black, Blue, Red, Magenta, Green, Cyan, Yellow, White);
+
+    internal static readonly PaletteColor StandardBrightColors =
+        new(Black, BrightBlue, BrightRed, BrightMagenta, BrightGreen, BrightCyan, BrightYellow, BrightWhite);
+
+    private static readonly Color[] BorderColors = new Color[0x08];
+    private static readonly Color[] InkColors = new Color[0x48];
+    private static readonly Color[] PaperColors = new Color[0x80];
+
+    public static Palette Current { get; private set; }
+
+    public static Color GetBorderColor(int attr) => BorderColors[attr & 0x07];
+    public static Color GetPaperColor(int attr) => PaperColors[attr & 0x78];
+    public static Color GetInkColor(int attr) => InkColors[attr & 0x47];
 
     static SpectrumPalette() => SetPalette(new Palette());
 
@@ -34,53 +44,21 @@ public static class SpectrumPalette
     {
         Current = palette;
 
-        BorderColors[0b0000000] = palette.Border.Black;
-        BorderColors[0b0000001] = palette.Border.Blue;
-        BorderColors[0b0000010] = palette.Border.Red;
-        BorderColors[0b0000011] = palette.Border.Magenta;
-        BorderColors[0b0000100] = palette.Border.Green;
-        BorderColors[0b0000101] = palette.Border.Cyan;
-        BorderColors[0b0000110] = palette.Border.Yellow;
-        BorderColors[0b0000111] = palette.Border.White;
+        var border = palette.Border.ToArray();
+        var ink = palette.Ink.ToArray();
+        var inkBright = palette.Bright.Ink.ToArray();
+        var paper = palette.Paper.ToArray();
+        var paperBright = palette.Bright.Paper.ToArray();
 
-        InkColors[0b00000000] = palette.Ink.Black;
-        InkColors[0b00000001] = palette.Ink.Blue;
-        InkColors[0b00000010] = palette.Ink.Red;
-        InkColors[0b00000011] = palette.Ink.Magenta;
-        InkColors[0b00000100] = palette.Ink.Green;
-        InkColors[0b00000101] = palette.Ink.Cyan;
-        InkColors[0b00000110] = palette.Ink.Yellow;
-        InkColors[0b00000111] = palette.Ink.White;
-        InkColors[0b01000000] = palette.Bright.Ink.Black;
-        InkColors[0b01000001] = palette.Bright.Ink.Blue;
-        InkColors[0b01000010] = palette.Bright.Ink.Red;
-        InkColors[0b01000011] = palette.Bright.Ink.Magenta;
-        InkColors[0b01000100] = palette.Bright.Ink.Green;
-        InkColors[0b01000101] = palette.Bright.Ink.Cyan;
-        InkColors[0b01000110] = palette.Bright.Ink.Yellow;
-        InkColors[0b01000111] = palette.Bright.Ink.White;
+        for (var i = 0; i < PaletteColor.Count; i++)
+        {
+            BorderColors[i] = border[i];
 
-        PaperColors[0b00000000] = palette.Paper.Black;
-        PaperColors[0b00001000] = palette.Paper.Blue;
-        PaperColors[0b00010000] = palette.Paper.Red;
-        PaperColors[0b00011000] = palette.Paper.Magenta;
-        PaperColors[0b00100000] = palette.Paper.Green;
-        PaperColors[0b00101000] = palette.Paper.Cyan;
-        PaperColors[0b00110000] = palette.Paper.Yellow;
-        PaperColors[0b00111000] = palette.Paper.White;
-        PaperColors[0b01000000] = palette.Bright.Paper.Black;
-        PaperColors[0b01001000] = palette.Bright.Paper.Blue;
-        PaperColors[0b01010000] = palette.Bright.Paper.Red;
-        PaperColors[0b01011000] = palette.Bright.Paper.Magenta;
-        PaperColors[0b01100000] = palette.Bright.Paper.Green;
-        PaperColors[0b01101000] = palette.Bright.Paper.Cyan;
-        PaperColors[0b01110000] = palette.Bright.Paper.Yellow;
-        PaperColors[0b01111000] = palette.Bright.Paper.White;
+            InkColors[i] = ink[i];                              // bits 0-2: ink
+            InkColors[0x40 | i] = inkBright[i];                 // bit 6: bright
+
+            PaperColors[i << 3] = paper[i];                     // bits 3-5: paper
+            PaperColors[0x40 | (i << 3)] = paperBright[i];      // bit 6: bright
+        }
     }
-
-    private static readonly Dictionary<byte, Color> BorderColors = new();
-
-    private static readonly Dictionary<int, Color> PaperColors = new();
-
-    private static readonly Dictionary<int, Color> InkColors = new();
 }

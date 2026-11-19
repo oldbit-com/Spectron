@@ -4,54 +4,11 @@ public record Bright(PaletteColor Ink, PaletteColor Paper);
 
 public sealed class Palette
 {
-    public PaletteColor Ink { get; init; } = new(
-        SpectrumPalette.Black,
-        SpectrumPalette.Blue,
-        SpectrumPalette.Red,
-        SpectrumPalette.Magenta,
-        SpectrumPalette.Green,
-        SpectrumPalette.Cyan,
-        SpectrumPalette.Yellow,
-        SpectrumPalette.White);
+    public PaletteColor Ink { get; init; } = SpectrumPalette.StandardColors;
 
-    public PaletteColor Paper { get; set; } = new(
-        SpectrumPalette.Black,
-        SpectrumPalette.Blue,
-        SpectrumPalette.Red,
-        SpectrumPalette.Magenta,
-        SpectrumPalette.Green,
-        SpectrumPalette.Cyan,
-        SpectrumPalette.Yellow,
-        SpectrumPalette.White);
+    public PaletteColor Paper { get; init; } = SpectrumPalette.StandardColors;
 
-    public Bright Bright { get; init; } = new(
-        new PaletteColor(
-            SpectrumPalette.Black,
-            SpectrumPalette.BrightBlue,
-            SpectrumPalette.BrightRed,
-            SpectrumPalette.BrightMagenta,
-            SpectrumPalette.BrightGreen,
-            SpectrumPalette.BrightCyan,
-            SpectrumPalette.BrightYellow,
-            SpectrumPalette.BrightWhite),
+    public Bright Bright { get; init; } = new(SpectrumPalette.StandardBrightColors, SpectrumPalette.StandardBrightColors);
 
-        new PaletteColor(
-            SpectrumPalette.Black,
-            SpectrumPalette.BrightBlue,
-            SpectrumPalette.BrightRed,
-            SpectrumPalette.BrightMagenta,
-            SpectrumPalette.BrightGreen,
-            SpectrumPalette.BrightCyan,
-            SpectrumPalette.BrightYellow,
-            SpectrumPalette.BrightWhite));
-
-    public PaletteColor Border { get; init; } = new(
-        SpectrumPalette.Black,
-        SpectrumPalette.Blue,
-        SpectrumPalette.Red,
-        SpectrumPalette.Magenta,
-        SpectrumPalette.Green,
-        SpectrumPalette.Cyan,
-        SpectrumPalette.Yellow,
-        SpectrumPalette.White);
+    public PaletteColor Border { get; init; } = SpectrumPalette.StandardColors;
 }
