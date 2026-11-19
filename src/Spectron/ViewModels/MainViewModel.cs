@@ -61,6 +61,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private readonly PreferencesService _preferencesService;
     private readonly FavoritesService _favoritesService;
+    private readonly PaletteService _paletteService;
     private readonly SessionService _sessionService;
     private readonly DebuggerContext _debuggerContext;
     private readonly QuickSaveService _quickSaveService;
@@ -353,6 +354,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Loader loader,
         PreferencesService preferencesService,
         FavoritesService favoritesService,
+        PaletteService paletteService,
         SessionService sessionService,
         RecentFilesViewModel recentFilesViewModel,
         FavoritesViewModel favoritesViewModel,
@@ -378,6 +380,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _loader = loader;
         _preferencesService = preferencesService;
         _favoritesService = favoritesService;
+        _paletteService = paletteService;
         _sessionService = sessionService;
         _debuggerContext = debuggerContext;
         _quickSaveService = quickSaveService;

@@ -12,6 +12,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IApplicationDataService, ApplicationDataService>();
         services.AddSingleton<PreferencesService>();
         services.AddSingleton<FavoritesService>();
+        services.AddSingleton<PaletteService>();
         services.AddSingleton<SessionService>();
         services.AddSingleton<RecentFilesService>();
         services.AddSingleton<TimeMachine>();

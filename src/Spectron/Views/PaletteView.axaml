@@ -9,6 +9,7 @@
         x:Class="OldBit.Spectron.Views.PaletteView"
         x:DataType="viewModels:PaletteEditorViewModel"
         WindowStartupLocation="CenterScreen"
+        CanResize="False"
         Width="720"
         Height="480"
         Title="Palette Editor">
@@ -29,6 +30,12 @@
         <Style Selector="controls|PaletteCell">
             <Setter Property="IsReadOnly" Value="{Binding !((viewModels:PaletteEditorViewModel)DataContext).IsEditable, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
         </Style>
+        <Style Selector="Border.ColorBox">
+            <Setter Property="BorderBrush" Value="{DynamicResource ButtonForeground}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Width" Value="20"/>
+        </Style>
     </Window.Styles>
 
     <Grid RowDefinitions="60,*" Margin="10">
@@ -44,6 +51,7 @@
 
                 <Button Content="Reset" Margin="10 0 0 0" Command="{Binding ResetPaletteCommand}"/>
                 <Button Content="Preview" Margin="10 0 0 0" Command="{Binding PreviewPaletteCommand}"/>
+                <TextBlock Text="READ-ONLY" Margin="20 0 0 0" FontSize="10" IsVisible="{Binding !IsEditable}"/>
             </StackPanel>
         </StackPanel>
 
@@ -62,14 +70,14 @@
             <TextBlock Grid.Row="0" Grid.Column="5" Text="Paper Bright" Classes="Header"/>
             <TextBlock Grid.Row="0" Grid.Column="6" Text="Border" Classes="Header"/>
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="0" Opacity="0.7"/>
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="1" Opacity="0.7"/>
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="2" Opacity="0.7"/>
-            <TextBlock Grid.Row="4" Grid.Column="0" Text="3" Opacity="0.7"/>
-            <TextBlock Grid.Row="5" Grid.Column="0" Text="4" Opacity="0.7"/>
-            <TextBlock Grid.Row="6" Grid.Column="0" Text="5" Opacity="0.7"/>
-            <TextBlock Grid.Row="7" Grid.Column="0" Text="6" Opacity="0.7"/>
-            <TextBlock Grid.Row="8" Grid.Column="0" Text="7" Opacity="0.7"/>
+            <Border Grid.Row="1" Grid.Column="0" Background="{StaticResource SpectrumBlack}" Classes="ColorBox" />
+            <Border Grid.Row="2" Grid.Column="0" Background="{StaticResource SpectrumBlue}" Classes="ColorBox" />
+            <Border Grid.Row="3" Grid.Column="0" Background="{StaticResource SpectrumRed}" Classes="ColorBox" />
+            <Border Grid.Row="4" Grid.Column="0" Background="{StaticResource SpectrumMagenta}" Classes="ColorBox" />
+            <Border Grid.Row="5" Grid.Column="0" Background="{StaticResource SpectrumGreen}" Classes="ColorBox" />
+            <Border Grid.Row="6" Grid.Column="0" Background="{StaticResource SpectrumCyan}" Classes="ColorBox" />
+            <Border Grid.Row="7" Grid.Column="0" Background="{StaticResource SpectrumYellow}" Classes="ColorBox" />
+            <Border Grid.Row="8" Grid.Column="0" Background="{StaticResource SpectrumWhite}" Classes="ColorBox" />
 
             <TextBlock Grid.Row="1" Grid.Column="1" Text="Black"/>
             <TextBlock Grid.Row="2" Grid.Column="1" Text="Blue"/>

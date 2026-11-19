@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
+using AvaloniaEdit.Utils;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OldBit.Spectron.Emulation.Screen.Palettes;
@@ -50,6 +53,24 @@ public partial class PaletteEditorViewModel : ObservableObject
             case nameof(PaletteName) when !string.Equals(PaletteName, SelectedPalette?.Name, StringComparison.CurrentCulture):
                 SelectedPalette?.Name = PaletteName;
                 break;
+        }
+    }
+
+    public Dictionary<PaletteType, IList<string>> ToDictionary() => Palettes
+        .Where(p => p.PaletteType != PaletteType.Standard)
+        .ToDictionary<PaletteViewModel, PaletteType, IList<string>>(p => p.PaletteType, p => p.Colors);
+
+    public void Update(Dictionary<PaletteType, IList<string>> palettes)
+    {
+        foreach (var palette in palettes)
+        {
+            var existingPalette = Palettes.FirstOrDefault(p => p.PaletteType == palette.Key);
+
+            if (existingPalette is not null && palette.Value.Count == 40)
+            {
+                existingPalette.Colors.Clear();
+                existingPalette.Colors.AddRange(palette.Value);
+            }
         }
     }
 
