@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Avalonia.Controls;
 using OldBit.Spectron.Controls;
 using OldBit.Spectron.Screen;
@@ -33,6 +34,19 @@ partial class MainViewModel
 
     private void HandleToggleFullScreen() =>
         WindowState = WindowState == WindowState.FullScreen ? WindowState.Normal : WindowState.FullScreen;
+
+    private void HandleChangePalette(PaletteType paletteType)
+    {
+        var paletteViewModel = PaletteEditorViewModel.Palettes.FirstOrDefault(p => p.PaletteType == paletteType);
+
+        if (paletteViewModel == null)
+        {
+            return;
+        }
+
+        PaletteType = paletteType;
+        Emulator?.SetPalette(paletteViewModel.ToPalette());
+    }
 
     partial void OnWindowStateChanged(WindowState value) =>
         IsMenuVisible = value != WindowState.FullScreen && !IsNativeMenuEnabled;

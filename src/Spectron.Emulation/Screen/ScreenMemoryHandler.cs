@@ -1,5 +1,6 @@
 using OldBit.Spectron.Emulation.Devices;
 using OldBit.Spectron.Emulation.Devices.Memory;
+using OldBit.Spectron.Emulation.Screen.Palettes;
 
 namespace OldBit.Spectron.Emulation.Screen;
 
@@ -68,8 +69,8 @@ internal sealed class ScreenMemoryHandler
 
         _screenBuffer.ChangeScreenMode(
             screenMode,
-            ulaTimex?.Ink ?? SpectrumPalette.Black,
-            ulaTimex?.Paper ?? SpectrumPalette.White,
+            ulaTimex?.Ink ?? SpectrumPalette.Current.Ink.Black,
+            ulaTimex?.Paper ?? SpectrumPalette.Current.Paper.White,
             ulaTimex?.PaperIndex ?? 0x07,
             frameTicks);
     }

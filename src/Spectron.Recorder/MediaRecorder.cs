@@ -1,4 +1,3 @@
-using FFMpegCore;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation.Devices.Audio;
 using OldBit.Spectron.Emulation.Screen;
@@ -109,14 +108,7 @@ public sealed class MediaRecorder : IDisposable
     {
         try
         {
-            var options = new FFOptions();
-
-            if (!string.IsNullOrWhiteSpace(ffmpegPath))
-            {
-                options.BinaryFolder = ffmpegPath;
-            }
-
-            FFMpegCore.Helpers.FFMpegHelper.VerifyFFMpegExists(options);
+            FFMpegCore.Helpers.FFMpegHelper.VerifyFFMpegExists(FFmpegOptions.Create(ffmpegPath));
 
             return true;
         }

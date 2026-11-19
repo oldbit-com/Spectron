@@ -6,8 +6,8 @@
         <Nullable>enable</Nullable>
         <AssemblyName>OldBit.Spectron.Files</AssemblyName>
         <RootNamespace>OldBit.Spectron.Files</RootNamespace>
-        <AssemblyVersion>1.0.1</AssemblyVersion>
-        <Version>1.0.1</Version>
+        <AssemblyVersion>1.0.2</AssemblyVersion>
+        <Version>1.0.2</Version>
     </PropertyGroup>
 
     <ItemGroup>

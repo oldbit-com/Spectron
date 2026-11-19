@@ -9,7 +9,6 @@ internal class VideoRecorder(string filePath) : IDisposable
     private readonly int _sizeOfColor = Marshal.SizeOf<Color>();
 
     private Stream? _stream;
-    private VideoProcessor? _videoGenerator;
 
     internal void AppendFrame(FrameBuffer frameBuffer)
     {
@@ -45,17 +44,5 @@ internal class VideoRecorder(string filePath) : IDisposable
         _stream = null;
     }
 
-    private void StopGenerator()
-    {
-        _videoGenerator?.Dispose();
-        _videoGenerator = null;
-    }
-
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-
-        Stop();
-        StopGenerator();
-    }
+    public void Dispose() => Stop();
 }

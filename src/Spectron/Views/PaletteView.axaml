@@ -1,0 +1,133 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+        xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="OldBit.Spectron.Views.PaletteView"
+        x:DataType="viewModels:PaletteEditorViewModel"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False"
+        Width="720"
+        Height="480"
+        Title="Palette Editor">
+
+    <Window.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="TextBlock.Header">
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="Opacity" Value="0.7"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+        <Style Selector="controls|PaletteCell">
+            <Setter Property="IsReadOnly" Value="{Binding !((viewModels:PaletteEditorViewModel)DataContext).IsEditable, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
+        </Style>
+        <Style Selector="Border.ColorBox">
+            <Setter Property="BorderBrush" Value="{DynamicResource ButtonForeground}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Width" Value="20"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="60,*" Margin="10">
+        <StackPanel Orientation="Vertical">
+            <TextBlock Text="SELECTED PALETTE" Margin="8 0 0 2" FontSize="10" />
+            <StackPanel Orientation="Horizontal">
+                <ComboBox
+                    ItemsSource="{Binding Palettes}"
+                    SelectedItem="{Binding SelectedPalette}"
+                    DisplayMemberBinding="{Binding Name}"
+                    Padding="8"
+                    Width="250" />
+
+                <Button Content="Reset" Margin="10 0 0 0" Command="{Binding ResetPaletteCommand}"/>
+                <Button Content="Preview" Margin="10 0 0 0" Command="{Binding PreviewPaletteCommand}"/>
+                <TextBlock Text="READ-ONLY" Margin="20 0 0 0" FontSize="10" IsVisible="{Binding !IsEditable}"/>
+            </StackPanel>
+        </StackPanel>
+
+        <Grid
+            Grid.Row="1"
+            DataContext="{Binding SelectedPalette}"
+            IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}}"
+            RowDefinitions="20,35,35,35,35,35,35,35,35"
+            ColumnDefinitions="20,100,100,100,100,100,100"
+            RowSpacing="10"
+            ColumnSpacing="10">
+
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="Ink" Classes="Header"/>
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="Ink Bright" Classes="Header"/>
+            <TextBlock Grid.Row="0" Grid.Column="4" Text="Paper" Classes="Header"/>
+            <TextBlock Grid.Row="0" Grid.Column="5" Text="Paper Bright" Classes="Header"/>
+            <TextBlock Grid.Row="0" Grid.Column="6" Text="Border" Classes="Header"/>
+
+            <Border Grid.Row="1" Grid.Column="0" Background="{StaticResource SpectrumBlack}" Classes="ColorBox" />
+            <Border Grid.Row="2" Grid.Column="0" Background="{StaticResource SpectrumBlue}" Classes="ColorBox" />
+            <Border Grid.Row="3" Grid.Column="0" Background="{StaticResource SpectrumRed}" Classes="ColorBox" />
+            <Border Grid.Row="4" Grid.Column="0" Background="{StaticResource SpectrumMagenta}" Classes="ColorBox" />
+            <Border Grid.Row="5" Grid.Column="0" Background="{StaticResource SpectrumGreen}" Classes="ColorBox" />
+            <Border Grid.Row="6" Grid.Column="0" Background="{StaticResource SpectrumCyan}" Classes="ColorBox" />
+            <Border Grid.Row="7" Grid.Column="0" Background="{StaticResource SpectrumYellow}" Classes="ColorBox" />
+            <Border Grid.Row="8" Grid.Column="0" Background="{StaticResource SpectrumWhite}" Classes="ColorBox" />
+
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="Black"/>
+            <TextBlock Grid.Row="2" Grid.Column="1" Text="Blue"/>
+            <TextBlock Grid.Row="3" Grid.Column="1" Text="Red"/>
+            <TextBlock Grid.Row="4" Grid.Column="1" Text="Magenta"/>
+            <TextBlock Grid.Row="5" Grid.Column="1" Text="Green"/>
+            <TextBlock Grid.Row="6" Grid.Column="1" Text="Cyan"/>
+            <TextBlock Grid.Row="7" Grid.Column="1" Text="Yellow"/>
+            <TextBlock Grid.Row="8" Grid.Column="1" Text="White"/>
+
+            <controls:PaletteCell Grid.Row="1" Grid.Column="2" Hex="{Binding Colors[0]}"/>
+            <controls:PaletteCell Grid.Row="2" Grid.Column="2" Hex="{Binding Colors[1]}"/>
+            <controls:PaletteCell Grid.Row="3" Grid.Column="2" Hex="{Binding Colors[2]}"/>
+            <controls:PaletteCell Grid.Row="4" Grid.Column="2" Hex="{Binding Colors[3]}"/>
+            <controls:PaletteCell Grid.Row="5" Grid.Column="2" Hex="{Binding Colors[4]}"/>
+            <controls:PaletteCell Grid.Row="6" Grid.Column="2" Hex="{Binding Colors[5]}"/>
+            <controls:PaletteCell Grid.Row="7" Grid.Column="2" Hex="{Binding Colors[6]}"/>
+            <controls:PaletteCell Grid.Row="8" Grid.Column="2" Hex="{Binding Colors[7]}"/>
+
+            <controls:PaletteCell Grid.Row="1" Grid.Column="3" Hex="{Binding Colors[8]}"/>
+            <controls:PaletteCell Grid.Row="2" Grid.Column="3" Hex="{Binding Colors[9]}"/>
+            <controls:PaletteCell Grid.Row="3" Grid.Column="3" Hex="{Binding Colors[10]}"/>
+            <controls:PaletteCell Grid.Row="4" Grid.Column="3" Hex="{Binding Colors[11]}"/>
+            <controls:PaletteCell Grid.Row="5" Grid.Column="3" Hex="{Binding Colors[12]}"/>
+            <controls:PaletteCell Grid.Row="6" Grid.Column="3" Hex="{Binding Colors[13]}"/>
+            <controls:PaletteCell Grid.Row="7" Grid.Column="3" Hex="{Binding Colors[14]}"/>
+            <controls:PaletteCell Grid.Row="8" Grid.Column="3" Hex="{Binding Colors[15]}"/>
+
+            <controls:PaletteCell Grid.Row="1" Grid.Column="4" Hex="{Binding Colors[16]}"/>
+            <controls:PaletteCell Grid.Row="2" Grid.Column="4" Hex="{Binding Colors[17]}"/>
+            <controls:PaletteCell Grid.Row="3" Grid.Column="4" Hex="{Binding Colors[18]}"/>
+            <controls:PaletteCell Grid.Row="4" Grid.Column="4" Hex="{Binding Colors[19]}"/>
+            <controls:PaletteCell Grid.Row="5" Grid.Column="4" Hex="{Binding Colors[20]}"/>
+            <controls:PaletteCell Grid.Row="6" Grid.Column="4" Hex="{Binding Colors[21]}"/>
+            <controls:PaletteCell Grid.Row="7" Grid.Column="4" Hex="{Binding Colors[22]}"/>
+            <controls:PaletteCell Grid.Row="8" Grid.Column="4" Hex="{Binding Colors[23]}"/>
+
+            <controls:PaletteCell Grid.Row="1" Grid.Column="5" Hex="{Binding Colors[24]}"/>
+            <controls:PaletteCell Grid.Row="2" Grid.Column="5" Hex="{Binding Colors[25]}"/>
+            <controls:PaletteCell Grid.Row="3" Grid.Column="5" Hex="{Binding Colors[26]}"/>
+            <controls:PaletteCell Grid.Row="4" Grid.Column="5" Hex="{Binding Colors[27]}"/>
+            <controls:PaletteCell Grid.Row="5" Grid.Column="5" Hex="{Binding Colors[28]}"/>
+            <controls:PaletteCell Grid.Row="6" Grid.Column="5" Hex="{Binding Colors[29]}"/>
+            <controls:PaletteCell Grid.Row="7" Grid.Column="5" Hex="{Binding Colors[30]}"/>
+            <controls:PaletteCell Grid.Row="8" Grid.Column="5" Hex="{Binding Colors[31]}"/>
+
+            <controls:PaletteCell Grid.Row="1" Grid.Column="6" Hex="{Binding Colors[32]}"/>
+            <controls:PaletteCell Grid.Row="2" Grid.Column="6" Hex="{Binding Colors[33]}"/>
+            <controls:PaletteCell Grid.Row="3" Grid.Column="6" Hex="{Binding Colors[34]}"/>
+            <controls:PaletteCell Grid.Row="4" Grid.Column="6" Hex="{Binding Colors[35]}"/>
+            <controls:PaletteCell Grid.Row="5" Grid.Column="6" Hex="{Binding Colors[36]}"/>
+            <controls:PaletteCell Grid.Row="6" Grid.Column="6" Hex="{Binding Colors[37]}"/>
+            <controls:PaletteCell Grid.Row="7" Grid.Column="6" Hex="{Binding Colors[38]}"/>
+            <controls:PaletteCell Grid.Row="8" Grid.Column="6" Hex="{Binding Colors[39]}"/>
+
+        </Grid>
+    </Grid>
+</Window>

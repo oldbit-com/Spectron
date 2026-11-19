@@ -1,0 +1,52 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
+             xmlns:converters="clr-namespace:OldBit.Spectron.Converters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="OldBit.Spectron.Controls.PaletteCell"
+             CornerRadius="8"
+             ClipToBounds="True">
+
+    <UserControl.Resources>
+        <converters:HexToBrushConverter x:Key="HexToBrushConverter"/>
+        <converters:HexColorTextConverter x:Key="HexColorTextConverter"/>
+    </UserControl.Resources>
+
+    <Border
+        Background="{Binding Hex, RelativeSource={RelativeSource AncestorType=controls:PaletteCell}, Converter={StaticResource HexToBrushConverter}}"
+        BorderBrush="White"
+        BorderThickness="2"
+        CornerRadius="8"
+        ClipToBounds="True">
+
+        <Grid Margin="4" ClipToBounds="True">
+            <TextBox
+                Text="{Binding Hex, RelativeSource={RelativeSource AncestorType=controls:PaletteCell}, Converter={StaticResource HexColorTextConverter}}"
+                IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=controls:PaletteCell}}"
+                MaxLength="7"
+                BorderThickness="0"
+                Background="Transparent"
+                VerticalAlignment="Center"
+                TextAlignment="Center"
+                Padding="2 8 2 8"
+                Margin="0"
+                ClipToBounds="True">
+
+                <TextBox.Styles>
+                    <Style Selector="TextBox /template/ Border#PART_BorderElement">
+                        <Setter Property="BorderThickness" Value="0"/>
+                    </Style>
+                    <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+                        <Setter Property="BorderThickness" Value="0"/>
+                    </Style>
+                    <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+                        <Setter Property="BorderThickness" Value="0"/>
+                    </Style>
+                </TextBox.Styles>
+            </TextBox>
+        </Grid>
+
+    </Border>
+</UserControl>

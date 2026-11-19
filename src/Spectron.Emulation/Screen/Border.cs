@@ -1,4 +1,5 @@
 using OldBit.Spectron.Emulation.Extensions;
+using OldBit.Spectron.Emulation.Screen.Palettes;
 
 namespace OldBit.Spectron.Emulation.Screen;
 
@@ -15,7 +16,7 @@ internal sealed class Border(HardwareSettings hardwareSettings, FrameBuffer fram
 
     private int _lastRangeIndex;
     private int _offset;
-    private Color _lastColor = SpectrumPalette.White;
+    private Color _lastColor = SpectrumPalette.Current.Border.White;
     private ScreenMode _screenMode = ScreenMode.Spectrum;
 
     internal void ChangeScreenMode(ScreenMode screenMode)
@@ -87,7 +88,7 @@ internal sealed class Border(HardwareSettings hardwareSettings, FrameBuffer fram
 
     internal void Reset()
     {
-        _lastColor = SpectrumPalette.White;
+        _lastColor = SpectrumPalette.Current.Border.White;
         Invalidate();
     }
 

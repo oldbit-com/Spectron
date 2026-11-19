@@ -4,6 +4,7 @@ using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Screen;
 using OldBit.Spectron.Theming;
+using OldBit.Spectron.ViewModels;
 
 namespace OldBit.Spectron.Settings;
 
@@ -52,4 +53,6 @@ public class Preferences
     public PrinterSettings Printer { get; init; } = new();
 
     public Interface1Settings Interface1 { get; init; } = new();
+
+    public PaletteType PaletteType { get; set; } = PaletteType.Standard;
 }
