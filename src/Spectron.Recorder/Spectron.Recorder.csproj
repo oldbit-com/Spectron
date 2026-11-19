@@ -18,7 +18,6 @@
     <ItemGroup>
       <PackageReference Include="Avalonia" />
       <PackageReference Include="FFMpegCore" />
-      <PackageReference Include="SkiaSharp" />
     </ItemGroup>
 
 </Project>
