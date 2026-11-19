@@ -5,7 +5,12 @@ namespace OldBit.Spectron.Views;
 
 public partial class AboutView : Window
 {
-    public AboutView() => InitializeComponent();
+    public AboutView()
+    {
+        InitializeComponent();
+
+        VersionText.Text = $"Version {AppVersion.Current}";
+    }
 
     protected override void OnKeyDown(KeyEventArgs e)
     {

@@ -1,0 +1,14 @@
+<Project>
+  <!--
+    Release builds pass the version from the git tag, e.g. -p:SpectronVersion=1.0.3 (see .github/workflows/release.yaml).
+    The SDK derives AssemblyVersion, FileVersion and InformationalVersion from Version.
+    Do not set any of these in individual projects.
+  -->
+  <PropertyGroup>
+    <SpectronVersion Condition="'$(SpectronVersion)' == ''">0.0.0-dev</SpectronVersion>
+    <Version>$(SpectronVersion)</Version>
+    <Company>OldBit Ltd</Company>
+    <Product>Spectron</Product>
+    <Copyright>© 2025-2026 Wojciech Sobieszek</Copyright>
+  </PropertyGroup>
+</Project>
