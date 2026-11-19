@@ -48,7 +48,6 @@ Spectron relies on several custom libraries developed specifically for this proj
 | Library                                                | Description                                  |
 |--------------------------------------------------------|----------------------------------------------|
 | [Z80](https://github.com/oldbit-com/Z80/tree/spectron) | Generic Z80 CPU emulator                     |
-| [Files](https://github.com/oldbit-com/Spectron.Files)  | Handles TZX, Z80, SNA and other file formats |
 | [Beep](https://github.com/oldbit-com/Beep)             | Basic audio player, cross-platform, native   |
 | [Joypad](https://github.com/oldbit-com/Joypad)         | Gamepad handler, cross-platform, native      |
 
@@ -61,6 +60,7 @@ The solution consists of several projects:
 | Spectron.Emulation   | Core emulation engine                                   |
 | Spectron.Basic       | Basic interpreter and related utilities                 |
 | Spectron.Disassembly | Z80 disassembler, used by the debugger                  |
+| Spectron.Files       | Handles TZX, Z80, SNA and other file formats            |
 | Spectron.Recorder    | Audio and video recording functionality                 |
 
 ## Quick demo

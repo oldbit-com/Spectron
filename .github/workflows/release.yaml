@@ -52,7 +52,7 @@ jobs:
 
       - name: Publish
         run: |
-          dotnet publish -r ${{ matrix.rid }} -p:DebugType=embedded -p:PublishSingleFile=true -p:SelfContained=true -o ./dist/${{ matrix.rid }}${{ matrix.bin }} ./src/Spectron/Spectron.csproj
+          dotnet publish -r ${{ matrix.rid }} -p:SpectronVersion=${GITHUB_REF_NAME#v} -p:DebugType=embedded -p:PublishSingleFile=true -p:SelfContained=true -o ./dist/${{ matrix.rid }}${{ matrix.bin }} ./src/Spectron/Spectron.csproj
 
       - name: Package Windows
         if: startsWith(matrix.rid, 'win-')
@@ -108,7 +108,15 @@ jobs:
           mkdir -p ./dist/${{ matrix.rid }}/Spectron.app/Contents/Resources
           cp ./src/Spectron/Assets/spectron.icns ./dist/${{ matrix.rid }}/Spectron.app/Contents/Resources/
           cp ./src/Spectron/Info.plist ./dist/${{ matrix.rid }}/Spectron.app/Contents/
-          
+
+          # Stamp version from tag (bundle versions must be numeric, so drop any pre-release suffix)
+          BUNDLE_VERSION="${GITHUB_REF_NAME#v}"
+          BUNDLE_VERSION="${BUNDLE_VERSION%%-*}"
+          /usr/libexec/PlistBuddy \
+            -c "Set :CFBundleVersion ${BUNDLE_VERSION}" \
+            -c "Set :CFBundleShortVersionString ${BUNDLE_VERSION}" \
+            ./dist/${{ matrix.rid }}/Spectron.app/Contents/Info.plist
+
           # Sign
           codesign --force --deep --options=runtime --sign "Developer ID Application" "./dist/${{ matrix.rid }}/Spectron.app" --entitlements ./src/Spectron/entitlements.plist
           
