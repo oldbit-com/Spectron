@@ -40,6 +40,7 @@ The ZX Spectrum was my first computer, and I still have a deep affection for it.
 - [x] Favorites manager
 - [x] Screen effects: Blur and CRT/Scanlines
 - [x] TC2048 extended graphics support (hi-res and hi-color)
+- [x] Custom color palettes 
 - [x] And more to come...
 
 Spectron relies on several custom libraries developed specifically for this project:
@@ -189,6 +190,8 @@ The Favorites Manager helps organize your favorite games, demos, and files, acce
 ## RZX Playback
 Playback of RZX files (recordings of ZX Spectrum games) is supported. You can find many RZX files in the [RZX Archive](https://www.rzxarchive.co.uk/).
 
+## Custom Color Palettes
+Custom color palettes allow you to modify the Spectrum's default palette. There are several predefined palettes and simple editor available. Any color can be customized to your liking.
 
 ### Resources
 - [Avalonia UI](https://avaloniaui.net/)
