@@ -2,7 +2,7 @@
   <!--
     Release builds pass the version from the git tag, e.g. -p:SpectronVersion=1.0.3 (see .github/workflows/release.yaml).
     The SDK derives AssemblyVersion, FileVersion and InformationalVersion from Version.
-    Projects published on their own (e.g. Spectron.Files) can still set their own Version.
+    Do not set any of these in individual projects.
   -->
   <PropertyGroup>
     <SpectronVersion Condition="'$(SpectronVersion)' == ''">0.0.0-dev</SpectronVersion>
