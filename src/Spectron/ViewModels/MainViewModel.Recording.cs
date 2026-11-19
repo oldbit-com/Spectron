@@ -66,7 +66,7 @@ partial class MainViewModel
     {
         var shouldResume = !IsPaused;
 
-        if (!MediaRecorder.VerifyDependencies())
+        if (!MediaRecorder.VerifyDependencies(_preferences.Recording.FFmpegPath))
         {
             await _messageDialogs.Error("Video recording is not available. It requires FFmpeg to be available.\nPlease check the documentation for more information.");
 
