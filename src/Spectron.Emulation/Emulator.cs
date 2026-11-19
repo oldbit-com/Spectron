@@ -226,6 +226,7 @@ public sealed class Emulator
     {
         SpectrumPalette.SetPalette(palette);
         FastLookup.UpdateAttributeData();
+        ScreenBuffer.RefreshBorder();
 
         _invalidateScreen = true;
     }

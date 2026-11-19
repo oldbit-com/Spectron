@@ -10,7 +10,5 @@ public static partial class StringExtensions
     extension(string s)
     {
         public string ToKebabCase() => string.IsNullOrEmpty(s) ? s : KebabCaseRegex().Replace(s, "-$1").ToLowerInvariant();
-
-        public string Truncate(int maxLength) => s.Length <= maxLength ? s : s[..maxLength];
     }
 }
