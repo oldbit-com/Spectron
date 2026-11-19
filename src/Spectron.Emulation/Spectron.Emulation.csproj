@@ -7,9 +7,6 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AssemblyName>OldBit.Spectron.Emulation</AssemblyName>
         <RootNamespace>OldBit.Spectron.Emulation</RootNamespace>
-        <Version>1.0.0</Version>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
-        <FileVersion>1.0.0</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
