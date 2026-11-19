@@ -8,10 +8,6 @@ using OldBit.Spectron.Recorder.Helpers;
 
 namespace OldBit.Spectron.Recorder.Video;
 
-/// <summary>
-/// Converts raw recorded frames into a video file. The raw recording is a Brotli compressed
-/// sequence of RGBA frames, which is decompressed and piped directly into FFmpeg as raw video.
-/// </summary>
 internal sealed class VideoProcessor(
     FrameBuffer frameBuffer,
     RecorderOptions options,
