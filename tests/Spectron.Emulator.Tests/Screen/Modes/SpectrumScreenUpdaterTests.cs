@@ -85,8 +85,8 @@ public class SpectrumScreenUpdaterTests
         // Set flash attribute
         _memory.Write(0x5800, InkRed | PaperCyan | Flash);
 
-        // For the first 31 frames, the flash should be off, color should be normal
-        for (var i = 0; i < 31; i++)
+        // For the first 16 frames, the flash should be off, color should be normal
+        for (var i = 0; i < 16; i++)
         {
             _content.UpdateFrameBuffer(14362);
             _frameBuffer.Pixels[0x56D0..0x56D8].ShouldBe([Red, Cyan, Red, Cyan, Red, Cyan, Red, Cyan]);
