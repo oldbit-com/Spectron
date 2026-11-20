@@ -82,7 +82,8 @@ public class TimexHiColorScreenUpdaterTests
         _memory.Write(0x4000, 0xAA);
         _memory.Write(0x6000, InkRed | PaperCyan | Flash);
 
-        for (var i = 0; i < 31; i++)
+        // For the first 16 frames, the flash should be off, color should be normal
+        for (var i = 0; i < 16; i++)
         {
             _content.UpdateFrameBuffer(14336);
             _frameBuffer.Pixels[0x5830..0x5838].ShouldBe([Red, Cyan, Red, Cyan, Red, Cyan, Red, Cyan]);
