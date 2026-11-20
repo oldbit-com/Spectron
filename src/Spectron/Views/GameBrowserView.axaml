@@ -10,9 +10,18 @@
         x:Class="OldBit.Spectron.Views.GameBrowserView"
         x:DataType="viewModels:GameBrowserViewModel"
         Title="Game Browser">
+
     <Grid Margin="10">
         <Grid RowDefinitions="30,5,*">
-            <TextBox Grid.Row="0" PlaceholderText="Search games, publishers or authors"/>
+            <TextBox
+                Name="SearchText"
+                Grid.Row="0"
+                Text="{Binding SearchText}"
+                PlaceholderText="Search games, publishers or authors">
+                <TextBox.KeyBindings>
+                    <KeyBinding Gesture="Enter" Command="{Binding SearchCommand}" />
+                </TextBox.KeyBindings>
+            </TextBox>
 
             <controls:HeaderSeparator Grid.Row="1" />
 

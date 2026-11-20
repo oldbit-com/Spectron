@@ -97,9 +97,9 @@ partial class MainViewModel
         }
     }
 
-    private static Task HandleBrowseGamesAsync()
+    private Task HandleBrowseGamesAsync()
     {
-        WeakReferenceMessenger.Default.Send(new ShowGameBrowserViewMessage(new GameBrowserViewModel()));
+        WeakReferenceMessenger.Default.Send(new ShowGameBrowserViewMessage(_gameBrowserViewModel));
 
         return Task.CompletedTask;
     }

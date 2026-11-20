@@ -20,10 +20,6 @@ public enum PaletteType
     Custom
 }
 
-/// <summary>
-/// Colour groups in the order they are stored in <see cref="PaletteViewModel.Colors"/>
-/// and shown as columns in PaletteView.
-/// </summary>
 public enum ColorGroup
 {
     Ink,
@@ -37,9 +33,6 @@ public partial class PaletteViewModel : ObservableObject
 {
     private static readonly ColorGroup[] ColorGroups = Enum.GetValues<ColorGroup>();
 
-    /// <summary>
-    /// Total number of colours: 8 colours in each of the <see cref="ColorGroup"/> groups.
-    /// </summary>
     public static readonly int ColorCount = ColorGroups.Length * PaletteColor.Count;
 
     [ObservableProperty]

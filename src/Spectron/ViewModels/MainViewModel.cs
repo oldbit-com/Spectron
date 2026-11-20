@@ -63,6 +63,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private readonly FavoritesService _favoritesService;
     private readonly PaletteService _paletteService;
     private readonly SessionService _sessionService;
+    private readonly GameBrowserViewModel _gameBrowserViewModel;
     private readonly DebuggerContext _debuggerContext;
     private readonly QuickSaveService _quickSaveService;
     private readonly ILogStore _logStore;
@@ -362,6 +363,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         RecentFilesViewModel recentFilesViewModel,
         FavoritesViewModel favoritesViewModel,
         PaletteEditorViewModel paletteEditorViewModel,
+        GameBrowserViewModel gameBrowserViewModel,
         TapeMenuViewModel tapeMenuViewModel,
         MicrodriveMenuViewModel microdriveMenuViewModel,
         DiskDriveMenuViewModel diskDriveMenuViewModel,
@@ -385,6 +387,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _favoritesService = favoritesService;
         _paletteService = paletteService;
         _sessionService = sessionService;
+        _gameBrowserViewModel = gameBrowserViewModel;
         _debuggerContext = debuggerContext;
         _quickSaveService = quickSaveService;
         _logStore = logStore;

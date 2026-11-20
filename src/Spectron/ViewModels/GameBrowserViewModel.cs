@@ -1,7 +1,9 @@
 using System.Collections.ObjectModel;
 using System.IO;
-using Avalonia.Media.Imaging;
+using System.Threading;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace OldBit.Spectron.ViewModels;
 
@@ -9,11 +11,18 @@ public partial class GameBrowserViewModel : ObservableObject
 {
     public ObservableCollection<GameViewModel> Games { get; } = [];
 
+    public IAsyncRelayCommand SearchCommand { get; }
+
     [ObservableProperty]
     public partial GameViewModel? SelectedGame { get; set; }
 
+    [ObservableProperty]
+    public partial string SearchText { get; set; } = string.Empty;
+
     public GameBrowserViewModel()
     {
+        SearchCommand = new AsyncRelayCommand(Search);
+
         Games.Add(new GameViewModel
         {
             Name = "Game 1",
@@ -43,5 +52,15 @@ public partial class GameBrowserViewModel : ObservableObject
             Availability = "Distribution denied",
             Data = File.ReadAllBytes("/Users/voytas/Downloads/PrizeThe.scr"),
         });
+    }
+
+    private async Task Search(CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(SearchText))
+        {
+            return;
+        }
+
+        //await _zxDbClient.SearchByTitle(SearchText, cancellationToken);
     }
 }
