@@ -48,6 +48,8 @@ public sealed class Emulator
 
     public bool IsPaused => _emulationTimer.IsPaused;
 
+    internal bool IsDebuggerBreak => _isDebuggerBreak;
+
     public bool IsUlaPlusEnabled
     {
         get => UlaPlus.IsEnabled;

@@ -50,12 +50,14 @@ The solution (`Spectron.slnx`) has five source projects with a strict dependency
 │   ├── /Snapshot                   # SNA, SZX, Z80 snapshot support
 │   ├── /Tape                       # Cassette/Tape emulation
 │   └── /TimeTravel                 # Time machine / re-play
+├── /Spectron.Mcp                   # MCP server so AI agents can control the running emulator
 ├── /Spectron.Recorder              # Audio and video recorder
 /tests
 ├── /Spectron.Debugger.Tests        # Tests for the debugger UI
 ├── /Spectron.Disassembly.Tests     # Tests for the Z80 disassembler
 ├── /Spectron.Emulator.Tests        # Tests for the core emulation logic
 ├── /Spectron.Integration.Tests     # Tests that execute real Spectrum software
+├── /Spectron.Mcp.Tests             # Tests for the MCP server tools
 └── /Spectron.Tests                 # Tests for the UI related components
 ```
 
@@ -101,4 +103,5 @@ Each functional area (tape, disk, snapshots, audio, etc.) lives in its own parti
 | Spectron.Emulation | `OldBit.Spectron.Emulation` |
 | Spectron.Debugger | `OldBit.Spectron.Debugger` |
 | Spectron.Disassembly | `OldBit.Spectron.Disassembly` |
+| Spectron.Mcp | `OldBit.Spectron.Mcp` |
 | Spectron.Recorder | `OldBit.Spectron.Recorder` |
