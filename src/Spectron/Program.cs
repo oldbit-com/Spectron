@@ -49,7 +49,8 @@ public class Program
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Unhandled exception occurred during startup");
+                Console.WriteLine("Unhandled exception occurred during startup");
+                Console.WriteLine(ex.ToString());
             }
         }, args);
     }
