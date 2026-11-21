@@ -15,7 +15,6 @@ using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Mcp.Input;
 using OldBit.Spectron.Mcp.Screen;
 using OldBit.Z80Cpu;
-using OldBit.Z80Cpu.Registers;
 
 namespace OldBit.Spectron.Mcp.Tools;
 
