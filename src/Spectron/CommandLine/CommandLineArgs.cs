@@ -34,5 +34,5 @@ public record CommandLineArgs(
     BorderSize? BorderSize,
     bool IsFullScreen,
     Theme? Theme,
-    bool IsMcpServerEnabled = false,
-    int? McpServerPort = null);
+    bool IsMcpServerEnabled,
+    int? McpServerPort);
