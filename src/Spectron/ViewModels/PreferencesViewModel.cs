@@ -22,6 +22,7 @@ using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Mouse;
 using OldBit.Spectron.Emulation.Rom;
 using OldBit.Spectron.Emulation.Tape;
+using OldBit.Spectron.Mcp;
 using OldBit.Spectron.Messages;
 using OldBit.Spectron.Recorder;
 using OldBit.Spectron.Screen;
@@ -77,6 +78,9 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         ShouldIncludeTapeInResume = preferences.Resume.ShouldIncludeTape;
         ShouldIncludeTimeMachineInResume = preferences.Resume.ShouldIncludeTimeMachine;
         ShouldAutoSuspendResume = preferences.Resume.ShouldAutoSuspendResume;
+
+        IsMcpServerEnabled = preferences.McpServer.IsEnabled;
+        McpServerPort = preferences.McpServer.Port;
 
         IsBeeperEnabled = preferences.Audio.IsBeeperEnabled;
         IsAyEnabled = preferences.Audio.IsAyAudioEnabled;
@@ -196,6 +200,12 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
             {
                 MouseType = MouseType,
                 IsStandardMousePointerHidden = IsStandardMousePointerHidden,
+            },
+
+            McpServer = new McpServerSettings
+            {
+                IsEnabled = IsMcpServerEnabled,
+                Port = (int)(McpServerPort ?? McpServer.DefaultPort),
             },
 
             Resume = new ResumeSettings
@@ -620,6 +630,12 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
 
     [ObservableProperty]
     public partial bool IsResumeEnabled { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsMcpServerEnabled { get; set; }
+
+    [ObservableProperty]
+    public partial decimal? McpServerPort { get; set; }
 
     [ObservableProperty]
     public partial bool ShouldIncludeTapeInResume { get; set; }

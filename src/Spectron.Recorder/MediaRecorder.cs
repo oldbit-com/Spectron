@@ -108,7 +108,7 @@ public sealed class MediaRecorder : IDisposable
     {
         try
         {
-            FFMpegCore.Helpers.FFMpegHelper.VerifyFFMpegExists(FFmpegOptions.Create(ffmpegPath));
+            FFMpegCore.FFMpeg.GetContainerFormats(FFmpegOptions.Create(ffmpegPath));
 
             return true;
         }

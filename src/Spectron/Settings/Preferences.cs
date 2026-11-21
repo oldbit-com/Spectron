@@ -55,4 +55,6 @@ public class Preferences
     public Interface1Settings Interface1 { get; init; } = new();
 
     public PaletteType PaletteType { get; set; } = PaletteType.Standard;
+
+    public McpServerSettings McpServer { get; init; } = new();
 }

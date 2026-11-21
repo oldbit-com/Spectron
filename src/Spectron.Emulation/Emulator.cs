@@ -35,18 +35,20 @@ public sealed class Emulator
     private readonly EmulatorTimer _emulationTimer;
     private readonly FloatingBus _floatingBus;
     private readonly ScreenMemoryHandler _screenMemoryHandler;
+    private readonly Lock _frameLock = new();
 
     private bool _isDebuggerResume;
     private bool _invalidateScreen;
     private bool _isAcceleratedTapeSpeed;
     private bool _isNmiRequested;
-    private bool _isDebuggerBreak;
     private long _ticksSinceReset;
 
     public delegate void FrameEvent(FrameBuffer frameBuffer, AudioBuffer audioBuffer);
     public event FrameEvent? FrameCompleted;
 
     public bool IsPaused => _emulationTimer.IsPaused;
+
+    internal bool IsDebuggerBreak { get; private set; }
 
     public bool IsUlaPlusEnabled
     {
@@ -181,7 +183,7 @@ public sealed class Emulator
 
     public void Resume(bool isDebuggerResume = false)
     {
-        _isDebuggerBreak = false;
+        IsDebuggerBreak = false;
         _isDebuggerResume = isDebuggerResume;
 
         _emulationTimer.Resume();
@@ -189,7 +191,7 @@ public sealed class Emulator
 
     public void Reset()
     {
-        _isDebuggerBreak = false;
+        IsDebuggerBreak = false;
         _ticksSinceReset = 0;
 
         RzxController = null;
@@ -209,7 +211,7 @@ public sealed class Emulator
     {
         Cpu.Break();
 
-        _isDebuggerBreak = true;
+        IsDebuggerBreak = true;
     }
 
     public void RequestNmi() => _isNmiRequested = true;
@@ -233,7 +235,7 @@ public sealed class Emulator
 
     private void OnTimerElapsed(object? sender, EventArgs e)
     {
-        if (_isDebuggerBreak)
+        if (IsDebuggerBreak)
         {
             return;
         }
@@ -280,7 +282,19 @@ public sealed class Emulator
         Cpu.AddBus(Bus);
     }
 
+    /// <summary>
+    /// Runs a single frame. Frames can be driven by the timer thread and by external controllers
+    /// (e.g. MCP tools), so the lock guarantees two frames never execute at the same time.
+    /// </summary>
     internal void RunFrame()
+    {
+        lock (_frameLock)
+        {
+            RunFrameCore();
+        }
+    }
+
+    private void RunFrameCore()
     {
         StartFrame();
 

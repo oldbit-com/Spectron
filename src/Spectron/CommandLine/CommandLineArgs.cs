@@ -33,4 +33,6 @@ public record CommandLineArgs(
     Interface1RomVersion? Interface1RomVersion,
     BorderSize? BorderSize,
     bool IsFullScreen,
-    Theme? Theme);
+    Theme? Theme,
+    bool IsMcpServerEnabled,
+    int? McpServerPort);

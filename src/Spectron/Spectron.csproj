@@ -36,7 +36,6 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
         <PackageReference Include="Microsoft.Extensions.Logging.Console" />
         <PackageReference Include="OldBit.Z80Cpu.Spectron" />
-        <PackageReference Include="SkiaSharp.NativeAssets.Linux" />
         <PackageReference Include="System.CommandLine" />
         <PackageReference Include="Xaml.Behaviors" />
     </ItemGroup>
@@ -51,6 +50,7 @@
       <ProjectReference Include="..\Spectron.Database\Spectron.Database.csproj" />
       <ProjectReference Include="..\Spectron.Debugger\Spectron.Debugger.csproj" />
       <ProjectReference Include="..\Spectron.Emulation\Spectron.Emulation.csproj" />
+      <ProjectReference Include="..\Spectron.Mcp\Spectron.Mcp.csproj" />
       <ProjectReference Include="..\Spectron.Recorder\Spectron.Recorder.csproj" />
     </ItemGroup>
 </Project>

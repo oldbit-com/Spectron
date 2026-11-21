@@ -68,6 +68,8 @@ partial class MainViewModel
 
         await RecentFilesViewModel.LoadAsync();
 
+        await ConfigureMcpServerAsync();
+
         ConfigureShiftKeys(_preferences.Keyboard);
         HandleChangeBorderSize(CommandLineArgs?.BorderSize ?? _preferences.BorderSize);
         HandleChangeScreenEffect(_preferences.ScreenEffect);
@@ -213,6 +215,8 @@ partial class MainViewModel
         }
 
         args.Cancel = true;
+
+        await StopMcpServerAsync();
 
         Emulator?.Shutdown(isAppClosing: true);
         _frameRateCalculator.Dispose();
