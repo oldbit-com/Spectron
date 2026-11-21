@@ -72,7 +72,7 @@
                         <CheckBox x:Name="McpServerEnabled" Content="Enable MCP server" ToolTip.Tip="Lets AI agents (e.g. Claude Code) control the emulator over the Model Context Protocol. Listens on localhost only." Classes="Center" Margin="10 0 0 0" IsChecked="{Binding IsMcpServerEnabled}"/>
                         <StackPanel Orientation="Horizontal" Margin="35 0 0 0" IsEnabled="{Binding #McpServerEnabled.IsChecked}">
                             <TextBlock Text="Port:" Padding="0 0 10 0" VerticalAlignment="Center" Classes="Center"/>
-                            <NumericUpDown Width="130" Minimum="1024" Maximum="65535" Increment="1" FormatString="0" Value="{Binding McpServerPort}"/>
+                            <NumericUpDown Width="130" Minimum="1024" Maximum="65535" Increment="1" FormatString="0" Value="{Binding McpServerPort}" VerticalContentAlignment="Center"/>
                             <SelectableTextBlock Text="{Binding McpServerPort, StringFormat='http://localhost:{0}/mcp'}" VerticalAlignment="Center" Margin="10 0 0 0" Opacity="0.7"/>
                         </StackPanel>
                     </StackPanel>
