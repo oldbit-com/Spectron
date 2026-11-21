@@ -164,6 +164,18 @@ pressed, which is useful in games (50 frames = 1 second).
 > for example `p` gives `PRINT`, `j` gives `LOAD` and `r` gives `RUN`. To enter `10 PRINT "HELLO"`,
 > type `10p"HELLO"` followed by a new line. The 128K BASIC editor accepts keywords spelled out in full.
 
+Some 48K keywords cannot be entered with `type_text` at all, because they need Symbol Shift or Extended mode.
+The agent enters those with `press_keys` and uses `type_text` for the rest of the line:
+
+- **Symbol Shift** keywords: `SYM+Y` AND, `SYM+U` OR, `SYM+F` TO, `SYM+D` STEP, `SYM+G` THEN, `SYM+I` AT,
+  `SYM+S` NOT, `SYM+A` STOP, `SYM+Q` `<=`, `SYM+W` `<>`, `SYM+E` `>=`.
+- **Extended mode** keywords printed above a key (in green), for example `["EXTEND", "H"]` gives SQR.
+- **Extended mode** keywords printed below a key (in red), for example `["EXTEND", "SYM+H"]` gives CIRCLE,
+  `["EXTEND", "SYM+X"]` gives INK and `["EXTEND", "SYM+C"]` gives PAPER.
+
+For example, `10 CIRCLE 128,88,50` is entered as `type_text "10"`, `press_keys ["EXTEND", "SYM+H"]` and
+`type_text "128,88,50\n"`. The full key map is included in the `press_keys` tool description, so agents can see it.
+
 By default each key is held for 3 frames and released for 6. The ROM ignores a key pressed again
 less than about 5 frames after it was released, so very small `releaseFrames` values can drop repeated keys.
 

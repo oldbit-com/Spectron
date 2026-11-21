@@ -106,7 +106,11 @@ public sealed class EmulatorTools(EmulatorController controller)
                  Supports letters (uppercase uses CAPS SHIFT), digits, space, newline (ENTER), backspace (DELETE) and symbols from
                  the 48K keyboard: ! @ # $ % & ' ( ) _ < > ; " ^ - + = : £ ? / * , .
                  IMPORTANT: 48K BASIC uses keyword entry. At the K cursor a letter key produces a whole keyword (e.g. 'p' = PRINT,
-                 'j' = LOAD, 'r' = RUN, 'l' = LET), so type the single keyword letter, not the word. 128K BASIC accepts keywords spelled out.
+                 'j' = LOAD, 'r' = RUN, 'l' = LET, 'f' = FOR, 'u' = IF, 'b' = BORDER), so type the single keyword letter, not the word.
+                 Keywords that need EXTEND mode (e.g. CIRCLE, INK, PAPER, BEEP, SIN, RND) or Symbol Shift (e.g. AND, OR, TO, STEP, THEN, AT, <=)
+                 cannot be typed with this tool: use press_keys for them (its description lists the keys) and type_text for the rest.
+                 The cursor returns to K after THEN and ':'. Check the edit line with read_screen_text before pressing ENTER.
+                 128K BASIC accepts keywords spelled out, so this tool can type whole lines there.
                  Emulation stays paused afterwards if it was paused before.
                  """)]
     public Task<string> TypeText(
@@ -137,6 +141,15 @@ public sealed class EmulatorTools(EmulatorController controller)
                  Key names: A-Z, 0-9, ENTER, SPACE, CAPS, SYM, and shortcuts BREAK, DELETE, EDIT, CAPSLOCK, TRUEVIDEO, INVVIDEO,
                  LEFT, DOWN, UP, RIGHT, GRAPHICS, EXTEND. Combine keys with '+', e.g. "SYM+P", "CAPS+5".
                  Use a long holdFrames to keep a key down in games (e.g. holdFrames 50 = 1 second).
+                 48K BASIC keywords that type_text cannot enter:
+                 - Symbol Shift: SYM+Q <=, SYM+W <>, SYM+E >=, SYM+Y AND, SYM+U OR, SYM+I AT, SYM+A STOP, SYM+S NOT, SYM+D STEP, SYM+F TO, SYM+G THEN.
+                 - EXTEND mode lasts for one key. Press EXTEND, then the key for the keyword above it:
+                   Q SIN, W COS, E TAN, R INT, T RND, Y STR$, U CHR$, I CODE, O PEEK, P TAB, A READ, S RESTORE, D DATA, F SGN, G ABS,
+                   H SQR, J VAL, K LEN, L USR, Z LN, X EXP, C LPRINT, V LLIST, B BIN, N INKEY$, M PI.
+                 - Or EXTEND, then SYM+key for the keyword below it: SYM+Q ASN, SYM+W ACS, SYM+E ATN, SYM+R VERIFY, SYM+T MERGE, SYM+I IN,
+                   SYM+O OUT, SYM+H CIRCLE, SYM+J VAL$, SYM+K SCREEN$, SYM+L ATTR, SYM+Z BEEP, SYM+X INK, SYM+C PAPER, SYM+V FLASH,
+                   SYM+B BRIGHT, SYM+N OVER, SYM+M INVERSE, SYM+1 DEF FN, SYM+2 FN, SYM+3 LINE, SYM+8 POINT, SYM+9 CAT.
+                 Example, 10 CIRCLE 128,88,50: type_text "10", press_keys ["EXTEND", "SYM+H"], type_text "128,88,50\n".
                  """)]
     public Task<string> PressKeys(
         [Description("Key combinations to press in order, e.g. [\"J\", \"SYM+P\", \"SYM+P\", \"ENTER\"].")] string[] keys,

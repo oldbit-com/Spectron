@@ -144,6 +144,22 @@ public class EmulatorToolsTests
         _host.Emulator.ShouldNotBe(original);
     }
 
+    [Theory]
+    [InlineData(new[] { "EXTEND", "SYM+H" }, "10 CIRCLE")]
+    [InlineData(new[] { "EXTEND", "H" }, "10SQR")]
+    [InlineData(new[] { "EXTEND", "SYM+X" }, "10 INK")]
+    public async Task PressKeys_ShouldEnterExtendedModeKeywords(string[] keys, string expected)
+    {
+        await _tools.RunFrames(150);
+
+        await _tools.TypeText("10");
+        await _tools.PressKeys(keys);
+
+        var lines = (await _tools.ReadScreenText()).Split('\n');
+
+        lines.Last(line => line.Length > 0).ShouldStartWith(expected);
+    }
+
     [Fact]
     public async Task TypeText_ShouldRejectUnsupportedCharacters()
     {
