@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>OldBit.Spectron.Mcp</AssemblyName>
+        <RootNamespace>OldBit.Spectron.Mcp</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="ModelContextProtocol.AspNetCore" />
+        <PackageReference Include="OldBit.Z80Cpu.Spectron" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>OldBit.Spectron.Mcp.Tests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Spectron.Debugger\Spectron.Debugger.csproj" />
+        <ProjectReference Include="..\Spectron.Disassembly\Spectron.Disassembly.csproj" />
+        <ProjectReference Include="..\Spectron.Emulation\Spectron.Emulation.csproj" />
+    </ItemGroup>
+</Project>

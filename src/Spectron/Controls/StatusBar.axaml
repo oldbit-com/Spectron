@@ -90,6 +90,15 @@
             <StackPanel
                 Orientation="Horizontal"
                 Margin="0 0 10 0"
+                IsVisible="{Binding IsMcpServerEnabled}"
+                ToolTip.Tip="MCP Server Enabled">
+
+                <material:MaterialIcon Kind="RobotLoveOutline"/>
+            </StackPanel>
+
+            <StackPanel
+                Orientation="Horizontal"
+                Margin="0 0 10 0"
                 IsVisible="{Binding IsRzxPlaying}"
                 ToolTip.Tip="RZX Playback Progress">
 

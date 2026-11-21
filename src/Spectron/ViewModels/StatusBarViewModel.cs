@@ -75,6 +75,9 @@ public partial class StatusBarViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(ToolTipAy))]
     public partial StereoMode StereoMode { get; set; }
 
+    [ObservableProperty]
+    public partial bool IsMcpServerEnabled { get; set; }
+
     private readonly Timer _timer;
     private readonly Stopwatch _stopwatch = new();
 

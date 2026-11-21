@@ -32,6 +32,8 @@ partial class MainViewModel
 
             IsNativeMenuEnabled = _preferences.IsNativeMenuEnabled;
 
+            await ConfigureMcpServerAsync();
+
             Emulator?.IsUlaPlusEnabled = _preferences.IsUlaPlusEnabled;
             Emulator?.IsFloatingBusEnabled = _preferences.IsFloatingBusEnabled;
             Emulator?.JoystickManager.Configure(JoystickType);
