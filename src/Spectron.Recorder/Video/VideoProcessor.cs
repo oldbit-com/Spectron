@@ -47,8 +47,8 @@ internal sealed class VideoProcessor(
                 .WithArgument(new CustomArgument($"-sws_flags {options.ScalingAlgorithm}"))
                 .WithVideoCodec(VideoCodec.LibX264)
                 .WithAudioCodec(AudioCodec.Aac)
-                .ForcePixelFormat("yuv420p")
-                .WithFramerate(FrameRate))
-            .ProcessSynchronously(ffMpegOptions: FFmpegOptions.Create(options.FFmpegPath));
+                .WithPixelFormat("yuv420p")
+                .WithFrameRate(FrameRate))
+            .ProcessSynchronously(ffOptions: FFmpegOptions.Create(options.FFmpegPath));
     }
 }
