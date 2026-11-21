@@ -16,6 +16,11 @@ public interface IEmulatorHost
     Emulator? Emulator { get; }
 
     /// <summary>
+    /// Gets a value indicating whether emulation is paused, as shown in the UI.
+    /// </summary>
+    bool IsPaused { get; }
+
+    /// <summary>
     /// Pauses the emulator. When the returned task completes, the emulator thread is no longer running frames.
     /// </summary>
     Task PauseAsync();

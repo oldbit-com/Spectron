@@ -12,7 +12,9 @@ namespace OldBit.Spectron.Mcp.Tests.Fixtures;
 /// </summary>
 internal sealed class TestEmulatorHost : IEmulatorHost
 {
-    public Emulator? Emulator { get; }
+    public Emulator? Emulator { get; set; }
+
+    public bool IsPaused { get; set; }
 
     public int PauseCount { get; private set; }
     public int ResumeCount { get; private set; }
@@ -32,12 +34,14 @@ internal sealed class TestEmulatorHost : IEmulatorHost
     public Task PauseAsync()
     {
         PauseCount++;
+        IsPaused = true;
         return Task.CompletedTask;
     }
 
     public Task ResumeAsync()
     {
         ResumeCount++;
+        IsPaused = false;
         return Task.CompletedTask;
     }
 

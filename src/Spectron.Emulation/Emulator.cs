@@ -35,6 +35,7 @@ public sealed class Emulator
     private readonly EmulatorTimer _emulationTimer;
     private readonly FloatingBus _floatingBus;
     private readonly ScreenMemoryHandler _screenMemoryHandler;
+    private readonly Lock _frameLock = new();
 
     private bool _isDebuggerResume;
     private bool _invalidateScreen;
@@ -282,7 +283,19 @@ public sealed class Emulator
         Cpu.AddBus(Bus);
     }
 
+    /// <summary>
+    /// Runs a single frame. Frames can be driven by the timer thread and by external controllers
+    /// (e.g. MCP tools), so the lock guarantees two frames never execute at the same time.
+    /// </summary>
     internal void RunFrame()
+    {
+        lock (_frameLock)
+        {
+            RunFrameCore();
+        }
+    }
+
+    private void RunFrameCore()
     {
         StartFrame();
 

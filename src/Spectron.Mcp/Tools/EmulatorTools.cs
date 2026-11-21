@@ -26,14 +26,14 @@ public sealed class EmulatorTools(EmulatorController controller)
 
     [McpServerTool(Name = "get_status", ReadOnly = true)]
     [Description("Returns the emulated machine type, ROM, whether emulation is paused, the program counter and tape state.")]
-    public Task<string> GetStatus() => controller.ExecuteAsync(emulator =>
+    public Task<string> GetStatus() => controller.ExecuteAsync((emulator, wasPaused) =>
         $"""
          Computer: {emulator.ComputerType}
          ROM: {emulator.RomType}
-         Paused: {emulator.IsPaused}
+         Paused: {wasPaused}
          PC: ${emulator.Cpu.Registers.PC:X4}
          Tape loaded: {emulator.TapeManager.IsTapeLoaded}, playing: {emulator.TapeManager.IsPlaying}
-         """);
+         """, leavePaused: false);
 
     [McpServerTool(Name = "pause")]
     [Description("Pauses emulation. While paused, use run_frames, type_text or press_keys to advance time deterministically.")]
@@ -86,7 +86,8 @@ public sealed class EmulatorTools(EmulatorController controller)
 
     [McpServerTool(Name = "run_frames")]
     [Description("Pauses real-time emulation (if running) and runs the given number of frames as fast as possible (50 frames = 1 second of Spectrum time). " +
-                 "The emulator stays paused afterwards, so the result can be inspected. Stops early if a debugger breakpoint is hit.")]
+                 "The emulator stays paused afterwards, so the result can be inspected. " +
+                 "Stops early if a debugger breakpoint is hit, the user resumes emulation or the machine is replaced.")]
     public Task<string> RunFrames(
         [Description("Number of frames to run.")] int count)
     {
@@ -95,12 +96,8 @@ public sealed class EmulatorTools(EmulatorController controller)
             throw new McpException($"Frame count must be between 1 and {EmulatorController.MaxFramesPerCall}.");
         }
 
-        return controller.ExecuteAsync(emulator =>
-        {
-            var frames = EmulatorController.RunFrames(emulator, count);
-
-            return FormatRunResult(emulator, frames);
-        }, leavePaused: true);
+        return controller.ExecuteAsync((emulator, _) =>
+            FormatRunResult(emulator, controller.RunFrames(emulator, count)), leavePaused: true);
     }
 
     [McpServerTool(Name = "type_text")]
@@ -131,11 +128,7 @@ public sealed class EmulatorTools(EmulatorController controller)
         ValidateKeyTiming(holdFrames, releaseFrames, keys.Count);
 
         return controller.ExecuteAsync(emulator =>
-        {
-            var frames = EmulatorController.PressKeys(emulator, keys, holdFrames, releaseFrames);
-
-            return FormatRunResult(emulator, frames);
-        });
+            FormatRunResult(emulator, controller.PressKeys(emulator, keys, holdFrames, releaseFrames)));
     }
 
     [McpServerTool(Name = "press_keys")]
@@ -164,11 +157,7 @@ public sealed class EmulatorTools(EmulatorController controller)
         ValidateKeyTiming(holdFrames, releaseFrames, combinations.Count);
 
         return controller.ExecuteAsync(emulator =>
-        {
-            var frames = EmulatorController.PressKeys(emulator, combinations, holdFrames, releaseFrames);
-
-            return FormatRunResult(emulator, frames);
-        });
+            FormatRunResult(emulator, controller.PressKeys(emulator, combinations, holdFrames, releaseFrames)));
     }
 
     [McpServerTool(Name = "read_screen_text", ReadOnly = true)]
@@ -345,16 +334,17 @@ public sealed class EmulatorTools(EmulatorController controller)
             : $"{register.Name}=${value:X4} ({value})";
     }
 
-    private static string FormatRunResult(Emulator emulator, int frames)
+    private static string FormatRunResult(Emulator emulator, RunResult result)
     {
-        var result = $"Ran {frames} frame(s). PC=${emulator.Cpu.Registers.PC:X4}.";
+        var text = $"Ran {result.Frames} frame(s). PC=${emulator.Cpu.Registers.PC:X4}.";
 
-        if (emulator.IsDebuggerBreak)
+        return result.StopReason switch
         {
-            result += " Stopped at a debugger breakpoint.";
-        }
-
-        return result;
+            StopReason.Breakpoint => text + " Stopped at a debugger breakpoint, the debugger window is open.",
+            StopReason.ResumedByUser => text + " Stopped because the user resumed emulation.",
+            StopReason.EmulatorReplaced => text + " Stopped because the machine was replaced (file loaded or machine reset).",
+            _ => text
+        };
     }
 
     private static string FormatRegisters(Z80 cpu)
@@ -387,6 +377,7 @@ public sealed class EmulatorTools(EmulatorController controller)
     private static string FormatHexDump(IMemory memory, Word start, int length)
     {
         var result = new StringBuilder();
+        var ascii = new StringBuilder(16);
 
         for (var offset = 0; offset < length; offset += 16)
         {
@@ -395,7 +386,7 @@ public sealed class EmulatorTools(EmulatorController controller)
 
             result.Append($"${lineAddress:X4}: ");
 
-            var ascii = new StringBuilder(16);
+            ascii.Clear();
 
             for (var i = 0; i < 16; i++)
             {

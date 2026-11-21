@@ -47,10 +47,10 @@ public class ScreenTextReaderTests
     [Fact]
     public void ReadLines_ShouldReadCopyrightMessageAfterBoot()
     {
-        var host = new TestEmulatorHost();
+        var host = new TestEmulatorHost { IsPaused = true };
         var memory = host.Emulator!.Memory;
 
-        EmulatorController.RunFrames(host.Emulator, 150);
+        new EmulatorController(host).RunFrames(host.Emulator, 150);
 
         var lines = ScreenTextReader.Create(memory).ReadLines(memory);
 

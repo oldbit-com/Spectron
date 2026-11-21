@@ -18,6 +18,8 @@ partial class MainViewModel : IEmulatorHost
 
     Emulator? IEmulatorHost.Emulator => Emulator;
 
+    bool IEmulatorHost.IsPaused => IsPaused;
+
     async Task IEmulatorHost.PauseAsync() =>
         await Dispatcher.UIThread.InvokeAsync(() => Pause(showOverlay: false));
 

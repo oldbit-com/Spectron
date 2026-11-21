@@ -72,6 +72,79 @@ public class EmulatorToolsTests
     }
 
     [Fact]
+    public async Task GetStatus_ShouldReportRunningStateFromBeforeTheCall()
+    {
+        var result = await _tools.GetStatus();
+
+        result.ShouldContain("Paused: False");
+        _host.ResumeCount.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task GetStatus_ShouldReportPausedStateWithoutResuming()
+    {
+        _host.IsPaused = true;
+
+        var result = await _tools.GetStatus();
+
+        result.ShouldContain("Paused: True");
+        _host.PauseCount.ShouldBe(0);
+        _host.ResumeCount.ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task RunFrames_ShouldStopWhenUserResumes()
+    {
+        OnFrame(5, () => _host.IsPaused = false);
+
+        var result = await _tools.RunFrames(100);
+
+        result.ShouldStartWith("Ran 5 frame(s).");
+        result.ShouldEndWith("Stopped because the user resumed emulation.");
+    }
+
+    [Fact]
+    public async Task TypeText_ShouldStopAndNotResumeWhenEmulatorReplaced()
+    {
+        var replacement = new TestEmulatorHost().Emulator;
+        OnFrame(4, () => _host.Emulator = replacement);
+
+        var result = await _tools.TypeText("abc");
+
+        result.ShouldStartWith("Ran 4 frame(s).");
+        result.ShouldEndWith("Stopped because the machine was replaced (file loaded or machine reset).");
+        _host.ResumeCount.ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task TypeText_ShouldStopAndNotResumeAtBreakpoint()
+    {
+        var emulator = _host.Emulator!;
+        OnFrame(2, () => emulator.Break());
+
+        var result = await _tools.TypeText("abc");
+
+        result.ShouldStartWith("Ran 2 frame(s).");
+        result.ShouldContain("Stopped at a debugger breakpoint");
+        _host.ResumeCount.ShouldBe(0);
+        emulator.KeyboardState.Read(0x00FE).ShouldBe((byte)0xFF);
+    }
+
+    [Fact]
+    public async Task ReadOnlyTools_ShouldRetryWhenEmulatorReplacedWhilePausing()
+    {
+        var original = _host.Emulator;
+        var replacement = new TestEmulatorHost().Emulator;
+        var host = new ReplacingHost(_host, replacement!);
+        var tools = new EmulatorTools(new EmulatorController(host));
+
+        await tools.GetRegisters();
+
+        host.PauseCount.ShouldBe(2);
+        _host.Emulator.ShouldNotBe(original);
+    }
+
+    [Fact]
     public async Task TypeText_ShouldRejectUnsupportedCharacters()
     {
         await Should.ThrowAsync<McpException>(() => _tools.TypeText("{"));
@@ -142,6 +215,46 @@ public class EmulatorToolsTests
     public async Task LoadFile_ShouldRejectMissingFile()
     {
         await Should.ThrowAsync<McpException>(() => _tools.LoadFile("/no/such/file.tap"));
+    }
+
+    private void OnFrame(int frame, Action action)
+    {
+        var frames = 0;
+
+        _host.Emulator!.FrameCompleted += (_, _) =>
+        {
+            if (++frames == frame)
+            {
+                action();
+            }
+        };
+    }
+
+    /// <summary>
+    /// Simulates the user loading a file while the first pause is in progress.
+    /// </summary>
+    private sealed class ReplacingHost(TestEmulatorHost inner, OldBit.Spectron.Emulation.Emulator replacement) : IEmulatorHost
+    {
+        public OldBit.Spectron.Emulation.Emulator? Emulator => inner.Emulator;
+        public bool IsPaused => inner.IsPaused;
+        public int PauseCount { get; private set; }
+
+        public async Task PauseAsync()
+        {
+            if (PauseCount++ == 0)
+            {
+                inner.Emulator = replacement;
+                await inner.PauseAsync();
+                inner.IsPaused = false;
+                return;
+            }
+
+            await inner.PauseAsync();
+        }
+
+        public Task ResumeAsync() => inner.ResumeAsync();
+        public Task ResetAsync(bool hardReset) => inner.ResetAsync(hardReset);
+        public Task LoadFileAsync(string filePath) => inner.LoadFileAsync(filePath);
     }
 
     [Theory]
