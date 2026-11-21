@@ -57,6 +57,8 @@ public static class CommandLineParser
         var interface1RomOption = GetInterface1RomOption();
         var beta128EnabledOption = GetBeta128EnabledOption();
         var beta128DisabledOption = GetBeta128DisabledOption();
+        var mcpServerOption = GetMcpServerOption();
+        var mcpPortOption = GetMcpPortOption();
 
         var rootCommand = new RootCommand("""
                                           **** Spectron ZX Spectrum Emulator ****
@@ -96,6 +98,8 @@ public static class CommandLineParser
         rootCommand.Options.Add(zxPrinterEnabledOption);
         rootCommand.Options.Add(zxPrinterDisabledOption);
         rootCommand.Options.Add(themeOption);
+        rootCommand.Options.Add(mcpServerOption);
+        rootCommand.Options.Add(mcpPortOption);
 
         rootCommand.Validators.Add(result =>
         {
@@ -181,7 +185,9 @@ public static class CommandLineParser
                 parseResult.GetValue(interface1RomOption),
                 parseResult.GetValue(borderSizeOption),
                 parseResult.GetValue(fullScreenOption),
-                parseResult.GetValue(themeOption)));
+                parseResult.GetValue(themeOption),
+                parseResult.GetValue(mcpServerOption) || parseResult.GetValue(mcpPortOption) != null,
+                parseResult.GetValue(mcpPortOption)));
         });
 
         return rootCommand.Parse(args).Invoke();
@@ -282,6 +288,31 @@ public static class CommandLineParser
         {
             Description = "Specifies the border size",
         };
+
+    private static Option<bool> GetMcpServerOption() =>
+        new("--mcp-server")
+        {
+            Description = "Starts the MCP server so AI agents can control the emulator (localhost only)",
+            DefaultValueFactory = _ => false
+        };
+
+    private static Option<int?> GetMcpPortOption()
+    {
+        var option = new Option<int?>("--mcp-port")
+        {
+            Description = $"Specifies the MCP server port and starts the server, default is {Mcp.McpServer.DefaultPort}",
+        };
+
+        option.Validators.Add(result =>
+        {
+            if (result.GetValue(option) is < 1 or > 65535)
+            {
+                result.AddError("MCP server port must be between 1 and 65535");
+            }
+        });
+
+        return option;
+    }
 
     private static Option<bool> GetFullScreenOption() =>
         new("--full-screen")

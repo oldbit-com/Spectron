@@ -451,6 +451,8 @@ public class CommandLineParserTests
         MouseType: null,
         RomType: null,
         TapeLoadSpeed: null,
-        Theme: null
+        Theme: null,
+        IsMcpServerEnabled: false,
+        McpServerPort: null
     );
 }

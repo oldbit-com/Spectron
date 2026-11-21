@@ -40,6 +40,8 @@ Options:
   --zx-printer                                                                                 Enables ZX Printer emulation
   --no-zx-printer                                                                              Disables ZX Printer emulation
   --theme <Dark|Light>                                                                         Specifies the application theme
+  --mcp-server                                                                                 Starts the MCP server so AI agents can control the emulator (localhost only)
+  --mcp-port <mcp-port>                                                                        Specifies the MCP server port and starts the server, default is 5480
   -?, -h, --help                                                                               Show help and usage information
   --version                                                                                    Show version information
 ```

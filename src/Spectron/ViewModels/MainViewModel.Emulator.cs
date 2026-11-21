@@ -329,6 +329,7 @@ partial class MainViewModel
         NumberOfMicrodrives = _preferences.Interface1.NumberOfDrives;
 
         StatusBarViewModel.IsRzxPlaying = _rzxController != null;
+        StatusBarViewModel.IsMcpServerEnabled =_preferences.McpServer.IsEnabled;
     }
 
     private void Pause(bool showOverlay = true)

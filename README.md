@@ -41,6 +41,7 @@ The ZX Spectrum was my first computer, and I still have a deep affection for it.
 - [x] Screen effects: Blur and CRT/Scanlines
 - [x] TC2048 extended graphics support (hi-res and hi-color)
 - [x] Custom color palettes 
+- [x] MCP server for AI agents (experimental)
 - [x] And more to come...
 
 Spectron relies on several custom libraries developed specifically for this project:
@@ -61,6 +62,7 @@ The solution consists of several projects:
 | Spectron.Basic       | Basic interpreter and related utilities                 |
 | Spectron.Disassembly | Z80 disassembler, used by the debugger                  |
 | Spectron.Files       | Handles TZX, Z80, SNA and other file formats            |
+| Spectron.Mcp         | MCP server that lets AI agents control the emulator     |
 | Spectron.Recorder    | Audio and video recording functionality                 |
 
 ## Quick demo
@@ -192,6 +194,27 @@ Playback of RZX files (recordings of ZX Spectrum games) is supported. You can fi
 
 ## Custom Color Palettes
 Custom color palettes allow you to modify the Spectrum's default palette. There are several predefined palettes and simple editor available. Any color can be customized to your liking.
+
+## AI Agents (MCP)
+Spectron includes an optional [Model Context Protocol](https://modelcontextprotocol.io) server, so AI agents such as
+Claude Code, GitHub Copilot or Cursor can see and control the running emulator. An agent can type on the keyboard,
+run frames, read the screen as text or take screenshots, inspect and modify memory, disassemble code, load files
+and use the debugger. This makes it possible, for example, to let an agent write a BASIC or machine code program,
+run it and check the result, or help you explore how a game works.
+
+The server is disabled by default. Enable it in **Preferences → General → AI Agents**, or start Spectron with
+`--mcp-server`. It listens on `http://localhost:5480/mcp` (local connections only). For example, to connect Claude Code:
+
+```shell
+claude mcp add --transport http spectron http://localhost:5480/mcp
+```
+
+Everything the agent does is visible in the emulator window, and you can take back control at any time by resuming
+emulation (`F2`). For the list of tools, client configuration and tips, see the [MCP documentation](docs/Mcp.md).
+
+> [!WARNING]
+> This is an experimental feature, and tools and behaviour may change. The server has no authentication, so any
+> program on your computer can control the emulator while it is enabled.
 
 ### Resources
 - [Avalonia UI](https://avaloniaui.net/)
