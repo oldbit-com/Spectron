@@ -36,7 +36,6 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
         <PackageReference Include="Microsoft.Extensions.Logging.Console" />
         <PackageReference Include="OldBit.Z80Cpu.Spectron" />
-        <PackageReference Include="SkiaSharp.NativeAssets.Linux" />
         <PackageReference Include="System.CommandLine" />
         <PackageReference Include="Xaml.Behaviors" />
     </ItemGroup>
