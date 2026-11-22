@@ -12,7 +12,7 @@ public class DivMmcMemoryTests
 
     private readonly Memory48K _memory48K;
     private readonly byte[] _rom48 = RomReader.ReadRom(RomType.Original48);
-    private readonly byte[] _romDivMmc = RomReader.ReadRom(RomType.DivMmc);
+    private readonly byte[] _romDivMmc = RomReader.ReadRom(RomType.DivMmcV089);
     private readonly DivMmcMemory _divMmcMemory;
 
     public DivMmcMemoryTests()

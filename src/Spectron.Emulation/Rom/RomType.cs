@@ -12,7 +12,9 @@ public enum RomType
 
     Timex2048,
 
-    DivMmc,
+    DivMmcV089,
+
+    DivMmcV090,
 
     Custom,
 

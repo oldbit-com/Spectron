@@ -23,7 +23,8 @@ internal static class RomReader
     private const string BrendanAlfordRomResourceName = "OldBit.Spectron.Emulation.Rom.Files.testrom1.37.bin";
 
     // DivMMC ROM
-    private const string DivMmcRomResourceName = "OldBit.Spectron.Emulation.Rom.Files.ESXMMC.0.8.9.BIN";
+    private const string DivMmcV089RomResourceName = "OldBit.Spectron.Emulation.Rom.Files.ESXMMC.0.8.9.BIN";
+    private const string DivMmcV090RomResourceName = "OldBit.Spectron.Emulation.Rom.Files.ESXMMC.0.9.0.BIN";
 
     // Interface 1 ROMs
     private const string Interface1V1RomResourceName = "OldBit.Spectron.Emulation.Rom.Files.interface1-v1.rom";
@@ -48,7 +49,8 @@ internal static class RomReader
             RomType.BusySoft => BusySoftRomResourceName,
             RomType.Harston => HarstonRomResourceName,
             RomType.BrendanAlford => BrendanAlfordRomResourceName,
-            RomType.DivMmc => DivMmcRomResourceName,
+            RomType.DivMmcV089 => DivMmcV089RomResourceName,
+            RomType.DivMmcV090 => DivMmcV090RomResourceName,
             RomType.Interface1V1 => Interface1V1RomResourceName,
             RomType.Interface1V2 => Interface1V2RomResourceName,
             RomType.TrDos => TrDosRomResourceName,
