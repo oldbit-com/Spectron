@@ -48,7 +48,9 @@
         <KeyBinding Gesture="F6" Command="{Binding QuickLoadCommand}"/>
         <KeyBinding Gesture="F11" Command="{Binding ShowDebuggerViewCommand}"/>
         <KeyBinding Gesture="Shift+Alt+Enter" Command="{Binding ToggleFullScreenCommand}"/>
-        <KeyBinding Gesture="Ctrl+F5" Command="{Binding ResetCommand}"/>
+        <KeyBinding Gesture="Ctrl+F3" Command="{Binding ResetCommand}"/>
+        <KeyBinding Gesture="Ctrl+Shift+F3" Command="{Binding HardResetCommand}"/>
+        <KeyBinding Gesture="Ctrl+F12" Command="{Binding TriggerNmiCommand}"/>
         <KeyBinding Gesture="{OnPlatform Ctrl+F4, macOS=Cmd+Q}" Command="{Binding ExitApplicationCommand}"/>
         <KeyBinding Gesture="{OnPlatform Ctrl+T, macOS=Cmd+T}" Command="{Binding TapeMenuViewModel.InsertCommand}"/>
         <KeyBinding Gesture="{OnPlatform Ctrl+D, macOS=Cmd+D}" Command="{Binding DiskDriveMenuViewModel.InsertDriveA}"/>
