@@ -59,4 +59,18 @@ public class Memory16KTests
             value.ShouldBe((byte)0xFF);
         }
     }
+
+    [Fact]
+    public void ShadowRom_ShouldSetIsShadowRomActive()
+    {
+        var memory = new Memory16K(new byte[16384]);
+
+        memory.IsShadowRomActive.ShouldBeFalse();
+
+        memory.ShadowRom(new RomMemory(new byte[16384]));
+        memory.IsShadowRomActive.ShouldBeTrue();
+
+        memory.ShadowRom(null);
+        memory.IsShadowRomActive.ShouldBeFalse();
+    }
 }

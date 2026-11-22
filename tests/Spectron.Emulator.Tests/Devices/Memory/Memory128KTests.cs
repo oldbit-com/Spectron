@@ -119,4 +119,30 @@ public class Memory128KTests
         memory.ReadScreen(0x0001).ShouldBe(0xBB);
         memory.ReadScreen()[..2].ShouldBe([0x77, 0xBB]);
     }
+
+    [Fact]
+    public void ShadowRom_ShouldSetIsShadowRomActive()
+    {
+        var memory = new Memory128K(_rom128, _rom48);
+
+        memory.IsShadowRomActive.ShouldBeFalse();
+
+        memory.ShadowRom(new RomMemory(new byte[16384]));
+        memory.IsShadowRomActive.ShouldBeTrue();
+
+        memory.ShadowRom(null);
+        memory.IsShadowRomActive.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Reset_ShouldClearShadowRom()
+    {
+        var memory = new Memory128K(_rom128, _rom48);
+        memory.ShadowRom(new RomMemory(new byte[16384]));
+
+        memory.Reset();
+
+        memory.IsShadowRomActive.ShouldBeFalse();
+        memory.Read(0x0000).ShouldBe(_rom128[0]);
+    }
 }

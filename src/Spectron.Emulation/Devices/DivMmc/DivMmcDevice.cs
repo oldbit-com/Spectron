@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Emulation.Devices.DivMmc.SD;
 using OldBit.Spectron.Emulation.Devices.Memory;
@@ -17,7 +16,6 @@ public sealed class DivMmcDevice : IDevice, IDisposable
     private const byte Sd1 = 0b01;  // negated, bit 1 == 0, selected card 1
 
     private readonly Z80 _cpu;
-    private readonly IEmulatorMemory _emulatorMemory;
     private readonly ILogger _logger;
     private readonly CardDevice _cardDevice0 = new();
     private readonly CardDevice _cardDevice1 = new();
@@ -38,7 +36,7 @@ public sealed class DivMmcDevice : IDevice, IDisposable
         set => ChangeDivMmcVersion(value);
     }
 
-    public DivMmcMemory Memory { get; private set; }
+    public DivMmcMemory Memory { get; }
 
     public bool IsDriveWriteEnabled
     {
@@ -60,11 +58,10 @@ public sealed class DivMmcDevice : IDevice, IDisposable
     internal DivMmcDevice(Z80 cpu, IEmulatorMemory emulatorMemory, ILogger logger)
     {
         _cpu = cpu;
-        _emulatorMemory = emulatorMemory;
         _logger = logger;
         _activeCardDevice = _cardDevice0;
 
-        ConfigureRomMemory();
+        Memory = new DivMmcMemory(emulatorMemory, ReadRom(_divMmcVersion));
     }
 
     public void Enable()
@@ -227,21 +224,15 @@ public sealed class DivMmcDevice : IDevice, IDisposable
         }
 
         _divMmcVersion = divMmcVersion;
-        ConfigureRomMemory();
+        Memory.ChangeEeprom(ReadRom(divMmcVersion));
     }
 
-    [MemberNotNull(nameof(Memory))]
-    private void ConfigureRomMemory()
+    private static byte[] ReadRom(DivMmcVersion divMmcVersion) => divMmcVersion switch
     {
-        var rom = DivMmcVersion switch
-        {
-            DivMmcVersion.V089 => RomReader.ReadRom(RomType.DivMmcV089),
-            DivMmcVersion.V090 => RomReader.ReadRom(RomType.DivMmcV090),
-            _ => throw new ArgumentOutOfRangeException(nameof(DivMmcVersion), DivMmcVersion, null)
-        };
-
-        Memory = new DivMmcMemory(_emulatorMemory, rom);
-    }
+        DivMmcVersion.V089 => RomReader.ReadRom(RomType.DivMmcV089),
+        DivMmcVersion.V090 => RomReader.ReadRom(RomType.DivMmcV090),
+        _ => throw new ArgumentOutOfRangeException(nameof(divMmcVersion), divMmcVersion, null)
+    };
 
     private static bool IsDataRegister(Word address) => (address & 0xFF) == DataRegister;
 

@@ -219,4 +219,45 @@ public class DivMmcMemoryTests
         _divMmcMemory.Read(0x0000).ShouldBe(0x01);
         _divMmcMemory.Read(0x0001).ShouldBe(0x02);
     }
+
+    [Fact]
+    public void ChangeEeprom_WhenPaged_ShouldReadNewEeprom()
+    {
+        var newEeprom = RomReader.ReadRom(RomType.DivMmcV090);
+
+        _divMmcMemory.Paging(PagingMode.On);
+        _divMmcMemory.ChangeEeprom(newEeprom);
+
+        _memory48K.ReadRange(0, 8192).ShouldBeEquivalentTo(newEeprom);
+    }
+
+    [Fact]
+    public void ChangeEeprom_ShouldPreserveSettingsAndRam()
+    {
+        var newEeprom = RomReader.ReadRom(RomType.DivMmcV090);
+
+        _divMmcMemory.IsEepromWriteEnabled = true;
+        _divMmcMemory.PagingControl(CONMEM | 0x02);
+        _divMmcMemory.Write(0x2000, 0x55);
+
+        _divMmcMemory.ChangeEeprom(newEeprom);
+
+        _divMmcMemory.IsEepromWriteEnabled.ShouldBeTrue();
+        _divMmcMemory.ControlRegister.ShouldBe((byte)(CONMEM | 0x02));
+        _divMmcMemory.Read(0x0000).ShouldBe(newEeprom[0]);
+        _divMmcMemory.Read(0x2000).ShouldBe(0x55);
+    }
+
+    [Fact]
+    public void ChangeEeprom_WhenMapRamActive_ShouldKeepRamInBank0()
+    {
+        var newEeprom = RomReader.ReadRom(RomType.DivMmcV090);
+
+        _divMmcMemory.Banks[3][0] = 0xAB;
+        _divMmcMemory.PagingControl(MAPRAM);
+
+        _divMmcMemory.ChangeEeprom(newEeprom);
+
+        _divMmcMemory.Read(0x0000).ShouldBe(0xAB);
+    }
 }

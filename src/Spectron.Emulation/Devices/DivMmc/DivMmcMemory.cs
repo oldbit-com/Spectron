@@ -13,7 +13,7 @@ public class DivMmcMemory : IRomMemory
     private const byte CONMEM = 0x80;
     private const byte MAPRAM = 0x40;
 
-    private readonly byte[] _eeprom;
+    private byte[] _eeprom;
 
     private byte[] _bank0;      // 0000h-1FFFh
     private byte[] _bank1;      // 2000h-3FFFh
@@ -32,6 +32,16 @@ public class DivMmcMemory : IRomMemory
 
         _bank0 = _eeprom;
         _bank1 = Banks[0];
+    }
+
+    internal void ChangeEeprom(byte[] eeprom)
+    {
+        if (ReferenceEquals(_bank0, _eeprom))
+        {
+            _bank0 = eeprom;
+        }
+
+        _eeprom = eeprom;
     }
 
     internal void Paging(PagingMode mode)
