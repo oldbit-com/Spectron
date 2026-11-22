@@ -422,6 +422,7 @@ public sealed class NativeMainMenu
             new NativeMenuItem("NMI")
             {
                 Command = _viewModel.TriggerNmiCommand,
+                Gesture = new KeyGesture(Key.F12, KeyModifiers.Control)
             },
 
             new NativeMenuItem("Reset")
@@ -433,6 +434,7 @@ public sealed class NativeMainMenu
             new NativeMenuItem("Hard Reset")
             {
                 Command = _viewModel.HardResetCommand,
+                Gesture = new KeyGesture(Key.F3, KeyModifiers.Control | KeyModifiers.Shift)
             },
         };
 
