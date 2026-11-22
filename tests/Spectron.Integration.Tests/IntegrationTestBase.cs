@@ -5,7 +5,6 @@ using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.DependencyInjection;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Tape.Loader;
-using OldBit.Spectron.Integration.Tests.Fixtures;
 
 namespace OldBit.Spectron.Integration.Tests;
 
@@ -29,14 +28,11 @@ public class IntegrationTestBase
 
     protected static void SaveOutput(FrameBuffer frameBuffer, string fileName)
     {
-        using var converter = new ScreenConverter(frameBuffer);
-        converter.UpdateBitmap();
-
         var path = Path.Combine(Directory.GetCurrentDirectory(), "TestResults");
         Directory.CreateDirectory(path);
 
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), $"{path}/{fileName}");
-
-        converter.SaveBitmap(filePath);
+        // Skip the first and last rows of the frame buffer.
+        var png = PngEncoder.Encode(frameBuffer, 0, 1, frameBuffer.Width, frameBuffer.Height - 2);
+        File.WriteAllBytes(Path.Combine(path, fileName), png);
     }
 }
