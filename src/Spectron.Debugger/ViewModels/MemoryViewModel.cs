@@ -85,8 +85,11 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
     {
         switch (e.Key)
         {
-            case Key.Enter when string.IsNullOrWhiteSpace(CommandText):
-                return;
+            case Key.Enter:
+                ExecuteCommand();
+                e.Handled = true;
+
+                break;
 
             case Key.Up when _commandHistory.Count > 0:
                 _historyIndex -= 1;
@@ -97,6 +100,7 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
                 }
 
                 CommandText = _commandHistory[_historyIndex];
+                e.Handled = true;
 
                 break;
 
@@ -109,8 +113,17 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
                 }
 
                 CommandText = _commandHistory[_historyIndex];
+                e.Handled = true;
 
                 break;
+        }
+    }
+
+    private void ExecuteCommand()
+    {
+        if (string.IsNullOrWhiteSpace(CommandText))
+        {
+            return;
         }
 
         var command = ParseCommand(CommandText);
