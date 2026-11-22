@@ -33,6 +33,6 @@ public class IntegrationTestBase
 
         // Skip the first and last rows of the frame buffer.
         var png = PngEncoder.Encode(frameBuffer, 0, 1, frameBuffer.Width, frameBuffer.Height - 2);
-        File.WriteAllBytes(Path.Combine(path, fileName), png);
+        File.WriteAllBytes(Path.Join(path, fileName), png);
     }
 }
