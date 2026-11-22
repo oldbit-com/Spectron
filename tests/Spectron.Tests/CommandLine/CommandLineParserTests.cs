@@ -440,6 +440,7 @@ public class CommandLineParserTests
         IsAyEnabled: null,
         IsDivMmcEnabled: null,
         IsDivMmcReadOnly: null,
+        DivMmcVersion: null,
         IsFullScreen: false,
         IsInterface1Enabled: null,
         IsResumeEnabled: null,

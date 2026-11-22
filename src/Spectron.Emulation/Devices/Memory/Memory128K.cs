@@ -17,7 +17,6 @@ internal sealed class Memory128K : IEmulatorMemory
     private IRomMemory _activeRom;
     private byte[] _activeRam;
     private bool _isPagingDisabledUntilReset;
-    private bool _isShadowRomActive;
 
     internal delegate void BankPagedEvent(int bankId);
     internal event BankPagedEvent? RamBankPaged;
@@ -81,9 +80,11 @@ internal sealed class Memory128K : IEmulatorMemory
         MemoryUpdated?.Invoke(address, data);
     }
 
+    public bool IsShadowRomActive { get; private set; }
+
     public void ShadowRom(IRomMemory? shadowRom)
     {
-        _isShadowRomActive = shadowRom != null;
+        IsShadowRomActive = shadowRom != null;
 
         _activeRom = shadowRom ?? RomBank1;
     }
@@ -103,6 +104,7 @@ internal sealed class Memory128K : IEmulatorMemory
     public void Reset()
     {
         _isPagingDisabledUntilReset = false;
+        IsShadowRomActive = false;
 
         RomBank = RomBank.Bank0;
         _activeRom = RomBank0;
@@ -138,7 +140,7 @@ internal sealed class Memory128K : IEmulatorMemory
 
     private void SelectActiveRomBank(byte pagingMode)
     {
-        if (_isShadowRomActive)
+        if (IsShadowRomActive)
         {
             return;
         }

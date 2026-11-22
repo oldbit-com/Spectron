@@ -106,6 +106,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
         DebuggerNumberFormat = preferences.Debugger.NumberFormat;
 
         IsDivMmcEnabled = preferences.DivMmc.IsEnabled;
+        DivMmcVersion = preferences.DivMmc.DivMmcVersion;
         IsDivMmcWriteEnabled = preferences.DivMmc.IsEepromWriteEnabled;
         DivMmcCard0FileName = preferences.DivMmc.Card0FileName;
         DivMmcCard1FileName = preferences.DivMmc.Card1FileName;
@@ -257,6 +258,7 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
             DivMmc = new DivMmcSettings
             {
                 IsEnabled = IsDivMmcEnabled,
+                DivMmcVersion = DivMmcVersion,
                 IsEepromWriteEnabled = IsDivMmcWriteEnabled,
                 Card0FileName = DivMmcCard0FileName,
                 Card1FileName = DivMmcCard1FileName,
@@ -705,6 +707,9 @@ public partial class PreferencesViewModel : ObservableValidator, IDisposable
 
     [ObservableProperty]
     public partial bool IsDivMmcWriteEnabled { get; set; }
+
+    [ObservableProperty]
+    public partial DivMmcVersion DivMmcVersion { get; set; } = DivMmcVersion.V089;
 
     [ObservableProperty]
     [CustomValidation(typeof(PreferencesViewModel), nameof(ValidateCardImageFile))]

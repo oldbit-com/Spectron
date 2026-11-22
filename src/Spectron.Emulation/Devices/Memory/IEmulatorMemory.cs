@@ -12,6 +12,8 @@ public interface IEmulatorMemory : IMemory, IDevice
 
     void ShadowRom(IRomMemory? shadowRom);
 
+    bool IsShadowRomActive { get; }
+
     IRomMemory OriginalRom { get; }
 
     RomBank RomBank => RomBank.Bank0;

@@ -23,11 +23,17 @@ public sealed class DivMmcDevice : IDevice, IDisposable
     private CardDevice _activeCardDevice;
     private PagingMode _afterFetchPagingMode = PagingMode.None;
     private bool _isDriveWriteEnabled;
+    private DivMmcVersion _version = DivMmcVersion.V089;
 
     private DiskImage? _diskImage0;
     private DiskImage? _diskImage1;
 
     public bool IsEnabled { get; private set; }
+
+    public DivMmcVersion Version
+    {
+        set => ChangeVersion(value);
+    }
 
     public DivMmcMemory Memory { get; }
 
@@ -54,9 +60,7 @@ public sealed class DivMmcDevice : IDevice, IDisposable
         _logger = logger;
         _activeCardDevice = _cardDevice0;
 
-        var rom = RomReader.ReadRom(RomType.DivMmc);
-
-        Memory = new DivMmcMemory(emulatorMemory, rom);
+        Memory = new DivMmcMemory(emulatorMemory, ReadRom(_version));
     }
 
     public void Enable()
@@ -210,6 +214,24 @@ public sealed class DivMmcDevice : IDevice, IDisposable
 
         Memory.Paging(_afterFetchPagingMode);
     }
+
+    private void ChangeVersion(DivMmcVersion version)
+    {
+        if (_version == version)
+        {
+            return;
+        }
+
+        _version = version;
+        Memory.ChangeEeprom(ReadRom(version));
+    }
+
+    private static byte[] ReadRom(DivMmcVersion version) => version switch
+    {
+        DivMmcVersion.V089 => RomReader.ReadRom(RomType.DivMmcV089),
+        DivMmcVersion.V090 => RomReader.ReadRom(RomType.DivMmcV090),
+        _ => throw new ArgumentOutOfRangeException(nameof(version), version, null)
+    };
 
     private static bool IsDataRegister(Word address) => (address & 0xFF) == DataRegister;
 

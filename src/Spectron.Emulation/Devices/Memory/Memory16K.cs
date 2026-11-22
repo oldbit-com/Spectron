@@ -49,5 +49,7 @@ internal sealed class Memory16K : IEmulatorMemory
 
     public void ShadowRom(IRomMemory? shadowRom) => _activeRom = shadowRom ?? OriginalRom;
 
+    public bool IsShadowRomActive => !ReferenceEquals(_activeRom, OriginalRom);
+
     public event MemoryUpdatedEvent? MemoryUpdated;
 }
