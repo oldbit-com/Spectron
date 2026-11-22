@@ -43,6 +43,39 @@ public static class ZxAscii
         return bytes;
     }
 
+    /// <summary>
+    /// Converts a string to ZX Spectrum character codes. Fails if any character has no Spectrum equivalent.
+    /// </summary>
+    public static bool TryFromString(ReadOnlySpan<char> s, out byte[] bytes)
+    {
+        bytes = new byte[s.Length];
+
+        for (var i = 0; i < s.Length; i++)
+        {
+            if (!TryFromSpectrumChar(s[i], out bytes[i]))
+            {
+                bytes = [];
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool TryFromSpectrumChar(char value, out byte code)
+    {
+        code = FromSpectrumChar(value);
+
+        if (value is >= ' ' and <= '\x7F')
+        {
+            return true;
+        }
+
+        // Characters outside ASCII are valid only when mapped to a Spectrum code explicitly,
+        // otherwise FromSpectrumChar just truncates them
+        return code != unchecked((byte)value);
+    }
+
     private static char ToSpectrumChar(byte code) => code switch
     {
         0x5E => '\x2191', // "↑"
