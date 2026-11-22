@@ -14,16 +14,21 @@ namespace OldBit.Spectron.Debugger.ViewModels;
 
 public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
 {
+    private const int MaxHistorySize = 100;
+
     private interface ICommand;
     private record WriteCommand (Word Address, byte Value) : ICommand;
     private record GoToCommand (Word Address) : ICommand;
-    private record FindCommand (string Text, bool ForceText = false) : ICommand;
+    private record FindCommand (byte[] Pattern) : ICommand;
     private record InvalidCommand (string Error) : ICommand;
 
     private int _historyIndex = -1;
     private readonly List<string> _commandHistory = [];
 
     private readonly Emulator _emulator;
+
+    private byte[] _lastFindPattern = [];
+    private int _nextFindIndex;
 
     public HexViewer? Viewer { get; set; }
     public IClipboard? Clipboard { get; set; }
@@ -32,14 +37,12 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
     public Action<Word> GoTo { get; set; } = _ => { };
     public Action<Word, int> Select { get; set; } = (_, _) => { };
 
-    private int _lastFindInex;
-
     [ObservableProperty]
     public partial byte[] Memory { get; set; }
 
+    // Validated only when the command is submitted, so no error is shown while it is being typed
     [ObservableProperty]
     [CustomValidation(typeof(MemoryViewModel), nameof(ValidateCommand))]
-    [NotifyDataErrorInfo]
     public partial string CommandText { get; set; } = string.Empty;
 
     public MemoryViewModel(Emulator emulator)
@@ -51,6 +54,8 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
     }
 
     public void Update(IMemory memory) => Memory = memory.ToBytes();
+
+    partial void OnCommandTextChanged(string value) => ClearErrors(nameof(CommandText));
 
     [RelayCommand]
     private async Task CopyHex()
@@ -85,8 +90,11 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
     {
         switch (e.Key)
         {
-            case Key.Enter when string.IsNullOrWhiteSpace(CommandText):
-                return;
+            case Key.Enter:
+                ExecuteCommand();
+                e.Handled = true;
+
+                break;
 
             case Key.Up when _commandHistory.Count > 0:
                 _historyIndex -= 1;
@@ -97,6 +105,7 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
                 }
 
                 CommandText = _commandHistory[_historyIndex];
+                e.Handled = true;
 
                 break;
 
@@ -109,14 +118,23 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
                 }
 
                 CommandText = _commandHistory[_historyIndex];
+                e.Handled = true;
 
                 break;
         }
+    }
 
+    private void ExecuteCommand()
+    {
         var command = ParseCommand(CommandText);
 
         switch (command)
         {
+            case InvalidCommand:
+                ValidateProperty(CommandText, nameof(CommandText));
+
+                break;
+
             case GoToCommand goToCommand:
                 GoTo(goToCommand.Address);
                 AddToHistory();
@@ -130,53 +148,45 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
                 break;
 
             case FindCommand findCommand:
-            {
-                byte[] find = [];
-
-                if (findCommand.ForceText)
-                {
-                    find = ZxAscii.FromString(findCommand.Text);
-                }
-                else
-                {
-                    var hexes = findCommand.Text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-                    foreach (var hex in hexes)
-                    {
-                        if (Hex.TryParse<byte>(hex, out var value, preferDecimal: false))
-                        {
-                            find = find.Concat([value]).ToArray();
-                        }
-                        else
-                        {
-                            find = ZxAscii.FromString(findCommand.Text);
-                            break;
-                        }
-                    }
-                }
-
-                var index = Memory.IndexOfSequence(find, _lastFindInex);
-                _lastFindInex = 0;
-
-                if (index < 0)
-                {
-                    return;
-                }
-
-                Select((Word)index, find.Length);
-
-                _lastFindInex = index + find.Length;
-
-                if (_lastFindInex >= Memory.Length)
-                {
-                    _lastFindInex = 0;
-                }
-
-                AddToHistory();
+                Find(findCommand.Pattern);
 
                 break;
-            }
         }
+    }
+
+    private void Find(byte[] pattern)
+    {
+        if (!pattern.AsSpan().SequenceEqual(_lastFindPattern))
+        {
+            _nextFindIndex = 0;
+        }
+
+        _lastFindPattern = pattern;
+
+        var index = Memory.IndexOfSequence(pattern, _nextFindIndex);
+
+        if (index < 0 && _nextFindIndex > 0)
+        {
+            index = Memory.IndexOfSequence(pattern, 0);
+        }
+
+        if (index < 0)
+        {
+            _nextFindIndex = 0;
+            return;
+        }
+
+        Select((Word)index, pattern.Length);
+
+        _nextFindIndex = index + pattern.Length;
+
+        if (_nextFindIndex >= Memory.Length)
+        {
+            _nextFindIndex = 0;
+        }
+
+        // Keep the find command, so pressing Enter again finds the next occurrence
+        AddToHistory(clearCommand: false);
     }
 
     private byte[] GetSelectedBytes()
@@ -217,73 +227,117 @@ public sealed partial class MemoryViewModel : ObservableValidator, IDisposable
     {
         command = command.Trim();
 
-        if (string.IsNullOrWhiteSpace(command))
+        if (command.Length == 0)
         {
             return null;
         }
 
-        if (command.StartsWith("g", StringComparison.OrdinalIgnoreCase))
-        {
-            if (Hex.TryParse<Word>(command[1..].Trim(), out var address))
-            {
-                return new GoToCommand(address);
-            }
+        var separatorIndex = command.IndexOfAny([' ', '\t']);
 
+        var keyword = separatorIndex < 0 ? command : command[..separatorIndex];
+        var args = separatorIndex < 0 ? string.Empty : command[(separatorIndex + 1)..].Trim();
+
+        return keyword.ToLowerInvariant() switch
+        {
+            "g" => ParseGoToCommand(args),
+            "w" => ParseWriteCommand(args),
+            "f" => ParseFindCommand(args),
+            _ => new InvalidCommand("Invalid command")
+        };
+    }
+
+    private static ICommand ParseGoToCommand(string args) =>
+        Hex.TryParse<Word>(args, out var address) ?
+            new GoToCommand(address) :
+            new InvalidCommand("Invalid address");
+
+    private static ICommand ParseWriteCommand(string args)
+    {
+        var values = args.Split(',');
+
+        if (values.Length != 2)
+        {
+            return new InvalidCommand("Invalid arguments");
+        }
+
+        if (!Hex.TryParse<Word>(values[0], out var address))
+        {
             return new InvalidCommand("Invalid address");
         }
 
-        if (command.StartsWith("f", StringComparison.OrdinalIgnoreCase))
+        if (!Hex.TryParse<byte>(values[1], out var value))
         {
-            var text = command[1..].Trim();
-
-            return text.Length switch
-            {
-                0 => new InvalidCommand("Empty search text"),
-                > 2 when text[0] == '"' && text[^1] == '"' => new FindCommand(text[1..^1], ForceText: true),
-                _ => new FindCommand(text)
-            };
+            return new InvalidCommand("Invalid value");
         }
 
-        if (command.StartsWith("w", StringComparison.OrdinalIgnoreCase))
-        {
-            var args = command[1..].Trim().Split(',');
-
-            if (args.Length != 2)
-            {
-                return new InvalidCommand("Invalid arguments");
-            }
-
-            if (!Hex.TryParse<Word>(args[0].Trim(), out var address))
-            {
-                return new InvalidCommand("Invalid address");
-            }
-
-            if (!Hex.TryParse<byte>(args[1].Trim(), out var value))
-            {
-                return new InvalidCommand("Invalid value");
-            }
-
-            return new WriteCommand(address, value);
-        }
-
-        return new InvalidCommand("Invalid command");
+        return new WriteCommand(address, value);
     }
 
-    private void AddToHistory()
+    private static ICommand ParseFindCommand(string args)
     {
-        if (_commandHistory.LastOrDefault() == CommandText)
+        if (args.Length == 0)
         {
-            return;
+            return new InvalidCommand("Empty search text");
         }
 
-        if (_commandHistory.Count > 100)
+        if (args[0] == '"')
         {
-            _commandHistory.RemoveAt(0);
+            if (args.Length < 2 || args[^1] != '"')
+            {
+                return new InvalidCommand("Missing closing quote");
+            }
+
+            return ParseFindText(args[1..^1]);
         }
 
-        _commandHistory.Add(CommandText);
+        var hexes = args.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var pattern = new byte[hexes.Length];
+
+        for (var i = 0; i < hexes.Length; i++)
+        {
+            if (!Hex.TryParse(hexes[i], out pattern[i]))
+            {
+                return ParseFindText(args);
+            }
+        }
+
+        return new FindCommand(pattern);
+    }
+
+    private static ICommand ParseFindText(string text)
+    {
+        if (text.Length == 0)
+        {
+            return new InvalidCommand("Empty search text");
+        }
+
+        if (!ZxAscii.TryFromString(text, out var pattern))
+        {
+            return new InvalidCommand("Unsupported character");
+        }
+
+        return new FindCommand(pattern);
+    }
+
+    private void AddToHistory(bool clearCommand = true)
+    {
+        var command = CommandText.Trim();
+
+        if (_commandHistory.LastOrDefault() != command)
+        {
+            if (_commandHistory.Count >= MaxHistorySize)
+            {
+                _commandHistory.RemoveAt(0);
+            }
+
+            _commandHistory.Add(command);
+        }
+
         _historyIndex = _commandHistory.Count;
 
-        CommandText = string.Empty;
+        if (clearCommand)
+        {
+            CommandText = string.Empty;
+        }
     }
 }
