@@ -1,5 +1,6 @@
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
+using OldBit.Spectron.Emulation.Devices.DivMmc;
 using OldBit.Spectron.Emulation.Devices.Interface1;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Mouse;
@@ -24,6 +25,7 @@ public record CommandLineArgs(
     bool? IsDivMmcEnabled,
     string? DivMmcImageFile,
     bool? IsDivMmcReadOnly,
+    DivMmcVersion? DivMmcVersion,
     bool? IsZxPrinterEnabled,
     bool? IsUlaPlusEnabled,
     bool? IsTimeMachineEnabled,
