@@ -46,7 +46,7 @@ internal sealed class EmulatorTimer : IDisposable
 
     internal void Pause()
     {
-        if (_isDisposed || !_worker.IsAlive)
+        if (_isDisposed)
         {
             return;
         }
@@ -56,8 +56,9 @@ internal sealed class EmulatorTimer : IDisposable
         // Will block the worker thread until it actually enters the pause loop
         _pausedEvent.Reset();
 
+        // Worker not started yet: it will enter the pause loop as soon as it starts.
         // Avoid self-deadlock when pausing from a debugger breakpoint mid-frame.
-        if (Thread.CurrentThread == _worker)
+        if (!_worker.IsAlive || Thread.CurrentThread == _worker)
         {
             return;
         }

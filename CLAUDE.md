@@ -30,6 +30,10 @@ dotnet test --filter "FullyQualifiedName~MyTestClass.MyTestMethod"
 Integration tests (`Category=Integration`) are excluded from CI and run actual emulator frames, 
 then compare screen memory hashes against known-good results.
 
+## Git Workflow
+
+- Never commit directly to `main`. Always create a new branch first (e.g. `fix/<short-description>` or `feature/<short-description>`), then commit there.
+
 ## Architecture
 
 The solution (`Spectron.slnx`) has five source projects with a strict dependency hierarchy:
