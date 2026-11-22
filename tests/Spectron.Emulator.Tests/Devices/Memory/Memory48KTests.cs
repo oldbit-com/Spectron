@@ -42,4 +42,18 @@ public class Memory48KTests
         data.ShouldAllBe(x => x == 0xFF);
         memory.Ram.ToArray().ShouldBeEquivalentTo(data);
     }
+
+    [Fact]
+    public void ShadowRom_ShouldSetIsShadowRomActive()
+    {
+        var memory = new Memory48K(new byte[16384]);
+
+        memory.IsShadowRomActive.ShouldBeFalse();
+
+        memory.ShadowRom(new RomMemory(new byte[16384]));
+        memory.IsShadowRomActive.ShouldBeTrue();
+
+        memory.ShadowRom(null);
+        memory.IsShadowRomActive.ShouldBeFalse();
+    }
 }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Audio;
+using OldBit.Spectron.Emulation.Devices.DivMmc;
 using OldBit.Spectron.Emulation.Devices.Interface1;
 using OldBit.Spectron.Emulation.Devices.Joystick;
 using OldBit.Spectron.Emulation.Devices.Mouse;
@@ -43,6 +44,7 @@ public static class CommandLineParser
         var divMmcDisabledOption = GetDivMmcDisabledOption();
         var divMmcImageOption = GetDivMmcImageOption();
         var divMmcReadOnly = GetDivMmcReadOnlyOption();
+        var divMmcVersionOption = GetDivMmcVersionOption();
         var divMmcWritable = GetDivMmcWritableOption();
         var zxPrinterEnabledOption = GetZxPrinterEnabledOption();
         var zxPrinterDisabledOption = GetZxPrinterDisabledOption();
@@ -89,6 +91,7 @@ public static class CommandLineParser
         rootCommand.Options.Add(divMmcDisabledOption);
         rootCommand.Options.Add(divMmcImageOption);
         rootCommand.Options.Add(divMmcReadOnly);
+        rootCommand.Options.Add(divMmcVersionOption);
         rootCommand.Options.Add(divMmcWritable);
         rootCommand.Options.Add(beta128EnabledOption);
         rootCommand.Options.Add(beta128DisabledOption);
@@ -176,6 +179,7 @@ public static class CommandLineParser
                 IsEnabled(parseResult.GetValue(divMmcEnabledOption), parseResult.GetValue(divMmcDisabledOption)),
                 parseResult.GetValue(divMmcImageOption)?.FullName,
                 IsDivMmcReadOnly(parseResult.GetValue(divMmcReadOnly), parseResult.GetValue(divMmcWritable)),
+                parseResult.GetValue(divMmcVersionOption),
                 IsEnabled(parseResult.GetValue(zxPrinterEnabledOption), parseResult.GetValue(zxPrinterDisabledOption)),
                 IsEnabled(parseResult.GetValue(ulaPlusEnabledOption), parseResult.GetValue(ulaPlusDisabledOption)),
                 IsEnabled(parseResult.GetValue(timeMachineEnabledOption), parseResult.GetValue(timeMachineDisabledOption)),
@@ -355,6 +359,12 @@ public static class CommandLineParser
         new("--divmmc-readonly")
         {
             Description = "Specifies the SD card image is readonly, SD card writes will be cached in-memory only",
+        };
+
+    private static Option<DivMmcVersion?> GetDivMmcVersionOption() =>
+        new("--divmmc-version")
+        {
+            Description = "Specifies DivMMC version to emulate",
         };
 
     private static Option<bool?> GetDivMmcWritableOption() =>

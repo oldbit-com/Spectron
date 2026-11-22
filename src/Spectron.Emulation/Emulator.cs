@@ -383,6 +383,12 @@ public sealed class Emulator
 
     private void BeforeInstruction(Word pc)
     {
+        // ROM traps only apply to the Spectrum ROM, not to a shadow ROM paged in at the same address
+        if (Memory.IsShadowRomActive)
+        {
+            return;
+        }
+
         switch (pc)
         {
             case RomRoutines.LD_START:

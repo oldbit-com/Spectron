@@ -8,6 +8,7 @@
         xmlns:theming="clr-namespace:OldBit.Spectron.Theming"
         xmlns:tape="clr-namespace:OldBit.Spectron.Emulation.Tape;assembly=OldBit.Spectron.Emulation"
         xmlns:if1="clr-namespace:OldBit.Spectron.Emulation.Devices.Interface1;assembly=OldBit.Spectron.Emulation"
+        xmlns:divmmc="clr-namespace:OldBit.Spectron.Emulation.Devices.DivMmc;assembly=OldBit.Spectron.Emulation"
         xmlns:material="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OldBit.Spectron.Views.PreferencesView"
@@ -106,10 +107,26 @@
                         <TabItem Header="DivMMC">
                             <StackPanel>
                                 <CheckBox x:Name="DivMmcEnabled" Content="DivMMC enabled" Classes="Center" IsChecked="{Binding IsDivMmcEnabled}"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="30 0 0 0" IsEnabled="{Binding #DivMmcEnabled.IsChecked}">
+                                    <RadioButton
+                                        Content="0.8.9"
+                                        ToolTip.Tip="Emulate version 0.8.9"
+                                        IsChecked="{Binding DivMmcVersion, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static divmmc:DivMmcVersion.V089}}"
+                                        Classes="Center"/>
+
+                                    <RadioButton
+                                        Content="0.9.0"
+                                        ToolTip.Tip="Emulate version 0.9.0"
+                                        IsChecked="{Binding DivMmcVersion, Converter={StaticResource ValueEqualityConverter}, ConverterParameter={x:Static divmmc:DivMmcVersion.V090}}"
+                                        Classes="Center"
+                                        Margin="10 0 0 0"/>
+                                </StackPanel>
+
                                 <CheckBox Content="EEPROM write enabled" Classes="Center" IsChecked="{Binding IsDivMmcWriteEnabled}" IsEnabled="{Binding #DivMmcEnabled.IsChecked}"/>
                                 <CheckBox Content="Persist disk writes" Classes="Center" IsChecked="{Binding IsDivMmcDriveWriteEnabled}" IsEnabled="{Binding #DivMmcEnabled.IsChecked}"/>
 
-                                <Grid ColumnDefinitions="210,*, 30" RowDefinitions="*,10,*" IsEnabled="{Binding #DivMmcEnabled.IsChecked}">
+                                <Grid ColumnDefinitions="210,*,30" RowDefinitions="*,10,40,*" IsEnabled="{Binding #DivMmcEnabled.IsChecked}">
                                     <TextBlock
                                         Grid.Column="0"
                                         Grid.Row="0"
@@ -161,6 +178,15 @@
                                         Command="{Binding SelectSdCardImageFileCommand}" CommandParameter="1">
                                         <material:MaterialIcon Kind="Harddisk"/>
                                     </Button>
+
+                                    <HyperlinkButton
+                                        Grid.ColumnSpan="3"
+                                        Grid.Column="0"
+                                        Grid.Row="3"
+                                        HorizontalAlignment="Right"
+                                        VerticalContentAlignment="Center"
+                                        Content="Download example SD card images"
+                                        NavigateUri="https://spectron.oldbit.com/samples" />
                                 </Grid>
                             </StackPanel>
                         </TabItem>

@@ -32,6 +32,7 @@ Options:
   --divmmc-image <divmmc-image>                                                                Specifies the SD card image to use with divMMC
   --divmmc-readonly                                                                            Specifies the SD card image is readonly, SD card writes will be cached in-memory only
   --divmmc-writable                                                                            Specifies the SD card image is writable, SD card writes will persisted
+  --divmmc-version <V089|V090>                                                                 Specifies DivMMC version to emulate
   --beta128                                                                                    Enables Beta 128 disk interface emulation
   --no-beta128                                                                                 Disables Beta 128 disk interface emulation
   --interface1                                                                                 Enables Interface 1 emulation

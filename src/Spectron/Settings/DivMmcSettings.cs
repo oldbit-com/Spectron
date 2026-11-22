@@ -1,3 +1,5 @@
+using OldBit.Spectron.Emulation.Devices.DivMmc;
+
 namespace OldBit.Spectron.Settings;
 
 public record DivMmcSettings
@@ -11,4 +13,6 @@ public record DivMmcSettings
     public string Card1FileName { get; init; } = string.Empty;
 
     public bool IsDriveWriteEnabled { get; init; }
+
+    public DivMmcVersion DivMmcVersion { get; init; } = DivMmcVersion.V089;
 }

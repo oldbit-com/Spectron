@@ -147,6 +147,11 @@ partial class MainViewModel
                 {
                     Emulator.DivMmc.IsDriveWriteEnabled = !CommandLineArgs.IsDivMmcReadOnly.Value;
                 }
+
+                if (CommandLineArgs?.DivMmcVersion != null)
+                {
+                    Emulator.DivMmc.Version = CommandLineArgs.DivMmcVersion.Value;
+                }
             }
             else
             {

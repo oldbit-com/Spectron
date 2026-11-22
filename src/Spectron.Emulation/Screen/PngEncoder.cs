@@ -1,9 +1,8 @@
 using System.Buffers.Binary;
 using System.IO.Compression;
 using System.Text;
-using OldBit.Spectron.Emulation.Screen;
 
-namespace OldBit.Spectron.Mcp.Screen;
+namespace OldBit.Spectron.Emulation.Screen;
 
 /// <summary>
 /// Minimal PNG encoder (8-bit RGB, no filtering), so screenshots don't need a UI or imaging library.

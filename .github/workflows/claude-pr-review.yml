@@ -35,7 +35,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: '10.0.x'
 
       - name: Build
         run: dotnet build --configuration Debug
@@ -74,6 +74,6 @@ jobs:
             `confirmed: true`) for specific line-level issues.
             Only post GitHub comments — do not return the review as a chat message.
           claude_args: |
-            --max-turns 20
+            --max-turns 50
             --model claude-opus-4-7
             --allowedTools "Bash(dotnet build),Bash(dotnet test),Bash(gh pr view:*),Bash(gh pr diff:*),Read,Grep,Glob"
