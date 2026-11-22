@@ -126,7 +126,7 @@
                                 <CheckBox Content="EEPROM write enabled" Classes="Center" IsChecked="{Binding IsDivMmcWriteEnabled}" IsEnabled="{Binding #DivMmcEnabled.IsChecked}"/>
                                 <CheckBox Content="Persist disk writes" Classes="Center" IsChecked="{Binding IsDivMmcDriveWriteEnabled}" IsEnabled="{Binding #DivMmcEnabled.IsChecked}"/>
 
-                                <Grid ColumnDefinitions="210,*, 30" RowDefinitions="*,10,*" IsEnabled="{Binding #DivMmcEnabled.IsChecked}">
+                                <Grid ColumnDefinitions="210,*,30" RowDefinitions="*,10,40,*" IsEnabled="{Binding #DivMmcEnabled.IsChecked}">
                                     <TextBlock
                                         Grid.Column="0"
                                         Grid.Row="0"
@@ -178,6 +178,15 @@
                                         Command="{Binding SelectSdCardImageFileCommand}" CommandParameter="1">
                                         <material:MaterialIcon Kind="Harddisk"/>
                                     </Button>
+
+                                    <HyperlinkButton
+                                        Grid.ColumnSpan="3"
+                                        Grid.Column="0"
+                                        Grid.Row="3"
+                                        HorizontalAlignment="Right"
+                                        VerticalContentAlignment="Center"
+                                        Content="Download example SD card images"
+                                        NavigateUri="https://spectron.oldbit.com/samples" />
                                 </Grid>
                             </StackPanel>
                         </TabItem>

@@ -58,9 +58,8 @@ The solution consists of several projects:
 |----------------------|---------------------------------------------------------|
 | Spectron             | Avalonia-based UI and main application logic            |
 | Spectron.Debugger    | Fully featured code debugger, including UI and controls |
-| Spectron.Emulation   | Core emulation engine                                   |
-| Spectron.Basic       | Basic interpreter and related utilities                 |
 | Spectron.Disassembly | Z80 disassembler, used by the debugger                  |
+| Spectron.Emulation   | Core emulation engine                                   |
 | Spectron.Files       | Handles TZX, Z80, SNA and other file formats            |
 | Spectron.Mcp         | MCP server that lets AI agents control the emulator     |
 | Spectron.Recorder    | Audio and video recording functionality                 |
@@ -157,8 +156,9 @@ Emulation is supported for Kempston, Sinclair, Cursor, and Fuller joysticks. Ext
 ULA+ mode is supported and can be enabled in the settings.
 
 ## DivMMC
-DivMMC emulation is supported and can be enabled in the settings. It is based on [esxDOS 0.8.9](https://esxdos.org/) and requires a disk image containing the esxDOS system files.
-Sample disk images are available [here](https://1drv.ms/u/c/7fd2cf29d9a4c5e1/EdULvNTWM7VLiU1_6GeGDcgBacxN6TanwmMCle2Hz8OBhg?e=3CSLB0).
+DivMMC emulation is supported and can be enabled in the settings. You can select [esxDOS](https://esxdos.org/) version 0.8.9 or 0.9.0.
+You will also need to provide a disk image containing the esxDOS system files.
+Sample disk images can be downloaded [here](https://spectron.oldbit.com/samples).
 
 Up to two SD card images are supported, and changes can be persisted to the images. RTC support is available via the [RTC.SYS](https://github.com/oldbit-com/Spectron/tree/main/src/Spectron.Emulation/Devices/DivMmc/RTC) file, allowing DivMMC to use the current system date and time.
 
