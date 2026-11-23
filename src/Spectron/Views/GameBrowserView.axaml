@@ -12,20 +12,63 @@
         Title="Game Browser">
 
     <Grid Margin="10">
-        <Grid RowDefinitions="30,5,*">
-            <TextBox
-                Name="SearchText"
-                Grid.Row="0"
-                Text="{Binding SearchText}"
-                PlaceholderText="Search games, publishers or authors">
-                <TextBox.KeyBindings>
-                    <KeyBinding Gesture="Enter" Command="{Binding SearchCommand}" />
-                </TextBox.KeyBindings>
-            </TextBox>
+        <StackPanel
+            Orientation="Vertical"
+            Spacing="10"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            IsVisible="{Binding !IsDatabaseAvailable}">
+            <material:MaterialIcon Height="48" Width="48" Kind="DatabaseSearchOutline" />
+            <TextBlock
+                Text="ZXDB database has not been located"
+                FontSize="16"
+                HorizontalAlignment="Center" />
+            <TextBlock
+                Text="Select the ZXDB SQLite database file to browse games."
+                Opacity="0.8"
+                HorizontalAlignment="Center" />
+            <Button
+                Content="Locate ZXDB Database..."
+                HorizontalAlignment="Center"
+                Command="{Binding LocateDatabaseCommand}" />
+            <TextBlock
+                Text="{Binding DatabaseError}"
+                Foreground="{StaticResource SpectrumBrightRed}"
+                HorizontalAlignment="Center"
+                IsVisible="{Binding DatabaseError, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        </StackPanel>
 
-            <controls:HeaderSeparator Grid.Row="1" />
+        <Grid RowDefinitions="30,Auto,5,*" IsVisible="{Binding IsDatabaseAvailable}">
+            <Grid Grid.Row="0" ColumnDefinitions="*,5,Auto">
+                <TextBox
+                    Name="SearchText"
+                    Grid.Column="0"
+                    Text="{Binding SearchText}"
+                    PlaceholderText="Search games, publishers or authors">
+                    <TextBox.KeyBindings>
+                        <KeyBinding Gesture="Enter" Command="{Binding SearchCommand}" />
+                    </TextBox.KeyBindings>
+                </TextBox>
 
-            <Grid Grid.Row="2" ColumnDefinitions="*,280">
+                <Button
+                    Grid.Column="2"
+                    Height="30"
+                    ToolTip.Tip="Change ZXDB database location"
+                    Command="{Binding LocateDatabaseCommand}">
+                    <material:MaterialIcon Kind="DatabaseCogOutline" />
+                </Button>
+            </Grid>
+
+            <TextBlock
+                Grid.Row="1"
+                Margin="0,5,0,0"
+                Text="{Binding DatabaseError}"
+                Foreground="{StaticResource SpectrumBrightRed}"
+                IsVisible="{Binding DatabaseError, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+            <controls:HeaderSeparator Grid.Row="2" />
+
+            <Grid Grid.Row="3" ColumnDefinitions="*,280">
                 <ListBox
                     SelectionMode="Single"
                     ItemsSource="{Binding Games}"

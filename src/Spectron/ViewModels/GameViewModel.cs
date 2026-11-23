@@ -13,5 +13,5 @@ public partial class GameViewModel : ObservableObject
     public string Availability { get; set; } = string.Empty;
 
     [ObservableProperty]
-    public partial byte[] Data { get; set; }
+    public partial byte[]? Data { get; set; }
 }

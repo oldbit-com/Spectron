@@ -1,17 +1,32 @@
+using System;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Data.Sqlite;
+using OldBit.Spectron.Database;
+using OldBit.Spectron.Dialogs;
+using OldBit.Spectron.Services;
+using OldBit.Spectron.Settings;
 
 namespace OldBit.Spectron.ViewModels;
 
 public partial class GameBrowserViewModel : ObservableObject
 {
+    private readonly ZxDbClient _zxDbClient;
+    private readonly ZxDbSettings _zxDbSettings;
+    private readonly IApplicationDataService _applicationDataService;
+    private readonly FileDialogs _fileDialogs;
+
+    private bool _isInitialized;
+
     public ObservableCollection<GameViewModel> Games { get; } = [];
 
     public IAsyncRelayCommand SearchCommand { get; }
+
+    public IAsyncRelayCommand LocateDatabaseCommand { get; }
 
     [ObservableProperty]
     public partial GameViewModel? SelectedGame { get; set; }
@@ -19,39 +34,77 @@ public partial class GameBrowserViewModel : ObservableObject
     [ObservableProperty]
     public partial string SearchText { get; set; } = string.Empty;
 
-    public GameBrowserViewModel()
+    [ObservableProperty]
+    public partial bool IsDatabaseAvailable { get; private set; }
+
+    [ObservableProperty]
+    public partial string? DatabaseError { get; private set; }
+
+    public GameBrowserViewModel(
+        ZxDbClient zxDbClient,
+        ZxDbSettings zxDbSettings,
+        IApplicationDataService applicationDataService,
+        FileDialogs fileDialogs)
     {
+        _zxDbClient = zxDbClient;
+        _zxDbSettings = zxDbSettings;
+        _applicationDataService = applicationDataService;
+        _fileDialogs = fileDialogs;
+
         SearchCommand = new AsyncRelayCommand(Search);
+        LocateDatabaseCommand = new AsyncRelayCommand(LocateDatabaseAsync);
+    }
 
-        Games.Add(new GameViewModel
+    public async Task InitializeAsync()
+    {
+        if (_isInitialized)
         {
-            Name = "Game 1",
-            Publisher = "Publisher 1",
-            Year = "2020",
-            Genre = "Arcade Game: Maze",
-            Availability = "Distribution denied - still for sale",
-            Data = File.ReadAllBytes("/Users/voytas/Downloads/PrizeThe.scr"),
-        });
+            RefreshAvailability();
+            return;
+        }
 
-        Games.Add(new GameViewModel
-        {
-            Name = "Writer's Digest Prize Draw Very Long Name Even Longer",
-            Publisher = "Publisher 2",
-            Year = "2021",
-            Genre = "Arcade Game: Maze",
-            Availability = "Available",
-            Data = File.ReadAllBytes("/Users/voytas/Downloads/PrizeThe.scr"),
-        });
+        var settings = await _applicationDataService.LoadAsync<GameBrowserSettings>();
 
-        Games.Add(new GameViewModel
+        _zxDbSettings.DatabasePath = settings.ZxDbPath;
+        _isInitialized = true;
+
+        RefreshAvailability();
+    }
+
+    internal async Task SetDatabasePathAsync(string databasePath)
+    {
+        if (!await ZxDbClient.IsValidDatabaseAsync(databasePath))
         {
-            Name = "Game 3",
-            Publisher = "Publisher 3",
-            Year = "2022",
-            Genre = "Arcade Game: Maze",
-            Availability = "Distribution denied",
-            Data = File.ReadAllBytes("/Users/voytas/Downloads/PrizeThe.scr"),
-        });
+            DatabaseError = "The selected file is not a valid ZXDB database.";
+            return;
+        }
+
+        _zxDbSettings.DatabasePath = databasePath;
+        await _applicationDataService.SaveAsync(new GameBrowserSettings { ZxDbPath = databasePath });
+
+        Games.Clear();
+        DatabaseError = null;
+        RefreshAvailability();
+    }
+
+    private async Task LocateDatabaseAsync()
+    {
+        var files = await _fileDialogs.OpenZxDbFileAsync();
+
+        if (files.Count == 0)
+        {
+            return;
+        }
+
+        var databasePath = files[0].TryGetLocalPath();
+
+        if (databasePath == null)
+        {
+            DatabaseError = "The selected file is not a local file.";
+            return;
+        }
+
+        await SetDatabasePathAsync(databasePath);
     }
 
     private async Task Search(CancellationToken cancellationToken)
@@ -61,6 +114,38 @@ public partial class GameBrowserViewModel : ObservableObject
             return;
         }
 
-        //await _zxDbClient.SearchByTitle(SearchText, cancellationToken);
+        RefreshAvailability();
+
+        if (!IsDatabaseAvailable)
+        {
+            return;
+        }
+
+        try
+        {
+            var results = await _zxDbClient.SearchByTitleAsync(SearchText, cancellationToken: cancellationToken);
+
+            Games.Clear();
+
+            foreach (var result in results)
+            {
+                Games.Add(new GameViewModel
+                {
+                    EntryId = result.Id,
+                    Name = result.Title,
+                    Publisher = result.Publisher ?? string.Empty,
+                    Year = result.Year?.ToString() ?? string.Empty,
+                    Genre = result.Genre ?? string.Empty,
+                    Availability = result.Availability ?? string.Empty,
+                });
+            }
+        }
+        catch (Exception ex) when (ex is SqliteException or ZxDbNotConfiguredException)
+        {
+            DatabaseError = $"Unable to read ZXDB database: {ex.Message}";
+            RefreshAvailability();
+        }
     }
+
+    private void RefreshAvailability() => IsDatabaseAvailable = _zxDbClient.IsAvailable;
 }

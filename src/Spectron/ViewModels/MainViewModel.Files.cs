@@ -97,11 +97,11 @@ partial class MainViewModel
         }
     }
 
-    private Task HandleBrowseGamesAsync()
+    private async Task HandleBrowseGamesAsync()
     {
-        WeakReferenceMessenger.Default.Send(new ShowGameBrowserViewMessage(_gameBrowserViewModel));
+        await _gameBrowserViewModel.InitializeAsync();
 
-        return Task.CompletedTask;
+        WeakReferenceMessenger.Default.Send(new ShowGameBrowserViewMessage(_gameBrowserViewModel));
     }
 
     private async Task OpenFavorite(FavoriteProgram favorite)

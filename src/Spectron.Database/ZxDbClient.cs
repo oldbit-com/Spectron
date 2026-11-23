@@ -1,11 +1,39 @@
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using OldBit.Spectron.Database.Data;
 
 namespace OldBit.Spectron.Database;
 
-public class ZxDbClient(IDbContextFactory<GamesDbContext> contextFactory)
+public class ZxDbClient(IDbContextFactory<GamesDbContext> contextFactory, ZxDbSettings settings)
 {
     private const byte ScreenshotFileTypeId = 1;
+
+    public bool IsAvailable => settings.IsAvailable;
+
+    public static async Task<bool> IsValidDatabaseAsync(string databasePath, CancellationToken cancellationToken = default)
+    {
+        if (!File.Exists(databasePath))
+        {
+            return false;
+        }
+
+        try
+        {
+            await using var connection = new SqliteConnection(ZxDbContextFactory.CreateConnectionString(databasePath));
+            await connection.OpenAsync(cancellationToken);
+
+            await using var command = connection.CreateCommand();
+            command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN ('entries', 'search_by_titles')";
+
+            var count = Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken));
+
+            return count == 2;
+        }
+        catch (SqliteException)
+        {
+            return false;
+        }
+    }
 
     public async Task<List<GameSearchResult>> SearchByTitleAsync(
         string title,
