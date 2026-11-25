@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.CommandLine;
+using OldBit.Spectron.Database.DependencyInjection;
 using OldBit.Spectron.Debugger.Extensions;
 using OldBit.Spectron.Emulation.DependencyInjection;
 using OldBit.Spectron.Extensions;
@@ -75,6 +76,7 @@ public class Program
         builder.Services.AddEmulation();
         builder.Services.AddServices();
         builder.Services.AddDebugging();
+        builder.Services.AddZxDb();
         builder.Services.AddViewModels();
         builder.Logging.ClearProviders();
         builder.Logging.SetMinimumLevel(LogLevel.Trace);

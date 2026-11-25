@@ -13,5 +13,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<PaletteEditorViewModel>();
         services.AddSingleton<MicrodriveMenuViewModel>();
         services.AddSingleton<DiskDriveMenuViewModel>();
+        services.AddSingleton<GameBrowserViewModel>();
     }
 }

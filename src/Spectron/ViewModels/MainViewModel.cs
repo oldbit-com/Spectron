@@ -63,6 +63,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private readonly FavoritesService _favoritesService;
     private readonly PaletteService _paletteService;
     private readonly SessionService _sessionService;
+    private readonly GameBrowserViewModel _gameBrowserViewModel;
     private readonly DebuggerContext _debuggerContext;
     private readonly QuickSaveService _quickSaveService;
     private readonly ILogStore _logStore;
@@ -220,6 +221,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private async Task LoadFile() => await HandleLoadFileAsync();
 
     [RelayCommand]
+    private async Task BrowseGames() => await HandleBrowseGamesAsync();
+
+    [RelayCommand]
     private async Task SaveFile() => await HandleSaveFileAsync();
 
     [RelayCommand]
@@ -359,6 +363,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         RecentFilesViewModel recentFilesViewModel,
         FavoritesViewModel favoritesViewModel,
         PaletteEditorViewModel paletteEditorViewModel,
+        GameBrowserViewModel gameBrowserViewModel,
         TapeMenuViewModel tapeMenuViewModel,
         MicrodriveMenuViewModel microdriveMenuViewModel,
         DiskDriveMenuViewModel diskDriveMenuViewModel,
@@ -382,6 +387,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _favoritesService = favoritesService;
         _paletteService = paletteService;
         _sessionService = sessionService;
+        _gameBrowserViewModel = gameBrowserViewModel;
         _debuggerContext = debuggerContext;
         _quickSaveService = quickSaveService;
         _logStore = logStore;
@@ -423,9 +429,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 _favorites = message.Favorites;
                 await _favoritesService.SaveAsync(_favorites);
             }
-            catch
+            catch (Exception ex)
             {
-                // Ignore
+                logger.LogError(ex, "Failed save favorites");
             }
         });
 
@@ -435,9 +441,21 @@ public partial class MainViewModel : ObservableObject, IDisposable
             {
                 await OpenFavorite(message.Favorite);
             }
-            catch
+            catch (Exception ex)
             {
-                // Ignore
+                logger.LogError(ex, "Failed to open favorite");
+            }
+        });
+
+        WeakReferenceMessenger.Default.Register<LoadFileMessage>(this, async void (_, message) =>
+        {
+            try
+            {
+                await HandleLoadFileAsync(message.FilePath);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to load file");
             }
         });
 

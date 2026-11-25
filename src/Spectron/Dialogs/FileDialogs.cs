@@ -60,6 +60,12 @@ public sealed class FileDialogs(IFileDialogProvider fileDialogProvider)
             FilePickerType.Any,
         ]);
 
+    public async Task<IReadOnlyList<IStorageFile>> OpenZxDbFileAsync() =>
+        await OpenFileAsync("Select ZXDB Database", [
+            FilePickerType.ZxDb,
+            FilePickerType.Any,
+        ]);
+
     public async Task<IStorageFile?> SaveTapeFileAsync(string? suggestedFileName = null)
     {
         var options = new FilePickerSaveOptions

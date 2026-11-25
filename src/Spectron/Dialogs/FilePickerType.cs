@@ -114,6 +114,11 @@ public static class FilePickerType
         Patterns = ["*.trd", "*.scl"]
     };
 
+    public static FilePickerFileType ZxDb { get; } = new("ZXDB Database")
+    {
+        Patterns = ["*.sqlite", "*.db", "*.sqlite3"]
+    };
+
     public static FilePickerFileType Any { get; } = new("All Files")
     {
         Patterns = ["*.*"]
