@@ -4,8 +4,5 @@ namespace OldBit.Spectron.Views;
 
 public partial class GameBrowserView : Window
 {
-    public GameBrowserView()
-    {
-        InitializeComponent();
-    }
+    public GameBrowserView() => InitializeComponent();
 }

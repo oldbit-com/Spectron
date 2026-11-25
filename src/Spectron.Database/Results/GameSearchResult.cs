@@ -1,4 +1,4 @@
-namespace OldBit.Spectron.Database;
+namespace OldBit.Spectron.Database.Results;
 
 public sealed record GameSearchResult(
     int Id,
@@ -7,5 +7,4 @@ public sealed record GameSearchResult(
     string? Genre,
     short? Year,
     string? Availability,
-    string? Publisher,
-    string? Screenshot);
+    string? Publisher);

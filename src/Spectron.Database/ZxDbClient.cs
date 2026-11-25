@@ -1,16 +1,28 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using OldBit.Spectron.Database.Data;
+using OldBit.Spectron.Database.Results;
 
 namespace OldBit.Spectron.Database;
 
-public class ZxDbClient(IDbContextFactory<GamesDbContext> contextFactory, ZxDbSettings settings)
+public sealed class ZxDbClient(IDbContextFactory<GamesDbContext> contextFactory, ZxDbSettings settings)
 {
     private const byte ScreenshotFileTypeId = 1;
+    private const byte TapeImageFileTypeId = 8;
+    private const byte SnapshotFileTypeId = 10;
+    private const byte DiskImageFileTypeId = 11;
+    private const byte BugFixTapeImageFileTypeId = 22;
 
-    public bool IsAvailable => settings.IsAvailable;
+    // Machine types 1-11 cover the ZX Spectrum 16K up to the Timex TC2048, 13 is TC2048/Tx2068.
+    // Entries without a machine type (magazines, covertapes, compilations) are Spectrum software too.
+    private const byte LastSpectrumMachineTypeId = 11;
+    private const byte TimexTc2048Tx2068MachineTypeId = 13;
 
-    public static async Task<bool> IsValidDatabaseAsync(string databasePath, CancellationToken cancellationToken = default)
+    private const string ScrFilePattern = "%.scr";
+
+    internal bool IsAvailable => settings.IsAvailable;
+
+    internal static async Task<bool> IsValidDatabaseAsync(string databasePath, CancellationToken cancellationToken = default)
     {
         if (!File.Exists(databasePath))
         {
@@ -35,7 +47,7 @@ public class ZxDbClient(IDbContextFactory<GamesDbContext> contextFactory, ZxDbSe
         }
     }
 
-    public async Task<List<GameSearchResult>> SearchByTitleAsync(
+    internal async Task<List<GameSearchResult>> SearchByTitleAsync(
         string title,
         int limit = 25,
         CancellationToken cancellationToken = default)
@@ -50,9 +62,13 @@ public class ZxDbClient(IDbContextFactory<GamesDbContext> contextFactory, ZxDbSe
         await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
 
         var pattern = $"%{searchTitle}%";
+        var titles = db.SearchByTitles;
 
         return await db.Entries
-            .Where(e => db.SearchByTitles.Any(s => s.EntryId == e.Id && EF.Functions.Like(s.EntryTitle, pattern)))
+            .Where(e => titles.Any(s => s.EntryId == e.Id && EF.Functions.Like(s.EntryTitle, pattern)))
+            .Where(e => e.MachinetypeId == null ||
+                        e.MachinetypeId <= LastSpectrumMachineTypeId ||
+                        e.MachinetypeId == TimexTc2048Tx2068MachineTypeId)
             .OrderBy(e => e.Title)
             .Select(e => new GameSearchResult(
                 e.Id,
@@ -67,13 +83,38 @@ public class ZxDbClient(IDbContextFactory<GamesDbContext> contextFactory, ZxDbSe
                 e.Publishers
                     .Where(p => p.ReleaseSeq == 0 && p.PublisherSeq == 1)
                     .Select(p => p.Label.Name)
-                    .FirstOrDefault(),
-                e.Downloads
-                    .Where(d => d.FiletypeId == ScreenshotFileTypeId)
-                    .OrderBy(d => d.Id)
-                    .Select(d => d.FileLink)
                     .FirstOrDefault()))
             .Take(limit)
+            .ToListAsync(cancellationToken);
+    }
+
+    internal async Task<string?> GetScreenshotFileAsync(int entryId, CancellationToken cancellationToken = default)
+    {
+        await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
+
+        // Only raw .scr screens can be rendered, some loading screens are stored as gif, png, etc.
+        return await db.Downloads
+            .Where(e => e.EntryId == entryId &&
+                        e.FiletypeId == ScreenshotFileTypeId &&
+                        EF.Functions.Like(e.FileLink, ScrFilePattern))
+            .OrderBy(e => e.Id)
+            .Select(e => e.FileLink)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    internal async Task<List<FileResult>> GetGameFileLinksAsync(int entryId, CancellationToken cancellationToken = default)
+    {
+        await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
+
+        return await db.Downloads
+            .Where(e => e.EntryId == entryId &&
+                        (e.FiletypeId == TapeImageFileTypeId ||
+                         e.FiletypeId == SnapshotFileTypeId ||
+                         e.FiletypeId == DiskImageFileTypeId ||
+                         e.FiletypeId == BugFixTapeImageFileTypeId))
+            .OrderBy(e => e.ReleaseSeq)
+            .ThenBy(e => e.Id)
+            .Select(e => new FileResult(e.FileLink))
             .ToListAsync(cancellationToken);
     }
 

@@ -1,3 +1,6 @@
+using System.Net;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using OldBit.Spectron.Database;
 using OldBit.Spectron.Database.Data;
@@ -17,10 +20,21 @@ public class GameBrowserViewModelTests
 
     public GameBrowserViewModelTests()
     {
-        var client = new ZxDbClient(new ZxDbContextFactory(_settings), _settings);
-        var fileDialogs = new FileDialogs(Substitute.For<IFileDialogProvider>());
+        var handler = new TestHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new ByteArrayContent([])
+        });
 
-        _viewModel = new GameBrowserViewModel(client, _settings, _applicationDataService, fileDialogs);
+        var factory = Substitute.For<IHttpClientFactory>();
+        factory.CreateClient(Arg.Any<string>()).Returns(_ => new HttpClient(handler, disposeHandler: false));
+
+        var cache = new MemoryCache(new MemoryCacheOptions());
+        var client = new ZxDbClient(new ZxDbContextFactory(_settings), _settings);
+        var service = new ZxDbService(client, cache, factory);
+        var fileDialogs = new FileDialogs(Substitute.For<IFileDialogProvider>());
+        var logger = Substitute.For<ILogger<GameBrowserViewModel>>();
+
+        _viewModel = new GameBrowserViewModel(service, _settings, _applicationDataService, logger, fileDialogs);
     }
 
     [Fact]

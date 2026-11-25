@@ -53,4 +53,8 @@
       <ProjectReference Include="..\Spectron.Mcp\Spectron.Mcp.csproj" />
       <ProjectReference Include="..\Spectron.Recorder\Spectron.Recorder.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Resources\Spectrum.scr" />
+    </ItemGroup>
 </Project>

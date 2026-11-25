@@ -11,5 +11,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ZxDbSettings>();
         services.AddSingleton<IDbContextFactory<GamesDbContext>, ZxDbContextFactory>();
         services.AddSingleton<ZxDbClient>();
+        services.AddSingleton<ZxDbService>();
+        services.AddMemoryCache();
+        services.AddHttpClient();
     }
 }
