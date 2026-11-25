@@ -253,10 +253,15 @@ public sealed class Emulator
     private void AddEventHandlers()
     {
         Cpu.Clock.TicksAdded += (_, previousFrameTicks, _) => ScreenBuffer.UpdateScreen(previousFrameTicks / Clock.Multiplier);
-        Cpu.BeforeInstruction += BeforeInstruction;
         UlaPlus.ActiveChanged += (_, _) => InvalidateUlaPlus();
         UlaPlus.PaletteChanged += (_, _) => InvalidateUlaPlus();
         Beta128.DiskActivity += _ => DiskDriveManager.OnDiskActivity();
+
+        // ROM traps are for the original ROM only. Otherwise, unexpected behavior may occur.
+        if (RomType == RomType.Original)
+        {
+            Cpu.BeforeInstruction += BeforeInstruction;
+        }
 
         if (Ula is UlaTimex ulaTimex)
         {
