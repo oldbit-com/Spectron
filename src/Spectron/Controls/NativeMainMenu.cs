@@ -242,6 +242,14 @@ public sealed class NativeMainMenu
                     : new KeyGesture(Key.O, KeyModifiers.Control)
             },
 
+            new NativeMenuItem("Browse Games...")
+            {
+                Command = _viewModel.BrowseGamesCommand,
+                Gesture = OperatingSystem.IsMacOS()
+                    ? new KeyGesture(Key.O, KeyModifiers.Meta | KeyModifiers.Shift)
+                    : new KeyGesture(Key.O, KeyModifiers.Control | KeyModifiers.Shift)
+            },
+
             CreateRecentMenuItem(),
 
             new NativeMenuItem("Save Snapshot...")
@@ -422,6 +430,7 @@ public sealed class NativeMainMenu
             new NativeMenuItem("NMI")
             {
                 Command = _viewModel.TriggerNmiCommand,
+                Gesture = new KeyGesture(Key.F12, KeyModifiers.Control)
             },
 
             new NativeMenuItem("Reset")
@@ -433,6 +442,7 @@ public sealed class NativeMainMenu
             new NativeMenuItem("Hard Reset")
             {
                 Command = _viewModel.HardResetCommand,
+                Gesture = new KeyGesture(Key.F3, KeyModifiers.Control | KeyModifiers.Shift)
             },
         };
 

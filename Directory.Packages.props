@@ -19,9 +19,12 @@
     <PackageVersion Include="Material.Icons.Avalonia" Version="3.0.2" />
     <PackageVersion Include="MemoryPack" Version="1.22.0" />
     <PackageVersion Include="MessageBox.Avalonia" Version="12.1.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.15" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.15" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.15" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.15" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.15" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.15" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.15" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.15" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="10.0.15" />

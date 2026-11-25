@@ -1,0 +1,210 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:OldBit.Spectron.Controls"
+        xmlns:viewModels="clr-namespace:OldBit.Spectron.ViewModels"
+        xmlns:scr="clr-namespace:OldBit.Spectron.Controls.Scr"
+        xmlns:material="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        mc:Ignorable="d"
+        Width="800"
+        Height="600"
+        WindowStartupLocation="CenterOwner"
+        x:Class="OldBit.Spectron.Views.GameBrowserView"
+        x:DataType="viewModels:GameBrowserViewModel"
+        Title="Game Browser">
+
+    <Grid Margin="10">
+        <StackPanel
+            Orientation="Vertical"
+            Spacing="10"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            IsVisible="{Binding !IsDatabaseAvailable}">
+            <material:MaterialIcon Height="48" Width="48" Kind="DatabaseSearchOutline" />
+            <TextBlock
+                Text="ZXDB database has not been located"
+                FontSize="16"
+                HorizontalAlignment="Center" />
+            <TextBlock
+                Text="Select the ZXDB SQLite database file to browse games."
+                Opacity="0.8"
+                HorizontalAlignment="Center" />
+            <Button
+                Content="Locate ZXDB Database..."
+                HorizontalAlignment="Center"
+                Command="{Binding LocateDatabaseCommand}" />
+            <HyperlinkButton
+                HorizontalAlignment="Center"
+                VerticalContentAlignment="Center"
+                Content="Or download it here"
+                NavigateUri="https://spectron.oldbit.com/samples"/>
+            <TextBlock
+                Text="{Binding DatabaseError}"
+                Foreground="{StaticResource SpectrumBrightRed}"
+                HorizontalAlignment="Center"
+                IsVisible="{Binding DatabaseError, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        </StackPanel>
+
+        <Grid RowDefinitions="30,Auto,5,*,Auto" IsVisible="{Binding IsDatabaseAvailable}">
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,5,*,5,Auto">
+                <ComboBox
+                    Grid.Column="0"
+                    Width="110"
+                    Height="30"
+                    VerticalAlignment="Stretch"
+                    ToolTip.Tip="Search by"
+                    ItemsSource="{Binding SearchFields}"
+                    DisplayMemberBinding="{Binding Name}"
+                    SelectedValueBinding="{Binding Value}"
+                    SelectedValue="{Binding SearchField}" />
+
+                <TextBox
+                    Name="SearchText"
+                    Grid.Column="2"
+                    Text="{Binding SearchText}"
+                    PlaceholderText="{Binding SearchPlaceholder}"
+                    VerticalContentAlignment="Center">
+                    <TextBox.KeyBindings>
+                        <KeyBinding Gesture="Enter" Command="{Binding SearchCommand}" />
+                    </TextBox.KeyBindings>
+                </TextBox>
+
+                <Button
+                    Grid.Column="4"
+                    Height="30"
+                    ToolTip.Tip="Change ZXDB database location"
+                    Command="{Binding LocateDatabaseCommand}">
+                    <material:MaterialIcon Kind="DatabaseCogOutline" />
+                </Button>
+            </Grid>
+
+            <TextBlock
+                Grid.Row="1"
+                Margin="0,5,0,0"
+                Text="{Binding DatabaseError}"
+                Foreground="{StaticResource SpectrumBrightRed}"
+                IsVisible="{Binding DatabaseError, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+            <controls:HeaderSeparator Grid.Row="2" />
+
+            <Grid Grid.Row="3" ColumnDefinitions="*,280">
+                <ListBox
+                    SelectionMode="Single"
+                    ItemsSource="{Binding Games}"
+                    SelectedItem="{Binding SelectedGame}"
+                    Background="Transparent">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="40,*,200">
+                                <material:MaterialIcon
+                                    Grid.Column="0"
+                                    Foreground="{StaticResource SpectrumBrightMagenta}"
+                                    Height="24"
+                                    Width="24"
+                                    Kind="{Binding Icon}"/>
+                                <StackPanel Grid.Column="1" Grid.ColumnSpan="2" Orientation="Vertical" Margin="10,0,0,0">
+                                    <TextBlock
+                                        Text="{Binding Name}"
+                                        Foreground="{DynamicResource SystemAccentColor}"
+                                        FontWeight="Bold"
+                                        FontSize="16"
+                                        Margin="0,0,0,10"/>
+
+                                    <TextBlock Margin="0,0,0,10" FontSize="12">
+                                        <Run Text="{Binding Year}"/>
+                                        <Run Text="-"/>
+                                        <Run Text="{Binding Publisher}"/>
+                                    </TextBlock>
+
+                                    <TextBlock Text="{Binding Genre}" FontSize="12"/>
+                                </StackPanel>
+
+                                <TextBlock
+                                    Grid.Column="2"
+                                    Text="{Binding Availability}"
+                                    Opacity="0.7"
+                                    FontSize="12"
+                                    TextWrapping="Wrap"
+                                    TextAlignment="Right"
+                                    VerticalAlignment="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <Grid
+                    Column="1"
+                    DataContext="{Binding SelectedGame}"
+                    RowDefinitions="208,*" Margin="10"
+                    IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}}">
+
+                    <Border Height="208" Width="273" CornerRadius="10" ClipToBounds="True" Padding="16" Background="{DynamicResource SystemAccentColor}" >
+                        <scr:ScrImage Height="192" Width="256" Data="{Binding ScreenData}"/>
+                    </Border>
+
+                    <StackPanel Grid.Row="1" Orientation="Vertical">
+                        <TextBlock
+                            Text="{Binding Name}"
+                            FontSize="18"
+                            Margin="0,10,0,0"
+                            Foreground="{DynamicResource SystemAccentColor}"
+                            TextAlignment="Center"
+                            TextWrapping="WrapWithOverflow"/>
+
+                        <TextBlock Margin="0,5,0,0" Opacity="0.8">
+                            <Run Text="{Binding Year}"/>
+                            <Run Text="∙"/>
+                            <Run Text="{Binding Publisher}"/>
+                        </TextBlock>
+
+                        <Grid RowDefinitions="30,30,30" Margin="0,20,0,0" Opacity="0.8">
+                            <Grid Grid.Row="0" ColumnDefinitions="70,*">
+                                <TextBlock Grid.Column="0" Text="Machine"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Machine}" TextAlignment="Right"/>
+                            </Grid>
+                            <Grid Grid.Row="1" ColumnDefinitions="70,*">
+                                <TextBlock Grid.Column="0" Text="Genre"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Genre}" TextAlignment="Right"/>
+                            </Grid>
+                            <Grid Grid.Row="2">
+                                <StackPanel IsVisible="{Binding SelectedFile, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <ComboBox
+                                        ItemsSource="{Binding Files}"
+                                        DisplayMemberBinding="{Binding Name}"
+                                        SelectedValueBinding="{Binding Value}"
+                                        SelectedValue="{Binding SelectedFile}"
+                                        HorizontalAlignment="Stretch"/>
+                                    <Grid
+                                        ColumnDefinitions="*,*"
+                                        Margin="0 5 0 0"
+                                        DataContext="{Binding $parent[Window].DataContext}"
+                                        x:DataType="viewModels:GameBrowserViewModel">
+                                        <Button
+                                            Grid.Column="0"
+                                            Content="Load"
+                                            Command="{Binding LoadFileCommand}"/>
+                                        <Button
+                                            Grid.Column="1"
+                                            Content="Download"
+                                            Command="{Binding DownloadFileCommand}"
+                                            CommandParameter="{Binding $parent[Window]}"
+                                            HorizontalAlignment="Right"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+
+            <TextBlock
+                Grid.Row="4"
+                Margin="0,5,0,0"
+                FontSize="12"
+                Opacity="0.7"
+                Text="{Binding SearchSummary}"
+                IsVisible="{Binding SearchSummary, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        </Grid>
+    </Grid>
+</Window>

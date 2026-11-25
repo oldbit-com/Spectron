@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using OldBit.Spectron.Database.DependencyInjection;
 using OldBit.Spectron.Debugger.Extensions;
 using OldBit.Spectron.Emulation.DependencyInjection;
 using OldBit.Spectron.Logging;
@@ -20,6 +21,7 @@ internal sealed class TestServiceProvider
         Services.AddViewModels();
         Services.AddEmulation();
         Services.AddDebugging();
+        Services.AddZxDb();
         Services.AddLogging();
         Services.AddSingleton(output);
 

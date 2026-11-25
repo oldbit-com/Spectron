@@ -40,7 +40,8 @@ The ZX Spectrum was my first computer, and I still have a deep affection for it.
 - [x] Favorites manager
 - [x] Screen effects: Blur and CRT/Scanlines
 - [x] TC2048 extended graphics support (hi-res and hi-color)
-- [x] Custom color palettes 
+- [x] Custom color palettes
+- [x] ZXDB integration
 - [x] MCP server for AI agents (experimental)
 - [x] And more to come...
 
@@ -57,6 +58,7 @@ The solution consists of several projects:
 | Project              | Description                                             |
 |----------------------|---------------------------------------------------------|
 | Spectron             | Avalonia-based UI and main application logic            |
+| Spectron.Database    | ZXDB search functionality                             |
 | Spectron.Debugger    | Fully featured code debugger, including UI and controls |
 | Spectron.Disassembly | Z80 disassembler, used by the debugger                  |
 | Spectron.Emulation   | Core emulation engine                                   |
@@ -195,6 +197,13 @@ Playback of RZX files (recordings of ZX Spectrum games) is supported. You can fi
 ## Custom Color Palettes
 Custom color palettes allow you to modify the Spectrum's default palette. There are several predefined palettes and simple editor available. Any color can be customized to your liking.
 
+## ZXDB Integration
+Spectron includes built-in [ZXDB](https://github.com/zxdb/ZXDB) search capability. This can be used to search for software and play it directly from the emulator.
+
+It requires a local copy of the ZXDB database in SQLite format. For the convenience I have created database you can simply [download](https://spectron.oldbit.com/samples):
+- `zxdb.sqlite.zip` - SQLite database file 
+- `zxdb.sql.zip` - SQL dump file if you would like to re-create the database yourself.
+
 ## AI Agents (MCP)
 Spectron includes an optional [Model Context Protocol](https://modelcontextprotocol.io) server, so AI agents such as
 Claude Code, GitHub Copilot or Cursor can see and control the running emulator. An agent can type on the keyboard,
@@ -219,8 +228,8 @@ emulation (`F2`). For the list of tools, client configuration and tips, see the 
 ### Resources
 - [Avalonia UI](https://avaloniaui.net/)
 - [FFmpeg wrapper](https://github.com/rosenbjerg/FFMpegCore)
-- [SkiaSharp](https://github.com/mono/SkiaSharp)
 - [Material Icons](https://github.com/SKProCH/Material.Icons)
+- [ZXDB](https://github.com/zxdb/ZXDB)
 - [ZX Spectrum Font by Patrick H. Lauke](https://fontstruct.com/fontstructions/show/1398596)
 - [Hack Font](https://sourcefoundry.org/hack/)
 - [VT220 Font](https://github.com/svofski/glasstty/blob/master/Glass_TTY_VT220.ttf)
