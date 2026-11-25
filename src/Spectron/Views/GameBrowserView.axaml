@@ -136,11 +136,11 @@
                 <Grid
                     Column="1"
                     DataContext="{Binding SelectedGame}"
-                    RowDefinitions="192,*" Margin="10"
+                    RowDefinitions="208,*" Margin="10"
                     IsVisible="{Binding ., Converter={x:Static ObjectConverters.IsNotNull}}">
 
-                    <Border Height="192" Width="256" CornerRadius="10" ClipToBounds="True">
-                        <scr:ScrImage Data="{Binding ScreenData}"/>
+                    <Border Height="208" Width="273" CornerRadius="10" ClipToBounds="True" Padding="16" Background="{DynamicResource SystemAccentColor}" >
+                        <scr:ScrImage Height="192" Width="256" Data="{Binding ScreenData}"/>
                     </Border>
 
                     <StackPanel Grid.Row="1" Orientation="Vertical">
