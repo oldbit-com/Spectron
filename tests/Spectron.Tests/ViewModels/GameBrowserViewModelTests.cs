@@ -12,11 +12,12 @@ using OldBit.Spectron.ViewModels;
 
 namespace OldBit.Spectron.Tests.ViewModels;
 
-public class GameBrowserViewModelTests
+public class GameBrowserViewModelTests : IDisposable
 {
     private readonly ZxDbSettings _settings = new();
     private readonly IApplicationDataService _applicationDataService = Substitute.For<IApplicationDataService>();
     private readonly GameBrowserViewModel _viewModel;
+    private readonly MemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
 
     public GameBrowserViewModelTests()
     {
@@ -28,9 +29,8 @@ public class GameBrowserViewModelTests
         var factory = Substitute.For<IHttpClientFactory>();
         factory.CreateClient(Arg.Any<string>()).Returns(_ => new HttpClient(handler, disposeHandler: false));
 
-        var cache = new MemoryCache(new MemoryCacheOptions());
         var client = new ZxDbClient(new ZxDbContextFactory(_settings), _settings);
-        var service = new ZxDbService(client, _settings, cache, factory);
+        var service = new ZxDbService(client, _settings, _cache, factory);
         var fileDialogs = new FileDialogs(Substitute.For<IFileDialogProvider>());
         var logger = Substitute.For<ILogger<GameBrowserViewModel>>();
 
@@ -177,5 +177,11 @@ public class GameBrowserViewModelTests
         _viewModel.DatabaseError.ShouldNotBeNull();
         _settings.DatabasePath.ShouldBeNull();
         await _applicationDataService.DidNotReceive().SaveAsync(Arg.Any<object>());
+    }
+
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        _cache.Dispose();
     }
 }
