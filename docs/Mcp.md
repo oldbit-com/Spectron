@@ -99,7 +99,7 @@ Normally the emulator runs in real time, 50 frames per second. AI agents work in
 read the result, think, and call the next tool. To make results predictable, every tool works like this:
 
 1. The emulator is paused for the duration of the call.
-2. Tools that need time to pass (`run_frames`, `type_text`, `press_keys`) run emulation frames themselves,
+2. Tools that need time to pass (`run_frames`, `type_text`, `type_basic`, `press_keys`) run emulation frames themselves,
    as fast as possible. 50 frames equal one second of Spectrum time.
 3. The previous run state is restored afterwards. The exception is `run_frames`, which deliberately
    leaves the emulator paused so the agent can inspect the result. The agent calls `resume` to hand
@@ -127,6 +127,7 @@ Calls from the agent are executed one at a time.
 | `load_file`        | Loads a file like *File → Open*: snapshots, tapes, disks, microdrives, RZX, POK and ZIP archives               |
 | `run_frames`       | Runs `count` frames as fast as possible and leaves the emulator paused (max 15,000 per call)                  |
 | `type_text`        | Types text on the Spectrum keyboard, one key press per character                                              |
+| `type_basic`       | Enters a 48K BASIC program from a plain listing, choosing the keyword keys automatically                      |
 | `press_keys`       | Presses named key combinations in turn, e.g. `["J", "SYM+P", "SYM+P", "ENTER"]`                               |
 | `read_screen_text` | Reads the 32×24 character screen as text                                                                      |
 | `screenshot`       | Captures the screen as a PNG image, scale 1–4, with or without the border                                     |
@@ -176,6 +177,30 @@ The agent enters those with `press_keys` and uses `type_text` for the rest of th
 For example, `10 CIRCLE 128,88,50` is entered as `type_text "10"`, `press_keys ["EXTEND", "SYM+H"]` and
 `type_text "128,88,50\n"`. The full key map is included in the `press_keys` tool description, so agents can see it.
 
+`type_basic` does all of this automatically, so it is the easiest way to enter a 48K program.
+It takes a plain listing with keywords written in full, as `LIST` shows them:
+
+```
+10 BORDER 1: CIRCLE 128,88,50
+20 FOR i=1 TO 10 STEP 2: PRINT AT i,0;"X": NEXT i
+30 IF a<=b THEN GO TO 10
+```
+
+It types each line through the ROM editor like a user would. Before every key press it waits until the
+editor is ready and reads the cursor mode (`K`, `L` or `E`) from the system variables, so keywords are always
+entered with the right keys and the ROM still checks the syntax. After each line it checks that the ROM
+accepted it. If the ROM rejects a line, `type_basic` stops and reports the line as the ROM shows it, with the
+`?` error marker. The edit line is left empty.
+
+- Separate keywords from names and numbers with spaces (`FOR i=1 TO 10`, not `1TO10`). `GOTO` and `GOSUB`
+  are accepted too. Keywords are recognised in any case, so variables can't have keyword names such as `to`,
+  `at` or `pi`.
+- Text in strings and after `REM` is typed literally. Other spaces are ignored, because the ROM adds its own.
+- Every line needs a line number from 1 to 9999. The program is not run: use `type_text "r\n"` afterwards.
+- It needs the 48K BASIC editor: a 16K, 48K or TC2048, or a 128K in 48 BASIC mode. In 128 BASIC, use
+  `type_text`, which accepts keywords spelled out.
+- Block graphics, UDGs and colour control codes inside strings are not supported.
+
 By default each key is held for 3 frames and released for 6. The ROM ignores a key pressed again
 less than about 5 frames after it was released, so very small `releaseFrames` values can drop repeated keys.
 
@@ -198,7 +223,7 @@ Once the agent is connected, ask for things in plain language, for example:
 
 - **Give the agent context.** If you use an agent regularly with Spectron, add a few notes to its instructions file
   (for example `CLAUDE.md` for Claude Code, or `AGENTS.md`): which machine you work with, where your files are,
-  which assembler to use, and the 48K keyword entry note above.
+  which assembler to use, and to use `type_basic` for 48K BASIC programs.
 - **Let the agent build and test in a loop.** Agents work best when they can check their own results.
   A typical loop is: write the code, then build it with a cross-assembler such as sjasmplus or pasmo,
   `load_file` or `write_memory`, `run_frames`, then `read_screen_text`, `read_memory` or `screenshot`.

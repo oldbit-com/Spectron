@@ -207,9 +207,9 @@ It requires a local copy of the ZXDB database in SQLite format. For the convenie
 ## AI Agents (MCP)
 Spectron includes an optional [Model Context Protocol](https://modelcontextprotocol.io) server, so AI agents such as
 Claude Code, GitHub Copilot or Cursor can see and control the running emulator. An agent can type on the keyboard,
-run frames, read the screen as text or take screenshots, inspect and modify memory, disassemble code, load files
-and use the debugger. This makes it possible, for example, to let an agent write a BASIC or machine code program,
-run it and check the result, or help you explore how a game works.
+enter 48K BASIC programs from a plain listing, run frames, read the screen as text or take screenshots, inspect and
+modify memory, disassemble code, load files and use the debugger. This makes it possible, for example, to let an agent
+write a BASIC or machine code program, run it and check the result, or help you explore how a game works.
 
 The server is disabled by default. Enable it in **Preferences → General → AI Agents**, or start Spectron with
 `--mcp-server`. It listens on `http://localhost:5480/mcp` (local connections only). For example, to connect Claude Code:

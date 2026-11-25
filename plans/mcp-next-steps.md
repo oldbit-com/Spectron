@@ -73,7 +73,15 @@ at this file and naming the step, for example:
 
 ---
 
-## Step 1: `type_basic` tool (48K keyword-aware entry)
+## Step 1: `type_basic` tool (48K keyword-aware entry) — DONE
+
+> Implemented on branch `feature/type-basic` (2026-11-25): `src/Spectron.Mcp/Basic/`, tests in
+> `tests/Spectron.Mcp.Tests/Basic/`. The `BasicKeywords` token table can be reused by step 2.
+
+> **Detailed plan: `plans/type-basic.md`** (verified against the ROM and a probe on 2026-11-25). It supersedes
+> points 2 and 4 below and the "Reuse" note. Wait for the editor to be idle before each key press, decide
+> success from memory instead of the screen, derive the keyword table from the ROM, and handle the REM `:`
+> and caps lock quirks.
 
 **Problem.** Entering a 48K program with `type_text` and `press_keys` works but is fiddly. The agent has to
 plan every keyword key and cursor mode itself, and a short program takes dozens of tool calls.
