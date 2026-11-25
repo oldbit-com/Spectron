@@ -11,11 +11,13 @@ using Avalonia.Platform.Storage;
 using AvaloniaEdit.Utils;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using OldBit.Spectron.Database;
 using OldBit.Spectron.Database.Results;
 using OldBit.Spectron.Dialogs;
+using OldBit.Spectron.Messages;
 using OldBit.Spectron.Services;
 using OldBit.Spectron.Settings;
 
@@ -28,7 +30,10 @@ public partial class GameBrowserViewModel : ObservableObject
     private readonly IApplicationDataService _applicationDataService;
     private readonly ILogger<GameBrowserViewModel> _logger;
     private readonly FileDialogs _fileDialogs;
+    private readonly IMessageDialogs _messageDialogs;
     private readonly byte[] _emptyScreenshot;
+
+    private static readonly TimeSpan DownloadTimeout = TimeSpan.FromSeconds(30);
 
     private bool _isInitialized;
 
@@ -57,13 +62,15 @@ public partial class GameBrowserViewModel : ObservableObject
         ZxDbSettings zxDbSettings,
         IApplicationDataService applicationDataService,
         ILogger<GameBrowserViewModel> logger,
-        FileDialogs fileDialogs)
+        FileDialogs fileDialogs,
+        IMessageDialogs messageDialogs)
     {
         _zxDbService = zxDbService;
         _zxDbSettings = zxDbSettings;
         _applicationDataService = applicationDataService;
         _logger = logger;
         _fileDialogs = fileDialogs;
+        _messageDialogs = messageDialogs;
 
         var assembly = Assembly.GetExecutingAssembly();
         using var stream = assembly.GetManifestResourceStream("OldBit.Spectron.Resources.Spectrum.scr")!;
@@ -136,14 +143,50 @@ public partial class GameBrowserViewModel : ObservableObject
             return;
         }
 
-        var uri = ZxDbFileUrlResolver.Resolve(SelectedGame.SelectedFile);
+        var url = ZxDbFileUrlResolver.Resolve(SelectedGame.SelectedFile);
 
-        if (uri is null)
+        if (url is null)
         {
             return;
         }
 
-        await topLevel.Launcher.LaunchUriAsync(new Uri(uri));
+        await topLevel.Launcher.LaunchUriAsync(new Uri(url));
+    }
+
+    [RelayCommand]
+    private async Task LoadFileAsync(CancellationToken cancellationToken)
+    {
+        var fileLink = SelectedGame?.SelectedFile;
+
+        if (fileLink is null)
+        {
+            return;
+        }
+
+        string? filePath;
+
+        try
+        {
+            using var tokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            tokenSource.CancelAfter(DownloadTimeout);
+
+            filePath = await _zxDbService.DownloadFileAsync(fileLink, tokenSource.Token);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error downloading file {FileLink}", fileLink);
+            await _messageDialogs.Error($"Unable to download {Path.GetFileName(fileLink)}: {ex.Message}");
+
+            return;
+        }
+
+        if (filePath is null)
+        {
+            await _messageDialogs.Warning($"Unable to resolve download location for {Path.GetFileName(fileLink)}.");
+            return;
+        }
+
+        WeakReferenceMessenger.Default.Send(new LoadFileMessage(filePath));
     }
 
     private async Task SearchAsync(CancellationToken cancellationToken)

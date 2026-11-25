@@ -30,11 +30,12 @@ public class GameBrowserViewModelTests
 
         var cache = new MemoryCache(new MemoryCacheOptions());
         var client = new ZxDbClient(new ZxDbContextFactory(_settings), _settings);
-        var service = new ZxDbService(client, cache, factory);
+        var service = new ZxDbService(client, _settings, cache, factory);
         var fileDialogs = new FileDialogs(Substitute.For<IFileDialogProvider>());
         var logger = Substitute.For<ILogger<GameBrowserViewModel>>();
 
-        _viewModel = new GameBrowserViewModel(service, _settings, _applicationDataService, logger, fileDialogs);
+        _viewModel = new GameBrowserViewModel(service, _settings, _applicationDataService, logger, fileDialogs,
+            Substitute.For<IMessageDialogs>());
     }
 
     [Fact]

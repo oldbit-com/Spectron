@@ -10,8 +10,9 @@ public sealed class ZxDbClient(IDbContextFactory<GamesDbContext> contextFactory,
     private const byte ScreenshotFileTypeId = 1;
     private const byte TapeImageFileTypeId = 8;
     private const byte SnapshotFileTypeId = 10;
-    private const byte DiskImageFileTypeId = 11;
     private const byte BugFixTapeImageFileTypeId = 22;
+    private const byte RzxFileTypeId = 63;
+    private const byte PokFileTypeId = 74;
 
     // Machine types 1-11 cover the ZX Spectrum 16K up to the Timex TC2048, 13 is TC2048/Tx2068.
     // Entries without a machine type (magazines, covertapes, compilations) are Spectrum software too.
@@ -110,8 +111,9 @@ public sealed class ZxDbClient(IDbContextFactory<GamesDbContext> contextFactory,
             .Where(e => e.EntryId == entryId &&
                         (e.FiletypeId == TapeImageFileTypeId ||
                          e.FiletypeId == SnapshotFileTypeId ||
-                         e.FiletypeId == DiskImageFileTypeId ||
-                         e.FiletypeId == BugFixTapeImageFileTypeId))
+                         e.FiletypeId == BugFixTapeImageFileTypeId ||
+                         e.FiletypeId == RzxFileTypeId ||
+                         e.FiletypeId == PokFileTypeId))
             .OrderBy(e => e.ReleaseSeq)
             .ThenBy(e => e.Id)
             .Select(e => new FileResult(e.FileLink))

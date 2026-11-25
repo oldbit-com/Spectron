@@ -59,14 +59,17 @@ public sealed class ZxDbClientTests : IDisposable
         _database.AddDownload(5, EntryId, "/pub/sinclair/games/g/Game.dsk.zip", fileTypeId: 11);
         _database.AddDownload(6, EntryId, "/pub/sinclair/games/g/Game (Bugfix).tap.zip", fileTypeId: 22);
         _database.AddDownload(7, EntryId + 1, "/pub/sinclair/games/o/Other.tzx.zip", fileTypeId: 8);
+        _database.AddDownload(8, EntryId, "/zxdb/sinclair/entries/0000100/Game.rzx.zip", fileTypeId: 63);
+        _database.AddDownload(9, EntryId, "/pub/sinclair/pokes/g/Game.pok", fileTypeId: 74);
 
         var files = await _client.GetGameFileLinksAsync(EntryId, TestContext.Current.CancellationToken);
 
         files.Select(f => f.FileLink).ShouldBe([
             "/pub/sinclair/games/g/Game.z80.zip",
             "/pub/sinclair/games/g/Game.tzx.zip",
-            "/pub/sinclair/games/g/Game.dsk.zip",
             "/pub/sinclair/games/g/Game (Bugfix).tap.zip",
+            "/zxdb/sinclair/entries/0000100/Game.rzx.zip",
+            "/pub/sinclair/pokes/g/Game.pok",
             "/pub/sinclair/games/g/Game (Re-release).tzx.zip"
         ]);
     }

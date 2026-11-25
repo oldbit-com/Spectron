@@ -13,7 +13,10 @@ public sealed class ZxDbServiceTests : IDisposable
     private readonly ZxDbTestDatabase _database = ZxDbTestDatabase.Create();
     private readonly MemoryCache _cache = new(new MemoryCacheOptions());
     private readonly List<Uri> _requests = [];
+    private readonly string _downloadDirectory = Path.Join(Path.GetTempPath(), $"spectron-zxdb-{Guid.NewGuid():N}");
     private readonly ZxDbService _service;
+
+    private HttpStatusCode _statusCode = HttpStatusCode.OK;
 
     public ZxDbServiceTests()
     {
@@ -21,7 +24,7 @@ public sealed class ZxDbServiceTests : IDisposable
         {
             _requests.Add(request.RequestUri!);
 
-            return new HttpResponseMessage(HttpStatusCode.OK)
+            return new HttpResponseMessage(_statusCode)
             {
                 Content = new ByteArrayContent([1, 2, 3])
             };
@@ -30,10 +33,10 @@ public sealed class ZxDbServiceTests : IDisposable
         var factory = Substitute.For<IHttpClientFactory>();
         factory.CreateClient(Arg.Any<string>()).Returns(_ => new HttpClient(handler, disposeHandler: false));
 
-        var settings = new ZxDbSettings { DatabasePath = _database.Path };
+        var settings = new ZxDbSettings { DatabasePath = _database.Path, DownloadDirectory = _downloadDirectory };
         var client = new ZxDbClient(new ZxDbContextFactory(settings), settings);
 
-        _service = new ZxDbService(client, _cache, factory);
+        _service = new ZxDbService(client, settings, _cache, factory);
     }
 
     [Fact]
@@ -80,8 +83,62 @@ public sealed class ZxDbServiceTests : IDisposable
         _requests.ShouldBeEmpty();
     }
 
+    [Fact]
+    public async Task DownloadFile_ShouldSaveFile_MirroringRemotePath()
+    {
+        var filePath = await _service.DownloadFileAsync("/pub/sinclair/games/j/Jet Set Willy.tzx.zip", TestContext.Current.CancellationToken);
+
+        filePath.ShouldBe(Path.Join(_downloadDirectory, "worldofspectrum.net", "pub", "sinclair", "games", "j", "Jet Set Willy.tzx.zip"));
+        (await File.ReadAllBytesAsync(filePath!, TestContext.Current.CancellationToken)).ShouldBe([1, 2, 3]);
+        _requests.ShouldHaveSingleItem().ToString()
+            .ShouldBe("https://worldofspectrum.net/pub/sinclair/games/j/Jet Set Willy.tzx.zip");
+    }
+
+    [Fact]
+    public async Task DownloadFile_ShouldUseLocalCopy_OnSubsequentCalls()
+    {
+        var first = await _service.DownloadFileAsync("/zxdb/sinclair/entries/0002259/Game.tap", TestContext.Current.CancellationToken);
+        var second = await _service.DownloadFileAsync("/zxdb/sinclair/entries/0002259/Game.tap", TestContext.Current.CancellationToken);
+
+        second.ShouldBe(first);
+        _requests.Count.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task DownloadFile_ShouldReturnNull_WhenLinkCannotBeResolved()
+    {
+        var filePath = await _service.DownloadFileAsync("unknown/Game.tap", TestContext.Current.CancellationToken);
+
+        filePath.ShouldBeNull();
+        _requests.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task DownloadFile_ShouldNotLeaveFiles_WhenDownloadFails()
+    {
+        _statusCode = HttpStatusCode.NotFound;
+
+        await Should.ThrowAsync<HttpRequestException>(() =>
+            _service.DownloadFileAsync("/pub/sinclair/games/g/Game.tap", TestContext.Current.CancellationToken));
+
+        Directory.EnumerateFiles(_downloadDirectory, "*", SearchOption.AllDirectories).ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task DownloadFile_ShouldKeepFilesInsideDownloadDirectory()
+    {
+        var filePath = await _service.DownloadFileAsync("/pub/sinclair/games/%2E%2E/%2E%2E/Game.tap", TestContext.Current.CancellationToken);
+
+        Path.GetFullPath(filePath!).ShouldStartWith(Path.GetFullPath(_downloadDirectory) + Path.DirectorySeparatorChar);
+    }
+
     public void Dispose()
     {
+        if (Directory.Exists(_downloadDirectory))
+        {
+            Directory.Delete(_downloadDirectory, recursive: true);
+        }
+
         _cache.Dispose();
         _database.Dispose();
     }

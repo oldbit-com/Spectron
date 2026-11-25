@@ -429,9 +429,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 _favorites = message.Favorites;
                 await _favoritesService.SaveAsync(_favorites);
             }
-            catch
+            catch (Exception ex)
             {
-                // Ignore
+                logger.LogError(ex, "Failed save favorites");
             }
         });
 
@@ -441,9 +441,21 @@ public partial class MainViewModel : ObservableObject, IDisposable
             {
                 await OpenFavorite(message.Favorite);
             }
-            catch
+            catch (Exception ex)
             {
-                // Ignore
+                logger.LogError(ex, "Failed to open favorite");
+            }
+        });
+
+        WeakReferenceMessenger.Default.Register<LoadFileMessage>(this, async void (_, message) =>
+        {
+            try
+            {
+                await HandleLoadFileAsync(message.FilePath);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to load file");
             }
         });
 
