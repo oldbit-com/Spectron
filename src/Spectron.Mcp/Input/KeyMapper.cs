@@ -94,7 +94,7 @@ internal static class KeyMapper
         return keys.Distinct().ToArray();
     }
 
-    private static SpectrumKey[]? FromChar(char c)
+    internal static SpectrumKey[]? FromChar(char c)
     {
         if (char.IsAsciiLetterLower(c) || char.IsAsciiDigit(c))
         {

@@ -12,6 +12,7 @@ using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
 using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Screen;
+using OldBit.Spectron.Mcp.Basic;
 using OldBit.Spectron.Mcp.Input;
 using OldBit.Spectron.Mcp.Screen;
 using OldBit.Z80Cpu;
@@ -103,6 +104,7 @@ public sealed class EmulatorTools(EmulatorController controller)
     [McpServerTool(Name = "type_text")]
     [Description("""
                  Types text on the Spectrum keyboard, one key press per character, by running emulation frames while keys are held.
+                 To enter a 48K BASIC program, prefer type_basic: it takes a plain listing and handles keyword entry itself.
                  Supports letters (uppercase uses CAPS SHIFT), digits, space, newline (ENTER), backspace (DELETE) and symbols from
                  the 48K keyboard: ! @ # $ % & ' ( ) _ < > ; " ^ - + = : £ ? / * , .
                  IMPORTANT: 48K BASIC uses keyword entry. At the K cursor a letter key produces a whole keyword (e.g. 'p' = PRINT,
@@ -171,6 +173,52 @@ public sealed class EmulatorTools(EmulatorController controller)
 
         return controller.ExecuteAsync(emulator =>
             FormatRunResult(emulator, controller.PressKeys(emulator, combinations, holdFrames, releaseFrames)));
+    }
+
+    [McpServerTool(Name = "type_basic")]
+    [Description("""
+                 Enters a 48K BASIC program from a plain listing, e.g. "10 BORDER 1: CIRCLE 128,88,50\n20 GO TO 10".
+                 Types each line through the ROM editor like a user would, choosing the keyword keys (K cursor, Symbol Shift,
+                 EXTEND) automatically, so the ROM still checks the syntax. Stops at the first line the ROM rejects and reports it.
+                 - Write keywords in full as LIST shows them, separated from names and numbers by spaces (FOR i=1 TO 10, not 1TO10).
+                   GOTO and GOSUB are accepted too. Keywords are matched in any case, so variables cannot be named like keywords (to, at, pi).
+                 - Text in strings and after REM is typed literally. Spaces elsewhere are ignored, as the ROM adds its own.
+                 - Each line needs a number from 1 to 9999. A number alone deletes that line. The program is not run:
+                   use type_text "r\n" (RUN) afterwards.
+                 - Needs the 48K BASIC editor: 16K/48K/TC2048, or 128K in 48 BASIC mode. In 128 BASIC use type_text,
+                   which accepts keywords spelled out. Block graphics, UDGs and colour control codes in strings are not supported.
+                 Emulation stays paused afterwards if it was paused before.
+                 """)]
+    public Task<string> TypeBasic(
+        [Description("The program listing, one BASIC line per text line.")] string program)
+    {
+        List<BasicLine> lines;
+
+        try
+        {
+            lines = BasicLineParser.Parse(program);
+        }
+        catch (ArgumentException ex)
+        {
+            throw new McpException(ex.Message);
+        }
+
+        if (lines.Count == 0)
+        {
+            throw new McpException("The program has no lines.");
+        }
+
+        if (BasicEditor.EstimateFrames(lines) > EmulatorController.MaxFramesPerCall)
+        {
+            throw new McpException("The program is too long for one call. Split it into several type_basic calls.");
+        }
+
+        return controller.ExecuteAsync(emulator =>
+        {
+            using var editor = new BasicEditor(controller, emulator);
+
+            return FormatBasicEntryResult(editor.EnterLines(lines));
+        });
     }
 
     [McpServerTool(Name = "read_screen_text", ReadOnly = true)]
@@ -357,6 +405,30 @@ public sealed class EmulatorTools(EmulatorController controller)
             StopReason.ResumedByUser => text + " Stopped because the user resumed emulation.",
             StopReason.EmulatorReplaced => text + " Stopped because the machine was replaced (file loaded or machine reset).",
             _ => text
+        };
+    }
+
+    private static string FormatBasicEntryResult(BasicEntryResult result)
+    {
+        var entered = result.EnteredLines.Count == 0
+            ? "No lines were entered."
+            : $"Entered {result.EnteredLines.Count} line(s): {string.Join(", ", result.EnteredLines)}.";
+
+        var cleared = result.ClearedCharacters > 0
+            ? $" Cleared {result.ClearedCharacters} character(s) that were already in the edit line."
+            : string.Empty;
+
+        if (result.Error != null)
+        {
+            throw new McpException($"{result.Error} {entered}{cleared}");
+        }
+
+        return result.StopReason switch
+        {
+            StopReason.Breakpoint => $"Stopped at a debugger breakpoint, the debugger window is open. {entered}{cleared}",
+            StopReason.ResumedByUser => $"Stopped because the user resumed emulation. {entered}{cleared}",
+            StopReason.EmulatorReplaced => $"Stopped because the machine was replaced (file loaded or machine reset). {entered}{cleared}",
+            _ => entered + cleared
         };
     }
 
