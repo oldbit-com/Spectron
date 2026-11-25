@@ -54,20 +54,12 @@ internal static class BasicLineParser
     /// Parses a listing, one BASIC line per text line. Blank lines are skipped.
     /// </summary>
     /// <exception cref="ArgumentException">The listing contains a line that cannot be typed.</exception>
-    internal static List<BasicLine> Parse(string program)
-    {
-        var lines = new List<BasicLine>();
-
-        foreach (var text in program.Replace("\r\n", "\n").Split('\n'))
-        {
-            if (!string.IsNullOrWhiteSpace(text))
-            {
-                lines.Add(ParseLine(text));
-            }
-        }
-
-        return lines;
-    }
+    internal static List<BasicLine> Parse(string program) => program
+        .Replace("\r\n", "\n")
+        .Split('\n')
+        .Where(text => !string.IsNullOrWhiteSpace(text))
+        .Select(ParseLine)
+        .ToList();
 
     internal static BasicLine ParseLine(string text)
     {
