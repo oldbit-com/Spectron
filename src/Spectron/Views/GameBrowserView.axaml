@@ -175,15 +175,19 @@
                                         SelectedValueBinding="{Binding Value}"
                                         SelectedValue="{Binding SelectedFile}"
                                         HorizontalAlignment="Stretch"/>
-                                    <Grid ColumnDefinitions="*,*" Margin="0 5 0 0">
+                                    <Grid
+                                        ColumnDefinitions="*,*"
+                                        Margin="0 5 0 0"
+                                        DataContext="{Binding $parent[Window].DataContext}"
+                                        x:DataType="viewModels:GameBrowserViewModel">
                                         <Button
                                             Grid.Column="0"
                                             Content="Load"
-                                            Command="{Binding $parent[Window].((viewModels:GameBrowserViewModel)DataContext).LoadFileCommand, FallbackValue={x:Null}}"/>
+                                            Command="{Binding LoadFileCommand}"/>
                                         <Button
                                             Grid.Column="1"
                                             Content="Download"
-                                            Command="{Binding $parent[Window].((viewModels:GameBrowserViewModel)DataContext).DownloadFileCommand, FallbackValue={x:Null}}"
+                                            Command="{Binding DownloadFileCommand}"
                                             CommandParameter="{Binding $parent[Window]}"
                                             HorizontalAlignment="Right"/>
                                     </Grid>
