@@ -318,6 +318,9 @@ public partial class GameBrowserViewModel : ObservableObject
     {
         List<FileResult> files;
 
+        game.SelectedFile = null;
+        game.Files.Clear();
+
         try
         {
             files = await _zxDbService.GetGameFileLinksAsync(game.EntryId, cancellationToken);
@@ -328,9 +331,6 @@ public partial class GameBrowserViewModel : ObservableObject
             return;
         }
 
-        game.SelectedFile = null;
-
-        game.Files.Clear();
         game.Files.AddRange(files.Select(f => new NameValuePair<string>(Path.GetFileName(f.FileLink), f.FileLink)));
 
         if (game.Files.Count > 0)
