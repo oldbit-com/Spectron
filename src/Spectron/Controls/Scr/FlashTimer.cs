@@ -9,6 +9,8 @@ internal static class FlashTimer
 
     internal static bool IsInverted { get; private set; }
 
+    internal static bool IsRunning => Timer.IsEnabled;
+
     static FlashTimer() => Timer.Tick += (_, _) =>
     {
         IsInverted = !IsInverted;

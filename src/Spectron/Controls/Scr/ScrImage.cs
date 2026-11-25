@@ -16,6 +16,9 @@ public sealed class ScrImage : Control
     private WriteableBitmap? _normal;
     private WriteableBitmap? _inverted;
 
+    private bool _isAttached;
+    private bool _isSubscribed;
+
     public byte[]? Data
     {
         get => GetValue(DataProperty);
@@ -31,11 +34,30 @@ public sealed class ScrImage : Control
     {
         base.OnPropertyChanged(change);
 
-        if (change.Property == DataProperty)
+        if (change.Property == DataProperty && _isAttached)
         {
             Rebuild();
             InvalidateVisual();
         }
+    }
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+
+        _isAttached = true;
+
+        Rebuild();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+
+        _isAttached = false;
+
+        ReleaseBitmaps();
+        UpdateSubscription();
     }
 
     public override void Render(DrawingContext context)
@@ -52,10 +74,7 @@ public sealed class ScrImage : Control
 
     private void Rebuild()
     {
-        _normal?.Dispose();
-        _inverted?.Dispose();
-
-        _normal = _inverted = null;
+        ReleaseBitmaps();
 
         if (Data is { Length: >= 6912 } data)
         {
@@ -70,15 +89,33 @@ public sealed class ScrImage : Control
         UpdateSubscription();
     }
 
+    private void ReleaseBitmaps()
+    {
+        _normal?.Dispose();
+        _inverted?.Dispose();
+
+        _normal = _inverted = null;
+    }
+
     private void UpdateSubscription()
     {
-        if (_inverted is null)
+        var shouldSubscribe = _isAttached && _inverted is not null;
+
+        if (shouldSubscribe == _isSubscribed)
         {
             return;
         }
 
-        FlashTimer.Tick -= InvalidateVisual;
-        FlashTimer.Tick += InvalidateVisual;
+        if (shouldSubscribe)
+        {
+            FlashTimer.Tick += InvalidateVisual;
+        }
+        else
+        {
+            FlashTimer.Tick -= InvalidateVisual;
+        }
+
+        _isSubscribed = shouldSubscribe;
     }
 
     private static bool HasFlash(ReadOnlySpan<byte> scr)
