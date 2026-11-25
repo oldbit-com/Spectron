@@ -109,6 +109,50 @@ public class GameBrowserViewModelTests
         _viewModel.Games.Select(g => g.Name).ShouldBe(["Batman"]);
     }
 
+    [Theory]
+    [InlineData(0, "No games found")]
+    [InlineData(1, "1 game found")]
+    [InlineData(3, "3 games found")]
+    public async Task Search_ShouldSummarizeResultCount(int count, string expectedSummary)
+    {
+        using var database = ZxDbTestDatabase.Create();
+
+        for (var i = 1; i <= count; i++)
+        {
+            database.AddEntry(i, $"Game {i}", 1984);
+        }
+
+        _applicationDataService.LoadAsync<GameBrowserSettings>().Returns(new GameBrowserSettings { ZxDbPath = database.Path });
+        await _viewModel.InitializeAsync();
+
+        _viewModel.SearchText = "game";
+        await _viewModel.SearchCommand.ExecuteAsync(null);
+
+        _viewModel.Games.Count.ShouldBe(count);
+        _viewModel.SearchSummary.ShouldBe(expectedSummary);
+    }
+
+    [Fact]
+    public async Task Search_ShouldReportTruncation_WhenMoreMatchesThanLimit()
+    {
+        using var database = ZxDbTestDatabase.Create();
+
+        for (var i = 1; i <= ZxDbService.DefaultSearchLimit + 1; i++)
+        {
+            database.AddEntry(i, $"Game {i}", 1984);
+        }
+
+        _applicationDataService.LoadAsync<GameBrowserSettings>().Returns(new GameBrowserSettings { ZxDbPath = database.Path });
+        await _viewModel.InitializeAsync();
+
+        _viewModel.SearchText = "game";
+        await _viewModel.SearchCommand.ExecuteAsync(null);
+
+        _viewModel.Games.Count.ShouldBe(ZxDbService.DefaultSearchLimit);
+        _viewModel.SearchSummary.ShouldBe(
+            $"Showing first {ZxDbService.DefaultSearchLimit} matches, refine your search to see more");
+    }
+
     [Fact]
     public async Task SetDatabasePath_ShouldSaveAndApplyPath_WhenValid()
     {

@@ -18,11 +18,26 @@ public sealed class ZxDbService(
     public static Task<bool> IsValidDatabaseAsync(string databasePath, CancellationToken cancellationToken = default)
         => ZxDbClient.IsValidDatabaseAsync(databasePath, cancellationToken);
 
-    public Task<List<GameSearchResult>> SearchAsync(
+    public const int DefaultSearchLimit = 500;
+
+    public async Task<GameSearchResults> SearchAsync(
         string text,
         GameSearchField field,
-        int limit = 500,
-        CancellationToken cancellationToken = default) => zxDbClient.SearchAsync(text, field, limit, cancellationToken);
+        int limit = DefaultSearchLimit,
+        CancellationToken cancellationToken = default)
+    {
+        // One extra row reveals whether the list was cut off, without a separate count query.
+        var games = await zxDbClient.SearchAsync(text, field, limit + 1, cancellationToken);
+
+        var isTruncated = games.Count > limit;
+
+        if (isTruncated)
+        {
+            games.RemoveRange(limit, games.Count - limit);
+        }
+
+        return new GameSearchResults(games, isTruncated);
+    }
 
     public async Task<byte[]?> GetScreenshotAsync(int entryId, CancellationToken cancellationToken = default) =>
         await memoryCache.GetOrCreateAsync(new ScreenshotCacheKey(entryId), async entry =>

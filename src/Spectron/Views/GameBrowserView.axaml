@@ -34,6 +34,11 @@
                 Content="Locate ZXDB Database..."
                 HorizontalAlignment="Center"
                 Command="{Binding LocateDatabaseCommand}" />
+            <HyperlinkButton
+                HorizontalAlignment="Center"
+                VerticalContentAlignment="Center"
+                Content="Or download it here"
+                NavigateUri="https://spectron.oldbit.com/samples"/>
             <TextBlock
                 Text="{Binding DatabaseError}"
                 Foreground="{StaticResource SpectrumBrightRed}"
@@ -41,7 +46,7 @@
                 IsVisible="{Binding DatabaseError, Converter={x:Static ObjectConverters.IsNotNull}}" />
         </StackPanel>
 
-        <Grid RowDefinitions="30,Auto,5,*" IsVisible="{Binding IsDatabaseAvailable}">
+        <Grid RowDefinitions="30,Auto,5,*,Auto" IsVisible="{Binding IsDatabaseAvailable}">
             <Grid Grid.Row="0" ColumnDefinitions="Auto,5,*,5,Auto">
                 <ComboBox
                     Grid.Column="0"
@@ -188,6 +193,14 @@
                     </StackPanel>
                 </Grid>
             </Grid>
+
+            <TextBlock
+                Grid.Row="4"
+                Margin="0,5,0,0"
+                FontSize="12"
+                Opacity="0.7"
+                Text="{Binding SearchSummary}"
+                IsVisible="{Binding SearchSummary, Converter={x:Static ObjectConverters.IsNotNull}}" />
         </Grid>
     </Grid>
 </Window>

@@ -75,6 +75,9 @@ public partial class GameBrowserViewModel : ObservableObject
     [ObservableProperty]
     public partial string? DatabaseError { get; private set; }
 
+    [ObservableProperty]
+    public partial string? SearchSummary { get; private set; }
+
     public GameBrowserViewModel(
         ZxDbService zxDbService,
         ZxDbSettings zxDbSettings,
@@ -249,7 +252,7 @@ public partial class GameBrowserViewModel : ObservableObject
 
             Games.Clear();
 
-            foreach (var result in results)
+            foreach (var result in results.Games)
             {
                 Games.Add(new GameViewModel
                 {
@@ -262,6 +265,8 @@ public partial class GameBrowserViewModel : ObservableObject
                     Machine = result.Machine ?? string.Empty
                 });
             }
+
+            SearchSummary = GetSearchSummary(results);
         }
         catch (Exception ex) when (ex is SqliteException or ZxDbNotConfiguredException)
         {
@@ -269,6 +274,14 @@ public partial class GameBrowserViewModel : ObservableObject
             RefreshAvailability();
         }
     }
+
+    private static string GetSearchSummary(GameSearchResults results) => results switch
+    {
+        { IsTruncated: true } => $"Showing first {results.Games.Count} matches, refine your search to see more",
+        { Games.Count: 0 } => "No games found",
+        { Games.Count: 1 } => "1 game found",
+        _ => $"{results.Games.Count} games found"
+    };
 
     private void RefreshAvailability() => IsDatabaseAvailable = _zxDbService.IsAvailable;
 

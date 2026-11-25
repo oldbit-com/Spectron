@@ -40,6 +40,31 @@ public sealed class ZxDbServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task Search_ShouldNotBeTruncated_WhenMatchesFitLimit()
+    {
+        _database.AddEntry(1, "Game A", 1984);
+        _database.AddEntry(2, "Game B", 1985);
+
+        var results = await _service.SearchAsync("game", GameSearchField.Title, 2, TestContext.Current.CancellationToken);
+
+        results.Games.Select(g => g.Title).ShouldBe(["Game A", "Game B"]);
+        results.IsTruncated.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task Search_ShouldBeTruncated_WhenMoreMatchesThanLimit()
+    {
+        _database.AddEntry(1, "Game A", 1984);
+        _database.AddEntry(2, "Game B", 1985);
+        _database.AddEntry(3, "Game C", 1986);
+
+        var results = await _service.SearchAsync("game", GameSearchField.Title, 2, TestContext.Current.CancellationToken);
+
+        results.Games.Select(g => g.Title).ShouldBe(["Game A", "Game B"]);
+        results.IsTruncated.ShouldBeTrue();
+    }
+
+    [Fact]
     public async Task GetScreenshot_ShouldDownloadResolvedUrl()
     {
         _database.AddDownload(1, EntryId, "/pub/sinclair/screens/load/g/scr/Game.scr", fileTypeId: 1);
