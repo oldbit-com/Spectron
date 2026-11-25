@@ -48,45 +48,74 @@ public sealed class ZxDbClient(IDbContextFactory<GamesDbContext> contextFactory,
         }
     }
 
-    internal async Task<List<GameSearchResult>> SearchByTitleAsync(
-        string title,
-        int limit = 25,
+    internal async Task<List<GameSearchResult>> SearchAsync(
+        string text,
+        GameSearchField field,
+        int limit,
         CancellationToken cancellationToken = default)
     {
-        var searchTitle = NormalizeSearchTitle(title);
+        var searchText = NormalizeSearchText(text);
 
-        if (searchTitle.Length == 0)
+        if (searchText.Length == 0)
         {
             return [];
         }
 
         await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
 
-        var pattern = $"%{searchTitle}%";
-        var titles = db.SearchByTitles;
+        var pattern = $"%{searchText}%";
 
-        return await db.Entries
-            .Where(e => titles.Any(s => s.EntryId == e.Id && EF.Functions.Like(s.EntryTitle, pattern)))
+        var entries = field switch
+        {
+            GameSearchField.Title => db.Entries.Where(e =>
+                db.SearchByTitles.Any(s => s.EntryId == e.Id && EF.Functions.Like(s.EntryTitle, pattern))),
+
+            GameSearchField.Publisher => db.Entries.Where(e =>
+                db.SearchByPublishers
+                    .Where(p => db.SearchByNames.Any(n => n.LabelId == p.LabelId && EF.Functions.Like(n.LabelName, pattern)))
+                    .Select(p => p.EntryId)
+                    .Contains(e.Id)),
+
+            GameSearchField.Author => db.Entries.Where(e =>
+                db.SearchByAuthors
+                    .Where(a => db.SearchByNames.Any(n => n.LabelId == a.LabelId && EF.Functions.Like(n.LabelName, pattern)))
+                    .Select(a => a.EntryId)
+                    .Contains(e.Id)),
+
+            _ => throw new ArgumentOutOfRangeException(nameof(field), field, null)
+        };
+
+        var rows = entries
             .Where(e => e.MachinetypeId == null ||
                         e.MachinetypeId <= LastSpectrumMachineTypeId ||
                         e.MachinetypeId == TimexTc2048Tx2068MachineTypeId)
-            .OrderBy(e => e.Title)
-            .Select(e => new GameSearchResult(
+            .Select(e => new
+            {
                 e.Id,
                 e.Title,
-                e.Machinetype!.Text,
-                e.Genretype!.Text,
-                e.Releases
+                Machine = e.Machinetype!.Text,
+                Genre = e.Genretype!.Text,
+                Year = e.Releases
                     .Where(r => r.ReleaseSeq == 0)
                     .Select(r => r.ReleaseYear)
                     .FirstOrDefault(),
-                e.Availabletype!.Text,
-                e.Publishers
+                Availability = e.Availabletype!.Text,
+                Publisher = e.Publishers
                     .Where(p => p.ReleaseSeq == 0 && p.PublisherSeq == 1)
                     .Select(p => p.Label.Name)
-                    .FirstOrDefault()))
-            .Take(limit)
-            .ToListAsync(cancellationToken);
+                    .FirstOrDefault()
+            });
+
+        // A publisher or author catalogue reads best chronologically, unknown years last.
+        rows = field == GameSearchField.Title
+            ? rows.OrderBy(r => r.Title)
+            : rows.OrderBy(r => r.Year == null).ThenBy(r => r.Year).ThenBy(r => r.Title);
+
+        var results = await rows.Take(limit).ToListAsync(cancellationToken);
+
+        return results
+            .Select(r => new GameSearchResult(r.Id, r.Title, r.Machine, r.Genre, r.Year, r.Availability, r.Publisher))
+            .ToList();
     }
 
     internal async Task<string?> GetScreenshotFileAsync(int entryId, CancellationToken cancellationToken = default)
@@ -120,8 +149,8 @@ public sealed class ZxDbClient(IDbContextFactory<GamesDbContext> contextFactory,
             .ToListAsync(cancellationToken);
     }
 
-    // search_by_titles stores titles lower-cased with everything except letters and digits removed,
+    // search_by_titles and search_by_names store text lower-cased with everything except letters and digits removed,
     // e.g. "Jet Set Willy 64: Manic Miner" -> "jetsetwilly64manicminer".
-    private static string NormalizeSearchTitle(string title) =>
-        string.Concat(title.Where(char.IsLetterOrDigit)).ToLowerInvariant();
+    private static string NormalizeSearchText(string text) =>
+        string.Concat(text.Where(char.IsLetterOrDigit)).ToLowerInvariant();
 }

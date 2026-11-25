@@ -18,10 +18,11 @@ public sealed class ZxDbService(
     public static Task<bool> IsValidDatabaseAsync(string databasePath, CancellationToken cancellationToken = default)
         => ZxDbClient.IsValidDatabaseAsync(databasePath, cancellationToken);
 
-    public Task<List<GameSearchResult>> SearchByTitleAsync(
-        string title,
-        int limit = 25,
-        CancellationToken cancellationToken = default) => zxDbClient.SearchByTitleAsync(title, limit, cancellationToken);
+    public Task<List<GameSearchResult>> SearchAsync(
+        string text,
+        GameSearchField field,
+        int limit = 500,
+        CancellationToken cancellationToken = default) => zxDbClient.SearchAsync(text, field, limit, cancellationToken);
 
     public async Task<byte[]?> GetScreenshotAsync(int entryId, CancellationToken cancellationToken = default) =>
         await memoryCache.GetOrCreateAsync(new ScreenshotCacheKey(entryId), async entry =>

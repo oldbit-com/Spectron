@@ -42,12 +42,23 @@
         </StackPanel>
 
         <Grid RowDefinitions="30,Auto,5,*" IsVisible="{Binding IsDatabaseAvailable}">
-            <Grid Grid.Row="0" ColumnDefinitions="*,5,Auto">
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,5,*,5,Auto">
+                <ComboBox
+                    Grid.Column="0"
+                    Width="110"
+                    Height="30"
+                    VerticalAlignment="Stretch"
+                    ToolTip.Tip="Search by"
+                    ItemsSource="{Binding SearchFields}"
+                    DisplayMemberBinding="{Binding Name}"
+                    SelectedValueBinding="{Binding Value}"
+                    SelectedValue="{Binding SearchField}" />
+
                 <TextBox
                     Name="SearchText"
-                    Grid.Column="0"
+                    Grid.Column="2"
                     Text="{Binding SearchText}"
-                    PlaceholderText="Search games, publishers or authors"
+                    PlaceholderText="{Binding SearchPlaceholder}"
                     VerticalContentAlignment="Center">
                     <TextBox.KeyBindings>
                         <KeyBinding Gesture="Enter" Command="{Binding SearchCommand}" />
@@ -55,7 +66,7 @@
                 </TextBox>
 
                 <Button
-                    Grid.Column="2"
+                    Grid.Column="4"
                     Height="30"
                     ToolTip.Tip="Change ZXDB database location"
                     Command="{Binding LocateDatabaseCommand}">

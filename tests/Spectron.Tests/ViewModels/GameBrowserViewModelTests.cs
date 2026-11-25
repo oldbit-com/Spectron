@@ -62,6 +62,54 @@ public class GameBrowserViewModelTests
     }
 
     [Fact]
+    public async Task Initialize_ShouldApplySavedSearchField()
+    {
+        _applicationDataService.LoadAsync<GameBrowserSettings>()
+            .Returns(new GameBrowserSettings { SearchField = GameSearchField.Author });
+
+        await _viewModel.InitializeAsync();
+
+        _viewModel.SearchField.ShouldBe(GameSearchField.Author);
+        _viewModel.SearchPlaceholder.ShouldBe("Search games by author");
+        await _applicationDataService.DidNotReceive().SaveAsync(Arg.Any<object>());
+    }
+
+    [Fact]
+    public async Task SearchField_ShouldSaveSettings_WhenChanged()
+    {
+        using var database = ZxDbTestDatabase.Create();
+        _applicationDataService.LoadAsync<GameBrowserSettings>().Returns(new GameBrowserSettings { ZxDbPath = database.Path });
+        await _viewModel.InitializeAsync();
+
+        _viewModel.SearchField = GameSearchField.Publisher;
+
+        await _applicationDataService.Received(1).SaveAsync(Arg.Is<GameBrowserSettings>(s =>
+            s.ZxDbPath == database.Path && s.SearchField == GameSearchField.Publisher));
+    }
+
+    [Fact]
+    public async Task SearchField_ShouldRerunSearch_WhenChanged()
+    {
+        using var database = ZxDbTestDatabase.Create();
+        database.AddEntry(1, "Batman", 1986);
+        database.AddEntry(2, "Ocean Conqueror", 1987);
+        database.AddLabel(10, "Ocean Software Ltd");
+        database.AddPublisher(1, 10);
+
+        _applicationDataService.LoadAsync<GameBrowserSettings>().Returns(new GameBrowserSettings { ZxDbPath = database.Path });
+        await _viewModel.InitializeAsync();
+
+        _viewModel.SearchText = "ocean";
+        await _viewModel.SearchCommand.ExecuteAsync(null);
+        _viewModel.Games.Select(g => g.Name).ShouldBe(["Ocean Conqueror"]);
+
+        _viewModel.SearchField = GameSearchField.Publisher;
+        await _viewModel.SearchCommand.ExecutionTask!;
+
+        _viewModel.Games.Select(g => g.Name).ShouldBe(["Batman"]);
+    }
+
+    [Fact]
     public async Task SetDatabasePath_ShouldSaveAndApplyPath_WhenValid()
     {
         using var database = ZxDbTestDatabase.Create();

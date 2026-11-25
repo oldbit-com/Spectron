@@ -45,11 +45,29 @@ public partial class GameBrowserViewModel : ObservableObject
 
     public IAsyncRelayCommand<TopLevel?> DownloadFileCommand { get; }
 
+    public IReadOnlyList<NameValuePair<GameSearchField>> SearchFields { get; } =
+    [
+        new("Title", GameSearchField.Title),
+        new("Publisher", GameSearchField.Publisher),
+        new("Author", GameSearchField.Author)
+    ];
+
     [ObservableProperty]
     public partial GameViewModel? SelectedGame { get; set; }
 
     [ObservableProperty]
     public partial string SearchText { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SearchPlaceholder))]
+    public partial GameSearchField SearchField { get; set; } = GameSearchField.Title;
+
+    public string SearchPlaceholder => SearchField switch
+    {
+        GameSearchField.Publisher => "Search games by publisher",
+        GameSearchField.Author => "Search games by author",
+        _ => "Search games by title"
+    };
 
     [ObservableProperty]
     public partial bool IsDatabaseAvailable { get; private set; }
@@ -93,12 +111,28 @@ public partial class GameBrowserViewModel : ObservableObject
         var settings = await _applicationDataService.LoadAsync<GameBrowserSettings>();
 
         _zxDbSettings.DatabasePath = settings.ZxDbPath;
+        SearchField = settings.SearchField;
         _isInitialized = true;
 
         RefreshAvailability();
     }
 
     partial void OnSelectedGameChanged(GameViewModel? value) => _ = LoadEntryDataAsync(value);
+
+    partial void OnSearchFieldChanged(GameSearchField value)
+    {
+        if (!_isInitialized)
+        {
+            return;
+        }
+
+        _ = SaveSettingsAsync();
+
+        if (!string.IsNullOrWhiteSpace(SearchText))
+        {
+            _ = SearchCommand.ExecuteAsync(null);
+        }
+    }
 
     internal async Task SetDatabasePathAsync(string databasePath)
     {
@@ -109,12 +143,18 @@ public partial class GameBrowserViewModel : ObservableObject
         }
 
         _zxDbSettings.DatabasePath = databasePath;
-        await _applicationDataService.SaveAsync(new GameBrowserSettings { ZxDbPath = databasePath });
+        await SaveSettingsAsync();
 
         Games.Clear();
         DatabaseError = null;
         RefreshAvailability();
     }
+
+    private Task SaveSettingsAsync() => _applicationDataService.SaveAsync(new GameBrowserSettings
+    {
+        ZxDbPath = _zxDbSettings.DatabasePath,
+        SearchField = SearchField
+    });
 
     private async Task LocateDatabaseAsync()
     {
@@ -205,7 +245,7 @@ public partial class GameBrowserViewModel : ObservableObject
 
         try
         {
-            var results = await _zxDbService.SearchByTitleAsync(SearchText, cancellationToken: cancellationToken);
+            var results = await _zxDbService.SearchAsync(SearchText, SearchField, cancellationToken: cancellationToken);
 
             Games.Clear();
 
