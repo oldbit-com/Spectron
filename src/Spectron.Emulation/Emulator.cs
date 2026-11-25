@@ -36,6 +36,7 @@ public sealed class Emulator
     private readonly FloatingBus _floatingBus;
     private readonly ScreenMemoryHandler _screenMemoryHandler;
     private readonly Lock _frameLock = new();
+    private readonly bool[] _isRomTrapSupported = new bool[2];
 
     private bool _isDebuggerResume;
     private bool _invalidateScreen;
@@ -257,8 +258,8 @@ public sealed class Emulator
         UlaPlus.PaletteChanged += (_, _) => InvalidateUlaPlus();
         Beta128.DiskActivity += _ => DiskDriveManager.OnDiskActivity();
 
-        // ROM traps are for the original ROM only. Otherwise, unexpected behavior may occur.
-        if (RomType == RomType.Original)
+        // ROM traps rely on the original tape routines, so they are only enabled for ROMs that contain them
+        if (DetectRomTrapSupport())
         {
             Cpu.BeforeInstruction += BeforeInstruction;
         }
@@ -386,10 +387,23 @@ public sealed class Emulator
         ScreenBuffer.RefreshBorder(Clock.UlaTicks);
     }
 
+    private bool DetectRomTrapSupport()
+    {
+        var (romBank0, romBank1) = Memory is Memory128K memory128K
+            ? (memory128K.RomBank0, memory128K.RomBank1)
+            : (Memory.OriginalRom, Memory.OriginalRom);
+
+        _isRomTrapSupported[(int)RomBank.Bank0] = RomTraps.IsSupported(romBank0.Memory);
+        _isRomTrapSupported[(int)RomBank.Bank1] = RomTraps.IsSupported(romBank1.Memory);
+
+        return _isRomTrapSupported.Any(isSupported => isSupported);
+    }
+
     private void BeforeInstruction(Word pc)
     {
-        // ROM traps only apply to the Spectrum ROM, not to a shadow ROM paged in at the same address
-        if (Memory.IsShadowRomActive)
+        // ROM traps only apply to the Spectrum ROM with the original tape routines,
+        // not to a shadow ROM or another ROM bank paged in at the same address
+        if (Memory.IsShadowRomActive || !_isRomTrapSupported[(int)Memory.RomBank])
         {
             return;
         }
