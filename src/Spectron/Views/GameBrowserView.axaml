@@ -221,7 +221,7 @@
                                     CommandParameter="{Binding $parent[Window]}"
                                     HorizontalAlignment="Right"/>
                             </Grid>
-                            </StackPanel>
+                        </StackPanel>
                     </StackPanel>
                 </Grid>
             </Grid>
