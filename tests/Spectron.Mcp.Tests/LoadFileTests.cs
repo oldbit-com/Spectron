@@ -182,9 +182,9 @@ public sealed class LoadFileTests : IDisposable
 
         using var zip = ZipFile.Open(path, ZipArchiveMode.Create);
 
-        foreach (var entry in entries)
+        foreach (var entry in entries.Select(name => zip.CreateEntry(name)))
         {
-            using var stream = zip.CreateEntry(entry).Open();
+            using var stream = entry.Open();
             stream.Write([1, 2, 3]);
         }
 

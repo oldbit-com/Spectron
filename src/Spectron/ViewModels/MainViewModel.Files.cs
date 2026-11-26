@@ -79,71 +79,61 @@ partial class MainViewModel
             throw new NotSupportedException($"Unsupported file type: {Path.GetExtension(filePath)}.");
         }
 
-        ZipArchiveReader? archive = null;
-        Stream? stream = null;
+        using var archive = fileType.IsArchive() ? new ZipArchiveReader(filePath) : null;
 
-        try
+        ArchiveEntry? entry = null;
+
+        if (archive != null)
         {
-            if (fileType.IsArchive())
-            {
-                archive = new ZipArchiveReader(filePath);
-
-                var entry = await selectArchiveEntry(archive.GetSupportedFiles());
-                if (entry == null)
-                {
-                    return null;
-                }
-
-                fileType = entry.FileType;
-                stream = archive.GetFile(entry.Name) ??
-                         throw new FileNotFoundException($"File {entry.Name} not found in the archive.");
-            }
-            else
-            {
-                stream = File.OpenRead(filePath);
-            }
-
-            switch (fileType)
-            {
-                case FileType.Pok:
-                    LoadPokeFile(stream);
-                    return fileType;
-
-                case FileType.Mdr:
-                    LoadMicrodriveFile(filePath, stream);
-                    RecentFilesViewModel.Add(filePath);
-                    return fileType;
-
-                case FileType.Trd:
-                case FileType.Scl:
-                    LoadDiskFile(filePath, stream);
-                    RecentFilesViewModel.Add(filePath);
-                    return fileType;
-
-                default:
-                    if (_preferences.IsAutoLoadPokeFilesEnabled)
-                    {
-                        TryAutoLoadPokeFile(filePath);
-                    }
-
-                    break;
-            }
-
-            if (!CreateEmulator(stream, fileType, favorite))
+            entry = await selectArchiveEntry(archive.GetSupportedFiles());
+            if (entry == null)
             {
                 return null;
             }
 
-            RecentFilesViewModel.Add(filePath);
-            Title = $"{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
+            fileType = entry.FileType;
+        }
 
-            return fileType;
-        }
-        finally
+        // Declared after the archive, so it is disposed first: a zip entry stream needs the archive open.
+        using var stream = archive == null || entry == null
+            ? File.OpenRead(filePath)
+            : archive.GetFile(entry.Name) ?? throw new FileNotFoundException($"File {entry.Name} not found in the archive.");
+
+        switch (fileType)
         {
-            stream?.Dispose();
-            archive?.Dispose();
+            case FileType.Pok:
+                LoadPokeFile(stream);
+                return fileType;
+
+            case FileType.Mdr:
+                LoadMicrodriveFile(filePath, stream);
+                RecentFilesViewModel.Add(filePath);
+                return fileType;
+
+            case FileType.Trd:
+            case FileType.Scl:
+                LoadDiskFile(filePath, stream);
+                RecentFilesViewModel.Add(filePath);
+                return fileType;
+
+            default:
+                if (_preferences.IsAutoLoadPokeFilesEnabled)
+                {
+                    TryAutoLoadPokeFile(filePath);
+                }
+
+                break;
         }
+
+        if (!CreateEmulator(stream, fileType, favorite))
+        {
+            return null;
+        }
+
+        RecentFilesViewModel.Add(filePath);
+        Title = $"{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
+
+        return fileType;
     }
 
     private async Task<ArchiveEntry?> SelectArchiveEntryAsync(List<ArchiveEntry> entries)
