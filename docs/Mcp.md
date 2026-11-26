@@ -128,6 +128,7 @@ Calls from the agent are executed one at a time.
 | `run_frames`       | Runs `count` frames as fast as possible and leaves the emulator paused (max 15,000 per call)                  |
 | `type_text`        | Types text on the Spectrum keyboard, one key press per character                                              |
 | `type_basic`       | Enters a 48K BASIC program from a plain listing, choosing the keyword keys automatically                      |
+| `list_basic`       | Lists the BASIC program in memory as text, like `LIST`, optionally a range of lines                           |
 | `press_keys`       | Presses named key combinations in turn, e.g. `["J", "SYM+P", "SYM+P", "ENTER"]`                               |
 | `read_screen_text` | Reads the 32×24 character screen as text                                                                      |
 | `screenshot`       | Captures the screen as a PNG image, scale 1–4, with or without the border                                     |
@@ -203,6 +204,22 @@ accepted it. If the ROM rejects a line, `type_basic` stops and reports the line 
 
 By default each key is held for 3 frames and released for 6. The ROM ignores a key pressed again
 less than about 5 frames after it was released, so very small `releaseFrames` values can drop repeated keys.
+
+#### Listing BASIC
+
+`list_basic` reads the BASIC program straight from memory (from `PROG` to `VARS`) and returns it as text,
+one BASIC line per text line. It doesn't type `LIST` or change the screen, and `fromLine` and `toLine` limit
+the listing to a range of lines. Keywords are spelled out with the same spacing as `LIST`, so a program entered
+with `type_basic` lists back the same way, and an agent can check what is in memory after loading a tape.
+
+- The hidden 5-byte numbers that follow each number in a program line are skipped.
+- Codes that `LIST` doesn't show as text are written in braces: colour codes as `{INK 2}`, `{PAPER 7}`,
+  `{FLASH 1}`, `{BRIGHT 1}`, `{INVERSE 1}`, `{OVER 1}`, `{AT 1,5}` and `{TAB 8}`, user-defined graphics as
+  `{UDG A}`, and other control codes as their hex value, e.g. `{$06}`. Block graphics are shown as the
+  Unicode block characters `▝▘▀▗▐▚▜▖▞▌▛▄▟▙█`.
+- 128K programs work too. `SPECTRUM` and `PLAY` are listed as keywords.
+- If the system variables don't point to a valid program area, for example because a machine-code program
+  overwrote them, `list_basic` reports an error. A line that runs past `VARS` stops the listing with a note.
 
 ---
 
