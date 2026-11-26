@@ -132,6 +132,7 @@ partial class MainViewModel
         IsUlaPlusEnabled = Emulator.IsUlaPlusEnabled;
 
         Emulator.FrameCompleted += EmulatorFrameCompleted;
+        Emulator.ExecutionStopped += EmulatorExecutionStopped;
 
         Emulator.ConfigureGamepad(new JoystickSettings
         {
@@ -184,6 +185,7 @@ partial class MainViewModel
 
         Emulator.Shutdown();
         Emulator.FrameCompleted -= EmulatorFrameCompleted;
+        Emulator.ExecutionStopped -= EmulatorExecutionStopped;
         Emulator.CommandManager.CommandReceived -= CommandManagerOnCommandReceived;
 
         Emulator = null;
@@ -348,9 +350,9 @@ partial class MainViewModel
         }
     }
 
-    private void Resume(bool isDebuggerResume = false)
+    private void Resume()
     {
-        Emulator?.Resume(isDebuggerResume);
+        Emulator?.Resume();
         IsPaused = false;
         IsPauseOverlayVisible = false;
         IsTimeMachineCountdownVisible = false;

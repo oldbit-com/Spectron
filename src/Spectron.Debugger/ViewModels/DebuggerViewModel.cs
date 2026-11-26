@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Debugger.Messages;
 using OldBit.Spectron.Debugger.Settings;
+using OldBit.Spectron.Debugger.Stepping;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Extensions;
 
@@ -59,6 +60,9 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
         _breakpointHandler.BreakpointHit += OnBreakpointHit;
 
         MemoryViewModel = new MemoryViewModel(Emulator);
+
+        // Null on the first call from the constructor
+        BreakpointListViewModel?.Dispose();
         BreakpointListViewModel = new BreakpointListViewModel(_breakpointHandler.BreakpointManager, _debuggerSettings.NumberFormat);
         CodeListViewModel = new CodeListViewModel(_breakpointHandler.BreakpointManager);
         ImmediateViewModel = new ImmediateViewModel(_debuggerContext, _debuggerSettings.NumberFormat, emulator,
@@ -78,6 +82,9 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
     private void OnBreakpointHit(object? sender, BreakpointHitEventArgs e)
     {
         Emulator.Pause();
+
+        // A step over or out stopped somewhere else, so its single-use breakpoint is no longer wanted
+        _breakpointHandler.BreakpointManager.RemoveSingleUseBreakpoints();
 
         Dispatcher.UIThread.Post(() =>
         {
@@ -99,6 +106,7 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
         WeakReferenceMessenger.Default.Send(new PauseForDebugMessage());
 
         Emulator.Pause();
+        _breakpointHandler.BreakpointManager.RemoveSingleUseBreakpoints();
 
         Refresh(breakpointHitEventArgs: breakpointHitEventArgs);
     }
@@ -106,25 +114,11 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
     [RelayCommand(CanExecute = nameof(CanExecuteStepCommands))]
     private void DebuggerStepOver()
     {
-        var opCode = Emulator.Memory.Read(Emulator.Cpu.Registers.PC);
-        var nextOpCode = Emulator.Memory.Read((Word)(Emulator.Cpu.Registers.PC + 1));
-
-        int? returnAddress = null;
-
-        if (IsCallInstruction(opCode) || IsJumpConditionInstruction(opCode))
-        {
-            returnAddress = Emulator.Cpu.Registers.PC + 3;
-        }
-        else if (IsDjnzInstruction(opCode) ||
-                 IsShortJumpConditionInstruction(opCode) ||
-                 opCode == 0xED && IsBlockTransferInstruction(nextOpCode))
-        {
-            returnAddress = Emulator.Cpu.Registers.PC + 2;
-        }
+        var returnAddress = StepOver.GetReturnAddress(Emulator.Memory, Emulator.Cpu.Registers.PC);
 
         if (returnAddress != null)
         {
-            _breakpointHandler.BreakpointManager.AddSingleUseBreakpoint((Word)returnAddress.Value);
+            _breakpointHandler.BreakpointManager.AddSingleUseBreakpoint(returnAddress.Value);
             DebuggerResume();
         }
         else
@@ -136,12 +130,7 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
     [RelayCommand(CanExecute = nameof(CanExecuteStepCommands))]
     private void DebuggerStepInto()
     {
-        Emulator.Cpu.Step();
-
-        if (Emulator.Cpu.Clock.IsFrameComplete)
-        {
-            Emulator.Cpu.Clock.NewFrame(Emulator.Clock.TicksPerFrame);
-        }
+        Emulator.Step();
 
         Refresh(refreshMemory: false);
     }
@@ -180,6 +169,7 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
     {
         LoggingViewModel.Dispose();
         MemoryViewModel.Dispose();
+        BreakpointListViewModel.Dispose();
 
         _breakpointHandler.BreakpointHit -= OnBreakpointHit;
     }
@@ -208,16 +198,6 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
         breakpointHitEventArgs);
 
     private void RefreshMemory() => MemoryViewModel.Update(Emulator.Memory);
-
-    private static bool IsCallInstruction(byte opCode) => opCode == 0xCD || (opCode & 0b1100_0111) == 0b1100_0100;
-
-    private static bool IsDjnzInstruction(byte opCode) => opCode == 0x10;
-
-    private static bool IsJumpConditionInstruction(byte opCode) => (opCode & 0b1100_0111) == 0b1100_0010;
-
-    private static bool IsShortJumpConditionInstruction(byte opCode) => opCode is 0x20 or 0x28 or 0x30 or 0x38;
-
-    private static bool IsBlockTransferInstruction(byte opCode) => opCode is 0xB0 or 0xB8;
 
     public void Dispose()
     {

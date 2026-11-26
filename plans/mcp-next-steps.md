@@ -171,6 +171,11 @@ User-initiated loads must keep the dialog.
 
 ## Step 4: breakpoint and stepping tools
 
+> **Detailed proposal: `plans/mcp-breakpoints.md`** (2026-11-26). It lists debugger problems found on the way
+> (partial frames ended twice, Step Into bypassing the emulator, `IsEnabled` ignored, thread safety) and splits
+> the work into two PRs: emulation and debugger groundwork, then the MCP tools.
+> PR 1 (groundwork) is implemented on branch `feature/debugger-stepping`; PR 2 (the tools) is next.
+
 Agents can hit breakpoints that the user set in the debugger, but they can't set breakpoints or step.
 
 - Tools: `set_breakpoint` (same syntax as the debugger: `PC==32768`, `16384==32`), `clear_breakpoint`,

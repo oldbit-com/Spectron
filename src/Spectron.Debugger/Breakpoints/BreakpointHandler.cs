@@ -2,9 +2,18 @@ using OldBit.Spectron.Emulation;
 
 namespace OldBit.Spectron.Debugger.Breakpoints;
 
-public class BreakpointHitEventArgs(Word previousAddress) : EventArgs
+public class BreakpointHitEventArgs(Word previousAddress, Breakpoint? breakpoint = null) : EventArgs
 {
+    /// <summary>
+    /// Gets the address of the previous instruction for a register breakpoint,
+    /// or of the instruction that wrote to memory for a memory breakpoint.
+    /// </summary>
     public Word PreviousAddress { get; } = previousAddress;
+
+    /// <summary>
+    /// Gets the breakpoint that was hit.
+    /// </summary>
+    public Breakpoint? Breakpoint { get; } = breakpoint;
 }
 
 public class BreakpointHandler : IDisposable
@@ -29,23 +38,28 @@ public class BreakpointHandler : IDisposable
 
     public event EventHandler<BreakpointHitEventArgs>? BreakpointHit;
 
+    /// <summary>
+    /// Creates a breakpoint handler. Breakpoints are checked only after <see cref="IsEnabled"/> is set to true.
+    /// </summary>
     public BreakpointHandler(Emulator emulator)
     {
         _emulator = emulator;
 
         BreakpointManager = new BreakpointManager(emulator.Cpu);
-
-        SubscribeToEvents(emulator);
     }
 
     public void Update(Emulator emulator)
     {
         UnsubscribeFromEvents(_emulator);
-        SubscribeToEvents(emulator);
+
+        _emulator = emulator;
 
         BreakpointManager.Update(emulator.Cpu);
 
-        _emulator = emulator;
+        if (IsEnabled)
+        {
+            SubscribeToEvents(emulator);
+        }
     }
 
     private void BeforeInstruction(Word pc)
@@ -53,9 +67,9 @@ public class BreakpointHandler : IDisposable
         _previousAddress = _currentAddress;
         _currentAddress = pc;
 
-        var isBreakpointHit = BreakpointManager.IsRegisterBreakpointHit();
+        var breakpoint = BreakpointManager.FindRegisterBreakpointHit();
 
-        if (!isBreakpointHit)
+        if (breakpoint == null)
         {
             PreviousAddress = pc;
             return;
@@ -63,21 +77,21 @@ public class BreakpointHandler : IDisposable
 
         _emulator.Break();
 
-        BreakpointHit?.Invoke(this, new BreakpointHitEventArgs(_previousAddress));
+        BreakpointHit?.Invoke(this, new BreakpointHitEventArgs(_previousAddress, breakpoint));
     }
 
     private void MemoryOnMemoryUpdated(Word address, byte value)
     {
-        var iisBreakpointHit = BreakpointManager.IsMemoryBreakpointHit(address, _emulator.Memory);
+        var breakpoint = BreakpointManager.FindMemoryBreakpointHit(address, _emulator.Memory);
 
-        if (!iisBreakpointHit)
+        if (breakpoint == null)
         {
             return;
         }
 
         _emulator.Break();
 
-        BreakpointHit?.Invoke(this, new BreakpointHitEventArgs(_currentAddress));
+        BreakpointHit?.Invoke(this, new BreakpointHitEventArgs(_currentAddress, breakpoint));
     }
 
     private void HandleIsEnabled()

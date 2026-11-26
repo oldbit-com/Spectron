@@ -47,7 +47,7 @@ partial class MainViewModel
     {
         if (_breakpointHandler == null)
         {
-            _breakpointHandler = new BreakpointHandler(emulator);
+            _breakpointHandler = new BreakpointHandler(emulator) { IsEnabled = BreakpointsEnabled };
             _breakpointHandler.BreakpointHit += OnBreakpointHit;
         }
         else
@@ -68,13 +68,14 @@ partial class MainViewModel
 
     private void DebuggerWindowClosed()
     {
-        Resume(isDebuggerResume: true);
+        Resume();
 
+        _debuggerViewModel?.Dispose();
         _debuggerViewModel = null;
         _breakpointHitEventArgs = null;
     }
 
-    private void ResumeFromDebug() => Resume(isDebuggerResume: true);
+    private void ResumeFromDebug() => Resume();
 
     private void PauseForDebug() => Pause(showOverlay: false);
 

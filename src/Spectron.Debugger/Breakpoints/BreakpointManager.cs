@@ -2,41 +2,106 @@ using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Debugger.Breakpoints;
 
+public enum BreakpointChange
+{
+    Added,
+    Removed,
+    Updated
+}
+
+public sealed class BreakpointsChangedEventArgs(BreakpointChange change, Breakpoint breakpoint, Breakpoint? original = null) : EventArgs
+{
+    public BreakpointChange Change { get; } = change;
+
+    /// <summary>
+    /// Gets the breakpoint that was added or removed, or the replacement for an update.
+    /// </summary>
+    public Breakpoint Breakpoint { get; } = breakpoint;
+
+    /// <summary>
+    /// Gets the breakpoint that was replaced, for an update.
+    /// </summary>
+    public Breakpoint? Original { get; } = original;
+}
+
 public class BreakpointManager
 {
     private readonly BreakpointList  _breakpoints = new();
     private readonly Func<Word>[] _registerValueIndex = new Func<Word>[(int)Register.Last];
 
-    public IReadOnlyList<Breakpoint> Breakpoints => _breakpoints.Breakpoints;
+    private int _lastId;
+
+    /// <summary>
+    /// Gets the user breakpoints, without the single-use breakpoints that the debugger adds when stepping.
+    /// </summary>
+    public IReadOnlyList<Breakpoint> Breakpoints =>
+        _breakpoints.Breakpoints.Where(breakpoint => breakpoint is not RegisterBreakpoint { IsSingleUse: true }).ToList();
+
+    /// <summary>
+    /// Raised when a user breakpoint is added, removed or updated, from the thread that made the change.
+    /// Not raised for single-use breakpoints.
+    /// </summary>
+    public event EventHandler<BreakpointsChangedEventArgs>? Changed;
 
     public BreakpointManager(Z80 cpu) => CreateRegistersIndex(cpu);
 
-    public void UpdateBreakpoint(Breakpoint original, Breakpoint updated) =>
-        _breakpoints.Replace(original, updated);
+    public void UpdateBreakpoint(Breakpoint original, Breakpoint updated)
+    {
+        updated.Id = original.Id;
+
+        if (_breakpoints.Replace(original, updated))
+        {
+            Changed?.Invoke(this, new BreakpointsChangedEventArgs(BreakpointChange.Updated, updated, original));
+        }
+    }
 
     public void Update(Z80 cpu) => CreateRegistersIndex(cpu);
 
-    public void AddBreakpoint(Breakpoint breakpoint) =>
-        _breakpoints.AddIfNotExists(breakpoint);
-
-    public void AddSingleUseBreakpoint(Word address)
+    public void AddBreakpoint(Breakpoint breakpoint)
     {
-        var breakpoint = new RegisterBreakpoint(Register.PC, address) { IsSingleUse = true };
+        if (breakpoint.Id == 0)
+        {
+            breakpoint.Id = Interlocked.Increment(ref _lastId);
+        }
 
-        _breakpoints.Add(breakpoint);
+        if (_breakpoints.AddIfNotExists(breakpoint) && !IsSingleUse(breakpoint))
+        {
+            Changed?.Invoke(this, new BreakpointsChangedEventArgs(BreakpointChange.Added, breakpoint));
+        }
     }
 
-    public void RemoveBreakpoint(Breakpoint breakpoint) => _breakpoints.Remove(breakpoint);
+    public void AddSingleUseBreakpoint(Word address) =>
+        AddBreakpoint(new RegisterBreakpoint(Register.PC, address) { IsSingleUse = true });
+
+    /// <summary>
+    /// Removes single-use breakpoints that were not hit, e.g. when stepping over a call that never returned.
+    /// </summary>
+    public void RemoveSingleUseBreakpoints() => _breakpoints.RemoveAll(IsSingleUse);
+
+    public void RemoveBreakpoint(Breakpoint breakpoint)
+    {
+        if (_breakpoints.Remove(breakpoint) && !IsSingleUse(breakpoint))
+        {
+            Changed?.Invoke(this, new BreakpointsChangedEventArgs(BreakpointChange.Removed, breakpoint));
+        }
+    }
 
     public bool ContainsBreakpoint(Register register, Word address) => _breakpoints.Register
         .Any(breakpoint => breakpoint.Register == register && breakpoint.Value == address && !breakpoint.IsSingleUse);
 
-    public bool IsRegisterBreakpointHit()
+    /// <summary>
+    /// Checks the register breakpoints. A breakpoint is hit when the register changes to the breakpoint value.
+    /// </summary>
+    /// <returns>The breakpoint that was hit, or null.</returns>
+    public RegisterBreakpoint? FindRegisterBreakpointHit()
     {
+        var breakpoints = _breakpoints.Register;
+        RegisterBreakpoint? hit = null;
+
         // ReSharper disable once ForCanBeConvertedToForeach - foreach in this case is not memory efficient
-        for (var index = 0; index < _breakpoints.Register.Count; index++)
+        for (var index = 0; index < breakpoints.Count; index++)
         {
-            var breakpoint = _breakpoints.Register[index];
+            var breakpoint = breakpoints[index];
 
             if (!breakpoint.IsEnabled)
             {
@@ -45,46 +110,55 @@ public class BreakpointManager
 
             var value = _registerValueIndex[(int)breakpoint.Register]();
 
-            if (breakpoint.Value == value && breakpoint.LastValue != value)
+            // Every breakpoint tracks its last value, so keep checking after a hit
+            if (hit == null && breakpoint.Value == value && breakpoint.LastValue != value)
             {
-                breakpoint.LastValue = value;
-
-                if (breakpoint.IsSingleUse)
-                {
-                    RemoveBreakpoint(breakpoint);
-                }
-
-                return true;
+                hit = breakpoint;
             }
 
             breakpoint.LastValue = value;
         }
 
-        return false;
+        if (hit is { IsSingleUse: true })
+        {
+            RemoveBreakpoint(hit);
+        }
+
+        return hit;
     }
 
-    public bool IsMemoryBreakpointHit(Word address, IMemory memory)
+    public bool IsRegisterBreakpointHit() => FindRegisterBreakpointHit() != null;
+
+    /// <summary>
+    /// Checks the memory breakpoints after a write to the given address.
+    /// </summary>
+    /// <returns>The breakpoint that was hit, or null.</returns>
+    public MemoryBreakpoint? FindMemoryBreakpointHit(Word address, IMemory memory)
     {
+        var breakpoints = _breakpoints.Memory;
+
         // ReSharper disable once ForCanBeConvertedToForeach - foreach in this case is not memory efficient
-        for (var index = 0; index < _breakpoints.Memory.Count; index++)
+        for (var index = 0; index < breakpoints.Count; index++)
         {
-            var breakpoint = _breakpoints.Memory[index];
+            var breakpoint = breakpoints[index];
 
             if (!breakpoint.IsEnabled || breakpoint.Address != address)
             {
                 continue;
             }
 
-            if (breakpoint.Value != null)
+            if (breakpoint.Value == null || breakpoint.Value == memory.Read(address))
             {
-                return breakpoint.Value == memory.Read(address);
+                return breakpoint;
             }
-
-            return true;
         }
 
-        return false;
+        return null;
     }
+
+    public bool IsMemoryBreakpointHit(Word address, IMemory memory) => FindMemoryBreakpointHit(address, memory) != null;
+
+    private static bool IsSingleUse(Breakpoint breakpoint) => breakpoint is RegisterBreakpoint { IsSingleUse: true };
 
     private void CreateRegistersIndex(Z80 cpu)
     {
