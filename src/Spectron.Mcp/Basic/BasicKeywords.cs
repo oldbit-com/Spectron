@@ -28,6 +28,11 @@ internal enum KeywordEntry
     /// EXTEND, then Symbol Shift and a key, e.g. EXTEND, SYM+H for CIRCLE.
     /// </summary>
     ExtendedSymbolShift,
+
+    /// <summary>
+    /// A 128 BASIC keyword (SPECTRUM, PLAY). It has no key and can only be spelled out in the 128 editor.
+    /// </summary>
+    Spelled,
 }
 
 /// <summary>
@@ -55,6 +60,8 @@ internal static class BasicKeywords
 {
     internal const byte FirstToken = 0xA5;
     internal const byte RemToken = 0xEA;
+    internal const byte Spectrum128Token = 0xA3;
+    internal const byte Play128Token = 0xA4;
 
     internal const int Count = 0x100 - FirstToken;
 
@@ -73,11 +80,20 @@ internal static class BasicKeywords
     internal static IReadOnlyList<BasicKeyword> All => Tables.Value.Keywords;
 
     /// <summary>
+    /// The keywords that only 128 BASIC knows, SPECTRUM and PLAY.
+    /// </summary>
+    internal static IReadOnlyList<BasicKeyword> Basic128 { get; } =
+    [
+        new(Spectrum128Token, "SPECTRUM", KeywordEntry.Spelled, default),
+        new(Play128Token, "PLAY", KeywordEntry.Spelled, default),
+    ];
+
+    /// <summary>
     /// Characters that can only be typed in extended mode with Symbol Shift, e.g. '[' is EXTEND, SYM+Y.
     /// </summary>
     internal static IReadOnlyDictionary<char, SpectrumKey> ExtendedCharacters => Tables.Value.ExtendedCharacters;
 
-    internal static BasicKeyword Get(byte token) => All[token - FirstToken];
+    internal static BasicKeyword Get(byte token) => token >= FirstToken ? All[token - FirstToken] : Basic128[token - Spectrum128Token];
 
     /// <summary>
     /// Converts a Spectrum character code to a .NET character, for the codes that differ from ASCII.

@@ -38,8 +38,6 @@ internal static class BasicLister
     private const int HiddenNumberLength = 5;
     private const byte Quote = 0x22;
     private const byte FirstUdg = 0x90;
-    private const byte Spectrum128Token = 0xA3;
-    private const byte Play128Token = 0xA4;
 
     private static readonly string[] ColourControls = ["INK", "PAPER", "FLASH", "BRIGHT", "INVERSE", "OVER"];
 
@@ -91,6 +89,79 @@ internal static class BasicLister
         }
 
         return new BasicProgram(lines, null);
+    }
+
+    /// <summary>
+    /// Finds a line in the program and returns its bytes after the number and length, or null when there is no such line.
+    /// </summary>
+    internal static byte[]? ReadLineBytes(IMemory memory, int number)
+    {
+        var prog = ReadWord(memory, Prog);
+        var vars = ReadWord(memory, Vars);
+
+        if (prog < MinProg || vars < prog)
+        {
+            return null;
+        }
+
+        var address = (int)prog;
+
+        while (address + 4 <= vars)
+        {
+            var lineNumber = memory.Read((Word)address) << 8 | memory.Read((Word)(address + 1));
+            var length = ReadWord(memory, (Word)(address + 2));
+
+            if (lineNumber > number || address + 4 + length > vars)
+            {
+                return null;
+            }
+
+            if (lineNumber == number)
+            {
+                return Enumerable.Range(address + 4, length).Select(a => memory.Read((Word)a)).ToArray();
+            }
+
+            address += 4 + length;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Removes the hidden 5-byte numbers and the final ENTER from the bytes of a program line,
+    /// leaving what the edit line had before the line was entered.
+    /// </summary>
+    internal static List<byte> StripHiddenNumbers(ReadOnlySpan<byte> data)
+    {
+        var result = new List<byte>(data.Length);
+        var isInString = false;
+        var isInRemark = false;
+
+        for (var i = 0; i < data.Length; i++)
+        {
+            var b = data[i];
+
+            if (b == Enter && i == data.Length - 1)
+            {
+                break;
+            }
+
+            if (b == HiddenNumber && !isInString && !isInRemark && i + HiddenNumberLength < data.Length)
+            {
+                i += HiddenNumberLength;
+                continue;
+            }
+
+            if (b == Quote && !isInRemark)
+            {
+                isInString = !isInString;
+            }
+
+            isInRemark |= b == BasicKeywords.RemToken && !isInString;
+            result.Add(b);
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -154,9 +225,9 @@ internal static class BasicLister
                     isInRemark |= b == BasicKeywords.RemToken && !isInString;
                     break;
 
-                case Spectrum128Token or Play128Token when !isInString && !isInRemark:
+                case BasicKeywords.Spectrum128Token or BasicKeywords.Play128Token when !isInString && !isInRemark:
                     // 128 BASIC keywords. In strings and on 48K these codes are the UDGs T and U.
-                    AppendKeyword(b == Spectrum128Token ? "SPECTRUM" : "PLAY", leadingSpace: true, trailingSpace: true);
+                    AppendKeyword(BasicKeywords.Get(b).Name, leadingSpace: true, trailingSpace: true);
                     break;
 
                 case >= 0x20 and < 0x80:

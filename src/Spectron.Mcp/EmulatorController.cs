@@ -29,6 +29,12 @@ public sealed class EmulatorController(IEmulatorHost host)
 
     private const int MaxPauseAttempts = 3;
 
+    // The 128 editor takes about 30 frames to redraw after ENTER, more on a full screen
+    private const int KeyReadTimeoutFrames = 100;
+
+    private const Word Flags = 23611;
+    private const byte NewKeyFlag = 0x20;   // FLAGS bit 5: a new key is waiting in LAST_K
+
     private readonly SemaphoreSlim _lock = new(1, 1);
 
     /// <summary>
@@ -109,12 +115,36 @@ public sealed class EmulatorController(IEmulatorHost host)
     /// Presses each key combination in turn, holding it for <paramref name="holdFrames"/> frames
     /// and releasing for <paramref name="releaseFrames"/> frames, so the ROM keyboard routine registers every press.
     /// </summary>
-    internal RunResult PressKeys(Emulator emulator, IEnumerable<SpectrumKey[]> combinations, int holdFrames, int releaseFrames)
+    /// <param name="emulator">The emulator.</param>
+    /// <param name="combinations">Key combinations to press in order.</param>
+    /// <param name="holdFrames">Frames to hold each combination.</param>
+    /// <param name="releaseFrames">Frames to wait after releasing each combination.</param>
+    /// <param name="waitUntilRead">
+    /// When true, before the next press waits until the program has read the previous key from LAST_K.
+    /// The ROM keyboard routine keeps only one key, so a key pressed while the program is busy (e.g. the 128 editor
+    /// redrawing after ENTER) would replace the one still waiting. Waiting stops for the rest of the call
+    /// when a key is not read in time, e.g. a game that reads the keyboard ports directly.
+    /// </param>
+    internal RunResult PressKeys(Emulator emulator, IEnumerable<SpectrumKey[]> combinations, int holdFrames, int releaseFrames,
+        bool waitUntilRead = false)
     {
         var frames = 0;
 
         foreach (var keys in combinations)
         {
+            if (waitUntilRead)
+            {
+                var (waitResult, isRead) = WaitUntilKeyRead(emulator);
+                frames += waitResult.Frames;
+
+                if (waitResult.StopReason != StopReason.None)
+                {
+                    return waitResult with { Frames = frames };
+                }
+
+                waitUntilRead = isRead;
+            }
+
             emulator.KeyboardState.KeyDown(keys);
 
             RunResult result;
@@ -142,7 +172,38 @@ public sealed class EmulatorController(IEmulatorHost host)
             }
         }
 
+        if (waitUntilRead)
+        {
+            // Let the last key be read too, so the next call or tool sees its effect
+            var (waitResult, _) = WaitUntilKeyRead(emulator);
+
+            return waitResult with { Frames = frames + waitResult.Frames };
+        }
+
         return new RunResult(frames, StopReason.None);
+    }
+
+    /// <summary>
+    /// Runs frames while FLAGS bit 5 says a key is waiting in LAST_K, up to <see cref="KeyReadTimeoutFrames"/>.
+    /// </summary>
+    private (RunResult Result, bool IsRead) WaitUntilKeyRead(Emulator emulator)
+    {
+        for (var i = 0; i < KeyReadTimeoutFrames; i++)
+        {
+            if ((emulator.Memory.Read(Flags) & NewKeyFlag) == 0)
+            {
+                return (new RunResult(i, StopReason.None), true);
+            }
+
+            var result = RunFrames(emulator, 1);
+
+            if (result.StopReason != StopReason.None)
+            {
+                return (result with { Frames = i + result.Frames }, false);
+            }
+        }
+
+        return (new RunResult(KeyReadTimeoutFrames, StopReason.None), false);
     }
 
     private async Task<(Emulator Emulator, bool WasPaused)> PauseEmulatorAsync()

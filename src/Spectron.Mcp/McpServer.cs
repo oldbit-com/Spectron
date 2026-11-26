@@ -46,7 +46,7 @@ public sealed class McpServer(IEmulatorHost host, ILogger logger) : IAsyncDispos
                     Controls a running ZX Spectrum emulator. Typical loop: load_file or type_text, run_frames to let time pass,
                     then read_screen_text (cheap) or screenshot (when graphics matter). Emulation runs in real time until
                     pause or run_frames is used; run_frames leaves it paused, so call resume to hand control back to the user.
-                    To enter a 48K BASIC program, use type_basic with a plain listing rather than typing keywords key by key,
+                    To enter a BASIC program (48K or 128 BASIC), use type_basic with a plain listing rather than typing keywords key by key,
                     and list_basic to read the program in memory back as text.
                     """;
             })

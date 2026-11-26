@@ -105,7 +105,7 @@ public sealed class EmulatorTools(EmulatorController controller)
     [McpServerTool(Name = "type_text")]
     [Description("""
                  Types text on the Spectrum keyboard, one key press per character, by running emulation frames while keys are held.
-                 To enter a 48K BASIC program, prefer type_basic: it takes a plain listing and handles keyword entry itself.
+                 To enter a BASIC program (48K or 128), prefer type_basic: it takes a plain listing, handles keyword entry and checks each line.
                  Supports letters (uppercase uses CAPS SHIFT), digits, space, newline (ENTER), backspace (DELETE) and symbols from
                  the 48K keyboard: ! @ # $ % & ' ( ) _ < > ; " ^ - + = : £ ? / * , .
                  IMPORTANT: 48K BASIC uses keyword entry. At the K cursor a letter key produces a whole keyword (e.g. 'p' = PRINT,
@@ -114,6 +114,8 @@ public sealed class EmulatorTools(EmulatorController controller)
                  cannot be typed with this tool: use press_keys for them (its description lists the keys) and type_text for the rest.
                  The cursor returns to K after THEN and ':'. Check the edit line with read_screen_text before pressing ENTER.
                  128K BASIC accepts keywords spelled out, so this tool can type whole lines there.
+                 Each key is pressed only after the program has read the previous one, so text can be typed while the ROM
+                 is busy, e.g. the 128 editor redrawing the screen after ENTER.
                  Emulation stays paused afterwards if it was paused before.
                  """)]
     public Task<string> TypeText(
@@ -135,7 +137,7 @@ public sealed class EmulatorTools(EmulatorController controller)
         ValidateKeyTiming(holdFrames, releaseFrames, keys.Count);
 
         return controller.ExecuteAsync(emulator =>
-            FormatRunResult(emulator, controller.PressKeys(emulator, keys, holdFrames, releaseFrames)));
+            FormatRunResult(emulator, controller.PressKeys(emulator, keys, holdFrames, releaseFrames, waitUntilRead: true)));
     }
 
     [McpServerTool(Name = "press_keys")]
@@ -178,48 +180,68 @@ public sealed class EmulatorTools(EmulatorController controller)
 
     [McpServerTool(Name = "type_basic")]
     [Description("""
-                 Enters a 48K BASIC program from a plain listing, e.g. "10 BORDER 1: CIRCLE 128,88,50\n20 GO TO 10".
-                 Types each line through the ROM editor like a user would, choosing the keyword keys (K cursor, Symbol Shift,
-                 EXTEND) automatically, so the ROM still checks the syntax. Stops at the first line the ROM rejects and reports it.
+                 Enters a BASIC program from a plain listing, e.g. "10 BORDER 1: CIRCLE 128,88,50\n20 GO TO 10".
+                 Types each line through the ROM editor like a user would, so the ROM still checks the syntax, and checks
+                 the stored line. Stops at the first line the ROM rejects and reports it.
+                 - Works in the 48K BASIC editor (16K/48K/TC2048, or 128K in 48 BASIC mode), choosing the keyword keys
+                   (K cursor, Symbol Shift, EXTEND) automatically, and in the 128 BASIC editor, where keywords are spelled
+                   out and PLAY and SPECTRUM are also recognised.
                  - Write keywords in full as LIST shows them, separated from names and numbers by spaces (FOR i=1 TO 10, not 1TO10).
                    GOTO and GOSUB are accepted too. Keywords are matched in any case, so variables cannot be named like keywords (to, at, pi).
-                 - Text in strings and after REM is typed literally. Spaces elsewhere are ignored, as the ROM adds its own.
+                 - Text in strings and after REM is typed literally. Spaces elsewhere are ignored.
                  - Each line needs a number from 1 to 9999. A number alone deletes that line. The program is not run:
-                   use type_text "r\n" (RUN) afterwards.
-                 - Needs the 48K BASIC editor: 16K/48K/TC2048, or 128K in 48 BASIC mode. In 128 BASIC use type_text,
-                   which accepts keywords spelled out. Block graphics, UDGs and colour control codes in strings are not supported.
+                   use type_text "r\n" (48K) or "run\n" (128) afterwards.
+                 - Block graphics, UDGs and colour control codes in strings are not supported.
+                 - In the 128 editor, text left at the cursor that is not a program line (e.g. a rejected line) is cleared first.
                  Emulation stays paused afterwards if it was paused before.
                  """)]
     public Task<string> TypeBasic(
         [Description("The program listing, one BASIC line per text line.")] string program)
     {
-        List<BasicLine> lines;
+        // Parse up front for both editors, so listing errors are reported without touching the emulator
+        List<BasicLine> lines48;
+        List<BasicLine> lines128;
 
         try
         {
-            lines = BasicLineParser.Parse(program);
+            lines48 = BasicLineParser.Parse(program);
+            lines128 = BasicLineParser.Parse(program, isBasic128: true);
         }
         catch (ArgumentException ex)
         {
             throw new McpException(ex.Message);
         }
 
-        if (lines.Count == 0)
+        if (lines48.Count == 0)
         {
             throw new McpException("The program has no lines.");
         }
 
-        if (BasicEditor.EstimateFrames(lines) > EmulatorController.MaxFramesPerCall)
-        {
-            throw new McpException("The program is too long for one call. Split it into several type_basic calls.");
-        }
-
         return controller.ExecuteAsync(emulator =>
         {
+            if (Basic128Editor.IsActive(emulator))
+            {
+                ThrowIfTooLong(Basic128Editor.EstimateFrames(lines128));
+
+                using var editor128 = new Basic128Editor(controller, emulator);
+
+                return FormatBasicEntryResult(editor128.EnterLines(lines128));
+            }
+
+            ThrowIfTooLong(BasicEditor.EstimateFrames(lines48));
+
             using var editor = new BasicEditor(controller, emulator);
 
-            return FormatBasicEntryResult(editor.EnterLines(lines));
+            return FormatBasicEntryResult(editor.EnterLines(lines48));
         });
+
+        static void ThrowIfTooLong(long frames)
+        {
+            if (frames > EmulatorController.MaxFramesPerCall)
+            {
+                throw new McpException("The program is too long for one call. Split it into several type_basic calls.");
+            }
+        }
     }
 
     [McpServerTool(Name = "list_basic", ReadOnly = true)]
