@@ -131,6 +131,21 @@ public partial class ListBasicTests
     }
 
     [Fact]
+    public async Task ListBasic_ShouldOnlyReportProblemWhenFirstLineRunsPastVars()
+    {
+        await _tools.RunFrames(150);
+        await _tools.TypeBasic("10 CLS");
+
+        var vars = ReadWord(23627);
+        await _tools.WriteMemory("23627", $"{(vars - 1) & 0xFF:X2} {(vars - 1) >> 8:X2}");
+
+        var listing = await _tools.ListBasic();
+
+        listing.ShouldStartWith("(Listing stopped: Line 10 at $");
+        listing.ShouldNotContain("There is no BASIC program");
+    }
+
+    [Fact]
     public async Task ListBasic_ShouldList128BasicProgram()
     {
         var test = new ListBasicTests(ComputerType.Spectrum128K);

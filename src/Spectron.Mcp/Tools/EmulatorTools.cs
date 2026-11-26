@@ -471,41 +471,37 @@ public sealed class EmulatorTools(EmulatorController controller)
 
     private static string FormatListing(BasicProgram program, int fromLine, int toLine)
     {
-        var result = new StringBuilder();
+        var result = new List<string>();
+        var length = 0;
         var lines = program.Lines.Where(line => line.Number >= fromLine && line.Number <= toLine).ToList();
 
         foreach (var line in lines)
         {
             var text = line.ToString();
 
-            if (result.Length > 0 && result.Length + text.Length > MaxListingLength)
+            if (result.Count > 0 && length + text.Length > MaxListingLength)
             {
-                result.Append($"\n(Listing truncated. Use fromLine {line.Number} to continue.)");
-
-                return result.ToString();
+                result.Add($"(Listing truncated. Use fromLine {line.Number} to continue.)");
+                break;
             }
 
-            if (result.Length > 0)
-            {
-                result.Append('\n');
-            }
-
-            result.Append(text);
+            result.Add(text);
+            length += text.Length + 1;
         }
 
-        if (lines.Count == 0)
+        if (lines.Count == 0 && program.Problem == null)
         {
-            result.Append(program.Lines.Count == 0
+            result.Add(program.Lines.Count == 0
                 ? "There is no BASIC program in memory."
                 : $"There are no lines between {fromLine} and {toLine}.");
         }
 
         if (program.Problem != null)
         {
-            result.Append($"\n(Listing stopped: {program.Problem})");
+            result.Add($"(Listing stopped: {program.Problem})");
         }
 
-        return result.ToString();
+        return string.Join('\n', result);
     }
 
     private static string FormatRegisters(Z80 cpu)

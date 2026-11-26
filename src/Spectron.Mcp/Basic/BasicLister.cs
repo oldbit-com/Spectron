@@ -29,7 +29,8 @@ internal static class BasicLister
     internal const Word Prog = 23635;
     internal const Word Vars = 23627;
 
-    // The lowest PROG can be: the system variables and channel information end at $5CB6 at least
+    // A conservative floor for PROG: the channel information (CHANS) starts at $5CB6 and the program follows it,
+    // normally at $5CCB, later with Interface 1 or extra channels
     private const Word MinProg = 0x5CB6;
 
     private const byte Enter = 0x0D;
