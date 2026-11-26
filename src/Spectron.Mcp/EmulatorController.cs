@@ -234,14 +234,17 @@ public sealed class EmulatorController(IEmulatorHost host) : IDisposable
     }
 
     /// <summary>
-    /// Runs frames until the current routine returns: a RET, RETI or RETN that leaves the stack pointer above its
-    /// value at the start. Interrupt routines that run meanwhile restore the stack pointer, so their returns
-    /// don't count. Also stops at user breakpoints and after <paramref name="maxFrames"/> frames.
+    /// Runs frames until the current routine returns: a RET, RETI or RETN that is taken (it pops the return address)
+    /// and leaves the stack pointer above its value at the start. Interrupt routines that run meanwhile restore the
+    /// stack pointer, so their returns don't count. A POP can also raise the stack pointer above the start, so an
+    /// untaken conditional return after it doesn't count either. Also stops at user breakpoints and after
+    /// <paramref name="maxFrames"/> frames.
     /// </summary>
     internal RunResult RunToReturn(Emulator emulator, int maxFrames)
     {
         var startSp = emulator.Cpu.Registers.SP;
         var isReturn = false;
+        Word returnSp = 0;
         Word previousPc = 0;
 
         emulator.Cpu.BeforeInstruction += BeforeInstruction;
@@ -257,13 +260,16 @@ public sealed class EmulatorController(IEmulatorHost host) : IDisposable
 
         void BeforeInstruction(Word pc)
         {
-            if (isReturn && (short)(emulator.Cpu.Registers.SP - startSp) > 0)
+            var sp = emulator.Cpu.Registers.SP;
+
+            if (isReturn && sp == (Word)(returnSp + 2) && (short)(sp - startSp) > 0)
             {
                 emulator.Break();
                 RecordHit(emulator, new BreakpointHitEventArgs(previousPc), isTemporary: true);
             }
 
             isReturn = IsReturnInstruction(emulator.Memory, pc);
+            returnSp = sp;
             previousPc = pc;
         }
     }

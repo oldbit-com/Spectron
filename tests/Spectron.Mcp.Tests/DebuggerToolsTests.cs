@@ -326,6 +326,30 @@ public class DebuggerToolsTests
     }
 
     [Fact]
+    public async Task StepOut_ShouldIgnoreUntakenConditionalReturnAfterPop()
+    {
+        // $8020  CALL $8030
+        // $8023  JR $
+        // $8030  PUSH BC
+        // $8031  OR 1           ; clears Z
+        // $8033  POP BC         ; SP rises above where step out starts
+        // $8034  RET Z          ; not taken
+        // $8035  INC A
+        // $8036  RET
+        await _emulatorTools.WriteMemory("$8020", "CD 30 80 18 FE");
+        await _emulatorTools.WriteMemory("$8030", "C5 F6 01 C1 C8 3C C9");
+        await _emulatorTools.DebuggerCommand("SP = $FF00; A = 0; GOTO $8020");
+        await _tools.Step("into", count: 3);
+        PC.ShouldBe((Word)0x8033);
+
+        var result = await _tools.Step("out");
+
+        result.ShouldContain("PC=$8023, previous PC=$8036");
+        PC.ShouldBe((Word)0x8023);
+        A.ShouldBe((byte)2);
+    }
+
+    [Fact]
     public async Task StepOut_ShouldGiveUpAfterFrameBudget()
     {
         await LoadRoutineAsync();

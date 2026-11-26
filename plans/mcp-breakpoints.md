@@ -29,9 +29,11 @@ The proposal was based on reading `main` at `618aed2`.
 > - `step over` and `run_until` use a temporary `BreakpointHandler` per call. Before running, its register breakpoint
 >   takes the current values, so `run_until PC==$8000` at `$8000` runs until execution comes back. Reaching the target
 >   clears the break, so it is not reported later as "stopped at a breakpoint".
-> - `step out` does not use a `BreakpointHandler`: the condition is "a RET/RETI/RETN leaves SP above its value at the
->   start", which a register breakpoint can't express. A plain `PC==(SP)` target, as in the debugger, breaks when the
->   routine has pushed something, and stops early in recursion. It hooks `BeforeInstruction` for the call only.
+> - `step out` does not use a `BreakpointHandler`: the condition is "a RET/RETI/RETN is taken (SP rises by 2 across it)
+>   and leaves SP above its value at the start", which a register breakpoint can't express. Checking that the return
+>   was taken matters after a POP, which can raise SP above the start before an untaken `RET cc`. A plain `PC==(SP)`
+>   target, as in the debugger, breaks when the routine has pushed something, and stops early in recursion.
+>   It hooks `BeforeInstruction` for the call only.
 > - A user breakpoint and a temporary target firing at the same instruction report the user breakpoint.
 > - Agent-set conditions get a canonical text (`PC == $8000`, `$5C3A == $00`), like the debugger's own.
 >   Setting an existing condition returns its id, or enables it if it was disabled.
