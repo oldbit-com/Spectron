@@ -186,13 +186,15 @@
                         </Grid>
                         <Grid ColumnDefinitions="70,*" Margin="0 10 0 0">
                             <TextBlock Grid.Column="0" Text="Authors:"/>
-                            <ItemsRepeater Grid.Column="1" ItemsSource="{Binding Authors}">
-                                <ItemsRepeater.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding .}" TextAlignment="Right"/>
-                                    </DataTemplate>
-                                </ItemsRepeater.ItemTemplate>
-                            </ItemsRepeater>
+                            <ScrollViewer Grid.Column="1" MaxHeight="120">
+                                <ItemsRepeater ItemsSource="{Binding Authors}">
+                                    <ItemsRepeater.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding .}" TextAlignment="Right"/>
+                                        </DataTemplate>
+                                    </ItemsRepeater.ItemTemplate>
+                                </ItemsRepeater>
+                            </ScrollViewer>
                         </Grid>
                         <StackPanel
                             Margin="0 10 0 0"
