@@ -174,7 +174,11 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
         _breakpointHandler.BreakpointHit -= OnBreakpointHit;
     }
 
-    private void Refresh(bool refreshMemory = true, BreakpointHitEventArgs? breakpointHitEventArgs = null)
+    /// <summary>
+    /// Refreshes the registers, stack, code and memory views, e.g. after an MCP tool changed the machine state.
+    /// Must be called on the UI thread.
+    /// </summary>
+    public void Refresh(bool refreshMemory = true, BreakpointHitEventArgs? breakpointHitEventArgs = null)
     {
         RefreshCpu();
         RefreshStack();

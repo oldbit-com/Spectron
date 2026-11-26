@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.DependencyInjection;
 using OldBit.Spectron.Emulation.Files;
@@ -30,7 +31,23 @@ internal sealed class TestEmulatorHost : IEmulatorHost
         using var provider = services.BuildServiceProvider();
 
         Emulator = provider.GetRequiredService<EmulatorFactory>().Create(computerType, RomType.Original);
+        Breakpoints = new BreakpointHandler(Emulator);
     }
+
+    /// <summary>
+    /// Gets the shared breakpoints. Like the app, breakpoint checking starts turned off.
+    /// </summary>
+    public BreakpointHandler? Breakpoints { get; }
+
+    public int NotifyStateChangedCount { get; private set; }
+
+    public Task EnableBreakpointsAsync()
+    {
+        Breakpoints?.IsEnabled = true;
+        return Task.CompletedTask;
+    }
+
+    public void NotifyStateChanged() => NotifyStateChangedCount++;
 
     public Task PauseAsync()
     {

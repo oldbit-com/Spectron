@@ -28,15 +28,23 @@ public sealed class EmulatorTools(EmulatorController controller)
     private const int MaxListingLength = 32_000;
 
     [McpServerTool(Name = "get_status", ReadOnly = true)]
-    [Description("Returns the emulated machine type, ROM, whether emulation is paused, the program counter and tape state.")]
+    [Description("Returns the emulated machine type, ROM, whether emulation is paused, the program counter, tape state, " +
+                 "the number of breakpoints and whether execution is stopped at one.")]
     public Task<string> GetStatus() => controller.ExecuteAsync((emulator, wasPaused) =>
-        $"""
-         Computer: {emulator.ComputerType}
-         ROM: {emulator.RomType}
-         Paused: {wasPaused}
-         PC: ${emulator.Cpu.Registers.PC:X4}
-         Tape loaded: {emulator.TapeManager.IsTapeLoaded}, playing: {emulator.TapeManager.IsPlaying}
-         """, leavePaused: false);
+    {
+        var status = $"""
+                      Computer: {emulator.ComputerType}
+                      ROM: {emulator.RomType}
+                      Paused: {wasPaused}
+                      PC: ${emulator.Cpu.Registers.PC:X4}
+                      Tape loaded: {emulator.TapeManager.IsTapeLoaded}, playing: {emulator.TapeManager.IsPlaying}
+                      {DebuggerTools.FormatBreakpointSummary(controller.Breakpoints)}
+                      """;
+
+        var stop = DebuggerTools.FormatCurrentStop(controller, emulator);
+
+        return stop == null ? status : $"{status}\n{stop}";
+    }, leavePaused: false);
 
     [McpServerTool(Name = "pause")]
     [Description("Pauses emulation. While paused, use run_frames, type_text or press_keys to advance time deterministically.")]
@@ -189,7 +197,8 @@ public sealed class EmulatorTools(EmulatorController controller)
     [McpServerTool(Name = "run_frames")]
     [Description("Pauses real-time emulation (if running) and runs the given number of frames as fast as possible (50 frames = 1 second of Spectrum time). " +
                  "The emulator stays paused afterwards, so the result can be inspected. " +
-                 "Stops early if a debugger breakpoint is hit, the user resumes emulation or the machine is replaced.")]
+                 "Stops early if a breakpoint is hit (the result says which), the user resumes emulation or the machine is replaced. " +
+                 "When stopped at a breakpoint, run_frames continues from there.")]
     public Task<string> RunFrames(
         [Description("Number of frames to run.")] int count)
     {
@@ -198,7 +207,7 @@ public sealed class EmulatorTools(EmulatorController controller)
             throw new McpException($"Frame count must be between 1 and {EmulatorController.MaxFramesPerCall}.");
         }
 
-        return controller.ExecuteAsync((emulator, _) =>
+        return controller.RunAsync(emulator =>
             FormatRunResult(emulator, controller.RunFrames(emulator, count)), leavePaused: true);
     }
 
@@ -236,7 +245,7 @@ public sealed class EmulatorTools(EmulatorController controller)
 
         ValidateKeyTiming(holdFrames, releaseFrames, keys.Count);
 
-        return controller.ExecuteAsync(emulator =>
+        return controller.RunAsync(emulator =>
             FormatRunResult(emulator, controller.PressKeys(emulator, keys, holdFrames, releaseFrames, waitUntilRead: true)));
     }
 
@@ -274,7 +283,7 @@ public sealed class EmulatorTools(EmulatorController controller)
 
         ValidateKeyTiming(holdFrames, releaseFrames, combinations.Count);
 
-        return controller.ExecuteAsync(emulator =>
+        return controller.RunAsync(emulator =>
             FormatRunResult(emulator, controller.PressKeys(emulator, combinations, holdFrames, releaseFrames)));
     }
 
@@ -317,7 +326,7 @@ public sealed class EmulatorTools(EmulatorController controller)
             throw new McpException("The program has no lines.");
         }
 
-        return controller.ExecuteAsync(emulator =>
+        return controller.RunAsync(emulator =>
         {
             if (Basic128Editor.IsActive(emulator))
             {
@@ -451,7 +460,7 @@ public sealed class EmulatorTools(EmulatorController controller)
         var start = ParseAddress(address);
         var bytes = ParseHexBytes(data);
 
-        return controller.ExecuteAsync(emulator =>
+        return controller.ModifyAsync(emulator =>
         {
             for (var i = 0; i < bytes.Length; i++)
             {
@@ -487,7 +496,7 @@ public sealed class EmulatorTools(EmulatorController controller)
                  """)]
     public Task<string> DebuggerCommand(
         [Description("The command, e.g. \"PRINT HL, DE\" or \"PEEK 23560\".")] string command) =>
-        controller.ExecuteAsync(emulator => ExecuteDebuggerCommand(emulator, command));
+        controller.ModifyAsync(emulator => ExecuteDebuggerCommand(emulator, command));
 
     private static string ExecuteDebuggerCommand(Emulator emulator, string command)
     {
@@ -560,7 +569,7 @@ public sealed class EmulatorTools(EmulatorController controller)
 
         return result.StopReason switch
         {
-            StopReason.Breakpoint => text + " Stopped at a debugger breakpoint, the debugger window is open.",
+            StopReason.Breakpoint => $"{text} {DebuggerTools.FormatHit(emulator, result.Hit)}",
             StopReason.ResumedByUser => text + " Stopped because the user resumed emulation.",
             StopReason.EmulatorReplaced => text + " Stopped because the machine was replaced (file loaded or machine reset).",
             _ => text
@@ -584,7 +593,7 @@ public sealed class EmulatorTools(EmulatorController controller)
 
         return result.StopReason switch
         {
-            StopReason.Breakpoint => $"Stopped at a debugger breakpoint, the debugger window is open. {entered}{cleared}",
+            StopReason.Breakpoint => $"Stopped at a breakpoint, use get_status to see which. {entered}{cleared}",
             StopReason.ResumedByUser => $"Stopped because the user resumed emulation. {entered}{cleared}",
             StopReason.EmulatorReplaced => $"Stopped because the machine was replaced (file loaded or machine reset). {entered}{cleared}",
             _ => entered + cleared
@@ -626,7 +635,7 @@ public sealed class EmulatorTools(EmulatorController controller)
         return string.Join('\n', result);
     }
 
-    private static string FormatRegisters(Z80 cpu)
+    internal static string FormatRegisters(Z80 cpu)
     {
         var r = cpu.Registers;
         var flags = (byte)r.F;
@@ -687,7 +696,7 @@ public sealed class EmulatorTools(EmulatorController controller)
         return result.ToString().TrimEnd();
     }
 
-    private static string FormatDisassembly(Emulator emulator, Word start, int count)
+    internal static string FormatDisassembly(Emulator emulator, Word start, int count)
     {
         var disassembler = new Disassembler(emulator.Memory, start, count);
         var result = new StringBuilder();

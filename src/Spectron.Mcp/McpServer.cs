@@ -48,10 +48,16 @@ public sealed class McpServer(IEmulatorHost host, ILogger logger) : IAsyncDispos
                     pause or run_frames is used; run_frames leaves it paused, so call resume to hand control back to the user.
                     To enter a BASIC program (48K or 128 BASIC), use type_basic with a plain listing rather than typing keywords key by key,
                     and list_basic to read the program in memory back as text.
+                    To debug machine code: put it in memory with write_memory or load_file, set_breakpoint (e.g. PC==$8000), start it
+                    (debugger_command "GOTO $8000", or from BASIC with RANDOMIZE USR), run_frames until the result says the breakpoint
+                    stopped it, then step (into, over or out) and inspect with get_registers, read_memory or disassemble.
+                    run_until runs to a condition without adding a breakpoint. Breakpoints are shared with the user's debugger window,
+                    so remove the ones you set with clear_breakpoint when you are done.
                     """;
             })
             .WithHttpTransport(options => options.Stateless = true)
-            .WithTools<EmulatorTools>();
+            .WithTools<EmulatorTools>()
+            .WithTools<DebuggerTools>();
 
         var app = builder.Build();
         app.MapMcp(EndpointPath);
