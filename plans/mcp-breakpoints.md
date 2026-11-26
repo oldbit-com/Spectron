@@ -1,6 +1,6 @@
 # Step 4: breakpoint and stepping tools (proposal)
 
-Status: PR 1 implemented on branch `feature/debugger-stepping` (2026-11-26). PR 2 (MCP tools) not started.
+Status: DONE. PR 1 merged as #93 (2026-11-26). PR 2 (MCP tools) implemented on branch `feature/mcp-debugger-tools` (2026-11-26).
 The proposal was based on reading `main` at `618aed2`.
 
 > **PR 1 notes.**
@@ -17,6 +17,28 @@ The proposal was based on reading `main` at `618aed2`.
 >   A register breakpoint no longer fires a second time at the same place when two breakpoints match at once.
 > - Tests: `tests/Spectron.Emulator.Tests/EmulatorSteppingTests.cs`, `tests/Spectron.Debugger.Tests/Breakpoints/`,
 >   `tests/Spectron.Debugger.Tests/Stepping/StepOverTests.cs`.
+
+> **PR 2 notes.**
+> - `IEmulatorHost.Breakpoints` exposes the shared `BreakpointHandler` (not only the manager): the controller needs its
+>   `BreakpointHit` event to say which breakpoint fired, and `IsEnabled` to report the state. `IsEnabled` is only changed
+>   through `EnableBreakpointsAsync`, so the menu item follows.
+> - `EmulatorController` follows the user's `BreakpointHit` for its lifetime (it is disposed with the server), so
+>   `get_status` and `list_breakpoints` can name a breakpoint hit while the user was running. `RunAsync` (frame-driving
+>   tools) clears a pending break first, `ModifyAsync` (`write_memory`, `debugger_command`) and `RunAsync` call
+>   `NotifyStateChanged`, which refreshes an open `DebuggerViewModel` (its `Refresh` is now public).
+> - `step over` and `run_until` use a temporary `BreakpointHandler` per call. Before running, its register breakpoint
+>   takes the current values, so `run_until PC==$8000` at `$8000` runs until execution comes back. Reaching the target
+>   clears the break, so it is not reported later as "stopped at a breakpoint".
+> - `step out` does not use a `BreakpointHandler`: the condition is "a RET/RETI/RETN is taken (SP rises by 2 across it)
+>   and leaves SP above its value at the start", which a register breakpoint can't express. Checking that the return
+>   was taken matters after a POP, which can raise SP above the start before an untaken `RET cc`. A plain `PC==(SP)`
+>   target, as in the debugger, breaks when the routine has pushed something, and stops early in recursion.
+>   It hooks `BeforeInstruction` for the call only.
+> - A user breakpoint and a temporary target firing at the same instruction report the user breakpoint.
+> - Agent-set conditions get a canonical text (`PC == $8000`, `$5C3A == $00`), like the debugger's own.
+>   Setting an existing condition returns its id, or enables it if it was disabled.
+> - `MainViewModel.OnBreakpointHit` doesn't open the window while `IsPaused` is true.
+> - Tests: `tests/Spectron.Mcp.Tests/DebuggerToolsTests.cs`.
 
 Goal from `plans/mcp-next-steps.md`: agents can set, list and clear breakpoints and step through code,
 not only hit breakpoints that the user set in the debugger.

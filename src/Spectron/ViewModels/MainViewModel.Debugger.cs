@@ -58,7 +58,9 @@ partial class MainViewModel
 
     private void OnBreakpointHit(object? sender, BreakpointHitEventArgs e)
     {
-        if (_debuggerViewModel != null)
+        // An open window refreshes itself. While paused, frames only run from an MCP tool call (or a step in
+        // the open window), so the hit belongs to the agent, which gets it in the tool result.
+        if (_debuggerViewModel != null || IsPaused)
         {
             return;
         }

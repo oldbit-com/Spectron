@@ -174,7 +174,7 @@ public partial class DebuggerViewModel : ObservableObject, IDisposable
         _breakpointHandler.BreakpointHit -= OnBreakpointHit;
     }
 
-    private void Refresh(bool refreshMemory = true, BreakpointHitEventArgs? breakpointHitEventArgs = null)
+    public void Refresh(bool refreshMemory = true, BreakpointHitEventArgs? breakpointHitEventArgs = null)
     {
         RefreshCpu();
         RefreshStack();

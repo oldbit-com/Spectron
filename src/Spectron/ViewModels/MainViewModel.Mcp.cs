@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
 using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
+using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Mcp;
@@ -34,6 +35,14 @@ partial class MainViewModel : IEmulatorHost
 
     async Task<FileType> IEmulatorHost.LoadFileAsync(string filePath, string? archiveEntry) =>
         await Dispatcher.UIThread.InvokeAsync(() => LoadFileForAgentAsync(filePath, archiveEntry));
+
+    BreakpointHandler? IEmulatorHost.Breakpoints => _breakpointHandler;
+
+    async Task IEmulatorHost.EnableBreakpointsAsync() =>
+        await Dispatcher.UIThread.InvokeAsync(() => BreakpointsEnabled = true);
+
+    void IEmulatorHost.NotifyStateChanged() =>
+        Dispatcher.UIThread.Post(() => _debuggerViewModel?.Refresh());
 
     /// <summary>
     /// Loads a file like File/Open does, but throws instead of showing error dialogs or the archive file picker,

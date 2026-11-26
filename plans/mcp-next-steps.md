@@ -1,6 +1,6 @@
 # MCP server: handover and next steps
 
-Status as of 2026-11-26 (steps 1, 2 and 3 done). The experimental MCP server was merged into `main` in PR #78
+Status as of 2026-11-26 (steps 1, 2, 3 and 4 done). The experimental MCP server was merged into `main` in PR #78
 (squashed as `6122385`). Baseline on `main`: solution builds with 0 warnings, all 57 tests in
 `Spectron.Mcp.Tests` pass.
 
@@ -17,9 +17,10 @@ at this file and naming the step, for example:
 | File | Role |
 |---|---|
 | `src/Spectron.Mcp/McpServer.cs` | Kestrel host, Streamable HTTP on `127.0.0.1:<port>/mcp`, stateless, server instructions text |
-| `src/Spectron.Mcp/IEmulatorHost.cs` | What the app exposes: `Emulator`, `IsPaused`, `PauseAsync`, `ResumeAsync`, `ResetAsync`, `LoadFileAsync` |
+| `src/Spectron.Mcp/IEmulatorHost.cs` | What the app exposes: `Emulator`, `IsPaused`, `PauseAsync`, `ResumeAsync`, `ResetAsync`, `LoadFileAsync`, `Breakpoints`, `EnableBreakpointsAsync`, `NotifyStateChanged` |
 | `src/Spectron.Mcp/EmulatorController.cs` | Serialises tool calls, pauses or restores the run state, drives frames, `StopReason` |
 | `src/Spectron.Mcp/Tools/EmulatorTools.cs` | The 15 tools. Tool and parameter `[Description]` texts are what agents read |
+| `src/Spectron.Mcp/Tools/DebuggerTools.cs` | Breakpoint and stepping tools (step 4) |
 | `src/Spectron.Mcp/Input/KeyMapper.cs` | Text and key names to `SpectrumKey` combinations |
 | `src/Spectron.Mcp/Screen/ScreenTextReader.cs` | Display file to text via ROM font matching (inverse and block graphics) |
 | `src/Spectron.Emulation/Screen/PngEncoder.cs` | PNG encoding (moved here from Spectron.Mcp in #81) |
@@ -37,6 +38,8 @@ at this file and naming the step, for example:
   open an audio device.
 - Frame loops (`RunFrames`, `PressKeys`) check `StopReason` before every frame: breakpoint hit, user resumed,
   or emulator replaced. Never resume after a breakpoint or after the emulator was replaced.
+- Frame-driving tools go through `EmulatorController.RunAsync`, which clears a pending break first and refreshes an
+  open debugger window afterwards. Tools that change memory or registers use `ModifyAsync`.
 - `Emulator.RunFrame` takes a frame lock, so the timer thread and MCP never run frames at the same time.
 - UI lifecycle operations go through the host on the UI thread (`Dispatcher.UIThread.InvokeAsync`).
 - Input errors are reported with `McpException`. The SDK returns those as tool errors with the message;
@@ -169,12 +172,14 @@ dialog, and the tool call waits until someone closes it. Add a way to return the
 optional `showErrors` flag or a separate method that throws, so the tool can report it with `McpException`.
 User-initiated loads must keep the dialog.
 
-## Step 4: breakpoint and stepping tools
+## Step 4: breakpoint and stepping tools — DONE
 
 > **Detailed proposal: `plans/mcp-breakpoints.md`** (2026-11-26). It lists debugger problems found on the way
 > (partial frames ended twice, Step Into bypassing the emulator, `IsEnabled` ignored, thread safety) and splits
 > the work into two PRs: emulation and debugger groundwork, then the MCP tools.
-> PR 1 (groundwork) is implemented on branch `feature/debugger-stepping`; PR 2 (the tools) is next.
+> PR 1 (groundwork) merged as #93. PR 2 implemented on branch `feature/mcp-debugger-tools` (2026-11-26):
+> `src/Spectron.Mcp/Tools/DebuggerTools.cs` (`set_breakpoint`, `list_breakpoints`, `clear_breakpoint`, `step`, `run_until`),
+> tests in `tests/Spectron.Mcp.Tests/DebuggerToolsTests.cs`. See the PR 2 notes in `plans/mcp-breakpoints.md`.
 
 Agents can hit breakpoints that the user set in the debugger, but they can't set breakpoints or step.
 

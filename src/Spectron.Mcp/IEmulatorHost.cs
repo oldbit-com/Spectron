@@ -1,3 +1,4 @@
+using OldBit.Spectron.Debugger.Breakpoints;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Files;
 
@@ -45,4 +46,22 @@ public interface IEmulatorHost
     /// contains exactly one supported file.</param>
     /// <returns>The type of the loaded file. For an archive, the type of the loaded entry.</returns>
     Task<FileType> LoadFileAsync(string filePath, string? archiveEntry);
+
+    /// <summary>
+    /// Gets the user's breakpoints, shared with the debugger window, or null when no machine has been created yet.
+    /// The handler survives machine replacement. Its <see cref="BreakpointHandler.IsEnabled"/> reflects the
+    /// Breakpoints Enabled menu item; change it only through <see cref="EnableBreakpointsAsync"/>.
+    /// </summary>
+    BreakpointHandler? Breakpoints { get; }
+
+    /// <summary>
+    /// Turns breakpoint checking on, as the Breakpoints Enabled menu item does, so the UI shows it.
+    /// </summary>
+    Task EnableBreakpointsAsync();
+
+    /// <summary>
+    /// Tells the UI that an MCP tool ran frames or changed memory or registers, so an open debugger window refreshes.
+    /// Can be called from any thread.
+    /// </summary>
+    void NotifyStateChanged();
 }

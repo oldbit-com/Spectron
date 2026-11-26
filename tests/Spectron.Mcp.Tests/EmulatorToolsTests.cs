@@ -125,7 +125,7 @@ public class EmulatorToolsTests
         var result = await _tools.TypeText("abc");
 
         result.ShouldStartWith("Ran 2 frame(s).");
-        result.ShouldContain("Stopped at a debugger breakpoint");
+        result.ShouldContain("Stopped at a breakpoint");
         _host.ResumeCount.ShouldBe(0);
         emulator.KeyboardState.Read(0x00FE).ShouldBe((byte)0xFF);
     }
@@ -266,6 +266,9 @@ public class EmulatorToolsTests
         public Task ResetAsync(bool hardReset) => inner.ResetAsync(hardReset);
         public Task<OldBit.Spectron.Emulation.Files.FileType> LoadFileAsync(string filePath, string? archiveEntry) =>
             inner.LoadFileAsync(filePath, archiveEntry);
+        public OldBit.Spectron.Debugger.Breakpoints.BreakpointHandler? Breakpoints => inner.Breakpoints;
+        public Task EnableBreakpointsAsync() => inner.EnableBreakpointsAsync();
+        public void NotifyStateChanged() => inner.NotifyStateChanged();
     }
 
     [Theory]

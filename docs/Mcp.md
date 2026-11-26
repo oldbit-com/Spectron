@@ -6,13 +6,16 @@
 Spectron includes an optional [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server.
 It lets AI agents such as Claude Code, GitHub Copilot or Cursor see and control the running emulator.
 An agent can type on the Spectrum keyboard, run frames, read the screen, inspect and change memory,
-disassemble code, load files and use the built-in debugger, while you watch everything happen in the emulator window.
+disassemble code, load files, set breakpoints, step through Z80 code and use the built-in debugger,
+while you watch everything happen in the emulator window.
 
 Typical uses:
 - **Writing BASIC or machine code**: the agent writes a program, enters or pokes it into memory, runs it,
   reads the result from the screen and iterates until it works.
 - **Exploring software**: load a game or demo and let the agent inspect memory and code, for example
   to find where the number of lives is stored or to explain what a routine does.
+- **Debugging machine code**: the agent sets breakpoints, runs until one is hit and steps through the code,
+  checking registers and memory as it goes.
 - **Investigating emulator behaviour**: reproduce a problem step by step with deterministic frame control.
 
 ---
@@ -99,18 +102,19 @@ Normally the emulator runs in real time, 50 frames per second. AI agents work in
 read the result, think, and call the next tool. To make results predictable, every tool works like this:
 
 1. The emulator is paused for the duration of the call.
-2. Tools that need time to pass (`run_frames`, `type_text`, `type_basic`, `press_keys`) run emulation frames themselves,
-   as fast as possible. 50 frames equal one second of Spectrum time.
-3. The previous run state is restored afterwards. The exception is `run_frames`, which deliberately
-   leaves the emulator paused so the agent can inspect the result. The agent calls `resume` to hand
+2. Tools that need time to pass (`run_frames`, `type_text`, `type_basic`, `press_keys`, `step`, `run_until`) run
+   emulation frames themselves, as fast as possible. 50 frames equal one second of Spectrum time.
+3. The previous run state is restored afterwards. The exceptions are `run_frames`, `step` and `run_until`, which
+   deliberately leave the emulator paused so the agent can inspect the result. The agent calls `resume` to hand
    control back to you.
 
 You stay in control the whole time:
 - If you **resume emulation** (for example with `F2`) while the agent is running frames,
   the agent stops immediately and is told that you took over.
 - If you **load a file or reset the machine**, the agent stops and is told that the machine was replaced.
-- If a **debugger breakpoint** is hit, the agent stops and the debugger window opens as usual.
-  The emulator is not resumed automatically.
+- If a **breakpoint** is hit while the agent runs frames, the agent stops and is told which breakpoint it was.
+  The debugger window doesn't open for the agent's runs, but if it is already open, it shows where execution stopped.
+  The emulator is not resumed automatically. See [Breakpoints and stepping](#breakpoints-and-stepping).
 
 Calls from the agent are executed one at a time.
 
@@ -120,7 +124,7 @@ Calls from the agent are executed one at a time.
 
 | Tool               | Description                                                                                                   |
 |--------------------|---------------------------------------------------------------------------------------------------------------|
-| `get_status`       | Machine type, ROM, whether emulation is paused, program counter and tape state                                |
+| `get_status`       | Machine type, ROM, whether emulation is paused, program counter, tape state and breakpoint state              |
 | `pause`            | Pauses emulation                                                                                              |
 | `resume`           | Resumes real-time emulation                                                                                   |
 | `reset`            | Soft reset, or hard reset (`hard: true`) which recreates the machine from the current preferences             |
@@ -137,6 +141,11 @@ Calls from the agent are executed one at a time.
 | `write_memory`     | Writes bytes to memory, like `POKE`, e.g. `"3E 01 C9"`                                                        |
 | `disassemble`      | Disassembles Z80 code, starting at the program counter by default                                             |
 | `debugger_command` | Executes a [debugger immediate window](Debugger.md) command, e.g. `HL = $4000`, `PEEK 23560`, `LIST`          |
+| `set_breakpoint`   | Sets a breakpoint, e.g. `PC==$8000`, `A==5` or `$5C3A==0`, shared with the debugger window                    |
+| `list_breakpoints` | Lists breakpoints with their ids, and which one execution is stopped at                                       |
+| `clear_breakpoint` | Removes a breakpoint by id, or all of them                                                                    |
+| `step`             | Steps into, over or out of Z80 code, `count` times, and shows the executed instructions and registers         |
+| `run_until`        | Runs until a condition is true, e.g. `PC==$8000`, without adding a breakpoint                                 |
 
 Addresses can be written as decimal (`32768`) or hexadecimal (`$8000`, `0x8000`, `#8000`, `8000h`).
 
@@ -221,6 +230,34 @@ with `type_basic` lists back the same way, and an agent can check what is in mem
 - If the system variables don't point to a valid program area, for example because a machine-code program
   overwrote them, `list_basic` reports an error. A line that runs past `VARS` stops the listing with a note.
 
+#### Breakpoints and stepping
+
+Breakpoints use the same conditions as the [debugger](Debugger.md):
+
+- `PC==$8000`, `A==5`, `HL==16384`: stops when the register changes to the value. A `PC` breakpoint stops before the
+  instruction at that address runs.
+- `$5C3A`: stops after any write to that address. `$5C3A==0`: stops after a write of that value.
+
+The agent and you share one breakpoint list: breakpoints set by the agent appear in the debugger window, and the
+agent sees yours. `set_breakpoint` turns on *Debug → Breakpoints Enabled* if it was off. When a breakpoint stops
+`run_frames` (or `type_text`, `press_keys`, `type_basic`), the result says which one, for example
+`Stopped at breakpoint #2 (PC == $8000), previous PC=$7FFD, frame T-state 31744.` Running again continues from there,
+even while the debugger window is open.
+
+`step` executes code while paused:
+
+- `into` runs one instruction. A `CALL` or `RST` goes into the routine. If an interrupt is accepted, the step stops at the
+  start of the interrupt routine. On `HALT`, the step runs to the end of the frame.
+- `over` runs a `CALL`, `RST`, `DJNZ`, conditional jump, repeating block instruction (`LDIR` and so on) or `HALT` until
+  execution reaches the next instruction, like *Step Over* in the debugger.
+- `out` runs until the current routine returns.
+
+`run_until` runs until a condition with the same syntax becomes true. `step over`, `step out` and `run_until` use a
+temporary target that lives only for the call, so they never add breakpoints to your list. They also stop at your
+breakpoints and after a number of frames (`maxFrames`), so they can't run forever.
+
+If the debugger window is open, it refreshes when the agent runs frames, steps or changes memory or registers.
+
 #### Loading files
 
 `load_file` loads a file the same way as *File → Open*, and its result says what happened, for example
@@ -246,6 +283,8 @@ Once the agent is connected, ask for things in plain language, for example:
   RANDOMIZE USR 32768 and check the result."*
 - *"The game is loaded. Find the memory location that holds the number of lives and suggest a POKE for infinite lives."*
 - *"Disassemble the code at the current program counter and explain what it does."*
+- *"Set a breakpoint where the game writes the number of lives, run until it is hit and step through the code
+  that decreases it."*
 
 ---
 
@@ -267,7 +306,6 @@ Once the agent is connected, ask for things in plain language, for example:
 ### Limitations
 
 - Experimental: tool names and behaviour may change.
-- There are no tools yet for setting breakpoints or stepping through code. Breakpoints set in the debugger still work.
 - Tokenised BASIC cannot be entered directly into memory yet, so programs are typed on the keyboard.
 - There is no tool for saving snapshots yet.
 - Screenshots use the currently selected colour palette.
