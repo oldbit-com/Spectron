@@ -62,9 +62,8 @@ internal sealed class BasicEditor : IDisposable
     private static readonly SpectrumKey[] EnterKeys = [Enter];
 
     internal const string NotReadyMessage =
-        "The 48K BASIC editor is not waiting for input. type_basic needs a 16K/48K/TC2048 machine, or a 128K in " +
-        "48 BASIC mode, showing the K cursor with no program running. The 128 BASIC editor is not supported: use " +
-        "type_text there, it accepts keywords spelled out.";
+        "The 48K BASIC editor is not waiting for input. type_basic needs the K cursor showing with no program running " +
+        "(16K/48K/TC2048, or 128K in 48 BASIC mode), or the 128 BASIC editor.";
 
     private readonly EmulatorController _controller;
     private readonly Emulator _emulator;
@@ -247,6 +246,9 @@ internal sealed class BasicEditor : IDisposable
             case KeywordEntry.SymbolShift:
                 Press(keyword.Keys);
                 break;
+
+            case KeywordEntry.Spelled:
+                throw new EntryFailedException($"Line {line.Number}: {keyword.Name} is a 128 BASIC keyword.");
 
             default:
                 PressExtended(keyword.Keys);

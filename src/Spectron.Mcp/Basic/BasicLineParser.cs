@@ -21,7 +21,7 @@ internal sealed record CharacterItem(char Character) : BasicItem
 }
 
 /// <summary>
-/// A parsed BASIC line ready to be typed into the 48K editor.
+/// A parsed BASIC line ready to be typed into the 48K or 128 editor.
 /// </summary>
 /// <param name="Number">The line number.</param>
 /// <param name="Items">Keywords and characters after the line number, up to and including REM.</param>
@@ -47,22 +47,29 @@ internal static class BasicLineParser
     internal const int MaxLineNumber = 9999;
 
     // Longest names first, so INKEY$ wins over INK and GO SUB over GO TO's prefix
-    private static readonly Lazy<BasicKeyword[]> KeywordsByLength = new(() =>
+    private static readonly Lazy<BasicKeyword[]> Keywords48ByLength = new(() =>
         BasicKeywords.All.OrderByDescending(keyword => keyword.Name.Length).ToArray());
+
+    private static readonly Lazy<BasicKeyword[]> Keywords128ByLength = new(() =>
+        BasicKeywords.All.Concat(BasicKeywords.Basic128).OrderByDescending(keyword => keyword.Name.Length).ToArray());
 
     /// <summary>
     /// Parses a listing, one BASIC line per text line. Blank lines are skipped.
     /// </summary>
+    /// <param name="program">The listing.</param>
+    /// <param name="isBasic128">True to also recognise the 128 BASIC keywords SPECTRUM and PLAY.</param>
     /// <exception cref="ArgumentException">The listing contains a line that cannot be typed.</exception>
-    internal static List<BasicLine> Parse(string program) => program
+    internal static List<BasicLine> Parse(string program, bool isBasic128 = false) => program
         .Replace("\r\n", "\n")
         .Split('\n')
         .Where(text => !string.IsNullOrWhiteSpace(text))
-        .Select(ParseLine)
+        .Select(text => ParseLine(text, isBasic128))
         .ToList();
 
-    internal static BasicLine ParseLine(string text)
+    internal static BasicLine ParseLine(string text, bool isBasic128 = false)
     {
+        var keywords = isBasic128 ? Keywords128ByLength.Value : Keywords48ByLength.Value;
+
         var position = 0;
 
         while (position < text.Length && char.IsWhiteSpace(text[position]))
@@ -118,7 +125,7 @@ internal static class BasicLineParser
                 continue;
             }
 
-            var keyword = MatchKeyword(text, position, bodyStart, out var length);
+            var keyword = MatchKeyword(keywords, text, position, bodyStart, out var length);
 
             if (keyword == null)
             {
@@ -159,9 +166,9 @@ internal static class BasicLineParser
         return remark;
     }
 
-    private static BasicKeyword? MatchKeyword(string text, int position, int bodyStart, out int length)
+    private static BasicKeyword? MatchKeyword(BasicKeyword[] keywords, string text, int position, int bodyStart, out int length)
     {
-        foreach (var keyword in KeywordsByLength.Value)
+        foreach (var keyword in keywords)
         {
             if (TryMatch(text, position, bodyStart, keyword.Name, out length))
             {
