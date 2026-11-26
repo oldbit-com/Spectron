@@ -242,6 +242,10 @@ public sealed class NativeMainMenu
                     : new KeyGesture(Key.O, KeyModifiers.Control)
             },
 
+            CreateRecentMenuItem(),
+
+            new NativeMenuItemSeparator(),
+
             new NativeMenuItem("Browse Games...")
             {
                 Command = _viewModel.BrowseGamesCommand,
@@ -250,8 +254,6 @@ public sealed class NativeMainMenu
                     : new KeyGesture(Key.O, KeyModifiers.Control | KeyModifiers.Shift)
             },
 
-            CreateRecentMenuItem(),
-
             new NativeMenuItem("Save Snapshot...")
             {
                 Command = _viewModel.SaveFileCommand,
@@ -259,6 +261,8 @@ public sealed class NativeMainMenu
                     ? new KeyGesture(Key.S, KeyModifiers.Meta)
                     : new KeyGesture(Key.S, KeyModifiers.Control)
             },
+
+            new NativeMenuItemSeparator(),
 
             new NativeMenuItem("Quick Save")
             {
@@ -833,7 +837,7 @@ public sealed class NativeMainMenu
 
     private NativeMenuItem CreateRecentMenuItem()
     {
-        var recentItem = new NativeMenuItem("Recent...");
+        var recentItem = new NativeMenuItem("Open Recent...");
 
         var itemsMenu = new NativeMenu();
         itemsMenu.Opening += (_, _) => _viewModel.RecentFilesViewModel.Opening(itemsMenu);
