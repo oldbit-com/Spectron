@@ -12,6 +12,7 @@ public partial class GameViewModel : ObservableObject
     public string Publisher { get; set; } = string.Empty;
     public string Year { get; set; } = string.Empty;
     public string Genre { get; set; } = string.Empty;
+    public ObservableCollection<string> Authors { get; set; } = [];
     public string Availability { get; set; } = string.Empty;
     public string? AvailabilityType { get; set; }
     public string Machine { get; set; } = string.Empty;

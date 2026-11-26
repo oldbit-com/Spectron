@@ -297,7 +297,8 @@ public partial class GameBrowserViewModel : ObservableObject
 
         await Task.WhenAll(
             LoadScreenshotAsync(game, tokenSource.Token),
-            LoadFilesAsync(game, tokenSource.Token));
+            LoadFilesAsync(game, tokenSource.Token),
+            GetAuthors(game, tokenSource.Token));
     }
 
     private async Task LoadScreenshotAsync(GameViewModel game, CancellationToken cancellationToken)
@@ -338,5 +339,24 @@ public partial class GameBrowserViewModel : ObservableObject
         {
             game.SelectedFile = game.Files[0].Value;
         }
+    }
+
+    private async Task GetAuthors(GameViewModel game, CancellationToken cancellationToken)
+    {
+        List<AuthorResult> authors;
+
+        game.Authors.Clear();
+
+        try
+        {
+            authors = await _zxDbService.GetAuthors(game.EntryId, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error reading authors for entry {EntryId}", game.EntryId);
+            return;
+        }
+
+        game.Authors.AddRange(authors.Select(a => a.Author));
     }
 }

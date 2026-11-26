@@ -160,57 +160,68 @@
                         <scr:ScrImage Height="192" Width="256" Data="{Binding ScreenData}"/>
                     </Border>
 
-                    <StackPanel Grid.Row="1" Orientation="Vertical">
+                    <StackPanel Grid.Row="1" Opacity="0.8">
                         <TextBlock
                             Text="{Binding Name}"
                             FontSize="18"
-                            Margin="0,10,0,0"
+                            Margin="0,10,0,10"
                             Foreground="{DynamicResource SystemAccentColor}"
                             TextAlignment="Center"
                             TextWrapping="WrapWithOverflow"/>
-
-                        <TextBlock Margin="0,5,0,0" Opacity="0.8">
-                            <Run Text="{Binding Year}"/>
-                            <Run Text="∙"/>
-                            <Run Text="{Binding Publisher}"/>
-                        </TextBlock>
-
-                        <Grid RowDefinitions="30,30,30" Margin="0,20,0,0" Opacity="0.8">
-                            <Grid Grid.Row="0" ColumnDefinitions="70,*">
-                                <TextBlock Grid.Column="0" Text="Machine"/>
-                                <TextBlock Grid.Column="1" Text="{Binding Machine}" TextAlignment="Right"/>
-                            </Grid>
-                            <Grid Grid.Row="1" ColumnDefinitions="70,*">
-                                <TextBlock Grid.Column="0" Text="Genre"/>
-                                <TextBlock Grid.Column="1" Text="{Binding Genre}" TextAlignment="Right"/>
-                            </Grid>
-                            <Grid Grid.Row="2">
-                                <StackPanel IsVisible="{Binding SelectedFile, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                    <ComboBox
-                                        ItemsSource="{Binding Files}"
-                                        DisplayMemberBinding="{Binding Name}"
-                                        SelectedValueBinding="{Binding Value}"
-                                        SelectedValue="{Binding SelectedFile}"
-                                        HorizontalAlignment="Stretch"/>
-                                    <Grid
-                                        ColumnDefinitions="*,*"
-                                        Margin="0 5 0 0"
-                                        DataContext="{Binding $parent[Window].DataContext}"
-                                        x:DataType="viewModels:GameBrowserViewModel">
-                                        <Button
-                                            Grid.Column="0"
-                                            Content="Load"
-                                            Command="{Binding LoadFileCommand}"/>
-                                        <Button
-                                            Grid.Column="1"
-                                            Content="Download"
-                                            Command="{Binding DownloadFileCommand}"
-                                            CommandParameter="{Binding $parent[Window]}"
-                                            HorizontalAlignment="Right"/>
-                                    </Grid>
-                                </StackPanel>
-                            </Grid>
+                        <Grid ColumnDefinitions="70,*">
+                            <TextBlock Grid.Column="0" Text="Year:"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Year}" TextAlignment="Right"/>
                         </Grid>
+                        <Grid ColumnDefinitions="70,*" Margin="0 10 0 0">
+                            <TextBlock Grid.Column="0" Text="Publisher:"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Publisher}" TextAlignment="Right"/>
+                        </Grid>
+                        <Grid ColumnDefinitions="70,*" Margin="0 10 0 0">
+                            <TextBlock Grid.Column="0" Text="Machine:"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Machine}" TextAlignment="Right"/>
+                        </Grid>
+                        <Grid ColumnDefinitions="70,*" Margin="0 10 0 0">
+                            <TextBlock Grid.Column="0" Text="Genre:"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Genre}" TextAlignment="Right"/>
+                        </Grid>
+                        <Grid ColumnDefinitions="70,*" Margin="0 10 0 0">
+                            <TextBlock Grid.Column="0" Text="Authors:"/>
+                            <ScrollViewer Grid.Column="1" MaxHeight="120">
+                                <ItemsRepeater ItemsSource="{Binding Authors}">
+                                    <ItemsRepeater.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" TextAlignment="Right"/>
+                                        </DataTemplate>
+                                    </ItemsRepeater.ItemTemplate>
+                                </ItemsRepeater>
+                            </ScrollViewer>
+                        </Grid>
+                        <StackPanel
+                            Margin="0 10 0 0"
+                            IsVisible="{Binding SelectedFile, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <ComboBox
+                                ItemsSource="{Binding Files}"
+                                DisplayMemberBinding="{Binding Name}"
+                                SelectedValueBinding="{Binding Value}"
+                                SelectedValue="{Binding SelectedFile}"
+                                HorizontalAlignment="Stretch"/>
+                            <Grid
+                                ColumnDefinitions="*,*"
+                                Margin="0 5 0 0"
+                                DataContext="{Binding $parent[Window].DataContext}"
+                                x:DataType="viewModels:GameBrowserViewModel">
+                                <Button
+                                    Grid.Column="0"
+                                    Content="Load"
+                                    Command="{Binding LoadFileCommand}"/>
+                                <Button
+                                    Grid.Column="1"
+                                    Content="Download"
+                                    Command="{Binding DownloadFileCommand}"
+                                    CommandParameter="{Binding $parent[Window]}"
+                                    HorizontalAlignment="Right"/>
+                            </Grid>
+                        </StackPanel>
                     </StackPanel>
                 </Grid>
             </Grid>
