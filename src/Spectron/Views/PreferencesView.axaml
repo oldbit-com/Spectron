@@ -40,11 +40,6 @@
         <Style Selector="TextBlock.Center">
             <Setter Property="Padding" Value="8 4 0 0" />
         </Style>
-        <Style Selector="ComboBox">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Padding" Value="10 2 0 0"/>
-        </Style>
     </Window.Styles>
 
     <Grid RowDefinitions="*,50">

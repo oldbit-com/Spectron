@@ -13,6 +13,7 @@ public partial class GameViewModel : ObservableObject
     public string Year { get; set; } = string.Empty;
     public string Genre { get; set; } = string.Empty;
     public string Availability { get; set; } = string.Empty;
+    public string? AvailabilityType { get; set; }
     public string Machine { get; set; } = string.Empty;
     public MaterialIconKind Icon => ResolveIcon(Genre);
     public ObservableCollection<NameValuePair<string>> Files { get; set; } = [];

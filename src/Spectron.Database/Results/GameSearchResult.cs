@@ -7,4 +7,5 @@ public sealed record GameSearchResult(
     string? Genre,
     short? Year,
     string? Availability,
+    string? AvailabilityType,
     string? Publisher);

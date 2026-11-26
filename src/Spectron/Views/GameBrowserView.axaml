@@ -122,12 +122,29 @@
 
                                 <TextBlock
                                     Grid.Column="2"
+                                    Classes="availability"
+                                    Tag="{Binding AvailabilityType}"
                                     Text="{Binding Availability}"
                                     Opacity="0.7"
                                     FontSize="12"
+                                    FontWeight="Bold"
                                     TextWrapping="Wrap"
                                     TextAlignment="Right"
-                                    VerticalAlignment="Center" />
+                                    VerticalAlignment="Center">
+
+                                    <TextBlock.Styles>
+                                        <Style Selector="TextBlock.availability[Tag=A]">
+                                            <Setter Property="Foreground" Value="ForestGreen"/>
+                                        </Style>
+                                        <Style Selector="TextBlock.availability[Tag=D]">
+                                            <Setter Property="Foreground" Value="Red"/>
+                                        </Style>
+                                        <Style Selector="TextBlock.availability[Tag=S]">
+                                            <Setter Property="Foreground" Value="Red"/>
+                                        </Style>
+                                    </TextBlock.Styles>
+
+                                </TextBlock>
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
