@@ -261,6 +261,7 @@ public partial class GameBrowserViewModel : ObservableObject
                     Publisher = result.Publisher ?? "Unknown",
                     Year = result.Year?.ToString() ?? "????",
                     Genre = result.Genre ?? string.Empty,
+                    AvailabilityType = result.AvailabilityType,
                     Availability = result.Availability ?? string.Empty,
                     Machine = result.Machine ?? string.Empty
                 });

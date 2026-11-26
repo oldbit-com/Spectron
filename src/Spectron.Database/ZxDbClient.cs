@@ -100,6 +100,7 @@ public sealed class ZxDbClient(IDbContextFactory<GamesDbContext> contextFactory,
                     .Select(r => r.ReleaseYear)
                     .FirstOrDefault(),
                 Availability = e.Availabletype!.Text,
+                AvailabilityType = e.Availabletype!.Id,
                 Publisher = e.Publishers
                     .Where(p => p.ReleaseSeq == 0 && p.PublisherSeq == 1)
                     .Select(p => p.Label.Name)
@@ -113,9 +114,19 @@ public sealed class ZxDbClient(IDbContextFactory<GamesDbContext> contextFactory,
 
         var results = await rows.Take(limit).ToListAsync(cancellationToken);
 
-        return results
-            .Select(r => new GameSearchResult(r.Id, r.Title, r.Machine, r.Genre, r.Year, r.Availability, r.Publisher))
-            .ToList();
+        return
+        [
+            .. results
+                .Select(r => new GameSearchResult(
+                    r.Id,
+                    r.Title,
+                    r.Machine,
+                    r.Genre,
+                    r.Year,
+                    r.Availability,
+                    r.AvailabilityType,
+                    r.Publisher))
+        ];
     }
 
     internal async Task<string?> GetScreenshotFileAsync(int entryId, CancellationToken cancellationToken = default)
