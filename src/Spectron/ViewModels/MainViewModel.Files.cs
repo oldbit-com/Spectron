@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Messaging;
@@ -18,7 +19,6 @@ partial class MainViewModel
 
     private async Task HandleLoadFileAsync(string? filePath, FavoriteProgram? favorite = null)
     {
-        Stream? stream = null;
         var shouldResume = !IsPaused;
 
         try
@@ -39,32 +39,86 @@ partial class MainViewModel
             var fileType = FileTypeResolver.FromPath(filePath);
             if (fileType == FileType.Unsupported)
             {
-                await _messageDialogs.Warning($"Unsupported file type: {fileType}.");
+                await _messageDialogs.Warning($"Unsupported file type: {Path.GetExtension(filePath)}.");
                 return;
             }
 
-            (stream, fileType) = await LoadFileAsync(filePath, fileType);
-            if (stream == null)
+            await LoadFileCoreAsync(filePath, fileType, favorite, SelectArchiveEntryAsync);
+        }
+        catch (Exception ex)
+        {
+            await _messageDialogs.Error(ex.Message);
+            RecentFilesViewModel.Remove(filePath);
+        }
+        finally
+        {
+            if (shouldResume)
             {
-                return;
+                Resume();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Loads a file without showing any dialogs. Errors are thrown to the caller.
+    /// </summary>
+    /// <param name="filePath">The path to the file.</param>
+    /// <param name="fileType">The type of the file.</param>
+    /// <param name="favorite">The favorite program settings to apply, if any.</param>
+    /// <param name="selectArchiveEntry">Chooses which supported file to load from a zip archive.
+    /// The list can be empty. Returns null to cancel the load.</param>
+    /// <returns>The type of the loaded file (for an archive, the type of the selected entry) or null if nothing was loaded.</returns>
+    private async Task<FileType?> LoadFileCoreAsync(
+        string filePath,
+        FileType fileType,
+        FavoriteProgram? favorite,
+        Func<List<ArchiveEntry>, Task<ArchiveEntry?>> selectArchiveEntry)
+    {
+        if (fileType == FileType.Unsupported)
+        {
+            throw new NotSupportedException($"Unsupported file type: {Path.GetExtension(filePath)}.");
+        }
+
+        ZipArchiveReader? archive = null;
+        Stream? stream = null;
+
+        try
+        {
+            if (fileType.IsArchive())
+            {
+                archive = new ZipArchiveReader(filePath);
+
+                var entry = await selectArchiveEntry(archive.GetSupportedFiles());
+                if (entry == null)
+                {
+                    return null;
+                }
+
+                fileType = entry.FileType;
+                stream = archive.GetFile(entry.Name) ??
+                         throw new FileNotFoundException($"File {entry.Name} not found in the archive.");
+            }
+            else
+            {
+                stream = File.OpenRead(filePath);
             }
 
             switch (fileType)
             {
                 case FileType.Pok:
                     LoadPokeFile(stream);
-                    return;
+                    return fileType;
 
                 case FileType.Mdr:
                     LoadMicrodriveFile(filePath, stream);
                     RecentFilesViewModel.Add(filePath);
-                    return;
+                    return fileType;
 
                 case FileType.Trd:
                 case FileType.Scl:
                     LoadDiskFile(filePath, stream);
                     RecentFilesViewModel.Add(filePath);
-                    return;
+                    return fileType;
 
                 default:
                     if (_preferences.IsAutoLoadPokeFilesEnabled)
@@ -75,25 +129,36 @@ partial class MainViewModel
                     break;
             }
 
-            if (CreateEmulator(stream, fileType, favorite))
+            if (!CreateEmulator(stream, fileType, favorite))
             {
-                RecentFilesViewModel.Add(filePath);
-                Title = $"{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
+                return null;
             }
-        }
-        catch (Exception ex)
-        {
-            await _messageDialogs.Error(ex.Message);
-            RecentFilesViewModel.Remove(filePath);
+
+            RecentFilesViewModel.Add(filePath);
+            Title = $"{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
+
+            return fileType;
         }
         finally
         {
-            stream?.Close();
+            stream?.Dispose();
+            archive?.Dispose();
+        }
+    }
 
-            if (shouldResume)
-            {
-                Resume();
-            }
+    private async Task<ArchiveEntry?> SelectArchiveEntryAsync(List<ArchiveEntry> entries)
+    {
+        switch (entries.Count)
+        {
+            case 0:
+                await _messageDialogs.Warning("No matching files found in the archive.");
+                return null;
+
+            case 1:
+                return entries[0];
+
+            default:
+                return await WeakReferenceMessenger.Default.Send(new ShowSelectArchiveFileViewMessage(entries));
         }
     }
 
@@ -110,47 +175,6 @@ partial class MainViewModel
         {
             await HandleLoadFileAsync(favorite.Path, favorite);
         }
-    }
-
-    private async Task<(Stream? Stream, FileType FileType)> LoadFileAsync(string filePath, FileType fileType)
-    {
-        Stream? stream = null;
-
-        if (fileType.IsArchive())
-        {
-            var archive = new ZipArchiveReader(filePath);
-            var files = archive.GetSupportedFiles();
-
-            switch (files.Count)
-            {
-                case 0:
-                    await _messageDialogs.Warning("No matching files found in the archive.");
-                    return (null, fileType);
-
-                case 1:
-                    fileType = files[0].FileType;
-                    stream = archive.GetFile(files[0].Name);
-                    break;
-
-                default:
-                {
-                    var selectedFile = await WeakReferenceMessenger.Default.Send(new ShowSelectArchiveFileViewMessage(files));
-
-                    if (selectedFile != null)
-                    {
-                        fileType = selectedFile.FileType;
-                        stream = archive.GetFile(selectedFile.Name);
-                    }
-                    break;
-                }
-            }
-        }
-        else
-        {
-            stream = File.OpenRead(filePath);
-        }
-
-        return (stream, fileType);
     }
 
     private void LoadPokeFile(Stream stream)

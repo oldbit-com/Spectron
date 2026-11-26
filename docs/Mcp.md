@@ -124,7 +124,7 @@ Calls from the agent are executed one at a time.
 | `pause`            | Pauses emulation                                                                                              |
 | `resume`           | Resumes real-time emulation                                                                                   |
 | `reset`            | Soft reset, or hard reset (`hard: true`) which recreates the machine from the current preferences             |
-| `load_file`        | Loads a file like *File → Open*: snapshots, tapes, disks, microdrives, RZX, POK and ZIP archives               |
+| `load_file`        | Loads a file like *File → Open*: snapshots, tapes, disks, microdrives, RZX and ZIP archives                    |
 | `run_frames`       | Runs `count` frames as fast as possible and leaves the emulator paused (max 15,000 per call)                  |
 | `type_text`        | Types text on the Spectrum keyboard, one key press per character                                              |
 | `type_basic`       | Enters a 48K BASIC program from a plain listing, choosing the keyword keys automatically                      |
@@ -221,6 +221,19 @@ with `type_basic` lists back the same way, and an agent can check what is in mem
 - If the system variables don't point to a valid program area, for example because a machine-code program
   overwrote them, `list_basic` reports an error. A line that runs past `VARS` stops the listing with a note.
 
+#### Loading files
+
+`load_file` loads a file the same way as *File → Open*, and its result says what happened, for example
+`Inserted tape game.tzx and entered LOAD "". Use run_frames to let it load.` Tapes are loaded with the current
+tape settings, so with auto-play on the agent only needs to run frames until the program has started.
+
+- If loading fails, for example because a snapshot is corrupt, the error is returned to the agent.
+  No error dialog is shown, so the call never waits for the user.
+- For a ZIP archive with one supported file, that file is loaded. If the archive contains several, the agent
+  chooses one with `entry`, by its name or its path in the archive. Without `entry`, the error lists the files,
+  so the archive picker is never shown.
+- POKE files (`.pok`) are not supported, because they open the Trainers window, which needs the user.
+
 ---
 
 ### Example prompts
@@ -257,7 +270,6 @@ Once the agent is connected, ask for things in plain language, for example:
 - There are no tools yet for setting breakpoints or stepping through code. Breakpoints set in the debugger still work.
 - Tokenised BASIC cannot be entered directly into memory yet, so programs are typed on the keyboard.
 - There is no tool for saving snapshots yet.
-- If loading a file fails, the usual error dialog is shown and the tool call waits until the dialog is closed.
 - Screenshots use the currently selected colour palette.
 - The server has no authentication, see the note in [Enabling the server](#enabling-the-server).
 

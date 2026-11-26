@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.DependencyInjection;
+using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Rom;
 
 namespace OldBit.Spectron.Mcp.Tests.Fixtures;
@@ -51,5 +52,24 @@ internal sealed class TestEmulatorHost : IEmulatorHost
         return Task.CompletedTask;
     }
 
-    public Task LoadFileAsync(string filePath) => Task.CompletedTask;
+    public string? LoadedFilePath { get; private set; }
+    public string? LoadedArchiveEntry { get; private set; }
+
+    /// <summary>
+    /// Gets or sets an exception thrown by LoadFileAsync, to simulate a failed load.
+    /// </summary>
+    public Exception? LoadFileException { get; set; }
+
+    public Task<FileType> LoadFileAsync(string filePath, string? archiveEntry)
+    {
+        if (LoadFileException != null)
+        {
+            throw LoadFileException;
+        }
+
+        LoadedFilePath = filePath;
+        LoadedArchiveEntry = archiveEntry;
+
+        return Task.FromResult(FileTypeResolver.FromPath(archiveEntry ?? filePath));
+    }
 }

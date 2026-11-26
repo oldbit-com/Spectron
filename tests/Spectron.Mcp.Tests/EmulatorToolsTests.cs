@@ -227,12 +227,6 @@ public class EmulatorToolsTests
         BinaryPrimitives.ReadInt32BigEndian(png.AsSpan(20)).ShouldBe(384);
     }
 
-    [Fact]
-    public async Task LoadFile_ShouldRejectMissingFile()
-    {
-        await Should.ThrowAsync<McpException>(() => _tools.LoadFile("/no/such/file.tap"));
-    }
-
     private void OnFrame(int frame, Action action)
     {
         var frames = 0;
@@ -270,7 +264,8 @@ public class EmulatorToolsTests
 
         public Task ResumeAsync() => inner.ResumeAsync();
         public Task ResetAsync(bool hardReset) => inner.ResetAsync(hardReset);
-        public Task LoadFileAsync(string filePath) => inner.LoadFileAsync(filePath);
+        public Task<OldBit.Spectron.Emulation.Files.FileType> LoadFileAsync(string filePath, string? archiveEntry) =>
+            inner.LoadFileAsync(filePath, archiveEntry);
     }
 
     [Theory]

@@ -1,4 +1,5 @@
 using OldBit.Spectron.Emulation;
+using OldBit.Spectron.Emulation.Files;
 
 namespace OldBit.Spectron.Mcp;
 
@@ -36,7 +37,12 @@ public interface IEmulatorHost
     Task ResetAsync(bool hardReset);
 
     /// <summary>
-    /// Loads a supported file (snapshot, tape, disk, etc.) the same way as File/Open does.
+    /// Loads a supported file (snapshot, tape, disk, etc.) the same way as File/Open does, but without
+    /// showing any dialogs. Errors are thrown to the caller.
     /// </summary>
-    Task LoadFileAsync(string filePath);
+    /// <param name="filePath">The path to the file.</param>
+    /// <param name="archiveEntry">For a zip archive, the name of the entry to load. It can be null when the archive
+    /// contains exactly one supported file.</param>
+    /// <returns>The type of the loaded file. For an archive, the type of the loaded entry.</returns>
+    Task<FileType> LoadFileAsync(string filePath, string? archiveEntry);
 }

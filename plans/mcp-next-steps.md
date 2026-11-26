@@ -1,6 +1,6 @@
 # MCP server: handover and next steps
 
-Status as of 2026-11-26 (steps 1 and 2 done). The experimental MCP server was merged into `main` in PR #78
+Status as of 2026-11-26 (steps 1, 2 and 3 done). The experimental MCP server was merged into `main` in PR #78
 (squashed as `6122385`). Baseline on `main`: solution builds with 0 warnings, all 57 tests in
 `Spectron.Mcp.Tests` pass.
 
@@ -155,7 +155,14 @@ that follow `0x0E`, and render embedded colour codes in some readable form. The 
 **Done when.** A program entered in step 1 lists back identically, and there are tests for keywords,
 numbers, strings and `REM`.
 
-## Step 3: report `load_file` errors instead of showing a dialog
+## Step 3: report `load_file` errors instead of showing a dialog — DONE
+
+> Implemented on branch `fix/mcp-load-file-errors` (2026-11-26). `MainViewModel.LoadFileCoreAsync` loads without
+> dialogs and throws; `HandleLoadFileAsync` wraps it for the UI (dialogs and archive picker unchanged).
+> `IEmulatorHost.LoadFileAsync(path, archiveEntry)` returns the loaded `FileType`. The tool resolves zip entries
+> itself (new optional `entry` parameter, error lists the files), rejects `.pok` (the Trainers window is modal),
+> wraps host errors in `McpException` and says what was loaded. Tests in `tests/Spectron.Mcp.Tests/LoadFileTests.cs`.
+> Also fixed: the `ZipArchiveReader` was never disposed. Not done: a way for agents to apply POKEs.
 
 `IEmulatorHost.LoadFileAsync` calls `MainViewModel.HandleLoadFileAsync`. If loading fails it shows an error
 dialog, and the tool call waits until someone closes it. Add a way to return the error, for example an
