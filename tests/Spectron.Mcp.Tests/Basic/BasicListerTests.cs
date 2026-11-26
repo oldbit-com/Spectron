@@ -44,6 +44,12 @@ public class BasicListerTests
     }
 
     [Fact]
+    public void FormatLine_ShouldNotStartRemarkAtRemTokenInsideString()
+    {
+        Format("PRINT", "\"", "REM", "\":", "PRINT", "1", HiddenOne, 0x0D).ShouldBe(" PRINT \" REM \": PRINT 1");
+    }
+
+    [Fact]
     public void FormatLine_ShouldShowControlCodesInBraces()
     {
         Format("PRINT", "\"", 0x10, 0x02, 0x11, 0x07, 0x12, 0x01, 0x13, 0x01, 0x14, 0x00, 0x15, 0x01, "A\"")

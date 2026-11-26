@@ -150,7 +150,7 @@ internal static class BasicLister
                     var index = b - BasicKeywords.FirstToken;
                     var name = BasicKeywords.Get(b).Name;
                     AppendKeyword(name, leadingSpace: index >= 0x20 && char.IsAsciiLetter(name[0]), trailingSpace: index >= 3);
-                    isInRemark |= b == BasicKeywords.RemToken;
+                    isInRemark |= b == BasicKeywords.RemToken && !isInString;
                     break;
 
                 case Spectrum128Token or Play128Token when !isInString && !isInRemark:
