@@ -59,15 +59,6 @@ partial class MainViewModel
         }
     }
 
-    /// <summary>
-    /// Loads a file without showing any dialogs. Errors are thrown to the caller.
-    /// </summary>
-    /// <param name="filePath">The path to the file.</param>
-    /// <param name="fileType">The type of the file.</param>
-    /// <param name="favorite">The favorite program settings to apply, if any.</param>
-    /// <param name="selectArchiveEntry">Chooses which supported file to load from a zip archive.
-    /// The list can be empty. Returns null to cancel the load.</param>
-    /// <returns>The type of the loaded file (for an archive, the type of the selected entry) or null if nothing was loaded.</returns>
     private async Task<FileType?> LoadFileCoreAsync(
         string filePath,
         FileType fileType,
@@ -95,7 +86,7 @@ partial class MainViewModel
         }
 
         // Declared after the archive, so it is disposed first: a zip entry stream needs the archive open.
-        using var stream = archive == null || entry == null
+        await using var stream = archive == null || entry == null
             ? File.OpenRead(filePath)
             : archive.GetFile(entry.Name) ?? throw new FileNotFoundException($"File {entry.Name} not found in the archive.");
 
