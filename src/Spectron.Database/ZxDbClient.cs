@@ -160,6 +160,16 @@ public sealed class ZxDbClient(IDbContextFactory<GamesDbContext> contextFactory,
             .ToListAsync(cancellationToken);
     }
 
+    internal async Task<List<AuthorResult>> GetAuthors(int entryId, CancellationToken cancellationToken = default)
+    {
+        await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
+
+        return await db.Authors
+            .Where(e => e.EntryId == entryId)
+            .Select(e => new AuthorResult(e.Label.Name))
+            .ToListAsync(cancellationToken);
+    }
+
     // search_by_titles and search_by_names store text lower-cased with everything except letters and digits removed,
     // e.g. "Jet Set Willy 64: Manic Miner" -> "jetsetwilly64manicminer".
     private static string NormalizeSearchText(string text) =>

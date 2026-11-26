@@ -61,6 +61,9 @@ public sealed class ZxDbService(
     public Task<List<FileResult>> GetGameFileLinksAsync(int entryId, CancellationToken cancellationToken = default) =>
         zxDbClient.GetGameFileLinksAsync(entryId, cancellationToken);
 
+    public Task<List<AuthorResult>> GetAuthors(int entryId, CancellationToken cancellationToken = default) =>
+        zxDbClient.GetAuthors(entryId, cancellationToken);
+
     /// <summary>
     /// Downloads a ZXDB file into the local download cache, mirroring the remote folder structure,
     /// so it keeps its original name and can be reopened later (recent files, favorites) without network access.
