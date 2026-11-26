@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Messaging;
@@ -18,7 +19,6 @@ partial class MainViewModel
 
     private async Task HandleLoadFileAsync(string? filePath, FavoriteProgram? favorite = null)
     {
-        Stream? stream = null;
         var shouldResume = !IsPaused;
 
         try
@@ -39,47 +39,11 @@ partial class MainViewModel
             var fileType = FileTypeResolver.FromPath(filePath);
             if (fileType == FileType.Unsupported)
             {
-                await _messageDialogs.Warning($"Unsupported file type: {fileType}.");
+                await _messageDialogs.Warning($"Unsupported file type: {Path.GetExtension(filePath)}.");
                 return;
             }
 
-            (stream, fileType) = await LoadFileAsync(filePath, fileType);
-            if (stream == null)
-            {
-                return;
-            }
-
-            switch (fileType)
-            {
-                case FileType.Pok:
-                    LoadPokeFile(stream);
-                    return;
-
-                case FileType.Mdr:
-                    LoadMicrodriveFile(filePath, stream);
-                    RecentFilesViewModel.Add(filePath);
-                    return;
-
-                case FileType.Trd:
-                case FileType.Scl:
-                    LoadDiskFile(filePath, stream);
-                    RecentFilesViewModel.Add(filePath);
-                    return;
-
-                default:
-                    if (_preferences.IsAutoLoadPokeFilesEnabled)
-                    {
-                        TryAutoLoadPokeFile(filePath);
-                    }
-
-                    break;
-            }
-
-            if (CreateEmulator(stream, fileType, favorite))
-            {
-                RecentFilesViewModel.Add(filePath);
-                Title = $"{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
-            }
+            await LoadFileCoreAsync(filePath, fileType, favorite, SelectArchiveEntryAsync);
         }
         catch (Exception ex)
         {
@@ -88,12 +52,94 @@ partial class MainViewModel
         }
         finally
         {
-            stream?.Close();
-
             if (shouldResume)
             {
                 Resume();
             }
+        }
+    }
+
+    private async Task<FileType?> LoadFileCoreAsync(
+        string filePath,
+        FileType fileType,
+        FavoriteProgram? favorite,
+        Func<List<ArchiveEntry>, Task<ArchiveEntry?>> selectArchiveEntry)
+    {
+        if (fileType == FileType.Unsupported)
+        {
+            throw new NotSupportedException($"Unsupported file type: {Path.GetExtension(filePath)}.");
+        }
+
+        using var archive = fileType.IsArchive() ? new ZipArchiveReader(filePath) : null;
+
+        ArchiveEntry? entry = null;
+
+        if (archive != null)
+        {
+            entry = await selectArchiveEntry(archive.GetSupportedFiles());
+            if (entry == null)
+            {
+                return null;
+            }
+
+            fileType = entry.FileType;
+        }
+
+        // Declared after the archive, so it is disposed first: a zip entry stream needs the archive open.
+        await using var stream = archive == null || entry == null
+            ? File.OpenRead(filePath)
+            : archive.GetFile(entry.Name) ?? throw new FileNotFoundException($"File {entry.Name} not found in the archive.");
+
+        switch (fileType)
+        {
+            case FileType.Pok:
+                LoadPokeFile(stream);
+                return fileType;
+
+            case FileType.Mdr:
+                LoadMicrodriveFile(filePath, stream);
+                RecentFilesViewModel.Add(filePath);
+                return fileType;
+
+            case FileType.Trd:
+            case FileType.Scl:
+                LoadDiskFile(filePath, stream);
+                RecentFilesViewModel.Add(filePath);
+                return fileType;
+
+            default:
+                if (_preferences.IsAutoLoadPokeFilesEnabled)
+                {
+                    TryAutoLoadPokeFile(filePath);
+                }
+
+                break;
+        }
+
+        if (!CreateEmulator(stream, fileType, favorite))
+        {
+            return null;
+        }
+
+        RecentFilesViewModel.Add(filePath);
+        Title = $"{DefaultTitle} [{RecentFilesViewModel.CurrentFileName}]";
+
+        return fileType;
+    }
+
+    private async Task<ArchiveEntry?> SelectArchiveEntryAsync(List<ArchiveEntry> entries)
+    {
+        switch (entries.Count)
+        {
+            case 0:
+                await _messageDialogs.Warning("No matching files found in the archive.");
+                return null;
+
+            case 1:
+                return entries[0];
+
+            default:
+                return await WeakReferenceMessenger.Default.Send(new ShowSelectArchiveFileViewMessage(entries));
         }
     }
 
@@ -110,47 +156,6 @@ partial class MainViewModel
         {
             await HandleLoadFileAsync(favorite.Path, favorite);
         }
-    }
-
-    private async Task<(Stream? Stream, FileType FileType)> LoadFileAsync(string filePath, FileType fileType)
-    {
-        Stream? stream = null;
-
-        if (fileType.IsArchive())
-        {
-            var archive = new ZipArchiveReader(filePath);
-            var files = archive.GetSupportedFiles();
-
-            switch (files.Count)
-            {
-                case 0:
-                    await _messageDialogs.Warning("No matching files found in the archive.");
-                    return (null, fileType);
-
-                case 1:
-                    fileType = files[0].FileType;
-                    stream = archive.GetFile(files[0].Name);
-                    break;
-
-                default:
-                {
-                    var selectedFile = await WeakReferenceMessenger.Default.Send(new ShowSelectArchiveFileViewMessage(files));
-
-                    if (selectedFile != null)
-                    {
-                        fileType = selectedFile.FileType;
-                        stream = archive.GetFile(selectedFile.Name);
-                    }
-                    break;
-                }
-            }
-        }
-        else
-        {
-            stream = File.OpenRead(filePath);
-        }
-
-        return (stream, fileType);
     }
 
     private void LoadPokeFile(Stream stream)

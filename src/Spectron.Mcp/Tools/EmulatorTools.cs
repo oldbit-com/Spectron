@@ -10,6 +10,7 @@ using OldBit.Spectron.Debugger.Parser.Values;
 using OldBit.Spectron.Disassembly;
 using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.Devices.Keyboard;
+using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Spectron.Emulation.Files;
 using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Mcp.Basic;
@@ -67,23 +68,122 @@ public sealed class EmulatorTools(EmulatorController controller)
 
     [McpServerTool(Name = "load_file", Destructive = true)]
     [Description("Loads a file into the emulator, same as File/Open: snapshots (.sna, .z80, .szx, .spectron), tapes (.tap, .tzx, auto-typing LOAD \"\"), " +
-                 "disks (.trd, .scl), microdrives (.mdr), RZX recordings and POKE files. Zip archives are supported. Snapshots replace the current machine.")]
+                 "disks (.trd, .scl), microdrives (.mdr) and RZX recordings. Zip archives are supported; if an archive contains more than one " +
+                 "supported file, choose one with entry. Snapshots replace the current machine. Errors are returned instead of shown to the user. " +
+                 "POKE files (.pok) are not supported, they need the Trainers window.")]
     public async Task<string> LoadFile(
-        [Description("Absolute path to the file.")] string path)
+        [Description("Absolute path to the file.")] string path,
+        [Description("Zip archives only: the file in the archive to load, by name or path inside the archive. " +
+                     "Needed when the archive contains more than one supported file; the error lists them.")] string? entry = null)
     {
         if (!File.Exists(path))
         {
             throw new McpException($"File not found: {path}");
         }
 
-        if (FileTypeResolver.FromPath(path) == FileType.Unsupported)
+        var fileType = FileTypeResolver.FromPath(path);
+
+        if (fileType == FileType.Unsupported)
         {
             throw new McpException($"Unsupported file type: {Path.GetExtension(path)}");
         }
 
-        await controller.RunHostActionAsync(host => host.LoadFileAsync(path));
+        if (fileType == FileType.Pok)
+        {
+            throw new McpException("POKE files are not supported here, they open the Trainers window, which needs the user.");
+        }
 
-        return $"Loaded {Path.GetFileName(path)}.";
+        string? archiveEntry = null;
+
+        if (fileType.IsArchive())
+        {
+            archiveEntry = ResolveArchiveEntry(path, entry);
+        }
+        else if (!string.IsNullOrEmpty(entry))
+        {
+            throw new McpException("The entry parameter only applies to zip archives.");
+        }
+
+        var fileName = archiveEntry == null ? Path.GetFileName(path) : $"{archiveEntry} from {Path.GetFileName(path)}";
+
+        FileType loadedType;
+
+        try
+        {
+            loadedType = await controller.RunHostActionAsync(host => host.LoadFileAsync(path, archiveEntry));
+        }
+        catch (Exception ex) when (ex is not McpException)
+        {
+            throw new McpException($"Failed to load {fileName}: {ex.Message}", ex);
+        }
+
+        return loadedType switch
+        {
+            _ when loadedType.IsTape() =>
+                $"Inserted tape {fileName} and entered LOAD \"\". Use run_frames to let it load.",
+            FileType.Trd or FileType.Scl =>
+                $"Inserted disk {fileName} into drive A and enabled the Beta 128 interface.",
+            FileType.Mdr =>
+                $"Inserted cartridge {fileName} into microdrive 1 and enabled Interface 1.",
+            FileType.Rzx =>
+                $"Started RZX playback of {fileName}.",
+            _ => $"Loaded snapshot {fileName}."
+        };
+    }
+
+    /// <summary>
+    /// Finds which supported file to load from a zip archive, so loading never needs the archive file picker.
+    /// </summary>
+    /// <param name="path">The path to the zip archive.</param>
+    /// <param name="entry">The requested entry: its full name or just the file name, case-insensitive. Optional when
+    /// the archive contains exactly one supported file.</param>
+    /// <returns>The full name of the entry in the archive.</returns>
+    internal static string ResolveArchiveEntry(string path, string? entry)
+    {
+        var archiveName = Path.GetFileName(path);
+        List<ArchiveEntry> entries;
+
+        try
+        {
+            using var archive = new ZipArchiveReader(path);
+            entries = archive.GetSupportedFiles();
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
+        {
+            throw new McpException($"Failed to read archive {archiveName}: {ex.Message}");
+        }
+
+        if (entries.Count == 0)
+        {
+            throw new McpException($"No supported files found in {archiveName}.");
+        }
+
+        var names = string.Join(", ", entries.Select(e => e.Name));
+
+        if (string.IsNullOrEmpty(entry))
+        {
+            return entries.Count == 1
+                ? entries[0].Name
+                : throw new McpException($"{archiveName} contains {entries.Count} supported files, choose one with entry: {names}");
+        }
+
+        var match = entries.FirstOrDefault(e => string.Equals(e.Name, entry, StringComparison.OrdinalIgnoreCase));
+
+        if (match == null)
+        {
+            var byFileName = entries
+                .Where(e => string.Equals(Path.GetFileName(e.Name), entry, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            match = byFileName.Count switch
+            {
+                1 => byFileName[0],
+                > 1 => throw new McpException($"More than one file named {entry} in {archiveName}, use the full path: {names}"),
+                _ => throw new McpException($"{entry} not found in {archiveName}. Supported files: {names}")
+            };
+        }
+
+        return match.Name;
     }
 
     [McpServerTool(Name = "run_frames")]

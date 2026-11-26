@@ -90,6 +90,20 @@ public sealed class EmulatorController(IEmulatorHost host)
         }
     }
 
+    internal async Task<T> RunHostActionAsync<T>(Func<IEmulatorHost, Task<T>> action)
+    {
+        await _lock.WaitAsync();
+
+        try
+        {
+            return await action(host);
+        }
+        finally
+        {
+            _lock.Release();
+        }
+    }
+
     /// <summary>
     /// Runs the given number of frames as fast as possible. Must be called while the emulator is paused.
     /// Stops early if a debugger breakpoint is hit, the user resumes emulation or the machine is replaced.
