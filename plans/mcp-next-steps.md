@@ -1,6 +1,6 @@
 # MCP server: handover and next steps
 
-Status as of 2026-11-22. The experimental MCP server was merged into `main` in PR #78
+Status as of 2026-11-26 (steps 1 and 2 done). The experimental MCP server was merged into `main` in PR #78
 (squashed as `6122385`). Baseline on `main`: solution builds with 0 warnings, all 57 tests in
 `Spectron.Mcp.Tests` pass.
 
@@ -138,7 +138,14 @@ string containing keyword-like text (`PRINT "TO BE"`), are entered correctly on 
 splitting, the mode handling and an end-to-end entry. The tool description, `docs/Mcp.md` and the Typing
 notes are updated.
 
-## Step 2: `list_basic` tool (read the program back as text)
+## Step 2: `list_basic` tool (read the program back as text) — DONE
+
+> Implemented on branch `feature/list-basic` (2026-11-26): `src/Spectron.Mcp/Basic/BasicLister.cs`, tests in
+> `tests/Spectron.Mcp.Tests/Basic/BasicListerTests.cs` and `ListBasicTests.cs`. Spacing follows `PO-TOKENS` in the
+> 48K ROM (verified by a test that compares the output with the ROM's own `LIST`). Control codes are shown in
+> braces (`{INK 2}`, `{AT 1,5}`, `{UDG A}`, `{$06}`). Hidden numbers are skipped outside strings and REM only, so
+> machine code in a REM is not misread. Not done: checking hidden numbers against the digits shown (obfuscated
+> loaders), and listing variables. Note: on the 128K menu, `ENTER` alone opens Tape Loader; 128 BASIC is `DOWN, ENTER`.
 
 A natural pair for step 1. The agent can check what is in memory without typing `LIST` and reading the screen.
 Read lines from `PROG` (23635) up to `VARS` (23627). Detokenise keywords, skip the hidden 5-byte numbers

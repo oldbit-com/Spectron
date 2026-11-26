@@ -24,6 +24,7 @@ public sealed class EmulatorTools(EmulatorController controller)
 {
     private const int MaxMemoryLength = 4096;
     private const int MaxInstructions = 500;
+    private const int MaxListingLength = 32_000;
 
     [McpServerTool(Name = "get_status", ReadOnly = true)]
     [Description("Returns the emulated machine type, ROM, whether emulation is paused, the program counter and tape state.")]
@@ -218,6 +219,42 @@ public sealed class EmulatorTools(EmulatorController controller)
             using var editor = new BasicEditor(controller, emulator);
 
             return FormatBasicEntryResult(editor.EnterLines(lines));
+        });
+    }
+
+    [McpServerTool(Name = "list_basic", ReadOnly = true)]
+    [Description("""
+                 Lists the BASIC program in memory as text, one line per BASIC line, without typing LIST or changing the screen.
+                 Keywords are spelled out with the same spacing as LIST, so a program entered with type_basic lists back the same way.
+                 - Hidden 5-byte numbers are skipped. Codes that LIST does not show as text are written in braces: colour codes
+                   as {INK 2}, {PAPER 7}, {FLASH 1}, {BRIGHT 1}, {INVERSE 1}, {OVER 1}, {AT 1,5}, {TAB 8}, user-defined graphics as {UDG A},
+                   other control codes as {$06}. Block graphics are shown as the Unicode characters ▝▘▀▗▐▚▜▖▞▌▛▄▟▙█.
+                 - Works for 48K and 128K programs (SPECTRUM and PLAY are listed as keywords).
+                 Emulation stays paused afterwards if it was paused before.
+                 """)]
+    public Task<string> ListBasic(
+        [Description("First line number to list.")] int fromLine = 0,
+        [Description("Last line number to list.")] int toLine = 65535)
+    {
+        if (fromLine is < 0 or > 65535 || toLine is < 0 or > 65535 || fromLine > toLine)
+        {
+            throw new McpException("fromLine and toLine must be between 0 and 65535, and fromLine cannot be greater than toLine.");
+        }
+
+        return controller.ExecuteAsync(emulator =>
+        {
+            BasicProgram program;
+
+            try
+            {
+                program = BasicLister.Read(emulator.Memory);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new McpException(ex.Message);
+            }
+
+            return FormatListing(program, fromLine, toLine);
         });
     }
 
@@ -430,6 +467,45 @@ public sealed class EmulatorTools(EmulatorController controller)
             StopReason.EmulatorReplaced => $"Stopped because the machine was replaced (file loaded or machine reset). {entered}{cleared}",
             _ => entered + cleared
         };
+    }
+
+    private static string FormatListing(BasicProgram program, int fromLine, int toLine)
+    {
+        var result = new StringBuilder();
+        var lines = program.Lines.Where(line => line.Number >= fromLine && line.Number <= toLine).ToList();
+
+        foreach (var line in lines)
+        {
+            var text = line.ToString();
+
+            if (result.Length > 0 && result.Length + text.Length > MaxListingLength)
+            {
+                result.Append($"\n(Listing truncated. Use fromLine {line.Number} to continue.)");
+
+                return result.ToString();
+            }
+
+            if (result.Length > 0)
+            {
+                result.Append('\n');
+            }
+
+            result.Append(text);
+        }
+
+        if (lines.Count == 0)
+        {
+            result.Append(program.Lines.Count == 0
+                ? "There is no BASIC program in memory."
+                : $"There are no lines between {fromLine} and {toLine}.");
+        }
+
+        if (program.Problem != null)
+        {
+            result.Append($"\n(Listing stopped: {program.Problem})");
+        }
+
+        return result.ToString();
     }
 
     private static string FormatRegisters(Z80 cpu)

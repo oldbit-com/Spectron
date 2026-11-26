@@ -20,7 +20,7 @@ internal sealed class ScreenTextReader
     private const int CharCount = 96;
 
     // Spectrum block graphics 0x80-0x8F: bit 0 = top right, bit 1 = top left, bit 2 = bottom right, bit 3 = bottom left.
-    private const string BlockGraphics = " ▝▘▀▗▐▚▜▖▞▌▛▄▟▙█";
+    internal const string BlockGraphics = " ▝▘▀▗▐▚▜▖▞▌▛▄▟▙█";
 
     private static readonly Lazy<byte[]> RomFont = new(() =>
         RomReader.ReadRom(RomType.Original48).AsSpan(RomFontAddress, CharCount * 8).ToArray());

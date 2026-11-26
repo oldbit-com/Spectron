@@ -157,7 +157,7 @@ public class TypeBasicTests
     {
         var test = new TypeBasicTests(ComputerType.Spectrum128K);
         await test._tools.RunFrames(150);
-        await test._tools.PressKeys(["ENTER"]);
+        await test._tools.PressKeys(["DOWN", "ENTER"]);
         await test._tools.RunFrames(100);
 
         var ex = await Should.ThrowAsync<McpException>(() => test._tools.TypeBasic("10 CLS"));
