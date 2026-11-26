@@ -46,20 +46,19 @@ public sealed class BreakpointList
         return true;
     }
 
-    public List<Breakpoint> RemoveAll(Predicate<Breakpoint> match)
+    public void RemoveAll(Predicate<Breakpoint> match)
     {
         lock (_lock)
         {
             var removed = _breakpoints.FindAll(match);
 
-            if (removed.Count > 0)
+            if (removed.Count <= 0)
             {
-                _breakpoints.RemoveAll(match);
-
-                SynchronizeLists();
+                return;
             }
 
-            return removed;
+            _breakpoints.RemoveAll(match);
+            SynchronizeLists();
         }
     }
 

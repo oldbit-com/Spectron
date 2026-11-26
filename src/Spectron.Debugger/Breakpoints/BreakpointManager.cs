@@ -156,8 +156,6 @@ public class BreakpointManager
         return null;
     }
 
-    public bool IsMemoryBreakpointHit(Word address, IMemory memory) => FindMemoryBreakpointHit(address, memory) != null;
-
     private static bool IsSingleUse(Breakpoint breakpoint) => breakpoint is RegisterBreakpoint { IsSingleUse: true };
 
     private void CreateRegistersIndex(Z80 cpu)

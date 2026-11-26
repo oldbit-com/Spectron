@@ -10,10 +10,6 @@ using OldBit.Spectron.Disassembly.Formatters;
 
 namespace OldBit.Spectron.Debugger.ViewModels;
 
-/// <summary>
-/// Shows the breakpoints of a <see cref="BreakpointManager"/>. The list follows the manager's
-/// <see cref="BreakpointManager.Changed"/> event, so it also shows changes made elsewhere (e.g. by an MCP agent).
-/// </summary>
 public partial class BreakpointListViewModel : ObservableObject,
     IRecipient<ToggleBreakpointMessage>, IDisposable
 {
