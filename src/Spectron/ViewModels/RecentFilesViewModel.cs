@@ -30,6 +30,9 @@ public partial class RecentFilesViewModel(RecentFilesService recentFilesService)
         }
     }
 
+    [RelayCommand]
+    private void ClearRecentFiles() => _recentFilesSettings.Files.Clear();
+
     public async Task LoadAsync() => _recentFilesSettings = await recentFilesService.LoadAsync();
 
     public async Task SaveAsync() => await recentFilesService.SaveAsync(_recentFilesSettings);
@@ -49,6 +52,18 @@ public partial class RecentFilesViewModel(RecentFilesService recentFilesService)
                 CommandParameter = file
             });
         }
+
+        if (items.Count == 0)
+        {
+            return;
+        }
+
+        items.Add(new MenuItem{Header = "-"});
+        items.Add(new MenuItem
+        {
+            Header = "Clear History",
+            Command = ClearRecentFilesCommand
+        });
     }
 
     public void Opening(NativeMenu recentMenu)
@@ -65,6 +80,17 @@ public partial class RecentFilesViewModel(RecentFilesService recentFilesService)
                 CommandParameter = file
             });
         }
+
+        if (recentMenu.Items.Count == 0)
+        {
+            return;
+        }
+
+        recentMenu.Items.Add(new NativeMenuItemSeparator());
+        recentMenu.Items.Add(new NativeMenuItem("Clear History")
+        {
+            Command = ClearRecentFilesCommand
+        });
     }
 
     public void Add(string filePath)

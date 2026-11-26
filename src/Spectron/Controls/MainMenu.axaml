@@ -53,11 +53,13 @@
     <Menu x:Name="Menu">
         <MenuItem Header="_File" Padding="10 0 10 0" IsTabStop="False" Focusable="False">
             <MenuItem Header="Load..." InputGesture="{OnPlatform Ctrl+O, macOS=Cmd+O}" Command="{Binding LoadFileCommand}"/>
-            <MenuItem Header="Browse Games..." InputGesture="{OnPlatform Ctrl+Shift+O, macOS=Cmd+Shift+O}" Command="{Binding BrowseGamesCommand}"/>
-            <MenuItem Header="Recent..." SubmenuOpened="RecentFilesSubmenuOpened">
+            <MenuItem Header="Open Recent..." SubmenuOpened="RecentFilesSubmenuOpened">
                 <MenuItem/>
             </MenuItem>
+            <MenuItem Header="-"/>
+            <MenuItem Header="Browse Games..." InputGesture="{OnPlatform Ctrl+Shift+O, macOS=Cmd+Shift+O}" Command="{Binding BrowseGamesCommand}"/>
             <MenuItem Header="Save Snapshot..." InputGesture="{OnPlatform Ctrl+S, macOS=Cmd+S}" Command="{Binding SaveFileCommand}"/>
+            <MenuItem Header="-"/>
             <MenuItem Header="Quick Save" InputGesture="F5" Command="{Binding QuickSaveCommand}"/>
             <MenuItem Header="Quick Load" InputGesture="F6" Command="{Binding QuickLoadCommand}"/>
             <MenuItem Header="-"/>
