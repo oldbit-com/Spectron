@@ -190,7 +190,7 @@
                                 <ItemsRepeater ItemsSource="{Binding Authors}">
                                     <ItemsRepeater.ItemTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding .}" TextAlignment="Right"/>
+                                            <TextBlock Text="{Binding}" TextAlignment="Right"/>
                                         </DataTemplate>
                                     </ItemsRepeater.ItemTemplate>
                                 </ItemsRepeater>
