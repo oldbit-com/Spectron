@@ -5,6 +5,8 @@ using OldBit.Spectron.Emulation;
 using OldBit.Spectron.Emulation.DependencyInjection;
 using OldBit.Spectron.Emulation.Extensions;
 using OldBit.Spectron.Emulation.Rom;
+using OldBit.Spectron.Emulation.Screen.Palettes;
+using OldBit.Spectron.Emulation.Tape;
 using OldBit.Z80Cpu;
 
 namespace OldBit.Spectron.Emulator.Tests;
@@ -137,6 +139,51 @@ public class EmulatorSteppingTests
 
         // The instruction where the break happened is announced again when the frame continues
         instructions.ShouldBe(referenceInstructions + 1);
+    }
+
+    [Fact]
+    public void Step_WhenNextInstructionIsRomTrap_ShouldRunTrapOnlyWhenInstructionIsExecuted()
+    {
+        _emulator.TapeManager.TapeSaveSpeed = TapeSpeed.Instant;
+        _emulator.TapeManager.IsTapeSaveEnabled = true;
+
+        // CALL SA_BYTES
+        WriteCode(0xCD, RomRoutines.SA_BYTES & 0xFF, RomRoutines.SA_BYTES >> 8);
+        DisableInterrupts();
+
+        _emulator.Step();
+
+        _emulator.Cpu.Registers.PC.ShouldBe(RomRoutines.SA_BYTES);
+        _emulator.TapeManager.Cassette.IsEmpty.ShouldBeTrue();
+
+        _emulator.Step();
+
+        _emulator.TapeManager.Cassette.IsEmpty.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void RunFrame_WhenBreakMidFrame_ShouldDrawBorderUpToBeam()
+    {
+        // LD A,2; OUT ($FE),A; JR $
+        WriteCode(0x3E, 0x02, 0xD3, 0xFE, 0x18, 0xFE);
+        DisableInterrupts();
+
+        var instructions = 0;
+        _emulator.Cpu.BeforeInstruction += _ =>
+        {
+            // Well past the top border
+            if (++instructions == 2000)
+            {
+                _emulator.Break();
+            }
+        };
+
+        _emulator.RunFrame();
+
+        _executionStops.ShouldBe(1);
+        // Row 20 is in the top border, drawn after the colour change and before the break
+        var frameBuffer = _emulator.ScreenBuffer.FrameBuffer;
+        frameBuffer.Pixels[20 * frameBuffer.Width].ShouldBe(SpectrumPalette.Red);
     }
 
     [Fact]

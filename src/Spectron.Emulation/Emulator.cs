@@ -38,7 +38,9 @@ public sealed class Emulator
     private readonly Lock _frameLock = new();
     private readonly bool[] _isRomTrapSupported = new bool[2];
 
+    private bool _hasRomTraps;
     private bool _isFrameInProgress;
+    private bool _isStepping;
     private bool _isStepComplete;
     private int _stepInstructionCount;
     private Word _stepStartAddress;
@@ -243,11 +245,16 @@ public sealed class Emulator
         {
             IsDebuggerBreak = false;
 
+            _isStepping = true;
             _isStepComplete = false;
             _stepInstructionCount = 0;
             _stepStartAddress = Cpu.Registers.PC;
 
-            Cpu.BeforeInstruction += StepBeforeInstruction;
+            // With ROM traps the handler is always subscribed
+            if (!_hasRomTraps)
+            {
+                Cpu.BeforeInstruction += BeforeInstruction;
+            }
 
             try
             {
@@ -255,22 +262,29 @@ public sealed class Emulator
             }
             finally
             {
-                Cpu.BeforeInstruction -= StepBeforeInstruction;
+                if (!_hasRomTraps)
+                {
+                    Cpu.BeforeInstruction -= BeforeInstruction;
+                }
+
+                _isStepping = false;
                 _isStepComplete = false;
             }
         }
     }
 
-    private void StepBeforeInstruction(Word pc)
+    private bool IsStepComplete(Word pc)
     {
         // The first instruction is the one being stepped, unless an interrupt was accepted before it
         if (_stepInstructionCount++ == 0 && pc == _stepStartAddress)
         {
-            return;
+            return false;
         }
 
         _isStepComplete = true;
         Cpu.Break();
+
+        return true;
     }
 
     public void RequestNmi() => _isNmiRequested = true;
@@ -317,7 +331,10 @@ public sealed class Emulator
         Beta128.DiskActivity += _ => DiskDriveManager.OnDiskActivity();
 
         // ROM traps rely on the original tape routines, so they are only enabled for ROMs that contain them
-        if (DetectRomTrapSupport())
+        // Subscribed first, so the step check runs before breakpoint handlers added later
+        _hasRomTraps = DetectRomTrapSupport();
+
+        if (_hasRomTraps)
         {
             Cpu.BeforeInstruction += BeforeInstruction;
         }
@@ -381,8 +398,10 @@ public sealed class Emulator
 
             if (!Cpu.Clock.IsFrameComplete)
             {
-                // The rest of the frame runs when execution continues, without starting a new frame
+                // The rest of the frame runs when execution continues, without starting a new frame.
+                // The screen is drawn up to the beam as ticks are added, the border only when its colour changes.
                 _isFrameInProgress = true;
+                ScreenBuffer.RefreshBorder(Clock.UlaTicks);
                 ExecutionStopped?.Invoke();
 
                 return;
@@ -473,6 +492,20 @@ public sealed class Emulator
     }
 
     private void BeforeInstruction(Word pc)
+    {
+        // A completed step stops before the next instruction, so its ROM trap runs only when execution continues
+        if (_isStepping && IsStepComplete(pc))
+        {
+            return;
+        }
+
+        if (_hasRomTraps)
+        {
+            HandleRomTraps(pc);
+        }
+    }
+
+    private void HandleRomTraps(Word pc)
     {
         // ROM traps only apply to the Spectrum ROM with the original tape routines,
         // not to a shadow ROM or another ROM bank paged in at the same address
