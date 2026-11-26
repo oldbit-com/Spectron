@@ -506,6 +506,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
+    /// <summary>
+    /// Execution stopped mid-frame (breakpoint or debugger step). The frame buffer is drawn up to the beam
+    /// position, so show it without the end-of-frame work (audio, recording, quick-save).
+    /// </summary>
+    private void EmulatorExecutionStopped() => Dispatcher.UIThread.Post(() =>
+    {
+        _frameBufferConverter?.UpdateBitmap();
+        ScreenControl.InvalidateVisual();
+    });
+
     public void OnViewClosed(Type? viewModel)
     {
         if (viewModel == typeof(DebuggerViewModel))

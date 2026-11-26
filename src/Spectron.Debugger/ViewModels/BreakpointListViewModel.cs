@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.ObjectModel;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -10,7 +11,7 @@ using OldBit.Spectron.Disassembly.Formatters;
 namespace OldBit.Spectron.Debugger.ViewModels;
 
 public partial class BreakpointListViewModel : ObservableObject,
-    IRecipient<ToggleBreakpointMessage>
+    IRecipient<ToggleBreakpointMessage>, IDisposable
 {
     private readonly BreakpointManager _breakpointManager;
     private readonly NumberFormatter _numberFormatter;
@@ -24,8 +25,10 @@ public partial class BreakpointListViewModel : ObservableObject,
 
         foreach (var breakpoint in _breakpointManager.Breakpoints)
         {
-            AddBreakpoint(breakpoint);
+            Breakpoints.Add(new BreakpointViewModel(breakpoint));
         }
+
+        _breakpointManager.Changed += BreakpointManagerOnChanged;
 
         WeakReferenceMessenger.Default.RegisterAll(this);
     }
@@ -42,15 +45,7 @@ public partial class BreakpointListViewModel : ObservableObject,
         }
     }
 
-    private void AddBreakpoint(Breakpoint breakpoint)
-    {
-        var viewModel = new BreakpointViewModel(breakpoint);
-
-        Breakpoints.Add(viewModel);
-        _breakpointManager.AddBreakpoint(breakpoint);
-
-        WeakReferenceMessenger.Default.Send(new BreakpointAddedMessage(breakpoint));
-    }
+    private void AddBreakpoint(Breakpoint breakpoint) => _breakpointManager.AddBreakpoint(breakpoint);
 
     private void AddBreakpoint(Register register, Word value)
     {
@@ -75,13 +70,8 @@ public partial class BreakpointListViewModel : ObservableObject,
         }
     }
 
-    private void RemoveBreakpoint(BreakpointViewModel breakpointViewModel)
-    {
+    private void RemoveBreakpoint(BreakpointViewModel breakpointViewModel) =>
         _breakpointManager.RemoveBreakpoint(breakpointViewModel.Breakpoint);
-        Breakpoints.Remove(breakpointViewModel);
-
-        WeakReferenceMessenger.Default.Send(new BreakpointRemovedMessage(breakpointViewModel.Breakpoint));
-    }
 
     public void UpdateBreakpoint(BreakpointViewModel breakpointViewModel)
     {
@@ -91,12 +81,58 @@ public partial class BreakpointListViewModel : ObservableObject,
         }
 
         var original = breakpointViewModel.Breakpoint;
-        breakpointViewModel.Breakpoint = updated;
 
         updated.IsEnabled = original.IsEnabled;
         _breakpointManager.UpdateBreakpoint(original, updated);
+    }
 
-        WeakReferenceMessenger.Default.Send(new BreakpointUpdatedMessage(original, updated));
+    private void BreakpointManagerOnChanged(object? sender, BreakpointsChangedEventArgs e)
+    {
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            ApplyChange(e);
+        }
+        else
+        {
+            Dispatcher.UIThread.Post(() => ApplyChange(e));
+        }
+    }
+
+    internal void ApplyChange(BreakpointsChangedEventArgs e)
+    {
+        switch (e.Change)
+        {
+            case BreakpointChange.Added:
+                if (Breakpoints.All(vm => vm.Breakpoint != e.Breakpoint))
+                {
+                    Breakpoints.Add(new BreakpointViewModel(e.Breakpoint));
+                }
+
+                WeakReferenceMessenger.Default.Send(new BreakpointAddedMessage(e.Breakpoint));
+                break;
+
+            case BreakpointChange.Removed:
+                var removed = Breakpoints.FirstOrDefault(vm => vm.Breakpoint == e.Breakpoint);
+
+                if (removed != null)
+                {
+                    Breakpoints.Remove(removed);
+                }
+
+                WeakReferenceMessenger.Default.Send(new BreakpointRemovedMessage(e.Breakpoint));
+                break;
+
+            case BreakpointChange.Updated:
+                var updated = Breakpoints.FirstOrDefault(vm => vm.Breakpoint == e.Original);
+
+                if (updated != null)
+                {
+                    updated.Breakpoint = e.Breakpoint;
+                }
+
+                WeakReferenceMessenger.Default.Send(new BreakpointUpdatedMessage(e.Original!, e.Breakpoint));
+                break;
+        }
     }
 
     public void Receive(ToggleBreakpointMessage message)
@@ -109,5 +145,13 @@ public partial class BreakpointListViewModel : ObservableObject,
         {
             RemoveBreakpoint(message.Register, message.Address);
         }
+    }
+
+    public void Dispose()
+    {
+        _breakpointManager.Changed -= BreakpointManagerOnChanged;
+        WeakReferenceMessenger.Default.UnregisterAll(this);
+
+        GC.SuppressFinalize(this);
     }
 }

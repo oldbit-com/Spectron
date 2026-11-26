@@ -38,7 +38,12 @@ public sealed class Emulator
     private readonly Lock _frameLock = new();
     private readonly bool[] _isRomTrapSupported = new bool[2];
 
-    private bool _isDebuggerResume;
+    private bool _hasRomTraps;
+    private bool _isFrameInProgress;
+    private bool _isStepping;
+    private bool _isStepComplete;
+    private int _stepInstructionCount;
+    private Word _stepStartAddress;
     private bool _invalidateScreen;
     private bool _isAcceleratedTapeSpeed;
     private bool _isNmiRequested;
@@ -46,6 +51,13 @@ public sealed class Emulator
 
     public delegate void FrameEvent(FrameBuffer frameBuffer, AudioBuffer audioBuffer);
     public event FrameEvent? FrameCompleted;
+
+    /// <summary>
+    /// Raised when execution stops before the end of a frame, at a breakpoint or after a step.
+    /// The frame is not complete, so <see cref="FrameCompleted"/> is not raised, but the screen
+    /// is already drawn up to the current position of the beam.
+    /// </summary>
+    public event Action? ExecutionStopped;
 
     public bool IsPaused => _emulationTimer.IsPaused;
 
@@ -182,10 +194,9 @@ public sealed class Emulator
         _timeMachine.AddEntry(this);
     }
 
-    public void Resume(bool isDebuggerResume = false)
+    public void Resume()
     {
         IsDebuggerBreak = false;
-        _isDebuggerResume = isDebuggerResume;
 
         _emulationTimer.Resume();
     }
@@ -193,6 +204,7 @@ public sealed class Emulator
     public void Reset()
     {
         IsDebuggerBreak = false;
+        _isFrameInProgress = false;
         _ticksSinceReset = 0;
 
         RzxController = null;
@@ -213,6 +225,66 @@ public sealed class Emulator
         Cpu.Break();
 
         IsDebuggerBreak = true;
+    }
+
+    /// <summary>
+    /// Clears the debugger break without resuming the timer, so frames driven by the caller continue
+    /// from where the breakpoint stopped the CPU.
+    /// </summary>
+    internal void ClearBreak() => IsDebuggerBreak = false;
+
+    /// <summary>
+    /// Executes a single instruction. Must be called while the emulator is paused.
+    /// The instruction runs through the normal frame loop, so interrupts, ROM traps, the screen and audio
+    /// behave as they do when running. When an interrupt is accepted, the step stops at the start of the
+    /// interrupt routine. When the CPU is halted, the step runs to the end of the frame.
+    /// </summary>
+    public void Step()
+    {
+        lock (_frameLock)
+        {
+            IsDebuggerBreak = false;
+
+            _isStepping = true;
+            _isStepComplete = false;
+            _stepInstructionCount = 0;
+            _stepStartAddress = Cpu.Registers.PC;
+
+            // With ROM traps the handler is always subscribed
+            if (!_hasRomTraps)
+            {
+                Cpu.BeforeInstruction += BeforeInstruction;
+            }
+
+            try
+            {
+                RunFrameCore();
+            }
+            finally
+            {
+                if (!_hasRomTraps)
+                {
+                    Cpu.BeforeInstruction -= BeforeInstruction;
+                }
+
+                _isStepping = false;
+                _isStepComplete = false;
+            }
+        }
+    }
+
+    private bool IsStepComplete(Word pc)
+    {
+        // The first instruction is the one being stepped, unless an interrupt was accepted before it
+        if (_stepInstructionCount++ == 0 && pc == _stepStartAddress)
+        {
+            return false;
+        }
+
+        _isStepComplete = true;
+        Cpu.Break();
+
+        return true;
     }
 
     public void RequestNmi() => _isNmiRequested = true;
@@ -259,7 +331,10 @@ public sealed class Emulator
         Beta128.DiskActivity += _ => DiskDriveManager.OnDiskActivity();
 
         // ROM traps rely on the original tape routines, so they are only enabled for ROMs that contain them
-        if (DetectRomTrapSupport())
+        // Subscribed first, so the step check runs before breakpoint handlers added later
+        _hasRomTraps = DetectRomTrapSupport();
+
+        if (_hasRomTraps)
         {
             Cpu.BeforeInstruction += BeforeInstruction;
         }
@@ -313,8 +388,27 @@ public sealed class Emulator
 
         if (RzxController == null || RzxController.IsPlaybackActive)
         {
-            Cpu.Run();
+            // Run returns early when a breakpoint or a step stops the CPU. It can also return straight away
+            // when a break was requested during the last instruction of the previous frame, so keep running.
+            do
+            {
+                Cpu.Run();
+            }
+            while (!Cpu.Clock.IsFrameComplete && !IsDebuggerBreak && !_isStepComplete);
+
+            if (!Cpu.Clock.IsFrameComplete)
+            {
+                // The rest of the frame runs when execution continues, without starting a new frame.
+                // The screen is drawn up to the beam as ticks are added, the border only when its colour changes.
+                _isFrameInProgress = true;
+                ScreenBuffer.RefreshBorder(Clock.UlaTicks);
+                ExecutionStopped?.Invoke();
+
+                return;
+            }
         }
+
+        _isFrameInProgress = false;
 
         EndFrame();
 
@@ -329,10 +423,8 @@ public sealed class Emulator
 
     private void StartFrame()
     {
-        if (_isDebuggerResume)
+        if (_isFrameInProgress)
         {
-            _isDebuggerResume = false;
-
             return;
         }
 
@@ -400,6 +492,20 @@ public sealed class Emulator
     }
 
     private void BeforeInstruction(Word pc)
+    {
+        // A completed step stops before the next instruction, so its ROM trap runs only when execution continues
+        if (_isStepping && IsStepComplete(pc))
+        {
+            return;
+        }
+
+        if (_hasRomTraps)
+        {
+            HandleRomTraps(pc);
+        }
+    }
+
+    private void HandleRomTraps(Word pc)
     {
         // ROM traps only apply to the Spectrum ROM with the original tape routines,
         // not to a shadow ROM or another ROM bank paged in at the same address
