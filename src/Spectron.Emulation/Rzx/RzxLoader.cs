@@ -19,7 +19,7 @@ internal sealed class RzxLoader(SnapshotManager snapshotManager)
 
         var snapshot = rzxFile.Snapshots[0];
 
-        using var memoryStream = new MemoryStream(snapshot.Data ?? []);
+        using var memoryStream = new MemoryStream(snapshot.Data);
 
         Emulator emulator;
 
@@ -48,7 +48,7 @@ internal sealed class RzxLoader(SnapshotManager snapshotManager)
     {
         var snapshot = rzxFile.Snapshots[currentSnapshot];
 
-        using var memoryStream = new MemoryStream(snapshot.Data ?? []);
+        using var memoryStream = new MemoryStream(snapshot.Data);
 
         switch (snapshot.Extension.ToLowerInvariant())
         {
