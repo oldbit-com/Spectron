@@ -7,6 +7,12 @@ public class StateSnapshotStore : IStateSnapshotStore
     public void Save(string filePath, StateSnapshot snapshot)
     {
         using var stream = File.Create(filePath);
+
+        Save(stream, snapshot);
+    }
+
+    public void Save(Stream stream, StateSnapshot snapshot)
+    {
         var data = MemoryPackSerializer.Serialize(snapshot);
 
         stream.Write(data);

@@ -18,7 +18,27 @@ public sealed class Z80Snapshot(EmulatorFactory emulatorFactory, IZ80SnapshotSto
         return CreateEmulator(snapshot);
     }
 
+    internal void Save(Stream stream, Emulator emulator)
+    {
+        var snapshot = CreateSnapshot(emulator);
+
+        if (snapshot != null)
+        {
+            snapshotStore.Save(stream, snapshot);
+        }
+    }
+
     internal void Save(string fileName, Emulator emulator)
+    {
+        var snapshot = CreateSnapshot(emulator);
+
+        if (snapshot != null)
+        {
+            snapshotStore.Save(fileName, snapshot);
+        }
+    }
+
+    private static Z80File? CreateSnapshot(Emulator emulator)
     {
         var header = new Z80Header
         {
@@ -90,10 +110,7 @@ public sealed class Z80Snapshot(EmulatorFactory emulatorFactory, IZ80SnapshotSto
                 break;
         }
 
-        if (snapshot != null)
-        {
-            snapshotStore.Save(fileName, snapshot);
-        }
+        return snapshot;
     }
 
     internal static void Update(Emulator emulator, Z80File snapshot, bool updateBorder = true)

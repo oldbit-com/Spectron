@@ -22,6 +22,32 @@ public sealed class SnapshotManager(
         _ => throw new NotSupportedException($"The file type '{fileType}' is not supported.")
     };
 
+    public void Save(Stream stream, FileType fileType, Emulator emulator)
+    {
+        switch (fileType)
+        {
+            case FileType.Sna:
+                snaSnapshot.Save(stream, emulator);
+                break;
+
+            case FileType.Szx:
+                szxSnapshot.Save(stream, emulator);
+                break;
+
+            case FileType.Z80:
+                z80Snapshot.Save(stream, emulator);
+                break;
+
+            case FileType.Spectron:
+                var stateSnapshot = StateSnapshotManager.CreateSnapshot(emulator);
+                stateSnapshotStore.Save(stream, stateSnapshot);
+                break;
+
+            default:
+                throw new NotSupportedException($"The file type '{fileType}' is not supported.");
+        }
+    }
+
     public void Save(string filePath, Emulator emulator)
     {
         var fileType = FileTypeResolver.FromPath(filePath);

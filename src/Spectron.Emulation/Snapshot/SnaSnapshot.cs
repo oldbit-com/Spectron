@@ -1,6 +1,5 @@
 using OldBit.Spectron.Emulation.Devices.Memory;
 using OldBit.Spectron.Emulation.Rom;
-using OldBit.Spectron.Emulation.Screen;
 using OldBit.Spectron.Emulation.Snapshot.Stores;
 using OldBit.Z80Cpu;
 using OldBit.Spectron.Files.Sna;
@@ -16,7 +15,21 @@ public sealed class SnaSnapshot(EmulatorFactory emulatorFactory, ISnaSnapshotSto
         return CreateEmulator(snapshot);
     }
 
+    internal void Save(Stream stream, Emulator emulator)
+    {
+        var snapshot = CreateSnapshot(emulator);
+
+        snapshotStore.Save(stream, snapshot);
+    }
+
     internal void Save(string fileName, Emulator emulator)
+    {
+        var snapshot = CreateSnapshot(emulator);
+
+        snapshotStore.Save(fileName, snapshot);
+    }
+
+    private static SnaFile CreateSnapshot(Emulator emulator)
     {
         var snapshot = new SnaFile
         {
@@ -75,7 +88,7 @@ public sealed class SnaSnapshot(EmulatorFactory emulatorFactory, ISnaSnapshotSto
             snapshot.Header.SP -= 2;
         }
 
-        snapshotStore.Save(fileName, snapshot);
+        return snapshot;
     }
 
     internal static void Update(Emulator emulator, SnaFile snapshot, bool updateBorder = true)
