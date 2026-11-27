@@ -11,17 +11,17 @@ public class CreatorBlock
     /// <summary>
     /// Creator's identification string.
     /// </summary>≠≠
-    public string CreatorName { get; private set; } = string.Empty;
+    public string CreatorName { get; set; } = string.Empty;
 
     /// <summary>
     /// Creator's major version number.
     /// </summary>
-    public Word MajorVersion { get; private set; }
+    public Word MajorVersion { get; set; }
 
     /// <summary>
     /// Creator's minor version number.
     /// </summary>
-    public Word MinorVersion { get; private set; }
+    public Word MinorVersion { get; set; }
 
     /// <summary>
     /// Creator's custom data (may be absent).

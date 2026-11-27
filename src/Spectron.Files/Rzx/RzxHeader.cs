@@ -25,6 +25,7 @@ public sealed class RzxHeader
 
     /// <summary>
     /// Flags.
+    /// b0: if set, all data following the main header and up to the Security Signature Block is signed.
     /// </summary>
     public DWord Flags { get; private set; }
 

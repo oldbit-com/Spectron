@@ -71,6 +71,13 @@ public class RecordingBlock
         {
             var frame = RecordingFrame.Read(reader);
 
+            // Skip bad frames, some emulators generate then. Otherwise, this will
+            // "hang" the execution (0 means no limit in terms of CPU instruction per frame).
+            if (frame.FetchCounter == 0)
+            {
+                continue;
+            }
+
             if (frame.InCounter == 65535)
             {
                 // Repeated frame, copy "in" values from the previous frame

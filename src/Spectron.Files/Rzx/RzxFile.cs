@@ -16,12 +16,12 @@ public sealed class RzxFile
     /// <summary>
     /// Gets the program that created this RZX file.
     /// </summary>
-    public CreatorBlock? Creator { get; private set; }
+    public CreatorBlock? Creator { get; set; }
 
     /// <summary>
     /// Gets a list of snapshots contained in the RZX file.
     /// </summary>
-    public List<SnapshotBlock> Snapshots { get; private set; } = [];
+    public List<SnapshotBlock> Snapshots { get; } = [];
 
     /// <summary>
     /// Loads a RZX file from the given stream.
