@@ -146,6 +146,43 @@ partial class MainViewModel
         });
     }
 
+    private async Task HandleStartRzxRecording()
+    {
+        var shouldResume = !IsPaused;
+
+        try
+        {
+            Pause();
+
+            var file = await _fileDialogs.SaveRzxFileAsync();
+
+            if (file != null && Emulator != null)
+            {
+                RzxRecordingStatus = RecordingStatus.Recording;
+            }
+        }
+        catch (Exception ex)
+        {
+            await _messageDialogs.Error(ex.Message);
+        }
+        finally
+        {
+            if (shouldResume)
+            {
+                Resume();
+            }
+        }
+
+    }
+
+    private void HandleStopRzxRecording()
+    {
+        RzxRecordingStatus = RecordingStatus.None;
+    }
+
     partial void OnRecordingStatusChanged(RecordingStatus value) =>
-        StatusBarViewModel.RecordingStatus = RecordingStatus;
+        StatusBarViewModel.RecordingStatus = value;
+
+    partial void OnRzxRecordingStatusChanged(RecordingStatus value) =>
+        StatusBarViewModel.RzxRecordingStatus = value;
 }

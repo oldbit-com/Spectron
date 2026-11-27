@@ -84,6 +84,16 @@
                     Text="{Binding TimeElapsed}"
                     VerticalAlignment="Center"/>
             </StackPanel>
+
+            <StackPanel
+                Orientation="Horizontal"
+                IsVisible="{Binding !!RzxRecordingStatus}">
+
+                <material:MaterialIcon
+                    Classes="AnimateRecord"
+                    Foreground="Red"
+                    Kind="Record"/>
+            </StackPanel>
         </StackPanel>
 
         <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">

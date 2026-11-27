@@ -16,6 +16,9 @@ public partial class StatusBarViewModel : ObservableObject
     public partial RecordingStatus RecordingStatus { get; set; } = RecordingStatus.None;
 
     [ObservableProperty]
+    public partial RecordingStatus RzxRecordingStatus { get; set; } = RecordingStatus.None;
+
+    [ObservableProperty]
     public partial string FramesPerSecond { get; set; } = "0";
 
     [ObservableProperty]

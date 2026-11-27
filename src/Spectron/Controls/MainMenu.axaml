@@ -143,6 +143,9 @@
             <MenuItem Header="Record Audio and Video..." Command="{Binding StartVideoRecordingCommand}"/>
             <MenuItem Header="Stop Recording" Command="{Binding StopRecordingCommand}"/>
             <MenuItem Header="-"/>
+            <MenuItem Header="Record RZX..." Command="{Binding StartRzxRecordingCommand}"/>
+            <MenuItem Header="Stop RZX Recording" Command="{Binding StopRzxRecordingCommand}"/>
+            <MenuItem Header="-"/>
             <MenuItem Header="Take Screenshot" Command="{Binding TakeScreenshotCommand}" InputGesture="{OnPlatform Ctrl+C, macOS=Cmd+C}"/>
             <MenuItem Header="View Screenshots" Command="{Binding ShowScreenshotViewerCommand}" InputGesture="{OnPlatform Ctrl+Shift+S, macOS=Cmd+Shift+S}"/>
         </MenuItem>

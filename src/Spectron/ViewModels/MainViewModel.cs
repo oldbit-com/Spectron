@@ -182,6 +182,17 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public bool CanStopRecording => RecordingStatus != RecordingStatus.None;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanStartRzxRecording))]
+    [NotifyPropertyChangedFor(nameof(CanStopRzxRecording))]
+    [NotifyCanExecuteChangedFor(nameof(StartRzxRecordingCommand))]
+    [NotifyCanExecuteChangedFor(nameof(StopRzxRecordingCommand))]
+    public partial RecordingStatus RzxRecordingStatus { get; set; } = RecordingStatus.None;
+
+    public bool CanStartRzxRecording => RzxRecordingStatus == RecordingStatus.None;
+
+    public bool CanStopRzxRecording => RzxRecordingStatus != RecordingStatus.None;
+
+    [ObservableProperty]
     public partial int TimeMachineCountdownSeconds { get; set; }
 
     [ObservableProperty]
@@ -288,6 +299,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     [RelayCommand(CanExecute = nameof(CanStopRecording))]
     private void StopRecording() => HandleStopRecording();
+
+    [RelayCommand(CanExecute = nameof(CanStartRzxRecording))]
+    private async Task StartRzxRecording() => await HandleStartRzxRecording();
+
+    [RelayCommand(CanExecute = nameof(CanStopRzxRecording))]
+    private void StopRzxRecording() => HandleStopRzxRecording();
 
     [RelayCommand]
     private void ShowScreenshotViewer() => OpenScreenshotViewer();

@@ -478,6 +478,18 @@ public sealed class NativeMainMenu
 
             new NativeMenuItemSeparator(),
 
+            new NativeMenuItem("Record RZX...")
+            {
+                Command = _viewModel.StartRzxRecordingCommand
+            },
+
+            new NativeMenuItem("Stop RZX Recording")
+            {
+                Command = _viewModel.StopRzxRecordingCommand,
+            },
+
+            new NativeMenuItemSeparator(),
+
             new NativeMenuItem("Take Screenshot")
             {
                 Command = _viewModel.TakeScreenshotCommand,

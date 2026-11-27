@@ -164,6 +164,20 @@ public sealed class FileDialogs(IFileDialogProvider fileDialogProvider)
         return await fileDialogProvider.SaveFilePickerAsync(options);
     }
 
+    public async Task<IStorageFile?> SaveRzxFileAsync(string? suggestedFileName = null)
+    {
+        var options = new FilePickerSaveOptions
+        {
+            Title = "Save RZX File",
+            DefaultExtension = ".rzx",
+            SuggestedFileName = suggestedFileName,
+            ShowOverwritePrompt = true,
+            FileTypeChoices = [FilePickerType.Rzx],
+        };
+
+        return await fileDialogProvider.SaveFilePickerAsync(options);
+    }
+
     private async Task<IReadOnlyList<IStorageFile>> OpenFileAsync(string title, IReadOnlyList<FilePickerFileType> fileTypes)
     {
         var options = new FilePickerOpenOptions
