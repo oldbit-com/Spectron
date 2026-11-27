@@ -4,7 +4,7 @@ using OldBit.Spectron.Files.Rzx.Blocks;
 
 namespace OldBit.Spectron.Emulation.Rzx;
 
-public sealed class RzxController
+public sealed class RzxPlayer
 {
     private readonly RzxFile _rzxFile;
 
@@ -30,16 +30,21 @@ public sealed class RzxController
     public event EventHandler? PlaybackCompleted;
     public event EventHandler<RzxProgressChangedEventArgs>? PlaybackProgressChanged;
 
-    public RzxController(SnapshotManager snapshotManager, Stream stream)
+    public RzxPlayer(SnapshotManager snapshotManager, Stream stream) :
+        this(snapshotManager, RzxFile.Load(stream))
+    {
+    }
+
+    internal RzxPlayer(SnapshotManager snapshotManager, RzxFile rzxFile)
     {
         var rzxLoader = new RzxLoader(snapshotManager);
-        _rzxFile = RzxFile.Load(stream);
+        _rzxFile = rzxFile;
 
         Emulator = rzxLoader.CreateEmulator(_rzxFile);
         Emulator.Bus.AddDevice(new RzxDevice(ReadPort));
-        Emulator.RzxController = this;
+        Emulator.RzxPlayer = this;
 
-        // Automaitc interrupts are disabled during the playback
+        // Automatic interrupts are disabled during the playback
         Emulator.Cpu.Clock.InterruptDuration = 0;
 
         _currentSnapshotIndex = 0;
@@ -49,6 +54,7 @@ public sealed class RzxController
     internal void NextFrame()
     {
         // Trigger INT before the next frame, these are not triggered automatically
+        // in RZX playback mode.
         Emulator.Cpu.TriggerInt(0xFF);
 
         _inReadCounter = 0;
@@ -102,7 +108,7 @@ public sealed class RzxController
 
         var inValues = CurrentFrame.InValues;
 
-        if (inValues.Length > _inReadCounter)
+        if (inValues.Count > _inReadCounter)
         {
             inValue = inValues[_inReadCounter];
         }
