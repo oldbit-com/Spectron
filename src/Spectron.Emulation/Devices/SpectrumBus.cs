@@ -6,6 +6,8 @@ public sealed class SpectrumBus : IBus
 {
     private readonly List<IDevice> _devices = [];
 
+    internal Action<byte>? PortRead { get; set; }
+
     internal void AddDevice(IDevice device)
     {
         var lastIndex = _devices.FindLastIndex(x => x.Priority <= device.Priority);
@@ -23,6 +25,15 @@ public sealed class SpectrumBus : IBus
     }
 
     public byte Read(Word address)
+    {
+        var value = ReadDevices(address);
+
+        PortRead?.Invoke(value);
+
+        return value;
+    }
+
+    private byte ReadDevices(Word address)
     {
         foreach (var device in _devices)
         {
