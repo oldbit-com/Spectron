@@ -54,6 +54,13 @@ public sealed class SzxSnapshot(EmulatorFactory emulatorFactory, ISzxSnapshotSto
         snapshotStore.Save(fileName, snapshot);
     }
 
+    internal void Save(Stream stream, Emulator emulator)
+    {
+        var snapshot = CreateSnapshot(emulator);
+
+        snapshotStore.Save(stream, snapshot);
+    }
+
     internal static void Update(Emulator emulator, SzxFile snapshot, bool updateBorder = true)
     {
         LoadRegisters(emulator.Cpu, snapshot.Z80Registers);
