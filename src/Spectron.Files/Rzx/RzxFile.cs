@@ -11,7 +11,7 @@ public sealed class RzxFile
     /// <summary>
     /// Gets the RZX file header.
     /// </summary>
-    public RzxHeader Header { get; private set; } = new();
+    public RzxHeader Header { get; init; } = new();
 
     /// <summary>
     /// Gets the program that created this RZX file.
@@ -65,5 +65,20 @@ public sealed class RzxFile
         }
 
         return file;
+    }
+
+    /// <summary>
+    /// Saves this RZX file to the specified stream.
+    /// </summary>
+    /// <param name="stream">The stream to which the RZX data is written.</param>
+    public void Save(Stream stream)
+    {
+        Header.Write(stream);
+        Creator?.Write(stream);
+
+        foreach (var snapshot in Snapshots)
+        {
+            snapshot.Write(stream);
+        }
     }
 }

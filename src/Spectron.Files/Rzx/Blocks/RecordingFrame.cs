@@ -1,3 +1,4 @@
+using OldBit.Spectron.Files.Extensions;
 using OldBit.Spectron.Files.IO;
 
 namespace OldBit.Spectron.Files.Rzx.Blocks;
@@ -5,8 +6,10 @@ namespace OldBit.Spectron.Files.Rzx.Blocks;
 /// <summary>
 /// Layout of the input log for the frame.
 /// </summary>
-public class RecordingFrame
+public sealed class RecordingFrame
 {
+    private const Word RepeatedFrameMarker = 65535;
+
     /// <summary>
     /// Fetch counter till next interrupt (i.e. number of R increments, INTA excluded)
     /// </summary>
@@ -31,11 +34,31 @@ public class RecordingFrame
             InCounter = reader.ReadWord()
         };
 
-        if (block.InCounter != 65535)
+        if (block.InCounter != RepeatedFrameMarker)
         {
             block.InValues.AddRange(reader.ReadBytes(block.InCounter));
         }
 
         return block;
+    }
+
+    internal void Write(Stream stream, bool isRepeatedFrame)
+    {
+        if (FetchCounter == 0)
+        {
+            return;
+        }
+
+        stream.WriteWord(FetchCounter);
+
+        if (isRepeatedFrame)
+        {
+            stream.WriteWord(RepeatedFrameMarker);
+        }
+        else
+        {
+            stream.WriteWord(InValues.Count);
+            stream.WriteBytes(InValues);
+        }
     }
 }

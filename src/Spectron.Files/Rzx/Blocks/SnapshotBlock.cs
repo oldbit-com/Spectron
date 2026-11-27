@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using OldBit.Spectron.Files.Extensions;
 using OldBit.Spectron.Files.IO;
 using OldBit.Spectron.Files.Szx;
@@ -7,14 +8,17 @@ namespace OldBit.Spectron.Files.Rzx.Blocks;
 /// <summary>
 /// Snapshot block.
 /// </summary>
-public class SnapshotBlock
+public sealed class SnapshotBlock
 {
+    private const byte ExternalFileFlag = 0x01;
+    private const byte CompressedFlag = 0x02;
+
     /// <summary>
     /// Flags.
     /// b0: External Data (this block contains a snapshot descriptor structure instead of the snapshot image).
     /// b1: Compressed data.
     /// </summary>
-    public DWord Flags { get; private init; }
+    private DWord Flags { get; init; }
 
     /// <summary>
     /// Snapshot filename extension ("SNA", "Z80", etc).
@@ -22,9 +26,9 @@ public class SnapshotBlock
     public string Extension { get; private set; } = string.Empty;
 
     /// <summary>
-    /// Uncompressed snapshot length (same as SL is the snapshot is not compressed
+    /// Uncompressed snapshot length (same as SL is the snapshot is not compressed).
     /// </summary>
-    public DWord UncompressedSize { get; private set; }
+    private DWord UncompressedSize { get; set; }
 
     /// <summary>
     /// Input recording block.
@@ -34,20 +38,31 @@ public class SnapshotBlock
     /// <summary>
     /// Snapshot data.
     /// </summary>
-    public byte[]? Data { get; private set; }
+    public byte[] Data { get; private set; } = [];
+
+    private bool IsCompressed => (Flags & CompressedFlag) != 0;
+    private bool IsExternalFile => (Flags & ExternalFileFlag) != 0;
+
+    private SnapshotBlock()
+    {
+    }
 
     /// <summary>
-    /// Creates a snapshot block. Like a block read from a file, the data is held uncompressed,
-    /// compression is applied only when the block is written.
+    /// Initializes a new instance of the <see cref="SnapshotBlock"/> class using the specified snapshot file extension and snapshot data.
     /// </summary>
-    /// <param name="extension">Snapshot file extension, e.g. "szx".</param>
-    /// <param name="data">Uncompressed snapshot data.</param>
-    public static SnapshotBlock Create(string extension, byte[] data) => new()
+    /// <param name="extension">
+    /// The snapshot format extension, such as the file type identifier stored with the snapshot block.
+    /// </param>
+    /// <param name="data">
+    /// The snapshot payload bytes to store in the block.
+    /// </param>
+    public SnapshotBlock(string extension, byte[] data)
     {
-        Extension = extension,
-        UncompressedSize = (DWord)data.Length,
-        Data = data
-    };
+        Extension = extension;
+        UncompressedSize = (DWord)data.Length;
+        Flags = CompressedFlag;
+        Data = data;
+    }
 
     internal static SnapshotBlock Read(ByteStreamReader reader, DWord blockLength)
     {
@@ -56,20 +71,32 @@ public class SnapshotBlock
             Flags = reader.ReadDWord()
         };
 
-        if ((block.Flags & 0x01) == 0x01)
+        if (block.IsExternalFile)
         {
-            throw new NotSupportedException("Only compressed snapshots are supported.");
+            throw new NotSupportedException("External data files are not supported.");
         }
-
-        var isCompressed = (block.Flags & 0x02) == 0x02;
 
         var bytes = reader.ReadBytes(4);
         block.Extension = bytes.ToAsciiString().Trim();
         block.UncompressedSize = reader.ReadDWord();
 
         var data = reader.ReadBytes((int)(blockLength - 17));
-        block.Data = isCompressed ? ZLibHelper.Decompress(data) : data;
+        block.Data = block.IsCompressed ? ZLibHelper.Decompress(data) : data;
 
         return block;
+    }
+
+    internal void Write(Stream stream)
+    {
+        var data = IsCompressed ? ZLibHelper.Compress(Data, CompressionLevel.Fastest) : Data;
+
+        stream.WriteByte(BlockIds.Snapshot);
+        stream.WriteDWord(17 + data.Length);
+        stream.WriteDWord(Flags);
+        stream.WriteChars(Extension, 4);
+        stream.WriteDWord(Data.Length);
+        stream.WriteBytes(data);
+
+        Recording.Write(stream);
     }
 }

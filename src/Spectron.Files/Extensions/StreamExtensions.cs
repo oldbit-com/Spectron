@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace OldBit.Spectron.Files.Extensions;
@@ -22,7 +23,11 @@ internal static class StreamExtensions
             stream.WriteByte((byte)(value >> 24));
         }
 
-        internal void WriteBytes(byte[] value) => stream.Write(value, 0, value.Length);
+        internal void WriteBytes(byte[] value) =>
+            stream.Write(value, 0, value.Length);
+
+        internal void WriteBytes(List<byte> value) =>
+            stream.Write(CollectionsMarshal.AsSpan(value));
 
         internal void WriteChars(string value, int length)
         {

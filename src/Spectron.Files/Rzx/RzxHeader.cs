@@ -41,4 +41,12 @@ public sealed class RzxHeader
 
         return header;
     }
+
+    internal void Write(Stream writer)
+    {
+        writer.WriteChars(Signature, 4);
+        writer.WriteByte(MajorVersion);
+        writer.WriteByte(MinorVersion);
+        writer.WriteDWord(Flags);
+    }
 }

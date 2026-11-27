@@ -11,7 +11,7 @@ internal sealed class BlockHeader(DWord blockId, int size)
     internal void Write(Stream writer)
     {
         writer.WriteDWord(BlockId);
-        writer.WriteDWord((DWord)Size);
+        writer.WriteDWord(Size);
     }
 
     internal static BlockHeader? Read(ByteStreamReader reader)
