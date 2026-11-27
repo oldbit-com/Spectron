@@ -13,17 +13,14 @@ public sealed class SnapshotManager(
     IStateSnapshotStore stateSnapshotStore,
     StateSnapshotManager stateSnapshotManager)
 {
-    public Emulator Load(Stream stream, FileType fileType)
+    public Emulator Load(Stream stream, FileType fileType) => fileType switch
     {
-        return fileType switch
-        {
-            FileType.Sna => snaSnapshot.Load(stream),
-            FileType.Szx => szxSnapshot.Load(stream),
-            FileType.Z80 => z80Snapshot.Load(stream),
-            FileType.Spectron => stateSnapshotManager.CreateEmulator(stateSnapshotStore.Load(stream)!),
-            _ => throw new NotSupportedException($"The file type '{fileType}' is not supported.")
-        };
-    }
+        FileType.Sna => snaSnapshot.Load(stream),
+        FileType.Szx => szxSnapshot.Load(stream),
+        FileType.Z80 => z80Snapshot.Load(stream),
+        FileType.Spectron => stateSnapshotManager.CreateEmulator(stateSnapshotStore.Load(stream)!),
+        _ => throw new NotSupportedException($"The file type '{fileType}' is not supported.")
+    };
 
     public void Save(string filePath, Emulator emulator)
     {
