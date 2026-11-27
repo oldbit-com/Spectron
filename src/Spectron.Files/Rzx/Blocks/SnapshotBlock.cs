@@ -11,6 +11,8 @@ public class SnapshotBlock
 {
     /// <summary>
     /// Flags.
+    /// b0: External Data (this block contains a snapshot descriptor structure instead of the snapshot image).
+    /// b1: Compressed data.
     /// </summary>
     public DWord Flags { get; private init; }
 
@@ -32,7 +34,20 @@ public class SnapshotBlock
     /// <summary>
     /// Snapshot data.
     /// </summary>
-    public byte[]? Data { get; set; }
+    public byte[]? Data { get; private set; }
+
+    /// <summary>
+    /// Creates a snapshot block. Like a block read from a file, the data is held uncompressed,
+    /// compression is applied only when the block is written.
+    /// </summary>
+    /// <param name="extension">Snapshot file extension, e.g. "szx".</param>
+    /// <param name="data">Uncompressed snapshot data.</param>
+    public static SnapshotBlock Create(string extension, byte[] data) => new()
+    {
+        Extension = extension,
+        UncompressedSize = (DWord)data.Length,
+        Data = data
+    };
 
     internal static SnapshotBlock Read(ByteStreamReader reader, DWord blockLength)
     {
