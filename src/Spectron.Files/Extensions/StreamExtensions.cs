@@ -12,6 +12,8 @@ internal static class StreamExtensions
             stream.WriteByte((byte)(value >> 8));
         }
 
+        internal void WriteDWord(int value) => stream.WriteDWord((DWord)value);
+
         internal void WriteDWord(DWord value)
         {
             stream.WriteByte((byte)value);
