@@ -139,8 +139,8 @@
         </MenuItem>
 
         <MenuItem Header="_Tools" Padding="10 0 10 0" Focusable="False">
-            <MenuItem Header="Record Audio..." Command="{Binding StartAudioRecordingCommand}"/>
-            <MenuItem Header="Record Video..." Command="{Binding StartVideoRecordingCommand}"/>
+            <MenuItem Header="Record Audio Only..." Command="{Binding StartAudioRecordingCommand}"/>
+            <MenuItem Header="Record Audio and Video..." Command="{Binding StartVideoRecordingCommand}"/>
             <MenuItem Header="Stop Recording" Command="{Binding StopRecordingCommand}"/>
             <MenuItem Header="-"/>
             <MenuItem Header="Take Screenshot" Command="{Binding TakeScreenshotCommand}" InputGesture="{OnPlatform Ctrl+C, macOS=Cmd+C}"/>

@@ -461,12 +461,12 @@ public sealed class NativeMainMenu
 
         var toolsSubMenu = new NativeMenu
         {
-            new NativeMenuItem("Record Audio...")
+            new NativeMenuItem("Record Audio Only...")
             {
                 Command = _viewModel.StartAudioRecordingCommand
             },
 
-            new NativeMenuItem("Record Video...")
+            new NativeMenuItem("Record Audio and Video...")
             {
                 Command = _viewModel.StartVideoRecordingCommand,
             },
