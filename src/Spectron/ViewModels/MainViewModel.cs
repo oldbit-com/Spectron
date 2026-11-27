@@ -85,7 +85,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private PokeFile? _pokeFile;
     private MouseInputHandler? _mouseInputHandler;
     private BreakpointHandler? _breakpointHandler;
-    private RzxController? _rzxController;
+    private RzxPlayer? _rzxPlayer;
 
     public Image ScreenControl { get; set; } = null!;
     public Window? MainWindow { get; set; }

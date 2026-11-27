@@ -98,11 +98,11 @@ partial class MainViewModel
         }
         else if (fileType == FileType.Rzx)
         {
-            _rzxController = new RzxController(_snapshotManager, stream);
-            _rzxController.PlaybackProgressChanged += (_, e) => StatusBarViewModel.RzxPlayProgress = $"{e.Progress:P2}";
-            _rzxController.PlaybackCompleted += (_, _) => StatusBarViewModel.RzxPlayProgress = "Completed";
+            _rzxPlayer = new RzxPlayer(_snapshotManager, stream);
+            _rzxPlayer.PlaybackProgressChanged += (_, e) => StatusBarViewModel.RzxPlayProgress = $"{e.Progress:P2}";
+            _rzxPlayer.PlaybackCompleted += (_, _) => StatusBarViewModel.RzxPlayProgress = "Completed";
 
-            emulator = _rzxController.Emulator;
+            emulator = _rzxPlayer.Emulator;
             emulator.ConfigureAudio(_preferences.Audio);
         }
 
@@ -216,7 +216,7 @@ partial class MainViewModel
     {
         _pokeFile = null;
 
-        if (hardReset || _rzxController != null)
+        if (hardReset || _rzxPlayer != null)
         {
             CreateEmulator(_preferences.ComputerType, _preferences.RomType, ClockMultiplier, hardReset: true);
         }
@@ -228,7 +228,7 @@ partial class MainViewModel
             ConfigureDebugging(Emulator);
         }
 
-        _rzxController = null;
+        _rzxPlayer = null;
         RecentFilesViewModel.CurrentFileName = string.Empty;
         UpdateWindowTitle();
     }
@@ -330,7 +330,7 @@ partial class MainViewModel
         IsInterface1Enabled = Emulator.Interface1.IsEnabled;
         NumberOfMicrodrives = _preferences.Interface1.NumberOfDrives;
 
-        StatusBarViewModel.IsRzxPlaying = _rzxController != null;
+        StatusBarViewModel.IsRzxPlaying = _rzxPlayer != null;
         StatusBarViewModel.IsMcpServerEnabled =_preferences.McpServer.IsEnabled;
     }
 
