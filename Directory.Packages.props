@@ -33,7 +33,7 @@
     <PackageVersion Include="NSubstitute" Version="6.2.0" />
     <PackageVersion Include="OldBit.Beep" Version="1.0.3" />
     <PackageVersion Include="OldBit.Joypad" Version="0.0.2-rc.3" />
-    <PackageVersion Include="OldBit.Z80Cpu.Spectron" Version="1.0.10" />
+    <PackageVersion Include="OldBit.Z80Cpu.Spectron" Version="1.0.12" />
     <PackageVersion Include="Shouldly" Version="4.3.0" />
     <PackageVersion Include="System.CommandLine" Version="3.0.0" />
     <PackageVersion Include="System.Reactive" Version="7.0.0" />
