@@ -99,8 +99,8 @@ public sealed class RecordingBlock
 
     private static void ReadFrames(RecordingBlock block, byte[] data)
     {
-        var memoryStream = new MemoryStream(data);
-        var reader = new ByteStreamReader(memoryStream);
+        using var stream = new MemoryStream(data);
+        var reader = new ByteStreamReader(stream);
 
         for (var i = 0; i < block.FrameCount; i++)
         {
