@@ -1,10 +1,12 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
 using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
-using OldBit.Spectron.Dialogs;
 using OldBit.Spectron.Emulation.Devices.Audio;
+using OldBit.Spectron.Emulation.Rzx;
+using OldBit.Spectron.Emulation.Tape;
 using OldBit.Spectron.Models;
 using OldBit.Spectron.Recorder;
 using OldBit.Spectron.Screen;
@@ -159,6 +161,11 @@ partial class MainViewModel
             if (file != null && Emulator != null)
             {
                 RzxRecordingStatus = RecordingStatus.Recording;
+                TapeLoadSpeed = TapeSpeed.Normal;
+                ClockMultiplier = 1;
+
+                var recorder = new RzxRecorder(Emulator, _snapshotManager, file.Path.LocalPath);
+                recorder.Start();
             }
         }
         catch (Exception ex)
@@ -172,12 +179,22 @@ partial class MainViewModel
                 Resume();
             }
         }
-
     }
 
     private void HandleStopRzxRecording()
     {
         RzxRecordingStatus = RecordingStatus.None;
+
+        if (Emulator?.RzxRecorder == null)
+        {
+            return;
+        }
+
+        var fileName = Emulator.RzxRecorder.FileName;
+        var rzxFile = Emulator.RzxRecorder.Stop();
+
+        using var stream = File.Create(fileName);
+        rzxFile.Save(stream);
     }
 
     partial void OnRecordingStatusChanged(RecordingStatus value) =>

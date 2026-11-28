@@ -267,10 +267,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     // Control
     [RelayCommand]
-    private void SetEmulationSpeed(int emulationSpeed) => HandleSetEmulationSpeed(emulationSpeed);
+    private void SetEmulationSpeed(int emulationSpeed) => EmulationSpeed = emulationSpeed;
 
     [RelayCommand]
-    private void SetClockMultiplier(int clockMultiplier) => HandleSetClockMultiplier(clockMultiplier);
+    private void SetClockMultiplier(int clockMultiplier) => ClockMultiplier = clockMultiplier;
 
     [RelayCommand]
     private void TogglePause() => HandleTogglePause();
@@ -340,7 +340,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     // Tape
     [RelayCommand]
-    private void SetTapeLoadSpeed(TapeSpeed tapeSpeed) => HandleSetTapeLoadingSpeed(tapeSpeed);
+    private void SetTapeLoadSpeed(TapeSpeed tapeSpeed) => TapeLoadSpeed = tapeSpeed;
 
     // Debug
     [RelayCommand]

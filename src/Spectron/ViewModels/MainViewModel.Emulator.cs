@@ -233,18 +233,16 @@ partial class MainViewModel
         UpdateWindowTitle();
     }
 
-    private void HandleSetEmulationSpeed(int emulationSpeed)
+    partial void OnEmulationSpeedChanged(int value)
     {
-        EmulationSpeed = emulationSpeed;
-        StatusBarViewModel.Speed = emulationSpeed == -1 ? "Max" : $"{emulationSpeed}%";
-        Emulator?.EmulationSpeed = emulationSpeed;
+        StatusBarViewModel.Speed = value == -1 ? "Max" : $"{value}%";
+        Emulator?.EmulationSpeed = value;
     }
 
-    private void HandleSetClockMultiplier(int clockMultiplier)
+    partial void OnClockMultiplierChanged(int value)
     {
-        ClockMultiplier = clockMultiplier;
-        StatusBarViewModel.Clock = clockMultiplier == 1 ? "" : $"{3.5 * clockMultiplier} MHz";
-        Emulator?.Clock.Multiplier = clockMultiplier;
+        StatusBarViewModel.Clock = value == 1 ? "" : $"{3.5 * value} MHz";
+        Emulator?.Clock.Multiplier = value;
     }
 
     private async Task HandleChangeRomAsync(RomType romType)
@@ -387,7 +385,7 @@ partial class MainViewModel
     }
 
     partial void OnTapeLoadSpeedChanged(TapeSpeed value) =>
-        Emulator?.TapeManager.TapeLoadSpeed = TapeLoadSpeed;
+        Emulator?.TapeManager.TapeLoadSpeed = value;
 
     partial void OnIsTimeMachineEnabledChanged(bool value) =>
         _timeMachine.IsEnabled = value;

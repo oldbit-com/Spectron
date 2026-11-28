@@ -28,6 +28,4 @@ partial class MainViewModel
     private void HandleCartridgeChanged(CartridgeChangedEventArgs e) => RefreshControls();
 
     private void HandleFloppyDiskChanged(DiskChangedEventArgs e) => RefreshControls();
-
-    private void HandleSetTapeLoadingSpeed(TapeSpeed tapeSpeed) => TapeLoadSpeed = tapeSpeed;
 }
